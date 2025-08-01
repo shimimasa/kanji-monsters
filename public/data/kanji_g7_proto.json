@@ -1,7 +1,7 @@
 [
   {
     "id": "g7-001",
-    "stageId": "",
+    "stageId": "America_area1",
     "kanji": "握",
     "grade": 7,
     "strokes": 12,
@@ -11,12 +11,19 @@
     "kunyomi": [
       "にぎ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "にぎる。手でしっかりとつかむこと。また、物事の主導権を持つこと。",
+    "exampleSentence": "彼は、困難な状況でも決して諦めず、自らの運命をしっかりと握（にぎ）りしめた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-002",
-    "stageId": "",
+    "stageId": "America_area1",
     "kanji": "扱",
     "grade": 7,
     "strokes": 6,
@@ -24,12 +31,19 @@
     "kunyomi": [
       "あつか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あつかう。物事を処理すること。人に対して接すること。",
+    "exampleSentence": "この繊細な機械は、専門的な知識を持つ人が慎重に扱（あつか）う必要がある。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-003",
-    "stageId": "",
+    "stageId": "America_area1",
     "kanji": "依",
     "grade": 7,
     "strokes": 8,
@@ -38,12 +52,19 @@
       "エ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "よる。他のものに頼ること。",
+    "exampleSentence": "この計画は、専門家の意見に依拠（いきょ）して立てられたため、信頼性が高い。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-004",
-    "stageId": "",
+    "stageId": "America_area1",
     "kanji": "威",
     "grade": 7,
     "strokes": 9,
@@ -51,12 +72,19 @@
       "イ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "い。人を恐れさせるような、りっぱな力や勢い。",
+    "exampleSentence": "ライオンは、その堂々とした姿と威厳（いげん）で、百獣の王と呼ばれている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-005",
-    "stageId": "",
+    "stageId": "America_area1",
     "kanji": "為",
     "grade": 7,
     "strokes": 9,
@@ -64,12 +92,19 @@
       "イ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ため。ある目的のために行うこと。",
+    "exampleSentence": "私たちは、未来の子供たちのために、地球環境を守る活動を為（な）すべきだ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-006",
-    "stageId": "",
+    "stageId": "America_area1",
     "kanji": "偉",
     "grade": 7,
     "strokes": 12,
@@ -79,12 +114,41 @@
     "kunyomi": [
       "えら"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "えらい。人並みはずれて、すぐれていること。",
+    "exampleSentence": "彼は、貧しい人々を救うために生涯を捧げた、偉大（いだい）な人物として歴史に名を残した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-007",
-    "stageId": "",
+    "stageId": "America_area1",
+    "kanji": "違",
+    "grade": 7,
+    "strokes": 13,
+    "onyomi": [
+      "イ"
+    ],
+    "kunyomi": [
+      "ちが"
+    ],
+    "meaning": "",
+    "exampleSentence": "",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
+    "id": "g7-008",
+    "stageId": "America_area1",
     "kanji": "維",
     "grade": 7,
     "strokes": 14,
@@ -92,12 +156,19 @@
       "イ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "い。物事を、つなぎとめること。",
+    "exampleSentence": "この橋は、最新の技術によって、強固な構造を維持（いじ）している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-008",
-    "stageId": "",
+    "id": "g7-009",
+    "stageId": "America_area1",
     "kanji": "緯",
     "grade": 7,
     "strokes": 16,
@@ -105,12 +176,19 @@
       "イ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "い。横糸。また、地球の横方向の線。",
+    "exampleSentence": "地球儀には、南北方向の経線と、東西方向の緯線（いせん）が描かれている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-009",
-    "stageId": "",
+    "id": "g7-010",
+    "stageId": "America_area1",
     "kanji": "壱",
     "grade": 7,
     "strokes": 7,
@@ -118,12 +196,19 @@
       "イチ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いち。漢数字の「一」の、間違いを防ぐための書き方。",
+    "exampleSentence": "契約書には、金額が壱（いち）万円と、はっきりと記載されていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-010",
-    "stageId": "",
+    "id": "g7-011",
+    "stageId": "America_area1",
     "kanji": "芋",
     "grade": 7,
     "strokes": 6,
@@ -131,12 +216,19 @@
     "kunyomi": [
       "いも"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いも。土の中にできる、でんぷんを多く含む植物の根や茎。",
+    "exampleSentence": "秋の収穫祭では、掘りたての新鮮な芋（いも）を使って、美味しい料理を作った。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-011",
-    "stageId": "",
+    "id": "g7-012",
+    "stageId": "America_area1",
     "kanji": "陰",
     "grade": 7,
     "strokes": 11,
@@ -146,12 +238,19 @@
     "kunyomi": [
       "かげ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かげ。光が当たらない部分。また、隠れた部分。",
+    "exampleSentence": "太陽が雲に隠れて、あたり一面が陰（かげ）になり、急に肌寒くなった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-012",
-    "stageId": "",
+    "id": "g7-013",
+    "stageId": "America_area1",
     "kanji": "隠",
     "grade": 7,
     "strokes": 14,
@@ -161,12 +260,19 @@
     "kunyomi": [
       "かく"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かくす。見えないようにすること。秘密にすること。",
+    "exampleSentence": "彼は、自分の過去の過ちを、誰にも知られないように隠し（かくし）続けていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-013",
-    "stageId": "",
+    "id": "g7-014",
+    "stageId": "America_area1",
     "kanji": "影",
     "grade": 7,
     "strokes": 15,
@@ -176,12 +282,19 @@
     "kunyomi": [
       "かげ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かげ。光によってできる、物の形。また、姿。",
+    "exampleSentence": "夕焼けの空の下、長い影（かげ）が地面に伸びて、幻想的な風景を作り出した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-014",
-    "stageId": "",
+    "id": "g7-015",
+    "stageId": "America_area1",
     "kanji": "鋭",
     "grade": 7,
     "strokes": 15,
@@ -191,13 +304,20 @@
     "kunyomi": [
       "するど"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "するどい。刃物などがよく切れること。感覚が優れていること。",
+    "exampleSentence": "探偵は、鋭い（するどい）洞察力で、事件の真相を瞬時に見抜いた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-015",
-    "stageId": "",
-    "kanji": "超",
+    "id": "g7-016",
+    "stageId": "America_area1",
+    "kanji": "越",
     "grade": 7,
     "strokes": 12,
     "onyomi": [
@@ -206,12 +326,19 @@
     "kunyomi": [
       "こ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "",
+    "exampleSentence": "",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-016",
-    "stageId": "",
+    "id": "g7-017",
+    "stageId": "America_area1",
     "kanji": "援",
     "grade": 7,
     "strokes": 12,
@@ -219,12 +346,19 @@
       "エン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たすける。力を貸すこと。",
+    "exampleSentence": "災害が発生した地域へ、多くのボランティアが救援（きゅうえん）活動のために駆けつけた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-017",
-    "stageId": "",
+    "id": "g7-018",
+    "stageId": "America_area1",
     "kanji": "煙",
     "grade": 7,
     "strokes": 13,
@@ -235,12 +369,19 @@
       "けむり",
       "けむ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "けむり。物が燃えるときに発生する、気体や微粒子の集まり。",
+    "exampleSentence": "工場から立ち上る煙（けむり）が、空を覆い、大気汚染の原因となっている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-018",
-    "stageId": "",
+    "id": "g7-019",
+    "stageId": "America_area1",
     "kanji": "鉛",
     "grade": 7,
     "strokes": 13,
@@ -250,12 +391,19 @@
     "kunyomi": [
       "なまり"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "なまり。重くて柔らかい金属。",
+    "exampleSentence": "昔の水道管には鉛（なまり）が使われていたが、健康への影響から現在は使用されていない。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-019",
-    "stageId": "",
+    "id": "g7-020",
+    "stageId": "America_area1",
     "kanji": "縁",
     "grade": 7,
     "strokes": 15,
@@ -265,12 +413,19 @@
     "kunyomi": [
       "ふち"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ふち。物の端。また、人と人とのつながり。",
+    "exampleSentence": "この古い茶碗の縁（ふち）は、長年の使用で少し欠けている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-020",
-    "stageId": "",
+    "id": "g7-021",
+    "stageId": "America_area1",
     "kanji": "汚",
     "grade": 7,
     "strokes": 6,
@@ -282,12 +437,19 @@
       "よご",
       "きたな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "よごれる。清潔でなくなること。不正なこと。",
+    "exampleSentence": "環境汚染（おせん）は、私たちの生活に深刻な影響を及ぼす、地球規模の課題だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-021",
-    "stageId": "",
+    "id": "g7-022",
+    "stageId": "America_area1",
     "kanji": "押",
     "grade": 7,
     "strokes": 8,
@@ -297,12 +459,19 @@
     "kunyomi": [
       "お"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おす。力を加えて、向こうへ動かすこと。また、無理にすること。",
+    "exampleSentence": "彼は、自分の意見を強く主張し、会議の決定を押し（おし）進めた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-022",
-    "stageId": "",
+    "id": "g7-023",
+    "stageId": "America_area1",
     "kanji": "奥",
     "grade": 7,
     "strokes": 12,
@@ -312,12 +481,19 @@
     "kunyomi": [
       "おく"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おく。物の、いちばん奥まった部分。",
+    "exampleSentence": "森の奥深く（おくふかく）には、まだ誰も足を踏み入れたことのない、神秘的な場所が広がっている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-023",
-    "stageId": "",
+    "id": "g7-024",
+    "stageId": "America_area1",
     "kanji": "憶",
     "grade": 7,
     "strokes": 16,
@@ -325,12 +501,19 @@
       "オク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おく。心に、物事を覚えておくこと。",
+    "exampleSentence": "遠い昔の記憶（きおく）が、ふとした瞬間に鮮明に蘇り、懐かしい気持ちになった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-024",
-    "stageId": "",
+    "id": "g7-025",
+    "stageId": "America_area1",
     "kanji": "菓",
     "grade": 7,
     "strokes": 11,
@@ -338,12 +521,19 @@
       "カ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "か。果物や、果物から作ったお菓子。",
+    "exampleSentence": "日本の伝統的な和菓子（わがし）は、季節の移ろいを表現する、美しい芸術品だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-025",
-    "stageId": "",
+    "id": "g7-026",
+    "stageId": "America_area1",
     "kanji": "暇",
     "grade": 7,
     "strokes": 13,
@@ -353,12 +543,19 @@
     "kunyomi": [
       "ひま"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひま。仕事や用事がなく、時間があること。",
+    "exampleSentence": "忙しい毎日の中で、たまには何も考えずに、ゆっくりと過ごす暇（ひま）も必要だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-026",
-    "stageId": "",
+    "id": "g7-027",
+    "stageId": "America_area1",
     "kanji": "箇",
     "grade": 7,
     "strokes": 14,
@@ -366,12 +563,19 @@
       "カ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "か。物事を数えるときに使う言葉。",
+    "exampleSentence": "この報告書には、重要な点がいくつか箇条書き（かじょうがき）でまとめられている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-027",
-    "stageId": "",
+    "id": "g7-028",
+    "stageId": "America_area1",
     "kanji": "雅",
     "grade": 7,
     "strokes": 13,
@@ -379,12 +583,19 @@
       "ガ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "が。上品で、風流なこと。",
+    "exampleSentence": "日本の伝統芸能である雅楽（ががく）は、千年以上もの歴史を持つ、貴重な文化遺産だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-028",
-    "stageId": "",
+    "id": "g7-029",
+    "stageId": "America_area1",
     "kanji": "介",
     "grade": 7,
     "strokes": 4,
@@ -392,12 +603,19 @@
       "カイ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かい。間に入って、助けること。",
+    "exampleSentence": "彼は、困っている友達を助けるために、積極的に仲介（ちゅうかい）役を買って出た。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-029",
-    "stageId": "",
+    "id": "g7-030",
+    "stageId": "America_area1",
     "kanji": "戒",
     "grade": 7,
     "strokes": 7,
@@ -407,12 +625,19 @@
     "kunyomi": [
       "いまし"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いましめる。悪いことをしないように、注意すること。",
+    "exampleSentence": "歴史は、過去の過ちを繰り返さないための、大切な戒め（いましめ）を与えてくれる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-030",
-    "stageId": "",
+    "id": "g7-031",
+    "stageId": "America_area1",
     "kanji": "皆",
     "grade": 7,
     "strokes": 9,
@@ -422,12 +647,20 @@
     "kunyomi": [
       "みな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みな。すべての人。",
+    "exampleSentence": "クラスの皆（みな）で協力し、文化祭の準備を成功させることができた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
+
   {
-    "id": "g7-031",
-    "stageId": "",
+    "id": "g7-032",
+    "stageId": "America_area1",
     "kanji": "壊",
     "grade": 7,
     "strokes": 16,
@@ -437,12 +670,19 @@
     "kunyomi": [
       "こわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こわす。物事を、もとの形がなくなるようにすること。",
+    "exampleSentence": "地震によって、多くの建物が壊れ（こわれ）、甚大な被害が出た。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-032",
-    "stageId": "",
+    "id": "g7-033",
+    "stageId": "America_area1",
     "kanji": "較",
     "grade": 7,
     "strokes": 13,
@@ -450,12 +690,19 @@
       "カク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くらべる。物事を、くらべあわせること。",
+    "exampleSentence": "この二つの製品は、性能を比較（ひかく）すると、ほとんど差がない。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-033",
-    "stageId": "",
+    "id": "g7-034",
+    "stageId": "America_area1",
     "kanji": "獲",
     "grade": 7,
     "strokes": 16,
@@ -465,12 +712,19 @@
     "kunyomi": [
       "え"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "える。狩りなどで、動物を捕らえること。",
+    "exampleSentence": "彼は、罠を仕掛けて、森の中で獲物（えもの）を獲（え）ることに成功した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-034",
-    "stageId": "",
+    "id": "g7-035",
+    "stageId": "America_area1",
     "kanji": "刈",
     "grade": 7,
     "strokes": 4,
@@ -478,12 +732,19 @@
     "kunyomi": [
       "か"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かる。草や稲などを、鎌などで切り取ること。",
+    "exampleSentence": "農家の人たちは、秋になると、黄金色に実った稲を刈り（かり）取る作業に追われる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-035",
-    "stageId": "",
+    "id": "g7-036",
+    "stageId": "America_area1",
     "kanji": "甘",
     "grade": 7,
     "strokes": 5,
@@ -493,12 +754,19 @@
     "kunyomi": [
       "あま"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あまい。砂糖のような味。また、物事がゆるいこと。",
+    "exampleSentence": "彼女は、いつも優しい言葉で、子供たちを甘やかす（あまやかす）傾向がある。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-036",
-    "stageId": "",
+    "id": "g7-037",
+    "stageId": "America_area1",
     "kanji": "汗",
     "grade": 7,
     "strokes": 6,
@@ -508,12 +776,19 @@
     "kunyomi": [
       "あせ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あせ。運動したり、暑かったりすると、体から出る水分。",
+    "exampleSentence": "夏の暑い日差しの中、彼は額に汗（あせ）をかきながら、練習に励んだ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-037",
-    "stageId": "",
+    "id": "g7-038",
+    "stageId": "America_area1",
     "kanji": "乾",
     "grade": 7,
     "strokes": 11,
@@ -523,12 +798,19 @@
     "kunyomi": [
       "かわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かわく。水気がなくなること。",
+    "exampleSentence": "洗濯物を外に干したら、あっという間に乾い（かわい）た。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-038",
-    "stageId": "",
+    "id": "g7-039",
+    "stageId": "America_area1",
     "kanji": "勧",
     "grade": 7,
     "strokes": 13,
@@ -538,12 +820,19 @@
     "kunyomi": [
       "すす"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "すすめる。あることをするように、人に働きかけること。",
+    "exampleSentence": "店員は、新商品の魅力を熱心に勧め（すすめ）、多くの客が購入した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-039",
-    "stageId": "",
+    "id": "g7-040",
+    "stageId": "America_area1",
     "kanji": "歓",
     "grade": 7,
     "strokes": 15,
@@ -551,12 +840,19 @@
       "カン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "よろこぶ。心から、うれしく思うこと。",
+    "exampleSentence": "オリンピックで自国の選手が金メダルを獲得し、国民は歓喜（かんき）に沸いた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-040",
-    "stageId": "",
+    "id": "g7-041",
+    "stageId": "America_area1",
     "kanji": "監",
     "grade": 7,
     "strokes": 15,
@@ -564,12 +860,19 @@
       "カン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かん。物事を、上から見ること。",
+    "exampleSentence": "彼は、建設現場の安全管理を監督（かんとく）する重要な役割を担っている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-041",
-    "stageId": "",
+    "id": "g7-042",
+    "stageId": "America_area1",
     "kanji": "環",
     "grade": 7,
     "strokes": 17,
@@ -577,12 +880,19 @@
       "カン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かん。ぐるりと取り囲むこと。輪。",
+    "exampleSentence": "地球温暖化は、地球規模の環境（かんきょう）問題であり、国際的な協力が不可欠だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-042",
-    "stageId": "",
+    "id": "g7-043",
+    "stageId": "America_area1",
     "kanji": "鑑",
     "grade": 7,
     "strokes": 23,
@@ -592,12 +902,19 @@
     "kunyomi": [
       "かんが"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かがみ。物事の善悪を判断する手本。",
+    "exampleSentence": "この古い書物は、当時の文化や生活を知る上で、貴重な鑑（かがみ）となる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-043",
-    "stageId": "",
+    "id": "g7-044",
+    "stageId": "America_area2",
     "kanji": "含",
     "grade": 7,
     "strokes": 7,
@@ -607,12 +924,19 @@
     "kunyomi": [
       "ふく"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ふくむ。中に、あるものを持っていること。",
+    "exampleSentence": "この言葉には、深い意味が含（ふく）まれており、何度読んでも新しい発見がある。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-044",
-    "stageId": "",
+    "id": "g7-045",
+    "stageId": "America_area2",
     "kanji": "奇",
     "grade": 7,
     "strokes": 8,
@@ -620,12 +944,19 @@
       "キ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "き。普通とは違っていて、珍しいこと。",
+    "exampleSentence": "彼は、奇妙（きみょう）な行動で、周囲の人々を驚かせることがよくある。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-045",
-    "stageId": "",
+    "id": "g7-046",
+    "stageId": "America_area2",
     "kanji": "祈",
     "grade": 7,
     "strokes": 8,
@@ -635,12 +966,19 @@
     "kunyomi": [
       "いの"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いのる。神仏に、願いを伝えること。",
+    "exampleSentence": "世界平和を祈り（いのり）、人々はそれぞれの場所で静かに手を合わせた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-046",
-    "stageId": "",
+    "id": "g7-047",
+    "stageId": "America_area2",
     "kanji": "鬼",
     "grade": 7,
     "strokes": 10,
@@ -650,12 +988,19 @@
     "kunyomi": [
       "おに"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おに。日本の伝説に登場する、恐ろしい姿の生き物。",
+    "exampleSentence": "昔話に出てくる鬼（おに）は、恐ろしいけれど、どこか人間らしい一面も持っている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-047",
-    "stageId": "",
+    "id": "g7-048",
+    "stageId": "America_area2",
     "kanji": "幾",
     "grade": 7,
     "strokes": 12,
@@ -665,12 +1010,19 @@
     "kunyomi": [
       "いく"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いく。どれくらい。",
+    "exampleSentence": "彼は、幾度（いくど）となく失敗を繰り返しながらも、決して諦めなかった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-048",
-    "stageId": "",
+    "id": "g7-049",
+    "stageId": "America_area2",
     "kanji": "輝",
     "grade": 7,
     "strokes": 15,
@@ -680,12 +1032,19 @@
     "kunyomi": [
       "かがや"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かがやく。光を放って、明るく見えること。",
+    "exampleSentence": "夜空には、無数の星が輝き（かがやき）、美しい天の川を形成している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-049",
-    "stageId": "",
+    "id": "g7-050",
+    "stageId": "America_area2",
     "kanji": "儀",
     "grade": 7,
     "strokes": 15,
@@ -693,12 +1052,19 @@
       "ギ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ぎ。物事を行うときの、きまったやり方。",
+    "exampleSentence": "結婚式は、厳粛な雰囲気の中で、伝統的な儀式（ぎしき）が執り行われた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-050",
-    "stageId": "",
+    "id": "g7-051",
+    "stageId": "America_area2",
     "kanji": "戯",
     "grade": 7,
     "strokes": 15,
@@ -708,12 +1074,19 @@
     "kunyomi": [
       "たわむ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たわむれる。ふざけて遊ぶこと。",
+    "exampleSentence": "子供たちは、公園で無邪気に戯れ（たわむれ）、楽しそうな笑い声が響いていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-051",
-    "stageId": "",
+    "id": "g7-052",
+    "stageId": "America_area2",
     "kanji": "詰",
     "grade": 7,
     "strokes": 13,
@@ -723,12 +1096,19 @@
     "kunyomi": [
       "つ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つめる。すきまなく、いっぱいに入れること。",
+    "exampleSentence": "彼は、自分の意見を論理的に詰めて（つめて）いき、相手を納得させた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-052",
-    "stageId": "",
+    "id": "g7-053",
+    "stageId": "America_area2",
     "kanji": "却",
     "grade": 7,
     "strokes": 7,
@@ -736,12 +1116,19 @@
       "キャク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "きゃく。しりぞけること。",
+    "exampleSentence": "彼の提案は、予算の都合により、残念ながら却下（きゃっか）された。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-053",
-    "stageId": "",
+    "id": "g7-054",
+    "stageId": "America_area2",
     "kanji": "脚",
     "grade": 7,
     "strokes": 11,
@@ -752,12 +1139,19 @@
     "kunyomi": [
       "あし"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あし。体の、歩くための部分。",
+    "exampleSentence": "彼は、長距離走の練習で、強靭な脚力（きゃくりょく）を身につけた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-054",
-    "stageId": "",
+    "id": "g7-055",
+    "stageId": "America_area2",
     "kanji": "及",
     "grade": 7,
     "strokes": 3,
@@ -767,12 +1161,19 @@
     "kunyomi": [
       "およ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "およぶ。ある範囲に達すること。",
+    "exampleSentence": "この問題は、個人の努力だけでは解決が難しく、社会全体に及ぶ（およぶ）影響がある。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-055",
-    "stageId": "",
+    "id": "g7-056",
+    "stageId": "America_area2",
     "kanji": "丘",
     "grade": 7,
     "strokes": 5,
@@ -782,12 +1183,19 @@
     "kunyomi": [
       "おか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おか。まわりより、少しだけ高くなっている、なだらかな土地。",
+    "exampleSentence": "春になると、丘（おか）一面に菜の花が咲き誇り、美しい景色が広がる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-056",
-    "stageId": "",
+    "id": "g7-057",
+    "stageId": "America_area2",
     "kanji": "朽",
     "grade": 7,
     "strokes": 6,
@@ -797,12 +1205,19 @@
     "kunyomi": [
       "く"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くちる。物が、古くなって、使えなくなること。",
+    "exampleSentence": "この古い木造建築は、長い年月を経て、少しずつ朽ち（くち）てきている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-057",
-    "stageId": "",
+    "id": "g7-058",
+    "stageId": "America_area2",
     "kanji": "巨",
     "grade": 7,
     "strokes": 5,
@@ -810,12 +1225,19 @@
       "キョ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "きょ。とても大きいこと。",
+    "exampleSentence": "彼は、世界経済に大きな影響を与える、巨大（きょだい）な企業を経営している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-058",
-    "stageId": "",
+    "id": "g7-059",
+    "stageId": "America_area2",
     "kanji": "拠",
     "grade": 7,
     "strokes": 8,
@@ -824,12 +1246,19 @@
       "コ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "よる。あるものを、よりどころとすること。",
+    "exampleSentence": "この研究は、最新の科学的データに根拠（こんきょ）を置いている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-059",
-    "stageId": "",
+    "id": "g7-060",
+    "stageId": "America_area2",
     "kanji": "距",
     "grade": 7,
     "strokes": 12,
@@ -837,12 +1266,19 @@
       "キョ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "きょ。二つの場所や物との間の、へだたり。",
+    "exampleSentence": "地球から月までの距離（きょり）は、約38万キロメートルもある。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-060",
-    "stageId": "",
+    "id": "g7-061",
+    "stageId": "America_area2",
     "kanji": "御",
     "grade": 7,
     "strokes": 12,
@@ -853,12 +1289,19 @@
     "kunyomi": [
       "おん"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おん。相手を敬う気持ちを表す言葉。",
+    "exampleSentence": "お客様を御案内（ごあんない）する際は、丁寧な言葉遣いを心がけましょう。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-061",
-    "stageId": "",
+    "id": "g7-062",
+    "stageId": "America_area2",
     "kanji": "凶",
     "grade": 7,
     "strokes": 4,
@@ -866,12 +1309,19 @@
       "キョウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "きょう。悪いこと。不吉なこと。",
+    "exampleSentence": "今日の占いでは、凶（きょう）と出ていたので、一日中、慎重に行動した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-062",
-    "stageId": "",
+    "stageId": "America_area2",
     "kanji": "叫",
     "grade": 7,
     "strokes": 6,
@@ -881,12 +1331,19 @@
     "kunyomi": [
       "さけ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さけぶ。大声で、何かを言うこと。",
+    "exampleSentence": "彼は、絶望的な状況の中で、助けを求めて大声で叫び（さけび）続けた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-063",
-    "stageId": "",
+    "id": "g7-064",
+    "stageId": "America_area2",
     "kanji": "狂",
     "grade": 7,
     "strokes": 7,
@@ -896,12 +1353,19 @@
     "kunyomi": [
       "くる"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くるう。心が、正常でなくなること。",
+    "exampleSentence": "彼は、その美しい絵に魅了され、まるで狂った（くるった）かのように見つめていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-064",
-    "stageId": "",
+    "id": "g7-065",
+    "stageId": "America_area2",
     "kanji": "況",
     "grade": 7,
     "strokes": 8,
@@ -909,12 +1373,19 @@
       "キョウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "きょう。物事の状況。",
+    "exampleSentence": "現在の経済状況（じょうきょう）は、非常に厳しく、多くの企業が苦境に立たされている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-065",
-    "stageId": "",
+    "id": "g7-066",
+    "stageId": "America_area2",
     "kanji": "狭",
     "grade": 7,
     "strokes": 9,
@@ -925,12 +1396,19 @@
       "せま",
       "せば"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "せまい。幅が少ないこと。",
+    "exampleSentence": "この道は、車一台がやっと通れるほどの狭い（せまい）道だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-066",
-    "stageId": "",
+    "id": "g7-067",
+    "stageId": "America_area2",
     "kanji": "恐",
     "grade": 7,
     "strokes": 10,
@@ -940,12 +1418,19 @@
     "kunyomi": [
       "おそ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おそれる。怖いと思うこと。",
+    "exampleSentence": "彼は、失敗を恐れ（おそれ）ずに、新しいことに挑戦する勇気を持っている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-067",
-    "stageId": "",
+    "id": "g7-068",
+    "stageId": "America_area2",
     "kanji": "響",
     "grade": 7,
     "strokes": 20,
@@ -955,12 +1440,19 @@
     "kunyomi": [
       "ひび"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひびく。音や声が、遠くまで伝わること。",
+    "exampleSentence": "彼の歌声は、会場全体に響き渡り（ひびきわたり）、聴衆を感動させた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-068",
-    "stageId": "",
+    "id": "g7-069",
+    "stageId": "America_area2",
     "kanji": "驚",
     "grade": 7,
     "strokes": 22,
@@ -970,12 +1462,19 @@
     "kunyomi": [
       "おどろ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "",
+    "exampleSentence": "",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-069",
-    "stageId": "",
+    "id": "g7-070",
+    "stageId": "America_area3",
     "kanji": "仰",
     "grade": 7,
     "strokes": 6,
@@ -987,12 +1486,19 @@
       "あお",
       "おお"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あおぐ。上を見上げること。",
+    "exampleSentence": "夜空を仰ぎ（あおぎ）見ると、満月が明るく輝いていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-070",
-    "stageId": "",
+    "id": "g7-071",
+    "stageId": "America_area3",
     "kanji": "駆",
     "grade": 7,
     "strokes": 10,
@@ -1002,12 +1508,19 @@
     "kunyomi": [
       "か"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かける。馬などを走らせること。",
+    "exampleSentence": "彼は、ゴールを目指して、全速力で駆け（かけ）抜けた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-071",
-    "stageId": "",
+    "id": "g7-072",
+    "stageId": "America_area3",
     "kanji": "屈",
     "grade": 7,
     "strokes": 8,
@@ -1015,12 +1528,19 @@
       "クツ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くっする。力や権力に、おさえつけられること。",
+    "exampleSentence": "彼は、どんな困難にも屈する（くっする）ことなく、自分の信念を貫き通した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-072",
-    "stageId": "",
+    "id": "g7-073",
+    "stageId": "America_area3",
     "kanji": "掘",
     "grade": 7,
     "strokes": 11,
@@ -1030,12 +1550,19 @@
     "kunyomi": [
       "ほ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ほる。地面などを、道具で掘り起こすこと。",
+    "exampleSentence": "考古学者は、古代遺跡の発掘（はっくつ）調査を行い、貴重な発見をした。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-073",
-    "stageId": "",
+    "id": "g7-074",
+    "stageId": "America_area3",
     "kanji": "繰",
     "grade": 7,
     "strokes": 19,
@@ -1043,12 +1570,19 @@
     "kunyomi": [
       "く"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くる。糸などを、巻き取ること。",
+    "exampleSentence": "彼女は、毎日同じ作業を繰り返し（くりかえし）、正確にこなしている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-074",
-    "stageId": "",
+    "id": "g7-075",
+    "stageId": "America_area3",
     "kanji": "恵",
     "grade": 7,
     "strokes": 10,
@@ -1059,12 +1593,19 @@
     "kunyomi": [
       "めぐ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "めぐむ。神や自然が、人々に恩恵を与えること。",
+    "exampleSentence": "この地域は、豊かな自然に恵まれ（めぐまれ）、美しい景色が広がっている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-075",
-    "stageId": "",
+    "id": "g7-076",
+    "stageId": "America_area3",
     "kanji": "傾",
     "grade": 7,
     "strokes": 13,
@@ -1074,12 +1615,19 @@
     "kunyomi": [
       "かたむ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かたむく。ある方向へ、斜めになること。",
+    "exampleSentence": "夕日が西の空に傾き（かたむき）、あたり一面がオレンジ色に染まった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-076",
-    "stageId": "",
+    "id": "g7-077",
+    "stageId": "America_area3",
     "kanji": "継",
     "grade": 7,
     "strokes": 13,
@@ -1089,12 +1637,19 @@
     "kunyomi": [
       "つ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つぐ。前のものを受け継ぐこと。",
+    "exampleSentence": "彼は、父親の事業を継ぎ（つぎ）、会社の発展に尽力した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-077",
-    "stageId": "",
+    "id": "g7-078",
+    "stageId": "America_area3",
     "kanji": "迎",
     "grade": 7,
     "strokes": 10,
@@ -1104,12 +1659,19 @@
     "kunyomi": [
       "むか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "むかえる。来る人を、出迎えること。",
+    "exampleSentence": "空港には、海外からのお客様を迎え（むかえる）るために、多くの人が集まっていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-078",
-    "stageId": "",
+    "id": "g7-079",
+    "stageId": "America_area3",
     "kanji": "撃",
     "grade": 7,
     "strokes": 15,
@@ -1119,12 +1681,19 @@
     "kunyomi": [
       "う"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "うつ。武器などで、相手を攻撃すること。",
+    "exampleSentence": "兵士たちは、敵の攻撃を撃退（げきたい）し、自国を守り抜いた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-079",
-    "stageId": "",
+    "id": "g7-080",
+    "stageId": "America_area3",
     "kanji": "肩",
     "grade": 7,
     "strokes": 8,
@@ -1134,12 +1703,19 @@
     "kunyomi": [
       "かた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かた。体の、首と腹の間の部分。",
+    "exampleSentence": "彼は、重い荷物を肩（かた）に担ぎ、黙々と歩き続けた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-080",
-    "stageId": "",
+    "id": "g7-081",
+    "stageId": "America_area3",
     "kanji": "兼",
     "grade": 7,
     "strokes": 10,
@@ -1149,12 +1725,19 @@
     "kunyomi": [
       "か"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かねる。二つ以上の役割を、同時に持つこと。",
+    "exampleSentence": "彼女は、仕事と育児を兼ねて（かねて）おり、毎日忙しい日々を送っている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-081",
-    "stageId": "",
+    "id": "g7-082",
+    "stageId": "America_area3",
     "kanji": "剣",
     "grade": 7,
     "strokes": 10,
@@ -1164,12 +1747,19 @@
     "kunyomi": [
       "つるぎ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つるぎ。両刃の刀。",
+    "exampleSentence": "彼は、古くから伝わる剣術（けんじゅつ）の達人で、その腕前は誰もが認めるものだった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-082",
-    "stageId": "",
+    "id": "g7-083",
+    "stageId": "America_area3",
     "kanji": "軒",
     "grade": 7,
     "strokes": 10,
@@ -1179,12 +1769,19 @@
     "kunyomi": [
       "のき"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "のき。家の屋根の、壁から突き出た部分。",
+    "exampleSentence": "雨宿りのため、軒先（のきさき）に身を寄せると、雨音がより一層大きく聞こえた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-083",
-    "stageId": "",
+    "id": "g7-084",
+    "stageId": "America_area3",
     "kanji": "圏",
     "grade": 7,
     "strokes": 12,
@@ -1192,12 +1789,19 @@
       "ケン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "けん。ある範囲。",
+    "exampleSentence": "この地域は、台風の暴風圏（ぼうふうけん）に入っており、厳重な警戒が必要だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-084",
-    "stageId": "",
+    "id": "g7-085",
+    "stageId": "America_area3",
     "kanji": "堅",
     "grade": 7,
     "strokes": 12,
@@ -1207,12 +1811,19 @@
     "kunyomi": [
       "かた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かたい。物が、しっかりしていて、壊れにくいこと。",
+    "exampleSentence": "彼は、どんな誘惑にも負けない、堅固（けんご）な意志を持っている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-085",
-    "stageId": "",
+    "id": "g7-086",
+    "stageId": "America_area3",
     "kanji": "遣",
     "grade": 7,
     "strokes": 13,
@@ -1222,12 +1833,19 @@
     "kunyomi": [
       "つか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つかわす。人を、ある目的のために行かせること。",
+    "exampleSentence": "彼は、会社の代表として、海外へ派遣（はけん）されることになった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-086",
-    "stageId": "",
+    "id": "g7-087",
+    "stageId": "America_area3",
     "kanji": "玄",
     "grade": 7,
     "strokes": 5,
@@ -1235,12 +1853,19 @@
       "ゲン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "げん。奥深く、はっきりしないこと。",
+    "exampleSentence": "この寺の門は、玄妙（げんみょう）な雰囲気を醸し出し、訪れる者を魅了する。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-087",
-    "stageId": "",
+    "id": "g7-088",
+    "stageId": "America_area3",
     "kanji": "枯",
     "grade": 7,
     "strokes": 9,
@@ -1250,12 +1875,19 @@
     "kunyomi": [
       "か"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かれる。植物が、水不足などで、しおれてしまうこと。",
+    "exampleSentence": "庭の草木が、夏の強い日差しで枯れ（かれ）てしまい、元気がなくなった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-088",
-    "stageId": "",
+    "id": "g7-089",
+    "stageId": "America_area3",
     "kanji": "誇",
     "grade": 7,
     "strokes": 13,
@@ -1265,12 +1897,19 @@
     "kunyomi": [
       "ほこ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ほこる。自分のことや、自分の属するものを、りっぱだと思うこと。",
+    "exampleSentence": "彼は、自分の故郷の美しい自然を、心から誇り（ほこり）に思っている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-089",
-    "stageId": "",
+    "id": "g7-090",
+    "stageId": "America_area3",
     "kanji": "鼓",
     "grade": 7,
     "strokes": 13,
@@ -1280,12 +1919,19 @@
     "kunyomi": [
       "つづみ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つづみ。打楽器の一種。",
+    "exampleSentence": "祭りの会場には、勇壮な太鼓（たいこ）の音が響き渡り、人々の心を高揚させた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-090",
-    "stageId": "",
+    "id": "g7-091",
+    "stageId": "America_area3",
     "kanji": "互",
     "grade": 7,
     "strokes": 4,
@@ -1295,12 +1941,19 @@
     "kunyomi": [
       "たが"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たがい。二人以上のものが、相手に対して、同じようにすること。",
+    "exampleSentence": "私たちは、互い（たがい）に協力し合い、困難な課題を乗り越えることができた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-091",
-    "stageId": "",
+    "id": "g7-092",
+    "stageId": "America_area3",
     "kanji": "抗",
     "grade": 7,
     "strokes": 7,
@@ -1308,12 +1961,19 @@
       "コウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こう。相手に逆らって、抵抗すること。",
+    "exampleSentence": "彼は、不正な権力に対して、最後まで抵抗（ていこう）し続けた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-092",
-    "stageId": "",
+    "id": "g7-093",
+    "stageId": "America_area3",
     "kanji": "攻",
     "grade": 7,
     "strokes": 7,
@@ -1323,12 +1983,19 @@
     "kunyomi": [
       "せ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "せめる。相手を攻撃すること。",
+    "exampleSentence": "サッカーの試合で、相手チームのゴールを攻め（せめ）続け、ついに得点した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-093",
-    "stageId": "",
+    "id": "g7-094",
+    "stageId": "America_area4",
     "kanji": "更",
     "grade": 7,
     "strokes": 7,
@@ -1339,12 +2006,19 @@
       "さら",
       "ふ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さらに。その上。",
+    "exampleSentence": "夜が更け（ふけ）るにつれて、街は静まり返り、星空がより一層輝きを増した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-094",
-    "stageId": "",
+    "id": "g7-095",
+    "stageId": "America_area4",
     "kanji": "恒",
     "grade": 7,
     "strokes": 9,
@@ -1352,12 +2026,19 @@
       "コウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こう。いつも変わらないこと。",
+    "exampleSentence": "地球は、太陽の周りを恒常的（こうじょうてき）に公転しており、季節の変化をもたらす。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-095",
-    "stageId": "",
+    "id": "g7-096",
+    "stageId": "America_area4",
     "kanji": "荒",
     "grade": 7,
     "strokes": 9,
@@ -1368,12 +2049,19 @@
       "あら",
       "あ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あらい。物事が、乱暴で、激しいこと。",
+    "exampleSentence": "嵐の夜、荒れ狂う（あれる）波が、海岸の岩に激しく打ち付けた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-096",
-    "stageId": "",
+    "id": "g7-097",
+    "stageId": "America_area4",
     "kanji": "項",
     "grade": 7,
     "strokes": 12,
@@ -1381,12 +2069,19 @@
       "コウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こう。物事を、いくつかに分けた、その一つ一つ。",
+    "exampleSentence": "契約書には、重要な項目（こうもく）がいくつか記載されており、注意深く確認する必要がある。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-097",
-    "stageId": "",
+    "id": "g7-098",
+    "stageId": "America_area4",
     "kanji": "稿",
     "grade": 7,
     "strokes": 15,
@@ -1394,12 +2089,19 @@
       "コウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こう。文章の、まだ完成していないもの。",
+    "exampleSentence": "彼は、新しい小説の原稿（げんこう）を、夜遅くまで書き続けている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-098",
-    "stageId": "",
+    "id": "g7-099",
+    "stageId": "America_area4",
     "kanji": "豪",
     "grade": 7,
     "strokes": 14,
@@ -1407,12 +2109,21 @@
       "ゴウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ごう。勢いが強く、りっぱなこと。",
+    "exampleSentence": "彼は、どんな困難な状況でも、豪胆（ごうたん）な精神で立ち向かう。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
+
+  
   {
-    "id": "g7-099",
-    "stageId": "",
+    "id": "g7-100",
+    "stageId": "America_area4",
     "kanji": "込",
     "grade": 7,
     "strokes": 5,
@@ -1423,9 +2134,10 @@
     "meaning": "かずのはじめ・ひとつ",
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
+
   {
-    "id": "g7-100",
-    "stageId": "",
+    "id": "g7-101",
+    "stageId": "America_area4",
     "kanji": "婚",
     "grade": 7,
     "strokes": 11,
@@ -1433,12 +2145,19 @@
       "コン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こん。結婚すること。",
+    "exampleSentence": "彼女は、長年の交際を経て、ついに彼と結婚（けっこん）することになった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-101",
-    "stageId": "",
+    "id": "g7-102",
+    "stageId": "America_area4",
     "kanji": "鎖",
     "grade": 7,
     "strokes": 18,
@@ -1448,12 +2167,19 @@
     "kunyomi": [
       "くさり"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くさり。金属の輪を、いくつもつなげたもの。",
+    "exampleSentence": "彼は、古い宝箱にかけられた、錆びた鎖（くさり）を力ずくで引きちぎった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-102",
-    "stageId": "",
+    "id": "g7-103",
+    "stageId": "America_area4",
     "kanji": "彩",
     "grade": 7,
     "strokes": 11,
@@ -1463,12 +2189,19 @@
     "kunyomi": [
       "いろど"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いろどる。色を付けて、美しく飾ること。",
+    "exampleSentence": "彼女は、絵の具を使って、真っ白なキャンバスを鮮やかな色彩（しきさい）で彩った（いろどった）。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-103",
-    "stageId": "",
+    "id": "g7-104",
+    "stageId": "America_area4",
     "kanji": "歳",
     "grade": 7,
     "strokes": 13,
@@ -1477,13 +2210,20 @@
       "セイ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さい。年の数。",
+    "exampleSentence": "彼は、まだ若い二十歳（はたち）だが、すでに多くの経験を積んでいる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-104",
-    "stageId": "",
-    "kanji": "載載",
+    "id": "g7-105",
+    "stageId": "America_area4",
+    "kanji": "載",
     "grade": 7,
     "strokes": 13,
     "onyomi": [
@@ -1493,11 +2233,18 @@
       "の"
     ],
     "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "exampleSentence": "りんごが 一（ひと）つ ある。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-105",
-    "stageId": "",
+    "id": "g7-106",
+    "stageId": "America_area4",
     "kanji": "剤",
     "grade": 7,
     "strokes": 10,
@@ -1505,12 +2252,20 @@
       "ザイ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ざい。薬や、化学物質のこと。",
+    "exampleSentence": "この洗剤（せんざい）は、環境に優しく、汚れをしっかりと落とすことができる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
+  
   {
-    "id": "g7-099",
-    "stageId": "",
+    "id": "g7-107",
+    "stageId": "America_area4",
     "kanji": "咲",
     "grade": 7,
     "strokes": 9,
@@ -1521,9 +2276,10 @@
     "meaning": "かずのはじめ・ひとつ",
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
+
   {
-    "id": "g7-106",
-    "stageId": "",
+    "id": "g7-108",
+    "stageId": "America_area4",
     "kanji": "惨",
     "grade": 7,
     "strokes": 11,
@@ -1534,12 +2290,20 @@
     "kunyomi": [
       "みじ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みじめ。見るに忍びないほど、ひどいこと。",
+    "exampleSentence": "戦争は、多くの人々の命を奪い、悲惨（ひさん）な状況を生み出す。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
+
   {
-    "id": "g7-099",
-    "stageId": "",
+    "id": "g7-109",
+    "stageId": "America_area4",
     "kanji": "旨",
     "grade": 7,
     "strokes": 6,
@@ -1553,8 +2317,8 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-107",
-    "stageId": "",
+    "id": "g7-110",
+    "stageId": "America_area4",
     "kanji": "伺",
     "grade": 7,
     "strokes": 7,
@@ -1568,8 +2332,8 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-099",
-    "stageId": "",
+    "id": "g7-111",
+    "stageId": "America_area4",
     "kanji": "刺",
     "grade": 7,
     "strokes": 8,
@@ -1583,8 +2347,8 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-108",
-    "stageId": "",
+    "id": "g7-112",
+    "stageId": "America_area5",
     "kanji": "脂",
     "grade": 7,
     "strokes": 10,
@@ -1594,12 +2358,19 @@
     "kunyomi": [
       "あぶら"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あぶら。動物の体や、植物に含まれる、水に溶けない物質。",
+    "exampleSentence": "健康のためには、動物性の脂質（ししつ）の摂取量を控えることが推奨されている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-109",
-    "stageId": "",
+    "id": "g7-113",
+    "stageId": "America_area5",
     "kanji": "紫",
     "grade": 7,
     "strokes": 12,
@@ -1609,12 +2380,19 @@
     "kunyomi": [
       "むらさき"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "むらさき。赤と青の中間の色。",
+    "exampleSentence": "夕焼けの空が、美しい紫色（むらさきいろ）に染まり、幻想的な景色を作り出した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-110",
-    "stageId": "",
+    "id": "g7-114",
+    "stageId": "America_area5",
     "kanji": "雌",
     "grade": 7,
     "strokes": 14,
@@ -1625,12 +2403,19 @@
       "めす",
       "め"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "めす。動物の、卵を産む性。",
+    "exampleSentence": "動物園では、珍しい鳥の雌（めす）が、卵を温めている姿を見ることができた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-111",
-    "stageId": "",
+    "id": "g7-115",
+    "stageId": "America_area5",
     "kanji": "執",
     "grade": 7,
     "strokes": 11,
@@ -1642,12 +2427,19 @@
     "kunyomi": [
       "と"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "とる。物事を、しっかりとつかむこと。",
+    "exampleSentence": "彼は、一度決めた目標は、どんな困難があっても、最後まで執念（しゅうねん）を持ってやり遂げる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-112",
-    "stageId": "",
+    "id": "g7-116",
+    "stageId": "America_area5",
     "kanji": "芝",
     "grade": 7,
     "strokes": 6,
@@ -1655,12 +2447,19 @@
     "kunyomi": [
       "しば"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "しば。地面を覆う、短い草。",
+    "exampleSentence": "公園の芝生（しばふ）の上で、子供たちが楽しそうに走り回っている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-113",
-    "stageId": "",
+    "id": "g7-117",
+    "stageId": "America_area5",
     "kanji": "斜",
     "grade": 7,
     "strokes": 11,
@@ -1670,12 +2469,19 @@
     "kunyomi": [
       "なな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ななめ。まっすぐではなく、傾いていること。",
+    "exampleSentence": "太陽の光が、窓から斜め（ななめ）に差し込み、部屋の中に長い影を作った。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-114",
-    "stageId": "",
+    "id": "g7-118",
+    "stageId": "America_area5",
     "kanji": "煮",
     "grade": 7,
     "strokes": 12,
@@ -1685,12 +2491,19 @@
     "kunyomi": [
       "に"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "にる。水や調味料と一緒に、火にかけて調理すること。",
+    "exampleSentence": "お母さんが、大根と鶏肉をじっくり煮（に）込んだ、美味しい煮物を作ってくれた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-115",
-    "stageId": "",
+    "id": "g7-119",
+    "stageId": "America_area5",
     "kanji": "釈",
     "grade": 7,
     "strokes": 11,
@@ -1698,12 +2511,19 @@
       "シャク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "しゃく。物事を、わかりやすく説明すること。",
+    "exampleSentence": "彼は、難しい法律の条文を、誰にでも理解できるように、丁寧に解釈（かいしゃく）した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-116",
-    "stageId": "",
+    "id": "g7-120",
+    "stageId": "America_area5",
     "kanji": "寂",
     "grade": 7,
     "strokes": 11,
@@ -1714,12 +2534,19 @@
     "kunyomi": [
       "さび"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さびしい。人がいなくて、ひっそりとしていること。",
+    "exampleSentence": "冬の夜、雪が降り積もる中、街は静寂（せいじゃく）に包まれ、寂しさが増した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-117",
-    "stageId": "",
+    "id": "g7-121",
+    "stageId": "America_area5",
     "kanji": "朱",
     "grade": 7,
     "strokes": 6,
@@ -1727,12 +2554,19 @@
       "シュ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "しゅ。鮮やかな赤色。",
+    "exampleSentence": "神社の鳥居は、鮮やかな朱色（しゅいろ）に塗られており、遠くからでもよく目立つ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-118",
-    "stageId": "",
+    "id": "g7-122",
+    "stageId": "America_area5",
     "kanji": "狩",
     "grade": 7,
     "strokes": 9,
@@ -1742,12 +2576,19 @@
     "kunyomi": [
       "か"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かる。動物を捕らえること。",
+    "exampleSentence": "昔の人々は、森で狩り（かり）をして、食料を得ていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-119",
-    "stageId": "",
+    "id": "g7-123",
+    "stageId": "America_area5",
     "kanji": "趣",
     "grade": 7,
     "strokes": 15,
@@ -1757,12 +2598,19 @@
     "kunyomi": [
       "おもむき"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おもむき。物事の、特別な味わいや、風情。",
+    "exampleSentence": "この古い庭園は、四季折々の趣（おもむき）があり、訪れる人々を魅了する。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-120",
-    "stageId": "",
+    "id": "g7-124",
+    "stageId": "America_area5",
     "kanji": "需",
     "grade": 7,
     "strokes": 14,
@@ -1770,12 +2618,19 @@
       "ジュ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "じゅ。必要とすること。",
+    "exampleSentence": "現代社会では、人々の多様なニーズに応えるため、様々な商品が供給（きょうきゅう）されている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-121",
-    "stageId": "",
+    "id": "g7-125",
+    "stageId": "America_area5",
     "kanji": "舟",
     "grade": 7,
     "strokes": 6,
@@ -1786,12 +2641,19 @@
       "ふね",
       "ふな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ふね。水の上を進むための乗り物。",
+    "exampleSentence": "小さな舟（ふね）に乗って、湖の真ん中まで漕ぎ出し、静かな時間を過ごした。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-122",
-    "stageId": "",
+    "id": "g7-126",
+    "stageId": "America_area5",
     "kanji": "秀",
     "grade": 7,
     "strokes": 7,
@@ -1801,12 +2663,19 @@
     "kunyomi": [
       "ひい"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひいでる。他のものより、特に優れていること。",
+    "exampleSentence": "彼は、学業だけでなく、スポーツでも秀で（ひいで）ており、クラスの模範となっている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-123",
-    "stageId": "",
+    "id": "g7-127",
+    "stageId": "America_area5",
     "kanji": "襲",
     "grade": 7,
     "strokes": 22,
@@ -1816,12 +2685,19 @@
     "kunyomi": [
       "おそ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おそう。突然、相手に攻撃を仕掛けること。",
+    "exampleSentence": "夜道で、突然、見知らぬ男に襲われ（おそわれ）、恐怖を感じた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-124",
-    "stageId": "",
+    "id": "g7-128",
+    "stageId": "America_area5",
     "kanji": "柔",
     "grade": 7,
     "strokes": 9,
@@ -1832,12 +2708,19 @@
     "kunyomi": [
       "やわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "やわらかい。力が加わっても、形が変わりやすいこと。",
+    "exampleSentence": "赤ちゃんの手は、とても柔らかく（やわらかく）、触れると心が和む。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-125",
-    "stageId": "",
+    "id": "g7-129",
+    "stageId": "America_area5",
     "kanji": "獣",
     "grade": 7,
     "strokes": 16,
@@ -1847,12 +2730,19 @@
     "kunyomi": [
       "けもの"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "けもの。人間以外の、四つ足の動物。",
+    "exampleSentence": "森の奥深くには、まだ人間が足を踏み入れたことのない、珍しい獣（けもの）が生息している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-126",
-    "stageId": "",
+    "id": "g7-130",
+    "stageId": "America_area5",
     "kanji": "瞬",
     "grade": 7,
     "strokes": 18,
@@ -1862,12 +2752,19 @@
     "kunyomi": [
       "またた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "またたく。ごく短い時間。",
+    "exampleSentence": "彼は、瞬く（またたく）間に問題を解決し、周囲の人々を驚かせた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-127",
-    "stageId": "",
+    "id": "g7-131",
+    "stageId": "America_area5",
     "kanji": "旬",
     "grade": 7,
     "strokes": 6,
@@ -1876,12 +2773,19 @@
       "シュン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "しゅん。その季節に、最も美味しくなる時期。",
+    "exampleSentence": "この魚は、冬が旬（しゅん）なので、今が一番美味しく食べられる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-128",
-    "stageId": "",
+    "id": "g7-132",
+    "stageId": "America_area5",
     "kanji": "巡",
     "grade": 7,
     "strokes": 6,
@@ -1891,12 +2795,19 @@
     "kunyomi": [
       "めぐ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "めぐる。ある場所を、ぐるりと回ること。",
+    "exampleSentence": "彼は、世界中の美術館を巡り（めぐり）、様々な芸術作品に触れる旅をしている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-129",
-    "stageId": "",
+    "id": "g7-133",
+    "stageId": "America_area5",
     "kanji": "盾",
     "grade": 7,
     "strokes": 9,
@@ -1906,12 +2817,19 @@
     "kunyomi": [
       "たて"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たて。身を守るための道具。",
+    "exampleSentence": "彼は、どんな批判にも屈せず、自分の信念を盾（たて）として、堂々と意見を述べた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-130",
-    "stageId": "",
+    "id": "g7-134",
+    "stageId": "America_area5",
     "kanji": "召",
     "grade": 7,
     "strokes": 5,
@@ -1921,12 +2839,19 @@
     "kunyomi": [
       "め"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "めす。人を呼び寄せること。",
+    "exampleSentence": "王様は、家来を召し（めし）て、重要な命令を下した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-099",
-    "stageId": "",
+    "id": "g7-135",
+    "stageId": "America_area5",
     "kanji": "床",
     "grade": 7,
     "strokes": 7,
@@ -1941,8 +2866,8 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-131",
-    "stageId": "",
+      "id": "g7-136",
+    "stageId": "America_area5",
     "kanji": "沼",
     "grade": 7,
     "strokes": 8,
@@ -1952,12 +2877,19 @@
     "kunyomi": [
       "ぬま"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ぬま。水がたまって、草が生い茂った場所。",
+    "exampleSentence": "この沼（ぬま）には、珍しい水生植物や、魚がたくさん生息している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-132",
-    "stageId": "",
+    "id": "g7-137",
+    "stageId": "America_area5",
     "kanji": "称",
     "grade": 7,
     "strokes": 10,
@@ -1965,12 +2897,39 @@
       "ショウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "となえる。名前を呼ぶこと。",
+    "exampleSentence": "彼は、世界チャンピオンの栄誉を称え（たたえ）、多くの人々から祝福された。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-133",
-    "stageId": "",
+    "id": "g7-138",
+    "stageId": "America_area5",
+    "kanji": "紹",
+    "grade": 7,
+    "strokes": 11,
+    "onyomi": [
+      "ショウ"
+    ],
+    "kunyomi": [],
+    "meaning": "",
+    "exampleSentence": "",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
+    "id": "g7-139",
+    "stageId": "America_area5",
     "kanji": "詳",
     "grade": 7,
     "strokes": 13,
@@ -1980,12 +2939,19 @@
     "kunyomi": [
       "くわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くわしい。物事の細部まで、よく知っていること。",
+    "exampleSentence": "この事件の詳しい（くわしい）状況は、まだ警察によって調査中だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-134",
-    "stageId": "",
+    "id": "g7-140",
+    "stageId": "America_area5",
     "kanji": "丈",
     "grade": 7,
     "strokes": 3,
@@ -1995,12 +2961,19 @@
     "kunyomi": [
       "たけ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たけ。物の長さ。",
+    "exampleSentence": "彼は、身長がとても高く、バスケットボールの選手として活躍している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-135",
-    "stageId": "",
+    "id": "g7-141",
+    "stageId": "America_area5",
     "kanji": "畳",
     "grade": 7,
     "strokes": 12,
@@ -2011,12 +2984,19 @@
       "たたみ",
       "たた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たたみ。い草で編んだ、日本の伝統的な敷物。",
+    "exampleSentence": "和室には、畳（たたみ）が敷かれており、独特の香りが漂っている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-136",
-    "stageId": "",
+    "id": "g7-142",
+    "stageId": "America_area5",
     "kanji": "殖",
     "grade": 7,
     "strokes": 12,
@@ -2026,12 +3006,19 @@
     "kunyomi": [
       "ふ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ふえる。数や量が増えること。",
+    "exampleSentence": "この会社は、新しい技術を開発し、資産を増殖（ぞうしょく）させている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-137",
-    "stageId": "",
+    "id": "g7-143",
+    "stageId": "America_area5",
     "kanji": "飾",
     "grade": 7,
     "strokes": 13,
@@ -2045,7 +3032,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-137",
+    "id": "g7-144",
     "stageId": "",
     "kanji": "触",
     "grade": 7,
@@ -2061,7 +3048,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-138",
+    "id": "g7-145",
     "stageId": "",
     "kanji": "侵",
     "grade": 7,
@@ -2076,8 +3063,8 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-139",
-    "stageId": "",
+    "id": "g7-146",
+    "stageId": "America_area5",
     "kanji": "振",
     "grade": 7,
     "strokes": 10,
@@ -2087,12 +3074,19 @@
     "kunyomi": [
       "ふ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ふるう。手や体を、勢いよく動かすこと。",
+    "exampleSentence": "彼は、試合の終盤で、バットを大きく振り（ふり）、逆転ホームランを放った。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-140",
-    "stageId": "",
+    "id": "g7-147",
+    "stageId": "America_area5",
     "kanji": "浸",
     "grade": 7,
     "strokes": 10,
@@ -2102,12 +3096,19 @@
     "kunyomi": [
       "ひた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひたす。液体の中に、物を漬けること。",
+    "exampleSentence": "パンを牛乳に浸し（ひたし）てから焼くと、ふんわりとしたフレンチトーストになる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-141",
-    "stageId": "",
+    "id": "g7-148",
+    "stageId": "America_area5",
     "kanji": "寝",
     "grade": 7,
     "strokes": 13,
@@ -2117,12 +3118,20 @@
     "kunyomi": [
       "ね"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ねる。横になって、体を休めること。",
+    "exampleSentence": "彼は、疲れていたので、ベッドに入るとすぐに寝て（ねて）しまった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
+  
   {
-    "id": "g7-142",
-    "stageId": "",
+    "id": "g7-149",
+    "stageId": "America_area5",
     "kanji": "慎",
     "grade": 7,
     "strokes": 13,
@@ -2132,12 +3141,19 @@
     "kunyomi": [
       "つつし"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つつしむ。言動を、控えめにすること。",
+    "exampleSentence": "公の場では、言葉遣いや態度を慎む（つつしむ）ことが、社会人としてのマナーだ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-143",
-    "stageId": "",
+    "id": "g7-150",
+    "stageId": "America_area5",
     "kanji": "震",
     "grade": 7,
     "strokes": 15,
@@ -2147,12 +3163,19 @@
     "kunyomi": [
       "ふる"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ふるえる。体が、小刻みに揺れること。",
+    "exampleSentence": "地震の揺れで、建物全体が大きく震え（ふるえ）、恐怖を感じた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-099",
-    "stageId": "",
+    "id": "g7-151",
+    "stageId": "America_area5",
     "kanji": "薪",
     "grade": 7,
     "strokes": 16,
@@ -2165,9 +3188,10 @@
     "meaning": "かずのはじめ・ひとつ",
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
+  
   {
-    "id": "g7-145",
-    "stageId": "",
+    "id": "g7-152",
+    "stageId": "America_area6",
     "kanji": "尽",
     "grade": 7,
     "strokes": 6,
@@ -2177,12 +3201,19 @@
     "kunyomi": [
       "つ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つくす。自分の力を、すべて出し切ること。",
+    "exampleSentence": "彼は、病気の母のために、献身的に尽くし（つくし）、看病を続けた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-146",
-    "stageId": "",
+    "id": "g7-153",
+    "stageId": "America_area6",
     "kanji": "陣",
     "grade": 7,
     "strokes": 10,
@@ -2190,12 +3221,19 @@
       "ジン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "じん。軍隊が、戦いのために、配置につくこと。",
+    "exampleSentence": "敵の攻撃に備え、兵士たちは、それぞれの陣地（じんち）に身を潜めた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-147",
-    "stageId": "",
+    "id": "g7-154",
+    "stageId": "America_area6",
     "kanji": "尋",
     "grade": 7,
     "strokes": 12,
@@ -2205,12 +3243,19 @@
     "kunyomi": [
       "たず"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たずねる。知らないことを、人に聞くこと。",
+    "exampleSentence": "彼は、道に迷ったので、近くにいた人に道を尋ね（たずね）た。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-148",
-    "stageId": "",
+    "id": "g7-155",
+    "stageId": "America_area6",
     "kanji": "吹",
     "grade": 7,
     "strokes": 7,
@@ -2220,12 +3265,19 @@
     "kunyomi": [
       "ふ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ふく。口から息を出すこと。",
+    "exampleSentence": "風が強く吹き（ふき）、木の葉が舞い上がった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-149",
-    "stageId": "",
+    "id": "g7-156",
+    "stageId": "America_area6",
     "kanji": "是",
     "grade": 7,
     "strokes": 9,
@@ -2233,12 +3285,19 @@
       "ゼ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ぜ。正しいこと。",
+    "exampleSentence": "彼は、常に是々非々（ぜぜひひ）の態度で物事に臨み、公平な判断を下す。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-150",
-    "stageId": "",
+    "id": "g7-157",
+    "stageId": "America_area6",
     "kanji": "姓",
     "grade": 7,
     "strokes": 8,
@@ -2247,12 +3306,19 @@
       "ショウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "せい。家族の、代々受け継がれる名前。",
+    "exampleSentence": "彼の姓（せい）は田中だが、下の名前は知らない。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-151",
-    "stageId": "",
+    "id": "g7-158",
+    "stageId": "America_area6",
     "kanji": "征",
     "grade": 7,
     "strokes": 8,
@@ -2260,12 +3326,19 @@
       "セイ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "せい。敵を攻め滅ぼすこと。",
+    "exampleSentence": "歴史の教科書には、昔の将軍が、遠くの国を征服（せいふく）した話が載っている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-152",
-    "stageId": "",
+    "id": "g7-159",
+    "stageId": "America_area6",
     "kanji": "跡",
     "grade": 7,
     "strokes": 13,
@@ -2275,12 +3348,19 @@
     "kunyomi": [
       "あと"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あと。物が通ったしるし。",
+    "exampleSentence": "雪の上に残された足跡（あしあと）をたどると、森の奥へと続いていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-153",
-    "stageId": "",
+    "id": "g7-160",
+    "stageId": "America_area6",
     "kanji": "占",
     "grade": 7,
     "strokes": 5,
@@ -2291,12 +3371,19 @@
       "し",
       "うらな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "しめる。ある場所を、自分のものにすること。",
+    "exampleSentence": "彼は、会議の場で、常に主導権を占め（しめ）、議論をリードする。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-154",
-    "stageId": "",
+    "id": "g7-161",
+    "stageId": "America_area6",
     "kanji": "扇",
     "grade": 7,
     "strokes": 10,
@@ -2306,12 +3393,19 @@
     "kunyomi": [
       "おうぎ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おうぎ。風を起こすための道具。",
+    "exampleSentence": "夏の暑い日には、扇子（せんす）を使って、涼しい風を送る。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-155",
-    "stageId": "",
+    "id": "g7-162",
+    "stageId": "America_area6",
     "kanji": "鮮",
     "grade": 7,
     "strokes": 17,
@@ -2321,12 +3415,19 @@
     "kunyomi": [
       "あざ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あざやか。色が、はっきりしていて、美しいこと。",
+    "exampleSentence": "彼女が描いた絵は、鮮やか（あざやか）な色彩で、見る人を魅了する。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-156",
-    "stageId": "",
+    "id": "g7-163",
+    "stageId": "America_area6",
     "kanji": "訴",
     "grade": 7,
     "strokes": 12,
@@ -2336,12 +3437,19 @@
     "kunyomi": [
       "うった"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "うったえる。自分の意見や、苦しみを、人に伝えること。",
+    "exampleSentence": "彼は、不正な行為に対して、勇気を持って裁判所に訴え（うったえ）た。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-157",
-    "stageId": "",
+    "id": "g7-164",
+    "stageId": "America_area6",
     "kanji": "僧",
     "grade": 7,
     "strokes": 13,
@@ -2349,12 +3457,19 @@
       "ソウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "そう。仏教の教えを学び、修行する人。",
+    "exampleSentence": "お寺には、毎日、多くの僧侶（そうりょ）が修行に励んでいる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-158",
-    "stageId": "",
+    "id": "g7-165",
+    "stageId": "America_area6",
     "kanji": "燥",
     "grade": 7,
     "strokes": 17,
@@ -2362,12 +3477,19 @@
       "ソウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かわく。水気がなくなること。",
+    "exampleSentence": "冬の乾燥（かんそう）した季節は、肌が荒れやすいので、保湿ケアが大切だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-159",
-    "stageId": "",
+    "id": "g7-166",
+    "stageId": "America_area6",
     "kanji": "騒",
     "grade": 7,
     "strokes": 18,
@@ -2377,12 +3499,19 @@
     "kunyomi": [
       "さわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さわぐ。声を出して、にぎやかにすること。",
+    "exampleSentence": "夜遅くまで騒いで（さわいで）いると、近所迷惑になるので注意しよう。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-160",
-    "stageId": "",
+    "id": "g7-167",
+    "stageId": "America_area6",
     "kanji": "贈",
     "grade": 7,
     "strokes": 18,
@@ -2393,12 +3522,19 @@
     "kunyomi": [
       "おく"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おくる。人に、物や気持ちを差し出すこと。",
+    "exampleSentence": "誕生日に、友達から素敵なプレゼントを贈られ（おくら）て、とても嬉しかった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-161",
-    "stageId": "",
+    "id": "g7-168",
+    "stageId": "America_area6",
     "kanji": "即",
     "grade": 7,
     "strokes": 7,
@@ -2406,12 +3542,19 @@
       "ソク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "すぐ。時間をおかずに、すぐに。",
+    "exampleSentence": "彼は、問題が発生すると、即座（そくざ）に解決策を見つけ、実行する。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-162",
-    "stageId": "",
+    "id": "g7-169",
+    "stageId": "America_area6",
     "kanji": "俗",
     "grade": 7,
     "strokes": 9,
@@ -2419,12 +3562,19 @@
       "ゾク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ぞく。世間一般の、ありふれたこと。",
+    "exampleSentence": "この絵は、芸術的な価値は低いが、大衆に人気のある俗悪（ぞくあく）な作品だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-163",
-    "stageId": "",
+    "id": "g7-170",
+    "stageId": "America_area6",
     "kanji": "耐",
     "grade": 7,
     "strokes": 9,
@@ -2434,12 +3584,19 @@
     "kunyomi": [
       "た"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たえる。苦しみや困難に、じっと我慢すること。",
+    "exampleSentence": "彼は、どんな厳しい訓練にも耐え（たえ）、ついに目標を達成した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-164",
-    "stageId": "",
+    "id": "g7-171",
+    "stageId": "America_area6",
     "kanji": "替",
     "grade": 7,
     "strokes": 12,
@@ -2449,12 +3606,19 @@
     "kunyomi": [
       "か"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かえる。古いものと、新しいものを交換すること。",
+    "exampleSentence": "電車の中で、席を替えて（かえて）もらい、窓際の席に座った。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-165",
-    "stageId": "",
+    "id": "g7-172",
+    "stageId": "America_area6",
     "kanji": "沢",
     "grade": 7,
     "strokes": 7,
@@ -2464,12 +3628,19 @@
     "kunyomi": [
       "さわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さわ。山の中の、水が流れる場所。",
+    "exampleSentence": "夏の暑い日には、沢（さわ）の冷たい水に足を浸すと、とても気持ちがいい。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-166",
-    "stageId": "",
+    "id": "g7-173",
+    "stageId": "America_area6",
     "kanji": "拓",
     "grade": 7,
     "strokes": 8,
@@ -2477,12 +3648,19 @@
       "タク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひらく。新しい土地を切り開くこと。",
+    "exampleSentence": "彼は、未開の地を拓き（ひらき）、新しい文明を築いた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-167",
-    "stageId": "",
+    "id": "g7-174",
+    "stageId": "America_area6",
     "kanji": "濁",
     "grade": 7,
     "strokes": 16,
@@ -2492,12 +3670,19 @@
     "kunyomi": [
       "にご"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "にごる。水などが、澄んでいないこと。",
+    "exampleSentence": "大雨の後、川の水が濁り（にごり）、魚の姿が見えなくなった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-168",
-    "stageId": "",
+    "id": "g7-175",
+    "stageId": "America_area6",
     "kanji": "脱",
     "grade": 7,
     "strokes": 11,
@@ -2507,12 +3692,19 @@
     "kunyomi": [
       "ぬ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ぬぐ。身につけているものを、取り去ること。",
+    "exampleSentence": "彼は、疲れていたので、服を脱ぐ（ぬぐ）とすぐにベッドに横になった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-169",
-    "stageId": "",
+    "id": "g7-176",
+    "stageId": "America_area6",
     "kanji": "丹",
     "grade": 7,
     "strokes": 4,
@@ -2520,12 +3712,19 @@
       "タン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たん。赤色の顔料。",
+    "exampleSentence": "この絵は、丹念（たんねん）に描かれており、作者の情熱が伝わってくる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-170",
-    "stageId": "",
+    "id": "g7-177",
+    "stageId": "America_area6",
     "kanji": "淡",
     "grade": 7,
     "strokes": 11,
@@ -2535,12 +3734,19 @@
     "kunyomi": [
       "あわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あわい。色が薄いこと。味が薄いこと。",
+    "exampleSentence": "彼女は、淡い（あわい）ピンク色のドレスを身につけ、パーティー会場に現れた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-171",
-    "stageId": "",
+    "id": "g7-178",
+    "stageId": "America_area6",
     "kanji": "嘆",
     "grade": 7,
     "strokes": 13,
@@ -2550,12 +3756,19 @@
     "kunyomi": [
       "なげ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "なげく。悲しみや、残念な気持ちを表すこと。",
+    "exampleSentence": "彼は、自分の不甲斐なさに、深く嘆き（なげき）、涙を流した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-172",
-    "stageId": "",
+    "id": "g7-179",
+    "stageId": "America_area6",
     "kanji": "端",
     "grade": 7,
     "strokes": 10,
@@ -2567,12 +3780,19 @@
       "は",
       "はた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はし。物の、いちばん端の部分。",
+    "exampleSentence": "彼は、テーブルの端（はし）に座り、静かに本を読んでいた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-173",
-    "stageId": "",
+    "id": "g7-180",
+    "stageId": "America_area7",
     "kanji": "弾",
     "grade": 7,
     "strokes": 12,
@@ -2584,12 +3804,19 @@
       "はず",
       "たま"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひく。弦楽器を演奏すること。",
+    "exampleSentence": "彼は、ギターを弾き（ひき）ながら、美しい歌声を披露した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-174",
-    "stageId": "",
+    "id": "g7-181",
+    "stageId": "America_area7",
     "kanji": "恥",
     "grade": 7,
     "strokes": 10,
@@ -2599,12 +3826,19 @@
     "kunyomi": [
       "は"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はじる。自分の行いが、人に知られて、きまりが悪いこと。",
+    "exampleSentence": "彼は、自分の失敗を恥じ（はじる）て、顔を赤くした。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-175",
-    "stageId": "",
+    "id": "g7-182",
+    "stageId": "America_area7",
     "kanji": "致",
     "grade": 7,
     "strokes": 10,
@@ -2614,12 +3848,19 @@
     "kunyomi": [
       "いた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いたす。ある状態に、到達させること。",
+    "exampleSentence": "彼は、目標達成のために、全力を尽くし、ついに目的を達成した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-176",
-    "stageId": "",
+    "id": "g7-183",
+    "stageId": "America_area7",
     "kanji": "遅",
     "grade": 7,
     "strokes": 12,
@@ -2630,12 +3871,19 @@
       "おく",
       "おそ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おくれる。時間が、予定より遅れること。",
+    "exampleSentence": "電車が遅れ（おくれ）てしまい、約束の時間に間に合わなかった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-177",
-    "stageId": "",
+    "id": "g7-184",
+    "stageId": "America_area7",
     "kanji": "蓄",
     "grade": 7,
     "strokes": 13,
@@ -2645,12 +3893,19 @@
     "kunyomi": [
       "たくわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たくわえる。物を、ためておくこと。",
+    "exampleSentence": "彼は、将来のために、少しずつお金を蓄え（たくわえ）ている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-178",
-    "stageId": "",
+    "id": "g7-185",
+    "stageId": "America_area7",
     "kanji": "跳",
     "grade": 7,
     "strokes": 13,
@@ -2661,12 +3916,19 @@
       "は",
       "と"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はねる。地面から、勢いよく飛び上がること。",
+    "exampleSentence": "彼は、ハードルを軽々と跳び（とび）越え、観客を沸かせた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-179",
-    "stageId": "",
+    "id": "g7-186",
+    "stageId": "America_area7",
     "kanji": "徴",
     "grade": 7,
     "strokes": 14,
@@ -2674,12 +3936,19 @@
       "チョウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ちょう。物事の、しるし。",
+    "exampleSentence": "この現象は、地球温暖化の明確な兆候（ちょうこう）であると、科学者は指摘している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-180",
-    "stageId": "",
+    "id": "g7-187",
+    "stageId": "America_area7",
     "kanji": "澄",
     "grade": 7,
     "strokes": 15,
@@ -2689,12 +3958,19 @@
     "kunyomi": [
       "す"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "すむ。水などが、にごりがなく、きれいなこと。",
+    "exampleSentence": "湖の水は、驚くほど澄んで（すんで）おり、底まで見通すことができた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-181",
-    "stageId": "",
+    "id": "g7-188",
+    "stageId": "America_area7",
     "kanji": "沈",
     "grade": 7,
     "strokes": 7,
@@ -2704,12 +3980,19 @@
     "kunyomi": [
       "しず"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "しずむ。水の中に、物が沈むこと。",
+    "exampleSentence": "夕日が水平線に沈み（しずみ）、あたりは茜色に染まった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-182",
-    "stageId": "",
+    "id": "g7-189",
+    "stageId": "America_area7",
     "kanji": "珍",
     "grade": 7,
     "strokes": 9,
@@ -2719,12 +4002,19 @@
     "kunyomi": [
       "めずら"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "めずらしい。普通では、あまり見かけないこと。",
+    "exampleSentence": "彼は、世界中を旅して、珍しい（めずらしい）切手を集めている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-183",
-    "stageId": "",
+    "id": "g7-190",
+    "stageId": "America_area7",
     "kanji": "抵",
     "grade": 7,
     "strokes": 8,
@@ -2732,12 +4022,19 @@
       "テイ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "てい。物事に、さからうこと。",
+    "exampleSentence": "彼は、どんな困難にも抵抗（ていこう）することなく、自分の信念を貫き通した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-184",
-    "stageId": "",
+    "id": "g7-191",
+    "stageId": "America_area7",
     "kanji": "堤",
     "grade": 7,
     "strokes": 12,
@@ -2747,12 +4044,19 @@
     "kunyomi": [
       "つつみ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つつみ。水があふれないように、土を盛り上げたもの。",
+    "exampleSentence": "大雨で川の水位が上昇し、堤防（ていぼう）が決壊する危険性がある。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-185",
-    "stageId": "",
+    "id": "g7-192",
+    "stageId": "America_area7",
     "kanji": "摘",
     "grade": 7,
     "strokes": 14,
@@ -2762,12 +4066,19 @@
     "kunyomi": [
       "つ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つむ。草花などを、手で摘み取ること。",
+    "exampleSentence": "彼女は、庭で摘んだ（つんだ）ばかりのバラの花を、花瓶に飾った。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-186",
-    "stageId": "",
+    "id": "g7-193",
+    "stageId": "America_area7",
     "kanji": "滴",
     "grade": 7,
     "strokes": 14,
@@ -2778,12 +4089,19 @@
       "しずく",
       "したた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "しずく。液体が、ぽたぽたと落ちる様子。",
+    "exampleSentence": "雨上がりの葉っぱには、たくさんの水滴（すいてき）が輝いていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-187",
-    "stageId": "",
+    "id": "g7-194",
+    "stageId": "America_area7",
     "kanji": "添",
     "grade": 7,
     "strokes": 11,
@@ -2793,12 +4111,19 @@
     "kunyomi": [
       "そ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "そえる。あるものに、別のものを付け加えること。",
+    "exampleSentence": "彼は、手紙に感謝の気持ちを添え（そえ）て、先生に渡した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-188",
-    "stageId": "",
+    "id": "g7-195",
+    "stageId": "America_area7",
     "kanji": "殿",
     "grade": 7,
     "strokes": 13,
@@ -2810,12 +4135,19 @@
       "との",
       "どの"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "との。昔の、身分の高い人の敬称。",
+    "exampleSentence": "この城は、昔、殿様（とのさま）が住んでいた場所として知られている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-189",
-    "stageId": "",
+    "id": "g7-196",
+    "stageId": "America_area7",
     "kanji": "吐",
     "grade": 7,
     "strokes": 6,
@@ -2825,12 +4157,19 @@
     "kunyomi": [
       "は"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はく。口から、息や物を出すこと。",
+    "exampleSentence": "彼は、緊張のあまり、思わず深いため息を吐い（はき）出した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-190",
-    "stageId": "",
+    "id": "g7-197",
+    "stageId": "America_area7",
     "kanji": "途",
     "grade": 7,
     "strokes": 10,
@@ -2838,12 +4177,19 @@
       "ト"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "と。道。物事の途中。",
+    "exampleSentence": "彼は、目標達成のために、どんな困難な道のりでも、途中で諦めない。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-191",
-    "stageId": "",
+    "id": "g7-198",
+    "stageId": "America_area7",
     "kanji": "渡",
     "grade": 7,
     "strokes": 12,
@@ -2853,12 +4199,19 @@
     "kunyomi": [
       "わた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "わたる。ある場所から、別の場所へ移動すること。",
+    "exampleSentence": "彼は、危険な川を無事に渡り（わたり）、対岸にたどり着いた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-192",
-    "stageId": "",
+    "id": "g7-199",
+    "stageId": "America_area7",
     "kanji": "奴",
     "grade": 7,
     "strokes": 5,
@@ -2866,12 +4219,19 @@
       "ド"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "やっこ。昔の、身分の低い男。",
+    "exampleSentence": "彼は、自分の意見を持たず、他人の言いなりになる奴隷（どれい）のような存在だった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-193",
-    "stageId": "",
+    "id": "g7-200",
+    "stageId": "America_area7",
     "kanji": "怒",
     "grade": 7,
     "strokes": 9,
@@ -2882,12 +4242,19 @@
       "いか",
       "おこ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いかる。腹を立てること。",
+    "exampleSentence": "彼は、不正な行為に対して、激しい怒り（いかり）を露わにした。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-194",
-    "stageId": "",
+    "id": "g7-201",
+    "stageId": "America_area7",
     "kanji": "到",
     "grade": 7,
     "strokes": 8,
@@ -2895,12 +4262,19 @@
       "トウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いたる。ある場所や状態に、たどり着くこと。",
+    "exampleSentence": "彼は、どんな困難な状況でも、目標達成のために最後まで努力し、ついに到達（とうたつ）した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-195",
-    "stageId": "",
+    "id": "g7-202",
+    "stageId": "America_area7",
     "kanji": "逃",
     "grade": 7,
     "strokes": 9,
@@ -2911,12 +4285,19 @@
       "に",
       "のが"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "にげる。危険な場所から、離れること。",
+    "exampleSentence": "彼は、追っ手から逃れる（のがれる）ために、森の奥深くへと姿を消した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-196",
-    "stageId": "",
+    "id": "g7-203",
+    "stageId": "America_area7",
     "kanji": "倒",
     "grade": 7,
     "strokes": 10,
@@ -2926,12 +4307,19 @@
     "kunyomi": [
       "たお"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たおれる。立っていたものが、横になること。",
+    "exampleSentence": "彼は、疲労困憊で、その場に倒れ（たおれ）込んでしまった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-197",
-    "stageId": "",
+    "id": "g7-204",
+    "stageId": "America_area7",
     "kanji": "唐",
     "grade": 7,
     "strokes": 10,
@@ -2941,12 +4329,19 @@
     "kunyomi": [
       "から"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "から。中国のこと。",
+    "exampleSentence": "昔の日本は、唐（から）から多くの文化や技術を取り入れていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-198",
-    "stageId": "",
+    "id": "g7-205",
+    "stageId": "America_area8",
     "kanji": "桃",
     "grade": 7,
     "strokes": 10,
@@ -2956,12 +4351,19 @@
     "kunyomi": [
       "もも"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "もも。春にピンク色の花を咲かせ、夏に甘い実をつける木。",
+    "exampleSentence": "桃（もも）の節句には、女の子の健やかな成長を願って、桃の花を飾る。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-199",
-    "stageId": "",
+    "id": "g7-206",
+    "stageId": "America_area8",
     "kanji": "透",
     "grade": 7,
     "strokes": 10,
@@ -2971,12 +4373,19 @@
     "kunyomi": [
       "す"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "すきとおる。向こう側が、はっきりと見えること。",
+    "exampleSentence": "彼女の肌は、透き通る（すきとおる）ように白く、とても美しかった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-200",
-    "stageId": "",
+    "id": "g7-207",
+    "stageId": "America_area8",
     "kanji": "盗",
     "grade": 7,
     "strokes": 11,
@@ -2986,12 +4395,19 @@
     "kunyomi": [
       "ぬす"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ぬすむ。人のものを、こっそり取ること。",
+    "exampleSentence": "彼は、他人のアイデアを盗み（ぬすみ）、自分のものとして発表した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-201",
-    "stageId": "",
+    "id": "g7-208",
+    "stageId": "America_area8",
     "kanji": "塔",
     "grade": 7,
     "strokes": 12,
@@ -2999,12 +4415,19 @@
       "トウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "とう。高くそびえる建物。",
+    "exampleSentence": "この町には、昔から人々に親しまれている、美しい五重の塔（とう）がある。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-202",
-    "stageId": "",
+    "id": "g7-209",
+    "stageId": "America_area8",
     "kanji": "稲",
     "grade": 7,
     "strokes": 14,
@@ -3015,12 +4438,19 @@
       "いね",
       "いな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いね。米のなる植物。",
+    "exampleSentence": "秋になると、黄金色に実った稲穂（いなほ）が、風に揺れる美しい景色が広がる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-203",
-    "stageId": "",
+    "id": "g7-210",
+    "stageId": "America_area8",
     "kanji": "踏",
     "grade": 7,
     "strokes": 15,
@@ -3030,12 +4460,19 @@
     "kunyomi": [
       "ふ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ふむ。足で、物を踏みつけること。",
+    "exampleSentence": "彼は、一歩一歩、大地をしっかりと踏みしめ（ふみしめ）ながら、山頂を目指した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-204",
-    "stageId": "",
+    "id": "g7-211",
+    "stageId": "America_area8",
     "kanji": "闘",
     "grade": 7,
     "strokes": 18,
@@ -3045,12 +4482,19 @@
     "kunyomi": [
       "たたか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たたかう。相手と、力や技を競い合うこと。",
+    "exampleSentence": "彼は、病気と闘い（たたかい）ながらも、決して希望を捨てなかった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-205",
-    "stageId": "",
+    "id": "g7-212",
+    "stageId": "America_area8",
     "kanji": "胴",
     "grade": 7,
     "strokes": 10,
@@ -3058,12 +4502,19 @@
       "ドウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "どう。体の、頭と手足を除いた部分。",
+    "exampleSentence": "彼は、柔道の試合で、相手の胴（どう）を狙って、見事な一本背負いを決めた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-206",
-    "stageId": "",
+    "id": "g7-213",
+    "stageId": "America_area8",
     "kanji": "峠",
     "grade": 7,
     "strokes": 9,
@@ -3071,12 +4522,19 @@
     "kunyomi": [
       "とうげ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "とうげ。山道の、いちばん高い場所。",
+    "exampleSentence": "彼は、いくつもの困難な峠（とうげ）を越え、ついに目標を達成した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-207",
-    "stageId": "",
+    "id": "g7-214",
+    "stageId": "America_area8",
     "kanji": "突",
     "grade": 7,
     "strokes": 8,
@@ -3086,12 +4544,19 @@
     "kunyomi": [
       "つ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つく。とがったもので、勢いよく突き刺すこと。",
+    "exampleSentence": "彼は、突然の質問に、思わず言葉に詰まり、沈黙が続いた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-208",
-    "stageId": "",
+    "id": "g7-215",
+    "stageId": "America_area8",
     "kanji": "鈍",
     "grade": 7,
     "strokes": 12,
@@ -3101,12 +4566,41 @@
     "kunyomi": [
       "にぶ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "にぶい。切れ味が悪いこと。反応が遅いこと。",
+    "exampleSentence": "彼は、鈍い（にぶい）音を立てて、地面に倒れ込んだ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-209",
-    "stageId": "",
+    "id": "g7-216",
+    "stageId": "America_area8",
+    "kanji": "曇",
+    "grade": 7,
+    "strokes": 16,
+    "onyomi": [
+      "ドン"
+    ],
+    "kunyomi": [
+      "くも"
+    ],
+    "meaning": "",
+    "exampleSentence": "",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
+    "id": "g7-217",
+    "stageId": "America_area8",
     "kanji": "弐",
     "grade": 7,
     "strokes": 6,
@@ -3114,12 +4608,19 @@
       "ニ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "に。漢数字の「二」の、間違いを防ぐための書き方。",
+    "exampleSentence": "契約書には、金額が弐（に）百万円と、はっきりと記載されていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-210",
-    "stageId": "",
+    "id": "g7-218",
+    "stageId": "America_area8",
     "kanji": "悩",
     "grade": 7,
     "strokes": 10,
@@ -3129,12 +4630,19 @@
     "kunyomi": [
       "なや"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "なやむ。どうしていいか分からず、苦しむこと。",
+    "exampleSentence": "彼は、将来の進路について、深く悩み（なやみ）、なかなか答えが出せないでいる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-211",
-    "stageId": "",
+    "id": "g7-219",
+    "stageId": "America_area8",
     "kanji": "濃",
     "grade": 7,
     "strokes": 16,
@@ -3144,12 +4652,19 @@
     "kunyomi": [
       "こ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こい。色や味が、はっきりしていること。",
+    "exampleSentence": "彼女は、濃い（こい）コーヒーを飲みながら、夜遅くまで勉強を続けた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-212",
-    "stageId": "",
+    "id": "g7-220",
+    "stageId": "America_area8",
     "kanji": "杯",
     "grade": 7,
     "strokes": 8,
@@ -3159,12 +4674,19 @@
     "kunyomi": [
       "さかずき"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さかずき。酒を飲むための小さな器。",
+    "exampleSentence": "彼は、勝利を祝って、仲間と杯（さかずき）を交わした。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-213",
-    "stageId": "",
+    "id": "g7-221",
+    "stageId": "America_area8",
     "kanji": "輩",
     "grade": 7,
     "strokes": 15,
@@ -3172,12 +4694,19 @@
       "ハイ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はい。同じ仲間。",
+    "exampleSentence": "彼は、先輩（せんぱい）から多くのことを学び、尊敬している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-214",
-    "stageId": "",
+    "id": "g7-222",
+    "stageId": "America_area8",
     "kanji": "拍",
     "grade": 7,
     "strokes": 8,
@@ -3186,12 +4715,19 @@
       "ヒョウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はく。手を打つこと。",
+    "exampleSentence": "観客は、彼の素晴らしい演奏に、惜しみない拍手（はくしゅ）を送った。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-215",
-    "stageId": "",
+    "id": "g7-223",
+    "stageId": "America_area8",
     "kanji": "泊",
     "grade": 7,
     "strokes": 8,
@@ -3201,12 +4737,19 @@
     "kunyomi": [
       "と"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "とまる。旅の途中で、宿に泊まること。",
+    "exampleSentence": "彼は、出張で、一週間ホテルに泊まる（とまる）予定だ。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-216",
-    "stageId": "",
+    "id": "g7-224",
+    "stageId": "America_area8",
     "kanji": "追",
     "grade": 7,
     "strokes": 10,
@@ -3216,12 +4759,19 @@
     "kunyomi": [
       "せま"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おいつく。後ろから追いかけること。",
+    "exampleSentence": "彼は、必死に前を走るランナーを追い（おい）かけ、ついに追いついた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-217",
-    "stageId": "",
+    "id": "g7-225",
+    "stageId": "America_area8",
     "kanji": "薄",
     "grade": 7,
     "strokes": 16,
@@ -3231,12 +4781,19 @@
     "kunyomi": [
       "うす"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "うすい。厚さが少ないこと。",
+    "exampleSentence": "彼女は、薄い（うすい）化粧で、自然な美しさを引き出している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-218",
-    "stageId": "",
+    "id": "g7-226",
+    "stageId": "America_area8",
     "kanji": "爆",
     "grade": 7,
     "strokes": 19,
@@ -3244,12 +4801,19 @@
       "バク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ばく。物が、勢いよく破裂すること。",
+    "exampleSentence": "工場で、ガス爆発（ばくはつ）が発生し、大きな被害が出た。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-219",
-    "stageId": "",
+    "id": "g7-227",
+    "stageId": "America_area8",
     "kanji": "髪",
     "grade": 7,
     "strokes": 14,
@@ -3259,12 +4823,19 @@
     "kunyomi": [
       "かみ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かみ。頭に生えている毛。",
+    "exampleSentence": "彼女は、長い髪（かみ）をなびかせながら、颯爽と歩いていった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-220",
-    "stageId": "",
+    "id": "g7-228",
+    "stageId": "America_area8",
     "kanji": "抜",
     "grade": 7,
     "strokes": 7,
@@ -3274,12 +4845,19 @@
     "kunyomi": [
       "ぬ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ぬく。引き抜くこと。",
+    "exampleSentence": "彼は、歯医者で虫歯を抜い（ぬい）てもらい、痛みがなくなった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-221",
-    "stageId": "",
+    "id": "g7-229",
+    "stageId": "America_area8",
     "kanji": "罰",
     "grade": 7,
     "strokes": 14,
@@ -3288,12 +4866,19 @@
       "バチ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ばつ。悪い行いに対して、与えられるもの。",
+    "exampleSentence": "彼は、交通ルールを破ったため、罰金（ばっきん）を支払うことになった。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-222",
-    "stageId": "",
+    "id": "g7-230",
+    "stageId": "America_area8",
     "kanji": "般",
     "grade": 7,
     "strokes": 10,
@@ -3301,12 +4886,20 @@
       "ハン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はん。一般的なこと。",
+    "exampleSentence": "この問題は、一般（いっぱん）的な知識があれば、誰でも解ける。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
+
   {
-    "id": "g7-223",
-    "stageId": "",
+    "id": "g7-231",
+    "stageId": "America_area9",
     "kanji": "販",
     "grade": 7,
     "strokes": 11,
@@ -3314,12 +4907,19 @@
       "ハン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はん。物を売ること。",
+    "exampleSentence": "彼は、インターネットを使って、自分の作った商品を販売（はんばい）している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-224",
-    "stageId": "",
+    "id": "g7-232",
+    "stageId": "America_area9",
     "kanji": "搬",
     "grade": 7,
     "strokes": 13,
@@ -3327,12 +4927,19 @@
       "ハン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はん。物を運ぶこと。",
+    "exampleSentence": "引越し業者に、重い家具の運搬（うんぱん）を依頼した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-225",
-    "stageId": "",
+    "id": "g7-233",
+    "stageId": "America_area9",
     "kanji": "範",
     "grade": 7,
     "strokes": 15,
@@ -3340,12 +4947,19 @@
       "ハン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はん。手本となること。",
+    "exampleSentence": "彼は、常に模範（もはん）的な行動を心がけ、後輩たちの手本となっている。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-226",
-    "stageId": "",
+    "id": "g7-234",
+    "stageId": "America_area9",
     "kanji": "繁",
     "grade": 7,
     "strokes": 16,
@@ -3353,12 +4967,19 @@
       "ハン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "しげる。草木が、たくさん生い茂ること。",
+    "exampleSentence": "この森は、手入れがされていないため、雑草が繁茂（はんも）している。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-227",
-    "stageId": "",
+    "id": "g7-235",
+    "stageId": "America_area9",
     "kanji": "盤",
     "grade": 7,
     "strokes": 15,
@@ -3366,12 +4987,19 @@
       "バン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ばん。平らな板。",
+    "exampleSentence": "彼は、将棋盤（しょうぎばん）に向かい、真剣な表情で次の手を考えていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-228",
-    "stageId": "",
+    "id": "g7-236",
+    "stageId": "America_area9",
     "kanji": "彼",
     "grade": 7,
     "strokes": 8,
@@ -3382,12 +5010,19 @@
       "かれ",
       "かの"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かれ。あの人。",
+    "exampleSentence": "彼は、いつも冷静沈着で、どんな状況でも慌てない。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-229",
-    "stageId": "",
+    "id": "g7-237",
+    "stageId": "America_area9",
     "kanji": "疲",
     "grade": 7,
     "strokes": 10,
@@ -3397,12 +5032,19 @@
     "kunyomi": [
       "つか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つかれる。体や心が、活動によって、力を失うこと。",
+    "exampleSentence": "彼は、一日中働き詰めだったので、とても疲れ（つかれ）ていた。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-230",
-    "stageId": "",
+    "id": "g7-238",
+    "stageId": "America_area9",
     "kanji": "被",
     "grade": 7,
     "strokes": 10,
@@ -3412,12 +5054,19 @@
     "kunyomi": [
       "こうむ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こうむる。ある物事を、身に受けること。",
+    "exampleSentence": "この地域は、台風によって甚大な被害（ひがい）を被った（こうむった）。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-231",
-    "stageId": "",
+    "id": "g7-239",
+    "stageId": "America_area9",
     "kanji": "避",
     "grade": 7,
     "strokes": 16,
@@ -3427,12 +5076,19 @@
     "kunyomi": [
       "さ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さける。危険なものから、遠ざかること。",
+    "exampleSentence": "彼は、人との争いを避け（さけ）、常に平和的な解決を望んでいる。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-232",
-    "stageId": "",
+    "id": "g7-240",
+    "stageId": "America_area9",
     "kanji": "尾",
     "grade": 7,
     "strokes": 7,
@@ -3442,12 +5098,19 @@
     "kunyomi": [
       "お"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "お。動物の体の、後ろに伸びた部分。",
+    "exampleSentence": "犬は、嬉しいときに、しっぽを振って、感情を表現する。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-233",
-    "stageId": "",
+    "id": "g7-241",
+    "stageId": "America_area9",
     "kanji": "微",
     "grade": 7,
     "strokes": 13,
@@ -3455,11 +5118,18 @@
       "ビ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かすか。わずかなこと。",
+    "exampleSentence": "彼は、遠くから聞こえる微（かすか）な音にも、敏感に反応した。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
-    "id": "g7-234",
+    "id": "g7-242",
     "stageId": "",
     "kanji": "匹",
     "grade": 7,
@@ -3474,7 +5144,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-235",
+    "id": "g7-243",
     "stageId": "",
     "kanji": "描",
     "grade": 7,
@@ -3490,7 +5160,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-236",
+    "id": "g7-244",
     "stageId": "",
     "kanji": "浜",
     "grade": 7,
@@ -3505,7 +5175,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-237",
+    "id": "g7-245",
     "stageId": "",
     "kanji": "敏",
     "grade": 7,
@@ -3518,7 +5188,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-238",
+    "id": "g7-246",
     "stageId": "",
     "kanji": "怖",
     "grade": 7,
@@ -3533,7 +5203,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-239",
+    "id": "g7-247",
     "stageId": "",
     "kanji": "浮",
     "grade": 7,
@@ -3548,7 +5218,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-240",
+    "id": "g7-248",
     "stageId": "",
     "kanji": "普",
     "grade": 7,
@@ -3561,7 +5231,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-241",
+    "id": "g7-249",
     "stageId": "",
     "kanji": "腐",
     "grade": 7,
@@ -3576,7 +5246,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-242",
+    "id": "g7-250",
     "stageId": "",
     "kanji": "敷",
     "grade": 7,
@@ -3591,7 +5261,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-243",
+    "id": "g7-251",
     "stageId": "",
     "kanji": "膚",
     "grade": 7,
@@ -3604,9 +5274,9 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-244",
+    "id": "g7-252",
     "stageId": "",
-    "kanji": "賦賦",
+    "kanji": "賦",
     "grade": 7,
     "strokes": 15,
     "onyomi": [
@@ -3617,7 +5287,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-245",
+    "id": "g7-253",
     "stageId": "",
     "kanji": "舞",
     "grade": 7,
@@ -3633,7 +5303,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-246",
+    "id": "g7-254",
     "stageId": "",
     "kanji": "幅",
     "grade": 7,
@@ -3648,7 +5318,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-247",
+    "id": "g7-255",
     "stageId": "",
     "kanji": "払",
     "grade": 7,
@@ -3663,7 +5333,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-248",
+    "id": "g7-256",
     "stageId": "",
     "kanji": "噴",
     "grade": 7,
@@ -3678,7 +5348,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-249",
+    "id": "g7-257",
     "stageId": "",
     "kanji": "柄",
     "grade": 7,
@@ -3694,7 +5364,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-250",
+    "id": "g7-258",
     "stageId": "",
     "kanji": "壁",
     "grade": 7,
@@ -3709,7 +5379,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-251",
+    "id": "g7-259",
     "stageId": "",
     "kanji": "捕",
     "grade": 7,
@@ -3725,7 +5395,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-252",
+    "id": "g7-260",
     "stageId": "",
     "kanji": "舗",
     "grade": 7,
@@ -3738,7 +5408,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-253",
+    "id": "g7-261",
     "stageId": "",
     "kanji": "抱",
     "grade": 7,
@@ -3755,7 +5425,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-254",
+    "id": "g7-262",
     "stageId": "",
     "kanji": "峰",
     "grade": 7,
@@ -3770,7 +5440,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-255",
+    "id": "g7-263",
     "stageId": "",
     "kanji": "砲",
     "grade": 7,
@@ -3783,7 +5453,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-256",
+    "id": "g7-264",
     "stageId": "",
     "kanji": "忙",
     "grade": 7,
@@ -3798,7 +5468,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-257",
+    "id": "g7-265",
     "stageId": "",
     "kanji": "坊",
     "grade": 7,
@@ -3812,7 +5482,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-234",
+    "id": "g7-266",
     "stageId": "",
     "kanji": "肪",
     "grade": 7,
@@ -3825,7 +5495,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-235",
+    "id": "g7-267",
     "stageId": "",
     "kanji": "冒",
     "grade": 7,
@@ -3840,7 +5510,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-236",
+    "id": "g7-268",
     "stageId": "",
     "kanji": "傍",
     "grade": 7,
@@ -3855,7 +5525,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-237",
+    "id": "g7-269",
     "stageId": "",
     "kanji": "帽",
     "grade": 7,
@@ -3868,7 +5538,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-238",
+    "id": "g7-270",
     "stageId": "",
     "kanji": "凡",
     "grade": 7,
@@ -3882,7 +5552,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-239",
+    "id": "g7-271",
     "stageId": "",
     "kanji": "盆",
     "grade": 7,
@@ -3895,7 +5565,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-240",
+    "id": "g7-272",
     "stageId": "",
     "kanji": "慢",
     "grade": 7,
@@ -3908,7 +5578,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-241",
+    "id": "g7-273",
     "stageId": "",
     "kanji": "漫",
     "grade": 7,
@@ -3921,7 +5591,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-242",
+    "id": "g7-274",
     "stageId": "",
     "kanji": "妙",
     "grade": 7,
@@ -3934,7 +5604,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-243",
+    "id": "g7-275",
     "stageId": "",
     "kanji": "眠",
     "grade": 7,
@@ -3949,7 +5619,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-244",
+    "id": "g7-276",
     "stageId": "",
     "kanji": "矛",
     "grade": 7,
@@ -3964,7 +5634,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-245",
+    "id": "g7-277",
     "stageId": "",
     "kanji": "霧",
     "grade": 7,
@@ -3979,7 +5649,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-246",
+    "id": "g7-278",
     "stageId": "",
     "kanji": "娘",
     "grade": 7,
@@ -3992,7 +5662,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-247",
+    "id": "g7-279",
     "stageId": "",
     "kanji": "茂",
     "grade": 7,
@@ -4007,7 +5677,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-248",
+    "id": "g7-280",
     "stageId": "",
     "kanji": "猛",
     "grade": 7,
@@ -4020,7 +5690,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-249",
+    "id": "g7-281",
     "stageId": "",
     "kanji": "網",
     "grade": 7,
@@ -4035,7 +5705,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-250",
+    "id": "g7-282",
     "stageId": "",
     "kanji": "黙",
     "grade": 7,
@@ -4050,7 +5720,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-251",
+    "id": "g7-283",
     "stageId": "",
     "kanji": "紋",
     "grade": 7,
@@ -4063,7 +5733,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-252",
+    "id": "g7-284",
     "stageId": "",
     "kanji": "躍",
     "grade": 7,
@@ -4078,7 +5748,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-253",
+    "id": "g7-285",
     "stageId": "",
     "kanji": "雄",
     "grade": 7,
@@ -4094,7 +5764,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-254",
+    "id": "g7-286",
     "stageId": "",
     "kanji": "与",
     "grade": 7,
@@ -4109,7 +5779,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-255",
+    "id": "g7-287",
     "stageId": "",
     "kanji": "誉",
     "grade": 7,
@@ -4124,7 +5794,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-256",
+    "id": "g7-288",
     "stageId": "",
     "kanji": "溶",
     "grade": 7,
@@ -4139,7 +5809,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-257",
+    "id": "g7-289",
     "stageId": "",
     "kanji": "腰",
     "grade": 7,
@@ -4154,7 +5824,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-258",
+    "id": "g7-290",
     "stageId": "",
     "kanji": "踊",
     "grade": 7,
@@ -4169,7 +5839,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-259",
+    "id": "g7-291",
     "stageId": "",
     "kanji": "謡",
     "grade": 7,
@@ -4185,7 +5855,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-260",
+    "id": "g7-292",
     "stageId": "",
     "kanji": "翼",
     "grade": 7,
@@ -4200,7 +5870,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-261",
+    "id": "g7-293",
     "stageId": "",
     "kanji": "雷",
     "grade": 7,
@@ -4215,7 +5885,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-262",
+    "id": "g7-294",
     "stageId": "",
     "kanji": "頼",
     "grade": 7,
@@ -4231,7 +5901,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-263",
+    "id": "g7-295",
     "stageId": "",
     "kanji": "絡",
     "grade": 7,
@@ -4246,7 +5916,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-264",
+    "id": "g7-296",
     "stageId": "",
     "kanji": "欄",
     "grade": 7,
@@ -4259,7 +5929,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-265",
+    "id": "g7-297",
     "stageId": "",
     "kanji": "離",
     "grade": 7,
@@ -4274,7 +5944,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-266",
+    "id": "g7-298",
     "stageId": "",
     "kanji": "粒",
     "grade": 7,
@@ -4289,7 +5959,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-267",
+    "id": "g7-299",
     "stageId": "",
     "kanji": "慮",
     "grade": 7,
@@ -4302,9 +5972,9 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-268",
+    "id": "g7-300",
     "stageId": "",
-    "kanji": "療療",
+    "kanji": "療",
     "grade": 7,
     "strokes": 17,
     "onyomi": [
@@ -4315,7 +5985,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-269",
+    "id": "g7-301",
     "stageId": "",
     "kanji": "隣",
     "grade": 7,
@@ -4331,7 +6001,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-270",
+    "id": "g7-302",
     "stageId": "",
     "kanji": "涙",
     "grade": 7,
@@ -4346,7 +6016,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-271",
+    "id": "g7-303",
     "stageId": "",
     "kanji": "隷",
     "grade": 7,
@@ -4359,7 +6029,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-272",
+    "id": "g7-304",
     "stageId": "",
     "kanji": "齢",
     "grade": 7,
@@ -4372,7 +6042,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-273",
+    "id": "g7-305",
     "stageId": "",
     "kanji": "麗",
     "grade": 7,
@@ -4387,7 +6057,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-274",
+    "id": "g7-306",
     "stageId": "",
     "kanji": "暦",
     "grade": 7,
@@ -4402,7 +6072,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-275",
+    "id": "g7-307",
     "stageId": "",
     "kanji": "劣",
     "grade": 7,
@@ -4417,7 +6087,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-276",
+    "id": "g7-308",
     "stageId": "",
     "kanji": "烈",
     "grade": 7,
@@ -4430,7 +6100,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-277",
+    "id": "g7-309",
     "stageId": "",
     "kanji": "恋",
     "grade": 7,
@@ -4446,7 +6116,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-278",
+    "id": "g7-310",
     "stageId": "",
     "kanji": "露",
     "grade": 7,
@@ -4462,7 +6132,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-279",
+    "id": "g7-311",
     "stageId": "",
     "kanji": "郎",
     "grade": 7,
@@ -4475,7 +6145,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-280",
+    "id": "g7-312",
     "stageId": "",
     "kanji": "惑",
     "grade": 7,
@@ -4490,7 +6160,7 @@
     "exampleSentence": "りんごが 一（ひと）つ ある。"
   },
   {
-    "id": "g7-281",
+    "id": "g7-313",
     "stageId": "",
     "kanji": "腕",
     "grade": 7,
