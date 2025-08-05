@@ -476,9 +476,7 @@ const resultWinState = {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
-    if (this.canvas) {
-      this.unregisterHandlers();
-    }
+    this.unregisterHandlers();
     this.canvas = null;
     this.ctx = null;
     this.resultData = null;
@@ -517,6 +515,7 @@ const resultWinState = {
     if (!this.canvas) return;
     
     const rect = this.canvas.getBoundingClientRect();
+    if (!rect) return; // getBoundingClientRectがnullの場合は処理しない
     const scaleX = this.canvas.width / rect.width;
     const scaleY = this.canvas.height / rect.height;
     
@@ -540,6 +539,7 @@ const resultWinState = {
     }
 
     const rect = this.canvas.getBoundingClientRect();
+    if (!rect) return; // getBoundingClientRectがnullの場合は処理しない
     const scaleX = this.canvas.width / rect.width;
     const scaleY = this.canvas.height / rect.height;
     
