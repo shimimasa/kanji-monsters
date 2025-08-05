@@ -1130,7 +1130,16 @@ const battleScreenState = {
         this.expAnimQueue.length === 0) {
       // 全ての経験値アニメーションが完了した場合、ステージクリア画面へ遷移
       this.stageClearPending = false;
-      this.victoryCallback && this.victoryCallback();
+      
+      // 先にexpParticlesを無効化してからvictoryCallbackを呼び出す
+      this.expParticles.active = false;
+      
+      // 安全のためにコールバックを非同期で呼び出す
+      setTimeout(() => {
+        if (this.victoryCallback) {
+          this.victoryCallback();
+        }
+      }, 0);
     }
 
     // コンボアニメーションの更新
