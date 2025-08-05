@@ -404,7 +404,22 @@ const battleScreenState = {
     // ② 左上に「タイトルへ」「ステージ選択」ボタンを描画（リッチなデザイン）
     [BTN.back, BTN.stage].forEach(b => {
       const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
-      this.drawRichButton(this.ctx, b.x, b.y, b.w, b.h, b.label, '#34495e', isHovered);
+      
+      // 単純な描画方法でテスト
+      this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
+      this.ctx.fillRect(b.x, b.y, b.w, b.h);
+      
+      // テキストを明示的に描画
+      this.ctx.fillStyle = 'white';
+      this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
+      
+      // 枠線を追加して視認性を高める
+      this.ctx.strokeStyle = 'white';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(b.x, b.y, b.w, b.h);
     });
 
     /* 敵 */
@@ -1766,16 +1781,19 @@ drawEnemyStatusPanel(ctx) {
     // 実際のタッチ/クリック座標を、800x600のゲーム内座標に変換
     const x = (eventX - rect.left) * scaleX;
     const y = (eventY - rect.top) * scaleY;
-    // === 座標変換ロジックここまで ===
-
+    
+    console.log('クリック座標:', x, y); // デバッグ用に座標を出力
+    
     // ▼ 以下は元のクリック判定ロジック（x, y を使うようにする）
     // ③ 「タイトルへ」ボタン押下時
     if (isMouseOverRect(x, y, BTN.back)) {
+      console.log('「タイトルへ」ボタンがクリックされました');
       publish('changeScreen', 'title');
       return true;
     }
     // ④ 「ステージ選択」ボタン押下時
     if (isMouseOverRect(x, y, BTN.stage)) {
+      console.log('「ステージ選択」ボタンがクリックされました');
       publish('changeScreen', 'stageSelect');
       return true;
     }
