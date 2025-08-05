@@ -1703,10 +1703,13 @@ drawEnemyStatusPanel(ctx) {
 
   /** クリックなどのイベントを登録 */
   registerHandlers() {
+    // クリックハンドラを保存して再利用できるようにする
     this._clickHandler = e => {
-      // handleClickメソッドを直接呼び出す（座標変換はhandleClick内で行う）
+      // デバッグ出力を追加
+      console.log('クリックイベント発生');
       this.handleClick(e);
     };
+    
     this.canvas.addEventListener('click', this._clickHandler);
     this.canvas.addEventListener('touchstart', this._clickHandler);
     
@@ -1724,7 +1727,7 @@ drawEnemyStatusPanel(ctx) {
     };
     this.canvas.addEventListener('mousemove', this._mousemoveHandler);
     
-    // メッセージログスクロール用ホイールイベント登録
+    // ホイールイベント登録（既存のまま）
     this._wheelHandler = e => {
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left, y = e.clientY - rect.top;
@@ -1747,14 +1750,31 @@ drawEnemyStatusPanel(ctx) {
       }
     };
     this.canvas.addEventListener('wheel', this._wheelHandler);
+    
+    // マウスダウン・アップイベントのハンドラを保存
+    this._mousedownHandler = this.handleMouseDown.bind(this);
+    this._mouseupHandler = this.handleMouseUp.bind(this);
+    this._mouseleaveHandler = this.handleMouseUp.bind(this);
+    
+    // マウスイベントハンドラを追加
+    this.canvas.addEventListener('mousedown', this._mousedownHandler);
+    this.canvas.addEventListener('mouseup', this._mouseupHandler);
+    this.canvas.addEventListener('mouseleave', this._mouseleaveHandler);
   },
 
   /** イベント登録を解除 */
   unregisterHandlers() {
+    if (!this.canvas) return; // canvasがnullの場合は何もしない
+    
     this.canvas.removeEventListener('click', this._clickHandler);
     this.canvas.removeEventListener('touchstart', this._clickHandler);
     this.canvas.removeEventListener('mousemove', this._mousemoveHandler);
     this.canvas.removeEventListener('wheel', this._wheelHandler);
+    
+    // マウスイベントハンドラを解除
+    this.canvas.removeEventListener('mousedown', this._mousedownHandler);
+    this.canvas.removeEventListener('mouseup', this._mouseupHandler);
+    this.canvas.removeEventListener('mouseleave', this._mouseleaveHandler);
   },
 
   /** クリック処理 */
@@ -2586,25 +2606,6 @@ drawEnemyStatusPanel(ctx) {
     }
   },
 
-  // イベントハンドラの登録を更新
-  registerHandlers() {
-    // ... 既存のイベントハンドラ ...
-    
-    // マウスイベントハンドラを追加
-    this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
-    this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
-    this.canvas.addEventListener('mouseleave', this.handleMouseUp.bind(this)); // マウスが離れた時も押下状態をクリア
-  },
-
-  // イベントハンドラの解除を更新
-  unregisterHandlers() {
-    // ... 既存のイベントハンドラ解除 ...
-    
-    // マウスイベントハンドラを解除
-    this.canvas.removeEventListener('mousedown', this.handleMouseDown.bind(this));
-    this.canvas.removeEventListener('mouseup', this.handleMouseUp.bind(this));
-    this.canvas.removeEventListener('mouseleave', this.handleMouseUp.bind(this));
-  },
 };
 
 export default battleScreenState;
