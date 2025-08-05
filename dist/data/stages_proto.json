@@ -51,7 +51,57 @@
       "g1-027",
       "g1-028",
       "g1-029",
-      "g1-030"
+      "g1-030",
+      "g1-031",
+      "g1-032",
+      "g1-033",
+      "g1-034",
+      "g1-035",
+      "g1-036",
+      "g1-037",
+      "g1-038",
+      "g1-039",
+      "g1-040",
+      "g1-041",
+      "g1-042",
+      "g1-043",
+      "g1-044",
+      "g1-045",
+      "g1-046",
+      "g1-047",
+      "g1-048",
+      "g1-049",
+      "g1-050",
+      "g1-051",
+      "g1-052",
+      "g1-053",
+      "g1-054",
+      "g1-055",
+      "g1-056",
+      "g1-057",
+      "g1-058",
+      "g1-059",
+      "g1-060",
+      "g1-061",
+      "g1-062",
+      "g1-063",
+      "g1-064",
+      "g1-065",
+      "g1-066",
+      "g1-067",
+      "g1-068",
+      "g1-069",
+      "g1-070",
+      "g1-071",
+      "g1-072",
+      "g1-073",
+      "g1-074",
+      "g1-075",
+      "g1-076",
+      "g1-077",
+      "g1-078",
+      "g1-079",
+      "g1-080"
     ],
     "clearBonusExp": 30,
     "recommendedLevel": 1
@@ -274,12 +324,7 @@
       "g2-112",
       "g2-113",
       "g2-114",
-      "g2-115",
-      "g2-116",
-      "g2-117",
-      "g2-118",
-      "g2-119",
-      "g2-120"
+      "g2-115"
     ],
     "clearBonusExp": 30,
     "recommendedLevel": 4
@@ -307,36 +352,31 @@
       "YMG-E10"
     ],
     "kanjiPoolIdList": [
-      "g2-091",
-      "g2-092",
-      "g2-093",
-      "g2-094",
-      "g2-095",
-      "g2-096",
-      "g2-097",
-      "g2-098",
-      "g2-099",
-      "g2-100",
-      "g2-101",
-      "g2-102",
-      "g2-103",
-      "g2-104",
-      "g2-105",
-      "g2-106",
-      "g2-107",
-      "g2-108",
-      "g2-109",
-      "g2-110",
-      "g2-111",
-      "g2-112",
-      "g2-113",
-      "g2-114",
-      "g2-115",
       "g2-116",
       "g2-117",
       "g2-118",
       "g2-119",
-      "g2-120"
+      "g2-120",
+      "g2-121",
+      "g2-122",
+      "g2-123",
+      "g2-124",
+      "g2-125",
+      "g2-126",
+      "g2-127",
+      "g2-128",
+      "g2-129",
+      "g2-130",
+      "g2-131",
+      "g2-132",
+      "g2-133",
+      "g2-134",
+      "g2-135",
+      "g2-136",
+      "g2-137",
+      "g2-138",
+      "g2-139",
+      "g2-140"
     ],
     "clearBonusExp": 30,
     "recommendedLevel": 5
@@ -364,30 +404,9 @@
       "HKS-E10"
     ],
     "kanjiPoolIdList": [
-      "g2-121",
-      "g2-122",
-      "g2-123",
-      "g2-124",
-      "g2-125",
-      "g2-126",
-      "g2-127",
-      "g2-128",
-      "g2-129",
-      "g2-130",
-      "g2-131",
-      "g2-132",
-      "g2-133",
-      "g2-134",
-      "g2-135",
-      "g2-136",
-      "g2-137",
-      "g2-138",
-      "g2-139",
-      "g2-140",
       "g2-141",
       "g2-142",
       "g2-143",
-      "g2-144",
       "g2-145",
       "g2-146",
       "g2-147",
@@ -396,7 +415,6 @@
       "g2-150",
       "g2-151",
       "g2-152",
-      "g2-153",
       "g2-154",
       "g2-155",
       "g2-156",
@@ -1332,7 +1350,8 @@
       "g4-199",
       "g4-200",
       "g4-201",
-      "g4-202"
+      "g4-202",
+      "g4-203"
     ],
     "clearBonusExp": 30,
     "recommendedLevel": 16
@@ -1714,7 +1733,8 @@
       "g5-190",
       "g5-191",
       "g5-192",
-      "g5-193"
+      "g5-193",
+      "g5-194"
     ],
     "clearBonusExp": 30,
     "recommendedLevel": 21
@@ -2048,24 +2068,24 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "東アジア1",
+    "pref": "東アジア",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 600,
+      "y": 200
     },
     "stageId": "Asie_area1",
-    "name": "東アジア1",
+    "name": "東アジア",
     "enemyIdList": [
-      "EAsia-E01",
-      "EAsia-E02",
-      "EAsia-E03",
-      "EAsia-E04",
-      "EAsia-E05",
-      "EAsia-E06",
-      "EAsia-E07",
-      "EAsia-E08",
-      "EAsia-E09",
-      "EAsia-E10"
+      "PRV-E001",
+      "PRV-E002",
+      "PRV-E003",
+      "PRV-E004",
+      "PRV-E005",
+      "PRV-E006",
+      "PRV-E007",
+      "PRV-E008",
+      "PRV-E009",
+      "PRV-E010"
     ],
     "kanjiPoolIdList": [
       "g7-001",
@@ -2105,24 +2125,24 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "東アジア2",
+    "pref": "東南アジア大陸部",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 600,
+      "y": 350
     },
     "stageId": "Asie_area2",
-    "name": "東アジア2",
+    "name": "東南アジア大陸部",
     "enemyIdList": [
-      "EAsia-E11",
-      "EAsia-E12",
-      "EAsia-E13",
-      "EAsia-E14",
-      "EAsia-E15",
-      "EAsia-E16",
-      "EAsia-E17",
-      "EAsia-E18",
-      "EAsia-E19",
-      "EAsia-E20"
+      "PRV-E011",
+      "PRV-E012",
+      "PRV-E013",
+      "PRV-E014",
+      "PRV-E015",
+      "PRV-E016",
+      "PRV-E017",
+      "PRV-E018",
+      "PRV-E019",
+      "PRV-E020"
     ],
     "kanjiPoolIdList": [
       "g7-031",
@@ -2163,24 +2183,24 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "南アジア1",
+    "pref": "東南アジア海洋部",
     "pos": {
-      "x": 450,
+      "x": 620,
       "y": 400
     },
     "stageId": "Asie_area3",
-    "name": "南アジア1",
+    "name": "東南アジア海洋部",
     "enemyIdList": [
-      "SAsia-E01",
-      "SAsia-E02",
-      "SAsia-E03",
-      "SAsia-E04",
-      "SAsia-E05",
-      "SAsia-E06",
-      "SAsia-E07",
-      "SAsia-E08",
-      "SAsia-E09",
-      "SAsia-E10"
+      "PRV-E021",
+      "PRV-E022",
+      "PRV-E023",
+      "PRV-E024",
+      "PRV-E025",
+      "PRV-E026",
+      "PRV-E027",
+      "PRV-E028",
+      "PRV-E029",
+      "PRV-E030"
     ],
     "kanjiPoolIdList": [
       "g7-061",
@@ -2221,24 +2241,24 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "南アジア2",
+    "pref": "南アジア",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 550,
+      "y": 330
     },
     "stageId": "Asie_area4",
-    "name": "南アジア2",
+    "name": "南アジア",
     "enemyIdList": [
-      "SAsia-E11",
-      "SAsia-E12",
-      "SAsia-E13",
-      "SAsia-E14",
-      "SAsia-E15",
-      "SAsia-E16",
-      "SAsia-E17",
-      "SAsia-E18",
-      "SAsia-E19",
-      "SAsia-E20"
+      "PRV-E031",
+      "PRV-E032",
+      "PRV-E033",
+      "PRV-E034",
+      "PRV-E035",
+      "PRV-E036",
+      "PRV-E037",
+      "PRV-E038",
+      "PRV-E039",
+      "PRV-E040"
     ],
     "kanjiPoolIdList": [
       "g7-091",
@@ -2279,24 +2299,24 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "東南アジア1",
+    "pref": "中央アジア",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 500,
+      "y": 200
     },
     "stageId": "Asie_area5",
-    "name": "東南アジア1",
+    "name": "中央アジア",
     "enemyIdList": [
-      "ESAsia-E01",
-      "ESAsia-E02",
-      "ESAsia-E03",
-      "ESAsia-E04",
-      "ESAsia-E05",
-      "ESAsia-E06",
-      "ESAsia-E07",
-      "ESAsia-E08",
-      "ESAsia-E09",
-      "ESAsia-E10"
+      "PRV-E041",
+      "PRV-E042",
+      "PRV-E043",
+      "PRV-E044",
+      "PRV-E045",
+      "PRV-E046",
+      "PRV-E047",
+      "PRV-E048",
+      "PRV-E049",
+      "PRV-E050"
     ],
     "kanjiPoolIdList": [
       "g7-121",
@@ -2337,24 +2357,24 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "東南アジア2",
+    "pref": "ペルシア文化圏",
     "pos": {
       "x": 450,
-      "y": 400
+      "y": 300
     },
     "stageId": "Asie_area6",
-    "name": "東南アジア2",
+    "name": "ペルシア文化圏",
     "enemyIdList": [
-      "ESAsia-E11",
-      "ESAsia-E12",
-      "ESAsia-E13",
-      "ESAsia-E14",
-      "ESAsia-E15",
-      "ESAsia-E16",
-      "ESAsia-E17",
-      "ESAsia-E18",
-      "ESAsia-E19",
-      "ESAsia-E20"
+      "PRV-E051",
+      "PRV-E052",
+      "PRV-E053",
+      "PRV-E054",
+      "PRV-E055",
+      "PRV-E056",
+      "PRV-E057",
+      "PRV-E058",
+      "PRV-E059",
+      "PRV-E060"
     ],
     "kanjiPoolIdList": [
       "g7-151",
@@ -2394,24 +2414,24 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "中央アジア1",
+    "pref": "コーカサス",
     "pos": {
       "x": 450,
-      "y": 400
+      "y": 350
     },
     "stageId": "Asie_area7",
-    "name": "中央アジア1",
+    "name": "コーカサス",
     "enemyIdList": [
-      "CAsia-E01",
-      "CAsia-E02",
-      "CAsia-E03",
-      "CAsia-E04",
-      "CAsia-E05",
-      "CAsia-E06",
-      "CAsia-E07",
-      "CAsia-E08",
-      "CAsia-E09",
-      "CAsia-E10"
+      "PRV-E061",
+      "PRV-E062",
+      "PRV-E063",
+      "PRV-E064",
+      "PRV-E065",
+      "PRV-E066",
+      "PRV-E067",
+      "PRV-E068",
+      "PRV-E069",
+      "PRV-E070"
     ],
     "kanjiPoolIdList": [
       "g7-181",
@@ -2451,24 +2471,24 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "中央アジア2",
+    "pref": "アラビア半島",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 500,
+      "y": 350
     },
     "stageId": "Asie_area8",
-    "name": "中央アジア2",
+    "name": "アラビア半島",
     "enemyIdList": [
-      "CAsia-E11",
-      "CAsia-E12",
-      "CAsia-E13",
-      "CAsia-E14",
-      "CAsia-E15",
-      "CAsia-E16",
-      "CAsia-E17",
-      "CAsia-E18",
-      "CAsia-E19",
-      "CAsia-E20"
+      "PRV-E071",
+      "PRV-E072",
+      "PRV-E073",
+      "PRV-E074",
+      "PRV-E075",
+      "PRV-E076",
+      "PRV-E077",
+      "PRV-E078",
+      "PRV-E079",
+      "PRV-E080"
     ],
     "kanjiPoolIdList": [
       "g7-211",
@@ -2511,24 +2531,24 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "西アジア1",
+    "pref": "モンゴル草原",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 500,
+      "y": 200
     },
     "stageId": "Asie_area9",
-    "name": "西アジア1",
+    "name": "モンゴル草原",
     "enemyIdList": [
-      "WAsia-E01",
-      "WAsia-E02",
-      "WAsia-E03",
-      "WAsia-E04",
-      "WAsia-E05",
-      "WAsia-E06",
-      "WAsia-E07",
-      "WAsia-E08",
-      "WAsia-E09",
-      "WAsia-E10"
+      "PRV-E081",
+      "PRV-E082",
+      "PRV-E083",
+      "PRV-E084",
+      "PRV-E085",
+      "PRV-E086",
+      "PRV-E087",
+      "PRV-E088",
+      "PRV-E089",
+      "PRV-E090"
     ],
     "kanjiPoolIdList": [
       "g7-241",
@@ -2568,81 +2588,24 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "西アジア1",
+    "pref": "中国",
     "pos": {
-      "x": 450,
-      "y": 400
-    },
-    "stageId": "Asie_area9",
-    "name": "西アジア1",
-    "enemyIdList": [
-      "WAsia-E01",
-      "WAsia-E02",
-      "WAsia-E03",
-      "WAsia-E04",
-      "WAsia-E05",
-      "WAsia-E06",
-      "WAsia-E07",
-      "WAsia-E08",
-      "WAsia-E09",
-      "WAsia-E10"
-    ],
-    "kanjiPoolIdList": [
-      "g7-241",
-      "g7-242",
-      "g7-243",
-      "g7-244",
-      "g7-245",
-      "g7-246",
-      "g7-247",
-      "g7-248",
-      "g7-249",
-      "g7-250",
-      "g7-251",
-      "g7-252",
-      "g7-253",
-      "g7-254",
-      "g7-255",
-      "g7-256",
-      "g7-257",
-      "g7-258",
-      "g7-259",
-      "g7-260",
-      "g7-261",
-      "g7-262",
-      "g7-263",
-      "g7-264",
-      "g7-265",
-      "g7-266",
-      "g7-267",
-      "g7-268",
-      "g7-269",
-      "g7-270"
-    ],
-    "clearBonusExp": 30,
-    "recommendedLevel": 24
-  },
-  {
-    "grade": 7,
-    "region": "アジア",
-    "pref": "西アジア2",
-    "pos": {
-      "x": 450,
-      "y": 400
+      "x": 600,
+      "y": 300
     },
     "stageId": "Asie_area10",
-    "name": "西アジア2",
+    "name": "中国",
     "enemyIdList": [
-      "WAsia-E11",
-      "WAsia-E12",
-      "WAsia-E13",
-      "WAsia-E14",
-      "WAsia-E15",
-      "WAsia-E16",
-      "WAsia-E17",
-      "WAsia-E18",
-      "WAsia-E19",
-      "WAsia-E20"
+      "PRV-E091",
+      "PRV-E092",
+      "PRV-E093",
+      "PRV-E094",
+      "PRV-E095",
+      "PRV-E096",
+      "PRV-E097",
+      "PRV-E098",
+      "PRV-E099",
+      "PRV-E100"
     ],
     "kanjiPoolIdList": [
       "g7-271",
@@ -2674,32 +2637,45 @@
       "g7-297",
       "g7-298",
       "g7-299",
-      "g7-300"
-    ],
+      "g7-300",
+      "g7-301",
+      "g7-302",
+      "g7-303",
+      "g7-304",
+      "g7-305",
+      "g7-306",
+      "g7-307",
+      "g7-308",
+      "g7-309",
+      "g7-310",
+      "g7-311",
+      "g7-312",
+      "g7-313"
+        ],
     "clearBonusExp": 30,
     "recommendedLevel": 24
   },
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "西ヨーロッパ1",
+    "pref": "北欧",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 600,
+      "y": 100
     },
     "stageId": "Europe_area1",
-    "name": "西ヨーロッパ1",
+    "name": "北欧",
     "enemyIdList": [
-      "WEurope-E01",
-      "WEurope-E02",
-      "WEurope-E03",
-      "WEurope-E04",
-      "WEurope-E05",
-      "WEurope-E06",
-      "WEurope-E07",
-      "WEurope-E08",
-      "WEurope-E09",
-      "WEurope-E10"
+      "PRV-E101",
+      "PRV-E102",
+      "PRV-E103",
+      "PRV-E104",
+      "PRV-E105",
+      "PRV-E106",
+      "PRV-E107",
+      "PRV-E108",
+      "PRV-E109",
+      "PRV-E110"
     ],
     "kanjiPoolIdList": [
       "g8-001",
@@ -2739,24 +2715,24 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "西ヨーロッパ2",
+    "pref": "ブリテン諸島",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 500,
+      "y": 300
     },
     "stageId": "Europe_area2",
-    "name": "西ヨーロッパ2",
+    "name": "ブリテン諸島",
     "enemyIdList": [
-      "WEurope-E11",
-      "WEurope-E12",
-      "WEurope-E13",
-      "WEurope-E14",
-      "WEurope-E15",
-      "WEurope-E16",
-      "WEurope-E17",
-      "WEurope-E18",
-      "WEurope-E19",
-      "WEurope-E20"
+      "PRV-E111",
+      "PRV-E112",
+      "PRV-E113",
+      "PRV-E114",
+      "PRV-E115",
+      "PRV-E116",
+      "PRV-E117",
+      "PRV-E118",
+      "PRV-E119",
+      "PRV-E120"
     ],
     "kanjiPoolIdList": [
       "g8-031",
@@ -2797,24 +2773,24 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "西ヨーロッパ3",
+    "pref": "イベリア半島",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 480,
+      "y": 430
     },
     "stageId": "Europe_area3",
-    "name": "西ヨーロッパ3",
+    "name": "イベリア半島",
     "enemyIdList": [
-      "WEurope-E21",
-      "WEurope-E22",
-      "WEurope-E23",
-      "WEurope-E24",
-      "WEurope-E25",
-      "WEurope-E26",
-      "WEurope-E27",
-      "WEurope-E28",
-      "WEurope-E29",
-      "WEurope-E30"
+      "PRV-E121",
+      "PRV-E122",
+      "PRV-E123",
+      "PRV-E124",
+      "PRV-E125",
+      "PRV-E126",
+      "PRV-E127",
+      "PRV-E128",
+      "PRV-E129",
+      "PRV-E130"
     ],
     "kanjiPoolIdList": [
       "g8-061",
@@ -2855,24 +2831,24 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "西ヨーロッパ4",
+    "pref": "フランス",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 500,
+      "y": 350
     },
     "stageId": "Europe_area4",
-    "name": "西ヨーロッパ4",
+    "name": "フランス",
     "enemyIdList": [
-      "WEurope-E31",
-      "WEurope-E32",
-      "WEurope-E33",
-      "WEurope-E34",
-      "WEurope-E35",
-      "WEurope-E36",
-      "WEurope-E37",
-      "WEurope-E38",
-      "WEurope-E39",
-      "WEurope-E40"
+      "PRV-E131",
+      "PRV-E132",
+      "PRV-E133",
+      "PRV-E134",
+      "PRV-E135",
+      "PRV-E136",
+      "PRV-E137",
+      "PRV-E138",
+      "PRV-E139",
+      "PRV-E140"
     ],
     "kanjiPoolIdList": [
       "g8-091",
@@ -2913,24 +2889,24 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "北ヨーロッパ1",
+    "pref": "ドイツ",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 520,
+      "y": 330
     },
     "stageId": "Europe_area5",
-    "name": "北ヨーロッパ1",
+    "name": "ドイツ",
     "enemyIdList": [
-      "NEurope-E01",
-      "NEurope-E02",
-      "NEurope-E03",
-      "NEurope-E04",
-      "NEurope-E05",
-      "NEurope-E06",
-      "NEurope-E07",
-      "NEurope-E08",
-      "NEurope-E09",
-      "NEurope-E10"
+      "PRV-E141",
+      "PRV-E142",
+      "PRV-E143",
+      "PRV-E144",
+      "PRV-E145",
+      "PRV-E146",
+      "PRV-E147",
+      "PRV-E148",
+      "PRV-E149",
+      "PRV-E150"
     ],
     "kanjiPoolIdList": [
       "g8-121",
@@ -2971,24 +2947,24 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "北ヨーロッパ2",
+    "pref": "イタリア",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 550,
+      "y": 450
     },
     "stageId": "Europe_area6",
-    "name": "北ヨーロッパ2",
+    "name": "イタリア",
     "enemyIdList": [
-      "NEurope-E11",
-      "NEurope-E12",
-      "NEurope-E13",
-      "NEurope-E14",
-      "NEurope-E15",
-      "NEurope-E16",
-      "NEurope-E17",
-      "NEurope-E18",
-      "NEurope-E19",
-      "NEurope-E20"
+      "PRV-E151",
+      "PRV-E152",
+      "PRV-E153",
+      "PRV-E154",
+      "PRV-E155",
+      "PRV-E156",
+      "PRV-E157",
+      "PRV-E158",
+      "PRV-E159",
+      "PRV-E160"
     ],
     "kanjiPoolIdList": [
       "g8-151",
@@ -3029,24 +3005,24 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "南ヨーロッパ1",
+    "pref": "ポーランド",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 570,
+      "y": 320
     },
     "stageId": "Europe_area7",
-    "name": "南ヨーロッパ1",
+    "name": "ポーランド",
     "enemyIdList": [
-      "SEurope-E01",
-      "SEurope-E02",
-      "SEurope-E03",
-      "SEurope-E04",
-      "SEurope-E05",
-      "SEurope-E06",
-      "SEurope-E07",
-      "SEurope-E08",
-      "SEurope-E09",
-      "SEurope-E10"
+      "PRV-E161",
+      "PRV-E162",
+      "PRV-E163",
+      "PRV-E164",
+      "PRV-E165",
+      "PRV-E166",
+      "PRV-E167",
+      "PRV-E168",
+      "PRV-E169",
+      "PRV-E170"
     ],
     "kanjiPoolIdList": [
       "g8-181",
@@ -3087,24 +3063,24 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "南ヨーロッパ2",
+    "pref": "東欧",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 570,
+      "y": 360
     },
     "stageId": "Europe_area8",
-    "name": "南ヨーロッパ2",
+    "name": "東欧",
     "enemyIdList": [
-      "SEurope-E11",
-      "SEurope-E12",
-      "SEurope-E13",
-      "SEurope-E14",
-      "SEurope-E15",
-      "SEurope-E16",
-      "SEurope-E17",
-      "SEurope-E18",
-      "SEurope-E19",
-      "SEurope-E20"
+      "PRV-E171",
+      "PRV-E172",
+      "PRV-E173",
+      "PRV-E174",
+      "PRV-E175",
+      "PRV-E176",
+      "PRV-E177",
+      "PRV-E178",
+      "PRV-E179",
+      "PRV-E180"
     ],
     "kanjiPoolIdList": [
       "g8-211",
@@ -3145,24 +3121,24 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "東ヨーロッパ1",
+    "pref": "バルト三国",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 620,
+      "y": 320
     },
     "stageId": "Europe_area9",
-    "name": "東ヨーロッパ1",
+    "name": "バルト三国",
     "enemyIdList": [
-      "EEurope-E01",
-      "EEurope-E02",
-      "EEurope-E03",
-      "EEurope-E04",
-      "EEurope-E05",
-      "EEurope-E06",
-      "EEurope-E07",
-      "EEurope-E08",
-      "EEurope-E09",
-      "EEurope-E10"
+      "PRV-E181",
+      "PRV-E182",
+      "PRV-E183",
+      "PRV-E184",
+      "PRV-E185",
+      "PRV-E186",
+      "PRV-E187",
+      "PRV-E188",
+      "PRV-E189",
+      "PRV-E190"
     ],
     "kanjiPoolIdList": [
       "g8-241",
@@ -3202,24 +3178,24 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "東ヨーロッパ2",
+    "pref": "ロシア",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 650,
+      "y": 250
     },
     "stageId": "Europe_area10",
-    "name": "東ヨーロッパ2",
+    "name": "ロシア",
     "enemyIdList": [
-      "EEurope-E11",
-      "EEurope-E12",
-      "EEurope-E13",
-      "EEurope-E14",
-      "EEurope-E15",
-      "EEurope-E16",
-      "EEurope-E17",
-      "EEurope-E18",
-      "EEurope-E19",
-      "EEurope-E20"
+      "PRV-E191",
+      "PRV-E192",
+      "PRV-E193",
+      "PRV-E194",
+      "PRV-E195",
+      "PRV-E196",
+      "PRV-E197",
+      "PRV-E198",
+      "PRV-E199",
+      "PRV-E200"
     ],
     "kanjiPoolIdList": [
       "g8-271",
@@ -3235,23 +3211,7 @@
       "g8-281",
       "g8-282",
       "g8-283",
-      "g8-284",
-      "g8-285",
-      "g8-286",
-      "g8-287",
-      "g8-288",
-      "g8-289",
-      "g8-290",
-      "g8-291",
-      "g8-292",
-      "g8-293",
-      "g8-294",
-      "g8-295",
-      "g8-296",
-      "g8-297",
-      "g8-298",
-      "g8-299",
-      "g8-300"
+      "g8-284"
     ],
     "clearBonusExp": 30,
     "recommendedLevel": 24
@@ -3259,25 +3219,25 @@
   
   {
     "grade": 9,
-    "region": "北南米アメリカ",
-    "pref": "北米1",
+    "region": "アメリカ大陸",
+    "pref": "アラスカ",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 550,
+      "y": 150
     },
     "stageId": "America_area1",
-    "name": "北米1",
+    "name": "アラスカ",
     "enemyIdList": [
-      "NAmerica-E01",
-      "NAmerica-E02",
-      "NAmerica-E03",
-      "NAmerica-E04",
-      "NAmerica-E05",
-      "NAmerica-E06",
-      "NAmerica-E07",
-      "NAmerica-E08",
-      "NAmerica-E09",
-      "NAmerica-E10"
+      "PRV-E201",
+      "PRV-E202",
+      "PRV-E203",
+      "PRV-E204",
+      "PRV-E205",
+      "PRV-E206",
+      "PRV-E207",
+      "PRV-E208",
+      "PRV-E209",
+      "PRV-E210"
     ],
     "kanjiPoolIdList": [
       "g9-001",
@@ -3317,25 +3277,25 @@
   
   {
     "grade": 9,
-    "region": "北南米アメリカ",
-    "pref": "北米2",
+    "region": "アメリカ大陸",
+    "pref": "北米西海岸",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 520,
+      "y": 220
     },
     "stageId": "America_area2",
-    "name": "北米2",
+    "name": "北米西海岸",
     "enemyIdList": [
-      "NAmerica-E11",
-      "NAmerica-E12",
-      "NAmerica-E13",
-      "NAmerica-E14",
-      "NAmerica-E15",
-      "NAmerica-E16",
-      "NAmerica-E17",
-      "NAmerica-E18",
-      "NAmerica-E19",
-      "NAmerica-E20"
+      "PRV-E211",
+      "PRV-E212",
+      "PRV-E213",
+      "PRV-E214",
+      "PRV-E215",
+      "PRV-E216",
+      "PRV-E217",
+      "PRV-E218",
+      "PRV-E219",
+      "PRV-E220"
     ],
     "kanjiPoolIdList": [
       "g9-031",
@@ -3374,25 +3334,25 @@
   },
   {
     "grade": 9,
-    "region": "北南米アメリカ",
-    "pref": "北米3",
+    "region": "アメリカ大陸",
+    "pref": "北米中西部",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 550,
+      "y": 250
     },
     "stageId": "America_area3",
-    "name": "北米3",
+    "name": "北米中西部",
     "enemyIdList": [
-      "NAmerica-E21",
-      "NAmerica-E22",
-      "NAmerica-E23",
-      "NAmerica-E24",
-      "NAmerica-E25",
-      "NAmerica-E26",
-      "NAmerica-E27",
-      "NAmerica-E28",
-      "NAmerica-E29",
-      "NAmerica-E30"
+      "PRV-E221",
+      "PRV-E222",
+      "PRV-E223",
+      "PRV-E224",
+      "PRV-E225",
+      "PRV-E226",
+      "PRV-E227",
+      "PRV-E228",
+      "PRV-E229",
+      "PRV-E230"
     ],
     "kanjiPoolIdList": [
       "g9-061",
@@ -3431,25 +3391,25 @@
   },
   {
     "grade": 9,
-    "region": "北南米アメリカ",
-    "pref": "中央アメリカ",
+    "region": "アメリカ大陸",
+    "pref": "北米東海岸",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 600,
+      "y": 200
     },
     "stageId": "America_area4",
-    "name": "中央アメリカ1",
+    "name": "北米東海岸",
     "enemyIdList": [
-      "CAmerica-E01",
-      "CAmerica-E02",
-      "CAmerica-E03",
-      "CAmerica-E04",
-      "CAmerica-E05",
-      "CAmerica-E06",
-      "CAmerica-E07",
-      "CAmerica-E08",
-      "CAmerica-E09",
-      "CAmerica-E10"
+      "PRV-E231",
+      "PRV-E232",
+      "PRV-E233",
+      "PRV-E234",
+      "PRV-E235",
+      "PRV-E236",
+      "PRV-E237",
+      "PRV-E238",
+      "PRV-E239",
+      "PRV-E240"
     ],
     "kanjiPoolIdList": [
       "g9-091",
@@ -3488,25 +3448,25 @@
   },
   {
     "grade": 9,
-    "region": "北南米アメリカ",
-    "pref": "中央アメリカ2",
+    "region": "アメリカ大陸",
+    "pref": "メキシコ",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 550,
+      "y": 300
     },
     "stageId": "America_area5",
-    "name": "中央アメリカ2",
+    "name": "メキシコ",
     "enemyIdList": [
-      "CAmerica-E11",
-      "CAmerica-E12",
-      "CAmerica-E13",
-      "CAmerica-E14",
-      "CAmerica-E15",
-      "CAmerica-E16",
-      "CAmerica-E17",
-      "CAmerica-E18",
-      "CAmerica-E19",
-      "CAmerica-E20"
+      "PRV-E241",
+      "PRV-E242",
+      "PRV-E243",
+      "PRV-E244",
+      "PRV-E245",
+      "PRV-E246",
+      "PRV-E247",
+      "PRV-E248",
+      "PRV-E249",
+      "PRV-E250"
     ],
     "kanjiPoolIdList": [
       "g9-121",
@@ -3545,25 +3505,25 @@
   },
   {
     "grade": 9,
-    "region": "北南米アメリカ",
-    "pref": "北部アメリカ1",
+    "region": "アメリカ大陸",
+    "pref": "コスタリカ",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 600,
+      "y": 380
     },
     "stageId": "America_area6",
-    "name": "北部アメリカ1",
+    "name": "コスタリカ",
     "enemyIdList": [
-      "NNAmerica-E01",
-      "NNAmerica-E02",
-      "NNAmerica-E03",
-      "NNAmerica-E04",
-      "NNAmerica-E05",
-      "NNAmerica-E06",
-      "NNAmerica-E07",
-      "NNAmerica-E08",
-      "NNAmerica-E09",
-      "NNAmerica-E10"
+      "PRV-E251",
+      "PRV-E252",
+      "PRV-E253",
+      "PRV-E254",
+      "PRV-E255",
+      "PRV-E256",
+      "PRV-E257",
+      "PRV-E258",
+      "PRV-E259",
+      "PRV-E260"
     ],
     "kanjiPoolIdList": [
       "g9-151",
@@ -3602,25 +3562,25 @@
   },
   {
     "grade": 9,
-    "region": "北南米アメリカ",
-    "pref": "北部アメリカ2",
+    "region": "アメリカ大陸",
+    "pref": "カリブ海諸島",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 600,
+      "y": 310
     },
     "stageId": "America_area7",
-    "name": "北部アメリカ2",
+    "name": "カリブ海諸島",
     "enemyIdList": [
-      "NNAmerica-E11",
-      "NNAmerica-E12",
-      "NNAmerica-E13",
-      "NNAmerica-E14",
-      "NNAmerica-E15",
-      "NNAmerica-E16",
-      "NNAmerica-E17",
-      "NNAmerica-E18",
-      "NNAmerica-E19",
-      "NNAmerica-E20"
+      "PRV-E261",
+      "PRV-E262",
+      "PRV-E263",
+      "PRV-E264",
+      "PRV-E265",
+      "PRV-E266",
+      "PRV-E267",
+      "PRV-E268",
+      "PRV-E269",
+      "PRV-E270"
     ],
     "kanjiPoolIdList": [
       "g9-181",
@@ -3659,25 +3619,25 @@
   },
   {
     "grade": 9,
-    "region": "北南米アメリカ",
-    "pref": "ブラジル",
+    "region": "アメリカ大陸",
+    "pref": "北アンデス",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 600,
+      "y": 350
     },
     "stageId": "America_area8",
-    "name": "ブラジル",
+    "name": "北アンデス",
     "enemyIdList": [
-      "BAmerica-E01",
-      "BAmerica-E02",
-      "BAmerica-E03",
-      "BAmerica-E04",
-      "BAmerica-E05",
-      "BAmerica-E06",
-      "BAmerica-E07",
-      "BAmerica-E08",
-      "BAmerica-E09",
-      "BAmerica-E10"
+      "PRV-E271",
+      "PRV-E272",
+      "PRV-E273",
+      "PRV-E274",
+      "PRV-E275",
+      "PRV-E276",
+      "PRV-E277",
+      "PRV-E278",
+      "PRV-E279",
+      "PRV-E280"
     ],
     "kanjiPoolIdList": [
       "g9-211",
@@ -3692,10 +3652,10 @@
       "g9-220",
       "g9-221",
       "g9-222",
-      "g9-193",
+      "g9-223",
+      "g9-224",
+      "g9-225",
       "g9-226",
-      "g9-227",
-      "g9-228",
       "g9-229",
       "g9-230",
       "g9-231",
@@ -3714,25 +3674,25 @@
   },
   {
     "grade": 9,
-    "region": "北南米アメリカ",
-    "pref": "南部アメリカ1",
+    "region": "アメリカ大陸",
+    "pref": "アマゾン盆地",
     "pos": {
-      "x": 450,
+      "x": 600,
       "y": 400
     },
     "stageId": "America_area9",
-    "name": "南部アメリカ1",
+    "name": "アマゾン盆地",
     "enemyIdList": [
-      "SAmerica-E01",
-      "SAmerica-E02",
-      "SAmerica-E03",
-      "SAmerica-E04",
-      "SAmerica-E05",
-      "SAmerica-E06",
-      "SAmerica-E07",
-      "SAmerica-E08",
-      "SAmerica-E09",
-      "SAmerica-E10"
+      "PRV-E281",
+      "PRV-E282",
+      "PRV-E283",
+      "PRV-E284",
+      "PRV-E285",
+      "PRV-E286",
+      "PRV-E287",
+      "PRV-E288",
+      "PRV-E289",
+      "PRV-E290"
     ],
     "kanjiPoolIdList": [
       "g9-241",
@@ -3772,25 +3732,25 @@
   
   {
     "grade": 9,
-    "region": "北南米アメリカ",
-    "pref": "南部アメリカ2",
+    "region": "アメリカ大陸",
+    "pref": "南アメリカ南部",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 580,
+      "y": 500
     },
     "stageId": "America_area10",
-    "name": "南部アメリカ2",
+    "name": "南アメリカ南部",
     "enemyIdList": [
-      "SAmerica-E11",
-      "SAmerica-E12",
-      "SAmerica-E13",
-      "SAmerica-E14",
-      "SAmerica-E15",
-      "SAmerica-E16",
-      "SAmerica-E17",
-      "SAmerica-E18",
-      "SAmerica-E19",
-      "SAmerica-E20"
+      "PRV-E291",
+      "PRV-E292",
+      "PRV-E293",
+      "PRV-E294",
+      "PRV-E295",
+      "PRV-E296",
+      "PRV-E297",
+      "PRV-E298",
+      "PRV-E299",
+      "PRV-E300"
     ],
     "kanjiPoolIdList": [
       "g9-271",
@@ -3822,7 +3782,35 @@
       "g9-297",
       "g9-298",
       "g9-299",
-      "g9-300"
+      "g9-300",
+      "g9-301",
+      "g9-302",
+      "g9-303",
+      "g9-304",
+      "g9-305",
+      "g9-306",
+      "g9-307",
+      "g9-308",
+      "g9-309",
+      "g9-310",
+      "g9-311",
+      "g9-312",
+      "g9-313",
+      "g9-314",
+      "g9-315",
+      "g9-316",
+      "g9-317",
+      "g9-318",
+      "g9-319",
+      "g9-320",
+      "g9-321",
+      "g9-322",
+      "g9-323",
+      "g9-324",
+      "g9-325",
+      "g9-326",
+      "g9-327",
+      "g9-328"
     ],
     "clearBonusExp": 30,
     "recommendedLevel": 24
@@ -3831,24 +3819,24 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "北アフリカ",
+    "pref": "北西アフリカ",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 630,
+      "y": 190
     },
     "stageId": "Africa_area1",
-    "name": "北アフリカ",
+    "name": "北西アフリカ",
     "enemyIdList": [
-      "NAfrica-E01",
-      "NAfrica-E02",
-      "NAfrica-E03",
-      "NAfrica-E04",
-      "NAfrica-E05",
-      "NAfrica-E06",
-      "NAfrica-E07",
-      "NAfrica-E08",
-      "NAfrica-E09",
-      "NAfrica-E10"
+      "PRV-E301",
+      "PRV-E302",
+      "PRV-E303",
+      "PRV-E304",
+      "PRV-E305",
+      "PRV-E306",
+      "PRV-E307",
+      "PRV-E308",
+      "PRV-E309",
+      "PRV-E310"
     ],
     "kanjiPoolIdList": [
       "g10-001",
@@ -3870,7 +3858,35 @@
       "g10-017",
       "g10-018",
       "g10-019",
-      "g10-020",
+      "g10-020"
+    ],
+    "clearBonusExp": 30,
+    "recommendedLevel": 24
+  },
+
+  {
+    "grade": 10,
+    "region": "アフリカ大陸",
+    "pref": "エジプト",
+    "pos": {
+      "x": 620,
+      "y": 130
+    },
+    "stageId": "Africa_area2",
+    "name": "エジプト",
+    "enemyIdList": [
+      "PRV-E311",
+      "PRV-E312",
+      "PRV-E313",
+      "PRV-E314",
+      "PRV-E315",
+      "PRV-E316",
+      "PRV-E317",
+      "PRV-E318",
+      "PRV-E319",
+      "PRV-E320"
+    ],
+    "kanjiPoolIdList": [
       "g10-021",
       "g10-022",
       "g10-023",
@@ -3880,35 +3896,7 @@
       "g10-027",
       "g10-028",
       "g10-029",
-      "g10-030"
-    ],
-    "clearBonusExp": 30,
-    "recommendedLevel": 24
-  },
-
-  {
-    "grade": 10,
-    "region": "アフリカ大陸",
-    "pref": "西アフリカ",
-    "pos": {
-      "x": 450,
-      "y": 400
-    },
-    "stageId": "Africa_area2",
-    "name": "西アフリカ",
-    "enemyIdList": [
-      "WAfrica-E01",
-      "WAfrica-E02",
-      "WAfrica-E03",
-      "WAfrica-E04",
-      "WAfrica-E05",
-      "WAfrica-E06",
-      "WAfrica-E07",
-      "WAfrica-E08",
-      "WAfrica-E09",
-      "WAfrica-E10"
-    ],
-    "kanjiPoolIdList": [
+      "g10-030",
       "g10-031",
       "g10-032",
       "g10-033",
@@ -3918,7 +3906,34 @@
       "g10-037",
       "g10-038",
       "g10-039",
-      "g10-040",
+      "g10-040"
+    ],
+    "clearBonusExp": 30,
+    "recommendedLevel": 24
+  },
+  {
+    "grade": 10,
+    "region": "アフリカ大陸",
+    "pref": "西アフリカ内陸",
+    "pos": {
+      "x": 500,
+      "y": 200
+    },
+    "stageId": "Africa_area3",
+    "name": "西アフリカ内陸",
+    "enemyIdList": [
+      "PRV-E321",
+      "PRV-E322",
+      "PRV-E323",
+      "PRV-E324",
+      "PRV-E325",
+      "PRV-E326",
+      "PRV-E327",
+      "PRV-E328",
+      "PRV-E329",
+      "PRV-E330"
+    ],
+    "kanjiPoolIdList": [
       "g10-041",
       "g10-042",
       "g10-043",
@@ -3926,7 +3941,7 @@
       "g10-045",
       "g10-046",
       "g10-047",
-      "g10-048",
+      "g10-048",  
       "g10-049",
       "g10-050",
       "g10-051",
@@ -3943,27 +3958,28 @@
     "clearBonusExp": 30,
     "recommendedLevel": 24
   },
+  
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "中央アフリカ",
+    "pref": "西アフリカ海岸",
     "pos": {
       "x": 450,
-      "y": 400
+      "y": 260
     },
-    "stageId": "Africa_area3",
-    "name": "中央アフリカ",
+    "stageId": "Africa_area4",
+    "name": "西アフリカ海岸",
     "enemyIdList": [
-      "CAfrica-E01",
-      "CAfrica-E02",
-      "CAfrica-E03",
-      "CAfrica-E04",
-      "CAfrica-E05",
-      "CAfrica-E06",
-      "CAfrica-E07",
-      "CAfrica-E08",
-      "CAfrica-E09",
-      "CAfrica-E10"
+      "PRV-E331",
+      "PRV-E332",
+      "PRV-E333",
+      "PRV-E334",
+      "PRV-E335",
+      "PRV-E336",
+      "PRV-E337",
+      "PRV-E338",
+      "PRV-E339",
+      "PRV-E340"
     ],
     "kanjiPoolIdList": [
       "g10-061",
@@ -3985,7 +4001,35 @@
       "g10-077",
       "g10-078",
       "g10-079",
-      "g10-080",
+      "g10-080"
+    ],
+    "clearBonusExp": 30,
+    "recommendedLevel": 24
+  },
+  
+  {
+    "grade": 10,
+    "region": "アフリカ大陸",
+    "pref": "ナイジェリア",
+    "pos": {
+      "x": 530,
+      "y": 250
+    },
+    "stageId": "Africa_area5",
+    "name": "ナイジェリア",
+    "enemyIdList": [
+      "PRV-E341",
+      "PRV-E342",
+      "PRV-E343",
+      "PRV-E344",
+      "PRV-E345",
+      "PRV-E346",
+      "PRV-E347",
+      "PRV-E348",
+      "PRV-E349",
+      "PRV-E350"
+    ],
+    "kanjiPoolIdList": [
       "g10-081",
       "g10-082",
       "g10-083",
@@ -3995,35 +4039,7 @@
       "g10-087",
       "g10-088",
       "g10-089",
-      "g10-090"
-    ],
-    "clearBonusExp": 30,
-    "recommendedLevel": 24
-  },
-  
-  {
-    "grade": 10,
-    "region": "アフリカ大陸",
-    "pref": "東アフリカ",
-    "pos": {
-      "x": 450,
-      "y": 400
-    },
-    "stageId": "Africa_area4",
-    "name": "東アフリカ",
-    "enemyIdList": [
-      "EAfrica-E01",
-      "EAfrica-E02",
-      "EAfrica-E03",
-      "EAfrica-E04",
-      "EAfrica-E05",
-      "EAfrica-E06",
-      "EAfrica-E07",
-      "EAfrica-E08",
-      "EAfrica-E09",
-      "EAfrica-E10"
-    ],
-    "kanjiPoolIdList": [
+      "g10-090",
       "g10-091",
       "g10-092",
       "g10-093",
@@ -4033,7 +4049,35 @@
       "g10-097",
       "g10-098",
       "g10-099",
-      "g10-100",
+      "g10-100"
+    ],
+    "clearBonusExp": 30,
+    "recommendedLevel": 24
+  },
+
+  {
+    "grade": 10,
+    "region": "アフリカ大陸",
+    "pref": "中央アフリカ",
+    "pos": {
+      "x": 590,
+      "y": 270
+    },
+    "stageId": "Africa_area6",
+    "name": "中央アフリカ",
+    "enemyIdList": [
+      "PRV-E351",
+      "PRV-E352",
+      "PRV-E353",
+      "PRV-E354",
+      "PRV-E355",
+      "PRV-E356",
+      "PRV-E357",
+      "PRV-E358",
+      "PRV-E359",
+      "PRV-E360"
+    ],
+    "kanjiPoolIdList": [
       "g10-101",
       "g10-102",
       "g10-103",
@@ -4041,7 +4085,7 @@
       "g10-105",
       "g10-106",
       "g10-107",
-      "g10-108",
+      "g10-108",  
       "g10-109",
       "g10-110",
       "g10-111",
@@ -4062,24 +4106,24 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "南アフリカ",
+    "pref": "ソマリア ",
     "pos": {
-      "x": 450,
-      "y": 400
+      "x": 730,
+      "y": 260
     },
-    "stageId": "Africa_area5",
-    "name": "南アフリカ",
+    "stageId": "Africa_area7",
+    "name": "ソマリア",
     "enemyIdList": [
-      "SAfrica-E01",
-      "SAfrica-E02",
-      "SAfrica-E03",
-      "SAfrica-E04",
-      "SAfrica-E05",
-      "SAfrica-E06",
-      "SAfrica-E07",
-      "SAfrica-E08",
-      "SAfrica-E09",
-      "SAfrica-E10"
+      "PRV-E361",
+      "PRV-E362",
+      "PRV-E363",
+      "PRV-E364",
+      "PRV-E365",
+      "PRV-E366",
+      "PRV-E367",
+      "PRV-E368",
+      "PRV-E369",
+      "PRV-E370"
     ],
     "kanjiPoolIdList": [
       "g10-121",
@@ -4101,8 +4145,37 @@
       "g10-137",
       "g10-138",
       "g10-139",
-      "g10-140",
-      "g10-141",
+      "g10-140"
+    ],
+    "clearBonusExp": 30,
+    "recommendedLevel": 24
+  },
+
+  
+  {
+    "grade": 10,
+    "region": "アフリカ大陸",
+    "pref": "エチオピア",
+    "pos": {
+      "x": 710,
+      "y": 280
+    },
+    "stageId": "Africa_area8",
+    "name": "エチオピア",
+    "enemyIdList": [
+      "PRV-E371",
+      "PRV-E372",
+      "PRV-E373",
+      "PRV-E374",
+      "PRV-E375",
+      "PRV-E376",
+      "PRV-E377",
+      "PRV-E378",
+      "PRV-E379",
+      "PRV-E380"
+    ],
+    "kanjiPoolIdList": [
+      "g10-141",  
       "g10-142",
       "g10-143",
       "g10-144",
@@ -4111,9 +4184,117 @@
       "g10-147",
       "g10-148",
       "g10-149",
-      "g10-150"
+      "g10-150",
+      "g10-151",
+      "g10-152",
+      "g10-153",
+      "g10-154",
+      "g10-155",
+      "g10-156",
+      "g10-157",
+      "g10-158",
+      "g10-159",
+      "g10-160"
+    ],
+    "clearBonusExp": 30,
+    "recommendedLevel": 24
+  },
+
+  
+  {
+    "grade": 10,
+    "region": "アフリカ大陸",
+    "pref": "東アフリカ",
+    "pos": {
+      "x": 650,
+      "y": 340
+    },
+    "stageId": "Africa_area9",
+    "name": "東アフリカ",
+    "enemyIdList": [
+      "PRV-E381",
+      "PRV-E382",
+      "PRV-E383",
+      "PRV-E384",
+      "PRV-E385",
+      "PRV-E386",
+      "PRV-E387",
+      "PRV-E388",
+      "PRV-E389",
+      "PRV-E390"
+    ],
+    "kanjiPoolIdList": [
+      "g10-161",
+      "g10-162",
+      "g10-163",
+      "g10-164",
+      "g10-165",
+      "g10-166",
+      "g10-167",
+      "g10-168",
+      "g10-169",
+      "g10-170",
+      "g10-171",
+      "g10-172",
+      "g10-173",
+      "g10-174",
+      "g10-175",
+      "g10-176",
+      "g10-177",
+      "g10-178",
+      "g10-179",
+      "g10-180"
+    ],
+    "clearBonusExp": 30,
+    "recommendedLevel": 24
+  },
+
+  {
+    "grade": 10,
+    "region": "アフリカ大陸",
+    "pref": "南部アフリカ",
+    "pos": {
+      "x": 590,
+      "y": 450
+    },
+    "stageId": "Africa_area10",
+    "name": "南部アフリカ",
+    "enemyIdList": [
+      "PRV-E391",
+      "PRV-E392",
+      "PRV-E393",
+      "PRV-E394",
+      "PRV-E395",
+      "PRV-E396",
+      "PRV-E397",
+      "PRV-E398",
+      "PRV-E399",
+      "PRV-E400"
+    ],
+    "kanjiPoolIdList": [
+      "g10-181",
+      "g10-182",
+      "g10-183",
+      "g10-184",
+      "g10-001",
+      "g10-002",
+      "g10-003",
+      "g10-004",
+      "g10-005",
+      "g10-006",
+      "g10-007",
+      "g10-008",
+      "g10-009",
+      "g10-010",
+      "g10-011",
+      "g10-012",
+      "g10-013",
+      "g10-014",
+      "g10-015",
+      "g10-016"
     ],
     "clearBonusExp": 30,
     "recommendedLevel": 24
   }
+
 ]

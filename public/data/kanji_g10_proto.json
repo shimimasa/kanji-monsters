@@ -2,7 +2,7 @@
   
   {
     "id": "g10-001",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "挨",
     "grade": 10,
     "strokes": 10,
@@ -17,7 +17,7 @@
   },
   {
     "id": "g10-002",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "曖",
     "grade": 10,
     "strokes": 17,
@@ -32,7 +32,7 @@
   },
   {
     "id": "g10-003",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "宛",
     "grade": 10,
     "strokes": 8,
@@ -47,7 +47,7 @@
   },
   {
     "id": "g10-004",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "嵐",
     "grade": 10,
     "strokes": 12,
@@ -62,7 +62,7 @@
   },
   {
     "id": "g10-005",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "畏",
     "grade": 10,
     "strokes": 9,
@@ -79,7 +79,7 @@
   },
   {
     "id": "g10-006",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "萎",
     "grade": 10,
     "strokes": 11,
@@ -96,7 +96,7 @@
   },
   {
     "id": "g10-007",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "椅",
     "grade": 10,
     "strokes": 12,
@@ -111,7 +111,7 @@
   },
   {
     "id": "g10-008",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "彙",
     "grade": 10,
     "strokes": 13,
@@ -126,7 +126,7 @@
   },
   {
     "id": "g10-009",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "咽",
     "grade": 10,
     "strokes": 9,
@@ -141,7 +141,7 @@
   },
   {
     "id": "g10-010",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "淫",
     "grade": 10,
     "strokes": 11,
@@ -158,7 +158,7 @@
   },
   {
     "id": "g10-011",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"]   ,
     "kanji": "唄",
     "grade": 10,
     "strokes": 10,
@@ -173,7 +173,7 @@
   },
   {
     "id": "g10-012",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "鬱",
     "grade": 10,
     "strokes": 29,
@@ -188,7 +188,7 @@
   },
   {
     "id": "g10-013",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "怨",
     "grade": 10,
     "strokes": 9,
@@ -204,7 +204,7 @@
   },
   {
     "id": "g10-014",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "艶",
     "grade": 10,
     "strokes": 19,
@@ -221,7 +221,7 @@
   },
   {
     "id": "g10-015",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "旺",
     "grade": 10,
     "strokes": 8,
@@ -236,7 +236,7 @@
   },
   {
     "id": "g10-016",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1","Africa_area10"],
     "kanji": "臆",
     "grade": 10,
     "strokes": 17,
@@ -251,7 +251,7 @@
   },
   {
     "id": "g10-017",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1"],
     "kanji": "俺",
     "grade": 10,
     "strokes": 10,
@@ -266,7 +266,7 @@
   },
   {
     "id": "g10-018",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1"],
     "kanji": "苛",
     "grade": 10,
     "strokes": 8,
@@ -281,7 +281,7 @@
   },
   {
     "id": "g10-019",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1"],
     "kanji": "牙",
     "grade": 10,
     "strokes": 4,
@@ -299,7 +299,7 @@
   },
   {
     "id": "g10-020",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area1"],
     "kanji": "瓦",
     "grade": 10,
     "strokes": 5,
@@ -316,7 +316,7 @@
   },
   {
     "id": "g10-021",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "楷",
     "grade": 10,
     "strokes": 13,
@@ -331,7 +331,7 @@
   },
   {
     "id": "g10-022",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "潰",
     "grade": 10,
     "strokes": 15,
@@ -348,7 +348,7 @@
   },
   {
     "id": "g10-023",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "諧",
     "grade": 10,
     "strokes": 16,
@@ -363,7 +363,7 @@
   },
   {
     "id": "g10-024",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "崖",
     "grade": 10,
     "strokes": 11,
@@ -380,7 +380,7 @@
   },
   {
     "id": "g10-025",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "蓋",
     "grade": 10,
     "strokes": 13,
@@ -397,7 +397,7 @@
   },
   {
     "id": "g10-026",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "骸",
     "grade": 10,
     "strokes": 16,
@@ -412,7 +412,7 @@
   },
   {
     "id": "g10-027",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "柿",
     "grade": 10,
     "strokes": 9,
@@ -427,7 +427,7 @@
   },
   {
     "id": "g10-028",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "顎",
     "grade": 10,
     "strokes": 9,
@@ -444,7 +444,7 @@
   },
   {
     "id": "g10-029",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "葛",
     "grade": 10,
     "strokes": 12,
@@ -461,7 +461,7 @@
   },
   {
     "id": "g10-030",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "釜",
     "grade": 10,
     "strokes": 10,
@@ -476,7 +476,7 @@
   },
   {
     "id": "g10-031",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "鎌",
     "grade": 10,
     "strokes": 18,
@@ -491,7 +491,7 @@
   },
   {
     "id": "g10-032",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "韓",
     "grade": 10,
     "strokes": 18,
@@ -506,7 +506,7 @@
   },
   {
     "id": "g10-033",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "玩",
     "grade": 10,
     "strokes": 8,
@@ -521,7 +521,7 @@
   },
   {
     "id": "g10-034",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "伎",
     "grade": 10,
     "strokes": 6,
@@ -536,7 +536,7 @@
   },
   {
     "id": "g10-035",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "亀",
     "grade": 10,
     "strokes": 11,
@@ -553,7 +553,7 @@
   },
   {
     "id": "g10-036",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "毀",
     "grade": 10,
     "strokes": 13,
@@ -568,7 +568,7 @@
   },
   {
     "id": "g10-037",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "畿",
     "grade": 10,
     "strokes": 15,
@@ -583,7 +583,7 @@
   },
   {
     "id": "g10-038",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "臼",
     "grade": 10,
     "strokes": 6,
@@ -600,7 +600,7 @@
   },
   {
     "id": "g10-039",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "嗅",
     "grade": 10,
     "strokes": 13,
@@ -617,7 +617,7 @@
   },
   {
     "id": "g10-040",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area2"],
     "kanji": "巾",
     "grade": 10,
     "strokes": 3,
@@ -632,7 +632,7 @@
   },
   {
     "id": "g10-041",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area3"],
     "kanji": "僅",
     "grade": 10,
     "strokes": 13,
@@ -649,7 +649,7 @@
   },
   {
     "id": "g10-042",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area3"],
     "kanji": "錦",
     "grade": 10,
     "strokes": 16,
@@ -666,7 +666,7 @@
   },
   {
     "id": "g10-043",
-    "stageId": "Africa_area1",
+    "stageId": ["Africa_area3"],
     "kanji": "惧",
     "grade": 10,
     "strokes": 11,
@@ -681,7 +681,7 @@
   },
   {
     "id": "g10-044",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"]               ,
     "kanji": "串",
     "grade": 10,
     "strokes": 7,
@@ -696,7 +696,7 @@
   },
   {
     "id": "g10-045",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "窟",
     "grade": 10,
     "strokes": 13,
@@ -711,7 +711,7 @@
   },
   {
     "id": "g10-046",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "詣",
     "grade": 10,
     "strokes": 13,
@@ -728,7 +728,7 @@
   },
   {
     "id": "g10-047",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "憬",
     "grade": 10,
     "strokes": 15,
@@ -743,7 +743,7 @@
   },
   {
     "id": "g10-048",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "稽",
     "grade": 10,
     "strokes": 15,
@@ -758,7 +758,7 @@
   },
   {
     "id": "g10-049",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "隙",
     "grade": 10,
     "strokes": 13,
@@ -775,7 +775,7 @@
   },
   {
     "id": "g10-050",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "桁",
     "grade": 10,
     "strokes": 10,
@@ -790,7 +790,7 @@
   },
   {
     "id": "g10-051",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "挙",
     "grade": 10,
     "strokes": 10,
@@ -807,7 +807,7 @@
   },
   {
     "id": "g10-052",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "鍵",
     "grade": 10,
     "strokes": 17,
@@ -824,7 +824,7 @@
   },
   {
     "id": "g10-053",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "舷",
     "grade": 10,
     "strokes": 11,
@@ -839,7 +839,7 @@
   },
   {
     "id": "g10-054",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "股",
     "grade": 10,
     "strokes": 8,
@@ -856,7 +856,7 @@
   },
   {
     "id": "g10-055",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"]                 ,
     "kanji": "虎",
     "grade": 10,
     "strokes": 8,
@@ -873,7 +873,7 @@
   },
   {
     "id": "g10-056",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "錮",
     "grade": 10,
     "strokes": 16,
@@ -888,7 +888,7 @@
   },
   {
     "id": "g10-057",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "勾",
     "grade": 10,
     "strokes": 4,
@@ -903,7 +903,7 @@
   },
   {
     "id": "g10-058",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "梗",
     "grade": 10,
     "strokes": 11,
@@ -918,7 +918,7 @@
   },
   {
     "id": "g10-059",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "喉",
     "grade": 10,
     "strokes": 12,
@@ -935,7 +935,7 @@
   },
   {
     "id": "g10-060",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area3"],
     "kanji": "乞",
     "grade": 10,
     "strokes": 3,
@@ -950,7 +950,7 @@
   },
   {
     "id": "g10-061",
-    "stageId": "Africa_area2",
+    "stageId": ["Africa_area4"],
     "kanji": "傲",
     "grade": 10,
     "strokes": 13,
@@ -965,7 +965,7 @@
   },
   {
     "id": "g10-062",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "駒",
     "grade": 10,
     "strokes": 15,
@@ -980,7 +980,7 @@
   },
   {
     "id": "g10-063",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "頃",
     "grade": 10,
     "strokes": 11,
@@ -995,7 +995,7 @@
   },
   {
     "id": "g10-064",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "痕",
     "grade": 10,
     "strokes": 11,
@@ -1012,7 +1012,7 @@
   },
   {
     "id": "g10-065",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"]       ,
     "kanji": "沙",
     "grade": 10,
     "strokes": 7,
@@ -1027,7 +1027,7 @@
   },
   {
     "id": "g10-066",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "挫",
     "grade": 10,
     "strokes": 10,
@@ -1042,7 +1042,7 @@
   },
   {
     "id": "g10-067",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "采",
     "grade": 10,
     "strokes": 8,
@@ -1057,7 +1057,7 @@
   },
   {
     "id": "g10-068",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "塞",
     "grade": 10,
     "strokes": 13,
@@ -1075,7 +1075,7 @@
   },
   {
     "id": "g10-069",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "柵",
     "grade": 10,
     "strokes": 9,
@@ -1090,7 +1090,7 @@
   },
   {
     "id": "g10-070",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "刹",
     "grade": 10,
     "strokes": 8,
@@ -1106,7 +1106,7 @@
   },
   {
     "id": "g10-071",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "拶",
     "grade": 10,
     "strokes": 9,
@@ -1121,7 +1121,7 @@
   },
   {
     "id": "g10-072",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "斬",
     "grade": 10,
     "strokes": 11,
@@ -1138,7 +1138,7 @@
   },
   {
     "id": "g10-073",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "恣",
     "grade": 10,
     "strokes": 10,
@@ -1153,7 +1153,7 @@
   },
   {
     "id": "g10-074",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "摯",
     "grade": 10,
     "strokes": 15,
@@ -1168,7 +1168,7 @@
   },
   {
     "id": "g10-075",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"]       ,
     "kanji": "餌",
     "grade": 10,
     "strokes": 15,
@@ -1186,7 +1186,7 @@
   },
   {
     "id": "g10-076",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "𠮟",
     "grade": 10,
     "strokes": 5,
@@ -1203,7 +1203,7 @@
   },
   {
     "id": "g10-077",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "嫉",
     "grade": 10,
     "strokes": 13,
@@ -1218,7 +1218,7 @@
   },
   {
     "id": "g10-078",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "腫",
     "grade": 10,
     "strokes": 13,
@@ -1235,7 +1235,7 @@
   },
   {
     "id": "g10-079",
-    "stageId": "Africa_area3",
+    "stageId": ["Africa_area4"],
     "kanji": "呪",
     "grade": 10,
     "strokes": 8,
@@ -1252,7 +1252,7 @@
   },
   {
     "id": "g10-080",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area4"],
     "kanji": "袖",
     "grade": 10,
     "strokes": 10,
@@ -1269,7 +1269,7 @@
   },
   {
     "id": "g10-081",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "羞",
     "grade": 10,
     "strokes": 11,
@@ -1284,7 +1284,7 @@
   },
   {
     "id": "g10-082",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "蹴",
     "grade": 10,
     "strokes": 19,
@@ -1301,7 +1301,7 @@
   },
   {
     "id": "g10-083",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "憧",
     "grade": 10,
     "strokes": 15,
@@ -1318,7 +1318,7 @@
   },
   {
     "id": "g10-084",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"]       ,
     "kanji": "拭",
     "grade": 10,
     "strokes": 9,
@@ -1336,7 +1336,7 @@
   },
   {
     "id": "g10-085",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "尻",
     "grade": 10,
     "strokes": 5,
@@ -1351,7 +1351,7 @@
   },
   {
     "id": "g10-086",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "芯",
     "grade": 10,
     "strokes": 7,
@@ -1366,7 +1366,7 @@
   },
   {
     "id": "g10-087",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "腎",
     "grade": 10,
     "strokes": 13,
@@ -1381,7 +1381,7 @@
   },
   {
     "id": "g10-088",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "須",
     "grade": 10,
     "strokes": 12,
@@ -1396,7 +1396,7 @@
   },
   {
     "id": "g10-089",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "裾",
     "grade": 10,
     "strokes": 13,
@@ -1411,7 +1411,7 @@
   },
   {
     "id": "g10-090",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "凄",
     "grade": 10,
     "strokes": 10,
@@ -1426,7 +1426,7 @@
   },
   {
     "id": "g10-091",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "醒",
     "grade": 10,
     "strokes": 16,
@@ -1441,7 +1441,7 @@
   },
   {
     "id": "g10-092",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "脊",
     "grade": 10,
     "strokes": 10,
@@ -1456,7 +1456,7 @@
   },
   {
     "id": "g10-093",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "戚",
     "grade": 10,
     "strokes": 11,
@@ -1471,7 +1471,7 @@
   },
   {
     "id": "g10-094",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "煎",
     "grade": 10,
     "strokes": 13,
@@ -1488,7 +1488,7 @@
   },
   {
     "id": "g10-095",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "羨",
     "grade": 10,
     "strokes": 13,
@@ -1505,7 +1505,7 @@
   },
   {
     "id": "g10-096",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "腺",
     "grade": 10,
     "strokes": 13,
@@ -1520,7 +1520,7 @@
   },
   {
     "id": "g10-097",
-    "stageId": "Africa_area4",
+    "stageId": ["Africa_area5"],
     "kanji": "詮",
     "grade": 10,
     "strokes": 13,
@@ -1535,7 +1535,7 @@
   },
   {
     "id": "g10-098",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area5"],
     "kanji": "箋",
     "grade": 10,
     "strokes": 14,
@@ -1550,7 +1550,7 @@
   },
   {
     "id": "g10-099",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area5"],
     "kanji": "膳",
     "grade": 10,
     "strokes": 16,
@@ -1565,7 +1565,7 @@
   },
   {
     "id": "g10-100",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area5"],
     "kanji": "狙",
     "grade": 10,
     "strokes": 8,
@@ -1582,7 +1582,7 @@
   },
   {
     "id": "g10-101",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "遡",
     "grade": 10,
     "strokes": 14,
@@ -1599,7 +1599,7 @@
   },
   {
     "id": "g10-102",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "曽",
     "grade": 10,
     "strokes": 11,
@@ -1615,7 +1615,7 @@
   },
   {
     "id": "g10-103",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "爽",
     "grade": 10,
     "strokes": 11,
@@ -1632,7 +1632,7 @@
   },
   {
     "id": "g10-104",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "瘦",
     "grade": 10,
     "strokes": 12,
@@ -1649,7 +1649,7 @@
   },
   {
     "id": "g10-105",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "踪",
     "grade": 10,
     "strokes": 15,
@@ -1664,7 +1664,7 @@
   },
   {
     "id": "g10-106",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "捉",
     "grade": 10,
     "strokes": 10,
@@ -1681,7 +1681,7 @@
   },
   {
     "id": "g10-107",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "遜",
     "grade": 10,
     "strokes": 14,
@@ -1696,7 +1696,7 @@
   },
   {
     "id": "g10-108",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "汰",
     "grade": 10,
     "strokes": 7,
@@ -1711,7 +1711,7 @@
   },
   {
     "id": "g10-109",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "唾",
     "grade": 10,
     "strokes": 11,
@@ -1728,7 +1728,7 @@
   },
   {
     "id": "g10-110",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "堆",
     "grade": 10,
     "strokes": 11,
@@ -1743,7 +1743,7 @@
   },
   {
     "id": "g10-111",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "載",
     "grade": 10,
     "strokes": 17,
@@ -1758,7 +1758,7 @@
   },
   {
     "id": "g10-112",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "誰",
     "grade": 10,
     "strokes": 15,
@@ -1773,7 +1773,7 @@
   },
   {
     "id": "g10-113",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "旦",
     "grade": 10,
     "strokes": 5,
@@ -1789,7 +1789,7 @@
   },
   {
     "id": "g10-114",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "綻",
     "grade": 10,
     "strokes": 14,
@@ -1806,7 +1806,7 @@
   },
   {
     "id": "g10-115",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "緻",
     "grade": 10,
     "strokes": 16,
@@ -1821,7 +1821,7 @@
   },
   {
     "id": "g10-116",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "酎",
     "grade": 10,
     "strokes": 10,
@@ -1836,7 +1836,7 @@
   },
   {
     "id": "g10-117",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "貼",
     "grade": 10,
     "strokes": 12,
@@ -1851,7 +1851,7 @@
   },
   {
     "id": "g10-118",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "嘲",
     "grade": 10,
     "strokes": 15,
@@ -1866,7 +1866,7 @@
   },
   {
     "id": "g10-119",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "捗",
     "grade": 10,
     "strokes": 10,
@@ -1879,7 +1879,7 @@
   },
   {
     "id": "g10-120",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area6"],
     "kanji": "椎",
     "grade": 10,
     "strokes": 12,
@@ -1892,7 +1892,7 @@
   },
   {
     "id": "g10-121",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "爪",
     "grade": 10,
     "strokes": 4,
@@ -1906,7 +1906,7 @@
   },
   {
     "id": "g10-121",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "鶴",
     "grade": 10,
     "strokes": 21,
@@ -1919,7 +1919,7 @@
   },
   {
     "id": "g10-123",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "諦",
     "grade": 10,
     "strokes": 16,
@@ -1934,7 +1934,7 @@
   },
   {
     "id": "g10-124",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "溺",
     "grade": 10,
     "strokes": 13,
@@ -1949,7 +1949,7 @@
   },
   {
     "id": "g10-125",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "填",
     "grade": 10,
     "strokes": 13,
@@ -1962,7 +1962,7 @@
   },
   {
     "id": "g10-126",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "妬",
     "grade": 10,
     "strokes": 8,
@@ -1977,7 +1977,7 @@
   },
   {
     "id": "g10-127",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "賭",
     "grade": 10,
     "strokes": 16,
@@ -1992,7 +1992,7 @@
   },
   {
     "id": "g10-128",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "藤",
     "grade": 10,
     "strokes": 18,
@@ -2007,7 +2007,7 @@
   },
   {
     "id": "g10-129",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "瞳",
     "grade": 10,
     "strokes": 17,
@@ -2022,7 +2022,7 @@
   },
   {
     "id": "g10-130",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "頓",
     "grade": 10,
     "strokes": 13,
@@ -2035,7 +2035,7 @@
   },
   {
     "id": "g10-131",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "貪",
     "grade": 10,
     "strokes": 11,
@@ -2050,7 +2050,7 @@
   },
   {
     "id": "g10-132",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "丼",
     "grade": 10,
     "strokes": 5,
@@ -2064,7 +2064,7 @@
   },
   {
     "id": "g10-133",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "那",
     "grade": 10,
     "strokes": 7,
@@ -2077,7 +2077,7 @@
   },
   {
     "id": "g10-134",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "謎",
     "grade": 10,
     "strokes": 17,
@@ -2090,7 +2090,7 @@
   },
   {
     "id": "g10-135",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "鍋",
     "grade": 10,
     "strokes": 17,
@@ -2103,7 +2103,7 @@
   },
   {
     "id": "g10-136",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "匂",
     "grade": 10,
     "strokes": 4,
@@ -2116,7 +2116,7 @@
   },
   {
     "id": "g10-137",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "虹",
     "grade": 10,
     "strokes": 9,
@@ -2129,7 +2129,7 @@
   },
   {
     "id": "g10-138",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "捻",
     "grade": 10,
     "strokes": 11,
@@ -2142,7 +2142,7 @@
   },
   {
     "id": "g10-139",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "罵",
     "grade": 10,
     "strokes": 15,
@@ -2157,7 +2157,7 @@
   },
   {
     "id": "g10-140",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area7"],
     "kanji": "剝",
     "grade": 10,
     "strokes": 10,
@@ -2172,7 +2172,7 @@
   },
   {
     "id": "g10-141",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "箸",
     "grade": 10,
     "strokes": 15,
@@ -2185,7 +2185,7 @@
   },
   {
     "id": "g10-142",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "氾",
     "grade": 10,
     "strokes": 5,
@@ -2198,7 +2198,7 @@
   },
   {
     "id": "g10-143",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "汎",
     "grade": 10,
     "strokes": 6,
@@ -2211,7 +2211,7 @@
   },
   {
     "id": "g10-144",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "斑",
     "grade": 10,
     "strokes": 12,
@@ -2224,7 +2224,7 @@
   },
   {
     "id": "g10-145",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "眉",
     "grade": 10,
     "strokes": 9,
@@ -2240,7 +2240,7 @@
   },
   {
     "id": "g10-146",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "膝",
     "grade": 10,
     "strokes": 15,
@@ -2253,7 +2253,7 @@
   },
   {
     "id": "g10-147",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"]   ,
     "kanji": "肘",
     "grade": 10,
     "strokes": 7,
@@ -2266,7 +2266,7 @@
   },
   {
     "id": "g10-148",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "訃",
     "grade": 10,
     "strokes": 9,
@@ -2279,7 +2279,7 @@
   },
   {
     "id": "g10-149",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "蔽",
     "grade": 10,
     "strokes": 15,
@@ -2292,7 +2292,7 @@
   },
   {
     "id": "g10-150",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "餅",
     "grade": 10,
     "strokes": 15,
@@ -2307,7 +2307,7 @@
   },
   {
     "id": "g10-151",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "璧",
     "grade": 10,
     "strokes": 18,
@@ -2320,7 +2320,7 @@
   },
   {
     "id": "g10-152",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "蔑",
     "grade": 10,
     "strokes": 14,
@@ -2335,7 +2335,7 @@
   },
   {
     "id": "g10-153",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "哺",
     "grade": 10,
     "strokes": 10,
@@ -2348,7 +2348,7 @@
   },
   {
     "id": "g10-154",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "蜂",
     "grade": 10,
     "strokes": 13,
@@ -2363,7 +2363,7 @@
   },
   {
     "id": "g10-155",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "貌",
     "grade": 10,
     "strokes": 14,
@@ -2376,7 +2376,7 @@
   },
   {
     "id": "g10-156",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "頬",
     "grade": 10,
     "strokes": 16,
@@ -2389,7 +2389,7 @@
   },
   {
     "id": "g10-157",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "睦",
     "grade": 10,
     "strokes": 13,
@@ -2402,7 +2402,7 @@
   },
   {
     "id": "g10-158",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"]     ,
     "kanji": "勃",
     "grade": 10,
     "strokes": 9,
@@ -2415,7 +2415,7 @@
   },
   {
     "id": "g10-159",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "昧",
     "grade": 10,
     "strokes": 9,
@@ -2428,7 +2428,7 @@
   },
   {
     "id": "g10-160",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area8"],
     "kanji": "枕",
     "grade": 10,
     "strokes": 8,
@@ -2443,7 +2443,7 @@
   },
   {
     "id": "g10-161",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "蜜",
     "grade": 10,
     "strokes": 14,
@@ -2456,7 +2456,7 @@
   },
   {
     "id": "g10-162",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "冥",
     "grade": 10,
     "strokes": 10,
@@ -2470,7 +2470,7 @@
   },
   {
     "id": "g10-163",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "麺",
     "grade": 10,
     "strokes": 16,
@@ -2483,7 +2483,7 @@
   },
   {
     "id": "g10-164",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "冶",
     "grade": 10,
     "strokes": 7,
@@ -2496,7 +2496,7 @@
   },
   {
     "id": "g10-165",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "弥",
     "grade": 10,
     "strokes": 8,
@@ -2509,7 +2509,7 @@
   },
   {
     "id": "g10-166",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "闇",
     "grade": 10,
     "strokes": 17,
@@ -2522,7 +2522,7 @@
   },
   {
     "id": "g10-165",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "喩",
     "grade": 10,
     "strokes": 12,
@@ -2535,7 +2535,7 @@
   },
   {
     "id": "g10-167",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "湧",
     "grade": 10,
     "strokes": 12,
@@ -2550,7 +2550,7 @@
   },
   {
     "id": "g10-168",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "妖",
     "grade": 10,
     "strokes": 7,
@@ -2565,7 +2565,7 @@
   },
   {
     "id": "g10-169",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "瘍",
     "grade": 10,
     "strokes": 14,
@@ -2578,7 +2578,7 @@
   },
   {
     "id": "g10-170",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "沃",
     "grade": 10,
     "strokes": 7,
@@ -2591,7 +2591,7 @@
   },
   {
     "id": "g10-171",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "拉",
     "grade": 10,
     "strokes": 8,
@@ -2604,7 +2604,7 @@
   },
   {
     "id": "g10-172",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "辣",
     "grade": 10,
     "strokes": 14,
@@ -2617,7 +2617,7 @@
   },
   {
     "id": "g10-173",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "藍",
     "grade": 10,
     "strokes": 18,
@@ -2632,7 +2632,7 @@
   },
   {
     "id": "g10-174",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "璃",
     "grade": 10,
     "strokes": 14,
@@ -2645,7 +2645,7 @@
   },
   {
     "id": "g10-175",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "慄",
     "grade": 10,
     "strokes": 13,
@@ -2658,7 +2658,7 @@
   },
   {
     "id": "g10-176",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "侶",
     "grade": 10,
     "strokes": 9,
@@ -2671,7 +2671,7 @@
   },
   {
     "id": "g10-177",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "瞭",
     "grade": 10,
     "strokes": 17,
@@ -2684,7 +2684,7 @@
   },
   {
     "id": "g10-178",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "瑠",
     "grade": 10,
     "strokes": 14,
@@ -2697,7 +2697,7 @@
   },
   {
     "id": "g10-179",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "呂",
     "grade": 10,
     "strokes": 7,
@@ -2710,7 +2710,7 @@
   },
   {
     "id": "g10-180",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area9"],
     "kanji": "賂",
     "grade": 10,
     "strokes": 13,
@@ -2723,7 +2723,7 @@
   },
   {
     "id": "g10-181",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area10"],
     "kanji": "弄",
     "grade": 10,
     "strokes": 7,
@@ -2738,7 +2738,7 @@
   },
   {
     "id": "g10-182",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area10"],
     "kanji": "籠",
     "grade": 10,
     "strokes": 22,
@@ -2754,7 +2754,7 @@
   },
   {
     "id": "g10-183",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area10"],
     "kanji": "麓",
     "grade": 10,
     "strokes": 19,
@@ -2769,7 +2769,7 @@
   },
   {
     "id": "g10-184",
-    "stageId": "Africa_area5",
+    "stageId": ["Africa_area10"] ,
     "kanji": "脇",
     "grade": 10,
     "strokes": 10,
@@ -2780,4 +2780,6 @@
     "meaning": "わき。体の、腕の付け根の部分。",
     "exampleSentence": "彼は、脇（わき）の下に汗をかき、緊張している様子だった。"
   }
+  
+  
 ]

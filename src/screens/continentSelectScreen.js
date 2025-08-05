@@ -3,13 +3,13 @@ import { gameState } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { images } from '../loaders/assetsLoader.js';
 
-// 大陸マーカーの定義
+// 大陸マーカーの定義を修正（7行目付近）
 const continentMarkers = [
-  { name: 'アジア・オセアニア', kanken_level: 5, x: 650, y: 350, color: '#4A90E2' },
-  { name: 'ヨーロッパ・中東',   kanken_level: 4, x: 450, y: 200, color: '#7ED321' },
-  { name: 'アフリカ',          kanken_level: 2, x: 450, y: 350, color: '#F5A623' },
-  { name: 'アメリカ大陸',      kanken_level: 3, x: 250, y: 250, color: '#BD10E0' },
-  { name: '世界の名作',        kanken_level: 1, x: 350, y: 300, color: '#50E3C2' },
+  // 漢検レベルを文字列として明示的に定義し、regionも追加
+  { name: 'アジア', kanken_level: "4", x: 550, y: 250, color: '#7ED321', region: 'アジア' },
+  { name: 'ヨーロッパ', kanken_level: "3", x: 450, y: 230, color: '#4169e1', region: 'ヨーロッパ' },
+  { name: 'アメリカ大陸', kanken_level: "準2", x: 200, y: 250, color: '#F5A623', region: 'アメリカ大陸' },
+  { name: 'アフリカ', kanken_level: "2", x: 420, y: 350, color: '#ff7f50', region: 'アフリカ大陸' } // regionを「アフリカ大陸」に修正
 ];
 
 const backButton = { x: 10, y: 540, width: 120, height: 40, text: '戻る' };
@@ -127,10 +127,26 @@ const continentSelectState = {
       
       // 少し遅延してから世界ステージ選択画面に遷移
       setTimeout(() => {
-        publish('changeScreen', 'worldStageSelect', { 
-          continent: this.zoomTarget.name, 
-          kanken_level: this.zoomTarget.kanken_level 
-        });
+        // デバッグ情報を追加（詳細なログ）
+        console.log(`大陸選択遷移: 大陸=${this.zoomTarget.name}, 漢検レベル=${this.zoomTarget.kanken_level}`);
+        
+        // 漢検レベルを明示的に文字列化して渡す
+        const kankenLevel = String(this.zoomTarget.kanken_level);
+        console.log(`遷移時の漢検レベル(文字列化後): ${kankenLevel}, 型=${typeof kankenLevel}`);
+
+        // 明示的に新しいオブジェクトを作成して渡す
+        const props = { 
+          continent: this.zoomTarget.name,
+          region: this.zoomTarget.region || this.zoomTarget.name, // regionも追加
+          kanken_level: kankenLevel
+        };
+        
+        // worldStageSelectScreenに強制的に遷移する
+        // 'worldStageSelect'という文字列を直接使用して、ステージIDとの混同を防ぐ
+        console.log("遷移時のprops:", props);
+        
+        // 強制的にworldStageSelectに遷移
+        window.switchScreen('worldStageSelect', props);
       }, 200);
     }
   },

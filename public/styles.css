@@ -1,0 +1,62 @@
+/* ことわざモンスター図鑑用のスタイルを追加 */
+
+.proverb-monster-container {
+  background-color: #f0e6ff; /* 通常の図鑑と区別するための背景色 */
+}
+
+.proverb-monster-card {
+  background: linear-gradient(to bottom, #e6ccff, #d9b3ff);
+  border: 2px solid #9966cc;
+}
+
+.proverb-monster-card .monster-proverb {
+  font-style: italic;
+  font-size: 0.9em;
+  color: #663399;
+  margin-top: 4px;
+}
+
+.proverb-monster-modal .modal-content {
+  background: linear-gradient(to bottom, #f5edff, #e6ccff);
+  border: 3px solid #9966cc;
+}
+
+.proverb-monster-modal h2 {
+  color: #663399;
+  border-bottom: 2px solid #9966cc;
+} 
+
+/* 漢字図鑑のスタイル */
+#kanjiDexContainer {
+  border: none !important;
+}
+
+.kanji-dex-container {
+  border: none !important;
+}
+
+/* カードグリッドの枠線も削除 */
+.kanji-card-grid {
+  border: none !important;
+}
+
+/* 漢字カードのスタイル */
+.kanji-card {
+  border: 1px solid #8B4513 !important;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* 統計情報エリアの枠線も削除 */
+.kanji-collection-stats {
+  border: none !important;
+}
+
+/* ナビゲーションエリアの枠線も削除 */
+.kanji-dex-navigation {
+  border: none !important;
+}
+
+/* モーダル関連の枠線も修正 */
+.kanji-modal .modal-content {
+  border: 1px solid #8B4513 !important;
+} 

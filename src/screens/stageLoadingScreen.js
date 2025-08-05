@@ -36,10 +36,19 @@ const stageLoadingState = {
 
       // 1. このステージで必要なアセットのリストを作成
       const enemies = getEnemiesByStageId(this.stageId);
+      console.log(`ステージ[${this.stageId}]の敵: ${enemies.length}体`, enemies);
+      
       const loadPromises = [loadBgImage(this.stageId)];
-      enemies.forEach(enemy => {
-        loadPromises.push(loadMonsterImage(enemy));
-      });
+      
+      // 各敵の画像読み込みを試みる（個別にエラーハンドリング）
+      for (const enemy of enemies) {
+        const enemyPromise = loadMonsterImage(enemy)
+          .catch(err => {
+            console.warn(`敵[${enemy.id}]の画像読み込みに失敗しましたが、続行します:`, err);
+            return null; // エラーが発生しても続行
+          });
+        loadPromises.push(enemyPromise);
+      }
 
       // 2. プログレスバーを更新しながら、すべてのアセットを並行して読み込む
       const totalAssets = loadPromises.length;
@@ -57,15 +66,21 @@ const stageLoadingState = {
         return result;
       }));
 
-      await Promise.all(wrappedPromises);
+      // Promise.allSettledを使用して、一部の画像が読み込めなくても続行
+      const results = await Promise.allSettled(wrappedPromises);
+      
+      // 結果のログ出力
+      const succeeded = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+      console.log(`アセット読み込み結果: 成功=${succeeded}, 失敗=${failed}`);
 
       // 3. ロード完了後、バトル画面へ遷移
       console.log(`ステージ[${this.stageId}]のアセット読み込み完了。バトル画面へ遷移します。`);
       
-      // 重要: キャンバス要素を明示的に渡す
-      // 注意: FSMはこの第2引数をpropsとして渡すので、
-      // バトル画面側でもpropsとして受け取る必要がある
-      publish('changeScreen', this.stageId, this.canvas);
+      // 直接ステージIDに遷移せず、常にbattleスクリーンに遷移する
+      gameState.currentStageId = this.stageId;
+      // キャンバスとステージIDを渡す
+      publish('changeScreen', 'battle', this.canvas);
 
     } catch (err) {
       console.error(`[${this.stageId}]のアセット読み込み中にエラー:`, err);

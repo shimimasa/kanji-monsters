@@ -4,6 +4,8 @@ export let stageData = [];
 let enemyData = [];
 export let kanjiData = [];
 let stageKanjiMap = {};
+// 学年別の漢字データを保持するオブジェクトを追加
+let kanjiByGrade = {};
 
 export async function loadAllGameData() {
   try {
@@ -24,6 +26,72 @@ export async function loadAllGameData() {
     }));
     console.log("漢字データ読み込み完了");
 
+    // 漢字データを学年別に整理
+    kanjiByGrade = {};
+    for (const kanji of kanjiData) {
+      const grade = kanji.grade || 1;
+      if (!kanjiByGrade[grade]) {
+        kanjiByGrade[grade] = [];
+      }
+      kanjiByGrade[grade].push(kanji);
+    }
+    console.log("漢字データを学年別に整理しました:", Object.keys(kanjiByGrade).map(g => `${g}年生: ${kanjiByGrade[g].length}件`));
+
+    // 中学生用の漢字データを読み込む（7〜10年生相当）
+    try {
+      // 漢検4級（7年生相当）
+      const g7Response = await fetch('/data/kanji_g7_proto.json').catch(() => null);
+      if (g7Response && g7Response.ok) {
+        const g7Data = await g7Response.json();
+        kanjiByGrade[7] = g7Data;
+        console.log(`漢検4級（7年生相当）の漢字データ: ${g7Data.length}件`);
+      }
+
+      // 漢検3級（8年生相当）
+      const g8Response = await fetch('/data/kanji_g8_proto.json').catch(() => null);
+      if (g8Response && g8Response.ok) {
+        const g8Data = await g8Response.json();
+        kanjiByGrade[8] = g8Data;
+        console.log(`漢検3級（8年生相当）の漢字データ: ${g8Data.length}件`);
+      }
+
+      // 漢検準2級（9年生相当）
+      const g9Response = await fetch('/data/kanji_g9_proto.json').catch(() => null);
+      if (g9Response && g9Response.ok) {
+        const g9Data = await g9Response.json();
+        kanjiByGrade[9] = g9Data;
+        console.log(`漢検準2級（9年生相当）の漢字データ: ${g9Data.length}件`);
+      }
+
+      // 漢検2級（10年生相当）
+      const g10Response = await fetch('/data/kanji_g10_proto.json').catch(() => null);
+      if (g10Response && g10Response.ok) {
+        const g10Data = await g10Response.json();
+        kanjiByGrade[10] = g10Data;
+        console.log(`漢検2級（10年生相当）の漢字データ: ${g10Data.length}件`);
+      }
+    } catch (error) {
+      console.warn("中学生用漢字データの読み込みに一部失敗しました:", error);
+    }
+
+    // 中学生用の漢字データがない場合のフォールバック
+    if (!kanjiByGrade[7]) {
+      console.log("漢検4級の漢字データが見つからないため、小学6年生の漢字を代用します");
+      kanjiByGrade[7] = kanjiByGrade[6] || [];
+    }
+    if (!kanjiByGrade[8]) {
+      console.log("漢検3級の漢字データが見つからないため、小学6年生の漢字を代用します");
+      kanjiByGrade[8] = kanjiByGrade[6] || [];
+    }
+    if (!kanjiByGrade[9]) {
+      console.log("漢検準2級の漢字データが見つからないため、小学6年生の漢字を代用します");
+      kanjiByGrade[9] = kanjiByGrade[6] || [];
+    }
+    if (!kanjiByGrade[10]) {
+      console.log("漢検2級の漢字データが見つからないため、小学6年生の漢字を代用します");
+      kanjiByGrade[10] = kanjiByGrade[6] || [];
+    }
+
     // 敵データ読み込み
     const enemyPath = '/data/enemies_proto.json';
     const enemyResponse = await fetch(enemyPath);
@@ -41,9 +109,11 @@ export async function loadAllGameData() {
     // 🔽 正しいマッピング処理（stageIdごとにグループ化）
     const kanjiMap = {};
     for (const k of kanjiData) {
-      const sid = k.stageId;
-      if (!kanjiMap[sid]) kanjiMap[sid] = [];
-      kanjiMap[sid].push(k);
+      const stageIds = Array.isArray(k.stageId) ? k.stageId : [k.stageId];
+      for (const sid of stageIds) {
+        if (!kanjiMap[sid]) kanjiMap[sid] = [];
+        kanjiMap[sid].push(k);
+      }
     }
     setStageKanjiMap(kanjiMap);
 
@@ -122,26 +192,70 @@ export function setStageKanjiMap(map) {
   stageKanjiMap = map;
 }
 
+// getKanjiByStageId関数を修正
 export function getKanjiByStageId(stageId) {
-  // ステージIDの正規化（chubu_area1 → chuubu_area1 のような違いを吸収）
-  const normalizedStageId = stageId
-    .replace('chubu_area', 'chuubu_area')
-    .replace('kanto_area', 'kantou_area');
+  // ステージIDを正規化（大文字小文字を区別しない）
+  const normalizedId = stageId.toLowerCase();
   
-  if (!stageKanjiMap || !stageKanjiMap[normalizedStageId]) {
-    console.warn(`stageKanjiMap[${stageId}] が見つかりません。正規化されたID: ${normalizedStageId}`);
+  // 中学生ステージの場合、学年に基づいて漢字プールを取得
+  if (normalizedId.startsWith('asie_')) {
+    console.log('4級（grade 7）の漢字プールを使用します');
+    return getKanjiByGrade(7);
+  } else if (normalizedId.startsWith('europe_')) {
+    console.log('3級（grade 8）の漢字プールを使用します');
+    return getKanjiByGrade(8);
+  } else if (normalizedId.startsWith('america_')) {
+    console.log('準2級（grade 9）の漢字プールを使用します');
+    return getKanjiByGrade(9);
+  } else if (normalizedId.startsWith('africa_')) {
+    console.log('2級（grade 10）の漢字プールを使用します');
+    return getKanjiByGrade(10);
+  }
+  
+  // 既存のロジック
+  if (!stageKanjiMap[normalizedId]) {
+    console.log(`stageKanjiMap[${normalizedId}] が見つかりません。正規化されたID: ${normalizedId}`);
     
-    // 学年に基づいた漢字データを返す代替処理
-    const stage = stageData.find(s => s.stageId === stageId);
-    if (stage && stage.grade) {
-      const gradeKanji = kanjiData.filter(k => k.grade === stage.grade);
-      console.log(`代替として学年${stage.grade}の漢字 ${gradeKanji.length}件を使用します。`);
-      return gradeKanji.slice(0, 50); // 最大50件に制限
+    // ステージIDから学年を推測
+    const grade = getGradeFromStageId(normalizedId);
+    if (grade) {
+      console.log(`代替として学年${grade}の漢字 ${kanjiByGrade[grade]?.length || 0}件を使用します。`);
+      return kanjiByGrade[grade] || [];
     }
     
     return [];
   }
-  return stageKanjiMap[normalizedStageId];
+  
+  return stageKanjiMap[normalizedId];
+}
+
+// ステージIDから学年を推測するヘルパー関数
+function getGradeFromStageId(stageId) {
+  // ステージIDから学年を推測するロジック
+  if (stageId.startsWith('hokkaido_')) return 1;
+  if (stageId.startsWith('tohoku_')) return 2;
+  if (stageId.startsWith('kanto_')) return 3;
+  if (stageId.startsWith('chubu_')) return 4;
+  if (stageId.startsWith('kinki_')) return 5;
+  if (stageId.startsWith('chugoku_')) return 6;
+  if (stageId.startsWith('asie_')) return 7;
+  if (stageId.startsWith('europe_')) return 8;
+  if (stageId.startsWith('america_')) return 9;
+  if (stageId.startsWith('africa_')) return 10;
+  
+  return null;
+}
+
+// 学年別の漢字データを取得する関数をエクスポート
+export function getKanjiByGrade(grade) {
+  // 既存の漢字データを使用
+  if (kanjiByGrade[grade] && kanjiByGrade[grade].length > 0) {
+    return kanjiByGrade[grade];
+  }
+  
+  // 該当する学年の漢字がない場合、代替として小学6年生の漢字を使用
+  console.warn(`学年${grade}の漢字データがありません。代替として小学6年生の漢字を使用します。`);
+  return kanjiByGrade[6] || kanjiData.filter(k => k.grade === 6) || [];
 }
 
 // 追加: ID から単一の漢字データを取得するヘルパ関数

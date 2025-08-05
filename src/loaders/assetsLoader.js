@@ -44,7 +44,8 @@ const UI_IMAGE_PATHS = {
   stageSelect5:  '/assets/images/stage.select/stage.select.5.png',
   stageSelect6:  '/assets/images/stage.select/stage.select.6.png',
   // 地方選択画面用の画像を追加
-  japanMap:      '/assets/images/japan_map.png',
+  japanMap: '/assets/images/stage.select/日本地図.png',
+  worldMap: '/assets/images/stage.select/世界地図.png',
   woodenSign:    '/assets/images/wooden_sign.png',
   regionMarker:  '/assets/images/region_marker.png',
   // タイトル画面用の背景画像を追加
@@ -56,6 +57,12 @@ const UI_IMAGE_PATHS = {
   region4Boundary: '/assets/images/regions/chubu_boundary.png',
   region5Boundary: '/assets/images/regions/kinki_boundary.png',
   region6Boundary: '/assets/images/regions/chugoku_boundary.png',
+  
+  // 世界ステージ選択用の画像を追加
+  stageSelect12: '/assets/images/stage.select/stage.select12.png', // 4級
+  stageSelect13: '/assets/images/stage.select/stage.select13.png', // 3級
+  stageSelect14: '/assets/images/stage.select/stage.select14.png', // 準2級
+  stageSelect15: '/assets/images/stage.select/stage.select15.png', // 2級
 };
 
 // L.73 付近の initAssets 関数を修正
@@ -118,37 +125,71 @@ export async function loadBgImage(stageId) {
   
   // ステージID別の背景画像パス（キャッシュバスターを追加）
   const timestamp = Date.now();
-  const path = `/assets/images/backgrounds/${stageId}.png?v=${timestamp}`;
   
-  try {
-    // 透明度を確保するために loadImageWithTransparency を使用
-    const img = await loadImageWithTransparency(path);
-    images[cacheKey] = img;
-    console.log(`✅ 背景画像ロード成功: ${path}`);
-    return img;
-  } catch (error) {
-    console.warn(`❌ 背景画像のロード失敗: ${path}`, error);
+  // 地域名とエリア番号を抽出
+  let regionName = '';
+  let areaNumber = 1; // デフォルトはarea1
+  
+  // ステージIDからエリア番号を抽出
+  const areaMatch = stageId.match(/_area(\d+)$/);
+  if (areaMatch && areaMatch[1]) {
+    // エリア番号が奇数なら1、偶数なら2を使用
+    areaNumber = parseInt(areaMatch[1]) % 2 === 0 ? 2 : 1;
+  }
+  
+  // 中学生ステージ（世界）の場合
+  if (stageId.startsWith('Asie_')) {
+    regionName = 'asia'; // または 'asie'（ファイル名に合わせる）
+  }
+  else if (stageId.startsWith('Europe_')) regionName = 'europe';
+  else if (stageId.startsWith('America_')) regionName = 'america';
+  else if (stageId.startsWith('Africa_')) regionName = 'africa';
+  // 日本の地域の場合
+  else {
+    // stageIdから地域名部分を抽出（例：tohoku_area2 → tohoku）
+    regionName = stageId.split('_')[0];
+  }
+  
+  // パスの配列を作成
+  const pathsToTry = [
+    // 1. 通常の背景画像パス（完全一致）
+    `/assets/images/backgrounds/${stageId}.png?v=${timestamp}`,
     
-    // フォールバック：学年別の背景画像を試す
-    const gradeMapping = {
-      'hokkaido_area1': 1,
-      'tohoku_area1': 2, 'tohoku_area2': 2, 'tohoku_area3': 2, 'tohoku_area4': 2, 'tohoku_area5': 2, 'tohoku_area6': 2,
-      'kanto_area1': 3, 'kanto_area2': 3, 'kanto_area3': 3, 'kanto_area4': 3, 'kanto_area5': 3, 'kanto_area6': 3, 'kanto_area7': 3,
-      'chubu_area1': 4, 'chubu_area2': 4, 'chubu_area3': 4, 'chubu_area4': 4, 'chubu_area5': 4, 'chubu_area6': 4, 'chubu_area7': 4, 'chubu_area8': 4, 'chubu_area9': 4,
-      'kinki_area1': 5, 'kinki_area2': 5, 'kinki_area3': 5, 'kinki_area4': 5, 'kinki_area5': 5, 'kinki_area6': 5, 'kinki_area7': 5,
-      'chugoku_area1': 6, 'chugoku_area2': 6, 'chugoku_area3': 6, 'chugoku_area4': 6, 'chugoku_area5': 6,
-    };
+    // 2. 地域ベースの背景画像パス（エリア番号に基づく）
+    `/assets/images/backgrounds/${regionName}_area${areaNumber}.png?v=${timestamp}`,
     
-    const grade = gradeMapping[stageId] || 1;
-    const fallbackPath = `/assets/images/stage.select.${grade}.png`; // 拡張子を小文字に変更
+    // 3. 地域のデフォルト背景画像（area1）をフォールバックとして試す
+    `/assets/images/backgrounds/${regionName}_area1.png?v=${timestamp}`,
     
+    // 4. 学年別の背景画像を試す（最終フォールバック）
+    `/assets/images/stage.select/stage.select${getGradeFromStageId(stageId)}.png?v=${timestamp}`
+  ];
+  
+  // 各パスを順番に試す
+  for (const path of pathsToTry) {
     try {
-      const fallbackImg = await loadImageWithTransparency(fallbackPath);
-      images[cacheKey] = fallbackImg;
-      return fallbackImg;
-    } catch {
-      return null;
+      console.log(`背景画像を試行: ${path}`);
+      // 透明度を確保するために loadImageWithTransparency を使用
+      const img = await loadImageWithTransparency(path);
+      images[cacheKey] = img;
+      console.log(`✅ 背景画像ロード成功: ${path}`);
+      return img;
+    } catch (error) {
+      console.log(`背景画像ロード失敗: ${path}`);
+      // 次のパスを試す
     }
+  }
+  
+  // すべてのパスが失敗した場合、デフォルト背景を返す
+  try {
+    const defaultPath = `/assets/images/stage.select/stage.select.png?v=${timestamp}`;
+    console.log(`デフォルト背景画像を試行: ${defaultPath}`);
+    const fallbackImg = await loadImageWithTransparency(defaultPath);
+    images[cacheKey] = fallbackImg;
+    return fallbackImg;
+  } catch {
+    console.error(`すべての背景画像読み込みに失敗: ${stageId}`);
+    return null;
   }
 }
 
@@ -168,6 +209,11 @@ export async function loadMonsterImage(enemy) {
     4: 'grade4-chuubu',
     5: 'grade5-kinki',
     6: 'grade6-chuugoku',
+    // 中学生ステージ用のマッピングを追加
+    7: 'proverbs',  // 4級
+    8: 'proverbs',  // 3級
+    9: 'proverbs',  // 準2級
+    10: 'proverbs', // 2級
   };
   
   // 学年に基づいてフォルダを決定
@@ -175,22 +221,34 @@ export async function loadMonsterImage(enemy) {
   
   // 画像ファイル名を取得（ID部分のみ）
   const enemyId = enemy.id;
-  console.log(`敵ID: ${enemyId}, フォルダ: ${folder}`);
+  console.log(`敵ID: ${enemyId}, フォルダ: ${folder}, 学年: ${enemy.grade}`);
   
   // 順番に試す画像パスの配列
-  const pathsToTry = [
-    // 1. WebP形式の画像（monsters/full/フォルダ内）
-    `/assets/images/monsters/full/${folder}/${enemyId}.webp`,
-    
-    // 2. 数字のファイル名形式（enemy/フォルダ内）
-    `/assets/images/enemy/${enemyId.split('-')[1].replace('E', '')}_${enemyName}.png`,
-    
-    // 3. 北海道の敵画像を代替として試す
-    `/assets/images/monsters/full/grade1-hokkaido/HKD-${enemyId.split('-')[1]}.webp`,
-    
-    // 4. 数字のみのファイル名で北海道フォルダ内を試す
-    `/assets/images/enemy/${enemyId.split('-')[1].replace('E', '')}_${enemyName.split('の')[0]}.png`
-  ];
+  const pathsToTry = [];
+  
+  // 中学生ステージ（PRV-Exxx形式）の場合
+  if (enemyId.startsWith('PRV-')) {
+    pathsToTry.push(
+      // 1. WebP形式の画像（proverbs/full/フォルダ内）
+      `/assets/images/proverbs/full/${enemyId}.webp`,
+      // 2. image-pipeline内のWebP画像
+      `/image‐pipeline/output/proverbs/full/${enemyId}.webp`,
+      // 3. PNG形式の代替
+      `/image‐pipeline/proverb/proverb_${enemyId.replace('PRV-E', '')}.png`
+    );
+  } else {
+    // 小学生ステージ用の既存のパス
+    pathsToTry.push(
+      // 1. WebP形式の画像（monsters/full/フォルダ内）
+      `/assets/images/monsters/full/${folder}/${enemyId}.webp`,
+      // 2. 数字のファイル名形式（enemy/フォルダ内）
+      `/assets/images/enemy/${enemyId.split('-')[1].replace('E', '')}_${enemyName}.png`,
+      // 3. 北海道の敵画像を代替として試す
+      `/assets/images/monsters/full/grade1-hokkaido/HKD-${enemyId.split('-')[1]}.webp`,
+      // 4. 数字のみのファイル名で北海道フォルダ内を試す
+      `/assets/images/enemy/${enemyId.split('-')[1].replace('E', '')}_${enemyName.split('の')[0]}.png`
+    );
+  }
   
   // 各パスを順番に試す
   for (const path of pathsToTry) {
@@ -488,6 +546,27 @@ export function drawStoneButton(ctx, button, isHovered, isPressed) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(label, x + w / 2, y + h / 2);
+}
+
+// ステージIDから学年を取得するヘルパー関数
+function getGradeFromStageId(stageId) {
+  // 中学生ステージの場合
+  if (stageId.startsWith('Asie_')) return 12; // 4級
+  if (stageId.startsWith('Europe_')) return 13; // 3級
+  if (stageId.startsWith('America_')) return 14; // 準2級
+  if (stageId.startsWith('Africa_')) return 15; // 2級
+  
+  // 小学生ステージの場合（既存のマッピング）
+  const gradeMapping = {
+    'hokkaido_area1': 1,
+    'tohoku_area1': 2, 'tohoku_area2': 2, 'tohoku_area3': 2, 'tohoku_area4': 2, 'tohoku_area5': 2, 'tohoku_area6': 2,
+    'kanto_area1': 3, 'kanto_area2': 3, 'kanto_area3': 3, 'kanto_area4': 3, 'kanto_area5': 3, 'kanto_area6': 3, 'kanto_area7': 3,
+    'chubu_area1': 4, 'chubu_area2': 4, 'chubu_area3': 4, 'chubu_area4': 4, 'chubu_area5': 4, 'chubu_area6': 4, 'chubu_area7': 4, 'chubu_area8': 4, 'chubu_area9': 4,
+    'kinki_area1': 5, 'kinki_area2': 5, 'kinki_area3': 5, 'kinki_area4': 5, 'kinki_area5': 5, 'kinki_area6': 5, 'kinki_area7': 5,
+    'chugoku_area1': 6, 'chugoku_area2': 6, 'chugoku_area3': 6, 'chugoku_area4': 6, 'chugoku_area5': 6,
+  };
+  
+  return gradeMapping[stageId] || '';
 }
 
 

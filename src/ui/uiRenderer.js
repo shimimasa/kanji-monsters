@@ -73,7 +73,85 @@ export function drawGauge(ctx, x, y, w, h, value, fill = '#27ae60') {
   ctx.fillRect(x, y, w * Math.max(0, Math.min(1, value)), h);
 }
 
-// ... existing code ...
+/**
+ * 石のようなテクスチャのボタンを描画する
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} x
+ * @param {number} y
+ * @param {number} width
+ * @param {number} height
+ * @param {string} label
+ * @param {boolean} isHovered
+ * @param {boolean} isPressed
+ */
+export function drawStoneButton(ctx, x, y, width, height, label, isHovered = false, isPressed = false) {
+  // 押下状態の表現を追加
+  const pressOffset = isPressed ? 2 : 0;
+  const shadowOffset = isHovered ? 4 : (isPressed ? 1 : 3);
+  
+  // 押下時は少し沈み込む表現
+  const adjustedY = y + pressOffset;
+  
+  // 影の描画
+  ctx.fillStyle = `rgba(0, 0, 0, ${isPressed ? 0.2 : 0.3})`;
+  ctx.fillRect(x + shadowOffset, adjustedY + shadowOffset, width, height);
+  
+  // ボタン本体の色（押下時は少し暗く）
+  const baseColor = '#6d6d6d';
+  const buttonColor = isPressed ? darkenColor(baseColor, 10) : baseColor;
+  
+  // ホバー時のカラー調整
+  const hoverColor = isHovered ? lightenColor(baseColor, 15) : buttonColor;
+  
+  // グラデーション背景を作成
+  const gradient = ctx.createLinearGradient(x, adjustedY, x, adjustedY + height);
+  gradient.addColorStop(0, lightenColor(hoverColor, 20)); // 上部を明るく
+  gradient.addColorStop(1, darkenColor(hoverColor, 20));  // 下部を暗く
+  
+  // ボタン本体を描画
+  ctx.fillStyle = gradient;
+  ctx.fillRect(x, adjustedY, width, height);
+  
+  // 枠線を描画
+  ctx.strokeStyle = darkenColor(hoverColor, 30);
+  ctx.lineWidth = isHovered ? 3 : 2; // ホバー時は枠線を太く
+  ctx.strokeRect(x, adjustedY, width, height);
+  
+  // テキストを描画
+  ctx.fillStyle = 'white';
+  ctx.font = '18px "UDデジタル教科書体", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + width / 2, adjustedY + height / 2);
+}
+
+/**
+ * 色を明るくするヘルパー関数
+ */
+function lightenColor(color, percent) {
+  const num = parseInt(color.replace('#', ''), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = (num >> 16) + amt;
+  const G = (num >> 8 & 0x00FF) + amt;
+  const B = (num & 0x0000FF) + amt;
+  return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+    (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+    (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+}
+
+/**
+ * 色を暗くするヘルパー関数
+ */
+function darkenColor(color, percent) {
+  const num = parseInt(color.replace('#', ''), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = (num >> 16) - amt;
+  const G = (num >> 8 & 0x00FF) - amt;
+  const B = (num & 0x0000FF) - amt;
+  return '#' + (0x1000000 + (R > 255 ? 255 : R < 0 ? 0 : R) * 0x10000 +
+    (G > 255 ? 255 : G < 0 ? 0 : G) * 0x100 +
+    (B > 255 ? 255 : B < 0 ? 0 : B)).toString(16).slice(1);
+}
 
 /* ------------------------------------------------------------------ */
 /*  パネル背景                                                         */

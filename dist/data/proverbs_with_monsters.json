@@ -1,0 +1,3602 @@
+[
+  {
+    "id": 1,
+    "text": "猫に小判",
+    "reading": "ねこにこばん",
+    "meaning": "価値のわからない人に高価なものを与えても意味がないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "おじいちゃんが、ゲームに興味のないおばあちゃんに最新のゲーム機をプレゼントしたけど、全然使ってくれない。まさに「猫に小判」だね。",
+    "monsterName": "コバン・ニャンター"
+  },
+  {
+    "id": 2,
+    "text": "猿も木から落ちる",
+    "reading": "さるもきからおちる",
+    "meaning": "その道の名人でも、時には失敗することがあるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "サッカー部のキャプテンが、簡単なパスをミスしてしまった。「猿も木から落ちる」って言うけど、どんな名人でも失敗することはあるんだな。",
+    "monsterName": "ウッカリ・モンキー"
+  },
+  {
+    "id": 3,
+    "text": "犬も歩けば棒に当たる",
+    "reading": "いぬもあるけばぼうにあたる",
+    "meaning": "何かをしていれば、思いがけない幸運に出会うことがあるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "ただ散歩をしていただけなのに、道で珍しいカードを拾った。これぞ「犬も歩けば棒に当たる」だ。",
+    "monsterName": "ラッキー・ハウンド"
+  },
+  {
+    "id": 4,
+    "text": "井の中の蛙大海を知らず",
+    "reading": "いのなかのかわずたいかいをしらず",
+    "meaning": "自分の狭い知識や考えにとらわれて、もっと広い世界があることを知らないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "彼は自分の村が一番だと思っていたけど、東京に来て人の多さに驚いていた。まさに「井の中の蛙大海を知らず」だね。",
+    "monsterName": "イドノ・フロッグ"
+  },
+  {
+    "id": 5,
+    "text": "石の上にも三年",
+    "reading": "いしのうえにもさんねん",
+    "meaning": "つらくても辛抱強く続ければ、いつかは必ず成功するということ。",
+    "difficulty": "小学生",
+    "example_sentence": "最初は苦手だったピアノも、毎日練習を続けたら、コンクールで賞がもらえるほど上手になった。「石の上にも三年」とは、このことだ。",
+    "monsterName": "セキジョウ・ゴーレム"
+  },
+  {
+    "id": 6,
+    "text": "花より団子",
+    "reading": "はなよりだんご",
+    "meaning": "風流のあるものよりも、実益のあるものの方がよいということ。",
+    "difficulty": "小学生",
+    "example_sentence": "お花見に行ったのに、きれいな桜には目もくれず、屋台の焼きそばばかり食べていた。弟は本当に「花より団子」だね。",
+    "monsterName": "ダンゴ・プリースト"
+  },
+  {
+    "id": 7,
+    "text": "泣き面に蜂",
+    "reading": "なきつらにはち",
+    "meaning": "不運が重なること。",
+    "difficulty": "小学生",
+    "example_sentence": "朝寝坊して学校に遅刻しそうになったところに、雨まで降ってきた。まさに「泣き面に蜂」で、朝からついてないよ。",
+    "monsterName": "ナキツラ・ビー"
+  },
+  {
+    "id": 8,
+    "text": "二階から目薬",
+    "reading": "nikaikara megusuri",
+    "meaning": "思うように届かず、もどかしいこと。また、遠回しで効果がないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "二階にいるお兄ちゃんに下から「ごはんよー！」と叫んでも、ヘッドホンをしていて聞こえない。これでは「二階から目薬」だ。",
+    "monsterName": "トドカヌ・ヒーラー"
+  },
+  {
+    "id": 9,
+    "text": "焼け石に水",
+    "reading": "yakeishi ni mizu",
+    "meaning": "わずかな助けや努力では、ほとんど効果がないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "燃え盛るキャンプファイヤーに、コップ一杯の水をかけても、じゅっと言うだけですぐに消えない。まさに「焼け石に水」だった。",
+    "monsterName": "ジュワット・スチーム"
+  },
+  {
+    "id": 10,
+    "text": "豚に真珠",
+    "reading": "buta ni shinju",
+    "meaning": "価値のわからない人に高価なものを与えても意味がないこと。（猫に小判と同じ）",
+    "difficulty": "小学生",
+    "example_sentence": "本を全く読まないいとこに、難しい小説をプレゼントしても、読まずに部屋の隅に置かれたまま。これは「豚に真珠」だったかもしれない。",
+    "monsterName": "パール・ピッグ"
+  },
+  {
+    "id": 11,
+    "text": "鬼に金棒",
+    "reading": "oni ni kanabou",
+    "meaning": "強いものがさらに強いものを得て、無敵になること。",
+    "difficulty": "小学生",
+    "example_sentence": "ただでさえ足の速い陸上部のエースが、新しい軽いスパイク手に入れた。これで「鬼に金棒」だ。次の大会も優勝は間違いないだろう。",
+    "monsterName": "カナボウ・オーガ"
+  },
+  {
+    "id": 12,
+    "text": "後の祭り",
+    "reading": "ato no matsuri",
+    "meaning": "時機を逃してしまい、手遅れであること。",
+    "difficulty": "小学生",
+    "example_sentence": "楽しみにしていたお祭りが昨日で終わっていたことを、今日になって知った。もう「後の祭り」で、とてもがっかりした。",
+    "monsterName": "レイト・フェスタ"
+  },
+  {
+    "id": 13,
+    "text": "案ずるより産むが易し",
+    "reading": "anzuru yori umu ga yasushi",
+    "meaning": "心配していたことでも、実際にやってみると案外たやすくできるものだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "初めての学芸会の主役で、セリフを覚えられるか心配だったけど、練習したらすらすら言えた。「案ずるより産むが易し」とはこのことだね。",
+    "monsterName": "イージー・トライ"
+  },
+  {
+    "id": 14,
+    "text": "急がば回れ",
+    "reading": "isogaba maware",
+    "meaning": "急いでいる時こそ、危険な近道より安全な遠回りを選んだ方が結局は早く着くということ。",
+    "difficulty": "小学生",
+    "example_sentence": "近道だと思って通った細い道が工事中で、結局遠回りするはめになった。最初から広い道を行けばよかった。「急がば回れ」だね。",
+    "monsterName": "セーフティ・ロード"
+  },
+  {
+    "id": 15,
+    "text": "塵も積もれば山となる",
+    "reading": "chiri mo tsumoreba yama to naru",
+    "meaning": "ほんのわずかなものでも、積み重なれば大きなものになるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "毎日10円ずつ貯金箱に入れていたら、一年後には大きなケーキが買えるくらいのお金が貯まった。「塵も積もれば山となる」って本当だね。",
+    "monsterName": "ダスト・タイタン"
+  },
+  {
+    "id": 16,
+    "text": "灯台下暗し",
+    "reading": "toudaimotokurashi",
+    "meaning": "身近なことほど、かえって気づきにくいということ。",
+    "difficulty": "小学生",
+    "example_sentence": "探し物をしていたら、自分のすぐ足元に落ちていた。まさに「灯台下暗し」で、もっとよく周りを見るべきだった。",
+    "monsterName": "モトクラ・ファントム"
+  },
+  {
+    "id": 17,
+    "text": "七転び八起き",
+    "reading": "nanakorobi yaoki",
+    "meaning": "何度失敗しても、くじけずに立ち上がること。",
+    "difficulty": "小学生",
+    "example_sentence": "自転車に初めて乗った時、何度も転んだけど、諦めずに練習したら、ついに乗れるようになった。「七転び八起き」の精神が大切だ。",
+    "monsterName": "フクツ・ダルマ"
+  },
+  {
+    "id": 18,
+    "text": "馬の耳に念仏",
+    "reading": "uma no mimi ni nenbutsu",
+    "meaning": "いくら意見をしても、全く聞き入れられず効果がないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "弟に「部屋を片付けなさい」と何度言っても、ゲームに夢中で全く聞いていない。これでは「馬の耳に念仏」だ。",
+    "monsterName": "ムシカ・ホース"
+  },
+  {
+    "id": 19,
+    "text": "餅は餅屋",
+    "reading": "mochi wa mochiya",
+    "meaning": "何事も、その道の専門家に任せるのが一番だということ。",
+    "difficulty": "小学生",
+    "example_sentence": "パソコンが壊れた時、自分で直そうとしたけど、余計にひどくなってしまった。やはり「餅は餅屋」で、専門の人に任せるのが一番だ。",
+    "monsterName": "モチ・マイスター"
+  },
+  {
+    "id": 20,
+    "text": "論より証拠",
+    "reading": "ron yori shouko",
+    "meaning": "物事を明らかにするには、議論するよりも証拠を示す方が確かだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "「このお菓子は美味しい」と力説するより、実際に一口食べてもらった方が、その美味しさが伝わる。「論より証拠」だね。",
+    "monsterName": "エビデンス・キーパー"
+  },
+  {
+    "id": 21,
+    "text": "月とすっぽん",
+    "reading": "tsuki to suppon",
+    "meaning": "二つのものが、比べものにならないほどかけ離れていること。",
+    "difficulty": "小学生",
+    "example_sentence": "僕の描いた絵と、有名な画家の描いた絵を比べると、まるで「月とすっぽん」だ。もっと練習して上手になりたいな。",
+    "monsterName": "ツキミ・タートル"
+  },
+  {
+    "id": 22,
+    "text": "提灯に釣鐘",
+    "reading": "chochin ni tsurigane",
+    "meaning": "形は似ていても、実際は比べものにならないほど違うこと。",
+    "difficulty": "小学生",
+    "example_sentence": "あっちのチームのキャプテンと僕たちのチームのキャプテンでは、リーダーシップが「提灯に釣鐘」ほど違う。やっぱり経験が豊富な人はすごい。",
+    "monsterName": "アンバランス・ベル"
+  },
+  {
+    "id": 23,
+    "text": "豆腐にかすがい",
+    "reading": "toufu ni kasugai",
+    "meaning": "少しも手ごたえがなく、効き目がないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "弟にいくら「静かにして」と注意しても、全く言うことを聞かない。まるで「豆腐にかすがい」のように、手ごたえがない。",
+    "monsterName": "トウフ・クラッシャー"
+  },
+  {
+    "id": 24,
+    "text": "暖簾に腕押し",
+    "reading": "noren ni udeoshi",
+    "meaning": "手ごたえがなく、張り合いがないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "彼に一生懸命アドバイスしても、いつも「へー」と気のない返事ばかり。これでは「暖簾に腕押し」で、話しているこっちが疲れてしまう。",
+    "monsterName": "ノレン・ウォール"
+  },
+  {
+    "id": 25,
+    "text": "猫の手も借りたい",
+    "reading": "neko no te mo karitai",
+    "meaning": "非常に忙しく、誰でもいいから手伝ってほしいと思うほどであること。",
+    "difficulty": "小学生",
+    "example_sentence": "運動会の前日は、準備することがたくさんあって、先生たちは「猫の手も借りたい」ほど忙しそうだった。",
+    "monsterName": "ヘルプフル・ケットシー"
+  },
+  {
+    "id": 26,
+    "text": "雀の涙",
+    "reading": "suzume no namida",
+    "meaning": "ほんのわずかしかないことのたとえ。",
+    "difficulty": "小学生",
+    "example_sentence": "今月のお小遣いは、ほとんどを貯金してしまったので、自由に使えるお金は「雀の涙」ほどしか残っていない。",
+    "monsterName": "スズメ・ティアドロップ"
+  },
+  {
+    "id": 27,
+    "text": "どんぐりの背比べ",
+    "reading": "donguri no seikurabe",
+    "meaning": "どれも同じくらいで、特に優れたものがないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "僕のクラスの男子は、みんな同じくらいの背の高さだ。誰が一番高いか比べても、まさに「どんぐりの背比べ」だね。",
+    "monsterName": "ドングリ・ブラザーズ"
+  },
+  {
+    "id": 28,
+    "text": "知らぬが仏",
+    "reading": "shiranu ga hotoke",
+    "meaning": "知らなければ、腹も立たず、悩みもせずにいられるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "歯医者さんの治療が、実はすごく痛いものだと知らなかったから、怖がらずに受けることができた。「知らぬが仏」とはこのことだ。",
+    "monsterName": "イノセント・ブッダ"
+  },
+  {
+    "id": 29,
+    "text": "善は急げ",
+    "reading": "zen wa isoge",
+    "meaning": "よいと思ったことは、ためらわずにすぐ実行するべきだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "迷子の子犬を見つけたので、「善は急げ」と、すぐに近くの交番に連れて行ってあげた。",
+    "monsterName": "ハリーアップ・エンジェル"
+  },
+  {
+    "id": 30,
+    "text": "失敗は成功のもと",
+    "reading": "shippai wa seikou no moto",
+    "meaning": "失敗してもその原因を反省し、改めることで、かえって成功に近づくことができるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "何度も計算ミスをして悔しかったけど、そのおかげで自分の苦手なところが分かった。「失敗は成功のもと」だと思って、これからも頑張ろう。",
+    "monsterName": "ミステイク・シード"
+  },
+  {
+    "id": 31,
+    "text": "好きこそ物の上手なれ",
+    "reading": "suki koso mono no jouzu nare",
+    "meaning": "好きなことは熱心にするので、自然と上達するものであるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "絵を描くのが大好きな妹は、誰に教わったわけでもないのに、どんどん上手になっていく。まさに「好きこそ物の上手なれ」だね。",
+    "monsterName": "スキルフル・ハート"
+  },
+  {
+    "id": 32,
+    "text": "備えあれば憂いなし",
+    "reading": "sonae areba urei nashi",
+    "meaning": "日頃から準備をしっかりしておけば、万一のことがあっても心配することはないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "明日の遠足のために、雨が降ってもいいようにカッパを準備しておいた。「備えあれば憂いなし」だから、これで安心だ。",
+    "monsterName": "パーフェクト・ガード"
+  },
+  {
+    "id": 33,
+    "text": "立つ鳥跡を濁さず",
+    "reading": "tatsu tori ato wo nigosazu",
+    "meaning": "去る者は、後が見苦しくないようにきれいに始末をしていくべきだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "キャンプの最後は、来た時よりもきれいになるように、みんなでゴミ拾いをした。「立つ鳥跡を濁さず」の気持ちが大切だ。",
+    "monsterName": "クリーン・バード"
+  },
+  {
+    "id": 34,
+    "text": "蓼食う虫も好き好き",
+    "reading": "tade kuu mushi mo suki suki",
+    "meaning": "人の好みはさまざまで、一概には言えないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "僕はピーマンが苦手だけど、お兄ちゃんは「美味しい」と言ってたくさん食べる。「蓼食う虫も好き好き」で、人の好みは本当に色々だね。",
+    "monsterName": "タデ・ワーム"
+  },
+  {
+    "id": 35,
+    "text": "隣の芝生は青い",
+    "reading": "tonari no shibafu wa aoi",
+    "meaning": "他人のものは、なんでも自分のものよりよく見えるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "友達の新しいゲームがすごく面白そうに見えるけど、自分の持っているゲームも楽しいはずだ。「隣の芝生は青い」って言うからね。",
+    "monsterName": "ブルー・グラス"
+  },
+  {
+    "id": 36,
+    "text": "虎の威を借る狐",
+    "reading": "tora no i wo karu kitsune",
+    "meaning": "力のない者が、力のある者の権勢をかさに着ていばること。",
+    "difficulty": "小学生",
+    "example_sentence": "いつもは静かなのに、上級生のお兄ちゃんと一緒にいる時だけ威張っている。彼はまさに「虎の威を借る狐」だ。",
+    "monsterName": "トラノイ・フォックス"
+  },
+  {
+    "id": 37,
+    "text": "無い袖は振れぬ",
+    "reading": "nai sode wa furenu",
+    "meaning": "持っていないものは、出しようがないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "友達に「ジュースをおごってよ」と頼まれたけど、お小遣いを全部使ってしまった後だったので、「ごめん、無い袖は振れぬだよ」と断った。",
+    "monsterName": "ナッシング・スリーブ"
+  },
+  {
+    "id": 38,
+    "text": "習うより慣れよ",
+    "reading": "narau yori nare yo",
+    "meaning": "人から教わるよりも、実際に経験を重ねる方が身につくのが早いということ。",
+    "difficulty": "小学生",
+    "example_sentence": "九九を覚えるのは大変だったけど、毎日計算ドリルを解いていたら、いつの間にかスラスラ言えるようになった。まさに「習うより慣れよ」だね。",
+    "monsterName": "エクスペリ・マスター"
+  },
+  {
+    "id": 39,
+    "text": "猫をかぶる",
+    "reading": "neko wo kaburu",
+    "meaning": "本性を隠して、おとなしそうに見せかけること。",
+    "difficulty": "小学生",
+    "example_sentence": "家ではわがまま放題の妹が、お客さんの前ではとても静かで礼儀正しくなる。あんなに上手に「猫をかぶる」なんて、すごいと思う。",
+    "monsterName": "フェイク・キャット"
+  },
+  {
+    "id": 40,
+    "text": "寝耳に水",
+    "reading": "ne ni mizu",
+    "meaning": "思いがけない出来事に、ひどく驚くこと。",
+    "difficulty": "小学生",
+    "example_sentence": "明日の遠足が、急に中止になったと聞かされて、本当に「寝耳に水」だった。楽しみにしてたのに、びっくりして声も出なかったよ。",
+    "monsterName": "サプライズ・ウォーター"
+  },
+  {
+    "id": 41,
+    "text": "能ある鷹は爪を隠す",
+    "reading": "nou aru taka wa tsume wo kakusu",
+    "meaning": "実力のある者ほど、それをむやみに見せびらかしたりはしないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "転校してきた田中くんは、いつも物静かだけど、ドッジボール大会では大活躍だった。まさに「能ある鷹は爪を隠す」だね。",
+    "monsterName": "シークレット・ホーク"
+  },
+  {
+    "id": 42,
+    "text": "のど元過ぎれば熱さを忘れる",
+    "reading": "nodomoto sugireba atsusa wo wasureru",
+    "meaning": "苦しいことも、過ぎ去ってしまえばその苦しさを忘れてしまうということ。",
+    "difficulty": "小学生",
+    "example_sentence": "あんなに痛がっていた注射のことを、終わったとたんにケロッと忘れて遊び始めた。弟は本当に「のど元過ぎれば熱さを忘れる」タイプだ。",
+    "monsterName": "フォーゲット・ペイン"
+  },
+  {
+    "id": 43,
+    "text": "百聞は一見に如かず",
+    "reading": "hyakubun wa ikken ni shikazu",
+    "meaning": "何度も人から聞くよりも、一度実際に自分の目で見る方が確かだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "恐竜の図鑑を何度も見ていたけど、博物館で本物の化石を見たら、その大きさにびっくりした。まさに「百聞は一見に如かず」だ。",
+    "monsterName": "イッケン・アイ"
+  },
+  {
+    "id": 44,
+    "text": "仏の顔も三度まで",
+    "reading": "hotoke no kao mo sando made",
+    "meaning": "どんなに温和な人でも、何度も無礼なことをされれば腹を立てるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "いつも優しいお兄ちゃんも、僕が三回も同じいたずらをしたら、さすがに「仏の顔も三度までだぞ」と、とても怒っていた。",
+    "monsterName": "スリー・リミット"
+  },
+  {
+    "id": 45,
+    "text": "負けるが勝ち",
+    "reading": "makeru ga kachi",
+    "meaning": "無理に争って勝つよりも、相手に勝ちを譲る方が、結局は自分にとって有利な結果になることがあるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "弟とゲームで喧嘩になりそうだったから、わざと負けてあげた。悔しいけど、おかげで仲直りできたから、今回は「負けるが勝ち」だったのかもしれない。",
+    "monsterName": "ウィニング・ルーズ"
+  },
+  {
+    "id": 46,
+    "text": "三つ子の魂百まで",
+    "reading": "mitsugo no tamashii hyaku made",
+    "meaning": "幼い頃の性質は、年をとっても変わらないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "小さい頃から人見知りだったお兄ちゃんは、大人になった今でも、初めて会う人とは少し恥ずかしそうに話す。「三つ子の魂百まで」って本当だね。",
+    "monsterName": "チャイルド・ソウル"
+  },
+  {
+    "id": 47,
+    "text": "目は口ほどに物を言う",
+    "reading": "me wa kuchi hodo ni mono wo iu",
+    "meaning": "口で話すのと同じくらい、目つきは感情を豊かに表すということ。",
+    "difficulty": "小学生",
+    "example_sentence": "転んでしまった友達は「大丈夫」と言っていたけど、その目はとても痛そうだった。「目は口ほどに物を言う」とは、このことだ。",
+    "monsterName": "トーキング・アイ"
+  },
+  {
+    "id": 48,
+    "text": "門前の小僧習わぬ経を読む",
+    "reading": "monzen no kozo narawanu kyou wo yomu",
+    "meaning": "いつも見たり聞いたりしていると、知らず知らずのうちにそれを覚えてしまうということ。",
+    "difficulty": "小学生",
+    "example_sentence": "お母さんが毎日聞いている歌を、いつの間にか自分も口ずさめるようになっていた。まさに「門前の小僧習わぬ経を読む」だね。",
+    "monsterName": "モンゼン・チャンター"
+  },
+  {
+    "id": 49,
+    "text": "笑う門には福来る",
+    "reading": "warau kado ni wa fuku kitaru",
+    "meaning": "いつも笑い声の絶えない家には、自然と幸福がやってくるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "僕の家族は、いつもみんなでテレビを見て大笑いしている。だから毎日が楽しいのかな。「笑う門には福来る」って言うしね。",
+    "monsterName": "ラフィン・ゲート"
+  },
+  {
+    "id": 50,
+    "text": "渡る世間に鬼はなし",
+    "reading": "wataru seken ni oni wa nashi",
+    "meaning": "世の中には無情な人ばかりではなく、親切な人も必ずいるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "駅で切符の買い方が分からなくて困っていたら、親切な駅員さんが丁寧に教えてくれた。「渡る世間に鬼はなし」とは本当だと思った。",
+    "monsterName": "セケン・エンジェル"
+  },
+  {
+    "id": 51,
+    "text": "油を売る",
+    "reading": "abura wo uru",
+    "meaning": "仕事の途中で無駄話をして時間を潰すこと。",
+    "difficulty": "小学生",
+    "example_sentence": "お母さんに「おつかいに行ってきて」と頼まれたのに、途中で友達と話し込んでしまって、「どこで油を売っていたの！」と怒られてしまった。",
+    "monsterName": "ダベリ・マーチャント"
+  },
+  {
+    "id": 52,
+    "text": "雨降って地固まる",
+    "reading": "ame futte ji katamaru",
+    "meaning": "ごたごたした出来事の後は、かえって物事が落ち着き、基礎が固まること。",
+    "difficulty": "小学生",
+    "example_sentence": "クラスのみんなで大喧嘩をしてしまったけど、その後、本音で話し合うことで、前よりもずっと仲良くなれた。まさに「雨降って地固まる」だね。",
+    "monsterName": "アメノチ・ガーディアン"
+  },
+  {
+    "id": 53,
+    "text": "生き馬の目を抜く",
+    "reading": "iki uma no me wo nuku",
+    "meaning": "油断も隙もないほど、すばしこいこと。また、抜け目なく利益を得ること。",
+    "difficulty": "小学生",
+    "example_sentence": "都会のビジネスの世界は、「生き馬の目を抜く」ような、少しの油断もできない厳しい場所だと聞いた。",
+    "monsterName": "スイフト・スナッチャー"
+  },
+  {
+    "id": 54,
+    "text": "一寸の虫にも五分の魂",
+    "reading": "issun no mushi ni mo gobu no tamashii",
+    "meaning": "小さく弱い者にも、それ相応の意地や考えがあるから、侮ってはいけないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "あんなに小さなアリでも、自分の巣を守るために一生懸命戦っている。「一寸の虫にも五分の魂」というように、どんなに小さな生き物でも命は大切にしないとね。",
+    "monsterName": "プライド・バグ"
+  },
+  {
+    "id": 55,
+    "text": "嘘から出た実",
+    "reading": "uso kara deta makoto",
+    "meaning": "初めは嘘だったことが、偶然にも本当になってしまうこと。",
+    "difficulty": "小学生",
+    "example_sentence": "転校初日に「サッカーが得意なんだ」と見栄を張って嘘をついてしまったけど、本当になれるように毎日必死で練習したら、チームのエースになれた。まさに「嘘から出た実」だ。",
+    "monsterName": "ライ・トゥルーサー"
+  },
+  {
+    "id": 56,
+    "text": "絵に描いた餅",
+    "reading": "e ni kaita mochi",
+    "meaning": "餅の絵は本物の餅ではないので食べられないことから、計画などが実際には役に立たないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "夏休みの計画表をびっしり書いたけど、結局ほとんど実行できなかった。これじゃ「絵に描いた餅」だ。来年こそはちゃんとやろう。",
+    "monsterName": "ピクチャー・モチ"
+  },
+  {
+    "id": 57,
+    "text": "えびで鯛を釣る",
+    "reading": "ebi de tai wo tsuru",
+    "meaning": "わずかな元手や労力で、大きな利益を得ること。",
+    "difficulty": "小学生",
+    "example_sentence": "お祭りのくじ引きで、100円で買ったくじが、一等賞の大きなぬいぐるみと交換になった。まさに「えびで鯛を釣る」で、大喜びした。",
+    "monsterName": "ビッグゲイン・フィッシャー"
+  },
+  {
+    "id": 58,
+    "text": "縁の下の力持ち",
+    "reading": "en no shita no chikaramo chi",
+    "meaning": "人に知られないところで、他人のために尽くすこと。",
+    "difficulty": "小学生",
+    "example_sentence": "文化祭の劇で、主役は目立っていたけれど、大道具や照明を黙々と準備してくれた裏方の友達こそ、本当の「縁の下の力持ち」だと思う。",
+    "monsterName": "シャドウ・サポーター"
+  },
+  {
+    "id": 59,
+    "text": "河童の川流れ",
+    "reading": "kappa no kawa nagare",
+    "meaning": "泳ぎの得意な河童でも、時には水に流されることがある。名人でも失敗することがあることのたとえ。（猿も木から落ちる と同じ）",
+    "difficulty": "小学生",
+    "example_sentence": "いつもは計算が速い算数の先生が、珍しく簡単な問題を間違えてしまった。「河童の川流れ」って言うけど、先生でも間違うことはあるんだね。",
+    "monsterName": "ドジ・カッパ"
+  },
+  {
+    "id": 60,
+    "text": "壁に耳あり障子に目あり",
+    "reading": "kabe ni mimi ari shoji ni me ari",
+    "meaning": "秘密は漏れやすいので、どこで誰が聞いているかわからないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "教室で友達とこっそり秘密の話をしていたつもりが、いつの間にかクラスのみんなに知られていた。「壁に耳あり障子に目あり」だから、気をつけないとね。",
+    "monsterName": "カベミミ・ウォッチャー"
+  },
+  {
+    "id": 61,
+    "text": "聞いて極楽見て地獄",
+    "reading": "kiite gokuraku mite jigoku",
+    "meaning": "話に聞いただけでは素晴らしいが、実際に見るとひどい状態であること。",
+    "difficulty": "小学生",
+    "example_sentence": "友達から「新しくできた遊園地は、天国みたいに楽しいよ」と聞いていたのに、実際に行ってみたら、人が多すぎて乗り物にも乗れず、まさに「聞いて極楽見て地獄」だった。",
+    "monsterName": "ギャップ・デーモン"
+  },
+  {
+    "id": 62,
+    "text": "木を見て森を見ず",
+    "reading": "ki wo mite mori wo mizu",
+    "meaning": "小さなことばかりに気を取られて、全体を見失うこと。",
+    "difficulty": "小学生",
+    "example_sentence": "プラモデルの小さな部品の色を塗るのに夢中になっていたら、全体のバランスがおかしくなってしまった。「木を見て森を見ず」ではだめだと反省した。",
+    "monsterName": "リーフ・ウォッチャー"
+  },
+  {
+    "id": 63,
+    "text": "郷に入っては郷に従え",
+    "reading": "gou ni itte wa gou ni shitagae",
+    "meaning": "その土地や社会の習慣には、素直に従うのがよいということ。",
+    "difficulty": "小学生",
+    "example_sentence": "おじいちゃんの家に行ったら、食事の前に必ずみんなでお祈りをする習慣があった。「郷に入っては郷に従え」で、僕も静かにお祈りをした。",
+    "monsterName": "アダプト・モンスター"
+  },
+  {
+    "id": 64,
+    "text": "弘法にも筆の誤り",
+    "reading": "koubou ni mo fude no ayamari",
+    "meaning": "書道の名人である弘法大師でも、書き損じることがある。その道の達人でも失敗はあるということ。（猿も木から落ちる と同じ）",
+    "difficulty": "小学生",
+    "example_sentence": "いつもきれいな字を書くお習字の先生が、お手本を書いていた時に、一文字だけ間違えてしまった。「弘法にも筆の誤り」とは言うけれど、少し驚いた。",
+    "monsterName": "マスター・ミス"
+  },
+  {
+    "id": 65,
+    "text": "転ばぬ先の杖",
+    "reading": "korobanu saki no tsue",
+    "meaning": "失敗しないように、前もって用心しておくこと。（備えあれば憂いなし に近い）",
+    "difficulty": "小学生",
+    "example_sentence": "山登りに行く前に、お母さんが「転んだ時のために」と、リュックに絆創膏を入れてくれた。まさに「転ばぬ先の杖」だね。",
+    "monsterName": "セーフティ・ステッキ"
+  },
+  {
+    "id": 66,
+    "text": "三人寄れば文殊の知恵",
+    "reading": "sannin yoreba monju no chie",
+    "meaning": "平凡な人でも、三人集まって相談すれば、文殊菩薩のような良い知恵が浮かぶものだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "自由研究のテーマがなかなか決まらなかったけど、友達と三人で話し合っていたら、面白いアイデアが浮かんできた。まさに「三人寄れば文殊の知恵」だね。",
+    "monsterName": "モンジュ・トリニティ"
+  },
+  {
+    "id": 67,
+    "text": "親しき仲にも礼儀あり",
+    "reading": "shitashiki naka ni mo reigi ari",
+    "meaning": "どんなに親しい間柄でも、守るべき礼儀があるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "いくら仲の良い友達でも、借りたものは「ありがとう」と言って返すのが当たり前だ。「親しき仲にも礼儀あり」だよ。",
+    "monsterName": "マナー・ナイト"
+  },
+  {
+    "id": 68,
+    "text": "朱に交われば赤くなる",
+    "reading": "shu ni majiwareba akaku naru",
+    "meaning": "人は付き合う友達によって、良くも悪くもなるものだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "読書が好きな友達のグループに入ったら、僕も自然と本を読むのが好きになった。「朱に交われば赤くなる」って本当だね。",
+    "monsterName": "カラー・チェンジャー"
+  },
+  {
+    "id": 69,
+    "text": "住めば都",
+    "reading": "sumeba miyako",
+    "meaning": "どんな場所でも、住み慣れてしまえばそこが良い所のように思えてくるものだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "引っ越してきたばかりの頃は、知らない場所で不安だったけど、一年も経つと友達もできて、すっかりこの町が好きになった。「住めば都」とはこのことだ。",
+    "monsterName": "ミヤコ・ビルダー"
+  },
+  {
+    "id": 70,
+    "text": "背に腹はかえられぬ",
+    "reading": "se ni hara wa kaerarenu",
+    "meaning": "目前の重大なことのためには、他のことを犠牲にするのもやむを得ないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "明日は大事なテストがあるから、本当はもっと遊びたいけど、今日は「背に腹はかえられぬ」と、諦めて勉強に集中することにした。",
+    "monsterName": "サクリファイス・ビースト"
+  },
+  {
+    "id": 71,
+    "text": "千里の道も一歩から",
+    "reading": "senri no michi mo ippo kara",
+    "meaning": "どんなに大きな計画でも、まずは手近なところから着実に努力を重ねていくことが大切だということ。",
+    "difficulty": "小学生",
+    "example_sentence": "漢字をたくさん覚えるのは大変だけど、「千里の道も一歩から」だと思って、毎日コツコツ練習を続けている。",
+    "monsterName": "ファースト・ステップ"
+  },
+  {
+    "id": 72,
+    "text": "大は小を兼ねる",
+    "reading": "dai wa shou wo kaneru",
+    "meaning": "大きいものは、小さいものの代わりとしても使えるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "お母さんが「どうせすぐ大きくなるから」と、少し大きめのTシャツを買ってくれた。「大は小を兼ねる」って言うけど、ちょっとぶかぶかだよ。",
+    "monsterName": "オールマイティ・ジャイアント"
+  },
+  {
+    "id": 73,
+    "text": "高嶺の花",
+    "reading": "takane no hana",
+    "meaning": "ただ見ているだけで、手に入れることのできないもののたとえ。",
+    "difficulty": "小学生",
+    "example_sentence": "クラスで一番人気のあるあの子は、僕にとっては「高嶺の花」で、話しかける勇気も出ない。",
+    "monsterName": "クリフ・フラワー"
+  },
+  {
+    "id": 74,
+    "text": "宝の持ち腐れ",
+    "reading": "takara no mochigusare",
+    "meaning": "役に立つ才能や物を持っているのに、それを活用しないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "おじいちゃんに立派な天体望遠鏡を買ってもらったのに、使い方が難しくて、部屋に置いたままになっている。これでは「宝の持ち腐れ」だ。",
+    "monsterName": "アンユーズド・ゴーレム"
+  },
+  {
+    "id": 75,
+    "text": "血は水よりも濃し",
+    "reading": "chi wa mizu yori mo koshi",
+    "meaning": "他人よりも、血のつながりのある身内の方が頼りになるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "友達と喧嘩して落ち込んでいた時、何も言わずにそばにいてくれたのは、やっぱりお兄ちゃんだった。「血は水よりも濃し」とは、こういう時に感じるものなのかな。",
+    "monsterName": "ブラッド・ボンド"
+  },
+  {
+    "id": 76,
+    "text": "月夜に提灯",
+    "reading": "tsukiyo ni chochin",
+    "meaning": "あっても役に立たない、不必要なもののたとえ。",
+    "difficulty": "小学生",
+    "example_sentence": "こんなに明るい満月の夜に、懐中電灯を持ってきても、まるで「月夜に提灯」で、全然意味がないね。",
+    "monsterName": "ムーンライト・ランタン"
+  },
+  {
+    "id": 77,
+    "text": "角を矯めて牛を殺す",
+    "reading": "tsuno wo tamete ushi wo korosu",
+    "meaning": "小さな欠点を直そうとして、かえって全体をだめにしてしまうこと。",
+    "difficulty": "小学生",
+    "example_sentence": "弟の作文の小さな間違いを直そうとして、細かく注意しすぎたら、かえって書くのが嫌になってしまった。これでは「角を矯めて牛を殺す」だ。",
+    "monsterName": "デッドリー・ホーン"
+  },
+  {
+    "id": 78,
+    "text": "出る杭は打たれる",
+    "reading": "deru kui wa utareru",
+    "meaning": "優れていて目立つ人は、他の人から憎まれたり、邪魔されたりしやすいということ。",
+    "difficulty": "小学生",
+    "example_sentence": "クラスで一人だけ違う意見を言ったら、みんなから少し変な目で見られてしまった。「出る杭は打たれる」と言うけれど、自分の考えを言うのは勇気がいることだ。",
+    "monsterName": "ハンマー・パイル"
+  },
+  {
+    "id": 79,
+    "text": "時は金なり",
+    "reading": "toki wa kane nari",
+    "meaning": "時間は金銭と同じように貴重なものだから、無駄にしてはいけないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "ゲームに夢中になっていたら、あっという間に宿題をする時間がなくなってしまった。「時は金なり」という言葉を、身をもって感じたよ。",
+    "monsterName": "タイム・イズ・ゴールド"
+  },
+  {
+    "id": 80,
+    "text": "捕らぬ狸の皮算用",
+    "reading": "toranu tanuki no kawazan you",
+    "meaning": "まだ手に入れていない不確かなものをあてにして、計画を立てること。",
+    "difficulty": "小学生",
+    "example_sentence": "次のテストで100点を取ったら、お母さんにお小遣いを上げてもらうんだ、と友達と話していたら、「まだテストも始まっていないのに、捕らぬ狸の皮算用だよ」と笑われた。",
+    "monsterName": "ドリーミン・タヌキ"
+  },
+  {
+    "id": 81,
+    "text": "虎穴に入らずんば虎子を得ず",
+    "reading": "koketsu ni irazunba koji wo ezu",
+    "meaning": "危険を冒さなければ、大きな成功は得られないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "優勝するためには、強豪チームと戦うことを避けては通れない。「虎穴に入らずんば虎子を得ず」の覚悟で、思い切って挑戦しよう。",
+    "monsterName": "チャレンジャー・タイガー"
+  },
+  {
+    "id": 82,
+    "text": "長いものには巻かれろ",
+    "reading": "nagai mono ni wa makarero",
+    "meaning": "力の強い者や権力のある者には、逆らわずに従っておく方が得策だということ。",
+    "difficulty": "小学生",
+    "example_sentence": "クラスのほとんどの人が賛成している意見に、一人だけ反対するのは勇気がいる。「長いものには巻かれろ」という考え方もあるけど、僕は自分の意見を大切にしたい。",
+    "monsterName": "フォロワー・スネーク"
+  },
+  {
+    "id": 83,
+    "text": "二兎を追う者は一兎をも得ず",
+    "reading": "nito wo ou mono wa itto mo ezu",
+    "meaning": "同時に二つのことを得ようとすると、結局どちらも失敗に終わるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "サッカーの練習とピアノの発表会が重なってしまい、どちらも中途半端な練習しかできなかった。結局、試合には負け、発表会でも失敗してしまい、「二兎を追う者は一兎をも得ず」だと痛感した。",
+    "monsterName": "ロスト・ラビット"
+  },
+  {
+    "id": 84,
+    "text": "濡れ手で粟",
+    "reading": "nurete de awa",
+    "meaning": "苦労せずに大きな利益を得ること。",
+    "difficulty": "小学生",
+    "example_sentence": "道端で拾った宝くじが、まさかの高額当選だったなんて、まるで「濡れ手で粟」のような話だ。",
+    "monsterName": "イージー・ゲッター"
+  },
+  {
+    "id": 85,
+    "text": "猫にまたたび",
+    "reading": "neko ni matatabi",
+    "meaning": "大好物なもののたとえ。",
+    "difficulty": "小学生",
+    "example_sentence": "魚が大好きなおじいちゃんにとって、新鮮なサンマの塩焼きは、まさに「猫にまたたび」で、ご飯を何杯もおかわりしていた。",
+    "monsterName": "マタタビ・ダンサー"
+  },
+  {
+    "id": 86,
+    "text": "早起きは三文の徳",
+    "reading": "hayaoki wa sanmon no toku",
+    "meaning": "朝早く起きると、健康にもよく、何かと良いことがあるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "いつもより少し早く起きて散歩に出かけたら、きれいな虹を見ることができた。「早起きは三文の徳」とは、このことだね。",
+    "monsterName": "サンモン・バード"
+  },
+  {
+    "id": 87,
+    "text": "人の噂も七十五日",
+    "reading": "hito no uwasa mo shichijuugo nichi",
+    "meaning": "世間の噂は、時が経てば自然と忘れられてしまうものだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "転校してきたばかりの頃は、色々な噂をされて気になったけど、しばらく経つと誰も何も言わなくなった。「人の噂も七十五日」って本当なんだな。",
+    "monsterName": "フェイドアウト・ゴシップ"
+  },
+  {
+    "id": 88,
+    "text": "人の振り見て我が振り直せ",
+    "reading": "hito no furi mite waga furi naose",
+    "meaning": "他人の言動の良いところは見習い、悪いところは自分もしていないか反省し、改めるべきだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "友達が先生に忘れ物をして叱られているのを見て、「人の振り見て我が振り直せ」と、自分の持ち物をしっかり確認した。",
+    "monsterName": "ミラー・ウォッチャー"
+  },
+  {
+    "id": 89,
+    "text": "火のない所に煙は立たぬ",
+    "reading": "hi no nai tokoro ni kemuri wa tatanu",
+    "meaning": "噂が立つからには、何かしらその原因となる事実があるはずだということ。",
+    "difficulty": "小学生",
+    "example_sentence": "「A組の鈴木くんが、近々転校するらしい」という噂が流れているけど、本当かな。「でも、最近お母さんが学校の先生と何か話していたみたいだよ。『火のない所に煙は立たぬ』って言うし、何かあるのかもね。」",
+    "monsterName": "スモーク・シグナル"
+  },
+  {
+    "id": 90,
+    "text": "瓢箪から駒",
+    "reading": "hyoutan kara koma",
+    "meaning": "思いがけない所から、意外なものが出てくること。冗談が本当になること。",
+    "difficulty": "小学生",
+    "example_sentence": "冗談半分で応募した作文コンクールで、まさか最優秀賞を取れるとは。「瓢箪から駒」とは、まさにこのことだ。",
+    "monsterName": "ヒョウタン・ナイト"
+  },
+  {
+    "id": 91,
+    "text": "への河童",
+    "reading": "he no kappa",
+    "meaning": "全くたやすいこと。なんとも思わないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "あんなに苦労していた算数の問題も、一度解き方が分かってしまえば、もう「への河っぱ」だ。今ではスラスラ解けるよ。",
+    "monsterName": "イージー・カッパ"
+  },
+  {
+    "id": 92,
+    "text": "待てば海路の日和あり",
+    "reading": "mateba kairo no hiyori ari",
+    "meaning": "焦らずに待っていれば、いつか必ず良い機会がやってくるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "ずっと欲しかった限定版のプラモデルが手に入らなくて落ち込んでいたけど、諦めずに待っていたら、再販されることが決まった。「待てば海路の日和あり」とはこのことだ。",
+    "monsterName": "ホープ・シーマン"
+  },
+  {
+    "id": 93,
+    "text": "ミイラ取りがミイラになる",
+    "reading": "miira tori ga miira ni naru",
+    "meaning": "人を連れ戻しに行った者が、かえって相手と同じ状態になってしまい、帰ってこなくなること。",
+    "difficulty": "小学生",
+    "example_sentence": "弟を説得してゲームをやめさせようとしたお兄ちゃんが、いつの間にか隣に座って、一緒になって夢中でゲームをしていた。お母さんが「これじゃミイラ取りがミイラになるだよ」と笑っていた。",
+    "monsterName": "ミイラ・メーカー"
+  },
+  {
+    "id": 94,
+    "text": "身から出た錆",
+    "reading": "mi kara deta sabi",
+    "meaning": "自分自身の行いのせいで、不幸な結果を招くこと。",
+    "difficulty": "小学生",
+    "example_sentence": "彼は、日頃の不摂生がたたり、若くして大病を患ってしまった。まさに「身から出た錆」で、自業自得としか言いようがない。",
+    "monsterName": "サビツキ・アーマー"
+  },
+  {
+    "id": 95,
+    "text": "目から鱗が落ちる",
+    "reading": "me kara uroko ga ochiru",
+    "meaning": "何かがきっかけで、今までわからなかったことが急によく理解できるようになること。",
+    "difficulty": "小学生",
+    "example_sentence": "算数の問題がどうしても解けなかったけど、先生のヒントを聞いた瞬間、急に解き方がひらめいた。まさに「目から鱗が落ちる」ような体験だった。",
+    "monsterName": "ウロコ・ワイパー"
+  },
+  {
+    "id": 96,
+    "text": "楽あれば苦あり",
+    "reading": "raku areba ku ari",
+    "meaning": "楽しいことがあれば、そのあとには必ず苦しいことがある。人生は良いことばかりではないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "夏休みは毎日遊んでばかりで楽しかったけど、その分、最後に残った宿題を片付けるのが大変だった。「楽あれば苦あり」とは、こういうことなんだな。",
+    "monsterName": "アップダウン・スピリット"
+  },
+  {
+    "id": 97,
+    "text": "良薬は口に苦し",
+    "reading": "ryouyaku wa kuchi ni nigashi",
+    "meaning": "身のためになる忠告は、聞くのがつらいものであるということ。",
+    "difficulty": "小学生",
+    "example_sentence": "先生からの「もっと字を丁寧に書きなさい」という注意は、聞いている時は少し嫌だったけど、そのおかげでテストの点数が上がった。「良薬は口に苦し」とは本当だ。",
+    "monsterName": "ビター・メディスン"
+  },
+  {
+    "id": 98,
+    "text": "頭隠して尻隠さず",
+    "reading": "atama kakushite shiri kakusazu",
+    "meaning": "悪事や欠点の一部だけを隠して、全部隠したつもりになっていること。",
+    "difficulty": "小学生",
+    "example_sentence": "かくれんぼで、カーテンの後ろに隠れた弟の足が丸見えだった。まさに『頭隠して尻隠さず』だね。",
+    "monsterName": "シリマル・ダチョウ"
+  },
+  {
+    "id": 99,
+    "text": "あっけにとられる",
+    "reading": "akke ni torareru",
+    "meaning": "あまりに意外な出来事に驚き、呆然とすること。",
+    "difficulty": "小学生",
+    "example_sentence": "突然、空からたくさんの風船が降ってきて、みんな何が起きたのか分からず、あっけにとられて空を見上げていた。",
+    "monsterName": "ポカン・フェイス"
+  },
+  {
+    "id": 100,
+    "text": "あとの祭り",
+    "reading": "ato no matsuri",
+    "meaning": "時機を逃してしまい、手遅れであること。",
+    "difficulty": "小学生",
+    "example_sentence": "楽しみにしていたお祭りが昨日で終わっていたことを、今日になって知った。もう『あとの祭り』で、とてもがっかりした。",
+    "monsterName": "フェスタ・エンド"
+  },
+  {
+    "id": 101,
+    "text": "油を絞る",
+    "reading": "abura wo shiboru",
+    "meaning": "人の失敗や欠点を厳しく責めること。",
+    "difficulty": "小学生",
+    "example_sentence": "練習試合で簡単なミスを連発してしまい、試合の後、監督から厳しく『油を絞られた』。",
+    "monsterName": "シボリ・マスター"
+  },
+  {
+    "id": 102,
+    "text": "息をのむ",
+    "reading": "iki wo nomu",
+    "meaning": "驚きや感動で、一瞬息を止めること。",
+    "difficulty": "小学生",
+    "example_sentence": "目の前で繰り広げられるプロのマジシャンのすごい手品に、思わず『息をのんだ』。",
+    "monsterName": "サイレント・ブレス"
+  },
+  {
+    "id": 103,
+    "text": "板につく",
+    "reading": "ita ni tsuku",
+    "meaning": "態度や服装などが、その人の地位や職業にふさわしくなること。",
+    "difficulty": "小学生",
+    "example_sentence": "最初はぎこちなかった新入生の制服姿も、夏休み前にはすっかり『板について』、立派な中学生に見える。",
+    "monsterName": "ジャストフィット・アクター"
+  },
+  {
+    "id": 104,
+    "text": "一か八か",
+    "reading": "ichi ka bachi ka",
+    "meaning": "結果はどうなろうと、運を天に任せて思い切ってやってみること。",
+    "difficulty": "小学生",
+    "example_sentence": "残り時間はあとわずか。逆転を狙って、ゴールキーパーも攻撃に参加するなんて、まさに『一か八か』の作戦だ。",
+    "monsterName": "ギャンブル・ダイス"
+  },
+  {
+    "id": 105,
+    "text": "上の空",
+    "reading": "uwa no sora",
+    "meaning": "他のことに心が奪われて、目の前のことに集中できないでいる様子。",
+    "difficulty": "小学生",
+    "example_sentence": "先生が大切な話をしているのに、窓の外を飛ぶ鳥に気を取られて、すっかり『上の空』だった。",
+    "monsterName": "エア・ヘッド"
+  },
+  {
+    "id": 106,
+    "text": "瓜二つ",
+    "reading": "uri futatsu",
+    "meaning": "顔や姿がそっくりであること。",
+    "difficulty": "小学生",
+    "example_sentence": "新しく来た双子の転校生は、顔も声もそっくりで、本当に『瓜二つ』だ。",
+    "monsterName": "ウリフタ・ツインズ"
+  },
+  {
+    "id": 107,
+    "text": "大船に乗ったよう",
+    "reading": "oofune ni notta you",
+    "meaning": "信頼できる人に任せて、安心しきっている様子。",
+    "difficulty": "小学生",
+    "example_sentence": "何でも知っているベテランのガイドさんと一緒だから、初めての山登りも『大船に乗ったよう』な気持ちで安心だ。",
+    "monsterName": "グレートシップ・キャプテン"
+  },
+  {
+    "id": 108,
+    "text": "奥歯に物が挟まったよう",
+    "reading": "okuba ni mono ga hasamatta you",
+    "meaning": "はっきりと言わず、何か隠しているような、もどかしい話し方。",
+    "difficulty": "小学生",
+    "example_sentence": "友達は何か言いたげにしているけれど、はっきり言わない。『奥歯に物が挟まったよう』な話し方で、こっちがもどかしいよ。",
+    "monsterName": "モゴモゴ・スピーカー"
+  },
+  {
+    "id": 109,
+    "text": "折り紙をつける",
+    "reading": "origami wo tsukeru",
+    "meaning": "その人や物の価値・能力について、信頼できるという保証をする。",
+    "difficulty": "小学生",
+    "example_sentence": "あのシェフの料理の腕は、有名な料理評論家が『折り紙をつけた』ほどだから、間違いなく美味しいだろう。",
+    "monsterName": "ギャランティ・ペーパー"
+  },
+  {
+    "id": 110,
+    "text": "肩を並べる",
+    "reading": "kata wo naraberu",
+    "meaning": "同じくらいの力や地位になって、対等に張り合うこと。",
+    "difficulty": "小学生",
+    "example_sentence": "去年の大会では全く歯が立たなかったライバルと、今年は互角に戦えるようになった。ついに彼と『肩を並べる』ことができたんだ。",
+    "monsterName": "イコール・ショルダー"
+  },
+  {
+    "id": 111,
+    "text": "兜を脱ぐ",
+    "reading": "kabuto wo nugu",
+    "meaning": "降参する。相手の力に負けて、謝ること。",
+    "difficulty": "小学生",
+    "example_sentence": "彼の完璧なプレゼンテーションを見て、自分の準備不足を痛感し、完全に『兜を脱いだ』。",
+    "monsterName": "ヘルム・オフ"
+  },
+  {
+    "id": 112,
+    "text": "借りてきた猫",
+    "reading": "karite kita neko",
+    "meaning": "普段と違って、非常におとなしくしている様子。",
+    "difficulty": "小学生",
+    "example_sentence": "いつもは元気でよく喋る妹が、お客さんの前では『借りてきた猫』のようにおとなしくなってしまう。",
+    "monsterName": "レンタル・ケットシー"
+  },
+  {
+    "id": 113,
+    "text": "気が置けない",
+    "reading": "ki ga okenai",
+    "meaning": "遠慮する必要がなく、心から打ち解けることができる。",
+    "difficulty": "小学生",
+    "example_sentence": "昔からの親友とは、何でも話せる『気が置けない』仲だ。",
+    "monsterName": "オープン・ハート"
+  },
+  {
+    "id": 114,
+    "text": "九死に一生を得る",
+    "reading": "kyuushi ni isshou wo eru",
+    "meaning": "ほとんど助かる見込みのない危険な状態から、かろうじて命が助かること。",
+    "difficulty": "小学生",
+    "example_sentence": "交通事故で車は大破したが、幸いにも軽いかすり傷だけで助かった。まさに『九死に一生を得る』経験だった。",
+    "monsterName": "ナインライブス・サバイバー"
+  },
+  {
+    "id": 115,
+    "text": "口が堅い",
+    "reading": "kuchi ga katai",
+    "meaning": "秘密を軽々しく他人に話さないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "彼はとても『口が堅い』ので、どんな秘密でも安心して打ち明けることができる。",
+    "monsterName": "ロック・マウス"
+  },
+  {
+    "id": 116,
+    "text": "口が軽い",
+    "reading": "kuchi ga karui",
+    "meaning": "言ってはいけないことを、うっかり話してしまうこと。",
+    "difficulty": "小学生",
+    "example_sentence": "あの人は『口が軽い』から、大切な相談はしない方がいいと、母からアドバイスされた。",
+    "monsterName": "ライト・スピーカー"
+  },
+  {
+    "id": 117,
+    "text": "口車に乗る",
+    "reading": "kuchiguruma ni noru",
+    "meaning": "うまい言葉に騙されて、その気にさせられること。",
+    "difficulty": "小学生",
+    "example_sentence": "『今だけお得』という店員さんのうまい話に、つい『口車に乗って』、予定になかった服まで買ってしまった。",
+    "monsterName": "トーク・ライダー"
+  },
+  {
+    "id": 118,
+    "text": "雲をつくよう",
+    "reading": "kumo wo tsuku you",
+    "meaning": "とてつもなく背が高いことのたとえ。",
+    "difficulty": "小学生",
+    "example_sentence": "バスケットボールの選手たちは、みんな『雲をつくよう』な大男ばかりで、見上げていると首が痛くなった。",
+    "monsterName": "クラウド・ジャイアント"
+  },
+  {
+    "id": 119,
+    "text": "けむに巻く",
+    "reading": "kemu ni maku",
+    "meaning": "話をそらしたり、ごまかしたりして、相手を混乱させること。",
+    "difficulty": "小学生",
+    "example_sentence": "犯人は、警察の質問を巧みに『けむに巻いて』、なかなか本当のことを言わなかった。",
+    "monsterName": "スモーク・トリッカー"
+  },
+  {
+    "id": 120,
+    "text": "鯖を読む",
+    "reading": "saba wo yomu",
+    "meaning": "自分の都合のいいように、数をごまかすこと。",
+    "difficulty": "小学生",
+    "example_sentence": "お祭りで釣った金魚の数を、妹に自慢するために少し『鯖を読んで』多く言ってしまった。",
+    "monsterName": "サバ・カウンター"
+  },
+  {
+    "id": 121,
+    "text": "地獄に仏",
+    "reading": "jigoku ni hotoke",
+    "meaning": "非常に困っている時に、思いがけない助けに会うことのたとえ。",
+    "difficulty": "小学生",
+    "example_sentence": "道に迷って困っていた時に、親切な人が声をかけてくれて、まさに『地獄に仏』だと思った。",
+    "monsterName": "ヘル・ブッダ"
+  },
+  {
+    "id": 122,
+    "text": "しっぽを出す",
+    "reading": "shippo wo dasu",
+    "meaning": "隠していた悪事や正体がばれること。",
+    "difficulty": "小学生",
+    "example_sentence": "嘘をつき続けていた彼は、友達からの鋭い質問に、とうとう『しっぽを出した』。",
+    "monsterName": "テール・リビーラー"
+  },
+  {
+    "id": 123,
+    "text": "しのぎを削る",
+    "reading": "shinogi wo kezuru",
+    "meaning": "互いに激しく争うこと。",
+    "difficulty": "小学生",
+    "example_sentence": "全国大会の決勝戦では、両チームが一歩も譲らず、最後まで『しのぎを削る』大接戦となった。",
+    "monsterName": "ブレード・ダンサー"
+  },
+  {
+    "id": 124,
+    "text": "白羽の矢が立つ",
+    "reading": "shiraha no ya ga tatsu",
+    "meaning": "大勢の中から、特に選び出されること。",
+    "difficulty": "小学生",
+    "example_sentence": "次の学級委員長として、クラスのみんなから推薦され、僕に『白羽の矢が立った』。",
+    "monsterName": "ホワイト・アロー"
+  },
+  {
+    "id": 125,
+    "text": "図に乗る",
+    "reading": "zu ni noru",
+    "meaning": "思い通りになったからといって、いい気になってつけあがること。",
+    "difficulty": "小学生",
+    "example_sentence": "一度テストで良い点を取ったからといって、『図に乗って』勉強を怠ると、次のテストで失敗するぞ。",
+    "monsterName": "ズノーリ・デビル"
+  },
+  {
+    "id": 126,
+    "text": "相好を崩す",
+    "reading": "sougou wo kuzusu",
+    "meaning": "顔をほころばせて、にこにこと笑う。",
+    "difficulty": "小学生",
+    "example_sentence": "いつもは厳しい顔のおじいちゃんも、孫の顔を見ると『相好を崩して』、とても優しくなる。",
+    "monsterName": "スマイル・フェイス"
+  },
+  {
+    "id": 127,
+    "text": "太鼓判を押す",
+    "reading": "taikoban wo osu",
+    "meaning": "間違いないと、強く保証すること。",
+    "difficulty": "小学生",
+    "example_sentence": "このケーキは、甘いもの好きの私が『太鼓判を押す』美味しさだから、ぜひ食べてみて。",
+    "monsterName": "ドラム・スタンプ"
+  },
+  {
+    "id": 128,
+    "text": "竹を割ったよう",
+    "reading": "take wo watta you",
+    "meaning": "性格がまっすぐで、さっぱりしていること。",
+    "difficulty": "小学生",
+    "example_sentence": "うちのクラスの委員長は、裏表がなく、誰にでもはっきり意見を言う、『竹を割ったよう』な性格で、みんなから信頼されている。",
+    "monsterName": "バンブー・サムライ"
+  },
+  {
+    "id": 129,
+    "text": "棚に上げる",
+    "reading": "tana ni ageru",
+    "meaning": "自分に都合の悪いことは、わざと知らないふりをすること。",
+    "difficulty": "小学生",
+    "example_sentence": "自分の部屋は散らかっているくせに、弟の机が汚いと注意するのは、自分のことを『棚に上げている』としか思えない。",
+    "monsterName": "シェルフ・マスター"
+  },
+  {
+    "id": 130,
+    "text": "手塩にかける",
+    "reading": "teshio ni kakeru",
+    "meaning": "自分で大切に世話をして育てること。",
+    "difficulty": "小学生",
+    "example_sentence": "祖父が『手塩にかけて』育てた盆栽は、どれも芸術品のように見事だ。",
+    "monsterName": "グローアップ・ソルト"
+  },
+  {
+    "id": 131,
+    "text": "手に汗を握る",
+    "reading": "te ni ase wo nigiru",
+    "meaning": "緊張や興奮、心配などでハラハラドキドキすること。",
+    "difficulty": "小学生",
+    "example_sentence": "映画のクライマックスシーンは、主人公が絶体絶命のピンチに陥り、見ているこちらも『手に汗を握った』。",
+    "monsterName": "スウェッティ・ハンド"
+  },
+  {
+    "id": 132,
+    "text": "手のひらを返す",
+    "reading": "tenohira wo kaesu",
+    "meaning": "それまでの態度を急にがらりと変えること。",
+    "difficulty": "小学生",
+    "example_sentence": "昨日まで僕の意見に賛成してくれていたのに、先生に注意された途端、『手のひらを返した』ように反対し始めた。",
+    "monsterName": "パーム・チェンジャー"
+  },
+  {
+    "id": 133,
+    "text": "年の功",
+    "reading": "toshi no kou",
+    "meaning": "長年経験を積んだことによって得られる、優れた能力や知恵。",
+    "difficulty": "小学生",
+    "example_sentence": "この難しいパズルを、おじいちゃんはあっという間に解いてしまった。さすが『年の功』だ。",
+    "monsterName": "エルダー・ウィズダム"
+  },
+  {
+    "id": 134,
+    "text": "飛ぶ鳥を落とす勢い",
+    "reading": "tobu tori wo otosu ikioi",
+    "meaning": "非常に勢いが盛んであることのたとえ。",
+    "difficulty": "小学生",
+    "example_sentence": "あの新しいアイドルグループは、出す曲すべてが大ヒットし、今や『飛ぶ鳥を落とす勢い』だ。",
+    "monsterName": "フライング・キラー"
+  },
+  {
+    "id": 135,
+    "text": "途方に暮れる",
+    "reading": "tohou ni kureru",
+    "meaning": "どうしていいか分からず、困り果てること。",
+    "difficulty": "小学生",
+    "example_sentence": "旅先で財布を落としてしまい、どうしていいか分からず、駅の前で『途方に暮れて』しまった。",
+    "monsterName": "ロスト・ウェイ"
+  },
+  {
+    "id": 136,
+    "text": "根も葉もない",
+    "reading": "ne mo ha mo nai",
+    "meaning": "全く根拠がないこと。でたらめであること。",
+    "difficulty": "小学生",
+    "example_sentence": "彼が転校するという噂が流れているけど、本人に聞いたら『根も葉もない』嘘だと分かって安心した。",
+    "monsterName": "ルートレス・ゴースト"
+  },
+  {
+    "id": 137,
+    "text": "白黒をつける",
+    "reading": "shirokuro wo tsukeru",
+    "meaning": "物事の善悪や是非をはっきりと決めること。",
+    "difficulty": "小学生",
+    "example_sentence": "どちらの言い分が正しいのか、今日の話し合いで、はっきりと『白黒をつけよう』。",
+    "monsterName": "ジャッジメント・スケール"
+  },
+  {
+    "id": 138,
+    "text": "歯が立たない",
+    "reading": "ha ga tatanai",
+    "meaning": "相手が強すぎて、とてもかなわないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "チェスの大会で、去年のチャンピオンと対戦したが、全く『歯が立たず』、完敗してしまった。",
+    "monsterName": "アイアン・ウォール"
+  },
+  {
+    "id": 139,
+    "text": "鼻が高い",
+    "reading": "hana ga takai",
+    "meaning": "得意になっていること。自慢に思うこと。",
+    "difficulty": "小学生",
+    "example_sentence": "兄がサッカーの全国大会で優勝し、自分のことのように嬉しくて、僕まで『鼻が高い』よ。",
+    "monsterName": "プラウド・ノーズ"
+  },
+  {
+    "id": 140,
+    "text": "羽を伸ばす",
+    "reading": "hatawo nobasu",
+    "meaning": "束縛から解放されて、のびのびと自由に行動すること。",
+    "difficulty": "小学生",
+    "example_sentence": "テストが終わったので、今日くらいは宿題のことは忘れて、思いっきり『羽を伸ばして』遊ぼう。",
+    "monsterName": "フリーダム・ウィング"
+  },
+  {
+    "id": 141,
+    "text": "非の打ち所がない",
+    "reading": "hi no uchidokoro ga nai",
+    "meaning": "欠点が全くなく、完璧であること。",
+    "difficulty": "小学生",
+    "example_sentence": "彼の作ったプラモデルは、塗装も組み立て も完璧で、まさに『非の打ち所がない』出来栄えだった。",
+    "monsterName": "パーフェクト・ソウル"
+  },
+  {
+    "id": 142,
+    "text": "火の車",
+    "reading": "hi no kuruma",
+    "meaning": "家計などが非常に苦しい状態であること。",
+    "difficulty": "小学生",
+    "example_sentence": "お小遣いを使いすぎて、月末はいつも『火の車』だ。",
+    "monsterName": "ファイア・チャリオット"
+  },
+  {
+    "id": 143,
+    "text": "右に出る者はいない",
+    "reading": "migi ni deru mono wa inai",
+    "meaning": "その人より優れている者は、誰もいないということ。",
+    "difficulty": "小学生",
+    "example_sentence": "ことわざの知識にかけては、クラスで彼の『右に出る者はいない』。",
+    "monsterName": "ザ・ワン"
+  },
+  {
+    "id": 144,
+    "text": "水に流す",
+    "reading": "mizu ni nagasu",
+    "meaning": "過去のいざこざなどを、すべてなかったことにして許す。",
+    "difficulty": "小学生",
+    "example_sentence": "喧嘩もしたけど、最後は仲直りだ。過去のことはきれいさっぱり『水に流そう』。",
+    "monsterName": "ウォーター・リセット"
+  },
+  {
+    "id": 145,
+    "text": "虫の知らせ",
+    "reading": "mushi no shirase",
+    "meaning": "何となく、よくないことが起こりそうだという予感がすること。",
+    "difficulty": "小学生",
+    "example_sentence": "なんだか胸騒ぎがすると思ったら、案の定、弟が学校で怪我をしたらしい。これが『虫の知らせ』というものか。",
+    "monsterName": "フォーチュン・バグ"
+  },
+  {
+    "id": 146,
+    "text": "胸をなでおろす",
+    "reading": "mune wo nadeorosu",
+    "meaning": "心配事が解決して、ほっとすること。",
+    "difficulty": "小学生",
+    "example_sentence": "迷子になったペットの猫が無事に見つかり、家族みんなで『胸をなでおろした』。",
+    "monsterName": "リリーフ・ハート"
+  },
+  {
+    "id": 147,
+    "text": "腑に落ちない",
+    "reading": "fu ni ochinai",
+    "meaning": "いくら考えても納得がいかないこと。",
+    "difficulty": "小学生",
+    "example_sentence": "先生の説明を聞いても、なぜそうなるのかどうしても納得できず、『腑に落ちない』顔をしていたら、もう一度詳しく教えてくれた。",
+    "monsterName": "ナットク・ゴーレム"
+  },
+  {
+    "id": 148,
+    "text": "青は藍より出でて藍より青し",
+    "reading": "あおはあいよりいでてあいよりあおし",
+    "meaning": "弟子が師匠よりも優れた才能を発揮することのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "部活の先輩のフォームを必死で真似して練習していたら、いつの間にか先輩自身から「お前のほうが上手い」と褒められた。「青は藍より出でて藍より青し」と言われるような選手になりたい。",
+    "monsterName": "インディゴ・マスター"
+  },
+  {
+    "id": 149,
+    "text": "悪事千里を走る",
+    "reading": "あくじせんりをはしる",
+    "meaning": "悪い行いや評判は、たちまち世間に知れ渡ってしまうということ。",
+    "difficulty": "中学生",
+    "example_sentence": "ほんの出来心でやった小さな悪ふざけが、SNSであっという間に広まってしまい、大事になってしまった。「悪事千里を走る」という言葉の恐ろしさを痛感した。",
+    "monsterName": "バッドニュース・ランナー"
+  },
+  {
+    "id": 150,
+    "text": "羹に懲りて膾を吹く",
+    "reading": "あつものにこりてなますをふく",
+    "meaning": "一度の失敗に懲りて、必要以上に用心深くなることのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "一度、人間関係のトラブルでひどく傷ついてから、彼は新しい友達を作ることに極端に臆病になってしまった。「羹に懲りて膾を吹く」というが、少し心配だ。",
+    "monsterName": "トラウマ・ブレス"
+  },
+  {
+    "id": 151,
+    "text": "雨垂れ石を穿つ",
+    "reading": "あまだれいしをうがつ",
+    "meaning": "小さな力でも根気よく続ければ、やがて大きな成果を得られるということ。（塵も積もれば山となる に近い）",
+    "difficulty": "中学生",
+    "example_sentence": "毎日たった30分でも、コツコツと続けた勉強のおかげで、苦手だった数学の成績が大きく上がった。「雨垂れ石を穿つ」とは、まさにこのことだ。",
+    "monsterName": "ドリップ・ドリラー"
+  },
+  {
+    "id": 152,
+    "text": "過ちては則ち改むるに憚ること勿れ",
+    "reading": "あやまちてはすなわちあらたむるにはばかることなかれ",
+    "meaning": "間違いを犯したと気づいたら、ためらうことなくすぐに改めるべきだということ。",
+    "difficulty": "中学生",
+    "example_sentence": "自分の間違いに気づいたら、プライドを捨ててすぐに「ごめん」と謝ることが大切だ。「過ちては則ち改むるに憚ること勿れ」と、古典の授業で習った通りだ。",
+    "monsterName": "リペンター・ソウル"
+  },
+  {
+    "id": 153,
+    "text": "生ける屍",
+    "reading": "ikuru shikabane",
+    "meaning": "生きてはいるが、全く生気や希望がなく、無気力な状態の人のこと。",
+    "difficulty": "中学生",
+    "example_sentence": "大好きだったペットを失ってから、彼は食事もろくに取らず、まるで『生ける屍』のように無気力な毎日を送っている。",
+    "monsterName": "リビング・コープス"
+  },
+  {
+    "id": 154,
+    "text": "石橋を叩いて渡る",
+    "reading": "ishibashi wo tataite wataru",
+    "meaning": "頑丈な石の橋でさえ、叩いて安全を確かめてから渡る。非常に用心深いことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は海外旅行の計画を立てるのに、航空券の予約からホテルの評判まで、あらゆることを調べ尽くしている。まさに『石橋を叩いて渡る』ような慎重さだ。",
+    "monsterName": "ストーンブリッジ・チェッカー"
+  },
+  {
+    "id": 155,
+    "text": "衣食足りて礼節を知る",
+    "reading": "ishoku tarite reisetsu wo shiru",
+    "meaning": "人は着るものや食べるものに不自由しなくなって、初めて礼儀や節度をわきまえるようになるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "戦後の混乱期には、誰もが生きるのに必死だった。まさに『衣食足りて礼節を知る』で、豊かな社会になって初めて、人々は他者を思いやる余裕を持てるようになったのだ。",
+    "monsterName": "マナー・ゴーレム"
+  },
+  {
+    "id": 156,
+    "text": "一事が万事",
+    "reading": "ichi ji ga ban ji",
+    "meaning": "一つのことから、他のすべてのことを推し量ることができるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼の部屋はいつも整理整頓されている。きっと他のこともきっちりしているのだろう。『一事が万事』というからね。",
+    "monsterName": "オール・イズ・ワン"
+  },
+  {
+    "id": 157,
+    "text": "一寸先は闇",
+    "reading": "issun saki wa yami",
+    "meaning": "少し先の未来のことは、全く予測できないということ。",
+    "difficulty": "中学生",
+    "example_sentence": "昨日まで元気だった人が、突然病に倒れるなんて。『一寸先は闇』とはよく言ったもので、人生何が起こるか分からない。",
+    "monsterName": "ダーク・フューチャー"
+  },
+  {
+    "id": 158,
+    "text": "韋編三絶",
+    "reading": "ihen san zetsu",
+    "meaning": "書物を綴じる革紐が三度も切れるほど、同じ本を熱心に読み込むこと。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は、愛読書を『韋編三絶』するほど読み込み、内容を完全に暗記している。",
+    "monsterName": "ブック・ワーム"
+  },
+  {
+    "id": 159,
+    "text": "魚心あれば水心",
+    "reading": "uogokoro areba mizugokoro",
+    "meaning": "相手が好意を示せば、こちらもそれに応えて好意を示す用意があるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "こちらが笑顔で挨拶すれば、相手も笑顔で返してくれる。まさに『魚心あれば水心』だ。",
+    "monsterName": "アクア・ソウル"
+  },
+  {
+    "id": 160,
+    "text": "烏合の衆",
+    "reading": "ugou no shuu",
+    "meaning": "規律も統一もなく、ただ寄り集まっただけの集団のこと。",
+    "difficulty": "中学生",
+    "example_sentence": "リーダーのいないチームは、ただの『烏合の衆』となり、試合で力を発揮することはできなかった。",
+    "monsterName": "カオス・クロウ"
+  },
+  {
+    "id": 161,
+    "text": "氏より育ち",
+    "reading": "uji yori sodachi",
+    "meaning": "家柄や血筋よりも、育った環境の方が人格形成に大きな影響を与えるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "たとえ名家の生まれでなくても、立派な教育を受ければ、品格のある人間になる。『氏より育ち』とはよく言ったものだ。",
+    "monsterName": "グロウス・フェニックス"
+  },
+  {
+    "id": 162,
+    "text": "嘘も方便",
+    "reading": "uso mo houben",
+    "meaning": "時には、物事を円滑に進めるために、嘘をつくことも必要になる場合があるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "重い病気の友人を元気づけるため、医者は『嘘も方便』と、少しだけ病状を軽く伝えた。",
+    "monsterName": "ホワイト・ライアー"
+  },
+  {
+    "id": 163,
+    "text": "独活の大木",
+    "reading": "udo no taiboku",
+    "meaning": "体ばかり大きくて、何の役にも立たない人のことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は体は大きいが、気が弱くて何も決められない。周りからは『独活の大木』だと陰口を言われている。",
+    "monsterName": "ウド・ジャイアント"
+  },
+  {
+    "id": 164,
+    "text": "溺れる者は藁をも掴む",
+    "reading": "oboreru mono wa wara wo mo tsukamu",
+    "meaning": "非常に困った時には、頼りにならないものでも必死に頼ろうとすることのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "借金で首が回らなくなった彼は、怪しげな儲け話にまで手を出そうとしている。まさに『溺れる者は藁をも掴む』心境なのだろう。",
+    "monsterName": "ストロー・ホルダー"
+  },
+  {
+    "id": 165,
+    "text": "帯に短し襷に長し",
+    "reading": "obi ni mijikashi tasuki ni nagashi",
+    "meaning": "中途半端で、どちらの役にも立たないことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "この布は、洋服を作るには足りないし、小物を作るには余ってしまう。まさに『帯に短し襷に長し』で、使い道に困る。",
+    "monsterName": "ハンパ・ゴーレム"
+  },
+  {
+    "id": 166,
+    "text": "快刀乱麻を断つ",
+    "reading": "kaitou ranma wo tatsu",
+    "meaning": "もつれた物事を、非常に鮮やかな手際で解決すること。",
+    "difficulty": "中学生",
+    "example_sentence": "複雑に絡み合った人間関係のトラブルを、彼女は『快刀乱麻を断つ』ような鮮やかな一言で解決してしまった。",
+    "monsterName": "カイトウ・ランマ"
+  },
+  {
+    "id": 167,
+    "text": "飼い犬に手を噛まれる",
+    "reading": "kaiinu ni te wo kamareru",
+    "meaning": "普段から面倒を見ていた者から、裏切られてひどい目に遭うこと。",
+    "difficulty": "中学生",
+    "example_sentence": "長年信頼していた部下に、会社の秘密情報を持ち出されてしまった。まさに『飼い犬に手を噛まれる』とはこのことだ。",
+    "monsterName": "ビトレイ・ハウンド"
+  },
+  {
+    "id": 168,
+    "text": "隗より始めよ",
+    "reading": "kai yori hajime yo",
+    "meaning": "大きな事業を始めるには、まず手近なことから着手するのがよいということ。また、物事は言い出した者から実行せよということ。",
+    "difficulty": "中学生",
+    "example_sentence": "教室の掃除当番を誰もやりたがらないなら、まずは言い出した君から始めるべきだ。『隗より始めよ』と言うだろう。",
+    "monsterName": "ファースト・チャレンジャー"
+  },
+  {
+    "id": 169,
+    "text": "駕籠に乗る人担ぐ人そのまた草鞋を作る人",
+    "reading": "kago ni noru hito katsugu hito sono mata waraji wo tsukuru hito",
+    "meaning": "世の中には、人の身分や職業には様々な違いがあるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "社会は、社長のような目立つ人もいれば、その下で働く社員、さらにその人たちの生活を支える人々もいる。『駕籠に乗る人担ぐ人そのまた草鞋を作る人』で、様々な役割の人がいて成り立っているんだ。",
+    "monsterName": "ソシアル・ピラミッド"
+  },
+  {
+    "id": 170,
+    "text": "果報は寝て待て",
+    "reading": "kahou wa nete mate",
+    "meaning": "幸運は人の力ではどうにもできないものだから、焦らずに時機を待つのが良いということ。",
+    "difficulty": "中学生",
+    "example_sentence": "受験勉強は全力でやったんだ。あとは結果を待つだけだ。焦っても仕方ない、『果報は寝て待て』さ。",
+    "monsterName": "スリーピング・フォーチュン"
+  },
+  {
+    "id": 171,
+    "text": "亀の甲より年の功",
+    "reading": "kame no kou yori toshi no kou",
+    "meaning": "年長者の経験は、貴重で尊重すべきであるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "この絡まった糸を、おばあちゃんはあっという間にほどいてしまった。まさに『亀の甲より年の功』だね。",
+    "monsterName": "エルダー・タートル"
+  },
+  {
+    "id": 172,
+    "text": "枯れ木も山の賑わい",
+    "reading": "kareki mo yama no nigiwai",
+    "meaning": "つまらないものでも、ないよりはあった方がましだということ。",
+    "difficulty": "中学生",
+    "example_sentence": "うちのチームは弱いけど、大会に参加することに意義がある。『枯れ木も山の賑わい』で、少しでも大会を盛り上げられればいいんだ。",
+    "monsterName": "ニギヤカシ・ツリー"
+  },
+  {
+    "id": 173,
+    "text": "可愛い子には旅をさせよ",
+    "reading": "kawaii ko ni wa tabi wo sase yo",
+    "meaning": "子どもが可愛いなら、甘やかすばかりでなく、世の中の苦労を経験させた方がよいということ。",
+    "difficulty": "中学生",
+    "example_sentence": "大学進学を機に、親元を離れて一人暮らしを始めることにした。『可愛い子には旅をさせよ』という親の愛情を感じ、期待に応えたいと思う。",
+    "monsterName": "トラベラー・プリンス"
+  },
+  {
+    "id": 174,
+    "text": "艱難辛苦汝を玉にす",
+    "reading": "kannan shinku nanji wo tama ni su",
+    "meaning": "人は多くの苦労を乗り越えることによって、初めて立派な人物になるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は、数々の挫折や失敗を乗り越えて、ついに事業を成功させた。まさに『艱難辛苦汝を玉にす』だ。",
+    "monsterName": "ダイヤモンド・ハート"
+  },
+  {
+    "id": 175,
+    "text": "木に竹を接ぐ",
+    "reading": "ki ni take wo tsugu",
+    "meaning": "物事のつながりが不自然で、調和がとれていないことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼の話は、あちこちに飛んで、つじつまが合わない。まるで『木に竹を接ぐ』ような、ちぐはぐな印象だ。",
+    "monsterName": "チグハグ・キメラ"
+  },
+  {
+    "id": 176,
+    "text": "杞憂",
+    "reading": "kiyuu",
+    "meaning": "取り越し苦労。必要のないことをあれこれ心配すること。",
+    "difficulty": "中学生",
+    "example_sentence": "明日、遠足で雨が降ったらどうしよう、お弁当が傷んだらどうしようと、あれこれ心配するのは『杞憂』というものだ。もっと楽しみにしたらどうだい。",
+    "monsterName": "ウォーリー・ゴースト"
+  },
+  {
+    "id": 177,
+    "text": "漁夫の利",
+    "reading": "gyofu no ri",
+    "meaning": "双方が争っているすきに、第三者が何の苦労もなく利益を横取りすること。",
+    "difficulty": "中学生",
+    "example_sentence": "A社とB社が値下げ競争で疲弊している間に、C社が新製品でシェアを奪っていった。まさに『漁夫の利』を得た形だ。",
+    "monsterName": "ラッキー・フィッシャーマン"
+  },
+  {
+    "id": 178,
+    "text": "苦言は薬なり",
+    "reading": "kugen wa kusuri nari",
+    "meaning": "自分にとって耳の痛い忠告こそ、身のためになるということ。（良薬は口に苦し と同じ）",
+    "difficulty": "中学生",
+    "example_sentence": "先生の厳しい注意は聞くのが辛かったけれど、そのおかげで自分の弱点に気づくことができた。『苦言は薬なり』とは、まさにこのことだ。",
+    "monsterName": "ニガヨモギ・フェアリー"
+  },
+  {
+    "id": 179,
+    "text": "苦しい時の神頼み",
+    "reading": "kurushii toki no kami danomi",
+    "meaning": "普段は神仏を信じない人でも、苦しい時には神や仏に助けを求めて祈ること。",
+    "difficulty": "中学生",
+    "example_sentence": "普段は全く信じていないくせに、テスト前になると急に神社にお参りに行くなんて、典型的な『苦しい時の神頼み』だね。",
+    "monsterName": "ヘルプミー・プリースト"
+  },
+  {
+    "id": 180,
+    "text": "君子危うきに近寄らず",
+    "reading": "kunshi ayauki ni chikayorazu",
+    "meaning": "教養のある立派な人は、自らを律して危険な場所には近づかないということ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は、少しでも怪しい儲け話には絶対に手を出さない。『君子危うきに近寄らず』を信条としているからだ。",
+    "monsterName": "セーフティ・ジェントル"
+  },
+  {
+    "id": 181,
+    "text": "芸は身を助く",
+    "reading": "gei wa mi wo tasuku",
+    "meaning": "一芸を身につけておけば、いざという時にそれが役立ち、生計の助けになるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "子供の頃に習ったピアノのおかげで、今ではレストランで演奏するアルバイトをしている。まさに『芸は身を助く』だ。",
+    "monsterName": "スキル・セイバー"
+  },
+  {
+    "id": 182,
+    "text": "逆鱗に触れる",
+    "reading": "gekirin ni fureru",
+    "meaning": "目上の人をひどく怒らせること。",
+    "difficulty": "中学生",
+    "example_sentence": "社長が一番こだわっているデザインについて、うっかり批判的な意見を言ってしまい、彼の『逆鱗に触れて』しまった。",
+    "monsterName": "ドラゴン・レイジ"
+  },
+  {
+    "id": 183,
+    "text": "光陰矢の如し",
+    "reading": "kouin ya no gotoshi",
+    "meaning": "月日が経つのが、飛ぶ矢のように非常に速いことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "ついこの間、高校に入学したと思っていたのに、もう卒業だなんて。『光陰矢の如し』とはよく言ったものだ。",
+    "monsterName": "タイム・アロー"
+  },
+  {
+    "id": 184,
+    "text": "後悔先に立たず",
+    "reading": "koukai saki ni tatazu",
+    "meaning": "物事が済んでしまってから悔やんでも、取り返しがつかないということ。",
+    "difficulty": "中学生",
+    "example_sentence": "もっと勉強しておけばよかったと今になって嘆いても、『後悔先に立たず』だ。次のテストに向けて頑張ろう。",
+    "monsterName": "リグレット・ビースト"
+  },
+  {
+    "id": 185,
+    "text": "弘法筆を選ばず",
+    "reading": "koubou fude wo erabazu",
+    "meaning": "本当の名人は、道具の良し悪しを問題にしないということ。",
+    "difficulty": "中学生",
+    "example_sentence": "どんな調理器具を使っても、彼はいつも美味しい料理を作ってしまう。まさに『弘法筆を選ばず』だね。",
+    "monsterName": "ノーチョイス・マスター"
+  },
+  {
+    "id": 186,
+    "text": "虎視眈々",
+    "reading": "koshitantan",
+    "meaning": "虎が獲物をじっと狙うように、機会をうかがって鋭く形勢を見守っている様子。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は、次の生徒会長の座を『虎視眈々』と狙っている。",
+    "monsterName": "コシ・タンタン"
+  },
+  {
+    "id": 187,
+    "text": "五十歩百歩",
+    "reading": "gojippo hyappo",
+    "meaning": "違いはあっても、本質的には大して変わらないこと。似たり寄ったりであること。",
+    "difficulty": "中学生",
+    "example_sentence": "遅刻してきた君と、5分前に慌てて駆け込んできた僕とでは、大して変わらないよ。まさに『五十歩百歩』だ。",
+    "monsterName": "ドッコイ・ドッコイ"
+  },
+  {
+    "id": 188,
+    "text": "転んでもただでは起きぬ",
+    "reading": "koronde mo tada de wa okinu",
+    "meaning": "失敗しても、そこから何か利益を得ようとする、したたかな人のこと。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は、たとえ失敗しても、その経験から何かを学び取ろうとする。『転んでもただでは起きぬ』精神の持ち主だ。",
+    "monsterName": "プラス・転生"
+  },
+  {
+    "id": 189,
+    "text": "触らぬ神に祟りなし",
+    "reading": "sawaranu kami ni tatari nashi",
+    "meaning": "余計なことに関わらなければ、災いを招くこともないということ。",
+    "difficulty": "中学生",
+    "example_sentence": "クラスの厄介事には、首を突っ込まない方がいい。『触らぬ神に祟りなし』だよ。",
+    "monsterName": "ノータッチ・ゴッド"
+  },
+  {
+    "id": 190,
+    "text": "三顧の礼",
+    "reading": "sanko no rei",
+    "meaning": "目上の人が、礼を尽くして優れた人物を招くこと。",
+    "difficulty": "中学生",
+    "example_sentence": "社長は、優秀な技術者をスカウトするために、自ら何度も足を運び、『三顧の礼』をもって彼を迎え入れた。",
+    "monsterName": "サンコ・ナイト"
+  },
+  {
+    "id": 191,
+    "text": "山椒は小粒でもぴりりと辛い",
+    "reading": "sanshou wa kotsubu demo piriri to karai",
+    "meaning": "体は小さくても、気性や才能が鋭く、侮れない人のことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼はチームで一番小柄だが、そのプレーは誰よりも鋭い。『山椒は小粒でもぴりりと辛い』とは、彼のような選手のことを言うのだろう。",
+    "monsterName": "スパイシー・ピクシー"
+  },
+  {
+    "id": 192,
+    "text": "人事を尽くして天命を待つ",
+    "reading": "jinji wo tsukushite tenmei wo matsu",
+    "meaning": "人間としてできる限りの努力をしたら、あとは静かに天の定めた運命に従うということ。",
+    "difficulty": "中学生",
+    "example_sentence": "やれるだけの準備はすべてやった。あとは本番で全力を出すだけだ。『人事を尽くして天命を待つ』心境だよ。",
+    "monsterName": "デスティニー・ウォリアー"
+  },
+  {
+    "id": 193,
+    "text": "雀百まで踊り忘れず",
+    "reading": "suzume hyaku made odori wasurezu",
+    "meaning": "幼い頃に身につけた習慣は、年をとっても忘れないということ。（三つ子の魂百まで と同じ）",
+    "difficulty": "中学生",
+    "example_sentence": "おじいちゃんは、子供の頃に覚えたけん玉の技を、今でも鮮やかに披露してくれる。『雀百まで踊り忘れず』とは、このことだね。",
+    "monsterName": "エターナル・ダンサー"
+  },
+  {
+    "id": 194,
+    "text": "背水の陣",
+    "reading": "haisui no jin",
+    "meaning": "決死の覚悟で物事に取り組むことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "この試合に負ければ、全国大会への道は閉ざされる。まさに『背水の陣』で、選手たちは決死の覚悟でピッチに立った。",
+    "monsterName": "ラスト・リバー"
+  },
+  {
+    "id": 195,
+    "text": "船頭多くして船山に上る",
+    "reading": "sendou ooku shite fune yama ni noboru",
+    "meaning": "指図する人が多すぎて、方針がまとまらず、物事がとんでもない方向に進んでしまうこと。",
+    "difficulty": "中学生",
+    "example_sentence": "文化祭の出し物について、クラスの意見がまとまらず、結局、準備が全く進まなかった。『船頭多くして船山に上る』とは、まさにこの状況だ。",
+    "monsterName": "マウンテン・シップ"
+  },
+  {
+    "id": 196,
+    "text": "前門の虎後門の狼",
+    "reading": "zenmon no tora koumon no ookami",
+    "meaning": "一つの災難を逃れても、またすぐに次の災難にあうこと。",
+    "difficulty": "中学生",
+    "example_sentence": "中間テストが終わったと思ったら、すぐに期末テストの勉強が始まった。まさに『前門の虎後門の狼』で、休む暇もない。",
+    "monsterName": "ダブル・プレデター"
+  },
+  {
+    "id": 197,
+    "text": "他山の石",
+    "reading": "tazan no ishi",
+    "meaning": "他人のつまらない言動や失敗も、自分を磨く助けになるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "ライバル校の敗因を分析することは、自分たちのチームの弱点を知る上で、良い『他山の石』となる。",
+    "monsterName": "ラーニング・ストーン"
+  },
+  {
+    "id": 198,
+    "text": "立つ瀬がない",
+    "reading": "tatsu se ga nai",
+    "meaning": "自分の立場や面目がなくなってしまうこと。",
+    "difficulty": "中学生",
+    "example_sentence": "後輩にまで正論で言い負かされてしまい、先輩としての『立つ瀬がない』よ。",
+    "monsterName": "ノーポジション"
+  },
+  {
+    "id": 199,
+    "text": "棚から牡丹餅",
+    "reading": "tana kara botamochi",
+    "meaning": "思いがけない幸運が舞い込むことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "期待していなかった福引で、一等の温泉旅行が当たった。まさに『棚から牡丹餅』で、家族みんなで大喜びした。",
+    "monsterName": "ラッキー・ボタモチ"
+  },
+  {
+    "id": 200,
+    "text": "類は友を呼ぶ",
+    "reading": "rui wa tomo wo yobu",
+    "meaning": "気の合う者や似た者同士は、自然と集まりやすいということ。",
+    "difficulty": "中学生",
+    "example_sentence": "アニメ好きの彼の周りには、自然とアニメ好きの友達が集まってくる。まさに『類は友を呼ぶ』だ。",
+    "monsterName": "フレンド・コーラー"
+  },
+  {
+    "id": 201,
+    "text": "蛇の道は蛇",
+    "reading": "ja no michi wa hebi",
+    "meaning": "同類の者のすることは、同じ仲間にはよくわかるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "あのアイドルの非公開スケジュールを、ファンがどうして知っているのか不思議だったが、ファン同士の情報網があるらしい。『蛇の道は蛇』ということか。",
+    "monsterName": "スネーク・アイ"
+  },
+  {
+    "id": 202,
+    "text": "重箱の隅を楊枝でほじくる",
+    "reading": "jubako no sumi wo youji de hojikuru",
+    "meaning": "ごく細かい、どうでもいいことまで問題にして、口うるさく言うこと。",
+    "difficulty": "中学生",
+    "example_sentence": "彼のレポートは、内容よりも誤字脱字など、細かい点ばかりを指摘された。まるで『重箱の隅を楊枝でほじくる』ような批評だった。",
+    "monsterName": "スミツツキ・インセクト"
+  },
+  {
+    "id": 203,
+    "text": "尻馬に乗る",
+    "reading": "shiriuma ni noru",
+    "meaning": "深く考えもせず、他人の言動に軽々しく同調すること。",
+    "difficulty": "中学生",
+    "example_sentence": "自分でよく考えもせず、人気のある意見にすぐ同調するのは、『尻馬に乗る』ようで、感心しないな。",
+    "monsterName": "フォロー・ライダー"
+  },
+  {
+    "id": 204,
+    "text": "人口に膾炙する",
+    "reading": "jinkou ni kaisha suru",
+    "meaning": "世間の人々の間で、広く知れ渡ること。",
+    "difficulty": "中学生",
+    "example_sentence": "その歌は、発売から数十年経った今でも、多くの人に愛され、『人口に膾炙している』名曲だ。",
+    "monsterName": "メジャー・ソング"
+  },
+  {
+    "id": 205,
+    "text": "寸鉄人を刺す",
+    "reading": "suntetsu hito wo sasu",
+    "meaning": "短く鋭い言葉で、相手の急所をつくこと。",
+    "difficulty": "中学生",
+    "example_sentence": "彼の批評は、いつも短く的確で、まさに『寸鉄人を刺す』ような鋭さがある。",
+    "monsterName": "ポイント・ニードル"
+  },
+  {
+    "id": 206,
+    "text": "青天の霹靂",
+    "reading": "seiten no hekireki",
+    "meaning": "突然に起こった、思いがけない大事件のこと。",
+    "difficulty": "中学生",
+    "example_sentence": "長年勤めた会社が、突然倒産するなんて、まさに『青天の霹靂』だった。",
+    "monsterName": "ブルーサンダー"
+  },
+  {
+    "id": 207,
+    "text": "栴檀は双葉より芳し",
+    "reading": "sendan wa futaba yori kanbashi",
+    "meaning": "大成する人は、幼い頃から優れた才能を発揮するということ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は、小学生の頃から大人顔負けの小説を書いていたそうだ。『栴檀は双葉より芳し』とは、彼のような人を言うのだろう。",
+    "monsterName": "ジーニアス・スプラウト"
+  },
+  {
+    "id": 208,
+    "text": "袖振り合うも多生の縁",
+    "reading": "sode furi au mo tashou no en",
+    "meaning": "道で知らない人と袖が触れ合うような些細なことも、前世からの因縁によるものだということ。",
+    "difficulty": "中学生",
+    "example_sentence": "旅先で偶然隣に座った人と、話が弾んで友達になった。『袖振り合うも多生の縁』というし、この出会いを大切にしたい。",
+    "monsterName": "フェイト・エンカウンター"
+  },
+  {
+    "id": 209,
+    "text": "大器晩成",
+    "reading": "taiki bansei",
+    "meaning": "大きな器は完成するのに時間がかかるように、偉大な人物も大成するのが遅いということ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は若い頃、なかなか芽が出なかったが、努力を重ね、今では世界的な科学者になった。まさに『大器晩成』だ。",
+    "monsterName": "レイト・ブルーム"
+  },
+  {
+    "id": 210,
+    "text": "立て板に水",
+    "reading": "tateita ni mizu",
+    "meaning": "すらすらとよどみなく、弁舌さわやかに話すことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼のプレゼンテーションは、まるで『立て板に水』のように滑らかで、聴衆は皆、彼の話に引き込まれていた。",
+    "monsterName": "スラスラ・スピーカー"
+  },
+  {
+    "id": 211,
+    "text": "提灯持ち",
+    "reading": "chochin mochi",
+    "meaning": "人の手先となって、その人を褒め上げること。",
+    "difficulty": "中学生",
+    "example_sentence": "彼はいつも部長の意見に賛成し、褒めちぎっている。周りからは『提灯持ち』だと陰口を叩かれているよ。",
+    "monsterName": "ランタン・キャリア"
+  },
+  {
+    "id": 212,
+    "text": "鶴の一声",
+    "reading": "tsuru no hitokoe",
+    "meaning": "大勢の議論をまとめ、決着させる、権威者の一言。",
+    "difficulty": "中学生",
+    "example_sentence": "会議が紛糾して結論が出なかったが、社長の『鶴の一声』で、方針が決定した。",
+    "monsterName": "クレイン・ボイス"
+  },
+  {
+    "id": 213,
+    "text": "手前味噌",
+    "reading": "temaemiso",
+    "meaning": "自分で自分のことを褒めること。自慢すること。",
+    "difficulty": "中学生",
+    "example_sentence": "『手前味噌』になりますが、今回の文化祭のポスターは、我ながらなかなかの出来栄えだと思います。",
+    "monsterName": "ジマン・ミソ"
+  },
+  {
+    "id": 214,
+    "text": "灯火親しむべし",
+    "reading": "touka shitashimu beshi",
+    "meaning": "秋の夜は涼しくて灯りの下で読書をするのに適しているということ。",
+    "difficulty": "中学生",
+    "example_sentence": "秋の夜長は、静かで涼しく、まさに『灯火親しむべし』で、読書にぴったりの季節だ。",
+    "monsterName": "リーディング・ランプ"
+  },
+  {
+    "id": 215,
+    "text": "登竜門",
+    "reading": "toryumon",
+    "meaning": "立身出世のための、重要な関門のこと。",
+    "difficulty": "中学生",
+    "example_sentence": "この新人賞は、多くの有名作家を輩出しており、若手作家にとっての『登竜門』と言われている。",
+    "monsterName": "ドラゴン・ゲート"
+  },
+  {
+    "id": 216,
+    "text": "毒を食らわば皿まで",
+    "reading": "doku wo kurawaba sara made",
+    "meaning": "一度悪事に手を出したからには、最後までやり通そうとすること。",
+    "difficulty": "中学生",
+    "example_sentence": "一度、不正に手を染めてしまった彼は、『毒を食らわば皿まで』と、次々と悪事を重ねていった。",
+    "monsterName": "ポイズン・イーター"
+  },
+  {
+    "id": 217,
+    "text": "鳶が鷹を産む",
+    "reading": "tobi ga taka wo umu",
+    "meaning": "平凡な親から、非常に優れた子どもが生まれることのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "ごく普通の家庭から、世界的なピアニストが生まれた。まさに『鳶が鷹を産む』だねと、近所では評判になっている。",
+    "monsterName": "トビノコ・ホーク"
+  },
+  {
+    "id": 218,
+    "text": "虎の尾を踏む",
+    "reading": "tora no o wo fumu",
+    "meaning": "非常に危険なことをするたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "機嫌の悪い父に、テストの結果が悪いことを報告するのは、まさに『虎の尾を踏む』ようなものだ。",
+    "monsterName": "タイガー・テイル"
+  },
+  {
+    "id": 219,
+    "text": "泣く子と地頭には勝てぬ",
+    "reading": "naku ko to jitou ni wa katenu",
+    "meaning": "道理の通じない相手と争っても、勝ち目はないということ。",
+    "difficulty": "中学生",
+    "example_sentence": "わがままを言って聞かない幼い弟には、何を言っても無駄だ。『泣く子と地頭には勝てぬ』と、母はため息をついた。",
+    "monsterName": "アンビータブル・チャイルド"
+  },
+  {
+    "id": 220,
+    "text": "情けは人の為ならず",
+    "reading": "nasake wa hito no tame narazu",
+    "meaning": "人に親切にしておけば、巡り巡って自分に良い報いが返ってくるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "困っている人を助けたら、後日、その人から思わぬ形でお礼をされた。『情けは人の為ならず』とは、本当だね。",
+    "monsterName": "リターン・グッドネス"
+  },
+  {
+    "id": 221,
+    "text": "生兵法は大怪我のもと",
+    "reading": "namabyouhou wa oogake no moto",
+    "meaning": "未熟な知識や技術で事に当たると、かえって大失敗を招くということ。",
+    "difficulty": "中学生",
+    "example_sentence": "インターネットで得た中途半端な知識でパソコンを修理しようとしたら、かえって壊してしまった。『生兵法は大怪我のもと』だ。",
+    "monsterName": "ハーフ・ヒーラー"
+  },
+  {
+    "id": 222,
+    "text": "錦を飾る",
+    "reading": "nishiki wo kazaru",
+    "meaning": "成功して故郷に帰ること。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は、オリンピックで金メダルを手にし、故郷に『錦を飾った』。",
+    "monsterName": "ニシキ・ヒーロー"
+  },
+  {
+    "id": 223,
+    "text": "糠に釘",
+    "reading": "nuka ni kugi",
+    "meaning": "手ごたえがなく、全く効き目がないことのたとえ。（豆腐にかすがい と同じ）",
+    "difficulty": "中学生",
+    "example_sentence": "いくら彼にアドバイスしても、全く聞く耳を持たない。まさに『糠に釘』で、何を言っても無駄だ。",
+    "monsterName": "ヌカ・ネイル"
+  },
+  {
+    "id": 224,
+    "text": "濡れ衣を着せる",
+    "reading": "nureginu wo kiseru",
+    "meaning": "無実の罪を、他人になすりつけること。",
+    "difficulty": "中学生",
+    "example_sentence": "自分がやった失敗を、他人のせいにするなんて、ひどい『濡れ衣を着せる』行為だ。",
+    "monsterName": "フォールス・チャージ"
+  },
+  {
+    "id": 225,
+    "text": "猫の額",
+    "reading": "neko no hitai",
+    "meaning": "土地などが非常に狭いことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "我が家の庭は、『猫の額』ほど狭いけれど、家族で家庭菜園を楽しむには十分な広さだ。",
+    "monsterName": "ナロー・ガーデン"
+  },
+  {
+    "id": 226,
+    "text": "寝た子を起こす",
+    "reading": "neta ko wo okosu",
+    "meaning": "静かに収まっている物事を、わざわざ蒸し返して問題にすること。",
+    "difficulty": "中学生",
+    "example_sentence": "せっかく解決した問題を、今さら蒸し返すなんて、『寝た子を起こす』ようなことはやめてくれ。",
+    "monsterName": "スリーピング・トラブル"
+  },
+  {
+    "id": 227,
+    "text": "馬脚を現す",
+    "reading": "bakyaku wo arawasu",
+    "meaning": "隠していた本性や実力が、思わず現れ出ること。",
+    "difficulty": "中学生",
+    "example_sentence": "おとなしそうに見えた彼だが、お酒が入ると口が悪くなり、すぐに『馬脚を現した』。",
+    "monsterName": "ホース・フット"
+  },
+  {
+    "id": 228,
+    "text": "破竹の勢い",
+    "reading": "hachiku no ikioi",
+    "meaning": "竹が割れるように、とどまることのない猛烈な勢いのこと。",
+    "difficulty": "中学生",
+    "example_sentence": "我が校のサッカー部は、一回戦から勝ち続け、まさに『破竹の勢い』で決勝まで勝ち進んだ。",
+    "monsterName": "バンブー・ブレイカー"
+  },
+  {
+    "id": 229,
+    "text": "鳩が豆鉄砲を食ったよう",
+    "reading": "hato ga mamedeppou wo kutta you",
+    "meaning": "突然の出来事に驚いて、きょとんとしている様子。",
+    "difficulty": "中学生",
+    "example_sentence": "突然、海外転勤を命じられ、彼は『鳩が豆鉄砲を食ったよう』な顔で、呆然と立ち尽くしていた。",
+    "monsterName": "ポッポ・ショック"
+  },
+  {
+    "id": 230,
+    "text": "花に嵐",
+    "reading": "hana ni arashi",
+    "meaning": "良いことには、とかく邪魔が入りやすいということのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "せっかくの楽しいデートの日に、大雨が降るなんて。まさに『花に嵐』だ。",
+    "monsterName": "フラワー・ストーム"
+  },
+  {
+    "id": 231,
+    "text": "腹を割る",
+    "reading": "hara wo waru",
+    "meaning": "包み隠さず、本心を打ち明けること。",
+    "difficulty": "中学生",
+    "example_sentence": "お互いに不満をためていても仕方ない。一度、とことん『腹を割って』話し合おう。",
+    "monsterName": "オープン・マインド"
+  },
+  {
+    "id": 232,
+    "text": "判官贔屓",
+    "reading": "hougan biiki",
+    "meaning": "弱い者や不幸な者に同情し、味方すること。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は、いつも弱いチームの方を応援している。どうやら『判官贔屓』な性格らしい。",
+    "monsterName": "アンダー・ドッグ"
+  },
+  {
+    "id": 233,
+    "text": "坊主憎けりゃ袈裟まで憎い",
+    "reading": "bouzu nikukerya kesa made nikui",
+    "meaning": "ある人を憎むあまり、その人に関係するすべてのものが憎くなること。",
+    "difficulty": "中学生",
+    "example_sentence": "彼のことが嫌いだからといって、彼の持っているもの全てをけなすなんて、『坊主憎けりゃ袈裟まで憎い』の典型だ。",
+    "monsterName": "ヘイト・プリースト"
+  },
+  {
+    "id": 234,
+    "text": "骨折り損の草臥れ儲け",
+    "reading": "honeori zon no kutabire mouke",
+    "meaning": "苦労しただけで、何の成果も得られないこと。",
+    "difficulty": "中学生",
+    "example_sentence": "徹夜で頑張って企画書を仕上げたのに、結局採用されなかった。全くの『骨折り損の草臥れ儲け』だった。",
+    "monsterName": "ゼロ・リターン"
+  },
+  {
+    "id": 235,
+    "text": "仏作って魂入れず",
+    "reading": "hotoke tsukutte tamashii irezu",
+    "meaning": "物事をほとんど仕上げながら、最も肝心な点が欠けていること。",
+    "difficulty": "中学生",
+    "example_sentence": "立派なホームページを作ったのに、肝心の商品情報が全く更新されていない。これでは『仏作って魂入れず』だ。",
+    "monsterName": "ソウルレス・ブッダ"
+  },
+  {
+    "id": 236,
+    "text": "馬子にも衣装",
+    "reading": "mago ni mo ishou",
+    "meaning": "どんな人でも、立派な服装をすれば、それなりに立派に見えるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "いつもは作業着の彼が、スーツを着ると別人のように格好良くなる。まさに『馬子にも衣装』だね。",
+    "monsterName": "ドレスアップ・マジック"
+  },
+  {
+    "id": 237,
+    "text": "見ざる聞かざる言わざる",
+    "reading": "mizaru kikazaru iwazaru",
+    "meaning": "自分に都合の悪いことや余計なことは、見たり聞いたり言ったりしない方が良いということ。",
+    "difficulty": "中学生",
+    "example_sentence": "他人のプライベートな問題には、深入りしない方がいい。『見ざる聞かざる言わざる』で、関わらないのが一番だ。",
+    "monsterName": "スリー・モンキーズ"
+  },
+  {
+    "id": 238,
+    "text": "三日坊主",
+    "reading": "mikka bouzu",
+    "meaning": "飽きっぽくて、長続きしないこと。また、その人のこと。",
+    "difficulty": "中学生",
+    "example_sentence": "毎朝ジョギングをすると決心したのに、結局3日でやめてしまった。我ながら本当に『三日坊主』だと思う。",
+    "monsterName": "ミッカ・プリースト"
+  },
+  {
+    "id": 239,
+    "text": "昔取った杵柄",
+    "reading": "mukashi totta kinezuka",
+    "meaning": "過去に習得した技術や腕前は、時が経っても衰えず、いざという時に役立つこと。",
+    "difficulty": "中学生",
+    "example_sentence": "何十年もピアノを弾いていなかった母が、久しぶりに見事な演奏を披露した。まさに『昔取った杵柄』だ。",
+    "monsterName": "オールド・テクニック"
+  },
+  {
+    "id": 240,
+    "text": "無用の長物",
+    "reading": "muyou no choubutsu",
+    "meaning": "あっても役に立たないばかりか、かえって邪魔になるもののこと。",
+    "difficulty": "中学生",
+    "example_sentence": "最新の機能がたくさんついたスマートフォンを買ったけれど、結局、電話とメールしか使っておらず、ほとんどの機能が『無用の長物』と化している。",
+    "monsterName": "ユースレス・ゴーレム"
+  },
+  {
+    "id": 241,
+    "text": "目から鼻へ抜ける",
+    "reading": "me kara hana e nukeru",
+    "meaning": "物事の理解が非常に早く、賢いことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼は、一度教えただけで、すぐに物事の本質を理解してしまう。まさに『目から鼻へ抜ける』ような賢さだ。",
+    "monsterName": "クイック・シンカー"
+  },
+  {
+    "id": 242,
+    "text": "目糞鼻糞を笑う",
+    "reading": "mekuso hanakuso wo warau",
+    "meaning": "自分の欠点には気づかず、他人の同じような欠点をあざ笑うこと。",
+    "difficulty": "中学生",
+    "example_sentence": "自分の部屋も散らかっているくせに、弟の机の汚さを笑うなんて、まさに『目糞鼻糞を笑う』だ。",
+    "monsterName": "ドングリ・アイ"
+  },
+  {
+    "id": 243,
+    "text": "目に入れても痛くない",
+    "reading": "me ni irete mo itakunai",
+    "meaning": "子どもや孫などが、可愛くてたまらないという気持ちを表す言葉。",
+    "difficulty": "中学生",
+    "example_sentence": "初孫が生まれて、おじいちゃんは『目に入れても痛くない』ほど、可愛がっている。",
+    "monsterName": "ラブリー・ベビー"
+  },
+  {
+    "id": 244,
+    "text": "目の上の瘤",
+    "reading": "me no ue no kobu",
+    "meaning": "自分の活動の邪魔になる、目障りな存在のこと。",
+    "difficulty": "中学生",
+    "example_sentence": "口うるさい先輩が異動になって、ようやく『目の上の瘤』が取れたと、ほっとしている。",
+    "monsterName": "ジャマ・コブ"
+  },
+  {
+    "id": 245,
+    "text": "元の木阿弥",
+    "reading": "moto no mokuami",
+    "meaning": "一度よくなったものが、また元の悪い状態に戻ってしまうこと。",
+    "difficulty": "中学生",
+    "example_sentence": "せっかくダイエットに成功したのに、油断して好きなものばかり食べていたら、すっかり体重が『元の木阿弥』に戻ってしまった。",
+    "monsterName": "リターン・トゥ・ゼロ"
+  },
+  {
+    "id": 246,
+    "text": "焼け木杭に火がつく",
+    "reading": "yakebokkui ni hi ga tsuku",
+    "meaning": "一度切れた関係が、また元に戻ること。特に男女関係について使う。",
+    "difficulty": "中学生",
+    "example_sentence": "同窓会で再会した元恋人と、また付き合い始めたらしい。『焼け木杭に火がつく』とは、よく言ったものだ。",
+    "monsterName": "リバイバル・フレーム"
+  },
+  {
+    "id": 247,
+    "text": "柳に風",
+    "reading": "yanagi ni kaze",
+    "meaning": "相手の力をうまく受け流し、逆らわずにやり過ごすことのたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "彼にどんな嫌味を言っても、いつも『柳に風』と受け流されてしまい、全く効果がない。",
+    "monsterName": "ウィロー・ウィスプ"
+  },
+  {
+    "id": 248,
+    "text": "柳の下にいつも泥鰌はいない",
+    "reading": "yanagi no shita ni itsumo dojou wa inai",
+    "meaning": "一度うまくいったからといって、同じ方法で次も成功するとは限らないということ。",
+    "difficulty": "中学生",
+    "example_sentence": "去年と同じ場所で、今年もカブトムシがたくさん捕れるとは限らないよ。『柳の下にいつも泥鰌はいない』って言うだろ。",
+    "monsterName": "ノーモア・ドジョウ"
+  },
+  {
+    "id": 249,
+    "text": "病は気から",
+    "reading": "yamai wa ki kara",
+    "meaning": "病気は気の持ちようで、重くもなれば軽くもなるということ。",
+    "difficulty": "中学生",
+    "example_sentence": "ただの風邪なのに、重い病気なんじゃないかと心配しすぎると、本当に具合が悪くなってしまうよ。『病は気から』って言うじゃないか。",
+    "monsterName": "マインド・イーター"
+  },
+  {
+    "id": 250,
+    "text": "闇夜の鉄砲",
+    "reading": "yamiyo no teppou",
+    "meaning": "当てずっぽうで、成功する見込みのないことをするたとえ。",
+    "difficulty": "中学生",
+    "example_sentence": "何の計画も立てずに、ただやみくもに事業を始めても、成功するはずがない。それは『闇夜の鉄砲』のようなものだ。",
+    "monsterName": "ダーク・ショット"
+  },
+  {
+    "id": 251,
+    "text": "油に水",
+    "reading": "abura ni mizu",
+    "meaning": "互いに溶け合わず、性質が合わないことのたとえ。",
+    "difficulty": "高校生",
+    "example_sentence": "あの二人は、性格が正反対で、まるで『油に水』のように、全く打ち解けようとしない。",
+    "monsterName": "オイル・ウォーター"
+  },
+  {
+    "id": 252,
+    "text": "阿吽の呼吸",
+    "reading": "aun no kokyuu",
+    "meaning": "二人以上が一緒に物事を行うとき、気持ちがぴったり合うこと。",
+    "difficulty": "高校生",
+    "example_sentence": "長年コンビを組んでいるだけあって、二人の漫才は『阿吽の呼吸』で、絶妙な間合いだ。",
+    "monsterName": "アウン・ツインズ"
+  },
+  {
+    "id": 253,
+    "text": "息を殺す",
+    "reading": "iki wo korosu",
+    "meaning": "気づかれないように、じっと静かにしていること。",
+    "difficulty": "高校生",
+    "example_sentence": "猛獣が通り過ぎるのを、探検隊は『息を殺して』岩陰から見守っていた。",
+    "monsterName": "サイレント・キラー"
+  },
+  {
+    "id": 254,
+    "text": "痛くも痒くもない",
+    "reading": "itaku mo kayuku mo nai",
+    "meaning": "全く何とも感じないこと。平気であること。",
+    "difficulty": "高校生",
+    "example_sentence": "周りからどんなに悪口を言われようと、彼は『痛くも痒くもない』という顔で、自分の信念を貫いている。",
+    "monsterName": "ノーダメージ・ゴーレム"
+  },
+  {
+    "id": 255,
+    "text": "板挟み",
+    "reading": "itabasami",
+    "meaning": "対立する二つのものの間に立って、どちらにも義理を立てねばならず、苦しむこと。",
+    "difficulty": "高校生",
+    "example_sentence": "部長と課長、二人の上司の意見が対立し、中間管理職の父は『板挟み』になって苦労している。",
+    "monsterName": "サンドイッチ・マン"
+  },
+  {
+    "id": 256,
+    "text": "一目置く",
+    "reading": "ichimoku oku",
+    "meaning": "相手が自分より優れていると認め、敬意を払うこと。",
+    "difficulty": "高校生",
+    "example_sentence": "ライバルチームのエースではあるが、彼の卓越した技術には、誰もが『一目置いている』。",
+    "monsterName": "リスペクト・アイ"
+  },
+  {
+    "id": 257,
+    "text": "一旗揚げる",
+    "reading": "hitohata ageru",
+    "meaning": "新しく事業などを起こして、地位や名声を得ようとすること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、故郷を後にして東京へ向かった。いつか必ず『一旗揚げる』と心に誓って。",
+    "monsterName": "フラッグ・ライザー"
+  },
+  {
+    "id": 258,
+    "text": "打てば響く",
+    "reading": "uteba hibiku",
+    "meaning": "反応が非常に早いことのたとえ。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は頭の回転が速く、こちらが質問すると、『打てば響く』ように的確な答えが返ってくる。",
+    "monsterName": "エコー・ベル"
+  },
+  {
+    "id": 259,
+    "text": "現を抜かす",
+    "reading": "utsutsu wo nukasu",
+    "meaning": "ある物事に夢中になり、心を奪われること。",
+    "difficulty": "高校生",
+    "example_sentence": "最近、弟はオンラインゲームに『現を抜かして』、勉強がおろそかになっている。",
+    "monsterName": "ドリーム・イーター"
+  },
+  {
+    "id": 260,
+    "text": "雲泥の差",
+    "reading": "undei no sa",
+    "meaning": "二つの物事の間に、非常に大きな差があること。",
+    "difficulty": "高校生",
+    "example_sentence": "プロの選手とアマチュアでは、実力に『雲泥の差』がある。",
+    "monsterName": "クラウド・マッド"
+  },
+  {
+    "id": 261,
+    "text": "同じ釜の飯を食う",
+    "reading": "onaji kama no meshi wo kuu",
+    "meaning": "同じ場所で一緒に生活し、苦楽を共にすること。",
+    "difficulty": "高校生",
+    "example_sentence": "学生寮で『同じ釜の飯を食った』仲間たちとは、今でも強い絆で結ばれている。",
+    "monsterName": "カマメシ・ブラザー"
+  },
+  {
+    "id": 262,
+    "text": "鬼の居ぬ間に洗濯",
+    "reading": "oni no inu ma ni sentaku",
+    "meaning": "怖い人や気兼ねする人がいない間に、のびのびとくつろぐこと。",
+    "difficulty": "高校生",
+    "example_sentence": "厳しい両親が旅行に出かけたので、子供たちは『鬼の居ぬ間に洗濯』とばかりに、夜更かしして映画を楽しんだ。",
+    "monsterName": "チャンス・ウォッシャー"
+  },
+  {
+    "id": 263,
+    "text": "鬼の目にも涙",
+    "reading": "oni no me ni mo namida",
+    "meaning": "無慈悲な人でも、時には情けの心を起こすことがあるということ。",
+    "difficulty": "高校生",
+    "example_sentence": "いつもは厳しい監督が、チームの優勝が決まった瞬間、そっと涙を拭った。まさに『鬼の目にも涙』だ。",
+    "monsterName": "オーガ・ティア"
+  },
+  {
+    "id": 264,
+    "text": "お茶を濁す",
+    "reading": "ocha wo nigosu",
+    "meaning": "いい加減なことを言ったりしたりして、その場をごまかすこと。",
+    "difficulty": "高校生",
+    "example_sentence": "会議で都合の悪い点を指摘された彼は、冗談を言って『お茶を濁し』、まともに答えようとしなかった。",
+    "monsterName": "ニゴシ・ティー"
+  },
+  {
+    "id": 265,
+    "text": "思う壺",
+    "reading": "omou tsubo",
+    "meaning": "相手の思惑通りになること。",
+    "difficulty": "高校生",
+    "example_sentence": "まんまと挑発に乗せられてしまった。完全に相手の『思う壺』にはまってしまったよ。",
+    "monsterName": "ウィッシュ・ポット"
+  },
+  {
+    "id": 266,
+    "text": "親の光は七光",
+    "reading": "oya no hikari wa nanahikari",
+    "meaning": "親の威光が、その子どもの利益になること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼が実力もないのに出世できたのは、社長の息子だからだ。まさに『親の光は七光』だね。",
+    "monsterName": "セブンライト・チャイルド"
+  },
+  {
+    "id": 267,
+    "text": "尾ひれをつける",
+    "reading": "ohire wo tsukeru",
+    "meaning": "事実を大げさに話すこと。",
+    "difficulty": "高校生",
+    "example_sentence": "彼の話は面白いけれど、いつも『尾ひれをつけて』大げさに言う癖があるから、半分くらいに聞いておいた方がいい。",
+    "monsterName": "フィン・テール"
+  },
+  {
+    "id": 268,
+    "text": "固唾をのむ",
+    "reading": "katazu wo nomu",
+    "meaning": "事の成り行きを、緊張してじっと見守る様子。",
+    "difficulty": "高校生",
+    "example_sentence": "PK戦の決着がつく瞬間を、観客は皆『固唾をのんで』見守った。",
+    "monsterName": "テンション・スピリット"
+  },
+  {
+    "id": 269,
+    "text": "閑古鳥が鳴く",
+    "reading": "kankodori ga naku",
+    "meaning": "商売などがはやらず、客が全く来ないで、ひっそりしている様子。",
+    "difficulty": "高校生",
+    "example_sentence": "駅前に新しいショッピングモールができてから、古くからの商店街は『閑古鳥が鳴いている』。",
+    "monsterName": "カンコ・バード"
+  },
+  {
+    "id": 270,
+    "text": "木で鼻をくくる",
+    "reading": "ki de hana wo kukuru",
+    "meaning": "相手に対して、ひどく無愛想に応対すること。",
+    "difficulty": "高校生",
+    "example_sentence": "勇気を出して話しかけたのに、彼は『木で鼻をくくった』ような返事しかせず、会話が続かなかった。",
+    "monsterName": "ウッド・ノーズ"
+  },
+  {
+    "id": 271,
+    "text": "狐につままれる",
+    "reading": "kitsune ni tsumamareru",
+    "meaning": "何が何だか訳が分からず、ぼんやりすること。",
+    "difficulty": "高校生",
+    "example_sentence": "目の前で起きたあまりに不思議な出来事に、まるで『狐につままれた』ような気分だった。",
+    "monsterName": "フォックス・マジック"
+  },
+  {
+    "id": 272,
+    "text": "釘を刺す",
+    "reading": "kugi wo sasu",
+    "meaning": "後で問題が起きないように、念を押しておくこと。",
+    "difficulty": "高校生",
+    "example_sentence": "「明日は絶対に遅刻するなよ」と、先生は生徒たちに固く『釘を刺した』。",
+    "monsterName": "ネイル・アタック"
+  },
+  {
+    "id": 273,
+    "text": "蜘蛛の子を散らすよう",
+    "reading": "kumo no ko wo chirasu you",
+    "meaning": "大勢の人が、一斉に散り散りになって逃げていく様子。",
+    "difficulty": "高校生",
+    "example_sentence": "突然の大きな音に驚き、広場に集まっていた鳩の群れは、『蜘蛛の子を散らすように』一斉に飛び去った。",
+    "monsterName": "スパイダー・キッズ"
+  },
+  {
+    "id": 274,
+    "text": "腰が低い",
+    "reading": "koshi ga hikui",
+    "meaning": "誰に対しても、謙虚で丁寧な態度であること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、誰に対しても『腰が低く』、常に丁寧な言葉遣いで接するので、皆から好かれている。",
+    "monsterName": "ロウ・ポスチャー"
+  },
+  {
+    "id": 275,
+    "text": "腰を据える",
+    "reading": "koshi wo sueru",
+    "meaning": "落ち着いて、じっくりと物事に取り組むこと。",
+    "difficulty": "高校生",
+    "example_sentence": "この問題は一筋縄ではいかない。一度『腰を据えて』、根本的な原因から考え直す必要がある。",
+    "monsterName": "グラウンド・ヒップ"
+  },
+  {
+    "id": 276,
+    "text": "言葉を濁す",
+    "reading": "kotoba wo nigosu",
+    "meaning": "はっきりと言わず、曖昧な言い方でごまかすこと。",
+    "difficulty": "高校生",
+    "example_sentence": "事件の真相について問われた彼は、何かを知っているようだったが、終始『言葉を濁して』、核心に触れようとしなかった。",
+    "monsterName": "クラウディ・ワード"
+  },
+  {
+    "id": 277,
+    "text": "さじを投げる",
+    "reading": "saji wo nageru",
+    "meaning": "見込みがないと諦めて、途中でやめてしまうこと。",
+    "difficulty": "高校生",
+    "example_sentence": "何度教えても同じ間違いを繰り返す彼に、とうとう先生も『さじを投げた』ようだ。",
+    "monsterName": "スプーン・スローワー"
+  },
+  {
+    "id": 278,
+    "text": "地団駄を踏む",
+    "reading": "jidanda wo fumu",
+    "meaning": "悔しさのあまり、激しく地面を踏みつけること。",
+    "difficulty": "高校生",
+    "example_sentence": "あと一歩のところで逆転負けを喫し、選手たちは悔しさに『地団駄を踏んだ』。",
+    "monsterName": "アース・スタンパー"
+  },
+  {
+    "id": 279,
+    "text": "舌を巻く",
+    "reading": "shita wo maku",
+    "meaning": "あまりの素晴らしさに、ひどく感心すること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼の描いた絵の緻密さと迫力には、プロの画家も『舌を巻いた』。",
+    "monsterName": "ローリング・タン"
+  },
+  {
+    "id": 280,
+    "text": "十人十色",
+    "reading": "juunin toiro",
+    "meaning": "人の考えや好み、性質などは、それぞれ違うということ。",
+    "difficulty": "高校生",
+    "example_sentence": "好きな音楽のジャンルは、人によって様々だ。まさに『十人十色』だね。",
+    "monsterName": "テン・カラーズ"
+  },
+  {
+    "id": 281,
+    "text": "水泡に帰す",
+    "reading": "suihou ni kisu",
+    "meaning": "努力したことが、すべて無駄になってしまうこと。",
+    "difficulty": "高校生",
+    "example_sentence": "長年の研究も、最後の実験の失敗で、すべてが『水泡に帰した』。",
+    "monsterName": "バブル・リターン"
+  },
+  {
+    "id": 282,
+    "text": "雀の涙ほどの",
+    "reading": "suzume no namida hodo no",
+    "meaning": "ほんのわずかしかないことのたとえ。",
+    "difficulty": "高校生",
+    "example_sentence": "ボーナスが出たといっても、『雀の涙ほどの』金額で、がっかりした。",
+    "monsterName": "ミニマム・ティアー"
+  },
+  {
+    "id": 283,
+    "text": "隅に置けない",
+    "reading": "sumi ni okenai",
+    "meaning": "意外な才能や知識を持っていて、侮れないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "いつもはおとなしい彼女が、カラオケでプロ顔負けの歌を披露するなんて、全く『隅に置けない』ね。",
+    "monsterName": "アナドレ・ナイ"
+  },
+  {
+    "id": 284,
+    "text": "赤貧洗うが如し",
+    "reading": "sekihin arau ga gotoshi",
+    "meaning": "非常に貧しく、家財道具などが何もない様子。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、売れない芸術家で、その暮らしぶりは『赤貧洗うが如し』だった。",
+    "monsterName": "プア・ウォッシュ"
+  },
+  {
+    "id": 285,
+    "text": "世話を焼く",
+    "reading": "sewa wo yaku",
+    "meaning": "面倒を見ること。おせっかいをすること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼女は、頼んでもいないのに、あれこれと僕の身の回りの『世話を焼きたがる』。",
+    "monsterName": "ベイク・ヘルパー"
+  },
+  {
+    "id": 286,
+    "text": "大同小異",
+    "reading": "daidou shoui",
+    "meaning": "細かい点に違いはあるが、全体的に見れば大して変わらないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "どちらの政党の公約も、結局は『大同小異』で、新鮮味に欠ける。",
+    "monsterName": "ビッグ・スモール"
+  },
+  {
+    "id": 287,
+    "text": "高をくくる",
+    "reading": "taka wo kukuru",
+    "meaning": "大したことはないと、安易に考えて見くびること。",
+    "difficulty": "高校生",
+    "example_sentence": "相手チームの実力を『高をくくって』油断していたら、思わぬ苦戦を強いられてしまった。",
+    "monsterName": "イージー・ジャッジ"
+  },
+  {
+    "id": 288,
+    "text": "高みの見物",
+    "reading": "takami no kenbutsu",
+    "meaning": "自分には関係のないこととして、傍観していること。",
+    "difficulty": "高校生",
+    "example_sentence": "クラスの討論が白熱しているのを、彼は一人、腕を組んで『高みの見物』と洒落込んでいた。",
+    "monsterName": "ハイ・ウォッチャー"
+  },
+  {
+    "id": 289,
+    "text": "宝の持ち腐れ",
+    "reading": "takara no mochigusare",
+    "meaning": "役に立つ才能や物を持っているのに、それを活用しないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "最新のパソコンを持っているのに、インターネットを見ることしかしないなんて、まさに『宝の持ち腐れ』だ。",
+    "monsterName": "トレジャー・スリーパー"
+  },
+  {
+    "id": 290,
+    "text": "棚からぼた餅",
+    "reading": "tana kara botamochi",
+    "meaning": "思いがけない幸運が舞い込むことのたとえ。",
+    "difficulty": "高校生",
+    "example_sentence": "道で拾った財布を届けたら、持ち主から多額のお礼をもらった。まさに『棚からぼた餅』だ。",
+    "monsterName": "シェルフ・モチ"
+  },
+  {
+    "id": 291,
+    "text": "ちゃんちゃらおかしい",
+    "reading": "chanchara okashii",
+    "meaning": "ばかばかしくて、おかしくてたまらない様子。",
+    "difficulty": "高校生",
+    "example_sentence": "今さらそんな言い訳が通用するとでも思っているのか。全く『ちゃんちゃらおかしい』ぜ。",
+    "monsterName": "ラフィン・ゴブリン"
+  },
+  {
+    "id": 292,
+    "text": "月と鼈",
+    "reading": "tsuki to suppon",
+    "meaning": "二つのものが、比べものにならないほどかけ離れていること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼の才能と僕の才能とでは、残念ながら『月と鼈』ほどの差がある。",
+    "monsterName": "ムーン・タートル"
+  },
+  {
+    "id": 293,
+    "text": "角が取れる",
+    "reading": "tsuno ga toreru",
+    "meaning": "性格が円満になること。",
+    "difficulty": "高校生",
+    "example_sentence": "昔は短気で怒りっぽかった彼も、結婚して子供ができてからは、すっかり『角が取れて』丸くなった。",
+    "monsterName": "ラウンド・ゴーレム"
+  },
+  {
+    "id": 294,
+    "text": "手も足も出ない",
+    "reading": "te mo ashi mo denai",
+    "meaning": "相手が強すぎて、全くどうすることもできないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "横綱の圧倒的な強さの前に、挑戦者は全く『手も足も出なかった』。",
+    "monsterName": "ノー・アームズ"
+  },
+  {
+    "id": 295,
+    "text": "とどのつまり",
+    "reading": "todo no tsumari",
+    "meaning": "結局のところ。行き着くところ。",
+    "difficulty": "高校生",
+    "example_sentence": "色々と理屈を並べていたが、『とどのつまり』、彼はただやりたくなかっただけなのだ。",
+    "monsterName": "ファイナル・シーバス"
+  },
+  {
+    "id": 296,
+    "text": "虎の子",
+    "reading": "tora no ko",
+    "meaning": "非常に大切にしているもの。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、長年貯めてきた『虎の子』の貯金を、息子の学費のために差し出した。",
+    "monsterName": "タイガー・チャイルド"
+  },
+  {
+    "id": 297,
+    "text": "取りつく島もない",
+    "reading": "toritsuku shima mo nai",
+    "meaning": "相手の態度が冷淡で、話を進めるきっかけがつかめないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "機嫌の悪い彼に話しかけても、返事もろくにせず、『取りつく島もない』とはこのことだ。",
+    "monsterName": "ノー・アイランド"
+  },
+  {
+    "id": 298,
+    "text": "どんぐりの背比べ",
+    "reading": "donguri no seikurabe",
+    "meaning": "どれも同じくらいで、特に優れたものがないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "このクラスの生徒たちの成績は、皆似たり寄ったりで、まさに『どんぐりの背比べ』だ。",
+    "monsterName": "エイコーン・レース"
+  },
+  {
+    "id": 299,
+    "text": "長い目で見る",
+    "reading": "nagai me de miru",
+    "meaning": "現状だけで判断せず、将来どうなるか気長に見守ること。",
+    "difficulty": "高校生",
+    "example_sentence": "新入社員の今はまだ失敗ばかりだが、彼の将来性を信じて、『長い目で見て』育てていこう。",
+    "monsterName": "ロング・ルック"
+  },
+  {
+    "id": 300,
+    "text": "鳴かず飛ばず",
+    "reading": "nakazu tobazu",
+    "meaning": "何の活躍もせず、世間に知られないままでいること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、デビューしてから10年間、全く『鳴かず飛ばず』だったが、ついに今回の作品で大ブレイクを果たした。",
+    "monsterName": "サイレント・バード"
+  },
+  {
+    "id": 301,
+    "text": "二の足を踏む",
+    "reading": "ni no ashi wo fumu",
+    "meaning": "ためらって、先に進めないでいること。",
+    "difficulty": "高校生",
+    "example_sentence": "新しいプロジェクトへの参加を打診されたが、その責任の重さを考えると、つい『二の足を踏んで』しまう。",
+    "monsterName": "セカンド・ステップ"
+  },
+  {
+    "id": 302,
+    "text": "二枚舌を使う",
+    "reading": "nimaijita wo tsukau",
+    "meaning": "矛盾したことを平気で言うこと。嘘をつくこと。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、Aさんの前ではBさんの悪口を言い、Bさんの前ではAさんの悪口を言うような、『二枚舌を使う』信用できない男だ。",
+    "monsterName": "ダブル・タン"
+  },
+  {
+    "id": 303,
+    "text": "糠喜び",
+    "reading": "nukayorokobi",
+    "meaning": "見込みが外れて、一時的な喜びに終わること。",
+    "difficulty": "高校生",
+    "example_sentence": "宝くじが当たったかと思ったが、番号を完全に見間違えていた。全くの『糠喜び』だった。",
+    "monsterName": "フェイク・ジョイ"
+  },
+  {
+    "id": 304,
+    "text": "濡れ衣を着せられる",
+    "reading": "nureginu wo kiserareru",
+    "meaning": "無実の罪を、他人からなすりつけられること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、自分がやっていないことで、クラスメートから『濡れ衣を着せられて』、辛い思いをした。",
+    "monsterName": "フォールス・ギルティ"
+  },
+  {
+    "id": 305,
+    "text": "根掘り葉掘り",
+    "reading": "nehori hahori",
+    "meaning": "細かい点まで、しつこく問いただす様子。",
+    "difficulty": "高校生",
+    "example_sentence": "久しぶりに会った親戚に、プライベートなことまで『根掘り葉掘り』聞かれて、うんざりした。",
+    "monsterName": "ルート・ディガー"
+  },
+  {
+    "id": 306,
+    "text": "猫なで声",
+    "reading": "neko nade goe",
+    "meaning": "人の機嫌を取るために、優しくこびるような声。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、上司の前では、いつも『猫なで声』で媚びへつらっている。",
+    "monsterName": "キャット・ボイス"
+  },
+  {
+    "id": 307,
+    "text": "寝耳に水",
+    "reading": "nemimi ni mizu",
+    "meaning": "思いがけない出来事に、ひどく驚くこと。",
+    "difficulty": "高校生",
+    "example_sentence": "親友から、突然、海外へ移住すると告げられ、まさに『寝耳に水』の出来事だった。",
+    "monsterName": "スリープ・ウォーター"
+  },
+  {
+    "id": 308,
+    "text": "念には念を入れる",
+    "reading": "nen ni wa nen wo ireru",
+    "meaning": "十分に注意した上で、さらに注意すること。",
+    "difficulty": "高校生",
+    "example_sentence": "海外旅行の前には、パスポートやビザの確認など、『念には念を入れて』準備することが大切だ。",
+    "monsterName": "ダブル・チェッカー"
+  },
+  {
+    "id": 309,
+    "text": "後の祭り",
+    "reading": "nochi no matsuri",
+    "meaning": "時機を逃してしまい、手遅れであること。",
+    "difficulty": "高校生",
+    "example_sentence": "試験が終わってから、もっと勉強しておけばよかったと後悔しても、もう『後の祭り』だ。",
+    "monsterName": "アフター・フェスティバル"
+  },
+  {
+    "id": 310,
+    "text": "歯に衣着せぬ",
+    "reading": "ha ni kinu kisenu",
+    "meaning": "思ったことを、遠慮なくはっきりと言うこと。",
+    "difficulty": "高校生",
+    "example_sentence": "彼女は、誰に対しても『歯に衣着せぬ』物言いで、時々、周りをひやひやさせる。",
+    "monsterName": "ストレート・トーク"
+  },
+  {
+    "id": 311,
+    "text": "歯の根が合わない",
+    "reading": "ha no ne ga awanai",
+    "meaning": "寒さや恐怖で、体が激しく震える様子。",
+    "difficulty": "高校生",
+    "example_sentence": "真冬の夜、暖房の切れた部屋で、寒さのあまり『歯の根が合わない』ほど震えた。",
+    "monsterName": "シバー・ティース"
+  },
+  {
+    "id": 312,
+    "text": "鼻であしらう",
+    "reading": "hana de ashirau",
+    "meaning": "相手を軽く見て、いい加減な応対をすること。",
+    "difficulty": "高校生",
+    "example_sentence": "真剣に相談しているのに、彼は『鼻であしらう』ような態度で、全く真面目に聞いてくれなかった。",
+    "monsterName": "ノーズ・スルー"
+  },
+  {
+    "id": 313,
+    "text": "鼻にかける",
+    "reading": "hana ni kakeru",
+    "meaning": "自慢すること。得意がること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、少しばかり家が金持ちなのを『鼻にかけて』、いつも威張っている。",
+    "monsterName": "テング・フェイス"
+  },
+  {
+    "id": 314,
+    "text": "鼻を明かす",
+    "reading": "hana wo akasu",
+    "meaning": "相手を出し抜いて、あっと言わせること。",
+    "difficulty": "高校生",
+    "example_sentence": "次の試合では、ライバルの『鼻を明かす』ような、あっと驚く作戦を考えている。",
+    "monsterName": "サプライズ・アタック"
+  },
+  {
+    "id": 315,
+    "text": "鼻を折る",
+    "reading": "hana wo oru",
+    "meaning": "得意になっている相手の勢いをくじくこと。",
+    "difficulty": "高校生",
+    "example_sentence": "連勝して得意になっていたチャンピオンの『鼻を折った』のは、無名の新人選手だった。",
+    "monsterName": "プライド・ブレイカー"
+  },
+  {
+    "id": 316,
+    "text": "幅を利かせる",
+    "reading": "haba wo kikaseru",
+    "meaning": "勢力を振るうこと。いばること。",
+    "difficulty": "高校生",
+    "example_sentence": "このクラスでは、一部の不良グループが『幅を利かせていて』、雰囲気が悪い。",
+    "monsterName": "ワイド・パワー"
+  },
+  {
+    "id": 317,
+    "text": "火に油を注ぐ",
+    "reading": "hi ni abura wo sosogu",
+    "meaning": "勢いの盛んなものを、さらに勢いづかせること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼の怒っている時に、言い訳などしようものなら、かえって『火に油を注ぐ』結果になるだけだ。",
+    "monsterName": "フレイム・オイル"
+  },
+  {
+    "id": 318,
+    "text": "火を見るより明らか",
+    "reading": "hi wo miru yori akiraka",
+    "meaning": "疑う余地もなく、はっきりしていること。",
+    "difficulty": "高校生",
+    "example_sentence": "このまま対策を怠れば、地球環境が悪化の一途をたどるのは、『火を見るより明らか』だ。",
+    "monsterName": "クリア・フレイム"
+  },
+  {
+    "id": 319,
+    "text": "百年の恋も冷める",
+    "reading": "hyakunen no koi mo sameru",
+    "meaning": "相手の幻滅するような言動に、愛情が一気に冷めてしまうこと。",
+    "difficulty": "高校生",
+    "example_sentence": "彼の食べ方の汚さを見て、一瞬で『百年の恋も冷めた』。",
+    "monsterName": "コールド・ハート"
+  },
+  {
+    "id": 320,
+    "text": "袋の鼠",
+    "reading": "fukuro no nezumi",
+    "meaning": "追い詰められて、もう逃げられない状態のこと。",
+    "difficulty": "高校生",
+    "example_sentence": "警察に完全に包囲され、犯人はもはや『袋の鼠』だった。",
+    "monsterName": "バッグ・ラット"
+  },
+  {
+    "id": 321,
+    "text": "腑に落ちない",
+    "reading": "fu ni ochinai",
+    "meaning": "いくら考えても納得がいかないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "なぜ彼が犯人だと断定されたのか、その理由を聞いても、どうにも『腑に落ちない』。",
+    "monsterName": "アンクリア・マインド"
+  },
+  {
+    "id": 322,
+    "text": "臍で茶を沸かす",
+    "reading": "heso de cha wo wakasu",
+    "meaning": "おかしくて、たまらないことのたとえ。",
+    "difficulty": "高校生",
+    "example_sentence": "彼の突拍子もない言い訳を聞いて、あまりのばかばかしさに『臍で茶を沸かす』思いだった。",
+    "monsterName": "ヘソチャ・ケトル"
+  },
+  {
+    "id": 323,
+    "text": "墓穴を掘る",
+    "reading": "hakaana wo horu",
+    "meaning": "自分の言動が原因で、自ら不利な立場に陥ること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、嘘の上塗りを重ねた結果、ついに『墓穴を掘って』、全てがばれてしまった。",
+    "monsterName": "グレイヴ・ディガー"
+  },
+  {
+    "id": 324,
+    "text": "間が悪い",
+    "reading": "ma ga warui",
+    "meaning": "タイミングが悪いこと。運が悪いこと。",
+    "difficulty": "高校生",
+    "example_sentence": "先生が教室に入ってきたその瞬間に、こっそりお菓子を食べているところを見つかってしまうなんて、全く『間が悪い』。",
+    "monsterName": "バッド・タイミング"
+  },
+  {
+    "id": 325,
+    "text": "満更でもない",
+    "reading": "manzara demo nai",
+    "meaning": "全く駄目というわけではなく、むしろ良いと思うこと。",
+    "difficulty": "高校生",
+    "example_sentence": "口では「やめてよ」と言いながらも、褒められて『満更でもない』といった表情を浮かべている。",
+    "monsterName": "ノット・ソー・バッド"
+  },
+  {
+    "id": 326,
+    "text": "身も蓋もない",
+    "reading": "mi mo futa mo nai",
+    "meaning": "あまりに露骨すぎて、情緒や含みがないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "「結局、世の中、金が全てだよ」なんて、『身も蓋もない』ことを言うのはやめてくれ。",
+    "monsterName": "ノー・カバー"
+  },
+  {
+    "id": 327,
+    "text": "耳が痛い",
+    "reading": "mimi ga itai",
+    "meaning": "自分の弱点を指摘されて、聞くのがつらいこと。",
+    "difficulty": "高校生",
+    "example_sentence": "先生からの「もっと計画的に勉強しなさい」という忠告は、まさに自分のことなので『耳が痛い』。",
+    "monsterName": "ペインフル・ワード"
+  },
+  {
+    "id": 328,
+    "text": "耳にたこができる",
+    "reading": "mimi ni tako ga dekiru",
+    "meaning": "同じことを、何度も繰り返し聞かされて、うんざりすること。",
+    "difficulty": "高校生",
+    "example_sentence": "母から「早く部屋を片付けなさい」と、『耳にたこができる』ほど言われ続けている。",
+    "monsterName": "オクトパス・イヤー"
+  },
+  {
+    "id": 329,
+    "text": "耳を疑う",
+    "reading": "mimi wo utagau",
+    "meaning": "聞いたことが、信じられないほど意外であること。",
+    "difficulty": "高校生",
+    "example_sentence": "あの真面目な彼が、まさかカンニングをするなんて、にわかには信じられず、自分の『耳を疑った』。",
+    "monsterName": "ダウト・サウンド"
+  },
+  {
+    "id": 330,
+    "text": "耳を貸す",
+    "reading": "mimi wo kasu",
+    "meaning": "相手の話を聞くこと。相談に乗ること。",
+    "difficulty": "高校生",
+    "example_sentence": "悩んでいる友人に対して、親身になって『耳を貸して』あげることが、本当の友情だろう。",
+    "monsterName": "ヒアリング・エンジェル"
+  },
+  {
+    "id": 331,
+    "text": "耳を揃える",
+    "reading": "mimi wo soroeru",
+    "meaning": "金額をきっちり揃えて用意すること。",
+    "difficulty": "高校生",
+    "example_sentence": "借金を返すときは、言い訳などせず、全額『耳を揃えて』返すのが筋だ。",
+    "monsterName": "ジャスト・マネー"
+  },
+  {
+    "id": 332,
+    "text": "水と油",
+    "reading": "mizu to abura",
+    "meaning": "互いに溶け合わず、性質が合わないことのたとえ。",
+    "difficulty": "高校生",
+    "example_sentence": "楽観的な兄と悲観的な弟。二人はまさに『水と油』で、いつも意見が対立している。",
+    "monsterName": "ウォーター・オイル・デュオ"
+  },
+  {
+    "id": 333,
+    "text": "水の泡",
+    "reading": "mizu no awa",
+    "meaning": "努力したことが、すべて無駄になってしまうこと。",
+    "difficulty": "高校生",
+    "example_sentence": "せっかくの計画も、台風でイベント自体が中止になり、すべてが『水の泡』となった。",
+    "monsterName": "アクア・バブル"
+  },
+  {
+    "id": 334,
+    "text": "味噌をつける",
+    "reading": "miso wo tsukeru",
+    "meaning": "失敗して、面目を失うこと。",
+    "difficulty": "高校生",
+    "example_sentence": "大事なプレゼンテーションで、彼は大きなミスを犯し、すっかり『味噌をつけて』しまった。",
+    "monsterName": "ミソ・エラー"
+  },
+  {
+    "id": 335,
+    "text": "道草を食う",
+    "reading": "michikusa wo kuu",
+    "meaning": "目的地へ行く途中で、他のことにかかわって時間を無駄にすること。",
+    "difficulty": "高校生",
+    "example_sentence": "学校の帰りに、本屋で立ち読みをしたり、ゲームセンターに寄ったりと、『道草を食って』いたら、すっかり遅くなってしまった。",
+    "monsterName": "グラス・イーター"
+  },
+  {
+    "id": 336,
+    "text": "三日見ぬ間の桜",
+    "reading": "mikka minu ma no sakura",
+    "meaning": "世の中の移り変わりが、非常に早いことのたとえ。",
+    "difficulty": "高校生",
+    "example_sentence": "IT業界の技術革新は、まさに『三日見ぬ間の桜』で、少し油断していると、あっという間に時代遅れになってしまう。",
+    "monsterName": "チェンジ・ブロッサム"
+  },
+  {
+    "id": 337,
+    "text": "虫がいい",
+    "reading": "mushi ga ii",
+    "meaning": "自分の都合ばかりを考え、身勝手であること。",
+    "difficulty": "高校生",
+    "example_sentence": "自分は何も手伝わないくせに、分け前だけは一人前に要求するなんて、あまりにも『虫がいい』話だ。",
+    "monsterName": "セルフィッシュ・バグ"
+  },
+  {
+    "id": 338,
+    "text": "虫が好かない",
+    "reading": "mushi ga sukanai",
+    "meaning": "何となく気に入らないこと。理由もなく嫌な感じがすること。",
+    "difficulty": "高校生",
+    "example_sentence": "特に何かされたわけではないのだが、彼の尊大な態度が、どうにも『虫が好かない』。",
+    "monsterName": "ヘイト・インセクト"
+  },
+  {
+    "id": 339,
+    "text": "胸に一物",
+    "reading": "mune ni ichimotsu",
+    "meaning": "心の中に、何かたくらみを秘めていること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、にこやかに握手を求めてきたが、その目の奥には、『胸に一物』あることが見て取れた。",
+    "monsterName": "シークレット・チェスト"
+  },
+  {
+    "id": 340,
+    "text": "胸を借りる",
+    "reading": "mune wo kariru",
+    "meaning": "格上の相手に、練習の相手をしてもらうこと。",
+    "difficulty": "高校生",
+    "example_sentence": "次の大会に向けて、OBの先輩に『胸を借りて』、稽古をつけてもらった。",
+    "monsterName": "チャレンジ・スピリット"
+  },
+  {
+    "id": 341,
+    "text": "目がない",
+    "reading": "me ga nai",
+    "meaning": "非常に好きであること。夢中であること。",
+    "difficulty": "高校生",
+    "example_sentence": "彼女は、甘いものに『目がなく』、ケーキバイキングに行くと、いつも全種類制覇しようとする。",
+    "monsterName": "ラブ・イーター"
+  },
+  {
+    "id": 342,
+    "text": "目と鼻の先",
+    "reading": "me to hana no saki",
+    "meaning": "非常に近い距離にあること。",
+    "difficulty": "高校生",
+    "example_sentence": "駅前のコンビニなら、ここから『目と鼻の先』だよ。",
+    "monsterName": "ニア・ポイント"
+  },
+  {
+    "id": 343,
+    "text": "目に余る",
+    "reading": "me ni amaru",
+    "meaning": "あまりにひどくて、黙って見ていられないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "彼の自分勝手な振る舞いは、最近、特に『目に余る』ものがある。",
+    "monsterName": "オーバー・アイ"
+  },
+  {
+    "id": 344,
+    "text": "目に入れても痛くない",
+    "reading": "me ni irete mo itakunai",
+    "meaning": "子どもや孫などが、可愛くてたまらないという気持ちを表す言葉。",
+    "difficulty": "高校生",
+    "example_sentence": "祖父にとって、初孫の私は『目に入れても痛くない』ほど可愛い存在だったらしい。",
+    "monsterName": "エンジェル・アイ"
+  },
+  {
+    "id": 345,
+    "text": "目を皿にする",
+    "reading": "me wo sara ni suru",
+    "meaning": "目を大きく見開いて、熱心にものを探す様子。",
+    "difficulty": "高校生",
+    "example_sentence": "落としてしまったコンタクトレンズを、『目を皿にして』探したが見つからなかった。",
+    "monsterName": "プレート・アイズ"
+  },
+  {
+    "id": 346,
+    "text": "目を三角にする",
+    "reading": "me wo sankaku ni suru",
+    "meaning": "怒って、怖い目つきになること。",
+    "difficulty": "高校生",
+    "example_sentence": "大事にしていたフィギュアを弟に壊され、彼は『目を三角にして』怒っていた。",
+    "monsterName": "アングリー・トライアングル"
+  },
+  {
+    "id": 347,
+    "text": "目を細める",
+    "reading": "me wo hosomeru",
+    "meaning": "嬉しそうに、にこやかな顔つきになること。",
+    "difficulty": "高校生",
+    "example_sentence": "祖母は、孫たちが元気に遊ぶ姿を、嬉しそうに『目を細めて』眺めていた。",
+    "monsterName": "ジェントル・ルック"
+  },
+  {
+    "id": 348,
+    "text": "目を丸くする",
+    "reading": "me wo maruku suru",
+    "meaning": "ひどく驚くこと。",
+    "difficulty": "高校生",
+    "example_sentence": "目の前で演じられた見事なマジックに、観客は皆『目を丸くしていた』。",
+    "monsterName": "サークル・アイズ"
+  },
+  {
+    "id": 349,
+    "text": "元も子もない",
+    "reading": "moto mo ko mo nai",
+    "meaning": "すべてを失って、何も残らないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "健康を害してまで働いてお金を稼いでも、結局は『元も子もない』。",
+    "monsterName": "オール・ロスト"
+  },
+  {
+    "id": 350,
+    "text": "焼け石に水",
+    "reading": "yakeishi ni mizu",
+    "meaning": "わずかな助けや努力では、ほとんど効果がないこと。",
+    "difficulty": "高校生",
+    "example_sentence": "この程度の金額では、彼の莫大な借金を返すには、『焼け石に水』だ。",
+    "monsterName": "ホットストーン・ウォーター"
+  },
+  {
+    "id": 351,
+    "text": "藪から棒",
+    "reading": "yabu kara bou",
+    "meaning": "あまりに突然で、唐突であること。",
+    "difficulty": "高校生",
+    "example_sentence": "静かに本を読んでいたら、突然、『藪から棒』に「君、名前は？」と話しかけられた。",
+    "monsterName": "ヤブ・スティック"
+  },
+  {
+    "id": 352,
+    "text": "藪をつついて蛇を出す",
+    "reading": "yabu wo tsutsuite hebi wo dasu",
+    "meaning": "余計なことをして、かえって災いを招くこと。",
+    "difficulty": "高校生",
+    "example_sentence": "黙っていればいいものを、余計な一言を言ったばかりに、相手を怒らせてしまった。まさに『藪をつついて蛇を出す』だ。",
+    "monsterName": "ヤブ・サーペント"
+  },
+  {
+    "id": 353,
+    "text": "焼けぼっくいに火がつく",
+    "reading": "yakebokkui ni hi ga tsuku",
+    "meaning": "一度切れた関係が、また元に戻ること。特に男女関係について使う。",
+    "difficulty": "高校生",
+    "example_sentence": "同窓会で再会したのをきっかけに、別れた恋人と『焼けぼっくいに火がついて』、また付き合い始めたらしい。",
+    "monsterName": "リターン・ラブ"
+  },
+  {
+    "id": 354,
+    "text": "柳に雪折れなし",
+    "reading": "yanagi ni yukiore nashi",
+    "meaning": "柔軟なものは、かえってよく持ちこたえるということ。",
+    "difficulty": "高校生",
+    "example_sentence": "彼は、どんな困難な状況でも、うまく受け流して乗り越えてしまう。まさに『柳に雪折れなし』だ。",
+    "monsterName": "フレキシブル・ウィロー"
+  },
+  {
+    "id": 355,
+    "text": "寄らば大樹の陰",
+    "reading": "yoraba taiju no kage",
+    "meaning": "頼るならば、力のある者に頼るのが安全で得策だということ。",
+    "difficulty": "高校生",
+    "example_sentence": "どうせ就職するなら、安定した大企業がいい。『寄らば大樹の陰』というじゃないか。",
+    "monsterName": "グレートツリー・ガーディアン"
+  },
+  {
+    "id": 356,
+    "text": "弱り目に祟り目",
+    "reading": "yowarime ni tatarime",
+    "meaning": "不運が重なること。",
+    "difficulty": "高校生",
+    "example_sentence": "財布を落とした上に、乗ろうとしていた電車に乗り遅れてしまうなんて、まさに『弱り目に祟り目』だ。",
+    "monsterName": "ダブル・カース"
+  },
+  {
+    "id": 357,
+    "text": "渡りに船",
+    "reading": "watari ni fune",
+    "meaning": "ちょうど困っている時に、都合の良いことが起こること。",
+    "difficulty": "高校生",
+    "example_sentence": "駅までどうやって行こうかと考えていたら、ちょうど友人が車で通りかかった。まさに『渡りに船』だった。",
+    "monsterName": "グッドタイミング・シップ"
+  },
+  {
+    "id": 358,
+    "text": "割れ鍋に綴じ蓋",
+    "reading": "warenabe ni tojibuta",
+    "meaning": "どんな人にも、ふさわしい伴侶がいるものだということ。",
+    "difficulty": "高校生",
+    "example_sentence": "あんな変わり者の彼に、ぴったりの彼女が見つかるなんて、『割れ鍋に綴じ蓋』とはよく言ったものだ。",
+    "monsterName": "ベストマッチ・ポット"
+  },
+  {
+    "id": 359,
+    "text": "悪銭身につかず",
+    "reading": "akusen mi ni tsukazu",
+    "meaning": "不正な手段で得た金銭は、すぐに無くなってしまうものだということ。",
+    "difficulty": "一般",
+    "example_sentence": "ギャンブルで大儲けした金は、結局、あっという間に使ってしまった。まさに『悪銭身につかず』だ。",
+    "monsterName": "ロスト・コイン"
+  },
+  {
+    "id": 360,
+    "text": "後の祭り",
+    "reading": "ato no matsuri",
+    "meaning": "時機を逃してしまい、手遅れであること。",
+    "difficulty": "一般",
+    "example_sentence": "バーゲンの最終日に行ったら、欲しかった商品はすべて売り切れていた。まさに『後の祭り』だった。",
+    "monsterName": "フェスティバル・イズ・オーバー"
+  },
+  {
+    "id": 361,
+    "text": "虻蜂取らず",
+    "reading": "abuhachi torazu",
+    "meaning": "同時に二つのものを得ようとして、結局どちらも得られないこと。",
+    "difficulty": "一般",
+    "example_sentence": "二つの会社から内定をもらい、どちらに行くか迷っているうちに、両方から断られてしまった。まさに『虻蜂取らず』だ。",
+    "monsterName": "ダブル・フェイラー"
+  },
+  {
+    "id": 362,
+    "text": "雨だれ石をうがつ",
+    "reading": "amadare ishi wo ugatsu",
+    "meaning": "小さな力でも根気よく続ければ、やがて大きな成果を得られるということ。",
+    "difficulty": "一般",
+    "example_sentence": "毎日少しずつでも勉強を続ければ、いつかは必ず目標を達成できる。『雨だれ石をうがつ』の精神だ。",
+    "monsterName": "コンスタント・ドロップ"
+  },
+  {
+    "id": 363,
+    "text": "案ずるより産むが易し",
+    "reading": "anzuru yori umu ga yasushi",
+    "meaning": "心配していたことでも、実際にやってみると案外たやすくできるものだということ。",
+    "difficulty": "一般",
+    "example_sentence": "プレゼンテーションは、準備段階ではとても不安だったが、いざ本番になると、意外と落ち着いて話せた。『案ずるより産むが易し』だ。",
+    "monsterName": "ノーウォーリー・ゴー"
+  },
+  {
+    "id": 364,
+    "text": "生き馬の目を抜く",
+    "reading": "ikiuma no me wo nuku",
+    "meaning": "油断も隙もないほど、すばしこいこと。また、抜け目なく利益を得ること。",
+    "difficulty": "一般",
+    "example_sentence": "競争の激しいこの業界で生き残るためには、『生き馬の目を抜く』ようなしたたかさが必要だ。",
+    "monsterName": "クイック・アイ"
+  },
+  {
+    "id": 365,
+    "text": "石の上にも三年",
+    "reading": "ishi no ue ni mo sannen",
+    "meaning": "つらくても辛抱強く続ければ、いつかは必ず成功するということ。",
+    "difficulty": "一般",
+    "example_sentence": "この仕事は覚えることが多くて大変だが、『石の上にも三年』というから、まずは辛抱強く頑張ってみよう。",
+    "monsterName": "ストーン・ペイシェンス"
+  },
+  {
+    "id": 366,
+    "text": "石橋を叩いて渡る",
+    "reading": "ishibashi wo tataite wataru",
+    "meaning": "非常に用心深いことのたとえ。",
+    "difficulty": "一般",
+    "example_sentence": "彼は、何事においても、まずリスクを徹底的に分析してからでないと行動しない。『石橋を叩いて渡る』タイプだ。",
+    "monsterName": "セーフティ・ブリッジ"
+  },
+  {
+    "id": 367,
+    "text": "急がば回れ",
+    "reading": "isogaba maware",
+    "meaning": "急いでいる時こそ、危険な近道より安全な遠回りを選んだ方が結局は早く着くということ。",
+    "difficulty": "一般",
+    "example_sentence": "焦って雑な仕事をすると、結局手直しに時間がかかってしまう。『急がば回れ』で、一つ一つ着実に進めよう。",
+    "monsterName": "ディツアー・ナイト"
+  },
+  {
+    "id": 368,
+    "text": "一寸の虫にも五分の魂",
+    "reading": "issun no mushi ni mo gobu no tamashii",
+    "meaning": "小さく弱い者にも、それ相応の意地や考えがあるから、侮ってはいけないということ。",
+    "difficulty": "一般",
+    "example_sentence": "どんな相手でも、見くびってはいけない。『一寸の虫にも五分の魂』というように、思わぬ反撃にあうかもしれない。",
+    "monsterName": "ソウル・ワーム"
+  },
+  {
+    "id": 369,
+    "text": "井の中の蛙大海を知らず",
+    "reading": "ino naka no kawazu taikai wo shirazu",
+    "meaning": "自分の狭い知識や考えにとらわれて、もっと広い世界があることを知らないこと。",
+    "difficulty": "一般",
+    "example_sentence": "自分の専門分野のことしか知らないようでは、『井の中の蛙大海を知らず』と言われても仕方がない。もっと視野を広げるべきだ。",
+    "monsterName": "ウェル・フロッグ"
+  },
+  {
+    "id": 370,
+    "text": "魚心あれば水心",
+    "reading": "uogokoro areba mizugokoro",
+    "meaning": "相手が好意を示せば、こちらもそれに応えて好意を示す用意があるということ。",
+    "difficulty": "一般",
+    "example_sentence": "こちらが誠意をもって接すれば、相手もきっと心を開いてくれるはずだ。『魚心あれば水心』というだろう。",
+    "monsterName": "フィッシュ・ハート"
+  },
+  {
+    "id": 371,
+    "text": "氏より育ち",
+    "reading": "uji yori sodachi",
+    "meaning": "家柄や血筋よりも、育った環境の方が人格形成に大きな影響を与えるということ。",
+    "difficulty": "一般",
+    "example_sentence": "どんなに良い家柄の生まれでも、甘やかされて育てば、わがままな人間になる。『氏より育ち』とは、よく言ったものだ。",
+    "monsterName": "ナーチャー・エレメント"
+  },
+  {
+    "id": 372,
+    "text": "嘘から出た実",
+    "reading": "uso kara deta makoto",
+    "meaning": "初めは嘘だったことが、偶然にも本当になってしまうこと。",
+    "difficulty": "一般",
+    "example_sentence": "冗談で「宝くじが当たった」と言っていたら、本当に高額当選してしまった。まさに『嘘から出た実』だ。",
+    "monsterName": "トゥルース・ライ"
+  },
+  {
+    "id": 373,
+    "text": "馬の耳に念仏",
+    "reading": "uma no mimi ni nenbutsu",
+    "meaning": "いくら意見をしても、全く聞き入れられず効果がないこと。",
+    "difficulty": "一般",
+    "example_sentence": "頑固な彼に、いくら正論を説いても、全く聞く耳を持たない。まさに『馬の耳に念仏』だ。",
+    "monsterName": "サイレント・ホース"
+  },
+  {
+    "id": 374,
+    "text": "絵に描いた餅",
+    "reading": "e ni kaita mochi",
+    "meaning": "計画などが実際には役に立たないこと。",
+    "difficulty": "一般",
+    "example_sentence": "どんなに立派な計画を立てても、実行が伴わなければ、それは『絵に描いた餅』に過ぎない。",
+    "monsterName": "ドリーム・モチ"
+  },
+  {
+    "id": 375,
+    "text": "縁の下の力持ち",
+    "reading": "en no shita no chikaramochi",
+    "meaning": "人に知られないところで、他人のために尽くすこと。",
+    "difficulty": "一般",
+    "example_sentence": "華やかな舞台の裏には、それを支える多くの『縁の下の力持ち』がいることを忘れてはならない。",
+    "monsterName": "アンサング・ヒーロー"
+  },
+  {
+    "id": 376,
+    "text": "帯に短し襷に長し",
+    "reading": "obi ni mijikashi tasuki ni nagashi",
+    "meaning": "中途半端で、どちらの役にも立たないことのたとえ。",
+    "difficulty": "一般",
+    "example_sentence": "この人材は、専門職としては知識が足りないが、一般職としては給与が高い。まさに『帯に短し襷に長し』で、処遇に困る。",
+    "monsterName": "ミドル・サイズ"
+  },
+  {
+    "id": 377,
+    "text": "鬼に金棒",
+    "reading": "oni ni kanabou",
+    "meaning": "強いものがさらに強いものを得て、無敵になること。",
+    "difficulty": "一般",
+    "example_sentence": "優秀な彼に、最新のツールが与えられた。これでまさに『鬼に金棒』だ。",
+    "monsterName": "アイアン・オーガ"
+  },
+  {
+    "id": 378,
+    "text": "飼い犬に手を噛まれる",
+    "reading": "kaiinu ni te wo kamareru",
+    "meaning": "普段から面倒を見ていた者から、裏切られてひどい目に遭うこと。",
+    "difficulty": "一般",
+    "example_sentence": "信頼していた部下に、会社の機密情報を持ち逃げされてしまった。まさに『飼い犬に手を噛まれる』思いだ。",
+    "monsterName": "トラスト・ブレイカー"
+  },
+  {
+    "id": 379,
+    "text": "果報は寝て待て",
+    "reading": "kahou wa nete mate",
+    "meaning": "幸運は人の力ではどうにもできないものだから、焦らずに時機を待つのが良いということ。",
+    "difficulty": "一般",
+    "example_sentence": "やるべきことは全てやった。あとは天命を待つだけだ。『果報は寝て待て』というじゃないか。",
+    "monsterName": "グッドスリープ・ナイト"
+  },
+  {
+    "id": 380,
+    "text": "亀の甲より年の功",
+    "reading": "kame no kou yori toshi no kou",
+    "meaning": "年長者の経験は、貴重で尊重すべきであるということ。",
+    "difficulty": "一般",
+    "example_sentence": "この問題の解決策は、若い我々には思いつかなかった。さすがは『亀の甲より年の功』だ。",
+    "monsterName": "ワイズ・タートル"
+  },
+  {
+    "id": 381,
+    "text": "聞いて極楽見て地獄",
+    "reading": "kiite gokuraku mite jigoku",
+    "meaning": "話に聞いただけでは素晴らしいが、実際に見るとひどい状態であること。",
+    "difficulty": "一般",
+    "example_sentence": "噂では素晴らしいリゾート地だと聞いていたが、実際に行ってみると、サービスも設備も最悪だった。まさに『聞いて極楽見て地獄』だ。",
+    "monsterName": "ヘブン・ヘル"
+  },
+  {
+    "id": 382,
+    "text": "木を見て森を見ず",
+    "reading": "ki wo mite mori wo mizu",
+    "meaning": "小さなことばかりに気を取られて、全体を見失うこと。",
+    "difficulty": "一般",
+    "example_sentence": "目先の利益ばかりを追い求めていると、大局的な視点を見失ってしまう。『木を見て森を見ず』ではいけない。",
+    "monsterName": "フォレスト・ブラインド"
+  },
+  {
+    "id": 383,
+    "text": "郷に入っては郷に従え",
+    "reading": "gou ni itte wa gou ni shitagae",
+    "meaning": "その土地や社会の習慣には、素直に従うのがよいということ。",
+    "difficulty": "一般",
+    "example_sentence": "海外に赴任したからには、その国の文化や習慣を尊重し、『郷に入っては郷に従え』の精神で臨むべきだ。",
+    "monsterName": "ローカル・ルール"
+  },
+  {
+    "id": 384,
+    "text": "光陰矢の如し",
+    "reading": "kouin ya no gotoshi",
+    "meaning": "月日が経つのが、飛ぶ矢のように非常に速いことのたとえ。",
+    "difficulty": "一般",
+    "example_sentence": "楽しかった学生時代も、振り返ってみればあっという間だった。『光陰矢の如し』とは、よく言ったものだ。",
+    "monsterName": "スピード・タイム"
+  },
+  {
+    "id": 385,
+    "text": "後悔先に立たず",
+    "reading": "koukai saki ni tatazu",
+    "meaning": "物事が済んでしまってから悔やんでも、取り返しがつかないということ。",
+    "difficulty": "一般",
+    "example_sentence": "あの時、もっと慎重に行動すべきだったと今更悔やんでも、『後悔先に立たず』だ。",
+    "monsterName": "ノー・リターン"
+  },
+  {
+    "id": 386,
+    "text": "弘法にも筆の誤り",
+    "reading": "koubou ni mo fude no ayamari",
+    "meaning": "その道の達人でも失敗はあるということ。",
+    "difficulty": "一般",
+    "example_sentence": "あのベテラン選手が、まさかあんな簡単なミスを犯すとは。『弘法にも筆の誤り』というものか。",
+    "monsterName": "ジーニアス・エラー"
+  },
+  {
+    "id": 387,
+    "text": "転ばぬ先の杖",
+    "reading": "korobanu saki no tsue",
+    "meaning": "失敗しないように、前もって用心しておくこと。",
+    "difficulty": "一般",
+    "example_sentence": "万一に備えて、保険に入っておくのは、『転ばぬ先の杖』として賢明な判断だ。",
+    "monsterName": "プロテクト・ロッド"
+  },
+  {
+    "id": 388,
+    "text": "三人寄れば文殊の知恵",
+    "reading": "sannin yoreba monju no chie",
+    "meaning": "平凡な人でも、三人集まって相談すれば、良い知恵が浮かぶものだということ。",
+    "difficulty": "一般",
+    "example_sentence": "この難問も、一人で抱え込まずに、皆で話し合えば、きっと解決策が見つかるはずだ。『三人寄れば文殊の知恵』というだろう。",
+    "monsterName": "トリプル・ブレイン"
+  },
+  {
+    "id": 389,
+    "text": "人事を尽くして天命を待つ",
+    "reading": "jinji wo tsukushite tenmei wo matsu",
+    "meaning": "人間としてできる限りの努力をしたら、あとは静かに天の定めた運命に従うということ。",
+    "difficulty": "一般",
+    "example_sentence": "試験に向けて、やれるだけの勉強はした。あとは『人事を尽くして天命を待つ』だけだ。",
+    "monsterName": "ヘブンズ・ウィル"
+  },
+  {
+    "id": 390,
+    "text": "好きこそ物の上手なれ",
+    "reading": "suki koso mono no jouzu nare",
+    "meaning": "好きなことは熱心にするので、自然と上達するものであるということ。",
+    "difficulty": "一般",
+    "example_sentence": "彼が、あれほどまでにギターが上達したのは、何よりもギターが好きだからだろう。『好きこそ物の上手なれ』とは、まさにこのことだ。",
+    "monsterName": "ラブ・イズ・パワー"
+  },
+  {
+    "id": 391,
+    "text": "背に腹はかえられぬ",
+    "reading": "se ni hara wa kaerarenu",
+    "meaning": "目前の重大なことのためには、他のことを犠牲にするのもやむを得ないということ。",
+    "difficulty": "一般",
+    "example_sentence": "会社の存続のためには、不採算部門の縮小もやむを得ない。まさに『背に腹はかえられぬ』状況だ。",
+    "monsterName": "プライオリティ・ワン"
+  },
+  {
+    "id": 392,
+    "text": "船頭多くして船山に上る",
+    "reading": "sendou ooku shite fune yama ni noboru",
+    "meaning": "指図する人が多すぎて、方針がまとまらず、物事がとんでもない方向に進んでしまうこと。",
+    "difficulty": "一般",
+    "example_sentence": "このプロジェクトが失敗したのは、各部門が自分たちの意見ばかりを主張し、リーダーシップが欠如していたからだ。まさに『船頭多くして船山に上る』の典型だ。",
+    "monsterName": "カオス・シップ"
+  },
+  {
+    "id": 393,
+    "text": "善は急げ",
+    "reading": "zen wa isoge",
+    "meaning": "よいと思ったことは、ためらわずにすぐ実行するべきだということ。",
+    "difficulty": "一般",
+    "example_sentence": "ボランティア活動に参加しようと思い立ったのなら、『善は急げ』だ。早速、申し込みをしよう。",
+    "monsterName": "クイック・グッドネス"
+  },
+  {
+    "id": 394,
+    "text": "大器晩成",
+    "reading": "taiki bansei",
+    "meaning": "偉大な人物も大成するのが遅いということ。",
+    "difficulty": "一般",
+    "example_sentence": "彼は、若い頃は目立たない存在だったが、地道な努力を重ね、今では社長として会社を率いている。まさに『大器晩成』型の人物だ。",
+    "monsterName": "スロウ・ジーニアス"
+  },
+  {
+    "id": 395,
+    "text": "立つ鳥跡を濁さず",
+    "reading": "tatsu tori ato wo nigosazu",
+    "meaning": "去る者は、後が見苦しくないようにきれいに始末をしていくべきだということ。",
+    "difficulty": "一般",
+    "example_sentence": "会社を辞めるにしても、後任への引き継ぎはしっかりと行い、『立つ鳥跡を濁さず』の精神で、円満に退社したいものだ。",
+    "monsterName": "ビューティフル・エンド"
+  },
+  {
+    "id": 396,
+    "text": "塵も積もれば山となる",
+    "reading": "chiri mo tsumoreba yama to naru",
+    "meaning": "ほんのわずかなものでも、積み重なれば大きなものになるということ。",
+    "difficulty": "一般",
+    "example_sentence": "毎日の節約は、たとえ少額でも、長年続ければ大きな資産となる。『塵も積もれば山となる』だ。",
+    "monsterName": "スモール・マウンテン"
+  },
+  {
+    "id": 397,
+    "text": "出る杭は打たれる",
+    "reading": "deru kui wa utareru",
+    "meaning": "優れていて目立つ人は、他の人から憎まれたり、邪魔されたりしやすいということ。",
+    "difficulty": "一般",
+    "example_sentence": "革新的なアイデアは、しばしば旧体制からの抵抗にあう。『出る杭は打たれる』というが、それを恐れていては、何も変えることはできない。",
+    "monsterName": "スタンドアウト・ペイン"
+  },
+  {
+    "id": 398,
+    "text": "時は金なり",
+    "reading": "toki wa kane nari",
+    "meaning": "時間は金銭と同じように貴重なものだから、無駄にしてはいけないということ。",
+    "difficulty": "一般",
+    "example_sentence": "だらだらと会議を続けるのは、時間の無駄だ。『時は金なり』という意識を持って、効率的に議論を進めるべきだ。",
+    "monsterName": "ゴールデン・タイム"
+  },
+  {
+    "id": 399,
+    "text": "捕らぬ狸の皮算用",
+    "reading": "toranu tanuki no kawazan'you",
+    "meaning": "まだ手に入れていない不確かなものをあてにして、計画を立てること。",
+    "difficulty": "一般",
+    "example_sentence": "まだ契約も取れていないのに、その利益をあてにして新しい設備投資の計画を立てるなんて、まさに『捕らぬ狸の皮算用』だ。",
+    "monsterName": "フューチャー・プランナー"
+  },
+  {
+    "id": 400,
+    "text": "泣き面に蜂",
+    "reading": "nakitsura ni hachi",
+    "meaning": "不運が重なること。",
+    "difficulty": "一般",
+    "example_sentence": "寝坊して会社に遅刻しそうになったところに、電車が遅延しているなんて、まさに『泣き面に蜂』だ。",
+    "monsterName": "ダブル・ペイン"
+  }
+]

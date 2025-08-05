@@ -3,7 +3,7 @@
 
 import { publish } from '../../core/eventBus.js';
 import { loadDex } from '../../models/kanjiDex.js';
-import { getKanjiById, kanjiData } from '../../loaders/dataLoader.js';
+import { getKanjiById, kanjiData, getKanjiByGrade } from '../../loaders/dataLoader.js';
 import { drawButton, isMouseOverRect } from '../../ui/uiRenderer.js';
 
 const BTN = {
@@ -52,6 +52,20 @@ const kanjiDexScreen = {
     
     // localStorageから収集済みデータを取得し、全漢字IDリストを生成
     this.allList = kanjiData.map(k => k.id);
+
+    // 中学生の漢字データも追加
+    for (let grade = 7; grade <= 10; grade++) {
+      const gradeKanji = getKanjiByGrade(grade);
+      if (gradeKanji && gradeKanji.length > 0) {
+        // 既に存在するIDは追加しない
+        const newIds = gradeKanji
+          .map(k => k.id)
+          .filter(id => !this.allList.includes(id));
+        
+        this.allList.push(...newIds);
+        console.log(`【漢字図鑑】${grade}年生相当の漢字を追加: ${newIds.length}件`);
+      }
+    }
     this.scroll  = 0;
     this.selectedKanjiId = null;
     
@@ -99,6 +113,8 @@ const kanjiDexScreen = {
     this.container = document.createElement('div');
     this.container.id = 'kanjiDexContainer';
     this.container.className = 'kanji-dex-container';
+    this.container.style.border = 'none';
+    this.container.style.outline = 'none';
 
     // 収集率統計エリア
     const statsDiv = document.createElement('div');
@@ -122,6 +138,8 @@ const kanjiDexScreen = {
     // ナビゲーションエリア
     const navDiv = document.createElement('div');
     navDiv.className = 'kanji-dex-navigation';
+    navDiv.style.border = 'none';
+    navDiv.style.outline = 'none';
 
     // 左側のコントロール
     const leftControls = document.createElement('div');
@@ -244,6 +262,8 @@ const kanjiDexScreen = {
     this.cardGrid = document.createElement('div');
     this.cardGrid.id = 'kanjiCardGrid';
     this.cardGrid.className = 'kanji-card-grid';
+    this.cardGrid.style.border = 'none';
+    this.cardGrid.style.outline = 'none';
     
     // コンテナに追加
     this.container.appendChild(this.cardGrid);
@@ -279,6 +299,10 @@ const kanjiDexScreen = {
     if (!collected) {
       card.classList.add('locked');
     }
+    
+    // 枠線のスタイルを直接設定
+    card.style.border = '1px solid #8B4513';
+    card.style.boxShadow = '3px 3px 5px rgba(0, 0, 0, 0.3)';
     
     // 漢字を表示
     const kanjiEl = document.createElement('h2');

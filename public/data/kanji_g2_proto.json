@@ -1,7 +1,7 @@
 [
   {
     "id": "g2-001",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "引",
     "grade": 2,
     "strokes": 4,
@@ -21,7 +21,7 @@
   },
   {
     "id": "g2-002",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "羽",
     "grade": 2,
     "strokes": 6,
@@ -42,7 +42,7 @@
   },
   {
     "id": "g2-003",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "雲",
     "grade": 2,
     "strokes": 12,
@@ -62,7 +62,7 @@
   },
   {
     "id": "g2-004",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "園",
     "grade": 2,
     "strokes": 13,
@@ -82,7 +82,7 @@
   },
   {
     "id": "g2-005",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "遠",
     "grade": 2,
     "strokes": 13,
@@ -102,7 +102,7 @@
   },
   {
     "id": "g2-006",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "何",
     "grade": 2,
     "strokes": 7,
@@ -123,7 +123,7 @@
   },
   {
     "id": "g2-007",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "科",
     "grade": 2,
     "strokes": 9,
@@ -141,7 +141,7 @@
   },
   {
     "id": "g2-008",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "夏",
     "grade": 2,
     "strokes": 10,
@@ -162,7 +162,7 @@
   },
   {
     "id": "g2-009",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "家",
     "grade": 2,
     "strokes": 10,
@@ -184,7 +184,7 @@
   },
   {
     "id": "g2-010",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "歌",
     "grade": 2,
     "strokes": 14,
@@ -204,7 +204,7 @@
   },
   {
     "id": "g2-011",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "画",
     "grade": 2,
     "strokes": 8,
@@ -223,7 +223,7 @@
   },
   {
     "id": "g2-012",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "回",
     "grade": 2,
     "strokes": 6,
@@ -243,7 +243,7 @@
   },
   {
     "id": "g2-013",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "会",
     "grade": 2,
     "strokes": 6,
@@ -263,7 +263,7 @@
   },
   {
     "id": "g2-014",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "海",
     "grade": 2,
     "strokes": 9,
@@ -283,7 +283,7 @@
   },
   {
     "id": "g2-015",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "絵",
     "grade": 2,
     "strokes": 12,
@@ -302,7 +302,7 @@
   },
   {
     "id": "g2-016",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "外",
     "grade": 2,
     "strokes": 5,
@@ -325,7 +325,7 @@
   },
   {
     "id": "g2-017",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "角",
     "grade": 2,
     "strokes": 7,
@@ -346,7 +346,7 @@
   },
   {
     "id": "g2-018",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "楽",
     "grade": 2,
     "strokes": 13,
@@ -367,7 +367,7 @@
   },
   {
     "id": "g2-019",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "活",
     "grade": 2,
     "strokes": 9,
@@ -387,7 +387,7 @@
   },
   {
     "id": "g2-020",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "間",
     "grade": 2,
     "strokes": 12,
@@ -409,7 +409,7 @@
   },
   {
     "id": "g2-021",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "丸",
     "grade": 2,
     "strokes": 3,
@@ -429,7 +429,7 @@
   },
   {
     "id": "g2-022",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "岩",
     "grade": 2,
     "strokes": 8,
@@ -449,7 +449,7 @@
   },
   {
     "id": "g2-023",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "顔",
     "grade": 2,
     "strokes": 18,
@@ -469,7 +469,7 @@
   },
   {
     "id": "g2-024",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "汽",
     "grade": 2,
     "strokes": 7,
@@ -487,7 +487,7 @@
   },
   {
     "id": "g2-025",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "記",
     "grade": 2,
     "strokes": 10,
@@ -507,7 +507,7 @@
   },
   {
     "id": "g2-026",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "帰",
     "grade": 2,
     "strokes": 10,
@@ -527,7 +527,7 @@
   },
   {
     "id": "g2-027",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "弓",
     "grade": 2,
     "strokes": 3,
@@ -547,7 +547,7 @@
   },
   {
     "id": "g2-028",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "牛",
     "grade": 2,
     "strokes": 4,
@@ -567,7 +567,7 @@
   },
   {
     "id": "g2-029",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "魚",
     "grade": 2,
     "strokes": 11,
@@ -588,7 +588,7 @@
   },
   {
     "id": "g2-030",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "京",
     "grade": 2,
     "strokes": 8,
@@ -607,7 +607,7 @@
   },
   {
     "id": "g2-031",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "強",
     "grade": 2,
     "strokes": 11,
@@ -628,7 +628,7 @@
   },
   {
     "id": "g2-032",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "教",
     "grade": 2,
     "strokes": 11,
@@ -649,7 +649,7 @@
   },
   {
     "id": "g2-033",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "近",
     "grade": 2,
     "strokes": 7,
@@ -669,7 +669,7 @@
   },
   {
     "id": "g2-034",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "兄",
     "grade": 2,
     "strokes": 5,
@@ -690,7 +690,7 @@
   },
   {
     "id": "g2-035",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "形",
     "grade": 2,
     "strokes": 7,
@@ -712,7 +712,7 @@
   },
   {
     "id": "g2-036",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "計",
     "grade": 2,
     "strokes": 9,
@@ -732,7 +732,7 @@
   },
   {
     "id": "g2-037",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "元",
     "grade": 2,
     "strokes": 4,
@@ -744,7 +744,7 @@
       "もと"
     ],
     "meaning": "はじめ。",
-    "exampleSentence": "元（もと）気な 子ども。",
+    "exampleSentence": "元（げん）気な 子ども。",
     "correctCount": 0,
     "incorrectCount": 0,
     "lastReviewDate": null,
@@ -753,7 +753,7 @@
   },
   {
     "id": "g2-038",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "言",
     "grade": 2,
     "strokes": 7,
@@ -775,7 +775,7 @@
   },
   {
     "id": "g2-039",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "原",
     "grade": 2,
     "strokes": 10,
@@ -795,7 +795,7 @@
   },
   {
     "id": "g2-040",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "戸",
     "grade": 2,
     "strokes": 4,
@@ -815,7 +815,7 @@
   },
   {
     "id": "g2-041",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "古",
     "grade": 2,
     "strokes": 5,
@@ -835,7 +835,7 @@
   },
   {
     "id": "g2-042",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "午",
     "grade": 2,
     "strokes": 4,
@@ -856,7 +856,7 @@
   },
   {
     "id": "g2-043",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "後",
     "grade": 2,
     "strokes": 9,
@@ -880,7 +880,7 @@
   },
   {
     "id": "g2-044",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "語",
     "grade": 2,
     "strokes": 14,
@@ -900,7 +900,7 @@
   },
   {
     "id": "g2-045",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "工",
     "grade": 2,
     "strokes": 3,
@@ -919,7 +919,7 @@
   },
   {
     "id": "g2-046",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "公",
     "grade": 2,
     "strokes": 4,
@@ -939,7 +939,7 @@
   },
   {
     "id": "g2-047",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "広",
     "grade": 2,
     "strokes": 5,
@@ -959,7 +959,7 @@
   },
   {
     "id": "g2-048",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "交",
     "grade": 2,
     "strokes": 6,
@@ -980,7 +980,7 @@
   },
   {
     "id": "g2-049",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "光",
     "grade": 2,
     "strokes": 6,
@@ -1001,7 +1001,7 @@
   },
   {
     "id": "g2-050",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "考",
     "grade": 2,
     "strokes": 6,
@@ -1021,7 +1021,7 @@
   },
   {
     "id": "g2-051",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "行",
     "grade": 2,
     "strokes": 6,
@@ -1044,7 +1044,7 @@
   },
   {
     "id": "g2-052",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "高",
     "grade": 2,
     "strokes": 10,
@@ -1064,7 +1064,7 @@
   },
   {
     "id": "g2-053",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "黄",
     "grade": 2,
     "strokes": 11,
@@ -1086,7 +1086,7 @@
   },
   {
     "id": "g2-054",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "合",
     "grade": 2,
     "strokes": 6,
@@ -1108,7 +1108,7 @@
   },
   {
     "id": "g2-055",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "谷",
     "grade": 2,
     "strokes": 7,
@@ -1128,7 +1128,7 @@
   },
   {
     "id": "g2-056",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "国",
     "grade": 2,
     "strokes": 8,
@@ -1148,7 +1148,7 @@
   },
   {
     "id": "g2-057",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "黒",
     "grade": 2,
     "strokes": 11,
@@ -1168,7 +1168,7 @@
   },
   {
     "id": "g2-058",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "今",
     "grade": 2,
     "strokes": 4,
@@ -1188,7 +1188,7 @@
   },
   {
     "id": "g2-059",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "才",
     "grade": 2,
     "strokes": 3,
@@ -1206,7 +1206,7 @@
   },
   {
     "id": "g2-060",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "細",
     "grade": 2,
     "strokes": 11,
@@ -1227,7 +1227,7 @@
   },
   {
     "id": "g2-061",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "作",
     "grade": 2,
     "strokes": 7,
@@ -1248,7 +1248,7 @@
   },
   {
     "id": "g2-062",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "算",
     "grade": 2,
     "strokes": 14,
@@ -1266,7 +1266,7 @@
   },
   {
     "id": "g2-063",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "止",
     "grade": 2,
     "strokes": 4,
@@ -1286,7 +1286,7 @@
   },
   {
     "id": "g2-064",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "市",
     "grade": 2,
     "strokes": 5,
@@ -1306,7 +1306,7 @@
   },
   {
     "id": "g2-065",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "矢",
     "grade": 2,
     "strokes": 5,
@@ -1326,7 +1326,7 @@
   },
   {
     "id": "g2-066",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "姉",
     "grade": 2,
     "strokes": 8,
@@ -1346,7 +1346,7 @@
   },
   {
     "id": "g2-067",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "思",
     "grade": 2,
     "strokes": 9,
@@ -1366,7 +1366,7 @@
   },
   {
     "id": "g2-068",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "紙",
     "grade": 2,
     "strokes": 10,
@@ -1386,7 +1386,7 @@
   },
   {
     "id": "g2-069",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "寺",
     "grade": 2,
     "strokes": 6,
@@ -1406,7 +1406,7 @@
   },
   {
     "id": "g2-070",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "自",
     "grade": 2,
     "strokes": 6,
@@ -1427,7 +1427,7 @@
   },
   {
     "id": "g2-071",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "時",
     "grade": 2,
     "strokes": 10,
@@ -1447,7 +1447,7 @@
   },
   {
     "id": "g2-072",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "室",
     "grade": 2,
     "strokes": 9,
@@ -1467,7 +1467,7 @@
   },
   {
     "id": "g2-073",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "社",
     "grade": 2,
     "strokes": 7,
@@ -1487,7 +1487,7 @@
   },
   {
     "id": "g2-074",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "弱",
     "grade": 2,
     "strokes": 10,
@@ -1507,7 +1507,7 @@
   },
   {
     "id": "g2-075",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "首",
     "grade": 2,
     "strokes": 9,
@@ -1527,7 +1527,7 @@
   },
   {
     "id": "g2-076",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "秋",
     "grade": 2,
     "strokes": 1,
@@ -1547,7 +1547,7 @@
   },
   {
     "id": "g2-077",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "週",
     "grade": 2,
     "strokes": 11,
@@ -1565,7 +1565,7 @@
   },
   {
     "id": "g2-078",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "春",
     "grade": 2,
     "strokes": 9,
@@ -1585,7 +1585,7 @@
   },
   {
     "id": "g2-079",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "書",
     "grade": 2,
     "strokes": 10,
@@ -1605,7 +1605,7 @@
   },
   {
     "id": "g2-080",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "少",
     "grade": 2,
     "strokes": 4,
@@ -1626,7 +1626,7 @@
   },
   {
     "id": "g2-081",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "場",
     "grade": 2,
     "strokes": 12,
@@ -1646,7 +1646,7 @@
   },
   {
     "id": "g2-082",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "色",
     "grade": 2,
     "strokes": 6,
@@ -1667,7 +1667,7 @@
   },
   {
     "id": "g2-083",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "食",
     "grade": 2,
     "strokes": 9,
@@ -1688,7 +1688,7 @@
   },
   {
     "id": "g2-084",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "心",
     "grade": 2,
     "strokes": 4,
@@ -1708,7 +1708,7 @@
   },
   {
     "id": "g2-085",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "新",
     "grade": 2,
     "strokes": 13,
@@ -1730,7 +1730,7 @@
   },
   {
     "id": "g2-086",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "親",
     "grade": 2,
     "strokes": 16,
@@ -1751,7 +1751,7 @@
   },
   {
     "id": "g2-087",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "図",
     "grade": 2,
     "strokes": 7,
@@ -1772,7 +1772,7 @@
   },
   {
     "id": "g2-088",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "数",
     "grade": 2,
     "strokes": 13,
@@ -1793,7 +1793,7 @@
   },
   {
     "id": "g2-089",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "西",
     "grade": 2,
     "strokes": 6,
@@ -1814,7 +1814,7 @@
   },
   {
     "id": "g2-090",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "声",
     "grade": 2,
     "strokes": 7,
@@ -1834,7 +1834,7 @@
   },
   {
     "id": "g2-091",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "星",
     "grade": 2,
     "strokes": 9,
@@ -1854,7 +1854,7 @@
   },
   {
     "id": "g2-092",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "晴",
     "grade": 2,
     "strokes": 12,
@@ -1874,7 +1874,7 @@
   },
   {
     "id": "g2-093",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "切",
     "grade": 2,
     "strokes": 4,
@@ -1894,7 +1894,7 @@
   },
   {
     "id": "g2-094",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "雪",
     "grade": 2,
     "strokes": 11,
@@ -1914,7 +1914,7 @@
   },
   {
     "id": "g2-095",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"]   ,
     "kanji": "船",
     "grade": 2,
     "strokes": 11,
@@ -1935,7 +1935,7 @@
   },
   {
     "id": "g2-096",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "線",
     "grade": 2,
     "strokes": 15,
@@ -1953,7 +1953,7 @@
   },
   {
     "id": "g2-097",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "前",
     "grade": 2,
     "strokes": 9,
@@ -1973,7 +1973,7 @@
   },
   {
     "id": "g2-098",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "組",
     "grade": 2,
     "strokes": 11,
@@ -1994,7 +1994,7 @@
   },
   {
     "id": "g2-099",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "走",
     "grade": 2,
     "strokes": 7,
@@ -2014,7 +2014,7 @@
   },
   {
     "id": "g2-100",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "多",
     "grade": 2,
     "strokes": 6,
@@ -2034,7 +2034,7 @@
   },
   {
     "id": "g2-101",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "太",
     "grade": 2,
     "strokes": 4,
@@ -2055,7 +2055,7 @@
   },
   {
     "id": "g2-102",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "体",
     "grade": 2,
     "strokes": 7,
@@ -2075,7 +2075,7 @@
   },
   {
     "id": "g2-103",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "台",
     "grade": 2,
     "strokes": 5,
@@ -2094,7 +2094,7 @@
   },
   {
     "id": "g2-104",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "地",
     "grade": 2,
     "strokes": 6,
@@ -2113,7 +2113,7 @@
   },
   {
     "id": "g2-105",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "池",
     "grade": 2,
     "strokes": 6,
@@ -2133,7 +2133,7 @@
   },
   {
     "id": "g2-106",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "知",
     "grade": 2,
     "strokes": 8,
@@ -2153,7 +2153,7 @@
   },
   {
     "id": "g2-107",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "茶",
     "grade": 2,
     "strokes": 9,
@@ -2172,7 +2172,7 @@
   },
   {
     "id": "g2-108",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "昼",
     "grade": 2,
     "strokes": 9,
@@ -2192,7 +2192,7 @@
   },
   {
     "id": "g2-109",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "長",
     "grade": 2,
     "strokes": 8,
@@ -2212,7 +2212,7 @@
   },
   {
     "id": "g2-110",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "鳥",
     "grade": 2,
     "strokes": 11,
@@ -2232,7 +2232,7 @@
   },
   {
     "id": "g2-111",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "朝",
     "grade": 2,
     "strokes": 12,
@@ -2252,7 +2252,7 @@
   },
   {
     "id": "g2-112",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "直",
     "grade": 2,
     "strokes": 8,
@@ -2274,7 +2274,7 @@
   },
   {
     "id": "g2-113",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "通",
     "grade": 2,
     "strokes": 10,
@@ -2295,7 +2295,7 @@
   },
   {
     "id": "g2-114",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "弟",
     "grade": 2,
     "strokes": 7,
@@ -2316,7 +2316,7 @@
   },
   {
     "id": "g2-115",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "店",
     "grade": 2,
     "strokes": 8,
@@ -2336,7 +2336,7 @@
   },
   {
     "id": "g2-116",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "点",
     "grade": 2,
     "strokes": 9,
@@ -2354,7 +2354,7 @@
   },
   {
     "id": "g2-117",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "電",
     "grade": 2,
     "strokes": 13,
@@ -2372,7 +2372,7 @@
   },
   {
     "id": "g2-118",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "刀",
     "grade": 2,
     "strokes": 2,
@@ -2392,7 +2392,7 @@
   },
   {
     "id": "g2-119",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "冬",
     "grade": 2,
     "strokes": 5,
@@ -2412,7 +2412,7 @@
   },
   {
     "id": "g2-120",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "当",
     "grade": 2,
     "strokes": 6,
@@ -2432,7 +2432,7 @@
   },
   {
     "id": "g2-121",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "東",
     "grade": 2,
     "strokes": 8,
@@ -2452,7 +2452,7 @@
   },
   {
     "id": "g2-122",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "答",
     "grade": 2,
     "strokes": 12,
@@ -2472,7 +2472,7 @@
   },
   {
     "id": "g2-123",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "頭",
     "grade": 2,
     "strokes": 16,
@@ -2494,7 +2494,7 @@
   },
   {
     "id": "g2-124",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "同",
     "grade": 2,
     "strokes": 6,
@@ -2514,7 +2514,7 @@
   },
   {
     "id": "g2-125",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "道",
     "grade": 2,
     "strokes": 12,
@@ -2534,7 +2534,7 @@
   },
   {
     "id": "g2-126",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "読",
     "grade": 2,
     "strokes": 14,
@@ -2556,7 +2556,7 @@
   },
   {
     "id": "g2-127",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "内",
     "grade": 2,
     "strokes": 4,
@@ -2576,7 +2576,7 @@
   },
   {
     "id": "g2-128",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "南",
     "grade": 2,
     "strokes": 9,
@@ -2596,7 +2596,7 @@
   },
   {
     "id": "g2-129",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "肉",
     "grade": 2,
     "strokes": 6,
@@ -2614,7 +2614,7 @@
   },
   {
     "id": "g2-130",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "馬",
     "grade": 2,
     "strokes": 10,
@@ -2635,7 +2635,7 @@
   },
   {
     "id": "g2-131",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "売",
     "grade": 2,
     "strokes": 7,
@@ -2655,7 +2655,7 @@
   },
   {
     "id": "g2-132",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "買",
     "grade": 2,
     "strokes": 12,
@@ -2675,7 +2675,7 @@
   },
   {
     "id": "g2-133",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "麦",
     "grade": 2,
     "strokes": 7,
@@ -2695,7 +2695,7 @@
   },
   {
     "id": "g2-134",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"]     ,
     "kanji": "半",
     "grade": 2,
     "strokes": 5,
@@ -2715,7 +2715,7 @@
   },
   {
     "id": "g2-135",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "番",
     "grade": 2,
     "strokes": 5,
@@ -2733,7 +2733,7 @@
   },
   {
     "id": "g2-136",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "父",
     "grade": 2,
     "strokes": 4,
@@ -2753,7 +2753,7 @@
   },
   {
     "id": "g2-137",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "風",
     "grade": 2,
     "strokes": 9,
@@ -2774,7 +2774,7 @@
   },
   {
     "id": "g2-138",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "分",
     "grade": 2,
     "strokes": 4,
@@ -2796,7 +2796,7 @@
   },
   {
     "id": "g2-139",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "聞",
     "grade": 2,
     "strokes": 14,
@@ -2816,7 +2816,7 @@
   },
   {
     "id": "g2-140",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "米",
     "grade": 2,
     "strokes": 6,
@@ -2837,7 +2837,7 @@
   },
   {
     "id": "g2-141",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "歩",
     "grade": 2,
     "strokes": 8,
@@ -2857,7 +2857,7 @@
   },
   {
     "id": "g2-142",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "母",
     "grade": 2,
     "strokes": 5,
@@ -2877,7 +2877,7 @@
   },
   {
     "id": "g2-143",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "方",
     "grade": 2,
     "strokes": 4,
@@ -2897,7 +2897,7 @@
   },
   {
     "id": "g2-144",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "北",
     "grade": 2,
     "strokes": 5,
@@ -2917,7 +2917,7 @@
   },
   {
     "id": "g2-145",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "毎",
     "grade": 2,
     "strokes": 6,
@@ -2935,7 +2935,7 @@
   },
   {
     "id": "g2-146",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "妹",
     "grade": 2,
     "strokes": 8,
@@ -2955,7 +2955,7 @@
   },
   {
     "id": "g2-147",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "万",
     "grade": 2,
     "strokes": 3,
@@ -2974,7 +2974,7 @@
   },
   {
     "id": "g2-148",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "明",
     "grade": 2,
     "strokes": 8,
@@ -2995,7 +2995,7 @@
   },
   {
     "id": "g2-149",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "鳴",
     "grade": 2,
     "strokes": 14,
@@ -3015,7 +3015,7 @@
   },
   {
     "id": "g2-150",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "毛",
     "grade": 2,
     "strokes": 4,
@@ -3035,7 +3035,7 @@
   },
   {
     "id": "g2-151",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "門",
     "grade": 2,
     "strokes": 8,
@@ -3055,7 +3055,7 @@
   },
   {
     "id": "g2-152",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "夜",
     "grade": 2,
     "strokes": 8,
@@ -3076,7 +3076,7 @@
   },
   {
     "id": "g2-153",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "野",
     "grade": 2,
     "strokes": 11,
@@ -3096,7 +3096,7 @@
   },
   {
     "id": "g2-154",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "友",
     "grade": 2,
     "strokes": 4,
@@ -3116,7 +3116,7 @@
   },
   {
     "id": "g2-155",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "用",
     "grade": 2,
     "strokes": 5,
@@ -3136,7 +3136,7 @@
   },
   {
     "id": "g2-156",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "曜",
     "grade": 2,
     "strokes": 18,
@@ -3154,7 +3154,7 @@
   },
   {
     "id": "g2-157",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "来",
     "grade": 2,
     "strokes": 7,
@@ -3174,7 +3174,7 @@
   },
   {
     "id": "g2-158",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "里",
     "grade": 2,
     "strokes": 7,
@@ -3194,7 +3194,7 @@
   },
   {
     "id": "g2-159",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "理",
     "grade": 2,
     "strokes": 11,
@@ -3212,7 +3212,7 @@
   },
   {
     "id": "g2-160",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "話",
     "grade": 2,
     "strokes": 13,

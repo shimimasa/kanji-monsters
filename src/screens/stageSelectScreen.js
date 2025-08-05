@@ -86,6 +86,7 @@ const tabs = [
   { label: '総復習', grade: 0 },
 ];
 
+// 選択中のステージを追跡するプロパティを追加（89行目付近）
 const stageSelectScreenState = {
   canvas: null,
   ctx: null,
@@ -98,6 +99,7 @@ const stageSelectScreenState = {
   mouseX: 0,
   mouseY: 0,
   hoveredStage: null,
+  selectedStage: null, // 選択中のステージを追跡
   animationTime: 0, // アニメーション用のタイマー
   
   // クロスフェード用の状態
@@ -173,10 +175,16 @@ const stageSelectScreenState = {
     uiRoot.appendChild(fontToggle);
     // 追加: 後で削除できるようにプロパティとして保持
     this.fontToggle = fontToggle;
+
+    // 選択中のステージをクリア
+    this.selectedStage = null;
   },
 
   /** ステージリストを更新する（学年切り替え時に呼ばれる） */
   updateStageList() {
+    // 選択中のステージをクリア
+    this.selectedStage = null;
+
     // 既存のフィルタリング処理
     this.stages = (gameState.currentGrade === 0)
       ? stageData
@@ -656,12 +664,13 @@ const stageSelectScreenState = {
       
       // ステージボタンの描画（リッチなデザイン版）
       if (this.stageButtons) {
-        const nextStage = this.getNextStage();
+        // const nextStage = this.getNextStage();
         
         this.stageButtons.forEach(button => {
           const stage = button.stage;
           const isCleared = this.isStageCleared(stage.stageId);
-          const isNext = nextStage && nextStage.stageId === stage.stageId;
+          // const isNext = nextStage && nextStage.stageId === stage.stageId;
+          const isNext = false; // 自動点滅を無効化
           const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
 
           // ボタンの色を決定
@@ -671,7 +680,13 @@ const stageSelectScreenState = {
           } else if (isNext) {
             buttonColor = '#e74c3c'; // 次に挑戦すべきは赤
           }
-          
+
+          // 選択中のボタンは目立つ色に変更
+          const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
+          if (isSelected) {
+            buttonColor = '#FF8C00'; // 選択中は鮮やかなオレンジ色
+          }
+
           // リッチなボタンを描画
           this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered);
 
@@ -679,6 +694,13 @@ const stageSelectScreenState = {
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.font = '12px sans-serif';
+
+          // 選択中のボタンには特別なマーク（チェックマーク）を表示
+          if (isSelected) {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '16px sans-serif';
+            ctx.fillText('✓', button.x + 10, button.y + 5);
+          }
 
           // クリア状況（星アイコン）
           if (isCleared) {
@@ -710,14 +732,26 @@ const stageSelectScreenState = {
         stages.forEach(stage => {
           const { x, y } = stage.pos;
           const isCleared = this.isStageCleared(stage.stageId);
-          const isNext = nextStage && nextStage.stageId === stage.stageId;
+          // 次のステージの自動点滅を無効化
+          // const nextStage = this.getNextStage();
+          // const isNext = nextStage && nextStage.stageId === stage.stageId;
+          const isNext = false; // 自動点滅を無効化
+          const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
           
           let markerImage = images.markerPref;
           let scale = 1;
           let alpha = 1;
 
           // ステータス別の表示
-          if (isCleared) {
+          if (isSelected) {
+            // 選択中のステージ: より強い点滅アニメーション
+            const pulse = Math.sin(this.animationTime * 0.01) * 0.5 + 0.5;
+            scale = 1 + pulse * 0.3;
+            alpha = 0.8 + pulse * 0.2;
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.filter = 'hue-rotate(120deg) saturate(2) brightness(1.3)';
+          } else if (isCleared) {
             // クリア済み: 金色のマーカー
             markerImage = images.markerCleared || images.markerPref;
             ctx.save();
@@ -982,32 +1016,42 @@ const stageSelectScreenState = {
     } else {
       // 通常モード（学年別）の処理
       
-      // ステージボタンのクリック判定（ワンクリックで即座にステージ開始）
+      // ステージボタンのクリック判定（1回目は選択、2回目で遷移）
       if (this.stageButtons) {
         for (const button of this.stageButtons) {
           if (isMouseOverRect(x, y, button)) {
-            // バトル画面へ直接遷移する
-            gameState.currentStageId = button.id;
-            resetStageProgress(button.id);
-            
             publish('playSE', 'decide');
-            publish('changeScreen', 'stageLoading');
+            
+            // すでに選択中のステージをクリックした場合は遷移
+            if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
+              gameState.currentStageId = button.id;
+              resetStageProgress(button.id);
+              publish('changeScreen', 'stageLoading');
+            } else {
+              // 1回目のクリック: ステージを選択状態にする
+              this.selectedStage = button.stage;
+            }
             return;
           }
         }
       }
 
-      // 各ステージマーカーのクリック判定（ワンクリックで即座にステージ開始）
+      // 各ステージマーカーのクリック判定（1回目は選択、2回目で遷移）
       if (gameState.currentGrade !== 0) {
         for (const stage of this.stages) {
           const { x: sx, y: sy } = stage.pos;
           if (x >= sx && x <= sx + MARKER_SIZE && y >= sy && y <= sy + MARKER_SIZE) {
-            gameState.currentStageId = stage.stageId;
-            resetStageProgress(stage.stageId);
-            
             publish('playSE', 'decide');
-            // battleFactory で登録したステート名（stageId）へ遷移
-            publish('changeScreen', 'stageLoading');
+            
+            // すでに選択中のステージをクリックした場合は遷移
+            if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
+              gameState.currentStageId = stage.stageId;
+              resetStageProgress(stage.stageId);
+              publish('changeScreen', 'stageLoading');
+            } else {
+              // 1回目のクリック: ステージを選択状態にする
+              this.selectedStage = stage;
+            }
             return;
           }
         }
@@ -1017,7 +1061,8 @@ const stageSelectScreenState = {
     // 「もどる」ボタン
     if (isMouseOverRect(x, y, backButton)) {
       publish('playSE', 'decide');
-      publish('changeScreen', 'title');
+      // titleではなく、regionSelectに戻るように修正
+      publish('changeScreen', 'regionSelect');
       return;
     }
 

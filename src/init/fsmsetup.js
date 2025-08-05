@@ -1,5 +1,6 @@
 // src/init/fsmSetup.js
 import { FSM } from '../core/stateMachine.js';
+import { gameState } from '../core/gameState.js';
 import battleFactory       from '../states/battleStateFactory.js';
 import gradeSelectState    from '../states/gradeSelectState.js';
 import regionSelectState   from '../screens/regionSelectScreen.js';
@@ -23,6 +24,7 @@ import stageLoadingState   from '../screens/stageLoadingScreen.js';
 import courseSelectScreen from '../screens/courseSelectScreen.js';
 import continentSelectScreen from '../screens/continentSelectScreen.js';
 import worldStageSelectScreen from '../screens/worldStageSelectScreen.js';
+import proverbMonsterDexState from '../screens/Dex/proverbMonsterDexScreen.js';
 
 export async function setupFSM() {
   const { stageData } = await loadAllGameData();
@@ -46,9 +48,12 @@ export async function setupFSM() {
     result:           resultScreenState,
     gameOver:         gameOverState,
     stageLoading:     stageLoadingState,
-    courseSelect: courseSelectScreen,
-    continentSelect: continentSelectScreen,
+    courseSelect:     courseSelectScreen,
+    continentSelect:  continentSelectScreen,
     worldStageSelect: worldStageSelectScreen,
+    proverbMonsterDex: proverbMonsterDexState,
+    // 共通バトル画面を追加
+    battle:           battleFactory('default'),
   };
   // ステージごとのバトルステートを一括登録
   stageData.forEach(s => {
@@ -60,7 +65,27 @@ export async function setupFSM() {
 
   // changeScreen イベントに応じて FSM を切り替えるラッパー
   function switchScreen(name, props) {
-    console.log(`画面遷移: ${name}`, props); // デバッグログを追加
+    console.log(`画面遷移: ${name}, props=`, props); // デバッグログを追加
+    
+    // 特定の画面名の場合は直接遷移する（安全リスト）
+    const safeScreens = ['title', 'menu', 'stageSelect', 'stageLoading', 'battle', 
+                        'worldStageSelect', 'continentSelect', 'courseSelect'];
+    
+    if (safeScreens.includes(name)) {
+      console.log(`安全な画面[${name}]への遷移を許可`);
+      fsm.change(name, props);
+      return;
+    }
+    
+    // stageIdと同名の画面への遷移を防止する安全対策
+    if (stageData.some(s => s.stageId === name)) {
+      console.warn(`ステージID[${name}]への直接遷移を検出。battleに変更します。`);
+      gameState.currentStageId = name;
+      fsm.change('battle', props);
+      return;
+    }
+    
+    // その他の画面への遷移
     fsm.change(name, props);
   }
   subscribe('changeScreen', switchScreen);

@@ -9,13 +9,15 @@ export default function createBattleState(stageId){
 
   return {
     enter(props) {
-      console.log(`🎮 battleStateFactory.enter() - ステージ: ${stageId}`, { props });
+      // stageIdがなければgameStateから取得（デフォルト値対応）
+      const currentStageId = stageId === 'default' ? gameState.currentStageId : stageId;
+      console.log(`🎮 battleStateFactory.enter() - ステージ: ${currentStageId}`, { props });
       
       // ステージ毎のデータをセット
-      enemies    = getEnemiesByStageId(stageId);
-      kanjiPool  = getKanjiByStageId(stageId);
-      gameState.currentStageId = stageId;
-      resetStageProgress(stageId);
+      enemies    = getEnemiesByStageId(currentStageId);
+      kanjiPool  = getKanjiByStageId(currentStageId);
+      gameState.currentStageId = currentStageId;
+      resetStageProgress(currentStageId);
       
       // キャンバス要素を取得 (propsまたはDOM)
       let canvas = props;
@@ -36,7 +38,7 @@ export default function createBattleState(stageId){
       battleScreenState.enter(canvas, () => {
         // ステージクリア後の処理
         // クリアしたらローカル保存
-        localStorage.setItem(`clear_${stageId}`, '1');
+        localStorage.setItem(`clear_${currentStageId}`, '1');
         // 新しい勝利画面に遷移（データ付き）
         const resultData = {
           stageId: gameState.currentStageId,

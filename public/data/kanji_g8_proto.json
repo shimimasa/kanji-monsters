@@ -2,7 +2,7 @@
   
   {
     "id": "g8-001",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "哀",
     "grade": 8,
     "strokes": 9,
@@ -22,7 +22,7 @@
   },
   {
     "id": "g8-002",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "慰",
     "grade": 8,
     "strokes": 15,
@@ -42,7 +42,7 @@
   },
   {
     "id": "g8-003",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "詠",
     "grade": 8,
     "strokes": 12,
@@ -62,7 +62,7 @@
   },
   {
     "id": "g8-004",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "悦",
     "grade": 8,
     "strokes": 10,
@@ -80,7 +80,7 @@
   },
   {
     "id": "g8-005",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "閲",
     "grade": 8,
     "strokes": 15,
@@ -98,7 +98,7 @@
   },
   {
     "id": "g8-006",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "炎",
     "grade": 8,
     "strokes": 8,
@@ -118,7 +118,7 @@
   },
   {
     "id": "g8-007",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "宴",
     "grade": 8,
     "strokes": 10,
@@ -136,7 +136,7 @@
   },
   {
     "id": "g8-008",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "欧",
     "grade": 8,
     "strokes": 8,
@@ -154,7 +154,7 @@
   },
   {
     "id": "g8-009",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "殴",
     "grade": 8,
     "strokes": 8,
@@ -174,7 +174,7 @@
   },
   {
     "id": "g8-010",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "乙",
     "grade": 8,
     "strokes": 1,
@@ -192,7 +192,7 @@
   },
   {
     "id": "g8-011",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "卸",
     "grade": 8,
     "strokes": 9,
@@ -211,7 +211,7 @@
   },
   {
     "id": "g8-012",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "穏",
     "grade": 8,
     "strokes": 16,
@@ -231,7 +231,7 @@
   },
   {
     "id": "g8-013",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "佳",
     "grade": 8,
     "strokes": 8,
@@ -249,7 +249,7 @@
   },
   {
     "id": "g8-014",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "架",
     "grade": 8,
     "strokes": 9,
@@ -269,7 +269,7 @@
   },
   {
     "id": "g8-015",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "華",
     "grade": 8,
     "strokes": 10,
@@ -290,7 +290,7 @@
   },
   {
     "id": "g8-016",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "嫁",
     "grade": 8,
     "strokes": 13,
@@ -311,7 +311,7 @@
   },
   {
     "id": "g8-017",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "餓",
     "grade": 8,
     "strokes": 15,
@@ -329,7 +329,7 @@
   },
   {
     "id": "g8-018",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "怪",
     "grade": 8,
     "strokes": 8,
@@ -349,7 +349,7 @@
   },
   {
     "id": "g8-019",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "悔",
     "grade": 8,
     "strokes": 9,
@@ -370,7 +370,7 @@
   },
   {
     "id": "g8-020",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "塊",
     "grade": 8,
     "strokes": 13,
@@ -390,7 +390,7 @@
   },
   {
     "id": "g8-021",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "慨",
     "grade": 8,
     "strokes": 13,
@@ -408,7 +408,7 @@
   },
   {
     "id": "g8-022",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "該",
     "grade": 8,
     "strokes": 13,
@@ -426,7 +426,7 @@
   },
   {
     "id": "g8-023",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "概",
     "grade": 8,
     "strokes": 14,
@@ -444,7 +444,7 @@
   },
   {
     "id": "g8-024",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "郭",
     "grade": 8,
     "strokes": 11,
@@ -462,7 +462,7 @@
   },
   {
     "id": "g8-025",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "隔",
     "grade": 8,
     "strokes": 13,
@@ -482,7 +482,7 @@
   },
   {
     "id": "g8-026",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "穫",
     "grade": 8,
     "strokes": 18,
@@ -500,7 +500,7 @@
   },
   {
     "id": "g8-027",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "岳",
     "grade": 8,
     "strokes": 8,
@@ -520,7 +520,7 @@
   },
   {
     "id": "g8-028",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "掛",
     "grade": 8,
     "strokes": 11,
@@ -539,7 +539,7 @@
   },
   {
     "id": "g8-029",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "滑",
     "grade": 8,
     "strokes": 13,
@@ -561,7 +561,7 @@
   },
   {
     "id": "g8-030",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area1"],
     "kanji": "肝",
     "grade": 8,
     "strokes": 7,
@@ -581,7 +581,7 @@
   },
   {
     "id": "g8-031",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "冠",
     "grade": 8,
     "strokes": 9,
@@ -601,7 +601,7 @@
   },
   {
     "id": "g8-032",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "勘",
     "grade": 8,
     "strokes": 11,
@@ -619,7 +619,7 @@
   },
   {
     "id": "g8-033",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "貫",
     "grade": 8,
     "strokes": 11,
@@ -639,7 +639,7 @@
   },
   {
     "id": "g8-034",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "喚",
     "grade": 8,
     "strokes": 12,
@@ -657,7 +657,7 @@
   },
   {
     "id": "g8-035",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "換",
     "grade": 8,
     "strokes": 12,
@@ -677,7 +677,7 @@
   },
   {
     "id": "g8-036",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "敢",
     "grade": 8,
     "strokes": 12,
@@ -697,7 +697,7 @@
   },
   {
     "id": "g8-037",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "緩",
     "grade": 8,
     "strokes": 15,
@@ -717,7 +717,7 @@
   },
   {
     "id": "g8-038",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "企",
     "grade": 8,
     "strokes": 6,
@@ -737,7 +737,7 @@
   },
   {
     "id": "g8-039",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "忌",
     "grade": 8,
     "strokes": 7,
@@ -757,7 +757,7 @@
   },
   {
     "id": "g8-040",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "軌",
     "grade": 8,
     "strokes": 9,
@@ -775,7 +775,7 @@
   },
   {
     "id": "g8-041",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "既",
     "grade": 8,
     "strokes": 10,
@@ -795,7 +795,7 @@
   },
   {
     "id": "g8-042",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "棋",
     "grade": 8,
     "strokes": 12,
@@ -813,7 +813,7 @@
   },
   {
     "id": "g8-043",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "棄",
     "grade": 8,
     "strokes": 13,
@@ -831,7 +831,7 @@
   },
   {
     "id": "g8-044",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "騎",
     "grade": 8,
     "strokes": 18,
@@ -849,7 +849,7 @@
   },
   {
     "id": "g8-045",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "欺",
     "grade": 8,
     "strokes": 12,
@@ -869,7 +869,7 @@
   },
   {
     "id": "g8-046",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "犠",
     "grade": 8,
     "strokes": 17,
@@ -887,7 +887,7 @@
   },
   {
     "id": "g8-046",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "菊",
     "grade": 8,
     "strokes": 11,
@@ -905,7 +905,7 @@
   },
   {
     "id": "g8-048",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "吉",
     "grade": 8,
     "strokes": 6,
@@ -924,7 +924,7 @@
   },
   {
     "id": "g8-049",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "喫",
     "grade": 8,
     "strokes": 12,
@@ -942,7 +942,7 @@
   },
   {
     "id": "g8-050",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "虐",
     "grade": 8,
     "strokes": 9,
@@ -962,7 +962,7 @@
   },
   {
     "id": "g8-051",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "虚",
     "grade": 8,
     "strokes": 11,
@@ -981,7 +981,7 @@
   },
   {
     "id": "g8-052",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "峡",
     "grade": 8,
     "strokes": 9,
@@ -999,7 +999,7 @@
   },
   {
     "id": "g8-053",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "脅",
     "grade": 8,
     "strokes": 10,
@@ -1020,7 +1020,7 @@
   },
   {
     "id": "g8-054",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "凝",
     "grade": 8,
     "strokes": 16,
@@ -1040,7 +1040,7 @@
   },
   {
     "id": "g8-055",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "斤",
     "grade": 8,
     "strokes": 4,
@@ -1058,7 +1058,7 @@
   },
   {
     "id": "g8-056",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "緊",
     "grade": 8,
     "strokes": 15,
@@ -1076,7 +1076,7 @@
   },
   {
     "id": "g8-057",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "愚",
     "grade": 8,
     "strokes": 13,
@@ -1096,7 +1096,7 @@
   },
   {
     "id": "g8-058",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "偶",
     "grade": 8,
     "strokes": 11,
@@ -1114,7 +1114,7 @@
   },
   {
     "id": "g8-059",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "遇",
     "grade": 8,
     "strokes": 12,
@@ -1132,7 +1132,7 @@
   },
   {
     "id": "g8-060",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area2"],
     "kanji": "刑",
     "grade": 8,
     "strokes": 6,
@@ -1150,7 +1150,7 @@
   },
   {
     "id": "g8-061",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "契",
     "grade": 8,
     "strokes": 9,
@@ -1170,7 +1170,7 @@
   },
   {
     "id": "g8-062",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"] ,
     "kanji": "啓",
     "grade": 8,
     "strokes": 11,
@@ -1188,7 +1188,7 @@
   },
   {
     "id": "g8-063",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "掲",
     "grade": 8,
     "strokes": 11,
@@ -1208,7 +1208,7 @@
   },
   {
     "id": "g8-064",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "携",
     "grade": 8,
     "strokes": 13,
@@ -1228,7 +1228,7 @@
   },
   {
     "id": "g8-065",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "憩",
     "grade": 8,
     "strokes": 16,
@@ -1248,7 +1248,7 @@
   },
   {
     "id": "g8-066",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "鶏",
     "grade": 8,
     "strokes": 19,
@@ -1268,7 +1268,7 @@
   },
   {
     "id": "g8-067",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "鯨",
     "grade": 8,
     "strokes": 19,
@@ -1288,7 +1288,7 @@
   },
   {
     "id": "g8-068",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "倹",
     "grade": 8,
     "strokes": 10,
@@ -1306,7 +1306,7 @@
   },
   {
     "id": "g8-069",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "賢",
     "grade": 8,
     "strokes": 16,
@@ -1326,7 +1326,7 @@
   },
   {
     "id": "g8-070",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"]           ,
     "kanji": "幻",
     "grade": 8,
     "strokes": 4,
@@ -1346,7 +1346,7 @@
   },
   {
     "id": "g8-071",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "孤",
     "grade": 8,
     "strokes": 9,
@@ -1364,7 +1364,7 @@
   },
   {
     "id": "g8-072",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "弧",
     "grade": 8,
     "strokes": 9,
@@ -1382,7 +1382,7 @@
   },
   {
     "id": "g8-073",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "雇",
     "grade": 8,
     "strokes": 12,
@@ -1402,7 +1402,7 @@
   },
   {
     "id": "g8-074",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "顧",
     "grade": 8,
     "strokes": 21,
@@ -1422,7 +1422,7 @@
   },
   {
     "id": "g8-075",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "娯",
     "grade": 8,
     "strokes": 10,
@@ -1440,7 +1440,7 @@
   },
   {
     "id": "g8-076",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "悟",
     "grade": 8,
     "strokes": 10,
@@ -1460,7 +1460,7 @@
   },
   {
     "id": "g8-077",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "孔",
     "grade": 8,
     "strokes": 4,
@@ -1478,7 +1478,7 @@
   },
   {
     "id": "g8-078",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "巧",
     "grade": 8,
     "strokes": 5,
@@ -1498,7 +1498,7 @@
   },
   {
     "id": "g8-079",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "甲",
     "grade": 8,
     "strokes": 5,
@@ -1517,7 +1517,7 @@
   },
   {
     "id": "g8-080",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "坑",
     "grade": 8,
     "strokes": 7,
@@ -1535,7 +1535,7 @@
   },
   {
     "id": "g8-081",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "拘",
     "grade": 8,
     "strokes": 8,
@@ -1553,7 +1553,7 @@
   },
   {
     "id": "g8-082",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "郊",
     "grade": 8,
     "strokes": 9,
@@ -1571,7 +1571,7 @@
   },
   {
     "id": "g8-083",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "控",
     "grade": 8,
     "strokes": 11,
@@ -1591,7 +1591,7 @@
   },
   {
     "id": "g8-084",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "慌",
     "grade": 8,
     "strokes": 12,
@@ -1611,7 +1611,7 @@
   },
   {
     "id": "g8-085",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "硬",
     "grade": 8,
     "strokes": 12,
@@ -1631,7 +1631,7 @@
   },
   {
     "id": "g8-086",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "絞",
     "grade": 8,
     "strokes": 12,
@@ -1652,7 +1652,7 @@
   },
   {
     "id": "g8-087",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "綱",
     "grade": 8,
     "strokes": 14,
@@ -1672,7 +1672,7 @@
   },
   {
     "id": "g8-088",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "酵",
     "grade": 8,
     "strokes": 14,
@@ -1690,7 +1690,7 @@
   },
   {
     "id": "g8-089",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "克",
     "grade": 8,
     "strokes": 7,
@@ -1708,7 +1708,7 @@
   },
   {
     "id": "g8-090",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area3"],
     "kanji": "獄",
     "grade": 8,
     "strokes": 14,
@@ -1726,7 +1726,7 @@
   },
   {
     "id": "g8-091",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "恨",
     "grade": 8,
     "strokes": 9,
@@ -1746,7 +1746,7 @@
   },
   {
     "id": "g8-092",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "紺",
     "grade": 8,
     "strokes": 11,
@@ -1764,7 +1764,7 @@
   },
   {
     "id": "g8-093",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "魂",
     "grade": 8,
     "strokes": 14,
@@ -1784,7 +1784,7 @@
   },
   {
     "id": "g8-094",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "墾",
     "grade": 8,
     "strokes": 16,
@@ -1802,7 +1802,7 @@
   },
   {
     "id": "g8-095",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "債",
     "grade": 8,
     "strokes": 13,
@@ -1820,7 +1820,7 @@
   },
   {
     "id": "g8-096",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "催",
     "grade": 8,
     "strokes": 13,
@@ -1840,7 +1840,7 @@
   },
   {
     "id": "g8-097",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "削",
     "grade": 8,
     "strokes": 9,
@@ -1860,7 +1860,7 @@
   },
   {
     "id": "g8-098",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "搾",
     "grade": 8,
     "strokes": 13,
@@ -1880,7 +1880,7 @@
   },
   {
     "id": "g8-099",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "錯",
     "grade": 8,
     "strokes": 16,
@@ -1898,7 +1898,7 @@
   },
   {
     "id": "g8-100",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "撮",
     "grade": 8,
     "strokes": 15,
@@ -1918,7 +1918,7 @@
   },
   {
     "id": "g8-101",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "擦",
     "grade": 8,
     "strokes": 17,
@@ -1938,7 +1938,7 @@
   },
   {
     "id": "g8-102",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "暫",
     "grade": 8,
     "strokes": 15,
@@ -1956,7 +1956,7 @@
   },
   {
     "id": "g8-103",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "祉",
     "grade": 8,
     "strokes": 8,
@@ -1974,7 +1974,7 @@
   },
   {
     "id": "g8-104",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "施",
     "grade": 8,
     "strokes": 9,
@@ -1995,7 +1995,7 @@
   },
   {
     "id": "g8-105",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"]           ,
     "kanji": "諮",
     "grade": 8,
     "strokes": 16,
@@ -2015,7 +2015,7 @@
   },
   {
     "id": "g8-106",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "侍",
     "grade": 8,
     "strokes": 8,
@@ -2035,7 +2035,7 @@
   },
   {
     "id": "g8-107",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "慈",
     "grade": 8,
     "strokes": 13,
@@ -2055,7 +2055,7 @@
   },
   {
     "id": "g8-108",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "軸",
     "grade": 8,
     "strokes": 12,
@@ -2073,7 +2073,7 @@
   },
   {
     "id": "g8-109",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "疾",
     "grade": 8,
     "strokes": 10,
@@ -2091,7 +2091,7 @@
   },
   {
     "id": "g8-110",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "湿",
     "grade": 8,
     "strokes": 12,
@@ -2111,7 +2111,7 @@
   },
   {
     "id": "g8-111",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "赦",
     "grade": 8,
     "strokes": 11,
@@ -2131,7 +2131,7 @@
   },
   {
     "id": "g8-112",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "邪",
     "grade": 8,
     "strokes": 8,
@@ -2149,7 +2149,7 @@
   },
   {
     "id": "g8-113",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"]         ,
     "kanji": "殊",
     "grade": 8,
     "strokes": 10,
@@ -2169,7 +2169,7 @@
   },
   {
     "id": "g8-114",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "寿",
     "grade": 8,
     "strokes": 7,
@@ -2189,7 +2189,7 @@
   },
   {
     "id": "g8-115",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "潤",
     "grade": 8,
     "strokes": 15,
@@ -2209,7 +2209,7 @@
   },
   {
     "id": "g8-116",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "遵",
     "grade": 8,
     "strokes": 15,
@@ -2227,7 +2227,7 @@
   },
   {
     "id": "g8-117",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "如",
     "grade": 8,
     "strokes": 6,
@@ -2246,7 +2246,7 @@
   },
   {
     "id": "g8-118",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "徐",
     "grade": 8,
     "strokes": 10,
@@ -2264,7 +2264,7 @@
   },
   {
     "id": "g8-119",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "匠",
     "grade": 8,
     "strokes": 6,
@@ -2282,7 +2282,7 @@
   },
   {
     "id": "g8-120",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area4"],
     "kanji": "昇",
     "grade": 8,
     "strokes": 8,
@@ -2302,7 +2302,7 @@
   },
   {
     "id": "g8-121",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "掌",
     "grade": 8,
     "strokes": 12,
@@ -2320,7 +2320,7 @@
   },
   {
     "id": "g8-122",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"] ,
     "kanji": "晶",
     "grade": 8,
     "strokes": 12,
@@ -2338,7 +2338,7 @@
   },
   {
     "id": "g8-123",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "焦",
     "grade": 8,
     "strokes": 12,
@@ -2359,7 +2359,7 @@
   },
   {
     "id": "g8-124",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "衝",
     "grade": 8,
     "strokes": 15,
@@ -2377,7 +2377,7 @@
   },
   {
     "id": "g8-125",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "鐘",
     "grade": 8,
     "strokes": 20,
@@ -2397,7 +2397,7 @@
   },
   {
     "id": "g8-126",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "冗",
     "grade": 8,
     "strokes": 4,
@@ -2415,7 +2415,7 @@
   },
   {
     "id": "g8-127",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "嬢",
     "grade": 8,
     "strokes": 16,
@@ -2433,7 +2433,7 @@
   },
   {
     "id": "g8-128",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "錠",
     "grade": 8,
     "strokes": 16,
@@ -2451,7 +2451,7 @@
   },
   {
     "id": "g8-129",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "譲",
     "grade": 8,
     "strokes": 20,
@@ -2471,7 +2471,7 @@
   },
   {
     "id": "g8-130",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"]       ,
     "kanji": "嘱",
     "grade": 8,
     "strokes": 15,
@@ -2489,7 +2489,7 @@
   },
   {
     "id": "g8-131",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "辱",
     "grade": 8,
     "strokes": 10,
@@ -2509,7 +2509,7 @@
   },
   {
     "id": "g8-132",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "伸",
     "grade": 8,
     "strokes": 7,
@@ -2529,7 +2529,7 @@
   },
   {
     "id": "g8-133",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "辛",
     "grade": 8,
     "strokes": 7,
@@ -2549,7 +2549,7 @@
   },
   {
     "id": "g8-134",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "審",
     "grade": 8,
     "strokes": 15,
@@ -2567,7 +2567,7 @@
   },
   {
     "id": "g8-135",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "炊",
     "grade": 8,
     "strokes": 8,
@@ -2587,7 +2587,7 @@
   },
   {
     "id": "g8-136",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "粋",
     "grade": 8,
     "strokes": 10,
@@ -2607,7 +2607,7 @@
   },
   {
     "id": "g8-137",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "衰",
     "grade": 8,
     "strokes": 10,
@@ -2627,7 +2627,7 @@
   },
   {
     "id": "g8-138",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"]       ,
     "kanji": "酔",
     "grade": 8,
     "strokes": 11,
@@ -2647,7 +2647,7 @@
   },
   {
     "id": "g8-139",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "遂",
     "grade": 8,
     "strokes": 12,
@@ -2667,7 +2667,7 @@
   },
   {
     "id": "g8-140",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "穂",
     "grade": 8,
     "strokes": 15,
@@ -2687,7 +2687,7 @@
   },
   {
     "id": "g8-141",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "随",
     "grade": 8,
     "strokes": 12,
@@ -2705,7 +2705,7 @@
   },
   {
     "id": "g8-142",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "髄",
     "grade": 8,
     "strokes": 19,
@@ -2723,7 +2723,7 @@
   },
   {
     "id": "g8-143",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "瀬",
     "grade": 8,
     "strokes": 19,
@@ -2741,7 +2741,7 @@
   },
   {
     "id": "g8-144",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "牲",
     "grade": 8,
     "strokes": 9,
@@ -2759,7 +2759,7 @@
   },
   {
     "id": "g8-145",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "婿",
     "grade": 8,
     "strokes": 12,
@@ -2779,7 +2779,7 @@
   },
   {
     "id": "g8-146",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"]         ,
     "kanji": "請",
     "grade": 8,
     "strokes": 15,
@@ -2800,7 +2800,7 @@
   },
   {
     "id": "g8-147",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "斥",
     "grade": 8,
     "strokes": 5,
@@ -2818,7 +2818,7 @@
   },
   {
     "id": "g8-148",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "隻",
     "grade": 8,
     "strokes": 10,
@@ -2836,7 +2836,7 @@
   },
   {
     "id": "g8-149",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "惜",
     "grade": 8,
     "strokes": 11,
@@ -2856,7 +2856,7 @@
   },
   {
     "id": "g8-150",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area5"],
     "kanji": "籍",
     "grade": 8,
     "strokes": 20,
@@ -2874,7 +2874,7 @@
   },
   {
     "id": "g8-151",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "摂",
     "grade": 8,
     "strokes": 13,
@@ -2892,7 +2892,7 @@
   },
   {
     "id": "g8-152",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "潜",
     "grade": 8,
     "strokes": 15,
@@ -2913,7 +2913,7 @@
   },
   {
     "id": "g8-153",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "繕",
     "grade": 8,
     "strokes": 18,
@@ -2933,7 +2933,7 @@
   },
   {
     "id": "g8-154",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"] ,
     "kanji": "阻",
     "grade": 8,
     "strokes": 8,
@@ -2953,7 +2953,7 @@
   },
   {
     "id": "g8-155",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "措",
     "grade": 8,
     "strokes": 11,
@@ -2971,7 +2971,7 @@
   },
   {
     "id": "g8-156",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "粗",
     "grade": 8,
     "strokes": 11,
@@ -2991,7 +2991,7 @@
   },
   {
     "id": "g8-157",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "礎",
     "grade": 8,
     "strokes": 18,
@@ -3011,7 +3011,7 @@
   },
   {
     "id": "g8-158",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "双",
     "grade": 8,
     "strokes": 4,
@@ -3031,7 +3031,7 @@
   },
   {
     "id": "g8-159",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "桑",
     "grade": 8,
     "strokes": 10,
@@ -3051,7 +3051,7 @@
   },
   {
     "id": "g8-160",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "掃",
     "grade": 8,
     "strokes": 11,
@@ -3071,7 +3071,7 @@
   },
   {
     "id": "g8-161",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "葬",
     "grade": 8,
     "strokes": 12,
@@ -3091,7 +3091,7 @@
   },
   {
     "id": "g8-162",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "遭",
     "grade": 8,
     "strokes": 14,
@@ -3111,7 +3111,7 @@
   },
   {
     "id": "g8-163",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "憎",
     "grade": 8,
     "strokes": 14,
@@ -3131,7 +3131,7 @@
   },
   {
     "id": "g8-164",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "促",
     "grade": 8,
     "strokes": 9,
@@ -3151,7 +3151,7 @@
   },
   {
     "id": "g8-165",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "賊",
     "grade": 8,
     "strokes": 13,
@@ -3169,7 +3169,7 @@
   },
   {
     "id": "g8-166",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "怠",
     "grade": 8,
     "strokes": 9,
@@ -3190,7 +3190,7 @@
   },
   {
     "id": "g8-167",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "胎",
     "grade": 8,
     "strokes": 9,
@@ -3208,7 +3208,7 @@
   },
   {
     "id": "g8-168",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "袋",
     "grade": 8,
     "strokes": 11,
@@ -3228,7 +3228,7 @@
   },
   {
     "id": "g8-169",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "逮",
     "grade": 8,
     "strokes": 11,
@@ -3246,7 +3246,7 @@
   },
   {
     "id": "g8-170",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "滞",
     "grade": 8,
     "strokes": 13,
@@ -3266,7 +3266,7 @@
   },
   {
     "id": "g8-171",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "滝",
     "grade": 8,
     "strokes": 13,
@@ -3284,7 +3284,7 @@
   },
   {
     "id": "g8-172",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "択",
     "grade": 8,
     "strokes": 7,
@@ -3302,7 +3302,7 @@
   },
   {
     "id": "g8-173",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "卓",
     "grade": 8,
     "strokes": 8,
@@ -3320,7 +3320,7 @@
   },
   {
     "id": "g8-174",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "託",
     "grade": 8,
     "strokes": 10,
@@ -3338,7 +3338,7 @@
   },
   {
     "id": "g8-175",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "諾",
     "grade": 8,
     "strokes": 15,
@@ -3356,7 +3356,7 @@
   },
   {
     "id": "g8-176",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "奪",
     "grade": 8,
     "strokes": 14,
@@ -3376,7 +3376,7 @@
   },
   {
     "id": "g8-177",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "胆",
     "grade": 8,
     "strokes": 9,
@@ -3394,7 +3394,7 @@
   },
   {
     "id": "g8-178",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "鍛",
     "grade": 8,
     "strokes": 17,
@@ -3414,7 +3414,7 @@
   },
   {
     "id": "g8-179",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"]       ,
     "kanji": "壇",
     "grade": 8,
     "strokes": 16,
@@ -3433,7 +3433,7 @@
   },
   {
     "id": "g8-180",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area6"],
     "kanji": "稚",
     "grade": 8,
     "strokes": 13,
@@ -3451,7 +3451,7 @@
   },
   {
     "id": "g8-181",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "畜",
     "grade": 8,
     "strokes": 10,
@@ -3469,7 +3469,7 @@
   },
   {
     "id": "g8-182",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "窒",
     "grade": 8,
     "strokes": 11,
@@ -3487,7 +3487,7 @@
   },
   {
     "id": "g8-183",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "抽",
     "grade": 8,
     "strokes": 8,
@@ -3505,7 +3505,7 @@
   },
   {
     "id": "g8-184",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "鋳",
     "grade": 8,
     "strokes": 15,
@@ -3525,7 +3525,7 @@
   },
   {
     "id": "g8-185",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "駐",
     "grade": 8,
     "strokes": 15,
@@ -3543,7 +3543,7 @@
   },
   {
     "id": "g8-186",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "彫",
     "grade": 8,
     "strokes": 11,
@@ -3563,7 +3563,7 @@
   },
   {
     "id": "g8-187",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "超",
     "grade": 8,
     "strokes": 12,
@@ -3583,7 +3583,7 @@
   },
   {
     "id": "g8-188",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "聴",
     "grade": 8,
     "strokes": 17,
@@ -3603,7 +3603,7 @@
   },
   {
     "id": "g8-189",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "陳",
     "grade": 8,
     "strokes": 11,
@@ -3623,7 +3623,7 @@
   },
   {
     "id": "g8-190",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "鎮",
     "grade": 8,
     "strokes": 18,
@@ -3643,7 +3643,7 @@
   },
   {
     "id": "g8-191",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "墜",
     "grade": 8,
     "strokes": 15,
@@ -3661,7 +3661,7 @@
   },
   {
     "id": "g8-192",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "帝",
     "grade": 8,
     "strokes": 9,
@@ -3679,7 +3679,7 @@
   },
   {
     "id": "g8-193",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "訂",
     "grade": 8,
     "strokes": 9,
@@ -3697,7 +3697,7 @@
   },
   {
     "id": "g8-194",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "締",
     "grade": 8,
     "strokes": 15,
@@ -3717,7 +3717,7 @@
   },
   {
     "id": "g8-195",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "哲",
     "grade": 8,
     "strokes": 10,
@@ -3735,7 +3735,7 @@
   },
   {
     "id": "g8-196",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "斗",
     "grade": 8,
     "strokes": 4,
@@ -3753,7 +3753,7 @@
   },
   {
     "id": "g8-197",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "塗",
     "grade": 8,
     "strokes": 13,
@@ -3773,7 +3773,7 @@
   },
   {
     "id": "g8-198",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "凍",
     "grade": 8,
     "strokes": 10,
@@ -3794,7 +3794,7 @@
   },
   {
     "id": "g8-199",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "陶",
     "grade": 8,
     "strokes": 11,
@@ -3812,7 +3812,7 @@
   },
   {
     "id": "g8-200",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "痘",
     "grade": 8,
     "strokes": 12,
@@ -3830,7 +3830,7 @@
   },
   {
     "id": "g8-201",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "匿",
     "grade": 8,
     "strokes": 10,
@@ -3848,7 +3848,7 @@
   },
   {
     "id": "g8-202",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "篤",
     "grade": 8,
     "strokes": 16,
@@ -3866,7 +3866,7 @@
   },
   {
     "id": "g8-203",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "豚",
     "grade": 8,
     "strokes": 11,
@@ -3886,7 +3886,7 @@
   },
   {
     "id": "g8-204",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "尿",
     "grade": 8,
     "strokes": 7,
@@ -3904,7 +3904,7 @@
   },
   {
     "id": "g8-205",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "粘",
     "grade": 8,
     "strokes": 11,
@@ -3924,7 +3924,7 @@
   },
   {
     "id": "g8-206",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "娑",
     "grade": 8,
     "strokes": 11,
@@ -3942,7 +3942,7 @@
   },
   {
     "id": "g8-207",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "排",
     "grade": 8,
     "strokes": 11,
@@ -3960,7 +3960,7 @@
   },
   {
     "id": "g8-208",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "陪",
     "grade": 8,
     "strokes": 11,
@@ -3978,7 +3978,7 @@
   },
   {
     "id": "g8-209",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "縛",
     "grade": 8,
     "strokes": 16,
@@ -3998,7 +3998,7 @@
   },
   {
     "id": "g8-210",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area7"],
     "kanji": "伐",
     "grade": 8,
     "strokes": 6,
@@ -4016,7 +4016,7 @@
   },
   {
     "id": "g8-211",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "帆",
     "grade": 8,
     "strokes": 6,
@@ -4036,7 +4036,7 @@
   },
   {
     "id": "g8-212",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "伴",
     "grade": 8,
     "strokes": 7,
@@ -4057,7 +4057,7 @@
   },
   {
     "id": "g8-213",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "畔",
     "grade": 8,
     "strokes": 10,
@@ -4075,7 +4075,7 @@
   },
   {
     "id": "g8-214",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "藩",
     "grade": 8,
     "strokes": 18,
@@ -4093,7 +4093,7 @@
   },
   {
     "id": "g8-215",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "蛮",
     "grade": 8,
     "strokes": 12,
@@ -4111,7 +4111,7 @@
   },
   {
     "id": "g8-216",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "卑",
     "grade": 8,
     "strokes": 9,
@@ -4131,7 +4131,7 @@
   },
   {
     "id": "g8-217",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "碑",
     "grade": 8,
     "strokes": 14,
@@ -4149,7 +4149,7 @@
   },
   {
     "id": "g8-218",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "泌",
     "grade": 8,
     "strokes": 8,
@@ -4168,7 +4168,7 @@
   },
   {
     "id": "g8-219",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "姫",
     "grade": 8,
     "strokes": 10,
@@ -4186,7 +4186,7 @@
   },
   {
     "id": "g8-220",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "漂",
     "grade": 8,
     "strokes": 14,
@@ -4206,7 +4206,7 @@
   },
   {
     "id": "g8-221",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "苗",
     "grade": 8,
     "strokes": 8,
@@ -4227,7 +4227,7 @@
   },
   {
     "id": "g8-222",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "赴",
     "grade": 8,
     "strokes": 9,
@@ -4247,7 +4247,7 @@
   },
   {
     "id": "g8-223",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "符",
     "grade": 8,
     "strokes": 11,
@@ -4265,7 +4265,7 @@
   },
   {
     "id": "g8-224",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "封",
     "grade": 8,
     "strokes": 9,
@@ -4284,7 +4284,7 @@
   },
   {
     "id": "g8-225",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "伏",
     "grade": 8,
     "strokes": 6,
@@ -4304,7 +4304,7 @@
   },
   {
     "id": "g8-226",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "覆",
     "grade": 8,
     "strokes": 18,
@@ -4325,7 +4325,7 @@
   },
   {
     "id": "g8-227",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "紛",
     "grade": 8,
     "strokes": 10,
@@ -4345,7 +4345,7 @@
   },
   {
     "id": "g8-228",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "墳",
     "grade": 8,
     "strokes": 15,
@@ -4363,7 +4363,7 @@
   },
   {
     "id": "g8-229",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "癖",
     "grade": 8,
     "strokes": 18,
@@ -4383,7 +4383,7 @@
   },
   {
     "id": "g8-230",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "募",
     "grade": 8,
     "strokes": 12,
@@ -4403,7 +4403,7 @@
   },
   {
     "id": "g8-231",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "慕",
     "grade": 8,
     "strokes": 14,
@@ -4423,7 +4423,7 @@
   },
   {
     "id": "g8-232",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "簿",
     "grade": 8,
     "strokes": 19,
@@ -4441,7 +4441,7 @@
   },
   {
     "id": "g8-233",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "芳",
     "grade": 8,
     "strokes": 7,
@@ -4461,7 +4461,7 @@
   },
   {
     "id": "g8-234",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "邦",
     "grade": 8,
     "strokes": 7,
@@ -4479,7 +4479,7 @@
   },
   {
     "id": "g8-235",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "奉",
     "grade": 8,
     "strokes": 8,
@@ -4500,7 +4500,7 @@
   },
   {
     "id": "g8-236",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "胞",
     "grade": 8,
     "strokes": 9,
@@ -4518,7 +4518,7 @@
   },
   {
     "id": "g8-237",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "倣",
     "grade": 8,
     "strokes": 10,
@@ -4538,7 +4538,7 @@
   },
   {
     "id": "g8-238",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"]       ,
     "kanji": "崩",
     "grade": 8,
     "strokes": 11,
@@ -4558,7 +4558,7 @@
   },
   {
     "id": "g8-239",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "飽",
     "grade": 8,
     "strokes": 13,
@@ -4578,7 +4578,7 @@
   },
   {
     "id": "g8-240",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area8"],
     "kanji": "縫",
     "grade": 8,
     "strokes": 16,
@@ -4598,7 +4598,7 @@
   },
   {
     "id": "g8-241",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "乏",
     "grade": 8,
     "strokes": 4,
@@ -4618,7 +4618,7 @@
   },
   {
     "id": "g8-242",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "妨",
     "grade": 8,
     "strokes": 7,
@@ -4638,7 +4638,7 @@
   },
   {
     "id": "g8-243",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "房",
     "grade": 8,
     "strokes": 8,
@@ -4658,7 +4658,7 @@
   },
   {
     "id": "g8-244",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "某",
     "grade": 8,
     "strokes": 9,
@@ -4676,7 +4676,7 @@
   },
   {
     "id": "g8-245",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "膨",
     "grade": 8,
     "strokes": 16,
@@ -4696,7 +4696,7 @@
   },
   {
     "id": "g8-246",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "謀",
     "grade": 8,
     "strokes": 16,
@@ -4717,7 +4717,7 @@
   },
   {
     "id": "g8-247",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "墨",
     "grade": 8,
     "strokes": 14,
@@ -4737,7 +4737,7 @@
   },
   {
     "id": "g8-248",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "没",
     "grade": 8,
     "strokes": 7,
@@ -4755,7 +4755,7 @@
   },
   {
     "id": "g8-249",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "翻",
     "grade": 8,
     "strokes": 18,
@@ -4775,7 +4775,7 @@
   },
   {
     "id": "g8-250",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "魔",
     "grade": 8,
     "strokes": 21,
@@ -4793,7 +4793,7 @@
   },
   {
     "id": "g8-251",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "埋",
     "grade": 8,
     "strokes": 10,
@@ -4813,7 +4813,7 @@
   },
   {
     "id": "g8-252",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "膜",
     "grade": 8,
     "strokes": 14,
@@ -4831,7 +4831,7 @@
   },
   {
     "id": "g8-253",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "又",
     "grade": 8,
     "strokes": 2,
@@ -4849,7 +4849,7 @@
   },
   {
     "id": "g8-254",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "魅",
     "grade": 8,
     "strokes": 15,
@@ -4867,7 +4867,7 @@
   },
   {
     "id": "g8-255",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "滅",
     "grade": 8,
     "strokes": 13,
@@ -4887,7 +4887,7 @@
   },
   {
     "id": "g8-256",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "免",
     "grade": 8,
     "strokes": 8,
@@ -4907,7 +4907,7 @@
   },
   {
     "id": "g8-257",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "幽",
     "grade": 8,
     "strokes": 9,
@@ -4925,7 +4925,7 @@
   },
   {
     "id": "g8-258",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "誘",
     "grade": 8,
     "strokes": 14,
@@ -4945,7 +4945,7 @@
   },
   {
     "id": "g8-259",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "憂",
     "grade": 8,
     "strokes": 15,
@@ -4966,7 +4966,7 @@
   },
   {
     "id": "g8-260",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "揚",
     "grade": 8,
     "strokes": 12,
@@ -4986,7 +4986,7 @@
   },
   {
     "id": "g8-261",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "揺",
     "grade": 8,
     "strokes": 12,
@@ -5006,7 +5006,7 @@
   },
   {
     "id": "g8-262",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "擁",
     "grade": 8,
     "strokes": 16,
@@ -5024,7 +5024,7 @@
   },
   {
     "id": "g8-263",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "抑",
     "grade": 8,
     "strokes": 7,
@@ -5044,7 +5044,7 @@
   },
   {
     "id": "g8-264",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "裸",
     "grade": 8,
     "strokes": 13,
@@ -5064,7 +5064,7 @@
   },
   {
     "id": "g8-265",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "濫",
     "grade": 8,
     "strokes": 18,
@@ -5082,7 +5082,7 @@
   },
   {
     "id": "g8-266",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "吏",
     "grade": 8,
     "strokes": 6,
@@ -5100,7 +5100,7 @@
   },
   {
     "id": "g8-267",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "隆",
     "grade": 8,
     "strokes": 11,
@@ -5118,7 +5118,7 @@
   },
   {
     "id": "g8-268",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "了",
     "grade": 8,
     "strokes": 2,
@@ -5136,7 +5136,7 @@
   },
   {
     "id": "g8-269",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "猟",
     "grade": 8,
     "strokes": 11,
@@ -5154,7 +5154,7 @@
   },
   {
     "id": "g8-270",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area9"],
     "kanji": "陵",
     "grade": 8,
     "strokes": 11,
@@ -5174,7 +5174,7 @@
   },
   {
     "id": "g8-271",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "糧",
     "grade": 8,
     "strokes": 18,
@@ -5195,7 +5195,7 @@
   },
   {
     "id": "g8-272",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "厘",
     "grade": 8,
     "strokes": 9,
@@ -5213,7 +5213,7 @@
   },
   {
     "id": "g8-273",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "励",
     "grade": 8,
     "strokes": 7,
@@ -5233,7 +5233,7 @@
   },
   {
     "id": "g8-274",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "零",
     "grade": 8,
     "strokes": 13,
@@ -5251,7 +5251,7 @@
   },
   {
     "id": "g8-275",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "霊",
     "grade": 8,
     "strokes": 15,
@@ -5272,7 +5272,7 @@
   },
   {
     "id": "g8-276",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "裂",
     "grade": 8,
     "strokes": 12,
@@ -5292,7 +5292,7 @@
   },
   {
     "id": "g8-277",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "廉",
     "grade": 8,
     "strokes": 13,
@@ -5310,7 +5310,7 @@
   },
   {
     "id": "g8-278",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "錬",
     "grade": 8,
     "strokes": 16,
@@ -5328,7 +5328,7 @@
   },
   {
     "id": "g8-279",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "炉",
     "grade": 8,
     "strokes": 8,
@@ -5346,7 +5346,7 @@
   },
   {
     "id": "g8-280",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "浪",
     "grade": 8,
     "strokes": 10,
@@ -5364,7 +5364,7 @@
   },
   {
     "id": "g8-281",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "廊",
     "grade": 8,
     "strokes": 12,
@@ -5382,7 +5382,7 @@
   },
   {
     "id": "g8-282",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "楼",
     "grade": 8,
     "strokes": 13,
@@ -5400,7 +5400,7 @@
   },
   {
     "id": "g8-283",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "漏",
     "grade": 8,
     "strokes": 14,
@@ -5420,7 +5420,7 @@
   },
   {
     "id": "g8-284",
-    "stageId": "chubu_area2",
+    "stageId": ["Europe_area10"],
     "kanji": "湾",
     "grade": 8,
     "strokes": 12,
@@ -5435,5 +5435,5 @@
     "lastReviewDate": null,
     "masteryLevel": 0,
     "tags": []
-  }
+      }
 ]

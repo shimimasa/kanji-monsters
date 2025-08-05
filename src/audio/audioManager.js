@@ -48,6 +48,38 @@ export class AudioManager {
         title:   '/assets/audio/bgm_title.mp3',
         battle:  '/assets/audio/bgm_battle.mp3',
         victory: '/assets/audio/bgm_victory.mp3',
+
+        // 地域別BGMを追加
+        hokkaido: '/assets/audio/北海道.mp3',
+    
+        tohoku_a: '/assets/audio/東北A.mp3',
+        tohoku_b: '/assets/audio/東北B.mp3',
+    
+        kanto_a: '/assets/audio/関東A.mp3',
+        kanto_b: '/assets/audio/関東B.mp3',
+    
+        chubu_a: '/assets/audio/中部A.mp3',
+        chubu_b: '/assets/audio/中部B.mp3',
+    
+        kinki_a: '/assets/audio/近畿A.mp3',
+        kinki_b: '/assets/audio/近畿B.mp3',
+    
+        chugoku_a: '/assets/audio/中国A.mp3',
+        chugoku_b: '/assets/audio/中国B.mp3',
+    
+        asia_a: '/assets/audio/アジアA.mp3',
+        asia_b: '/assets/audio/アジアB.mp3',
+    
+        europe_a: '/assets/audio/ヨーロッパA.mp3',
+        europe_b: '/assets/audio/ヨーロッパB.mp3',
+    
+        america_a: '/assets/audio/アメリカA.mp3',
+        america_a2: '/assets/audio/アメリカA2.mp3',
+    
+        africa_a: '/assets/audio/アフリカ大陸A.mp3',
+        africa_b: '/assets/audio/アフリカ大陸B.mp3',
+    
+        boss: '/assets/audio/boss.mp3'
       },
       se: {
         appear:  '/assets/audio/se_appear.mp3',

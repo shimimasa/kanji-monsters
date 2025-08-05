@@ -60,7 +60,7 @@ const courseSelectScreen = {
       ctx,
       this.japanButton,
       '小学生の漢字（日本編）',
-      images.japanMap || null
+      images.japanMap
     );
     
     // 右側エリア（世界編）
@@ -68,7 +68,7 @@ const courseSelectScreen = {
       ctx,
       this.worldButton,
       '中学生の漢字（世界編）',
-      images.worldMap || this._createWorldMapPlaceholder()
+      images.worldMap
     );
     
     // 戻るボタン
@@ -105,86 +105,7 @@ const courseSelectScreen = {
       const imgY = area.y + 70;
       
       ctx.drawImage(image, imgX, imgY, imgWidth, imgHeight);
-    } else {
-      // 画像がない場合のプレースホルダー
-      ctx.fillStyle = '#95a5a6';
-      ctx.fillRect(area.x + 50, area.y + 70, area.width - 100, area.height - 140);
-      
-      ctx.fillStyle = '#ecf0f1';
-      ctx.font = '20px "UDデジタル教科書体", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('画像準備中', area.x + area.width / 2, area.y + area.height / 2);
     }
-  },
-  
-  /** 世界地図のプレースホルダーを作成 */
-  _createWorldMapPlaceholder() {
-    if (this._worldMapPlaceholder) return this._worldMapPlaceholder;
-    
-    const canvas = document.createElement('canvas');
-    canvas.width = 300;
-    canvas.height = 200;
-    const ctx = canvas.getContext('2d');
-    
-    // 海（背景）
-    ctx.fillStyle = '#3498db';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // 大陸（シンプルな楕円）
-    ctx.fillStyle = '#27ae60';
-    
-    // 北アメリカ
-    ctx.beginPath();
-    ctx.ellipse(80, 70, 40, 30, 0, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // 南アメリカ
-    ctx.beginPath();
-    ctx.ellipse(100, 140, 25, 40, Math.PI / 6, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // ユーラシア
-    ctx.beginPath();
-    ctx.ellipse(200, 70, 80, 40, 0, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // アフリカ
-    ctx.beginPath();
-    ctx.ellipse(170, 120, 30, 50, Math.PI / 12, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // オーストラリア
-    ctx.beginPath();
-    ctx.ellipse(250, 150, 25, 20, 0, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // 緯線・経線
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.lineWidth = 1;
-    
-    // 緯線
-    for (let y = 20; y < canvas.height; y += 40) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-      ctx.stroke();
-    }
-    
-    // 経線
-    for (let x = 20; x < canvas.width; x += 40) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
-      ctx.stroke();
-    }
-    
-    // 画像オブジェクトに変換
-    const img = new Image();
-    img.src = canvas.toDataURL();
-    
-    this._worldMapPlaceholder = img;
-    return img;
   },
 
   /** 画面離脱時のクリーンアップ */

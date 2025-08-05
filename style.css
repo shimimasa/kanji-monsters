@@ -10,7 +10,6 @@ body {
 }
 
 #gameCanvas {
-    border: 1px solid #fff;
     background-color: #000;
      /* 画面の横幅、または縦幅のどちらか小さい方に合わせる */
   max-width: 100vw;

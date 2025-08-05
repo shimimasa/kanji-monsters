@@ -1,7 +1,7 @@
 [
   {
     "id": "g1-001",
-    "stageId": "hokkaido_area1",
+    "stageId": ["hokkaido_area1"],
     "kanji": "一",
     "grade": 1,
     "strokes": 1,
@@ -12,17 +12,18 @@
     "kunyomi": [
       "ひと"
     ],
-    "meaning": "かずのはじめ・ひとつ。",
-    "exampleSentence": "一（ひと）つ、りんごを たべる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "かずのはじめ・ひとつ",
+    "examples": [
+      {
+        "word": "一",
+        "reading": "ひと",
+        "sentence": "りんごが 一（ひと）つ ある。"
+      }
+    ]
   },
   {
     "id": "g1-002",
-    "stageId": "hokkaido_area1",
+    "stageId": ["hokkaido_area1"],
     "kanji": "右",
     "grade": 1,
     "strokes": 5,
@@ -33,17 +34,18 @@
     "kunyomi": [
       "みぎ"
     ],
-    "meaning": "ひだりの はんたいがわ。",
-    "exampleSentence": "右（みぎ）てで、ボールを なげる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ひだりの はんたいがわ",
+    "examples": [
+      {
+        "word": "右",
+        "reading": "みぎ",
+        "sentence": "みぎ（みぎ）てを あげよう。"
+      }
+    ]
   },
   {
     "id": "g1-003",
-    "stageId": "hokkaido_area1",
+    "stageId": ["hokkaido_area1"],
     "kanji": "雨",
     "grade": 1,
     "strokes": 8,
@@ -53,17 +55,18 @@
     "kunyomi": [
       "あめ"
     ],
-    "meaning": "そらから ふる みず。",
-    "exampleSentence": "雨（あめ）が ふる ひ、いえで あそぶ。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "そらから ふる みず",
+    "examples": [
+      {
+        "word": "雨",
+        "reading": "あめ",
+        "sentence": "空（そら）から 雨（あめ）が ふってきた。"
+      }
+    ]
   },
   {
     "id": "g1-004",
-    "stageId": "hokkaido_area1",
+    "stageId": ["hokkaido_area1"],
     "kanji": "円",
     "grade": 1,
     "strokes": 4,
@@ -73,13 +76,14 @@
     "kunyomi": [
       "まる"
     ],
-    "meaning": "まるい かたち・おかねの たんい。",
-    "exampleSentence": "円（まる）い つきが、そらに でる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "まるい かたち・おかねの たんい",
+    "examples": [
+      {
+        "word": "円",
+        "reading": "エン",
+        "sentence": "百円（エン）で おかしを かった。"
+      }
+    ]
   },
   {
     "id": "g1-005",
@@ -91,13 +95,14 @@
       "オウ"
     ],
     "kunyomi": [],
-    "meaning": "いちばん えらい ひと。",
-    "exampleSentence": "王（おう）さまは、くにを おさめる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "いちばん えらい ひと",
+    "examples": [
+      {
+        "word": "王",
+        "reading": "オウ",
+        "sentence": "どうぶつの 王（オウ）さまは ライオンだ。"
+      }
+    ]
   },
   {
     "id": "g1-006",
@@ -112,13 +117,14 @@
     "kunyomi": [
       "おと"
     ],
-    "meaning": "みみで きこえるもの。",
-    "exampleSentence": "きれいな音（おと）が、きこえる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "みみで きこえるもの",
+    "examples": [
+      {
+        "word": "音",
+        "reading": "おと",
+        "sentence": "おおきな 音（おと）が きこえた。"
+      }
+    ]
   },
   {
     "id": "g1-007",
@@ -133,13 +139,14 @@
     "kunyomi": [
       "した"
     ],
-    "meaning": "うえの はんたい・ひくいところ。",
-    "exampleSentence": "つくえの下（した）に、ほんが ある。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "うえの はんたい・ひくいところ",
+    "examples": [
+      {
+        "word": "下",
+        "reading": "した",
+        "sentence": "つくえの 下（した）に けしゴムが ある。"
+      }
+    ]
   },
   {
     "id": "g1-008",
@@ -153,13 +160,14 @@
     "kunyomi": [
       "ひ"
     ],
-    "meaning": "あかくて あつい もえるもの。",
-    "exampleSentence": "キャンプで、火（ひ）を みる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "あかくて あつい もえるもの",
+    "examples": [
+      {
+        "word": "火",
+        "reading": "ひ",
+        "sentence": "ろうそくに 火（ひ）を つける。"
+      }
+    ]
   },
   {
     "id": "g1-009",
@@ -174,13 +182,14 @@
     "kunyomi": [
       "はな"
     ],
-    "meaning": "きれいに さくもの。",
-    "exampleSentence": "あかい花（はな）が、にわに さく。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "きれいに さくもの",
+    "examples": [
+      {
+        "word": "花",
+        "reading": "はな",
+        "sentence": "にわに あかい 花（はな）が さいた。"
+      }
+    ]
   },
   {
     "id": "g1-010",
@@ -194,13 +203,14 @@
     "kunyomi": [
       "かい"
     ],
-    "meaning": "うみに いる からをもつ いきもの。",
-    "exampleSentence": "うみで、貝（かい）を ひろう。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "うみに いる からをもつ いきもの",
+    "examples": [
+      {
+        "word": "貝",
+        "reading": "かい",
+        "sentence": "うみで きれいな 貝（かい）がらを ひろった。"
+      }
+    ]
   },
   {
     "id": "g1-011",
@@ -213,14 +223,15 @@
     "kunyomi": [
       "まな"
     ],
-    "meaning": "あたらしいことを おぼえる。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "がっこうで、学（まな）ぶ。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "あたらしいことを おぼえる",
+    "examples": [
+      {
+        "word": "学",
+        "reading": "まな",
+        "sentence": "学校（ガッコウ）で 字（ジ）を 学（まな）ぶ。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-012",
@@ -232,14 +243,15 @@
       "ケ"
     ],
     "kunyomi": [],
-    "meaning": "いきるための ちから・くうき。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "そとで、気（き）もちがいい。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "いきるための ちから・くうき",
+    "examples": [
+      {
+        "word": "気",
+        "reading": "キ",
+        "sentence": "げん気（キ）に あいさつを する。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-013",
@@ -253,14 +265,15 @@
     "kunyomi": [
       "ここの"
     ],
-    "meaning": "はちの つぎの かず。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "九（ここの）つの りんご。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "はちの つぎの かず",
+    "examples": [
+      {
+        "word": "九",
+        "reading": "ここの",
+        "sentence": "えんぴつが 九（ここの）つ ある。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-014",
@@ -273,14 +286,15 @@
     "kunyomi": [
       "やす"
     ],
-    "meaning": "しごとや べんきょうを しないこと。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "きょうは、休（やす）む。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "しごとや べんきょうを しないこと",
+    "examples": [
+      {
+        "word": "休",
+        "reading": "やす",
+        "sentence": "今日（きょう）は ゆっくり 休（やす）む。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-015",
@@ -293,14 +307,15 @@
     "kunyomi": [
       "たま"
     ],
-    "meaning": "まるくて ひかるもの。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "まるい玉（たま）で あそぶ。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "まるくて ひかるもの",
+    "examples": [
+      {
+        "word": "玉",
+        "reading": "たま",
+        "sentence": "おはじきの 玉（たま）で あそぶ。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-016",
@@ -315,14 +330,15 @@
     "kunyomi": [
       "かね"
     ],
-    "meaning": "きいろく ひかる きんぞく・おかね。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "金（かね）を、もらう。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "きいろく ひかる きんぞく・おかね",
+    "examples": [
+      {
+        "word": "金",
+        "reading": "かね",
+        "sentence": "お年玉（としだま）で お金（かね）を もらった。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-017",
@@ -335,14 +351,15 @@
     "kunyomi": [
       "そら"
     ],
-    "meaning": "あおくて ひろいもの・なにもないこと。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "あおい空（そら）を、みる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "あおくて ひろいもの・なにもないこと",
+    "examples": [
+      {
+        "word": "空",
+        "reading": "そら",
+        "sentence": "青（あお）い 空（そら）に とりが とんでいる。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-018",
@@ -356,14 +373,15 @@
     "kunyomi": [
       "つき"
     ],
-    "meaning": "よるに でる ひかり・カレンダーのつき。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "きれいな月（つき）が、でる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "よるに でる ひかり・カレンダーのつき",
+    "examples": [
+      {
+        "word": "月",
+        "reading": "つき",
+        "sentence": "まんまるい 月（つき）が でている。"
+      }
+    ],
+    "stageId": "hokkaido_area1"
   },
   {
     "id": "g1-019",
@@ -376,14 +394,15 @@
     "kunyomi": [
       "いぬ"
     ],
-    "meaning": "ワンワンなく どうぶつ。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "かわいい犬（いぬ）が、いる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ワンワンなく どうぶつ",
+    "examples": [
+      {
+        "word": "犬",
+        "reading": "いぬ",
+        "sentence": "かわいい 犬（いぬ）を かっている。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-020",
@@ -396,14 +415,15 @@
     "kunyomi": [
       "み"
     ],
-    "meaning": "めを つかって みること。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "はなを、見（み）る。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "めを つかって みること",
+    "examples": [
+      {
+        "word": "見",
+        "reading": "み",
+        "sentence": "テレビを 見（み）るのが すきだ。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]  
   },
   {
     "id": "g1-021",
@@ -416,14 +436,15 @@
     "kunyomi": [
       "いつ"
     ],
-    "meaning": "よんの つぎの かず。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "五（いつ）つの、おもちゃ。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "よんの つぎの かず",
+    "examples": [
+      {
+        "word": "五",
+        "reading": "いつ",
+        "sentence": "手（て）の ゆびは 五（いつ）つ ある。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-022",
@@ -437,14 +458,15 @@
     "kunyomi": [
       "くち"
     ],
-    "meaning": "たべたり はなしたりするところ。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "おおきな口（くち）を、あける。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "たべたり はなしたりするところ",
+    "examples": [
+      {
+        "word": "口",
+        "reading": "くち",
+        "sentence": "おおきな 口（くち）を あけて うたう。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-023",
@@ -455,14 +477,15 @@
       "コウ"
     ],
     "kunyomi": [],
-    "meaning": "まなびや・べんきょうするところ。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "がっ校（こう）へ、いく。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "まなびや・べんきょうするところ",
+    "examples": [
+      {
+        "word": "校",
+        "reading": "コウ",
+        "sentence": "まいにち 学校（ガッコウ）へ いく。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-024",
@@ -476,14 +499,15 @@
     "kunyomi": [
       "ひだり"
     ],
-    "meaning": "みぎの はんたいがわ。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "左（ひだり）てで、かばんを もつ。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "みぎの はんたいがわ",
+    "examples": [
+      {
+        "word": "左",
+        "reading": "ひだり",
+        "sentence": "左（ひだり）がわを あるこう。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-025",
@@ -497,14 +521,15 @@
     "kunyomi": [
       "み"
     ],
-    "meaning": "にの つぎの かず。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "三（み）つの、りんご。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "にの つぎの かず",
+    "examples": [
+      {
+        "word": "三",
+        "reading": "みっ",
+        "sentence": "みかんが 三（みっ）つ テーブルに ある。"
+      }
+    ],
+    "stageId": "hokkaido_area1"
   },
   {
     "id": "g1-026",
@@ -518,14 +543,15 @@
     "kunyomi": [
       "やま"
     ],
-    "meaning": "じめんが たかくなったところ。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "たかい山（やま）に、のぼる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "じめんが たかくなったところ",
+    "examples": [
+      {
+        "word": "山",
+        "reading": "やま",
+        "sentence": "たかい 山（やま）に のぼってみたい。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]     
   },
   {
     "id": "g1-027",
@@ -539,14 +565,15 @@
     "kunyomi": [
       "こ"
     ],
-    "meaning": "おさないひと・どうぶつのこども。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "かわいい子（こ）どもが、いる。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "おさないひと・どうぶつのこども",
+    "examples": [
+      {
+        "word": "子",
+        "reading": "こ",
+        "sentence": "ひろばで 多（おお）くの 子（こ）が あそんでいる。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-028",
@@ -559,14 +586,15 @@
     "kunyomi": [
       "よん"
     ],
-    "meaning": "さんの つぎの かず。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "四（よん）つの、ボール。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "さんの つぎの かず",
+    "examples": [
+      {
+        "word": "四",
+        "reading": "よん",
+        "sentence": "いすの あしは 四（よん）ほん ある。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]     
   },
   {
     "id": "g1-029",
@@ -579,14 +607,15 @@
     "kunyomi": [
       "いと"
     ],
-    "meaning": "ぬうときにつかう ほそいもの。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "ほそい糸（いと）を、つかう。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ぬうときにつかう ほそいもの",
+    "examples": [
+      {
+        "word": "糸",
+        "reading": "いと",
+        "sentence": "はり に 糸（いと）を とおすのは むずかしい。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-030",
@@ -599,14 +628,15 @@
     "kunyomi": [
       "あざ"
     ],
-    "meaning": "かくための しるし・もじ。",
-    "stageId": "hokkaido_area1",
-    "exampleSentence": "きれいな字（じ）を、かく。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "かくための しるし・もじ",
+    "examples": [
+      {
+        "word": "字",
+        "reading": "ジ",
+        "sentence": "じぶんの 名（な）まえの 字（ジ）を れんしゅうする。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-031",
@@ -619,14 +649,15 @@
     "kunyomi": [
       "みみ"
     ],
-    "meaning": "おとを きくところ。",
-    "exampleSentence": "おおきな耳（みみ）で、おとを きく。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "おとを きくところ",
+    "examples": [
+      {
+        "word": "耳",
+        "reading": "みみ",
+        "sentence": "うさぎの 耳（みみ）は ながい。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-032",
@@ -639,14 +670,15 @@
     "kunyomi": [
       "なな"
     ],
-    "meaning": "ろくの つぎの かず。",
-    "exampleSentence": "七（なな）つの、おかし。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ろくの つぎの かず",
+    "examples": [
+      {
+        "word": "七",
+        "reading": "なな",
+        "sentence": "なないろの にじは 七（なな）つの いろだ。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-033",
@@ -659,14 +691,15 @@
     "kunyomi": [
       "くるま"
     ],
-    "meaning": "はしるための のりもの。",
-    "exampleSentence": "あかい車（くるま）が、はしる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "はしるための のりもの",
+    "examples": [
+      {
+        "word": "車",
+        "reading": "くるま",
+        "sentence": "赤（あか）い 車（くるま）が とまっている。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-034",
@@ -680,14 +713,15 @@
     "kunyomi": [
       "て"
     ],
-    "meaning": "ものを つかむところ。",
-    "exampleSentence": "ちいさな手（て）を、つなぐ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ものを つかむところ",
+    "examples": [
+      {
+        "word": "手",
+        "reading": "て",
+        "sentence": "ごはんの まえに 手（て）を きれいに あらう。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-035",
@@ -702,14 +736,15 @@
     "kunyomi": [
       "とお"
     ],
-    "meaning": "きゅうの つぎの かず。",
-    "exampleSentence": "十（とお）この、おもちゃ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "きゅうの つぎの かず",
+    "examples": [
+      {
+        "word": "十",
+        "reading": "とお",
+        "sentence": "りょうほうの 手（て）の ゆびは 十（とお）ぽん ある。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-036",
@@ -723,14 +758,15 @@
     "kunyomi": [
       "で"
     ],
-    "meaning": "うちから そとへ いくこと。",
-    "exampleSentence": "いえを、出（で）る。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "うちから そとへ いくこと",
+    "examples": [
+      {
+        "word": "出",
+        "reading": "で",
+        "sentence": "いえを 出（で）て がっこうへ いく。"
+      }
+          ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-037",
@@ -745,14 +781,15 @@
     "kunyomi": [
       "おんな"
     ],
-    "meaning": "おんなのひと。",
-    "exampleSentence": "やさしい女（おんな）のひと。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "おんなのひと",
+    "examples": [
+      {
+        "word": "女",
+        "reading": "おんな",
+        "sentence": "あの 女（おんな）の 人（ひと）は やさしい。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-038",
@@ -765,14 +802,15 @@
     "kunyomi": [
       "ちい"
     ],
-    "meaning": "おおきくないこと。",
-    "exampleSentence": "小（ちい）さい、はな。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "おおきくないこと",
+    "examples": [
+      {
+        "word": "小",
+        "reading": "ちい",
+        "sentence": "小（ちい）さな はこを あけてみた。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-039",
@@ -787,14 +825,15 @@
     "kunyomi": [
       "うえ"
     ],
-    "meaning": "したの はんたい・たかいところ。",
-    "exampleSentence": "つくえの上（うえ）に、本がある。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "したの はんたい・たかいところ",
+    "examples": [
+      {
+        "word": "上",
+        "reading": "うえ",
+        "sentence": "つくえの 上（うえ）に ほんが ある。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]     
   },
   {
     "id": "g1-040",
@@ -807,14 +846,15 @@
     "kunyomi": [
       "もり"
     ],
-    "meaning": "たくさんの木（き）が あるところ。",
-    "exampleSentence": "おおきな森（もり）で、あそぶ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "たくさんの木（き）が あるところ",
+    "examples": [
+      {
+        "word": "森",
+        "reading": "もり",
+        "sentence": "ふかい 森（もり）の なかには どうぶつが いる。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-041",
@@ -828,14 +868,15 @@
     "kunyomi": [
       "ひと"
     ],
-    "meaning": "わたしたちのこと。",
-    "exampleSentence": "たくさんの人（ひと）が、いる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "わたしたちのこと",
+    "examples": [
+      {
+        "word": "人",
+        "reading": "ひと",
+        "sentence": "ひろばに 人（ひと）が たくさん あつまった。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-042",
@@ -848,14 +889,15 @@
     "kunyomi": [
       "みず"
     ],
-    "meaning": "のんだり あらったりするもの。",
-    "exampleSentence": "きれいな水（みず）を、のむ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "のんだり あらったりするもの",
+    "examples": [
+      {
+        "word": "水",
+        "reading": "みず",
+        "sentence": "つめたい 水（みず）を のむと きもちがいい。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-043",
@@ -869,14 +911,15 @@
     "kunyomi": [
       "ただ"
     ],
-    "meaning": "まちがっていないこと。",
-    "exampleSentence": "正（ただ）しい こたえ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "まちがっていないこと",
+    "examples": [
+      {
+        "word": "正",
+        "reading": "ただ",
+        "sentence": "こたえが 正（ただ）しいか どうか かくにんする。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-044",
@@ -890,14 +933,15 @@
     "kunyomi": [
       "い"
     ],
-    "meaning": "いのち・そだつこと。",
-    "exampleSentence": "はなが、生（い）きる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "いのち・そだつこと",
+    "examples": [
+      {
+        "word": "生",
+        "reading": "い",
+        "sentence": "土（つち）から くさの めが 生（は）える。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-045",
@@ -911,14 +955,15 @@
     "kunyomi": [
       "あお"
     ],
-    "meaning": "そらや うみの いろ。",
-    "exampleSentence": "青（あお）い そら。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "そらや うみの いろ",
+    "examples": [
+      {
+        "word": "青",
+        "reading": "あお",
+        "sentence": "今日（きょう）の 空（そら）は とても 青（あお）い。"
+      }
+    ],
+    "stageId": "hokkaido_area1"
   },
   {
     "id": "g1-046",
@@ -931,14 +976,15 @@
     "kunyomi": [
       "ゆう"
     ],
-    "meaning": "ひが しずむ ころ。",
-    "exampleSentence": "夕（ゆう）やけが、きれい。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ひが しずむ ころ",
+    "examples": [
+      {
+        "word": "夕",
+        "reading": "ゆう",
+        "sentence": "夕（ゆう）ごはんの じゅんびを する。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-047",
@@ -953,14 +999,14 @@
     "kunyomi": [
       "いし"
     ],
-    "meaning": "かたくて ちいさな いわ。",
-    "exampleSentence": "まるい石（いし）を、ひろう。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "かたくて ちいさな いわ",
+    "examples": [
+      {
+        "word": "石",
+        "reading": "いし",
+        "sentence": "かわらで まるい 石（いし）を みつけた。"
+      }
+    ]
   },
   {
     "id": "g1-048",
@@ -974,14 +1020,15 @@
     "kunyomi": [
       "あか"
     ],
-    "meaning": "トマトや りんごの いろ。",
-    "exampleSentence": "赤い（あか）い ぼうし。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "トマトや りんごの いろ",
+    "examples": [
+      {
+        "word": "赤",
+        "reading": "あか",
+        "sentence": "しんごうが 赤（あか）に なったら とまる。"
+      }
+    ],
+    "stageId": "hokkaido_area1"
   },
   {
     "id": "g1-049",
@@ -994,14 +1041,15 @@
     "kunyomi": [
       "ち"
     ],
-    "meaning": "百（ヒャク）が とお あつまったかず。",
-    "exampleSentence": "千（ち）えん、もっている。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "百（ヒャク）が とお あつまったかず",
+    "examples": [
+      {
+        "word": "千",
+        "reading": "ち",
+        "sentence": "千円（センエン）さつを もっている。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-050",
@@ -1014,14 +1062,14 @@
     "kunyomi": [
       "かわ"
     ],
-    "meaning": "みずが ながれるところ。",
-    "exampleSentence": "おおきな川（かわ）で、あそぶ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "みずが ながれるところ",
+    "examples": [
+      {
+        "word": "川",
+        "reading": "かわ",
+        "sentence": "おおきな 川（かわ）で さかなが およいでいる。"
+      }
+    ]
   },
   {
     "id": "g1-051",
@@ -1034,14 +1082,15 @@
     "kunyomi": [
       "さき"
     ],
-    "meaning": "まえ・じかんてきに はやいこと。",
-    "exampleSentence": "先（さき）に、いく。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "まえ・じかんてきに はやいこと",
+    "examples": [
+      {
+        "word": "先",
+        "reading": "さき",
+        "sentence": "わたしが 先（さき）に はしるよ。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]       
   },
   {
     "id": "g1-052",
@@ -1055,14 +1104,15 @@
     "kunyomi": [
       "はや"
     ],
-    "meaning": "じかんが かからないこと。",
-    "exampleSentence": "早（はや）く、おきる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "じかんが かからないこと",
+    "examples": [
+      {
+        "word": "早",
+        "reading": "はや",
+        "sentence": "あしたは いつもより 早（はや）く おきる。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-053",
@@ -1075,14 +1125,15 @@
     "kunyomi": [
       "くさ"
     ],
-    "meaning": "にわや のはらに はえる しょくぶつ。",
-    "exampleSentence": "みどりの草（くさ）が、はえる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "にわや のはらに はえる しょくぶつ",
+    "examples": [
+      {
+        "word": "草",
+        "reading": "くさ",
+        "sentence": "にわに たくさんの 草（くさ）が はえている。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-054",
@@ -1095,14 +1146,15 @@
     "kunyomi": [
       "あし"
     ],
-    "meaning": "あるくときに つかうからだのぶぶん。",
-    "exampleSentence": "おおきな足（あし）。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "あるくときに つかうからだのぶぶん",
+    "examples": [
+      {
+        "word": "足",
+        "reading": "あし",
+        "sentence": "かけっこでは 足（あし）が はやいほうが かつ。"
+      }
+          ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-055",
@@ -1115,14 +1167,15 @@
     "kunyomi": [
       "むら"
     ],
-    "meaning": "いえがいくつか あつまっているところ。",
-    "exampleSentence": "ちいさな村（むら）に、すむ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "いえがいくつか あつまっているところ",
+    "examples": [
+      {
+        "word": "村",
+        "reading": "むら",
+        "sentence": "おじいちゃんのいえは しずかな 村（むら）に ある。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-056",
@@ -1136,14 +1189,15 @@
     "kunyomi": [
       "おお"
     ],
-    "meaning": "ちいさくないこと・サイズがおおきい。",
-    "exampleSentence": "大（おお）きな いえ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ちいさくないこと・サイズがおおきい",
+    "examples": [
+      {
+        "word": "大",
+        "reading": "おお",
+        "sentence": "大（おお）きな こえで へんじを する。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-057",
@@ -1157,14 +1211,15 @@
     "kunyomi": [
       "おとこ"
     ],
-    "meaning": "おんなの はんたいのひと。",
-    "exampleSentence": "やさしい男（おとこ）のひと。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "おんなの はんたいのひと",
+    "examples": [
+      {
+        "word": "男",
+        "reading": "おとこ",
+        "sentence": "あの 男（おとこ）の 子（こ）は わたしの ともだちだ。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-058",
@@ -1177,14 +1232,15 @@
     "kunyomi": [
       "たけ"
     ],
-    "meaning": "まっすぐで ながい くきをもつ しょくぶつ。",
-    "exampleSentence": "たかい竹（たけ）が、のびる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "まっすぐで ながい くきをもつ しょくぶつ",
+    "examples": [
+      {
+        "word": "竹",
+        "reading": "たけ",
+        "sentence": "パンダは 竹（たけ）の はっぱを たべる。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-059",
@@ -1197,14 +1253,15 @@
     "kunyomi": [
       "なか"
     ],
-    "meaning": "そとではない ところ・まんなか。",
-    "exampleSentence": "はこの中（なか）に、いれる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "そとではない ところ・まんなか",
+    "examples": [
+      {
+        "word": "中",
+        "reading": "なか",
+        "sentence": "は この 中（なか）に プレゼントが はいっている。"
+      }
+    ],
+    "stageId": "hokkaido_area1"
   },
   {
     "id": "g1-060",
@@ -1218,14 +1275,15 @@
     "kunyomi": [
       "むし"
     ],
-    "meaning": "ちいさな いきもの。",
-    "exampleSentence": "かわいい虫（むし）を、みつけた。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ちいさな いきもの",
+    "examples": [
+      {
+        "word": "虫",
+        "reading": "むし",
+        "sentence": "はっぱの うえに いろんな 虫（むし）が いた。"
+      }
+          ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-061",
@@ -1238,14 +1296,15 @@
     "kunyomi": [
       "まち"
     ],
-    "meaning": "ひとや みせが あつまるにぎやかなところ。",
-    "exampleSentence": "にぎやかな町（まち）を、あるく。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ひとや みせが あつまるにぎやかなところ",
+    "examples": [
+      {
+        "word": "町",
+        "reading": "まち",
+        "sentence": "わたしが すんでいる 町（まち）を しょうかいします。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-062",
@@ -1258,14 +1317,15 @@
     "kunyomi": [
       "あめ"
     ],
-    "meaning": "そら・おてんき。",
-    "exampleSentence": "あおい天（あめ）が、ひろがる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "そら・おてんき",
+    "examples": [
+      {
+        "word": "天",
+        "reading": "あめ",
+        "sentence": "今日（きょう）は 天（テン）気（キ）が とても いい。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-063",
@@ -1278,14 +1338,15 @@
     "kunyomi": [
       "た"
     ],
-    "meaning": "おこめを つくるところ。",
-    "exampleSentence": "ひろい田（た）んぼで、あそぶ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "おこめを つくるところ",
+    "examples": [
+      {
+        "word": "田",
+        "reading": "た",
+        "sentence": "田（た）んぼに かかしが たっている。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-064",
@@ -1299,14 +1360,15 @@
     "kunyomi": [
       "つち"
     ],
-    "meaning": "じめん・しょくぶつが そだつところ。",
-    "exampleSentence": "やわらかい土（つち）を、さわる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "じめん・しょくぶつが そだつところ",
+    "examples": [
+      {
+        "word": "土",
+        "reading": "つち",
+        "sentence": "はたけの 土（つち）を たがやす。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-065",
@@ -1320,14 +1382,15 @@
     "kunyomi": [
       "ふた"
     ],
-    "meaning": "いちの つぎの かず。",
-    "exampleSentence": "二（ふた）つの、りんご。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "いちの つぎの かず",
+    "examples": [
+      {
+        "word": "二",
+        "reading": "ふた",
+        "sentence": "えんぴつを 二（ふた）ほん もっている。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-066",
@@ -1341,14 +1404,15 @@
     "kunyomi": [
       "ひ"
     ],
-    "meaning": "たいよう・いちにち。",
-    "exampleSentence": "きょうは、いい日（ひ）だ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "たいよう・いちにち",
+    "examples": [
+      {
+        "word": "日",
+        "reading": "ひ",
+        "sentence": "今日（きょう）は とてもあつい 日（ひ）だ。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-067",
@@ -1362,14 +1426,15 @@
     "kunyomi": [
       "はい"
     ],
-    "meaning": "そとから なかへ うつること。",
-    "exampleSentence": "へやに、入（はい）る。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "そとから なかへ うつること",
+    "examples": [
+      {
+        "word": "入",
+        "reading": "はい",
+        "sentence": "へやに 入（はい）るときは ドアを しめる。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-068",
@@ -1382,14 +1447,15 @@
     "kunyomi": [
       "とし"
     ],
-    "meaning": "一年（いちねん）かんのこと。",
-    "exampleSentence": "あたらしい年（とし）が、くる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "一年（いちねん）かんのこと",
+    "examples": [
+      {
+        "word": "年",
+        "reading": "とし",
+        "sentence": "あたらしい 年（とし）が はじまって うれしい。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-069",
@@ -1403,14 +1469,15 @@
     "kunyomi": [
       "しろ"
     ],
-    "meaning": "くろの はんたいの いろ・ゆきのいろ。",
-    "exampleSentence": "白（しろ）い ゆきが、ふる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "くろの はんたいの いろ・ゆきのいろ",
+    "examples": [
+      {
+        "word": "白",
+        "reading": "しろ",
+        "sentence": "しろい紙（かみ）に えを かく。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]   
   },
   {
     "id": "g1-070",
@@ -1424,14 +1491,15 @@
     "kunyomi": [
       "やっ"
     ],
-    "meaning": "ななの つぎの かず。",
-    "exampleSentence": "八（やっ）つの、おかし。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ななの つぎの かず",
+    "examples": [
+      {
+        "word": "八",
+        "reading": "やっ",
+        "sentence": "たこには 足（あし）が 八（やっ）つ ある。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-071",
@@ -1445,14 +1513,15 @@
     "kunyomi": [
       "もも"
     ],
-    "meaning": "じゅうが とお あつまったかず。",
-    "exampleSentence": "百（ひゃく）えん、もっている。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "じゅうが とお あつまったかず",
+    "examples": [
+      {
+        "word": "百",
+        "reading": "もも",
+        "sentence": "百円（ヒャクエン）だまを ちょきんばこに いれた。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-072",
@@ -1466,14 +1535,15 @@
     "kunyomi": [
       "ふみ"
     ],
-    "meaning": "ことばを かきあらわしたもの。",
-    "exampleSentence": "文（ふみ）を、かく。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ことばを かきあらわしたもの",
+    "examples": [
+      {
+        "word": "文",
+        "reading": "ふみ",
+        "sentence": "この 本（ホン）の 文（ブン）は わかりやすい。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-073",
@@ -1487,14 +1557,15 @@
     "kunyomi": [
       "き"
     ],
-    "meaning": "はっぱや えだがある しょくぶつ。",
-    "exampleSentence": "おおきな木（き）が、ある。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "はっぱや えだがある しょくぶつ",
+    "examples": [
+      {
+        "word": "木",
+        "reading": "き",
+        "sentence": "ひろばの 大（おお）きな 木（き）の したで やすむ。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-074",
@@ -1507,14 +1578,15 @@
     "kunyomi": [
       "もと"
     ],
-    "meaning": "よむためのもの・おおもと。",
-    "exampleSentence": "おもしろい本（ほん）を、よむ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "よむためのもの・おおもと",
+    "examples": [
+      {
+        "word": "本",
+        "reading": "もと",
+        "sentence": "としょしつで すきな 本（ホン）を よんだ。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-075",
@@ -1528,14 +1600,15 @@
     "kunyomi": [
       "な"
     ],
-    "meaning": "ひとや ものの よびな。",
-    "exampleSentence": "名（な）まえを、いう。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ひとや ものの よびな",
+    "examples": [
+      {
+        "word": "名",
+        "reading": "な",
+        "sentence": "じぶんの 名（な）まえを 大（おお）きく かきましょう。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-076",
@@ -1549,14 +1622,15 @@
     "kunyomi": [
       "め"
     ],
-    "meaning": "ものを みるための からだのぶぶん。",
-    "exampleSentence": "おおきな目（め）で、みる。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ものを みるための からだのぶぶん",
+    "examples": [
+      {
+        "word": "目",
+        "reading": "め",
+        "sentence": "ねこは くらやみでも 目（め）が よくみえる。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-077",
@@ -1571,14 +1645,15 @@
     "kunyomi": [
       "た"
     ],
-    "meaning": "じめんに まっすぐたつこと。",
-    "exampleSentence": "まっすぐ立（た）つ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "じめんに まっすぐたつこと",
+    "examples": [
+      {
+        "word": "立",
+        "reading": "た",
+        "sentence": "先生（センセイ）の まえに きちんと 立（た）つ。"
+      }
+            ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-078",
@@ -1592,14 +1667,15 @@
     "kunyomi": [
       "ちから"
     ],
-    "meaning": "ものを うごかす はたらき。",
-    "exampleSentence": "つよい力（ちから）を、だす。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ものを うごかす はたらき",
+    "examples": [
+      {
+        "word": "力",
+        "reading": "ちから",
+        "sentence": "みんなで 力（ちから）を あわせて がんばろう。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-079",
@@ -1612,14 +1688,15 @@
     "kunyomi": [
       "はやし"
     ],
-    "meaning": "木（き）が たくさん あつまっているところ。",
-    "exampleSentence": "ちいさな林（はやし）を、あるく。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "木（き）が たくさん あつまっているところ",
+    "examples": [
+      {
+        "word": "林",
+        "reading": "はやし",
+        "sentence": "小（ちい）さな 林（はやし）を ぬけると うみが みえた。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   },
   {
     "id": "g1-080",
@@ -1633,13 +1710,14 @@
     "kunyomi": [
       "む"
     ],
-    "meaning": "ごの つぎの かず。",
-    "exampleSentence": "六（む）つの、おもちゃ。",
-    "stageId": "hokkaido_area1",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
+    "meaning": "ごの つぎの かず",
+    "examples": [
+      {
+        "word": "六",
+        "reading": "む",
+        "sentence": "さいころを ふったら 六（むっ）つ の 目（め）が でた。"
+      }
+    ],
+    "stageId": ["hokkaido_area1"]
   }
 ]

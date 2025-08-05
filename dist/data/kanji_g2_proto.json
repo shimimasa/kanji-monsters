@@ -1,7 +1,7 @@
 [
   {
     "id": "g2-001",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "引",
     "grade": 2,
     "strokes": 4,
@@ -11,12 +11,17 @@
     "kunyomi": [
       "ひ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものを ちかづける。",
+    "exampleSentence": "ひもを引（ひ）く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-002",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "羽",
     "grade": 2,
     "strokes": 6,
@@ -27,12 +32,17 @@
       "はね",
       "は"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "とりや むしが とぶための からだのぶぶん。",
+    "exampleSentence": "鳥の羽（はね）が、とても きれい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-003",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "雲",
     "grade": 2,
     "strokes": 12,
@@ -42,12 +52,17 @@
     "kunyomi": [
       "くも"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "そらに うかぶ しろい かたまり。",
+    "exampleSentence": "空に雲（くも）が、たくさん うかぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-004",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "園",
     "grade": 2,
     "strokes": 13,
@@ -57,12 +72,17 @@
     "kunyomi": [
       "その"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はなや きが ある にわ。",
+    "exampleSentence": "公園の園（その）で、花を 見る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-005",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "遠",
     "grade": 2,
     "strokes": 13,
@@ -72,12 +92,17 @@
     "kunyomi": [
       "とお"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "とおく はなれていること。",
+    "exampleSentence": "遠（とお）い 山が、小さく 見える。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-006",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "何",
     "grade": 2,
     "strokes": 7,
@@ -88,12 +113,17 @@
       "なに",
       "なん"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものを たずねるときに つかう ことば。",
+    "exampleSentence": "何（なに）を 食べるか、考える。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-007",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "科",
     "grade": 2,
     "strokes": 9,
@@ -101,12 +131,17 @@
       "カ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "べんきょうの しゅるい。",
+    "exampleSentence": "理科という科（か）目を 勉強する。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-008",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "夏",
     "grade": 2,
     "strokes": 10,
@@ -117,12 +152,17 @@
     "kunyomi": [
       "なつ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あつい きせつ。",
+    "exampleSentence": "夏（なつ）休みは、とても 楽しい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-009",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "家",
     "grade": 2,
     "strokes": 10,
@@ -134,12 +174,17 @@
       "いえ",
       "や"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひとが すむ いえ。",
+    "exampleSentence": "私の家（いえ）は、ここにある。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-010",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "歌",
     "grade": 2,
     "strokes": 14,
@@ -149,12 +194,17 @@
     "kunyomi": [
       "うた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こえを だして うたうこと。",
+    "exampleSentence": "みんなで歌（うた）を、うたう。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-011",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "画",
     "grade": 2,
     "strokes": 8,
@@ -163,12 +213,17 @@
       "カク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "えを かくこと。",
+    "exampleSentence": "絵を画（か）くのが、とても 好きだ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-012",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "回",
     "grade": 2,
     "strokes": 6,
@@ -178,12 +233,17 @@
     "kunyomi": [
       "まわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "まわること。",
+    "exampleSentence": "地球は、太陽の まわりを 回（まわ）る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-013",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "会",
     "grade": 2,
     "strokes": 6,
@@ -193,12 +253,17 @@
     "kunyomi": [
       "あ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひとが あつまること。",
+    "exampleSentence": "友達と会（あ）うのが、楽しみだ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-014",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "海",
     "grade": 2,
     "strokes": 9,
@@ -208,12 +273,17 @@
     "kunyomi": [
       "うみ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひろい みずうみ。",
+    "exampleSentence": "海（うみ）で、魚を 見る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-015",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "絵",
     "grade": 2,
     "strokes": 12,
@@ -222,12 +292,17 @@
       "エ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いろを つかって かいたもの。",
+    "exampleSentence": "きれいな絵（え）を、かく。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-016",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "外",
     "grade": 2,
     "strokes": 5,
@@ -240,12 +315,17 @@
       "はず",
       "ほか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "そと。",
+    "exampleSentence": "外（そと）で、元気に 遊ぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-017",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "角",
     "grade": 2,
     "strokes": 7,
@@ -256,12 +336,17 @@
       "つの",
       "かど"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かど。",
+    "exampleSentence": "机の角（かど）に、ぶつからないように 気を つける。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-018",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "楽",
     "grade": 2,
     "strokes": 13,
@@ -272,12 +357,17 @@
     "kunyomi": [
       "たの"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たのしいこと。",
+    "exampleSentence": "音楽を 聞くのは、とても 楽（たの）しい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-019",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "活",
     "grade": 2,
     "strokes": 9,
@@ -287,12 +377,17 @@
     "kunyomi": [
       "い"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いきいきと うごくこと。",
+    "exampleSentence": "元気に活（い）き活きと、遊ぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-020",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "間",
     "grade": 2,
     "strokes": 12,
@@ -304,12 +399,17 @@
       "あいだ",
       "ま"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あいだ。",
+    "exampleSentence": "木と 木の 間（あいだ）を、通る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-021",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "丸",
     "grade": 2,
     "strokes": 3,
@@ -319,12 +419,17 @@
     "kunyomi": [
       "まる"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "まるい かたち。",
+    "exampleSentence": "丸（まる）い ボールで、ともだちと あそぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-022",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "岩",
     "grade": 2,
     "strokes": 8,
@@ -334,12 +439,17 @@
     "kunyomi": [
       "いわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おおきな いし。",
+    "exampleSentence": "山に、おおきな岩（いわ）が ある。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-023",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "顔",
     "grade": 2,
     "strokes": 18,
@@ -349,12 +459,17 @@
     "kunyomi": [
       "かお"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひとの かお。",
+    "exampleSentence": "ともだちの顔（かお）を 見て、わらう。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-024",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "汽",
     "grade": 2,
     "strokes": 7,
@@ -362,12 +477,17 @@
       "キ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みずが あつくなって けむりのように なるもの。",
+    "exampleSentence": "汽（き）車が、えきに 入る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-025",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "記",
     "grade": 2,
     "strokes": 10,
@@ -377,12 +497,17 @@
     "kunyomi": [
       "しる"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かきしるすこと。",
+    "exampleSentence": "日記に、今日の ことを 記（しる）す。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-026",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "帰",
     "grade": 2,
     "strokes": 10,
@@ -392,12 +517,17 @@
     "kunyomi": [
       "かえ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "もとへ もどること。",
+    "exampleSentence": "学校から 帰（かえ）る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-027",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "弓",
     "grade": 2,
     "strokes": 3,
@@ -407,12 +537,17 @@
     "kunyomi": [
       "ゆみ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ゆみ。",
+    "exampleSentence": "弓（ゆみ）を ひいて、やを はなつ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-028",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "牛",
     "grade": 2,
     "strokes": 4,
@@ -422,12 +557,17 @@
     "kunyomi": [
       "うし"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "うし。",
+    "exampleSentence": "牛（うし）が、草を 食べる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-029",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "魚",
     "grade": 2,
     "strokes": 11,
@@ -438,12 +578,17 @@
       "さかな",
       "うお"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さかな。",
+    "exampleSentence": "魚（さかな）が、川で 泳ぐ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-030",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area1"],
     "kanji": "京",
     "grade": 2,
     "strokes": 8,
@@ -452,12 +597,17 @@
       "ケイ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みやこ。",
+    "exampleSentence": "ひがしの 京（きょう）の 町に、行く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-031",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "強",
     "grade": 2,
     "strokes": 11,
@@ -468,12 +618,17 @@
     "kunyomi": [
       "つよ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ちからが つよいこと。",
+    "exampleSentence": "強（つよ）い 力で、ボールを なげる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-032",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "教",
     "grade": 2,
     "strokes": 11,
@@ -484,12 +639,17 @@
       "おし",
       "おそ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おしえること。",
+    "exampleSentence": "先生が、本を 教（おし）える。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-033",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "近",
     "grade": 2,
     "strokes": 7,
@@ -499,12 +659,17 @@
     "kunyomi": [
       "ちか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ちかいこと。",
+    "exampleSentence": "学校の 近（ちか）くに、家がある。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-034",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "兄",
     "grade": 2,
     "strokes": 5,
@@ -515,12 +680,17 @@
     "kunyomi": [
       "あに"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おとうとの はんたいの ひと。",
+    "exampleSentence": "私の 兄（あに）は、とても やさしい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-035",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "形",
     "grade": 2,
     "strokes": 7,
@@ -532,12 +702,17 @@
       "かたち",
       "かた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものの かたち。",
+    "exampleSentence": "まるい 形（かたち）の、おもちゃ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-036",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "計",
     "grade": 2,
     "strokes": 9,
@@ -547,12 +722,17 @@
     "kunyomi": [
       "はか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かずを かぞえること。",
+    "exampleSentence": "時間を 計（はか）る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-037",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "元",
     "grade": 2,
     "strokes": 4,
@@ -563,12 +743,17 @@
     "kunyomi": [
       "もと"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はじめ。",
+    "exampleSentence": "元（げん）気な 子ども。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-038",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "言",
     "grade": 2,
     "strokes": 7,
@@ -580,12 +765,17 @@
       "い",
       "こと"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ことばを いうこと。",
+    "exampleSentence": "言（い）う ことを、よく 聞く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-039",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "原",
     "grade": 2,
     "strokes": 10,
@@ -595,12 +785,17 @@
     "kunyomi": [
       "はら"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひろい のはら。",
+    "exampleSentence": "広い 原（はら）で、あそぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-040",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "戸",
     "grade": 2,
     "strokes": 4,
@@ -610,12 +805,17 @@
     "kunyomi": [
       "こ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いえの いりぐち。",
+    "exampleSentence": "戸（と）を 開けて、外へ 出る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-041",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "古",
     "grade": 2,
     "strokes": 5,
@@ -625,12 +825,17 @@
     "kunyomi": [
       "ふる"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ふるいこと。",
+    "exampleSentence": "古（ふる）い 本を、読む。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-042",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "午",
     "grade": 2,
     "strokes": 4,
@@ -641,12 +846,17 @@
       "うま",
       "ひる"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひる。",
+    "exampleSentence": "午（ひる）ごはんを、食べる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-043",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "後",
     "grade": 2,
     "strokes": 9,
@@ -660,12 +870,17 @@
       "のち",
       "おく"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "うしろ。",
+    "exampleSentence": "学校の 後（うしろ）に、公園がある。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-044",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "語",
     "grade": 2,
     "strokes": 14,
@@ -675,12 +890,17 @@
     "kunyomi": [
       "かた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ことば。",
+    "exampleSentence": "日本語を 語（かた）る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-045",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "工",
     "grade": 2,
     "strokes": 3,
@@ -689,12 +909,17 @@
       "ク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものをつくること。",
+    "exampleSentence": "工（こう）場を、見学する。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-046",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "公",
     "grade": 2,
     "strokes": 4,
@@ -704,12 +929,17 @@
     "kunyomi": [
       "おおやけ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みんなの もの。",
+    "exampleSentence": "公（おおやけ）の 場所を、きれいに する。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-047",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "広",
     "grade": 2,
     "strokes": 5,
@@ -719,12 +949,17 @@
     "kunyomi": [
       "ひろ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひろいこと。",
+    "exampleSentence": "広い 広（ひろ）場で、あそぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-048",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "交",
     "grade": 2,
     "strokes": 6,
@@ -735,12 +970,17 @@
       "まじ",
       "ま"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "まじわること。",
+    "exampleSentence": "友達と 交（まじ）わる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-049",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "光",
     "grade": 2,
     "strokes": 6,
@@ -751,12 +991,17 @@
       "ひかり",
       "ひか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひかり。",
+    "exampleSentence": "太陽の 光（ひかり）が、まぶしい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-050",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "考",
     "grade": 2,
     "strokes": 6,
@@ -766,12 +1011,17 @@
     "kunyomi": [
       "かんが"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かんがえること。",
+    "exampleSentence": "問題を 考（かんが）える。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-051",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "行",
     "grade": 2,
     "strokes": 6,
@@ -784,12 +1034,17 @@
       "ゆ",
       "おこな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いくこと。",
+    "exampleSentence": "学校へ 行（い）く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-052",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "高",
     "grade": 2,
     "strokes": 10,
@@ -799,12 +1054,17 @@
     "kunyomi": [
       "たか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たかいこと。",
+    "exampleSentence": "高（たか）い 山に、のぼる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-053",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "黄",
     "grade": 2,
     "strokes": 11,
@@ -816,12 +1076,17 @@
       "き",
       "こ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "きいろ。",
+    "exampleSentence": "黄（き）色い 花が、咲く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-054",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "合",
     "grade": 2,
     "strokes": 6,
@@ -833,12 +1098,17 @@
     "kunyomi": [
       "あ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あつまること。",
+    "exampleSentence": "みんなで 合（あ）わせて、歌う。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-055",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "谷",
     "grade": 2,
     "strokes": 7,
@@ -848,12 +1118,17 @@
     "kunyomi": [
       "たに"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "たに。",
+    "exampleSentence": "深い 谷（たに）を、見る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-056",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "国",
     "grade": 2,
     "strokes": 8,
@@ -863,12 +1138,17 @@
     "kunyomi": [
       "くに"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くに。",
+    "exampleSentence": "日本の 国（くに）を、大切にする。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-057",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "黒",
     "grade": 2,
     "strokes": 11,
@@ -878,12 +1158,17 @@
     "kunyomi": [
       "くろ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くろいこと。",
+    "exampleSentence": "黒（くろ）い 犬が、走る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-058",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "今",
     "grade": 2,
     "strokes": 4,
@@ -893,12 +1178,17 @@
     "kunyomi": [
       "いま"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いま。",
+    "exampleSentence": "今（いま）から、勉強する。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-059",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "才",
     "grade": 2,
     "strokes": 3,
@@ -906,12 +1196,17 @@
       "サイ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ちから。",
+    "exampleSentence": "彼は、才（さい）能がある。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-060",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area2"],
     "kanji": "細",
     "grade": 2,
     "strokes": 11,
@@ -922,12 +1217,17 @@
       "ほそ",
       "こま"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ほそいこと。",
+    "exampleSentence": "細（ほそ）い 道を、歩く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-061",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "作",
     "grade": 2,
     "strokes": 7,
@@ -938,12 +1238,17 @@
     "kunyomi": [
       "つく"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "つくること。",
+    "exampleSentence": "おもちゃを 作（つく）る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-062",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "算",
     "grade": 2,
     "strokes": 14,
@@ -951,12 +1256,17 @@
       "サン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かずを かぞえること。",
+    "exampleSentence": "算（さん）数の 勉強。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-063",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "止",
     "grade": 2,
     "strokes": 4,
@@ -966,12 +1276,17 @@
     "kunyomi": [
       "と"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "とまること。",
+    "exampleSentence": "車が 止（と）まる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-064",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "市",
     "grade": 2,
     "strokes": 5,
@@ -981,12 +1296,17 @@
     "kunyomi": [
       "いち"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みせが あつまる ばしょ。",
+    "exampleSentence": "市（いち）場へ、買い物に 行く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-065",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "矢",
     "grade": 2,
     "strokes": 5,
@@ -996,12 +1316,17 @@
     "kunyomi": [
       "や"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "や。",
+    "exampleSentence": "矢（や）を 放つ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-066",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "姉",
     "grade": 2,
     "strokes": 8,
@@ -1011,12 +1336,17 @@
     "kunyomi": [
       "あね"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おとうとの はんたいの ひと。",
+    "exampleSentence": "私の 姉（あね）は、やさしい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-067",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "思",
     "grade": 2,
     "strokes": 9,
@@ -1026,12 +1356,17 @@
     "kunyomi": [
       "おも"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かんがえること。",
+    "exampleSentence": "友達を 思（おも）う。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-068",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "紙",
     "grade": 2,
     "strokes": 10,
@@ -1041,12 +1376,17 @@
     "kunyomi": [
       "かみ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かみ。",
+    "exampleSentence": "白い 紙（かみ）に、絵をかく。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-069",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "寺",
     "grade": 2,
     "strokes": 6,
@@ -1056,12 +1396,17 @@
     "kunyomi": [
       "てら"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おてら。",
+    "exampleSentence": "寺（てら）へ、お参りに 行く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-070",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "自",
     "grade": 2,
     "strokes": 6,
@@ -1072,12 +1417,17 @@
     "kunyomi": [
       "みずか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みずから。",
+    "exampleSentence": "自（みずか）ら 考える。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-071",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "時",
     "grade": 2,
     "strokes": 10,
@@ -1087,12 +1437,17 @@
     "kunyomi": [
       "とき"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "じかん。",
+    "exampleSentence": "時間（じかん）を 大切に 使う。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-072",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "室",
     "grade": 2,
     "strokes": 9,
@@ -1102,12 +1457,17 @@
     "kunyomi": [
       "むろ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "へや。",
+    "exampleSentence": "教室の 室（むろ）で、勉強する。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-073",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "社",
     "grade": 2,
     "strokes": 7,
@@ -1117,12 +1477,17 @@
     "kunyomi": [
       "やしろ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "じんじゃ。",
+    "exampleSentence": "社（やしろ）へ、お参りに 行く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-074",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "弱",
     "grade": 2,
     "strokes": 10,
@@ -1132,12 +1497,17 @@
     "kunyomi": [
       "よわ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ちからが よわいこと。",
+    "exampleSentence": "弱（よわ）い 力では、勝てない。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-075",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "首",
     "grade": 2,
     "strokes": 9,
@@ -1147,12 +1517,17 @@
     "kunyomi": [
       "くび"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くび。",
+    "exampleSentence": "首（くび）を かしげる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-076",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "秋",
     "grade": 2,
     "strokes": 1,
@@ -1162,12 +1537,17 @@
     "kunyomi": [
       "あき"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あき。",
+    "exampleSentence": "秋（あき）の 空は、とても 高い。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-077",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "週",
     "grade": 2,
     "strokes": 11,
@@ -1175,12 +1555,17 @@
       "シュウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "一週間。",
+    "exampleSentence": "週（しゅう）末は、友達と 遊ぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-078",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "春",
     "grade": 2,
     "strokes": 9,
@@ -1190,12 +1575,17 @@
     "kunyomi": [
       "はる"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はる。",
+    "exampleSentence": "春（はる）には、花が 咲く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-079",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "書",
     "grade": 2,
     "strokes": 10,
@@ -1205,12 +1595,17 @@
     "kunyomi": [
       "か"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かくこと。",
+    "exampleSentence": "本を 書（か）く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-080",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "少",
     "grade": 2,
     "strokes": 4,
@@ -1221,12 +1616,17 @@
       "すく",
       "すこ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "すくないこと。",
+    "exampleSentence": "少（すこ）しだけ、食べる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-081",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "場",
     "grade": 2,
     "strokes": 12,
@@ -1236,12 +1636,17 @@
     "kunyomi": [
       "ば"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ばしょ。あることが行われるところ。",
+    "exampleSentence": "広い場（ば）所で、みんなで遊ぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-082",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "色",
     "grade": 2,
     "strokes": 6,
@@ -1252,12 +1657,17 @@
     "kunyomi": [
       "いろ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "物体の表面がもつ、光のちがいによって見えるちがい。あか、あお、きいろなど。",
+    "exampleSentence": "きれいな色（いろ）の 花を、見つけた。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-083",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "食",
     "grade": 2,
     "strokes": 9,
@@ -1268,12 +1678,17 @@
       "た",
       "く"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "口からものを とりいれて、からだの えいようと すること。",
+    "exampleSentence": "おいしい食（た）べ物を、食べる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-084",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "心",
     "grade": 2,
     "strokes": 4,
@@ -1283,12 +1698,17 @@
     "kunyomi": [
       "こころ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "気持ちや考えを 生み出す、からだの なかにあるもの。",
+    "exampleSentence": "心（こころ）が、とても優しい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-085",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "新",
     "grade": 2,
     "strokes": 13,
@@ -1300,12 +1720,17 @@
       "あら",
       "にい"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "まえには なかったこと。ふるくないこと。",
+    "exampleSentence": "新しい本を、読む。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-086",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "親",
     "grade": 2,
     "strokes": 16,
@@ -1316,12 +1741,17 @@
       "おや",
       "した"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こどもを うんだり、そだてたりする ひと。",
+    "exampleSentence": "親（おや）と、公園へ行く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-087",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "図",
     "grade": 2,
     "strokes": 7,
@@ -1332,12 +1762,17 @@
     "kunyomi": [
       "はか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "えや ずを かくこと。また、ずめん。",
+    "exampleSentence": "図書館で、本を借りる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-088",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "数",
     "grade": 2,
     "strokes": 13,
@@ -1348,12 +1783,17 @@
       "かず",
       "かぞ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものの りょうを あらわすことば。ひとつ、ふたつなど。",
+    "exampleSentence": "数（かず）を、数える。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-089",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "西",
     "grade": 2,
     "strokes": 6,
@@ -1364,12 +1804,17 @@
     "kunyomi": [
       "にし"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "太陽が しずむ ほうこう。",
+    "exampleSentence": "太陽が西（にし）に、しずむ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-090",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area3"],
     "kanji": "声",
     "grade": 2,
     "strokes": 7,
@@ -1379,12 +1824,17 @@
     "kunyomi": [
       "こえ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "のどから 出る おと。人が はなしたり、歌ったりするときに 出る おと。",
+    "exampleSentence": "大きな声（こえ）で、歌う。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-091",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "星",
     "grade": 2,
     "strokes": 9,
@@ -1394,12 +1844,17 @@
     "kunyomi": [
       "ほし"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "よるの 空に ひかるもの。",
+    "exampleSentence": "夜空に星（ほし）が、たくさん 光る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-092",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "晴",
     "grade": 2,
     "strokes": 12,
@@ -1409,12 +1864,17 @@
     "kunyomi": [
       "は"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "そらが はれること。",
+    "exampleSentence": "今日は、晴（は）れた 空が、とても きれい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-093",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "切",
     "grade": 2,
     "strokes": 4,
@@ -1424,12 +1884,17 @@
     "kunyomi": [
       "き"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものを きること。",
+    "exampleSentence": "紙を切（き）る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-094",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "雪",
     "grade": 2,
     "strokes": 11,
@@ -1439,12 +1904,17 @@
     "kunyomi": [
       "ゆき"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "そらから ふる しろいもの。",
+    "exampleSentence": "雪（ゆき）が、たくさん 降る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-095",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"]   ,
     "kanji": "船",
     "grade": 2,
     "strokes": 11,
@@ -1455,12 +1925,17 @@
       "ふね",
       "ふな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みずの うえを すすむ のりもの。",
+    "exampleSentence": "大きな船（ふね）が、海を 進む。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-096",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "線",
     "grade": 2,
     "strokes": 15,
@@ -1468,12 +1943,17 @@
       "セン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ほそく ながいもの。",
+    "exampleSentence": "まっすぐな線（せん）を、引く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-097",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "前",
     "grade": 2,
     "strokes": 9,
@@ -1483,12 +1963,17 @@
     "kunyomi": [
       "まえ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "まえ。",
+    "exampleSentence": "学校の前に、公園がある。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-098",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "組",
     "grade": 2,
     "strokes": 11,
@@ -1499,12 +1984,17 @@
       "くみ",
       "く"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものを くみあわせること。",
+    "exampleSentence": "友達と組（く）んで、遊ぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-099",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "走",
     "grade": 2,
     "strokes": 7,
@@ -1514,12 +2004,17 @@
     "kunyomi": [
       "はし"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はしること。",
+    "exampleSentence": "走（はし）るのが、とても 速い。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-100",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "多",
     "grade": 2,
     "strokes": 6,
@@ -1529,12 +2024,17 @@
     "kunyomi": [
       "おお"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かずが おおいこと。",
+    "exampleSentence": "多（おお）い 数を、数える。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-101",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "太",
     "grade": 2,
     "strokes": 4,
@@ -1545,12 +2045,17 @@
     "kunyomi": [
       "ふと"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ふといこと。ほそくないこと。",
+    "exampleSentence": "太（ふと）い 木が、にわに ある。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-102",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "体",
     "grade": 2,
     "strokes": 7,
@@ -1560,12 +2065,17 @@
     "kunyomi": [
       "からだ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "からだ。いきものが うごくための ぶぶん。",
+    "exampleSentence": "体（からだ）を うごかすのが、すきだ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-103",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "台",
     "grade": 2,
     "strokes": 5,
@@ -1574,12 +2084,17 @@
       "タイ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものを のせる だい。ものを ささえる だい。",
+    "exampleSentence": "つくえの台（だい）の上に、ほんを おく。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-104",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "地",
     "grade": 2,
     "strokes": 6,
@@ -1588,12 +2103,17 @@
       "ジ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "じめん。つち。",
+    "exampleSentence": "地（ち）面を、あるく。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-105",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "池",
     "grade": 2,
     "strokes": 6,
@@ -1603,12 +2123,17 @@
     "kunyomi": [
       "いけ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みずが たまっているところ。",
+    "exampleSentence": "こうえんの池（いけ）に、さかなが いる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-106",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "知",
     "grade": 2,
     "strokes": 8,
@@ -1618,12 +2143,17 @@
     "kunyomi": [
       "し"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "しること。ものを さとること。",
+    "exampleSentence": "あたらしいことを知（し）るのが、たのしい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-107",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "茶",
     "grade": 2,
     "strokes": 9,
@@ -1632,12 +2162,17 @@
       "サ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ちゃ。おちゃ。",
+    "exampleSentence": "あたたかい茶（ちゃ）を、のむ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-108",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "昼",
     "grade": 2,
     "strokes": 9,
@@ -1647,12 +2182,17 @@
     "kunyomi": [
       "ひる"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひる。太陽が 空の たかいところに ある じかん。",
+    "exampleSentence": "昼（ひる）ごはんを、たべる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-109",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "長",
     "grade": 2,
     "strokes": 8,
@@ -1662,12 +2202,17 @@
     "kunyomi": [
       "なが"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ながいこと。みじかくないこと。",
+    "exampleSentence": "長（なが）い みちを、あるく。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-110",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "鳥",
     "grade": 2,
     "strokes": 11,
@@ -1677,12 +2222,17 @@
     "kunyomi": [
       "とり"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "そらを とぶ どうぶつ。はねが ある どうぶつ。",
+    "exampleSentence": "鳥（とり）が、そらを とぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-111",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "朝",
     "grade": 2,
     "strokes": 12,
@@ -1692,12 +2242,17 @@
     "kunyomi": [
       "あさ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あさ。太陽が のぼる じかん。",
+    "exampleSentence": "朝（あさ）に、鳥が 鳴く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-112",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "直",
     "grade": 2,
     "strokes": 8,
@@ -1709,12 +2264,17 @@
       "なお",
       "ただ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "まっすぐなこと。まがっていないこと。",
+    "exampleSentence": "まっすぐな 道を、直（ただ）しく 歩く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-113",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "通",
     "grade": 2,
     "strokes": 10,
@@ -1725,12 +2285,17 @@
       "とお",
       "かよ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "とおること。",
+    "exampleSentence": "学校へ 通（かよ）う 道。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-114",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "弟",
     "grade": 2,
     "strokes": 7,
@@ -1741,12 +2306,17 @@
     "kunyomi": [
       "おとうと"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おとうと。",
+    "exampleSentence": "私の 弟（おとうと）は、小さい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-115",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area4"],
     "kanji": "店",
     "grade": 2,
     "strokes": 8,
@@ -1756,12 +2326,17 @@
     "kunyomi": [
       "みせ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものを うる ばしょ。",
+    "exampleSentence": "店（みせ）で、おかしを 買う。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-116",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "点",
     "grade": 2,
     "strokes": 9,
@@ -1769,12 +2344,17 @@
       "テン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ちいさな しるし。",
+    "exampleSentence": "テストの 点（てん）を、見る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-117",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "電",
     "grade": 2,
     "strokes": 13,
@@ -1782,12 +2362,17 @@
       "デン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひかりや ねつを だす ちから。",
+    "exampleSentence": "電（でん）車が、駅に 来る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-118",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "刀",
     "grade": 2,
     "strokes": 2,
@@ -1797,12 +2382,17 @@
     "kunyomi": [
       "かたな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かたな。",
+    "exampleSentence": "刀（かたな）を、持つ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-119",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "冬",
     "grade": 2,
     "strokes": 5,
@@ -1812,12 +2402,17 @@
     "kunyomi": [
       "ふゆ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さむい きせつ。",
+    "exampleSentence": "冬（ふゆ）は、雪が 降る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-120",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "当",
     "grade": 2,
     "strokes": 6,
@@ -1827,12 +2422,17 @@
     "kunyomi": [
       "あ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あたること。",
+    "exampleSentence": "ボールが、当（あ）たる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-121",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "東",
     "grade": 2,
     "strokes": 8,
@@ -1842,12 +2442,17 @@
     "kunyomi": [
       "ひがし"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ひがし。太陽が のぼる ほうこう。",
+    "exampleSentence": "東（ひがし）の 空が、明るくなる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-122",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "答",
     "grade": 2,
     "strokes": 12,
@@ -1857,12 +2462,17 @@
     "kunyomi": [
       "こた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こたえること。",
+    "exampleSentence": "先生の 質問に、答（こた）える。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-123",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "頭",
     "grade": 2,
     "strokes": 16,
@@ -1874,12 +2484,17 @@
       "あたま",
       "かしら"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "からだの いちばん 上の ぶぶん。",
+    "exampleSentence": "頭（あたま）を、なでる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-124",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "同",
     "grade": 2,
     "strokes": 6,
@@ -1889,12 +2504,17 @@
     "kunyomi": [
       "おな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おなじこと。",
+    "exampleSentence": "友達と 同（おな）じ 服を、着る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-125",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "道",
     "grade": 2,
     "strokes": 12,
@@ -1904,12 +2524,17 @@
     "kunyomi": [
       "みち"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みち。",
+    "exampleSentence": "長い 道（みち）を、歩く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-126",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "読",
     "grade": 2,
     "strokes": 14,
@@ -1921,12 +2546,17 @@
     "kunyomi": [
       "よ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "もじを よむこと。",
+    "exampleSentence": "本を 読（よ）むのが、好きだ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-127",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "内",
     "grade": 2,
     "strokes": 4,
@@ -1936,12 +2566,17 @@
     "kunyomi": [
       "うち"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "うち。",
+    "exampleSentence": "家の 内（うち）で、遊ぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-128",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "南",
     "grade": 2,
     "strokes": 9,
@@ -1951,12 +2586,17 @@
     "kunyomi": [
       "みなみ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "みなみ。",
+    "exampleSentence": "南（みなみ）の 空に、鳥が 飛ぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-129",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "肉",
     "grade": 2,
     "strokes": 6,
@@ -1964,12 +2604,17 @@
       "ニク"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "にく。",
+    "exampleSentence": "おいしい 肉（にく）を、食べる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-130",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "馬",
     "grade": 2,
     "strokes": 10,
@@ -1980,12 +2625,17 @@
       "うま",
       "ま"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "うま。",
+    "exampleSentence": "馬（うま）が、草を 食べる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-131",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "売",
     "grade": 2,
     "strokes": 7,
@@ -1995,12 +2645,17 @@
     "kunyomi": [
       "う"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものを うること。",
+    "exampleSentence": "お店で、おもちゃを 売（う）る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-132",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "買",
     "grade": 2,
     "strokes": 12,
@@ -2010,12 +2665,17 @@
     "kunyomi": [
       "か"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ものを かうこと。",
+    "exampleSentence": "お店で、おかしを 買（か）う。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-133",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "麦",
     "grade": 2,
     "strokes": 7,
@@ -2025,12 +2685,17 @@
     "kunyomi": [
       "むぎ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "むぎ。",
+    "exampleSentence": "麦（むぎ）畑が、風に ゆれる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-134",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"]     ,
     "kanji": "半",
     "grade": 2,
     "strokes": 5,
@@ -2040,12 +2705,17 @@
     "kunyomi": [
       "なか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はんぶん。",
+    "exampleSentence": "りんごを 半（はん）分に、切る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-135",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "番",
     "grade": 2,
     "strokes": 5,
@@ -2053,12 +2723,17 @@
       "バン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かずを かぞえること。",
+    "exampleSentence": "番（ばん）号を、言う。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-136",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "父",
     "grade": 2,
     "strokes": 4,
@@ -2068,12 +2743,17 @@
     "kunyomi": [
       "ちち"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ちち。",
+    "exampleSentence": "私の 父（ちち）は、優しい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-137",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "風",
     "grade": 2,
     "strokes": 9,
@@ -2084,12 +2764,17 @@
       "かぜ",
       "かざ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "かぜ。",
+    "exampleSentence": "風（かぜ）が、強く 吹く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-138",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "分",
     "grade": 2,
     "strokes": 4,
@@ -2101,12 +2786,17 @@
     "kunyomi": [
       "わ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "わけること。",
+    "exampleSentence": "りんごを 分（わ）ける。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-139",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "聞",
     "grade": 2,
     "strokes": 14,
@@ -2116,12 +2806,17 @@
     "kunyomi": [
       "き"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おとを きくこと。",
+    "exampleSentence": "鳥の 歌を、聞（き）く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-140",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area5"],
     "kanji": "米",
     "grade": 2,
     "strokes": 6,
@@ -2132,12 +2827,17 @@
     "kunyomi": [
       "こめ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "こめ。",
+    "exampleSentence": "米（こめ）を、食べる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-141",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "歩",
     "grade": 2,
     "strokes": 8,
@@ -2147,12 +2847,17 @@
     "kunyomi": [
       "あゆ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あるくこと。足を 動かして すすむこと。",
+    "exampleSentence": "道を 歩（ある）く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-142",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "母",
     "grade": 2,
     "strokes": 5,
@@ -2162,12 +2867,17 @@
     "kunyomi": [
       "はは"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "お母さん。こどもを うんだり、そだてたりする 女の人。",
+    "exampleSentence": "私の 母（はは）は、料理が 上手だ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-143",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "方",
     "grade": 2,
     "strokes": 4,
@@ -2177,12 +2887,17 @@
     "kunyomi": [
       "かた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ほう。どちらの ほうこうか。",
+    "exampleSentence": "方（かた）角を、見る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-144",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "北",
     "grade": 2,
     "strokes": 5,
@@ -2192,12 +2907,17 @@
     "kunyomi": [
       "きた"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "きた。地図の 上の ほう。",
+    "exampleSentence": "北（きた）の 空に、星が 光る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-145",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "毎",
     "grade": 2,
     "strokes": 6,
@@ -2205,12 +2925,17 @@
       "マイ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "まい。いつも。",
+    "exampleSentence": "毎日、学校へ 行く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-146",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "妹",
     "grade": 2,
     "strokes": 8,
@@ -2220,12 +2945,17 @@
     "kunyomi": [
       "いもうと"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "いもうと。自分より 年下の 女の きょうだい。",
+    "exampleSentence": "私の 妹（いもうと）は、小さい。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-147",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "万",
     "grade": 2,
     "strokes": 3,
@@ -2234,12 +2964,17 @@
       "バン"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "まん。千が 十こ あつまった かず。",
+    "exampleSentence": "万（まん）の 数を、数える。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-148",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "明",
     "grade": 2,
     "strokes": 8,
@@ -2250,12 +2985,17 @@
     "kunyomi": [
       "あか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "あかるいこと。くらいことの はんたい。",
+    "exampleSentence": "明るい 朝が、来た。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-149",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "鳴",
     "grade": 2,
     "strokes": 14,
@@ -2265,12 +3005,17 @@
     "kunyomi": [
       "な"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "なくこと。こえを だすこと。",
+    "exampleSentence": "鳥が 鳴（な）く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-150",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "毛",
     "grade": 2,
     "strokes": 4,
@@ -2280,12 +3025,17 @@
     "kunyomi": [
       "け"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "け。からだの 表面に はえている ほそいもの。",
+    "exampleSentence": "犬の 毛（け）が、ふわふわだ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-151",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "門",
     "grade": 2,
     "strokes": 8,
@@ -2295,12 +3045,17 @@
     "kunyomi": [
       "かど"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "もん。いえや 建物に 入るための おおきな とびら。",
+    "exampleSentence": "学校の門（もん）を、開ける。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-152",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "夜",
     "grade": 2,
     "strokes": 8,
@@ -2311,12 +3066,17 @@
       "よる",
       "よ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "よる。太陽が しずんでから、のぼるまでの じかん。",
+    "exampleSentence": "夜（よる）空に、月が 出る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-153",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "野",
     "grade": 2,
     "strokes": 11,
@@ -2326,12 +3086,17 @@
     "kunyomi": [
       "の"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "の。ひろい くさばら。",
+    "exampleSentence": "広い野（の）原で、遊ぶ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-154",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "友",
     "grade": 2,
     "strokes": 4,
@@ -2341,12 +3106,17 @@
     "kunyomi": [
       "とも"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "とも。なかよし。",
+    "exampleSentence": "友（とも）だちと、公園へ 行く。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-155",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "用",
     "grade": 2,
     "strokes": 5,
@@ -2356,12 +3126,17 @@
     "kunyomi": [
       "もち"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "もちいること。つかうこと。",
+    "exampleSentence": "用（よう）事を、する。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-156",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "曜",
     "grade": 2,
     "strokes": 18,
@@ -2369,12 +3144,17 @@
       "ヨウ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "よう。日、月、火などの、一週間の なまえ。",
+    "exampleSentence": "今日の曜（よう）日は、何曜日？",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-157",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "来",
     "grade": 2,
     "strokes": 7,
@@ -2384,12 +3164,17 @@
     "kunyomi": [
       "く"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "くること。",
+    "exampleSentence": "明日、友達が来（く）る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-158",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "里",
     "grade": 2,
     "strokes": 7,
@@ -2399,12 +3184,17 @@
     "kunyomi": [
       "さと"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "さと。むら。",
+    "exampleSentence": "ふるさとの里（さと）へ、帰る。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-159",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "理",
     "grade": 2,
     "strokes": 11,
@@ -2412,12 +3202,17 @@
       "リ"
     ],
     "kunyomi": [],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "ことわり。ものごとの すじみち。",
+    "exampleSentence": "理（り）科の 勉強を、する。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g2-160",
-    "stageId": "tohoku_area1",
+    "stageId": ["tohoku_area6"],
     "kanji": "話",
     "grade": 2,
     "strokes": 13,
@@ -2427,7 +3222,12 @@
     "kunyomi": [
       "はな"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "はなすこと。",
+    "exampleSentence": "友達と話（はな）すのが、好きだ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   }
 ]
