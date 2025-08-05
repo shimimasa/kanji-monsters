@@ -1705,61 +1705,65 @@ drawEnemyStatusPanel(ctx) {
   registerHandlers() {
     // クリックハンドラを保存して再利用できるようにする
     this._clickHandler = e => {
-      // デバッグ出力を追加
-      console.log('クリックイベント発生');
+      console.log('クリックイベント発生:', e.type);
       this.handleClick(e);
     };
     
-    this.canvas.addEventListener('click', this._clickHandler);
-    this.canvas.addEventListener('touchstart', this._clickHandler);
-    
-    // マウス移動ハンドラーを追加
-    this._mousemoveHandler = e => {
-      const rect = this.canvas.getBoundingClientRect();
+    // イベントリスナーを登録
+    if (this.canvas) {
+      console.log('イベントリスナーを登録します');
+      this.canvas.addEventListener('click', this._clickHandler);
+      this.canvas.addEventListener('touchstart', this._clickHandler);
       
-      // Canvasの実際の表示サイズと内部解像度の比率を計算
-      const scaleX = this.canvas.width / rect.width;
-      const scaleY = this.canvas.height / rect.height;
+      // マウス移動ハンドラーを追加
+      this._mousemoveHandler = e => {
+        const rect = this.canvas.getBoundingClientRect();
+        
+        // Canvasの実際の表示サイズと内部解像度の比率を計算
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        
+        // マウス座標を800x600のゲーム内座標に変換
+        this.mouseX = (e.clientX - rect.left) * scaleX;
+        this.mouseY = (e.clientY - rect.top) * scaleY;
+      };
+      this.canvas.addEventListener('mousemove', this._mousemoveHandler);
       
-      // マウス座標を800x600のゲーム内座標に変換
-      this.mouseX = (e.clientX - rect.left) * scaleX;
-      this.mouseY = (e.clientY - rect.top) * scaleY;
-    };
-    this.canvas.addEventListener('mousemove', this._mousemoveHandler);
-    
-    // ホイールイベント登録（既存のまま）
-    this._wheelHandler = e => {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left, y = e.clientY - rect.top;
-      // メッセージログの位置を更新
-      const msgX = this.canvas.width - 330;
-      const msgY = 450;
-      const msgW = 310;
-      const msgH = 130;
-      
-      if (x >= msgX && x <= msgX + msgW && y >= msgY && y <= msgY + msgH) {
-        e.preventDefault();
-        const N = 5;
-        const len = battleState.log.length;
-        const maxOffset = Math.max(0, len - N);
-        if (e.deltaY < 0) {
-          this.logOffset = Math.min(this.logOffset + 1, maxOffset);
-        } else {
-          this.logOffset = Math.max(0, this.logOffset - 1);
+      // ホイールイベント登録
+      this._wheelHandler = e => {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left, y = e.clientY - rect.top;
+        // メッセージログの位置を更新
+        const msgX = this.canvas.width - 330;
+        const msgY = 450;
+        const msgW = 310;
+        const msgH = 130;
+        
+        if (x >= msgX && x <= msgX + msgW && y >= msgY && y <= msgY + msgH) {
+          e.preventDefault();
+          const N = 5;
+          const len = battleState.log.length;
+          const maxOffset = Math.max(0, len - N);
+          if (e.deltaY < 0) {
+            this.logOffset = Math.min(this.logOffset + 1, maxOffset);
+          } else {
+            this.logOffset = Math.max(0, this.logOffset - 1);
+          }
         }
-      }
-    };
-    this.canvas.addEventListener('wheel', this._wheelHandler);
-    
-    // マウスダウン・アップイベントのハンドラを保存
-    this._mousedownHandler = this.handleMouseDown.bind(this);
-    this._mouseupHandler = this.handleMouseUp.bind(this);
-    this._mouseleaveHandler = this.handleMouseUp.bind(this);
-    
-    // マウスイベントハンドラを追加
-    this.canvas.addEventListener('mousedown', this._mousedownHandler);
-    this.canvas.addEventListener('mouseup', this._mouseupHandler);
-    this.canvas.addEventListener('mouseleave', this._mouseleaveHandler);
+      };
+      this.canvas.addEventListener('wheel', this._wheelHandler);
+      
+      // マウスダウン・アップイベントのハンドラを保存
+      this._mousedownHandler = e => this.handleMouseDown(e);
+      this._mouseupHandler = e => this.handleMouseUp(e);
+      
+      // マウスイベントハンドラを追加
+      this.canvas.addEventListener('mousedown', this._mousedownHandler);
+      this.canvas.addEventListener('mouseup', this._mouseupHandler);
+      this.canvas.addEventListener('mouseleave', this._mouseupHandler);
+    } else {
+      console.error('canvas要素がnullです。イベントリスナーを登録できません。');
+    }
   },
 
   /** イベント登録を解除 */
@@ -1774,13 +1778,15 @@ drawEnemyStatusPanel(ctx) {
     // マウスイベントハンドラを解除
     this.canvas.removeEventListener('mousedown', this._mousedownHandler);
     this.canvas.removeEventListener('mouseup', this._mouseupHandler);
-    this.canvas.removeEventListener('mouseleave', this._mouseleaveHandler);
+    this.canvas.removeEventListener('mouseleave', this._mouseupHandler);
   },
 
   /** クリック処理 */
   handleClick(e) {
     // === ここからが新しい座標変換ロジック ===
     e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
+
+    console.log('handleClick実行');
 
     let eventX, eventY;
     // e.changedTouchesが存在すればタッチイベント、なければマウスイベントと判定
@@ -1802,43 +1808,54 @@ drawEnemyStatusPanel(ctx) {
     const x = (eventX - rect.left) * scaleX;
     const y = (eventY - rect.top) * scaleY;
     
-    console.log('クリック座標:', x, y); // デバッグ用に座標を出力
+    console.log('クリック座標:', x, y);
     
-    // ▼ 以下は元のクリック判定ロジック（x, y を使うようにする）
-    // ③ 「タイトルへ」ボタン押下時
+    // BTNオブジェクトのプロパティを確認
+    console.log('BTN.back:', BTN.back);
+    console.log('BTN.stage:', BTN.stage);
+    console.log('BTN.attack:', BTN.attack);
+    
+    // ボタンの当たり判定を詳細にデバッグ
+    Object.entries(BTN).forEach(([key, btn]) => {
+      const isHit = isMouseOverRect(x, y, btn);
+      console.log(`ボタン[${key}] 座標(${btn.x},${btn.y},${btn.w},${btn.h}) ヒット:${isHit}`);
+    });
+    
+    // 「タイトルへ」ボタン押下時
     if (isMouseOverRect(x, y, BTN.back)) {
       console.log('「タイトルへ」ボタンがクリックされました');
       publish('changeScreen', 'title');
       return true;
     }
-    // ④ 「ステージ選択」ボタン押下時
+    
+    // 「ステージ選択」ボタン押下時
     if (isMouseOverRect(x, y, BTN.stage)) {
       console.log('「ステージ選択」ボタンがクリックされました');
       publish('changeScreen', 'stageSelect');
       return true;
     }
-    // ⑤ 既存のこうげき／かいふく／ヒント処理
+    
+    // 「こうげき」ボタン押下時
     if (isMouseOverRect(x, y, BTN.attack)) {
-      e.preventDefault();
-      e.stopPropagation();
+      console.log('「こうげき」ボタンがクリックされました');
       onAttack();
-      battleState.lastCommandMode = 'attack';
       return true;
     }
+    
+    // 「かいふく」ボタン押下時
     if (isMouseOverRect(x, y, BTN.heal)) {
-      e.preventDefault();
-      e.stopPropagation();
+      console.log('「かいふく」ボタンがクリックされました');
       onHeal();
-      battleState.lastCommandMode = 'heal';
       return true;
     }
+    
+    // 「ヒント」ボタン押下時
     if (isMouseOverRect(x, y, BTN.hint)) {
-      e.preventDefault();
-      e.stopPropagation();
+      console.log('「ヒント」ボタンがクリックされました');
       onHint();
-      battleState.lastCommandMode = 'hint';
       return true;
     }
+    
     return false; // イベント未処理を示す
   },
 
