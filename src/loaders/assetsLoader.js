@@ -232,7 +232,7 @@ export async function loadMonsterImage(enemy) {
       // 1. WebP形式の画像（proverbs/full/フォルダ内）
       `/assets/images/proverbs/full/${enemyId}.webp`,
       // 2. image-pipeline内のWebP画像
-      `/image‐pipeline/output/proverbs/full/${enemyId}.webp`,
+      `/image-pipeline/output/proverbs/full/${enemyId}.webp`,
       // 3. PNG形式の代替
       `/image‐pipeline/proverb/proverb_${enemyId.replace('PRV-E', '')}.png`
     );
@@ -343,24 +343,25 @@ function loadImageWithTransparency(src) {
       const data = imageData.data;
       
       // ↓↓↓ ここからが新しい白判定ロジック ↓↓↓
-      const threshold = 240; // 白と判定する明るさのしきい値 (少し下げる)
-      const colorDifferenceThreshold = 15; // R,G,B間の許容色差
+      const threshold = 230; // 白と判定する明るさのしきい値を下げる
+      const colorDifferenceThreshold = 20; // R,G,B間の許容色差を上げる
 
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
 
-        // 明るさがしきい値を超え、かつ各色が非常に近い（＝無彩色に近い）ピクセルを白とみなす
-        if (
-          r > threshold &&
-          g > threshold &&
-          b > threshold &&
-          Math.abs(r - g) < colorDifferenceThreshold &&
-          Math.abs(g - b) < colorDifferenceThreshold &&
-          Math.abs(b - r) < colorDifferenceThreshold
-        ) {
-          data[i + 3] = 0; // アルファ値を0（完全透明）にする
+        // 明るさの平均値を計算
+        const brightness = (r + g + b) / 3;
+
+        // 明るさに応じたアルファ値のグラデーション
+        if (brightness > threshold && 
+            Math.abs(r - g) < colorDifferenceThreshold &&
+            Math.abs(g - b) < colorDifferenceThreshold &&
+            Math.abs(b - r) < colorDifferenceThreshold) {
+          // 明るさに応じてアルファ値を調整（明るいほど透明に）
+          const alphaFactor = Math.min(1, (255 - brightness) / (255 - threshold));
+          data[i + 3] = Math.floor(data[i + 3] * alphaFactor);
         }
       }
       // ↑↑↑ ここまでが新しい白判定ロジック ↑↑↑

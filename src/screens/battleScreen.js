@@ -467,7 +467,7 @@ const battleScreenState = {
 
     /* 敵 */
     const enemy = gameState.currentEnemy;
-    const ex = 480, ey = 120, ew = 240, eh = 120; // eyを80から120に変更
+    const ex = 500, ey = 120, ew = 240, eh = 120; // eyを80から120に変更
 
     // アニメーション用オフセット計算
     let offsetX = 0, offsetY = 0, rotateAngle = 0, alpha = 1;
@@ -3648,4 +3648,7 @@ const UI_THEME = {
   borderRadius: 4,
   shadowOpacity: 0.3
 };
+
+const threshold = 240; // 白と判定する明るさのしきい値
+const colorDifferenceThreshold = 15; // R,G,B間の許容色差
 
