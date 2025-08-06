@@ -729,7 +729,7 @@
     "atk": 15,
     "thumb": "MYG-E10_thumb",
     "image": "MYG-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 50,
     "weakness": "onyomi"
   },
@@ -864,7 +864,7 @@
     "atk": 13,
     "thumb": "YMG-E09_thumb",
     "image": "YMG-E09.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 31,
     "weakness": "kunyomi"
   },
@@ -879,7 +879,7 @@
     "atk": 20,
     "thumb": "YMG-E10_thumb",
     "image": "YMG-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 62,
     "weakness": "kunyomi"
   },
@@ -1029,7 +1029,7 @@
     "atk": 20,
     "thumb": "HKS-E10_thumb",
     "image": "HKS-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 62,
     "weakness": "onyomi"
   },
@@ -1179,7 +1179,7 @@
     "atk": 23,
     "thumb": "TCG-E10_thumb",
     "image": "TCG-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 80,
     "weakness": "onyomi"
   },
@@ -1329,7 +1329,7 @@
     "atk": 27,
     "thumb": "GNM-E10_thumb",
     "image": "GNM-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 100,
     "weakness": "onyomi"
   },
@@ -1479,7 +1479,7 @@
     "atk": 27,
     "thumb": "IBK-E10_thumb",
     "image": "IBK-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 100,
     "weakness": "kunyomi"
   },
@@ -1629,7 +1629,7 @@
     "atk": 30,
     "thumb": "SIT-E10_thumb",
     "image": "SIT-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 122,
     "weakness": "onyomi"
   },
@@ -1779,7 +1779,7 @@
     "atk": 35,
     "thumb": "TB-E10_thumb",
     "image": "TB-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 152,
     "weakness": "kunyomi"
   },
@@ -1929,7 +1929,7 @@
     "atk": 35,
     "thumb": "TKY-E10_thumb",
     "image": "TKY-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 152,
     "weakness": "kunyomi"
   },
@@ -2079,7 +2079,7 @@
     "atk": 38,
     "thumb": "KNG-E10_thumb",
     "image": "KNG-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 186,
     "weakness": "kunyomi"
   },
@@ -2229,7 +2229,7 @@
     "atk": 42,
     "thumb": "NGT-E10_thumb",
     "image": "NGT-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 226,
     "weakness": "kunyomi"
   },
@@ -2379,7 +2379,7 @@
     "atk": 42,
     "thumb": "TYM-E10_thumb",
     "image": "TYM-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 226,
     "weakness": "onyomi"
   },
@@ -2529,7 +2529,7 @@
     "atk": 45,
     "thumb": "ISK-E10_thumb",
     "image": "ISK-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 276,
     "weakness": "onyomi"
   },
@@ -2679,7 +2679,7 @@
     "atk": 50,
     "thumb": "HKI-E10_thumb",
     "image": "HKI-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 334,
     "weakness": "kunyomi"
   },
@@ -2829,7 +2829,7 @@
     "atk": 50,
     "thumb": "NGN-E10_thumb",
     "image": "NGN-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 334,
     "weakness": "kunyomi"
   },
@@ -2979,7 +2979,7 @@
     "atk": 53,
     "thumb": "GF-E10_thumb",
     "image": "GF-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 406,
     "weakness": "onyomi"
   },
@@ -3129,7 +3129,7 @@
     "atk": 57,
     "thumb": "YMN-E10_thumb",
     "image": "YMN-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 490,
     "weakness": "kunyomi"
   },
@@ -3279,7 +3279,7 @@
     "atk": 57,
     "thumb": "SZO-E10_thumb",
     "image": "SZO-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 490,
     "weakness": "kunyomi"
   },
@@ -3429,7 +3429,7 @@
     "atk": 60,
     "thumb": "AIC-E10_thumb",
     "image": "AIC-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 592,
     "weakness": "kunyomi"
   },
@@ -3579,7 +3579,7 @@
     "atk": 65,
     "thumb": "SG-E10_thumb",
     "image": "SG-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 714,
     "weakness": "onyomi"
   },
@@ -3729,7 +3729,7 @@
     "atk": 65,
     "thumb": "ME-E10_thumb",
     "image": "ME-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 714,
     "weakness": "kunyomi"
   },
@@ -3879,7 +3879,7 @@
     "atk": 68,
     "thumb": "KYT-E10_thumb",
     "image": "KYT-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 862,
     "weakness": "onyomi"
   },
@@ -4029,7 +4029,7 @@
     "atk": 72,
     "thumb": "NR-E10_thumb",
     "image": "NR-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1038,
     "weakness": "kunyomi"
   },
@@ -4179,7 +4179,7 @@
     "atk": 72,
     "thumb": "OSK-E10_thumb",
     "image": "OSK-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1038,
     "weakness": "onyomi"
   },
@@ -4329,7 +4329,7 @@
     "atk": 75,
     "thumb": "WKY-E10_thumb",
     "image": "WKY-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1250,
     "weakness": "kunyomi"
   },
@@ -4479,7 +4479,7 @@
     "atk": 80,
     "thumb": "HYG-E10_thumb",
     "image": "HYG-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1504,
     "weakness": "onyomi"
   },
@@ -4629,7 +4629,7 @@
     "atk": 80,
     "thumb": "TTR-E10_thumb",
     "image": "TTR-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1504,
     "weakness": "kunyomi"
   },
@@ -4779,7 +4779,7 @@
     "atk": 83,
     "thumb": "OKY-E10.thumb",
     "image": "OKY-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1808,
     "weakness": "onyomi"
   },
@@ -4929,7 +4929,7 @@
     "atk": 87,
     "thumb": "SMN-E10_thumb",
     "image": "SMN-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 2174,
     "weakness": "kunyomi"
   },
@@ -5079,7 +5079,7 @@
     "atk": 87,
     "thumb": "HRS-E10_thumb",
     "image": "HRS-E10.webp",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 2174,
     "weakness": "onyomi"
   },
@@ -5380,7 +5380,7 @@
     "atk": 54,
     "thumb": "PRV-E010_thumb",
     "image": "PRV-E010.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 775,
     "weakness": "onyomi"
   },
@@ -5530,7 +5530,7 @@
     "atk": 58,
     "thumb": "PRV-E020_thumb",
     "image": "PRV-E020.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 775,
     "weakness": "onyomi"
   },
@@ -5680,7 +5680,7 @@
     "atk": 62,
     "thumb": "PRV-E030_thumb",
     "image": "PRV-E030.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 775,
     "weakness": "onyomi"
   },
@@ -5830,7 +5830,7 @@
     "atk": 50,
     "thumb": "PRV-E040_thumb",
     "image": "PRV-E040.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 775,
     "weakness": "onyomi"
   },
@@ -5980,7 +5980,7 @@
     "atk": 54,
     "thumb": "PRV-E050_thumb",
     "image": "PRV-E050.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 775,
     "weakness": "onyomi"
   },
@@ -6130,7 +6130,7 @@
     "atk": 58,
     "thumb": "PRV-E060_thumb",
     "image": "PRV-E060.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 775,
     "weakness": "onyomi"
   },
@@ -6280,7 +6280,7 @@
     "atk": 62,
     "thumb": "PRV-E070_thumb",
     "image": "PRV-E070.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 775,
     "weakness": "onyomi"
   },
@@ -6430,7 +6430,7 @@
     "atk": 50,
     "thumb": "PRV-E080_thumb",
     "image": "PRV-E080.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 775,
     "weakness": "onyomi"
   },
@@ -6580,7 +6580,7 @@
     "atk": 54,
     "thumb": "PRV-E090_thumb",
     "image": "PRV-E090.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 775,
     "weakness": "onyomi"
   },
@@ -6730,7 +6730,7 @@
     "atk": 58,
     "thumb": "PRV-E100_thumb",
     "image": "PRV-E100.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 775,
     "weakness": "onyomi"
   },
@@ -6880,7 +6880,7 @@
     "atk": 67,
     "thumb": "PRV-E110_thumb",
     "image": "PRV-E110.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 850,
     "weakness": "onyomi"
   },
@@ -7030,7 +7030,7 @@
     "atk": 55,
     "thumb": "PRV-E120_thumb",
     "image": "PRV-E120.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 850,
     "weakness": "onyomi"
   },
@@ -7180,7 +7180,7 @@
     "atk": 59,
     "thumb": "PRV-E130_thumb",
     "image": "PRV-E130.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 850,
     "weakness": "onyomi"
   },
@@ -7330,7 +7330,7 @@
     "atk": 63,
     "thumb": "PRV-E140_thumb",
     "image": "PRV-E140.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 850,
     "weakness": "onyomi"
   },
@@ -7480,7 +7480,7 @@
     "atk": 67,
     "thumb": "PRV-E150_thumb",
     "image": "PRV-E150.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 850,
     "weakness": "onyomi"
   },
@@ -7630,7 +7630,7 @@
     "atk": 55,
     "thumb": "PRV-E160_thumb",
     "image": "PRV-E160.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 850,
     "weakness": "onyomi"
   },
@@ -7780,7 +7780,7 @@
     "atk": 59,
     "thumb": "PRV-E170_thumb",
     "image": "PRV-E170.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 850,
     "weakness": "onyomi"
   },
@@ -7930,7 +7930,7 @@
     "atk": 63,
     "thumb": "PRV-E180_thumb",
     "image": "PRV-E180.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 850,
     "weakness": "onyomi"
   },
@@ -8080,7 +8080,7 @@
     "atk": 67,
     "thumb": "PRV-E190_thumb",
     "image": "PRV-E190.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 850,
     "weakness": "onyomi"
   },
@@ -8230,7 +8230,7 @@
     "atk": 55,
     "thumb": "PRV-E200_thumb",
     "image": "PRV-E200.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 850,
     "weakness": "onyomi"
   },
@@ -8380,7 +8380,7 @@
     "atk": 64,
     "thumb": "PRV-E210_thumb",
     "image": "PRV-E210.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 925,
     "weakness": "onyomi"
   },
@@ -8530,7 +8530,7 @@
     "atk": 68,
     "thumb": "PRV-E220_thumb",
     "image": "PRV-E220.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 925,
     "weakness": "onyomi"
   },
@@ -8680,7 +8680,7 @@
     "atk": 72,
     "thumb": "PRV-E230_thumb",
     "image": "PRV-E230.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 925,
     "weakness": "onyomi"
   },
@@ -8830,7 +8830,7 @@
     "atk": 60,
     "thumb": "PRV-E240_thumb",
     "image": "PRV-E240.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 925,
     "weakness": "onyomi"
   },
@@ -8980,7 +8980,7 @@
     "atk": 64,
     "thumb": "PRV-E250_thumb",
     "image": "PRV-E250.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 925,
     "weakness": "onyomi"
   },
@@ -9130,7 +9130,7 @@
     "atk": 68,
     "thumb": "PRV-E260_thumb",
     "image": "PRV-E260.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 925,
     "weakness": "onyomi"
   },
@@ -9280,7 +9280,7 @@
     "atk": 72,
     "thumb": "PRV-E270_thumb",
     "image": "PRV-E270.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 925,
     "weakness": "meaning"
   },
@@ -9430,7 +9430,7 @@
     "atk": 60,
     "thumb": "PRV-E280_thumb",
     "image": "PRV-E280.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 925,
     "weakness": "onyomi"
   },
@@ -9580,7 +9580,7 @@
     "atk": 64,
     "thumb": "PRV-E290_thumb",
     "image": "PRV-E290.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 925,
     "weakness": "onyomi"
   },
@@ -9730,7 +9730,7 @@
     "atk": 68,
     "thumb": "PRV-E300_thumb",
     "image": "PRV-E300.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 925,
     "weakness": "onyomi"
   },
@@ -9880,7 +9880,7 @@
     "atk": 77,
     "thumb": "PRV-E310_thumb",
     "image": "PRV-E310.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1000,
     "weakness": "onyomi"
   },
@@ -10030,7 +10030,7 @@
     "atk": 65,
     "thumb": "PRV-E320_thumb",
     "image": "PRV-E320.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1000,
     "weakness": "onyomi"
   },
@@ -10180,7 +10180,7 @@
     "atk": 69,
     "thumb": "PRV-E330_thumb",
     "image": "PRV-E330.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1000,
     "weakness": "onyomi"
   },
@@ -10330,7 +10330,7 @@
     "atk": 73,
     "thumb": "PRV-E340_thumb",
     "image": "PRV-E340.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1000,
     "weakness": "onyomi"
   },
@@ -10480,7 +10480,7 @@
     "atk": 77,
     "thumb": "PRV-E350_thumb",
     "image": "PRV-E350.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1000,
     "weakness": "onyomi"
   },
@@ -10630,7 +10630,7 @@
     "atk": 65,
     "thumb": "PRV-E360_thumb",
     "image": "PRV-E360.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1000,
     "weakness": "onyomi"
   },
@@ -10780,7 +10780,7 @@
     "atk": 69,
     "thumb": "PRV-E370_thumb",
     "image": "PRV-E370.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1000,
     "weakness": "onyomi"
   },
@@ -10930,7 +10930,7 @@
     "atk": 73,
     "thumb": "PRV-E380_thumb",
     "image": "PRV-E380.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1000,
     "weakness": "onyomi"
   },
@@ -11080,7 +11080,7 @@
     "atk": 77,
     "thumb": "PRV-E390_thumb",
     "image": "PRV-E390.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1000,
     "weakness": "onyomi"
   },
@@ -11230,7 +11230,7 @@
     "atk": 65,
     "thumb": "PRV-E400_thumb",
     "image": "PRV-E400.png",
-    "isBoss": false,
+    "isBoss": true,
     "exp": 1000,
     "weakness": "onyomi"
   }

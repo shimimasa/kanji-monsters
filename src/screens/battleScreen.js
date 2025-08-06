@@ -2919,6 +2919,25 @@ function onAttack() {
       // 経験値獲得メッセージを表示
       battleState.log.push(`${expGained}の経験値を獲得した！`);
       
+      // 経験値パーティクルエフェクト後に経験値を実際に加算
+      setTimeout(() => {
+        // 経験値を加算して、レベルアップ判定を行う
+        const levelUpResult = addPlayerExp(expGained);
+        
+        // レベルアップした場合の演出処理
+        if (levelUpResult.leveledUp) {
+          // レベルアップSE再生
+          publish('playSE', 'levelUp');
+          
+          // レベルアップメッセージをログに追加
+          battleState.log.push(`レベルが ${levelUpResult.newLevel} にあがった！`);
+          addToLog(`攻撃力が上がった！ HP最大値が増えた！`);
+          
+          // レベルアップ強化エフェクトを開始
+          battleScreenState.startLevelUpEffect(120); // 2秒間表示
+        }
+      }, 1000); // パーティクルエフェクトが見える程度の遅延
+      
       // 敵が残っていれば次の敵をスポーン、最後の敵ならステージクリア待機
       if (gameState.currentEnemyIndex < gameState.enemies.length - 1) {
         setTimeout(() => {
