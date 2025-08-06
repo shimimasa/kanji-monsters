@@ -336,91 +336,35 @@ function loadImageWithTransparency(src) {
       canvas.width = img.width;
       canvas.height = img.height;
       
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const ctx = canvas.getContext('2d', { willReadFrequently: true }); // パフォーマンスヒントを追加
       ctx.drawImage(img, 0, 0);
       
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
       
-      // 画像の外周部分のピクセル色を取得（背景色の推定に使用）
-      const edgePixels = [];
-      // 上端のピクセル
-      for (let x = 0; x < canvas.width; x += Math.max(1, Math.floor(canvas.width / 20))) {
-        const i = (0 * canvas.width + x) * 4;
-        edgePixels.push({ r: data[i], g: data[i+1], b: data[i+2] });
-      }
-      // 下端のピクセル
-      for (let x = 0; x < canvas.width; x += Math.max(1, Math.floor(canvas.width / 20))) {
-        const i = ((canvas.height - 1) * canvas.width + x) * 4;
-        edgePixels.push({ r: data[i], g: data[i+1], b: data[i+2] });
-      }
-      // 左端のピクセル
-      for (let y = 0; y < canvas.height; y += Math.max(1, Math.floor(canvas.height / 20))) {
-        const i = (y * canvas.width + 0) * 4;
-        edgePixels.push({ r: data[i], g: data[i+1], b: data[i+2] });
-      }
-      // 右端のピクセル
-      for (let y = 0; y < canvas.height; y += Math.max(1, Math.floor(canvas.height / 20))) {
-        const i = (y * canvas.width + (canvas.width - 1)) * 4;
-        edgePixels.push({ r: data[i], g: data[i+1], b: data[i+2] });
-      }
-      
-      // 基本的な透過処理パラメータ
-      const threshold = 210; // 白に近い色を検出するしきい値（低いほど多くの色が対象に）
-      const colorDifferenceThreshold = 30; // RGB間の許容差（高いほど多くの色が対象に）
-      
-      // 画像全体をスキャンして透過処理
+      // ↓↓↓ ここからが新しい白判定ロジック ↓↓↓
+      const threshold = 230; // 白と判定する明るさのしきい値を下げる
+      const colorDifferenceThreshold = 20; // R,G,B間の許容色差を上げる
+
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
-        
-        // 明るさの計算（輝度に近い加重平均）
-        const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
-        
-        // 条件1: 明るい色（白に近い）の検出
-        const isWhitish = brightness > threshold && 
-                         Math.abs(r - g) < colorDifferenceThreshold && 
-                         Math.abs(g - b) < colorDifferenceThreshold && 
-                         Math.abs(b - r) < colorDifferenceThreshold;
-        
-        // 条件2: チェッカーボードパターンの検出
-        const isCheckerboard = (
-          // 薄い青（チェッカーボードの一部）
-          (b > 180 && b > r + 20 && b > g + 20) ||
-          // 薄いグレー（チェッカーボードの別の部分）
-          (r > 180 && g > 180 && b > 180 && 
-           Math.abs(r - g) < 20 && 
-           Math.abs(g - b) < 20 && 
-           Math.abs(b - r) < 20)
-        );
-        
-        // 条件3: 画像の外周部分の色に近いかどうか（背景色の可能性が高い）
-        let isEdgeColor = false;
-        for (const pixel of edgePixels) {
-          const colorDistance = Math.sqrt(
-            Math.pow(r - pixel.r, 2) + 
-            Math.pow(g - pixel.g, 2) + 
-            Math.pow(b - pixel.b, 2)
-          );
-          if (colorDistance < 25) { // 色の距離が近い
-            isEdgeColor = true;
-            break;
-          }
-        }
-        
-        // いずれかの条件に当てはまれば透明化
-        if (isWhitish || isCheckerboard || isEdgeColor) {
-          if (brightness > 240) {
-            // 非常に明るい色は完全に透明に
-            data[i + 3] = 0;
-          } else {
-            // それ以外はグラデーションで透明度を調整
-            const alphaFactor = Math.pow((255 - brightness) / (255 - threshold), 2);
-            data[i + 3] = Math.floor(data[i + 3] * Math.min(alphaFactor, 0.3));
-          }
+
+        // 明るさの平均値を計算
+        const brightness = (r + g + b) / 3;
+
+        // 明るさに応じたアルファ値のグラデーション
+        if (brightness > threshold && 
+            Math.abs(r - g) < colorDifferenceThreshold &&
+            Math.abs(g - b) < colorDifferenceThreshold &&
+            Math.abs(b - r) < colorDifferenceThreshold) {
+          // 明るさに応じてアルファ値を調整（明るいほど透明に）
+          const alphaFactor = Math.min(1, (255 - brightness) / (255 - threshold));
+          data[i + 3] = Math.floor(data[i + 3] * alphaFactor);
         }
       }
+      // ↑↑↑ ここまでが新しい白判定ロジック ↑↑↑
       
       ctx.putImageData(imageData, 0, 0);
       
