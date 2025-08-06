@@ -467,7 +467,7 @@ const battleScreenState = {
 
     /* 敵 */
     const enemy = gameState.currentEnemy;
-    const ex = 480, ey = 80, ew = 240, eh = 120;
+    const ex = 480, ey = 120, ew = 240, eh = 120; // eyを80から120に変更
 
     // アニメーション用オフセット計算
     let offsetX = 0, offsetY = 0, rotateAngle = 0, alpha = 1;
