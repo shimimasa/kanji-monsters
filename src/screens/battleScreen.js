@@ -185,8 +185,12 @@ const battleScreenState = {
         return;
       }
       
-      // バトル画面に入ったら BGM をバトル用に切り替える
-      publish('playBGM', 'battle');
+      // ステージIDに基づいて適切なBGMを選択
+      const bgmKey = this.getBGMKeyForStage(gameState.currentStageId);
+      console.log(`🎵 ステージ ${gameState.currentStageId} のBGM: ${bgmKey}`);
+      
+      // 選択されたBGMを再生
+      publish('playBGM', bgmKey);
       
       // バトル開始時にプレイヤー HP とターン状態を初期化
       gameState.playerStats.hp       = gameState.playerStats.maxHp;
@@ -382,6 +386,45 @@ const battleScreenState = {
       alert(`ゲーム画面の初期化に失敗しました: ${error.message}\nステージ選択に戻ります。`);
       publish('changeScreen', 'stageSelect');
     }
+  },
+
+  /**
+   * ステージIDから適切なBGMキーを取得する
+   * @param {string} stageId - ステージID
+   * @returns {string} BGMのキー
+   */
+  getBGMKeyForStage(stageId) {
+    // ボス戦の場合
+    if (stageId.includes('boss')) {
+      return 'boss';
+    }
+    
+    // 地域名を抽出
+    let region = '';
+    
+    // 中学生ステージ（世界）の場合
+    if (stageId.startsWith('Asie_')) {
+      region = 'asia';
+    } else if (stageId.startsWith('Europe_')) {
+      region = 'europe';
+    } else if (stageId.startsWith('America_')) {
+      region = 'america';
+    } else if (stageId.startsWith('Africa_')) {
+      region = 'africa';
+    } else {
+      // 日本の地域の場合（例：tohoku_area2 → tohoku）
+      region = stageId.split('_')[0];
+    }
+    
+    // エリア番号を抽出して偶数か奇数かを判定
+    const areaMatch = stageId.match(/_area(\d+)$/);
+    const suffix = areaMatch && parseInt(areaMatch[1]) % 2 === 0 ? 'b' : 'a';
+    
+    // 地域別BGMのキーを生成
+    const regionBgmKey = `${region}_${suffix}`;
+    
+    // BGMキーが存在するか確認（存在しない場合はデフォルトのbattleを使用）
+    return regionBgmKey;
   },
 
   /** 1フレームごとの描画更新 */
@@ -842,9 +885,9 @@ const battleScreenState = {
     }
 
     // ── メッセージ欄 ──（右下に配置、横幅を拡張）
-    const msgX = this.canvas.width - 380; // 330から380に拡張
+    const msgX = this.canvas.width - 420; // 380から420に拡張
     const msgY = 450; // ボトムエリアの開始位置
-    const msgW = 360; // 310から360に拡張
+    const msgW = 400; // 360から400に拡張
     const msgH = 130; // 高さを調整（プレイヤーパネルと同じ）
 
     // 半透明の黒背景から石版風デザインに変更
