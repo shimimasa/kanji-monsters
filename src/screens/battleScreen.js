@@ -535,8 +535,9 @@ const battleScreenState = {
     }
 
     if (enemy && enemy.img) {
-      // 画像がある場合は画像を描画（シンプルに）
-      // 透明度を保持するために、背景を先に描画しない
+      // 透明度を適切に処理するための合成モードを設定
+      this.ctx.globalCompositeOperation = 'source-over';
+      // 画像を描画
       this.ctx.drawImage(enemy.img, -ew/2, -eh/2, ew, eh);
     } else {
       // 画像がない場合は代替表示
