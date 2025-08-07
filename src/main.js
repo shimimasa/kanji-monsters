@@ -17,6 +17,7 @@ import DataSync from './services/firebase/dataSync.js';
 import { FSM } from './core/stateMachine.js';
 import { setupFSM } from './init/fsmsetup.js';
 import { checkAchievements } from './core/achievementManager.js';
+import { addKanji } from './models/kanjiDex.js';
 
 /* ----------------------------- 実績通知システム ----------------------------- */
 const achievementNotificationQueue = [];
@@ -235,6 +236,11 @@ subscribe('achievementUnlocked', (achievementData) => {
       achievementNotificationQueue.shift();
     }
   }, 3500);
+});
+
+// 漢字図鑑に追加するイベントを購読
+subscribe('addToKanjiDex', id => {
+  addKanji(id);
 });
 
 // ... アプリ初期化後などの適切な位置で ...

@@ -345,6 +345,11 @@ const battleScreenState = {
       for (const e of gameState.enemies) {
         e.img = images[e.id] || null;
         e.hp = e.maxHp;
+        
+        // ボスのシールドHPの初期値を保存（ここを追加）
+        if (e.isBoss && e.shieldHp !== undefined) {
+          e.originalShieldHp = e.shieldHp;
+        }
       }
 
       // 表示用HPステートを初期化
@@ -1940,8 +1945,8 @@ drawEnemyStatusPanel(ctx) {
     const kanjiY = 200;
     const kanjiBoxW = 180;
     
-    // コンボ表示の位置（漢字の右横）
-    const comboX = kanjiX + kanjiBoxW / 2 + 40;
+    // コンボ表示の位置（漢字の左横に変更）
+    const comboX = kanjiX - kanjiBoxW / 2 - 40;
     const comboY = kanjiY;
     
     ctx.save();
@@ -2573,7 +2578,7 @@ drawEnemyStatusPanel(ctx) {
       const kanjiX = this.canvas.width / 2;
       const kanjiY = 200;
       const kanjiBoxW = 180;
-      const comboX = kanjiX + kanjiBoxW / 2 + 40;
+      const comboX = kanjiX - kanjiBoxW / 2 - 40; // 左側に変更
       const comboY = kanjiY;
       
       const timerRatio = battleState.comboTimer / 300; // 5秒 = 300フレーム
@@ -2676,13 +2681,33 @@ export default battleScreenState;
 // 敵をスポーン（初期化）
 function spawnEnemy() {
   const e = gameState.enemies[gameState.currentEnemyIndex];
+  
+  // ボスのシールドHPを初期化（ここを追加）
+  if (e.isBoss && e.shieldHp !== undefined) {
+    // JSONに設定されているオリジナルのshieldHp値を保存
+    if (e.originalShieldHp === undefined) {
+      e.originalShieldHp = e.shieldHp;
+    }
+    // シールドHPを初期値に戻す
+    e.shieldHp = e.originalShieldHp;
+  }
+  
   gameState.currentEnemy = e;
   updateEnemyUI(e.name, e.hp, e.maxHp);
   
   // 従来のログ初期化をaddToLogに置き換え
-  // battleState.log = [`${e.name} があらわれた！`];
   battleState.log = [];
-  addToLog(`${e.name} があらわれた！`);
+  
+  // ボス戦かどうかに応じてメッセージを変更
+  if (e.isBoss) {
+    addToLog(`ボス ${e.name} があらわれた！`);
+    // ボスのシールド情報をログに表示
+    if (e.shieldHp > 0) {
+      addToLog(`${e.name}は防御態勢をとっている！`);
+    }
+  } else {
+    addToLog(`${e.name} があらわれた！`);
+  }
   
   publish('playSE', 'appear');
   
@@ -2758,6 +2783,11 @@ function onAttack() {
     
     // 1) 連続正解カウントアップ（既存のbattleState.comboCountは保持）
     battleState.comboCount++;
+    
+    // 5コンボで止める
+    if (battleState.comboCount > 5) {
+      battleState.comboCount = 5;
+    }
     
     // コンボカウントが2以上になったらコンボアニメーションを開始
     if (battleState.comboCount >= 2) {
@@ -3164,7 +3194,7 @@ function onHeal() {
     publish('playSE', 'heal');
     gameState.playerStats.hp = Math.min(
       gameState.playerStats.maxHp,
-      gameState.playerStats.hp + 30
+      gameState.playerStats.hp + calculateHealAmount(gameState.playerStats.level)
     );
     battleState.playerHpTarget    = gameState.playerStats.hp;
     battleState.playerHpAnimating = true;
@@ -3671,4 +3701,16 @@ const UI_THEME = {
 
 const threshold = 240; // 白と判定する明るさのしきい値
 const colorDifferenceThreshold = 15; // R,G,B間の許容色差
+
+// 回復量をレベルに応じて計算する関数
+function calculateHealAmount(playerLevel) {
+  // 基本回復量（レベル1の時）
+  const baseHeal = 30;
+  
+  // レベルごとの増加量
+  const levelBonus = Math.floor(playerLevel * 2.5);
+  
+  // 合計回復量（基本値 + レベルボーナス）
+  return baseHeal + levelBonus;
+}
 
