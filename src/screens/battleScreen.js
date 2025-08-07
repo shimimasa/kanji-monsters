@@ -1349,6 +1349,55 @@ if (gameState.currentKanji) {
   this.ctx.shadowOffsetX = 0;
   this.ctx.shadowOffsetY = 0;
 }
+
+    // ボタンの描画時に選択されているコマンドを強調表示
+    const mode = battleState.lastCommandMode || 'attack';
+    
+    // 攻撃ボタンの描画
+    this.drawRichButton(
+      this.ctx, 
+      BTN.attack.x, BTN.attack.y, 
+      BTN.attack.w, BTN.attack.h, 
+      "こうげき", 
+      mode === 'attack' ? '#e74c3c' : '#2980b9', // 選択中は赤色
+      isMouseOverRect(this.mouseX, this.mouseY, BTN.attack),
+      false
+    );
+    
+    // 回復ボタンの描画
+    this.drawRichButton(
+      this.ctx, 
+      BTN.heal.x, BTN.heal.y, 
+      BTN.heal.w, BTN.heal.h, 
+      "かいふく", 
+      mode === 'heal' ? '#e74c3c' : '#2980b9', // 選択中は赤色
+      isMouseOverRect(this.mouseX, this.mouseY, BTN.heal),
+      false
+    );
+    
+    // ヒントボタンの描画
+    this.drawRichButton(
+      this.ctx, 
+      BTN.hint.x, BTN.hint.y, 
+      BTN.hint.w, BTN.hint.h, 
+      "ヒント", 
+      mode === 'hint' ? '#e74c3c' : '#2980b9', // 選択中は赤色
+      isMouseOverRect(this.mouseX, this.mouseY, BTN.hint),
+      false
+    );
+    
+    // 選択中のコマンドに関する説明を表示
+    const helpText = {
+      'attack': 'Enterキーで攻撃を繰り返し',
+      'heal': 'Enterキーで回復を繰り返し',
+      'hint': 'Enterキーでヒントを表示'
+    };
+    
+    // 画面下部に選択中のコマンドのヘルプテキストを表示
+    this.ctx.font = '14px "UDデジタル教科書体", sans-serif';
+    this.ctx.fillStyle = 'white';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText(helpText[mode], this.canvas.width / 2, this.canvas.height - 20);
   },
 
   /**
@@ -1887,6 +1936,8 @@ drawEnemyStatusPanel(ctx) {
     // 「こうげき」ボタン押下時
     if (isMouseOverRect(x, y, BTN.attack)) {
       console.log('「こうげき」ボタンがクリックされました');
+      // 最後に使用したコマンドを「攻撃」に設定
+      battleState.lastCommandMode = 'attack';
       onAttack();
       return true;
     }
@@ -1894,6 +1945,8 @@ drawEnemyStatusPanel(ctx) {
     // 「かいふく」ボタン押下時
     if (isMouseOverRect(x, y, BTN.heal)) {
       console.log('「かいふく」ボタンがクリックされました');
+      // 最後に使用したコマンドを「回復」に設定
+      battleState.lastCommandMode = 'heal';
       onHeal();
       return true;
     }
@@ -1901,6 +1954,8 @@ drawEnemyStatusPanel(ctx) {
     // 「ヒント」ボタン押下時
     if (isMouseOverRect(x, y, BTN.hint)) {
       console.log('「ヒント」ボタンがクリックされました');
+      // 最後に使用したコマンドを「ヒント」に設定
+      battleState.lastCommandMode = 'hint';
       onHint();
       return true;
     }

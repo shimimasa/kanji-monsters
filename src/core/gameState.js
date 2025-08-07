@@ -15,6 +15,9 @@ export const battleState = {
   // コンボタイマー関連のプロパティを追加
   comboTimer: 0,         // コンボの残り時間（フレーム数）
   COMBO_TIMER_MAX: 300,  // コンボの最大持続時間（5秒 = 300フレーム）
+  
+  // 最後に選択したコマンドモード（攻撃、回復、ヒント）
+  lastCommandMode: 'attack', // デフォルトは攻撃
 };
 
 export const gameState = {

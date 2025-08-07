@@ -165,6 +165,10 @@ function drawAchievementNotifications(ctx) {
   if (!initializeFirebaseServices()) return;
   const user = await signInAnonymouslyIfNeeded();
   console.log('UID:', user?.uid);
+  
+  // プレイヤーデータを読み込む処理を追加
+  await loadPlayerData();
+  
   await loadAllStageClearStatus();
 
   // セーブデータ読み込み完了後に実績チェックを実行（プレイ時間や累計系実績のチェック）
