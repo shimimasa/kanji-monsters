@@ -1372,6 +1372,12 @@ if (gameState.currentKanji) {
     const scale = isHovered ? 1.05 : 1.0;
     const hoverColor = isHovered ? this.lightenColor(baseColor, 15) : baseColor;
     
+    // 元の座標を保存（テキスト描画用）
+    const originalX = x;
+    const originalY = y;
+    const originalWidth = width;
+    const originalHeight = height;
+    
     // ホバー時はボタンを中央基準で拡大
     if (isHovered) {
       const centerX = x + width / 2;
@@ -1412,6 +1418,42 @@ if (gameState.currentKanji) {
       ctx.lineWidth = 1;
       ctx.strokeRect(x + 1, y + 1, width - 2, height - 2);
     }
+    
+    ctx.restore();
+    
+    // ▼▼▼ テキストとアイコンを追加 ▼▼▼
+    
+    // アイコンの描画
+    let iconKey = '';
+    if (label === 'こうげき') iconKey = 'iconAttack';
+    else if (label === 'かいふく') iconKey = 'iconHeal';
+    else if (label === 'ヒント') iconKey = 'iconHint';
+    
+    const icon = images[iconKey];
+    if (icon) {
+      const iconSize = 24;
+      const iconX = originalX + 15;
+      const iconY = originalY + (originalHeight - iconSize) / 2;
+      ctx.drawImage(icon, iconX, iconY, iconSize, iconSize);
+    }
+    
+    // テキストの描画
+    ctx.save();
+    ctx.font = 'bold 16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    const textX = originalX + originalWidth/2 + 10; // アイコン分右にずらす
+    const textY = originalY + originalHeight/2;
+    
+    // 縁取り
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 3;
+    ctx.strokeText(label, textX, textY);
+    
+    // テキスト
+    ctx.fillStyle = 'white';
+    ctx.fillText(label, textX, textY);
     
     ctx.restore();
   },
