@@ -176,6 +176,22 @@ export function getEnemiesByStageId(stageId) {
       // 該当する都道府県コードの敵を検索
       enemies = enemyData.filter(e => e.id.startsWith(prefCode));
       console.log(`${prefCode} で始まる敵を ${enemies.length} 件見つけました。`);
+      
+      // 敵をIDでソートして、E01からE10の順になるようにする
+      enemies.sort((a, b) => {
+        const numA = parseInt(a.id.split('-E')[1]) || 0;
+        const numB = parseInt(b.id.split('-E')[1]) || 0;
+        return numA - numB;
+      });
+      
+      // 最後の敵にisBossフラグが設定されていない場合は設定する
+      if (enemies.length > 0) {
+        const lastEnemy = enemies[enemies.length - 1];
+        if (!lastEnemy.isBoss) {
+          console.warn(`最後の敵 ${lastEnemy.id} にisBossフラグがないため、設定します。`);
+          lastEnemy.isBoss = true;
+        }
+      }
     }
   }
   
@@ -183,6 +199,11 @@ export function getEnemiesByStageId(stageId) {
   if (enemies.length === 0) {
     console.warn('代替として北海道の敵を使用します。');
     enemies = enemyData.filter(e => e.id.startsWith('HKD-E')).slice(0, 10);
+    
+    // 最後の敵をボスとして設定
+    if (enemies.length > 0) {
+      enemies[enemies.length - 1].isBoss = true;
+    }
   }
   
   return enemies;

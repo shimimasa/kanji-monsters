@@ -2737,6 +2737,12 @@ export default battleScreenState;
 function spawnEnemy() {
   const e = gameState.enemies[gameState.currentEnemyIndex];
   
+  // 最後の敵の場合、ボスフラグを確認して必要なら設定
+  if (gameState.currentEnemyIndex === gameState.enemies.length - 1 && !e.isBoss) {
+    console.warn(`最後の敵 ${e.id} にisBossフラグがないため、設定します。`);
+    e.isBoss = true;
+  }
+  
   // ボスのシールドHPを初期化（ここを追加）
   if (e.isBoss && e.shieldHp !== undefined) {
     // JSONに設定されているオリジナルのshieldHp値を保存
@@ -2745,6 +2751,10 @@ function spawnEnemy() {
     }
     // シールドHPを初期値に戻す
     e.shieldHp = e.originalShieldHp;
+  } else if (e.isBoss && e.shieldHp === undefined) {
+    // ボスなのにシールドHPが設定されていない場合、デフォルト値を設定
+    e.shieldHp = 3;
+    e.originalShieldHp = 3;
   }
   
   gameState.currentEnemy = e;
