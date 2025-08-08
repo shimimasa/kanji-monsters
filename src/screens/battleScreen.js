@@ -806,17 +806,35 @@ const battleScreenState = {
 
       // ホバー判定
       const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
+      // 押下判定
+      const isPressed = this.pressedButtons.has(key);
       
       // ボタンの背景を描画
-      this.drawRichButton(this.ctx, b.x, b.y, b.w, b.h, b.label, buttonColor, isHovered);
+      this.drawRichButton(this.ctx, b.x, b.y, b.w, b.h, b.label, buttonColor, isHovered, isPressed);
 
-      // アイコンマップ
-      const iconMap = {
-        attack: images.iconAttack,
-        heal:   images.iconHeal,
-        hint:   images.iconHint
+      // アイコンの直接パスを使用
+      const iconPaths = {
+        attack: '/assets/images/icon_attack.png',
+        heal: '/assets/images/icon_heal.png',
+        hint: '/assets/images/icon_hint.png'
       };
-      const iconImg = iconMap[key];
+      
+      // アイコンを直接ロード（キャッシュがなければ）
+      if (!images[`icon_${key}`] && iconPaths[key]) {
+        const img = new Image();
+        img.src = iconPaths[key];
+        img.onload = () => {
+          images[`icon_${key}`] = img;
+          // 画像が読み込まれたら再描画を促す
+          this.needsRedraw = true;
+        };
+        img.onerror = () => {
+          console.error(`アイコン画像の読み込みに失敗しました: ${iconPaths[key]}`);
+        };
+      }
+      
+      // アイコン参照を更新
+      const iconImg = images[`icon_${key}`] || images[key === 'attack' ? 'iconAttack' : (key === 'heal' ? 'iconHeal' : 'iconHint')];
       const padding = 8;
       
       // ホバー時のスケール調整を考慮したアイコンとテキストの位置計算
@@ -835,11 +853,48 @@ const battleScreenState = {
         adjustedY = centerY - adjustedH / 2;
       }
       
+      // 押下時は少し下にずらす
+      if (isPressed) {
+        adjustedY += 2;
+      }
+      
       const iconSize = adjustedH - padding * 2;
 
       // アイコン描画（アイコンがない場合はスキップ）
       if (iconImg) {
         this.ctx.drawImage(iconImg, adjustedX + padding, adjustedY + padding, iconSize, iconSize);
+      } else {
+        // アイコンがない場合は代替表示（シンプルな図形で表現）
+        this.ctx.save();
+        if (key === 'attack') {
+          // 攻撃アイコンの代替：赤い剣マーク
+          this.ctx.fillStyle = '#e74c3c';
+          this.ctx.beginPath();
+          const cx = adjustedX + padding + iconSize/2;
+          const cy = adjustedY + padding + iconSize/2;
+          this.ctx.moveTo(cx, cy - iconSize/3);
+          this.ctx.lineTo(cx + iconSize/4, cy + iconSize/3);
+          this.ctx.lineTo(cx - iconSize/4, cy + iconSize/3);
+          this.ctx.closePath();
+          this.ctx.fill();
+        } else if (key === 'heal') {
+          // 回復アイコンの代替：緑の十字
+          this.ctx.fillStyle = '#27ae60';
+          const cx = adjustedX + padding + iconSize/2;
+          const cy = adjustedY + padding + iconSize/2;
+          const w = iconSize/5;
+          const h = iconSize/2;
+          this.ctx.fillRect(cx - w/2, cy - h/2, w, h);
+          this.ctx.fillRect(cx - h/2, cy - w/2, h, w);
+        } else if (key === 'hint') {
+          // ヒントアイコンの代替：黄色の？マーク
+          this.ctx.fillStyle = '#f39c12';
+          this.ctx.font = `bold ${iconSize * 0.7}px sans-serif`;
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText('?', adjustedX + padding + iconSize/2, adjustedY + padding + iconSize/2);
+        }
+        this.ctx.restore();
       }
 
       // ボタンラベルの表示テキスト（日本語）- BTNオブジェクトから直接取得
@@ -859,11 +914,12 @@ const battleScreenState = {
       }
 
       // テキスト描画（縁取り付き）- テキストサイズを大きくして視認性を向上
-      const textX = adjustedX + padding + (iconImg ? iconSize + padding : 0);
+      const textX = adjustedX + padding + (iconImg ? iconSize + padding : iconSize + padding);
       const textY = adjustedY + adjustedH / 2;
       
       // テキスト描画の前に背景を追加して視認性を高める
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      this.ctx.font = 'bold 16px "UDデジタル教科書体",sans-serif';
       const textWidth = this.ctx.measureText(labelText).width;
       this.ctx.fillRect(textX - 2, textY - 10, textWidth + 4, 20);
       
@@ -878,9 +934,6 @@ const battleScreenState = {
         'middle',
         2 // 縁取りを太く
       );
-      
-      // デバッグ情報を出力（開発中のみ）
-      console.log(`ボタン描画: key=${key}, label=${labelText}, x=${textX}, y=${textY}`);
     });
 
     /* 入力欄 */
