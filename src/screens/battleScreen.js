@@ -844,8 +844,17 @@ const battleScreenState = {
         iconKey = 'iconHint';
       }
       
-      // アイコンがある場合は描画
+      // デバッグ：アイコンの存在確認
       const icon = images[iconKey];
+      if (!window._debuggedIcons) {
+        window._debuggedIcons = {};
+      }
+      if (!window._debuggedIcons[iconKey]) {
+        console.log(`アイコン確認: ${iconKey}, 存在: ${!!icon}`);
+        window._debuggedIcons[iconKey] = true;
+      }
+      
+      // アイコンがある場合は描画
       if (icon) {
         const iconSize = 24;
         const iconX = b.x + 15;
@@ -853,20 +862,42 @@ const battleScreenState = {
         this.ctx.drawImage(icon, iconX, iconY, iconSize, iconSize);
       }
       
-      // テキスト描画（直接描画、フォントサイズを大きく、位置を調整）
+      // 最も確実なテキスト描画方法を試す
       this.ctx.save();
-      this.ctx.font = 'bold 20px sans-serif';
+      
+      // テキストの設定をリセット
+      this.ctx.globalAlpha = 1.0;
+      this.ctx.globalCompositeOperation = 'source-over';
+      
+      // フォールバック用のシンプルフォント
+      this.ctx.font = 'bold 18px Arial, sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
       
-      // 縁取り（太く）
-      this.ctx.strokeStyle = 'black';
-      this.ctx.lineWidth = 4;
-      this.ctx.strokeText(labelText, b.x + b.w/2 + 10, b.y + b.h/2);
+      const textX = b.x + b.w/2;
+      const textY = b.y + b.h/2;
       
-      // テキスト
+      // 太い黒い縁取り
+      this.ctx.strokeStyle = 'black';
+      this.ctx.lineWidth = 6;
+      this.ctx.strokeText(labelText, textX, textY);
+      
+      // 白いテキスト
       this.ctx.fillStyle = 'white';
-      this.ctx.fillText(labelText, b.x + b.w/2 + 10, b.y + b.h/2);
+      this.ctx.fillText(labelText, textX, textY);
+      
+      // さらにデバッグ用の四角形を描画してテキスト位置を確認
+      if (!window._debuggedTextPos) {
+        window._debuggedTextPos = {};
+      }
+      if (!window._debuggedTextPos[key]) {
+        console.log(`テキスト位置: ${key}, x=${textX}, y=${textY}, text="${labelText}"`);
+        // デバッグ用：テキスト位置に小さな赤い点を描画
+        this.ctx.fillStyle = 'red';
+        this.ctx.fillRect(textX - 2, textY - 2, 4, 4);
+        window._debuggedTextPos[key] = true;
+      }
+      
       this.ctx.restore();
       
       // 押下状態を示すインジケータ（押されている場合のみ表示）
@@ -886,15 +917,6 @@ const battleScreenState = {
         this.ctx.textBaseline = 'bottom';
         this.ctx.fillText('Enterで継続', b.x + b.w - 5, b.y + b.h - 5);
         this.ctx.restore();
-      }
-      
-      // デバッグ用：コンソールにボタン情報を出力（初回のみ）
-      if (!window._debuggedButtons) {
-        window._debuggedButtons = {};
-      }
-      if (!window._debuggedButtons[key]) {
-        console.log(`ボタン描画: ${key}, label=${labelText}, x=${b.x}, y=${b.y}, w=${b.w}, h=${b.h}`);
-        window._debuggedButtons[key] = true;
       }
     });
 
