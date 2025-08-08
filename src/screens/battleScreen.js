@@ -13,13 +13,12 @@ battleState.timeRemaining = 60;
 // 直近に出題された問題を避けるための設定値
 const RECENT_QUESTIONS_BUFFER_SIZE = 5; // 直近5問は出題しない
 
-// BTNオブジェクトの位置を修正（画像の2枚目に合わせる）
 const BTN = {
   back:   { x: 20,  y: 20,  w: 100, h: 30,  label: 'タイトルへ' },
   stage:  { x: 140, y: 20,  w: 120, h: 30,  label: 'ステージ選択' },
-  attack: { x: 340, y: 580, w: 140, h: 50,  label: 'こうげき' },
-  heal:   { x: 490, y: 580, w: 140, h: 50,  label: 'かいふく' },
-  hint:   { x: 640, y: 580, w: 140, h: 50,  label: 'ヒント' },
+  attack: { x: 230, y: 380, w: 110, h: 50,  label: 'こうげき' },
+  heal:   { x: 350, y: 380, w: 110, h: 50,  label: 'かいふく' },
+  hint:   { x: 470, y: 380, w: 110, h: 50,  label: 'ヒント' },
 };
 
 const ENEMY_DAMAGE_ANIM_DURATION = 10; // ダメージ時の振動フレーム数
@@ -795,37 +794,33 @@ const battleScreenState = {
     this.drawPlayerStatusPanel(this.ctx);
     this.drawEnemyStatusPanel(this.ctx);
 
-    /* ボタン描画（リッチなデザイン） */
+    /* ボタン描画（シンプルで確実な実装） */
     Object.entries(BTN).forEach(([key, b]) => {
       if (key === 'back' || key === 'stage') return; // 既に上で描画済み
 
       // ボタンの色を決定
-      let buttonColor = '#2980b9'; // 青色（デフォルト）
-      let iconText = '?';
-      
-      if (key === 'attack') {
-        buttonColor = '#e74c3c'; // 赤色
-        iconText = '⚔️';
-      } else if (key === 'heal') {
-        buttonColor = '#27ae60'; // 緑色
-        iconText = '❤️';
-      } else if (key === 'hint') {
-        buttonColor = '#f39c12'; // オレンジ色
-        iconText = '💡';
-      }
+      let buttonColor = '#2980b9';
+      if (key === 'attack') buttonColor = '#e74c3c';
+      else if (key === 'heal') buttonColor = '#27ae60';
+      else if (key === 'hint') buttonColor = '#f39c12';
 
-      // ホバー判定
+      // ホバー判定と押下判定
       const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
+      const isPressed = this.pressedButtons && this.pressedButtons.has(key);
       
-      // ボタン本体の描画
+      // ボタンの背景を描画
       this.ctx.save();
       
-      // 背景グラデーション
-      const gradient = this.ctx.createLinearGradient(b.x, b.y, b.x, b.y + b.h);
-      gradient.addColorStop(0, this.lightenColor(buttonColor, 20));
-      gradient.addColorStop(1, this.darkenColor(buttonColor, 20));
+      // 背景色（ホバー時は明るく、押下時は暗く）
+      if (isPressed) {
+        this.ctx.fillStyle = this.darkenColor(buttonColor, 15);
+      } else if (isHovered) {
+        this.ctx.fillStyle = this.lightenColor(buttonColor, 15);
+      } else {
+        this.ctx.fillStyle = buttonColor;
+      }
       
-      this.ctx.fillStyle = gradient;
+      // ボタン本体の描画
       this.ctx.fillRect(b.x, b.y, b.w, b.h);
       
       // 枠線
@@ -833,23 +828,43 @@ const battleScreenState = {
       this.ctx.lineWidth = 2;
       this.ctx.strokeRect(b.x, b.y, b.w, b.h);
       
-      // アイコン部分
-      this.ctx.font = '20px sans-serif';
-      this.ctx.fillStyle = 'white';
-      this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'middle';
-      this.ctx.fillText(iconText, b.x + 25, b.y + b.h/2);
+      // ボタンラベルの表示
+      let labelText = b.label || '';
+      if (key === 'attack') labelText = 'こうげき';
+      else if (key === 'heal') labelText = 'かいふく';
+      else if (key === 'hint') labelText = 'ヒント';
       
-      // ラベル部分
-      this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
-      this.ctx.fillStyle = 'white';
-      this.ctx.textAlign = 'left';
-      this.ctx.fillText(b.label, b.x + 50, b.y + b.h/2);
+      // テキスト描画
+      this.drawTextWithOutline(
+        labelText,
+        b.x + b.w/2,
+        b.y + b.h/2,
+        'white',
+        'black',
+        'bold 16px "UDデジタル教科書体", sans-serif',
+        'center',
+        'middle',
+        2
+      );
+      
+      // 押下状態を示すインジケータ（押されている場合のみ表示）
+      if (isPressed) {
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        this.ctx.beginPath();
+        this.ctx.arc(b.x + b.w - 10, b.y + 10, 5, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+      
+      // Enterキーで継続可能なことを示す（最後に使用したコマンドの場合）
+      if (battleState.lastCommandMode === key) {
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '12px "UDデジタル教科書体", sans-serif';
+        this.ctx.textAlign = 'right';
+        this.ctx.textBaseline = 'bottom';
+        this.ctx.fillText('Enterで継続', b.x + b.w - 5, b.y + b.h - 5);
+      }
       
       this.ctx.restore();
-      
-      // デバッグ情報
-      console.log(`ボタン描画: ${key}, label=${b.label}, x=${b.x}, y=${b.y}, w=${b.w}, h=${b.h}`);
     });
 
     /* 入力欄 */
