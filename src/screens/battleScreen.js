@@ -794,131 +794,7 @@ const battleScreenState = {
     this.drawPlayerStatusPanel(this.ctx);
     this.drawEnemyStatusPanel(this.ctx);
 
-    /* ボタン描画（シンプルで確実な実装） */
-    Object.entries(BTN).forEach(([key, b]) => {
-      if (key === 'back' || key === 'stage') return; // 既に上で描画済み
-
-      // ボタンの色を決定
-      let buttonColor = '#2980b9';
-      if (key === 'attack') buttonColor = '#e74c3c';
-      else if (key === 'heal') buttonColor = '#27ae60';
-      else if (key === 'hint') buttonColor = '#f39c12';
-
-      // ホバー判定と押下判定
-      const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
-      const isPressed = this.pressedButtons && this.pressedButtons.has(key);
-      
-      // ボタンの背景を描画
-      this.ctx.save();
-      
-      // 背景色（ホバー時は明るく、押下時は暗く）
-      if (isPressed) {
-        this.ctx.fillStyle = this.darkenColor(buttonColor, 15);
-      } else if (isHovered) {
-        this.ctx.fillStyle = this.lightenColor(buttonColor, 15);
-      } else {
-        this.ctx.fillStyle = buttonColor;
-      }
-      
-      // ボタン本体の描画
-      this.ctx.fillRect(b.x, b.y, b.w, b.h);
-      
-      // 枠線
-      this.ctx.strokeStyle = 'white';
-      this.ctx.lineWidth = 2;
-      this.ctx.strokeRect(b.x, b.y, b.w, b.h);
-      this.ctx.restore();
-      
-      // ボタンラベルとアイコンの表示
-      let labelText = '';
-      let iconKey = '';
-      
-      if (key === 'attack') {
-        labelText = 'こうげき';
-        iconKey = 'iconAttack';
-      } else if (key === 'heal') {
-        labelText = 'かいふく';
-        iconKey = 'iconHeal';
-      } else if (key === 'hint') {
-        labelText = 'ヒント';
-        iconKey = 'iconHint';
-      }
-      
-      // デバッグ：アイコンの存在確認
-      const icon = images[iconKey];
-      if (!window._debuggedIcons) {
-        window._debuggedIcons = {};
-      }
-      if (!window._debuggedIcons[iconKey]) {
-        console.log(`アイコン確認: ${iconKey}, 存在: ${!!icon}`);
-        window._debuggedIcons[iconKey] = true;
-      }
-      
-      // アイコンがある場合は描画
-      if (icon) {
-        const iconSize = 24;
-        const iconX = b.x + 15;
-        const iconY = b.y + (b.h - iconSize) / 2;
-        this.ctx.drawImage(icon, iconX, iconY, iconSize, iconSize);
-      }
-      
-      // 最も確実なテキスト描画方法を試す
-      this.ctx.save();
-      
-      // テキストの設定をリセット
-      this.ctx.globalAlpha = 1.0;
-      this.ctx.globalCompositeOperation = 'source-over';
-      
-      // フォールバック用のシンプルフォント
-      this.ctx.font = 'bold 18px Arial, sans-serif';
-      this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'middle';
-      
-      const textX = b.x + b.w/2;
-      const textY = b.y + b.h/2;
-      
-      // 太い黒い縁取り
-      this.ctx.strokeStyle = 'black';
-      this.ctx.lineWidth = 6;
-      this.ctx.strokeText(labelText, textX, textY);
-      
-      // 白いテキスト
-      this.ctx.fillStyle = 'white';
-      this.ctx.fillText(labelText, textX, textY);
-      
-      // さらにデバッグ用の四角形を描画してテキスト位置を確認
-      if (!window._debuggedTextPos) {
-        window._debuggedTextPos = {};
-      }
-      if (!window._debuggedTextPos[key]) {
-        console.log(`テキスト位置: ${key}, x=${textX}, y=${textY}, text="${labelText}"`);
-        // デバッグ用：テキスト位置に小さな赤い点を描画
-        this.ctx.fillStyle = 'red';
-        this.ctx.fillRect(textX - 2, textY - 2, 4, 4);
-        window._debuggedTextPos[key] = true;
-      }
-      
-      this.ctx.restore();
-      
-      // 押下状態を示すインジケータ（押されている場合のみ表示）
-      if (isPressed) {
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        this.ctx.beginPath();
-        this.ctx.arc(b.x + b.w - 10, b.y + 10, 5, 0, Math.PI * 2);
-        this.ctx.fill();
-      }
-      
-      // Enterキーで継続可能なことを示す（最後に使用したコマンドの場合）
-      if (battleState.lastCommandMode === key) {
-        this.ctx.save();
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '12px sans-serif';
-        this.ctx.textAlign = 'right';
-        this.ctx.textBaseline = 'bottom';
-        this.ctx.fillText('Enterで継続', b.x + b.w - 5, b.y + b.h - 5);
-        this.ctx.restore();
-      }
-    });
+    
 
     /* 入力欄 */
     if (this.inputEl) {
@@ -1414,40 +1290,40 @@ if (gameState.currentKanji) {
 }
 
     // ボタンの描画時に選択されているコマンドを強調表示
-    // const mode = battleState.lastCommandMode || 'attack';
-    // 
-    // // 攻撃ボタンの描画
-    // this.drawRichButton(
-    //   this.ctx, 
-    //   BTN.attack.x, BTN.attack.y, 
-    //   BTN.attack.w, BTN.attack.h, 
-    //   "こうげき", 
-    //   mode === 'attack' ? '#e74c3c' : '#2980b9', // 選択中は赤色
-    //   isMouseOverRect(this.mouseX, this.mouseY, BTN.attack),
-    //   false
-    // );
-    // 
-    // // 回復ボタンの描画
-    // this.drawRichButton(
-    //   this.ctx, 
-    //   BTN.heal.x, BTN.heal.y, 
-    //   BTN.heal.w, BTN.heal.h, 
-    //   "かいふく", 
-    //   mode === 'heal' ? '#e74c3c' : '#2980b9', // 選択中は赤色
-    //   isMouseOverRect(this.mouseX, this.mouseY, BTN.heal),
-    //   false
-    // );
-    // 
-    // // ヒントボタンの描画
-    // this.drawRichButton(
-    //   this.ctx, 
-    //   BTN.hint.x, BTN.hint.y, 
-    //   BTN.hint.w, BTN.hint.h, 
-    //   "ヒント", 
-    //   mode === 'hint' ? '#e74c3c' : '#2980b9', // 選択中は赤色
-    //   isMouseOverRect(this.mouseX, this.mouseY, BTN.hint),
-    //   false
-    // );
+    const mode = battleState.lastCommandMode || 'attack';
+    
+    // 攻撃ボタンの描画
+    this.drawRichButton(
+      this.ctx, 
+      BTN.attack.x, BTN.attack.y, 
+      BTN.attack.w, BTN.attack.h, 
+      "こうげき", 
+      mode === 'attack' ? '#e74c3c' : '#2980b9', // 選択中は赤色
+      isMouseOverRect(this.mouseX, this.mouseY, BTN.attack),
+      false
+    );
+    
+    // 回復ボタンの描画
+    this.drawRichButton(
+      this.ctx, 
+      BTN.heal.x, BTN.heal.y, 
+      BTN.heal.w, BTN.heal.h, 
+      "かいふく", 
+      mode === 'heal' ? '#e74c3c' : '#2980b9', // 選択中は赤色
+      isMouseOverRect(this.mouseX, this.mouseY, BTN.heal),
+      false
+    );
+    
+    // ヒントボタンの描画
+    this.drawRichButton(
+      this.ctx, 
+      BTN.hint.x, BTN.hint.y, 
+      BTN.hint.w, BTN.hint.h, 
+      "ヒント", 
+      mode === 'hint' ? '#e74c3c' : '#2980b9', // 選択中は赤色
+      isMouseOverRect(this.mouseX, this.mouseY, BTN.hint),
+      false
+    );
     
     // 選択中のコマンドに関する説明を表示
     const helpText = {
