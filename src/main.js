@@ -8,7 +8,8 @@ import {
   signInAnonymouslyIfNeeded,
   loadAllStageClearStatus,
   getCurrentUser,
-  initializeNewPlayerData
+  initializeNewPlayerData,
+  loadPlayerData
 } from './services/firebase/firebaseController.js';
 import { AudioManager } from './audio/audioManager.js';
 import { subscribe, publish } from './core/eventBus.js';
@@ -166,8 +167,8 @@ function drawAchievementNotifications(ctx) {
   const user = await signInAnonymouslyIfNeeded();
   console.log('UID:', user?.uid);
   
-  // プレイヤーデータを読み込む処理を追加
-  await loadPlayerData();
+  // loadPlayerData()はsignInAnonymouslyIfNeeded()内で既に呼び出されているため、
+  // ここでの重複呼び出しは不要です
   
   await loadAllStageClearStatus();
 
@@ -178,6 +179,9 @@ function drawAchievementNotifications(ctx) {
   } catch (error) {
     console.error('❌ ゲーム起動時の実績チェックでエラー:', error);
   }
+
+  // プレイヤーデータを読み込む処理を追加
+  await loadPlayerData();
 
   // ─────────── プレイヤー名自動入力 ───────────
   // データ未設定時に名前を聞いて gameState にセット、Firestore に書き込む
