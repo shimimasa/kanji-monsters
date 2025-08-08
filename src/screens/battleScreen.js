@@ -804,141 +804,41 @@ const battleScreenState = {
       else if (key === 'heal') buttonColor = '#27ae60';
       else if (key === 'hint') buttonColor = '#f39c12';
 
-      // ホバー判定と押下判定
+      // ホバー判定
       const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
-      const isPressed = this.pressedButtons && this.pressedButtons.has(key);
       
-      // ボタンの背景を描画（押下状態も反映）
-      this.drawRichButton(this.ctx, b.x, b.y, b.w, b.h, b.label, buttonColor, isHovered, isPressed);
+      // ボタンの背景を描画
+      this.ctx.fillStyle = isHovered ? this.lightenColor(buttonColor, 15) : buttonColor;
+      this.ctx.fillRect(b.x, b.y, b.w, b.h);
+      
+      // ボタンの枠線
+      this.ctx.strokeStyle = 'white';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(b.x, b.y, b.w, b.h);
 
-      // パディングと位置調整
-      const padding = 8;
-      
-      // ホバー時のスケール調整を考慮したアイコンとテキストの位置計算
-      const scale = isHovered ? 1.05 : 1.0;
-      let adjustedX = b.x;
-      let adjustedY = b.y;
-      let adjustedW = b.w;
-      let adjustedH = b.h;
-      
-      if (isHovered) {
-        const centerX = b.x + b.w / 2;
-        const centerY = b.y + b.h / 2;
-        adjustedW = b.w * scale;
-        adjustedH = b.h * scale;
-        adjustedX = centerX - adjustedW / 2;
-        adjustedY = centerY - adjustedH / 2;
-      }
-      
-      // 押下時は少し下にずらす
-      if (isPressed) {
-        adjustedY += 2;
-      }
-      
-      const iconSize = adjustedH - padding * 2;
-
-      // アイコンを描画（シンボルで代替）
-      this.ctx.save();
-      
-      // アイコンの色（押下時は少し暗く）
-      let iconColor = buttonColor;
-      if (isPressed) {
-        iconColor = this.darkenColor(buttonColor, 15);
-      } else if (isHovered) {
-        iconColor = this.lightenColor(buttonColor, 15);
-      }
-      
-      if (key === 'attack') {
-        // 攻撃アイコン（剣のシンボル）
-        this.ctx.fillStyle = iconColor;
-        this.ctx.beginPath();
-        const cx = adjustedX + padding + iconSize/2;
-        const cy = adjustedY + padding + iconSize/2;
-        this.ctx.moveTo(cx, cy - iconSize/3);
-        this.ctx.lineTo(cx + iconSize/4, cy + iconSize/3);
-        this.ctx.lineTo(cx - iconSize/4, cy + iconSize/3);
-        this.ctx.closePath();
-        this.ctx.fill();
-        
-        // 剣の柄
-        this.ctx.fillRect(cx - 2, cy + iconSize/3, 4, iconSize/4);
-      } else if (key === 'heal') {
-        // 回復アイコン（十字のシンボル）
-        this.ctx.fillStyle = iconColor;
-        const cx = adjustedX + padding + iconSize/2;
-        const cy = adjustedY + padding + iconSize/2;
-        const w = iconSize/5;
-        const h = iconSize/2;
-        this.ctx.fillRect(cx - w/2, cy - h/2, w, h);
-        this.ctx.fillRect(cx - h/2, cy - w/2, h, w);
-      } else if (key === 'hint') {
-        // ヒントアイコン（？マーク）
-        this.ctx.fillStyle = iconColor;
-        this.ctx.font = `bold ${iconSize * 0.7}px sans-serif`;
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('?', adjustedX + padding + iconSize/2, adjustedY + padding + iconSize/2);
-      }
-      this.ctx.restore();
-
-      // ボタンラベルの表示テキスト（日本語）
-      let labelText;
-      
-      // BTNオブジェクトに定義されているラベルを優先的に使用
-      if (b.label && typeof b.label === 'string') {
-        labelText = b.label;
-      } else {
-        // フォールバック用のラベル
-        const buttonLabels = {
-          attack: 'こうげき',
-          heal: 'かいふく',
-          hint: 'ヒント'
-        };
-        labelText = buttonLabels[key] || key;
-      }
+      // ボタンラベルの表示テキスト
+      const labelText = b.label || (
+        key === 'attack' ? 'こうげき' : 
+        key === 'heal' ? 'かいふく' : 
+        key === 'hint' ? 'ヒント' : key
+      );
 
       // テキスト描画（縁取り付き）
-      const textX = adjustedX + padding + iconSize + padding;
-      const textY = adjustedY + adjustedH / 2;
+      this.ctx.font = 'bold 18px "UDデジタル教科書体",sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
       
-      // 押下状態を示すインジケータ（押されている場合のみ表示）
-      if (isPressed) {
-        // 「押しっぱなし」インジケータ
-        this.ctx.save();
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        this.ctx.beginPath();
-        this.ctx.arc(
-          adjustedX + adjustedW - 10, 
-          adjustedY + 10, 
-          5, 0, Math.PI * 2
-        );
-        this.ctx.fill();
-        this.ctx.restore();
-      }
+      // 縁取り（黒）
+      this.ctx.strokeStyle = 'black';
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeText(labelText, b.x + b.w/2, b.y + b.h/2);
       
-      // テキスト描画
-      this.drawTextWithOutline(
-        labelText,
-        textX,
-        textY,
-        'white',
-        'black',
-        'bold 16px "UDデジタル教科書体",sans-serif',
-        'left',
-        'middle',
-        2 // 縁取りを太く
-      );
+      // 本文（白）
+      this.ctx.fillStyle = 'white';
+      this.ctx.fillText(labelText, b.x + b.w/2, b.y + b.h/2);
       
-      // Enterキーで継続可能なことを示す（最後に使用したコマンドの場合）
-      if (battleState.lastCommandMode === key) {
-        this.ctx.save();
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '12px "UDデジタル教科書体",sans-serif';
-        this.ctx.textAlign = 'right';
-        this.ctx.textBaseline = 'bottom';
-        this.ctx.fillText('Enterで継続', adjustedX + adjustedW - 5, adjustedY + adjustedH - 5);
-        this.ctx.restore();
-      }
+      // デバッグ情報
+      console.log(`ボタン描画: ${key}, label=${labelText}, x=${b.x}, y=${b.y}, w=${b.w}, h=${b.h}`);
     });
 
     /* 入力欄 */
