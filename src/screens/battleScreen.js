@@ -13,12 +13,13 @@ battleState.timeRemaining = 60;
 // 直近に出題された問題を避けるための設定値
 const RECENT_QUESTIONS_BUFFER_SIZE = 5; // 直近5問は出題しない
 
+// BTNオブジェクトの位置を修正（画像の2枚目に合わせる）
 const BTN = {
   back:   { x: 20,  y: 20,  w: 100, h: 30,  label: 'タイトルへ' },
   stage:  { x: 140, y: 20,  w: 120, h: 30,  label: 'ステージ選択' },
-  attack: { x: 230, y: 380, w: 110, h: 50,  label: 'こうげき' },
-  heal:   { x: 350, y: 380, w: 110, h: 50,  label: 'かいふく' },
-  hint:   { x: 470, y: 380, w: 110, h: 50,  label: 'ヒント' },
+  attack: { x: 340, y: 580, w: 140, h: 50,  label: 'こうげき' },
+  heal:   { x: 490, y: 580, w: 140, h: 50,  label: 'かいふく' },
+  hint:   { x: 640, y: 580, w: 140, h: 50,  label: 'ヒント' },
 };
 
 const ENEMY_DAMAGE_ANIM_DURATION = 10; // ダメージ時の振動フレーム数
@@ -799,46 +800,56 @@ const battleScreenState = {
       if (key === 'back' || key === 'stage') return; // 既に上で描画済み
 
       // ボタンの色を決定
-      let buttonColor = '#2980b9';
-      if (key === 'attack') buttonColor = '#e74c3c';
-      else if (key === 'heal') buttonColor = '#27ae60';
-      else if (key === 'hint') buttonColor = '#f39c12';
+      let buttonColor = '#2980b9'; // 青色（デフォルト）
+      let iconText = '?';
+      
+      if (key === 'attack') {
+        buttonColor = '#e74c3c'; // 赤色
+        iconText = '⚔️';
+      } else if (key === 'heal') {
+        buttonColor = '#27ae60'; // 緑色
+        iconText = '❤️';
+      } else if (key === 'hint') {
+        buttonColor = '#f39c12'; // オレンジ色
+        iconText = '💡';
+      }
 
       // ホバー判定
       const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
       
-      // ボタンの背景を描画
-      this.ctx.fillStyle = isHovered ? this.lightenColor(buttonColor, 15) : buttonColor;
+      // ボタン本体の描画
+      this.ctx.save();
+      
+      // 背景グラデーション
+      const gradient = this.ctx.createLinearGradient(b.x, b.y, b.x, b.y + b.h);
+      gradient.addColorStop(0, this.lightenColor(buttonColor, 20));
+      gradient.addColorStop(1, this.darkenColor(buttonColor, 20));
+      
+      this.ctx.fillStyle = gradient;
       this.ctx.fillRect(b.x, b.y, b.w, b.h);
       
-      // ボタンの枠線
+      // 枠線
       this.ctx.strokeStyle = 'white';
       this.ctx.lineWidth = 2;
       this.ctx.strokeRect(b.x, b.y, b.w, b.h);
-
-      // ボタンラベルの表示テキスト
-      const labelText = b.label || (
-        key === 'attack' ? 'こうげき' : 
-        key === 'heal' ? 'かいふく' : 
-        key === 'hint' ? 'ヒント' : key
-      );
-
-      // テキスト描画（縁取り付き）
-      this.ctx.font = 'bold 18px "UDデジタル教科書体",sans-serif';
+      
+      // アイコン部分
+      this.ctx.font = '20px sans-serif';
+      this.ctx.fillStyle = 'white';
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(iconText, b.x + 25, b.y + b.h/2);
       
-      // 縁取り（黒）
-      this.ctx.strokeStyle = 'black';
-      this.ctx.lineWidth = 3;
-      this.ctx.strokeText(labelText, b.x + b.w/2, b.y + b.h/2);
-      
-      // 本文（白）
+      // ラベル部分
+      this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
       this.ctx.fillStyle = 'white';
-      this.ctx.fillText(labelText, b.x + b.w/2, b.y + b.h/2);
+      this.ctx.textAlign = 'left';
+      this.ctx.fillText(b.label, b.x + 50, b.y + b.h/2);
+      
+      this.ctx.restore();
       
       // デバッグ情報
-      console.log(`ボタン描画: ${key}, label=${labelText}, x=${b.x}, y=${b.y}, w=${b.w}, h=${b.h}`);
+      console.log(`ボタン描画: ${key}, label=${b.label}, x=${b.x}, y=${b.y}, w=${b.w}, h=${b.h}`);
     });
 
     /* 入力欄 */
