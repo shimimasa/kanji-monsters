@@ -807,6 +807,7 @@ const battleScreenState = {
       // ホバー判定
       const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
       
+      // ボタンの背景を描画
       this.drawRichButton(this.ctx, b.x, b.y, b.w, b.h, b.label, buttonColor, isHovered);
 
       // アイコンマップ
@@ -841,11 +842,21 @@ const battleScreenState = {
         this.ctx.drawImage(iconImg, adjustedX + padding, adjustedY + padding, iconSize, iconSize);
       }
 
+      // ボタンラベルの表示テキスト（日本語）
+      const buttonLabels = {
+        attack: 'こうげき',
+        heal: 'かいふく',
+        hint: 'ヒント'
+      };
+      
+      // 表示するラベルテキスト
+      const labelText = buttonLabels[key] || b.label;
+
       // テキスト描画（縁取り付き）
       const textX = adjustedX + padding + (iconImg ? iconSize + padding : 0);
       const textY = adjustedY + adjustedH / 2;
       this.drawTextWithOutline(
-        b.label,
+        labelText,
         textX,
         textY,
         'white',
