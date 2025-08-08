@@ -827,25 +827,28 @@ const battleScreenState = {
       this.ctx.strokeStyle = 'white';
       this.ctx.lineWidth = 2;
       this.ctx.strokeRect(b.x, b.y, b.w, b.h);
+      this.ctx.restore();
       
-      // ボタンラベルの表示
-      let labelText = b.label || '';
+      // ボタンラベルの表示（フォントを汎用的なものに変更）
+      let labelText = '';
       if (key === 'attack') labelText = 'こうげき';
       else if (key === 'heal') labelText = 'かいふく';
       else if (key === 'hint') labelText = 'ヒント';
       
-      // テキスト描画
-      this.drawTextWithOutline(
-        labelText,
-        b.x + b.w/2,
-        b.y + b.h/2,
-        'white',
-        'black',
-        'bold 16px "UDデジタル教科書体", sans-serif',
-        'center',
-        'middle',
-        2
-      );
+      // テキスト描画（直接描画）
+      this.ctx.save();
+      this.ctx.font = 'bold 16px sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      
+      // 縁取り
+      this.ctx.strokeStyle = 'black';
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeText(labelText, b.x + b.w/2, b.y + b.h/2);
+      
+      // テキスト
+      this.ctx.fillStyle = 'white';
+      this.ctx.fillText(labelText, b.x + b.w/2, b.y + b.h/2);
       
       // 押下状態を示すインジケータ（押されている場合のみ表示）
       if (isPressed) {
@@ -858,13 +861,16 @@ const battleScreenState = {
       // Enterキーで継続可能なことを示す（最後に使用したコマンドの場合）
       if (battleState.lastCommandMode === key) {
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '12px "UDデジタル教科書体", sans-serif';
+        this.ctx.font = '12px sans-serif';
         this.ctx.textAlign = 'right';
         this.ctx.textBaseline = 'bottom';
         this.ctx.fillText('Enterで継続', b.x + b.w - 5, b.y + b.h - 5);
       }
       
       this.ctx.restore();
+      
+      // デバッグ用：コンソールにボタン情報を出力
+      console.log(`ボタン描画: ${key}, label=${labelText}, x=${b.x}, y=${b.y}, w=${b.w}, h=${b.h}`);
     });
 
     /* 入力欄 */
