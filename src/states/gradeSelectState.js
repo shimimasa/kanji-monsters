@@ -3,12 +3,12 @@ import { publish } from '../core/eventBus.js';
 
 // タブ定義：1〜6年 と 総復習（総復習は grade=0）
 const tabs = [
-  { label: '1年',   grade: 1 },
-  { label: '2年',   grade: 2 },
-  { label: '3年',   grade: 2 },
-  { label: '4年',   grade: 4 },
-  { label: '5年',   grade: 5 },
-  { label: '6年',   grade: 6 },
+  { label: '1年', grade: 1 },
+  { label: '2年', grade: 2 },
+  { label: '3年', grade: 3 }, // ← 修正
+  { label: '4年', grade: 4 },
+  { label: '5年', grade: 5 },
+  { label: '6年', grade: 6 },
   { label: '総復習', grade: 0 },
 ];
 

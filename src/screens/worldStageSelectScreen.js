@@ -88,6 +88,7 @@ const worldStageSelectScreen = {
   selectedTabLevel: 4, // デフォルトは4級
   selectedGrade: 7, // デフォルトは7（4級）
   continentInfo: null, // 選択された大陸の情報
+  _inputLocked: false, // 二重発火防止の簡易ロック
 
   /** 画面表示時の初期化 */
   enter(arg) {
@@ -769,6 +770,10 @@ const worldStageSelectScreen = {
 
   /** クリックイベント処理 */
   handleClick(e) {
+    if (this._inputLocked) return;
+    this._inputLocked = true;
+    setTimeout(() => { this._inputLocked = false; }, 250);
+
     if (this.isZooming) return; // ズーム中はクリックを無効化
     
     // 座標変換ロジック
@@ -964,6 +969,22 @@ const worldStageSelectScreen = {
     this.drawRichButton(ctx, backButton.x, backButton.y, backButton.width, backButton.height, backButton.text, isBackHovered ? '#4A90E2' : '#ccc', isBackHovered);
     this.drawRichButton(ctx, dexButton.x, dexButton.y, dexButton.width, dexButton.height, dexButton.text, isDexHovered ? '#4A90E2' : '#ccc', isDexHovered);
     this.drawRichButton(ctx, monsterButton.x, monsterButton.y, monsterButton.width, monsterButton.height, monsterButton.text, isMonsterHovered ? '#4A90E2' : '#ccc', isMonsterHovered);
+  },
+
+  /** 確実にリスナーを解除 */
+  exit() {
+    if (this.canvas) {
+      this.canvas.removeEventListener('click', this._clickHandler);
+      this.canvas.removeEventListener('touchstart', this._clickHandler);
+      this.canvas.removeEventListener('mousemove', this._mousemoveHandler);
+      this.canvas.style.cursor = 'default';
+    }
+    this._clickHandler = null;
+    this._mousemoveHandler = null;
+    this.stageButtons = [];
+    this.selectedStage = null;
+    this.canvas = null;
+    this.ctx = null;
   },
 
   // 他のメソッドはそのまま使用
