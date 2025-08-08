@@ -125,6 +125,25 @@ export const gameState = {
     const result = checkLevelUp();
     // 統計データが変更されたのでセーブ
     saveGameData();
+    
+    // ▼▼▼ 追加：Firestoreにも保存 ▼▼▼
+    // Firebaseサービスが利用可能な場合はFirestoreにも保存
+    import('../services/firebase/firebaseController.js').then(firebase => {
+      firebase.savePlayerData({
+        name: gameState.playerName,
+        level: gameState.playerStats.level,
+        exp: gameState.playerStats.exp,
+        maxHp: gameState.playerStats.maxHp,
+        attack: gameState.playerStats.attack,
+        nextLevelExp: gameState.playerStats.nextLevelExp
+      }).catch(error => {
+        console.warn('Firestoreへのプレイヤーデータ保存に失敗:', error);
+      });
+    }).catch(error => {
+      console.warn('Firebase controller読み込み失敗:', error);
+    });
+    // ▲▲▲ 追加終了 ▲▲▲
+    
     return result;
   }
 
@@ -182,11 +201,30 @@ export const gameState = {
       const saveData = {
         playerName: gameState.playerName,
         playerStats: gameState.playerStats,
-        unlockedAchievements: Array.from(gameState.unlockedAchievements), // SetをArrayに変換
-        saveDate: new Date().toISOString()
+        unlockedAchievements: Array.from(gameState.unlockedAchievements)
       };
+      
       localStorage.setItem('kanjiGameSave', JSON.stringify(saveData));
       console.log('💾 ゲームデータを保存しました');
+      
+      // ▼▼▼ 追加：Firestoreにも保存 ▼▼▼
+      // Firebaseサービスが利用可能な場合はFirestoreにも保存
+      import('../services/firebase/firebaseController.js').then(firebase => {
+        firebase.savePlayerData({
+          name: gameState.playerName,
+          level: gameState.playerStats.level,
+          exp: gameState.playerStats.exp,
+          maxHp: gameState.playerStats.maxHp,
+          attack: gameState.playerStats.attack,
+          nextLevelExp: gameState.playerStats.nextLevelExp
+        }).catch(error => {
+          console.warn('Firestoreへのプレイヤーデータ保存に失敗:', error);
+        });
+      }).catch(error => {
+        console.warn('Firebase controller読み込み失敗:', error);
+      });
+      // ▲▲▲ 追加終了 ▲▲▲
+      
     } catch (error) {
       console.error('❌ ゲームデータの保存に失敗しました:', error);
     }
