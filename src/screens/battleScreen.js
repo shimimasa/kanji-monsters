@@ -870,7 +870,13 @@ const battleScreenState = {
       this.ctx.restore();
       
       // デバッグ用：コンソールにボタン情報を出力
-      console.log(`ボタン描画: ${key}, label=${labelText}, x=${b.x}, y=${b.y}, w=${b.w}, h=${b.h}`);
+      if (!window._debuggedButtons) {
+        window._debuggedButtons = {};
+      }
+      if (!window._debuggedButtons[key]) {
+        console.log(`ボタン描画: ${key}, label=${labelText}, x=${b.x}, y=${b.y}, w=${b.w}, h=${b.h}`);
+        window._debuggedButtons[key] = true;
+      }
     });
 
     /* 入力欄 */
