@@ -837,35 +837,50 @@ const battleScreenState = {
       
       const iconSize = adjustedH - padding * 2;
 
-      // アイコン描画
+      // アイコン描画（アイコンがない場合はスキップ）
       if (iconImg) {
         this.ctx.drawImage(iconImg, adjustedX + padding, adjustedY + padding, iconSize, iconSize);
       }
 
-      // ボタンラベルの表示テキスト（日本語）
-      const buttonLabels = {
-        attack: 'こうげき',
-        heal: 'かいふく',
-        hint: 'ヒント'
-      };
+      // ボタンラベルの表示テキスト（日本語）- BTNオブジェクトから直接取得
+      let labelText;
       
-      // 表示するラベルテキスト
-      const labelText = buttonLabels[key] || b.label;
+      // BTNオブジェクトに定義されているラベルを優先的に使用
+      if (b.label && typeof b.label === 'string') {
+        labelText = b.label;
+      } else {
+        // フォールバック用のラベル
+        const buttonLabels = {
+          attack: 'こうげき',
+          heal: 'かいふく',
+          hint: 'ヒント'
+        };
+        labelText = buttonLabels[key] || key;
+      }
 
-      // テキスト描画（縁取り付き）
+      // テキスト描画（縁取り付き）- テキストサイズを大きくして視認性を向上
       const textX = adjustedX + padding + (iconImg ? iconSize + padding : 0);
       const textY = adjustedY + adjustedH / 2;
+      
+      // テキスト描画の前に背景を追加して視認性を高める
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      const textWidth = this.ctx.measureText(labelText).width;
+      this.ctx.fillRect(textX - 2, textY - 10, textWidth + 4, 20);
+      
       this.drawTextWithOutline(
         labelText,
         textX,
         textY,
         'white',
         'black',
-        '16px "UDデジタル教科書体",sans-serif',
+        'bold 16px "UDデジタル教科書体",sans-serif', // フォントを太字に
         'left',
         'middle',
-        1
+        2 // 縁取りを太く
       );
+      
+      // デバッグ情報を出力（開発中のみ）
+      console.log(`ボタン描画: key=${key}, label=${labelText}, x=${textX}, y=${textY}`);
     });
 
     /* 入力欄 */
