@@ -804,13 +804,14 @@ const battleScreenState = {
       else if (key === 'heal') buttonColor = '#27ae60';
       else if (key === 'hint') buttonColor = '#f39c12';
 
-      // ホバー判定
+      // ホバー判定と押下判定
       const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
+      const isPressed = this.pressedButtons && this.pressedButtons.has(key);
       
-      // ボタンの背景を描画
-      this.drawRichButton(this.ctx, b.x, b.y, b.w, b.h, b.label, buttonColor, isHovered);
+      // ボタンの背景を描画（押下状態も反映）
+      this.drawRichButton(this.ctx, b.x, b.y, b.w, b.h, b.label, buttonColor, isHovered, isPressed);
 
-      // アイコンは使用せず、テキストのみで表示する
+      // パディングと位置調整
       const padding = 8;
       
       // ホバー時のスケール調整を考慮したアイコンとテキストの位置計算
@@ -829,35 +830,54 @@ const battleScreenState = {
         adjustedY = centerY - adjustedH / 2;
       }
       
-      // アイコンの代わりにシンプルな図形を描画
+      // 押下時は少し下にずらす
+      if (isPressed) {
+        adjustedY += 2;
+      }
+      
+      const iconSize = adjustedH - padding * 2;
+
+      // アイコンを描画（シンボルで代替）
       this.ctx.save();
+      
+      // アイコンの色（押下時は少し暗く）
+      let iconColor = buttonColor;
+      if (isPressed) {
+        iconColor = this.darkenColor(buttonColor, 15);
+      } else if (isHovered) {
+        iconColor = this.lightenColor(buttonColor, 15);
+      }
+      
       if (key === 'attack') {
-        // 攻撃アイコンの代替：赤い剣マーク
-        this.ctx.fillStyle = '#e74c3c';
+        // 攻撃アイコン（剣のシンボル）
+        this.ctx.fillStyle = iconColor;
         this.ctx.beginPath();
-        const cx = adjustedX + padding + 15;
-        const cy = adjustedY + adjustedH / 2;
-        this.ctx.moveTo(cx, cy - 10);
-        this.ctx.lineTo(cx + 8, cy + 10);
-        this.ctx.lineTo(cx - 8, cy + 10);
+        const cx = adjustedX + padding + iconSize/2;
+        const cy = adjustedY + padding + iconSize/2;
+        this.ctx.moveTo(cx, cy - iconSize/3);
+        this.ctx.lineTo(cx + iconSize/4, cy + iconSize/3);
+        this.ctx.lineTo(cx - iconSize/4, cy + iconSize/3);
         this.ctx.closePath();
         this.ctx.fill();
+        
+        // 剣の柄
+        this.ctx.fillRect(cx - 2, cy + iconSize/3, 4, iconSize/4);
       } else if (key === 'heal') {
-        // 回復アイコンの代替：緑の十字
-        this.ctx.fillStyle = '#27ae60';
-        const cx = adjustedX + padding + 15;
-        const cy = adjustedY + adjustedH / 2;
-        const w = 6;
-        const h = 18;
+        // 回復アイコン（十字のシンボル）
+        this.ctx.fillStyle = iconColor;
+        const cx = adjustedX + padding + iconSize/2;
+        const cy = adjustedY + padding + iconSize/2;
+        const w = iconSize/5;
+        const h = iconSize/2;
         this.ctx.fillRect(cx - w/2, cy - h/2, w, h);
         this.ctx.fillRect(cx - h/2, cy - w/2, h, w);
       } else if (key === 'hint') {
-        // ヒントアイコンの代替：黄色の？マーク
-        this.ctx.fillStyle = '#f39c12';
-        this.ctx.font = 'bold 20px sans-serif';
+        // ヒントアイコン（？マーク）
+        this.ctx.fillStyle = iconColor;
+        this.ctx.font = `bold ${iconSize * 0.7}px sans-serif`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('?', adjustedX + padding + 15, adjustedY + adjustedH / 2);
+        this.ctx.fillText('?', adjustedX + padding + iconSize/2, adjustedY + padding + iconSize/2);
       }
       this.ctx.restore();
 
@@ -878,15 +898,25 @@ const battleScreenState = {
       }
 
       // テキスト描画（縁取り付き）
-      const textX = adjustedX + padding + 30; // アイコン代わりの図形の分だけスペースを空ける
+      const textX = adjustedX + padding + iconSize + padding;
       const textY = adjustedY + adjustedH / 2;
       
-      // テキスト描画の前に背景を追加して視認性を高める
-      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-      this.ctx.font = 'bold 16px "UDデジタル教科書体",sans-serif';
-      const textWidth = this.ctx.measureText(labelText).width;
-      this.ctx.fillRect(textX - 2, textY - 10, textWidth + 4, 20);
+      // 押下状態を示すインジケータ（押されている場合のみ表示）
+      if (isPressed) {
+        // 「押しっぱなし」インジケータ
+        this.ctx.save();
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        this.ctx.beginPath();
+        this.ctx.arc(
+          adjustedX + adjustedW - 10, 
+          adjustedY + 10, 
+          5, 0, Math.PI * 2
+        );
+        this.ctx.fill();
+        this.ctx.restore();
+      }
       
+      // テキスト描画
       this.drawTextWithOutline(
         labelText,
         textX,
@@ -899,8 +929,16 @@ const battleScreenState = {
         2 // 縁取りを太く
       );
       
-      // デバッグ情報をコンソールに出力
-      console.log(`ボタン描画: key=${key}, label=${labelText}, x=${textX}, y=${textY}`);
+      // Enterキーで継続可能なことを示す（最後に使用したコマンドの場合）
+      if (battleState.lastCommandMode === key) {
+        this.ctx.save();
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '12px "UDデジタル教科書体",sans-serif';
+        this.ctx.textAlign = 'right';
+        this.ctx.textBaseline = 'bottom';
+        this.ctx.fillText('Enterで継続', adjustedX + adjustedW - 5, adjustedY + adjustedH - 5);
+        this.ctx.restore();
+      }
     });
 
     /* 入力欄 */
