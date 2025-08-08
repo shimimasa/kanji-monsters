@@ -1414,40 +1414,40 @@ if (gameState.currentKanji) {
 }
 
     // ボタンの描画時に選択されているコマンドを強調表示
-    const mode = battleState.lastCommandMode || 'attack';
-    
-    // 攻撃ボタンの描画
-    this.drawRichButton(
-      this.ctx, 
-      BTN.attack.x, BTN.attack.y, 
-      BTN.attack.w, BTN.attack.h, 
-      "こうげき", 
-      mode === 'attack' ? '#e74c3c' : '#2980b9', // 選択中は赤色
-      isMouseOverRect(this.mouseX, this.mouseY, BTN.attack),
-      false
-    );
-    
-    // 回復ボタンの描画
-    this.drawRichButton(
-      this.ctx, 
-      BTN.heal.x, BTN.heal.y, 
-      BTN.heal.w, BTN.heal.h, 
-      "かいふく", 
-      mode === 'heal' ? '#e74c3c' : '#2980b9', // 選択中は赤色
-      isMouseOverRect(this.mouseX, this.mouseY, BTN.heal),
-      false
-    );
-    
-    // ヒントボタンの描画
-    this.drawRichButton(
-      this.ctx, 
-      BTN.hint.x, BTN.hint.y, 
-      BTN.hint.w, BTN.hint.h, 
-      "ヒント", 
-      mode === 'hint' ? '#e74c3c' : '#2980b9', // 選択中は赤色
-      isMouseOverRect(this.mouseX, this.mouseY, BTN.hint),
-      false
-    );
+    // const mode = battleState.lastCommandMode || 'attack';
+    // 
+    // // 攻撃ボタンの描画
+    // this.drawRichButton(
+    //   this.ctx, 
+    //   BTN.attack.x, BTN.attack.y, 
+    //   BTN.attack.w, BTN.attack.h, 
+    //   "こうげき", 
+    //   mode === 'attack' ? '#e74c3c' : '#2980b9', // 選択中は赤色
+    //   isMouseOverRect(this.mouseX, this.mouseY, BTN.attack),
+    //   false
+    // );
+    // 
+    // // 回復ボタンの描画
+    // this.drawRichButton(
+    //   this.ctx, 
+    //   BTN.heal.x, BTN.heal.y, 
+    //   BTN.heal.w, BTN.heal.h, 
+    //   "かいふく", 
+    //   mode === 'heal' ? '#e74c3c' : '#2980b9', // 選択中は赤色
+    //   isMouseOverRect(this.mouseX, this.mouseY, BTN.heal),
+    //   false
+    // );
+    // 
+    // // ヒントボタンの描画
+    // this.drawRichButton(
+    //   this.ctx, 
+    //   BTN.hint.x, BTN.hint.y, 
+    //   BTN.hint.w, BTN.hint.h, 
+    //   "ヒント", 
+    //   mode === 'hint' ? '#e74c3c' : '#2980b9', // 選択中は赤色
+    //   isMouseOverRect(this.mouseX, this.mouseY, BTN.hint),
+    //   false
+    // );
     
     // 選択中のコマンドに関する説明を表示
     const helpText = {
