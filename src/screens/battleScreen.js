@@ -829,26 +829,45 @@ const battleScreenState = {
       this.ctx.strokeRect(b.x, b.y, b.w, b.h);
       this.ctx.restore();
       
-      // ボタンラベルの表示（フォントを汎用的なものに変更）
+      // ボタンラベルとアイコンの表示
       let labelText = '';
-      if (key === 'attack') labelText = 'こうげき';
-      else if (key === 'heal') labelText = 'かいふく';
-      else if (key === 'hint') labelText = 'ヒント';
+      let iconKey = '';
       
-      // テキスト描画（直接描画）
+      if (key === 'attack') {
+        labelText = 'こうげき';
+        iconKey = 'iconAttack';
+      } else if (key === 'heal') {
+        labelText = 'かいふく';
+        iconKey = 'iconHeal';
+      } else if (key === 'hint') {
+        labelText = 'ヒント';
+        iconKey = 'iconHint';
+      }
+      
+      // アイコンがある場合は描画
+      const icon = images[iconKey];
+      if (icon) {
+        const iconSize = 24;
+        const iconX = b.x + 15;
+        const iconY = b.y + (b.h - iconSize) / 2;
+        this.ctx.drawImage(icon, iconX, iconY, iconSize, iconSize);
+      }
+      
+      // テキスト描画（直接描画、フォントサイズを大きく、位置を調整）
       this.ctx.save();
-      this.ctx.font = 'bold 16px sans-serif';
+      this.ctx.font = 'bold 20px sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
       
-      // 縁取り
+      // 縁取り（太く）
       this.ctx.strokeStyle = 'black';
-      this.ctx.lineWidth = 3;
-      this.ctx.strokeText(labelText, b.x + b.w/2, b.y + b.h/2);
+      this.ctx.lineWidth = 4;
+      this.ctx.strokeText(labelText, b.x + b.w/2 + 10, b.y + b.h/2);
       
       // テキスト
       this.ctx.fillStyle = 'white';
-      this.ctx.fillText(labelText, b.x + b.w/2, b.y + b.h/2);
+      this.ctx.fillText(labelText, b.x + b.w/2 + 10, b.y + b.h/2);
+      this.ctx.restore();
       
       // 押下状態を示すインジケータ（押されている場合のみ表示）
       if (isPressed) {
@@ -860,16 +879,16 @@ const battleScreenState = {
       
       // Enterキーで継続可能なことを示す（最後に使用したコマンドの場合）
       if (battleState.lastCommandMode === key) {
+        this.ctx.save();
         this.ctx.fillStyle = 'white';
         this.ctx.font = '12px sans-serif';
         this.ctx.textAlign = 'right';
         this.ctx.textBaseline = 'bottom';
         this.ctx.fillText('Enterで継続', b.x + b.w - 5, b.y + b.h - 5);
+        this.ctx.restore();
       }
       
-      this.ctx.restore();
-      
-      // デバッグ用：コンソールにボタン情報を出力
+      // デバッグ用：コンソールにボタン情報を出力（初回のみ）
       if (!window._debuggedButtons) {
         window._debuggedButtons = {};
       }
