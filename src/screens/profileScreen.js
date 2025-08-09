@@ -15,13 +15,18 @@ const profileScreen = {
     this.container = document.createElement('div');
     this.container.id = 'profileScreenContainer';
     Object.assign(this.container.style, {
-      position: 'absolute',
-      inset: '0',
+      position: 'fixed',         // 画面全面に固定
+      left: '0',
+      top: '0',
+      width: '100vw',
+      height: '100vh',
       overflowY: 'auto',
-      background: 'rgba(0,0,0,0.6)',
+      background: 'rgba(0,0,0,0.7)', // 背景を少し濃く
       color: 'white',
       fontFamily: '"UDデジタル教科書体", sans-serif',
       padding: '16px',
+      zIndex: '100000',          // 最前面に
+      pointerEvents: 'auto',     // クリックを受ける
     });
 
     // ヘッダー
