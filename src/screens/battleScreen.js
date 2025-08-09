@@ -855,10 +855,10 @@ const battleScreenState = {
     }
 
     // ── メッセージ欄 ──（右下に配置、横幅を拡張）
-    const msgX = this.canvas.width - 540; // 420→540に拡張
+    const msgX = this.canvas.width - 380; // 旧寄り
     const msgY = 450;
-    const msgW = 520; // 400→520に拡張
-    const msgH = 160; // 130→160に拡張
+    const msgW = 360;
+    const msgH = 130;
 
     this.drawPanelBackground(this.ctx, msgX, msgY, msgW, msgH, 'stone');
 
@@ -1425,7 +1425,8 @@ if (gameState.currentKanji) {
     }
 
     // 前回漢字パネルの最初（枠を描いた直後）に
-    if (battleScreenState.masteryFlash?.active && battleScreenState.masteryFlash.kanjiId === battleState.lastAnswered.id) {
+    const prevLast = battleState.lastAnswered;
+    if (battleScreenState.masteryFlash?.active && prevLast && battleScreenState.masteryFlash.kanjiId === prevLast.id) {
       const t = battleScreenState.masteryFlash.timer;
       const alpha = Math.max(0, Math.min(1, t / 30));
       this.ctx.save();
