@@ -3941,3 +3941,11 @@ function ensureProgressRoot() {
   }
 }
 
+// 音読み/訓読みありの漢字プールを初期化
+const hasAny = (v) =>
+  (Array.isArray(v) && v.length > 0) ||
+  (typeof v === 'string' && v.trim().length > 0);
+
+battleState.kanjiPool_onyomi = (gameState.kanjiPool || []).filter(k => hasAny(k.onyomi));
+battleState.kanjiPool_kunyomi = (gameState.kanjiPool || []).filter(k => hasAny(k.kunyomi));
+
