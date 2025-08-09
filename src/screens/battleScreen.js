@@ -303,6 +303,9 @@ const battleScreenState = {
       gameState.correctKanjiList = [];
       gameState.wrongKanjiList = [];
 
+      // 追加: バトル開始時にログを初期化（漢字切替時にはリセットしない）
+      battleState.log = [];
+
       // 背景画像をキャッシュから取得
       try {
         this.stageBgImage = images[`bg_${gameState.currentStageId}`] || null;
@@ -3809,8 +3812,9 @@ function updatePlayerExp(expGained) {
 
 // メッセージをログに追加する共通関数を追加
 function addToLog(message) {
+  if (!Array.isArray(battleState.log)) battleState.log = []; // ガード追加
   battleState.log.push(message);
-  // メッセージ追加時にタイプライターエフェクトを開始
+  // メッセージ追加時にタイプライター効果を開始
   battleScreenState.startTypewriterEffect(message);
 }
 
