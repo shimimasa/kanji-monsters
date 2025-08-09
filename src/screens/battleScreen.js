@@ -302,7 +302,6 @@ const battleScreenState = {
       // 各リストを初期化
       gameState.correctKanjiList = [];
       gameState.wrongKanjiList = [];
-      battleState.log = [];
 
       // 背景画像をキャッシュから取得
       try {
@@ -677,50 +676,69 @@ const battleScreenState = {
       this.ctx.font = '42px serif';
       this.ctx.fillText(battleState.lastAnswered.text, bx + bw/2, by + 55);
 
-      // 訓読み（ひらがな）
+      // 読み進捗の取得（存在しない場合も考慮）
+      const prog = (gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id]) || null;
+      const progKun = prog ? prog.kunyomi : null;
+      const progOn  = prog ? prog.onyomi  : null;
+
+      // 訓読み（トークンごとに色分け）
       this.ctx.font = '12px "UDデジタル教科書体",sans-serif';
-      const kun = battleState.lastAnswered.kunyomi.join('、');
-      
-      // 訓読みのハイライト効果
-      if (this.readingHighlight.active && this.readingHighlight.type === 'kunyomi') {
-        this.ctx.fillStyle = 'yellow';
-      } else {
-        this.ctx.fillStyle = '#3498db'; // 青に変更
-      }
       this.ctx.textAlign = 'left';
-      this.ctx.fillText(`訓読み: ${kun}`, bx + 10, by + 85);
-      
-      // 音読み（カタカナ）
-      const on = battleState.lastAnswered.onyomi.join('、');
-      
-      // 音読みのハイライト効果
-      if (this.readingHighlight.active && this.readingHighlight.type === 'onyomi') {
-        this.ctx.fillStyle = 'yellow';
-      } else {
-        this.ctx.fillStyle = '#3498db'; // 青に変更
-      }
-      this.ctx.fillText(`音読み: ${on}`, bx + 10, by + 105);
+      let x = bx + 10;
+      let y = by + 85;
+      // ラベルは白
+      this.ctx.fillStyle = 'white';
+      this.ctx.fillText('訓読み: ', x, y);
+      x += this.ctx.measureText('訓読み: ').width;
+
+      const kunTokens = (battleState.lastAnswered.kunyomi || []);
+      kunTokens.forEach((token, idx) => {
+        const isMastered = !!(progKun && progKun.has(token));
+        this.ctx.fillStyle = isMastered ? '#3498db' : 'white';
+        this.ctx.fillText(token, x, y);
+        x += this.ctx.measureText(token).width;
+        if (idx < kunTokens.length - 1) {
+          this.ctx.fillStyle = 'white';
+          this.ctx.fillText('、', x, y);
+          x += this.ctx.measureText('、').width;
+        }
+      });
+
+      // 音読み（トークンごとに色分け）
+      x = bx + 10;
+      y = by + 105;
+      this.ctx.fillStyle = 'white';
+      this.ctx.fillText('音読み: ', x, y);
+      x += this.ctx.measureText('音読み: ').width;
+
+      const onTokens = (battleState.lastAnswered.onyomi || []);
+      onTokens.forEach((token, idx) => {
+        const isMastered = !!(progOn && progOn.has(token));
+        this.ctx.fillStyle = isMastered ? '#3498db' : 'white';
+        this.ctx.fillText(token, x, y);
+        x += this.ctx.measureText(token).width;
+        if (idx < onTokens.length - 1) {
+          this.ctx.fillStyle = 'white';
+          this.ctx.fillText('、', x, y);
+          x += this.ctx.measureText('、').width;
+        }
+      });
 
       // 画数（常に白色）
       this.ctx.fillStyle = 'white';
-      this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, by + 125); // Y座標を調整
+      this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, by + 125);
 
-      // 自分の間違った答えを表示（lastIncorrectAnswerが存在する場合のみ）
+      // 間違った答え表示（既存のまま）
       if (this.lastIncorrectAnswer) {
-        // 背景（半透明の赤）
         this.ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
-        this.ctx.fillRect(bx + 10, by + 140, bw - 20, 22); // Y座標を調整
-        
-        // 枠線（赤）
+        this.ctx.fillRect(bx + 10, by + 140, bw - 20, 22);
         this.ctx.strokeStyle = 'rgba(231, 76, 60, 0.8)';
         this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(bx + 10, by + 140, bw - 20, 22); // Y座標を調整
-        
-        // 間違った答えのテキスト
-        this.ctx.fillStyle = '#e74c3c'; // 赤色
+        this.ctx.strokeRect(bx + 10, by + 140, bw - 20, 22);
+        this.ctx.fillStyle = '#e74c3c';
         this.ctx.font = 'bold 12px "UDデジタル教科書体",sans-serif';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(`あなたの答え: ${this.lastIncorrectAnswer}`, bx + bw/2, by + 155); // Y座標を調整
+        this.ctx.fillText(`あなたの答え: ${this.lastIncorrectAnswer}`, bx + bw/2, by + 155);
       }
     }
     // ← ここまで追加
@@ -2830,7 +2848,8 @@ function spawnEnemy() {
   updateEnemyUI(e.name, e.hp, e.maxHp);
   
   // 従来のログ初期化をaddToLogに置き換え
-  battleState.log = [];
+  // ↓ 削除
+  // battleState.log = [];
   
   // ボス戦かどうかに応じてメッセージを変更
   if (e.isBoss) {
