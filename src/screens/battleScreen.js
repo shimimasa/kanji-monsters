@@ -3871,6 +3871,7 @@ function calculateHealAmount(playerLevel) {
 
 // 読み進捗のエントリを確保
 function ensureProgressEntry(kanjiId) {
+  ensureProgressRoot(); // 追加
   const prog = gameState.kanjiReadProgress[kanjiId];
   if (!prog) {
     gameState.kanjiReadProgress[kanjiId] = {
@@ -3885,14 +3886,14 @@ function ensureProgressEntry(kanjiId) {
 // 現在の問題の読み進捗を更新し、マスター済みか判定
 function updateKanjiMasteryAfterCorrect(currentKanji, answer) {
   if (!currentKanji || !currentKanji.id) return;
+  ensureProgressRoot(); // 追加
   const id = currentKanji.id;
   const prog = ensureProgressEntry(id);
 
-  // 種別判定（両方に含まれる可能性もある）
   const isKun = (currentKanji.kunyomi || []).includes(answer);
-  const isOn = (currentKanji.onyomi || []).includes(answer);
+  const isOn  = (currentKanji.onyomi || []).includes(answer);
   if (isKun) prog.kunyomi.add(answer);
-  if (isOn) prog.onyomi.add(answer);
+  if (isOn)  prog.onyomi.add(answer);
 
   const allKunOk = (currentKanji.kunyomi || []).every(r => prog.kunyomi.has(r));
   const allOnOk  = (currentKanji.onyomi || []).every(r => prog.onyomi.has(r));
@@ -3901,7 +3902,15 @@ function updateKanjiMasteryAfterCorrect(currentKanji, answer) {
 
 // その漢字がマスター済みか
 function isKanjiMastered(kanjiId) {
+  ensureProgressRoot(); // 追加
   const prog = gameState.kanjiReadProgress[kanjiId];
   return !!(prog && prog.mastered);
+}
+
+// 追加: 進捗ルートの初期化
+function ensureProgressRoot() {
+  if (!gameState.kanjiReadProgress) {
+    gameState.kanjiReadProgress = {};
+  }
 }
 
