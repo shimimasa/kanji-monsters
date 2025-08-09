@@ -1414,6 +1414,28 @@ if (gameState.currentKanji) {
     this.ctx.fillStyle = 'white';
     this.ctx.textAlign = 'center';
     this.ctx.fillText(helpText[mode], this.canvas.width / 2, this.canvas.height - 20);
+
+    // 前回漢字パネル内（枠と漢字を描いた直後あたり）
+    const progForPrev = (gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id]) || null;
+    const isPrevMastered = !!(progForPrev && progForPrev.mastered);
+
+    // 右上にMASTERバッジ
+    if (isPrevMastered) {
+      drawMasterBadge(this.ctx, bx + bw - 6, by + 6);
+    }
+
+    // 前回漢字パネルの最初（枠を描いた直後）に
+    if (battleScreenState.masteryFlash?.active && battleScreenState.masteryFlash.kanjiId === battleState.lastAnswered.id) {
+      const t = battleScreenState.masteryFlash.timer;
+      const alpha = Math.max(0, Math.min(1, t / 30));
+      this.ctx.save();
+      this.ctx.strokeStyle = `rgba(241, 196, 15, ${0.6 * alpha})`;
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeRect(bx - 2, by - 2, bw + 4, bh + 4);
+      this.ctx.restore();
+      battleScreenState.masteryFlash.timer--;
+      if (battleScreenState.masteryFlash.timer <= 0) battleScreenState.masteryFlash.active = false;
+    }
   },
 
   /**
@@ -3922,9 +3944,16 @@ function updateKanjiMasteryAfterCorrect(currentKanji, answer) {
   if (isKun) prog.kunyomi.add(answer);
   if (isOn)  prog.onyomi.add(answer);
 
+  const before = !!prog.mastered;
   const allKunOk = (currentKanji.kunyomi || []).every(r => prog.kunyomi.has(r));
   const allOnOk  = (currentKanji.onyomi || []).every(r => prog.onyomi.has(r));
   prog.mastered = allKunOk && allOnOk;
+
+  // 追加: 初めてマスターになった瞬間にフラグ
+  if (!before && prog.mastered) {
+    battleScreenState.masteryFlash = { active: true, timer: 30, kanjiId: currentKanji.id };
+    addToLog('ぜんぶよめた！マスターかんじになった！');
+  }
 }
 
 // その漢字がマスター済みか
@@ -3948,4 +3977,43 @@ const hasAny = (v) =>
 
 battleState.kanjiPool_onyomi = (gameState.kanjiPool || []).filter(k => hasAny(k.onyomi));
 battleState.kanjiPool_kunyomi = (gameState.kanjiPool || []).filter(k => hasAny(k.kunyomi));
+
+// MASTERバッジ描画
+function drawMasterBadge(ctx, x, y) {
+  ctx.save();
+  ctx.font = 'bold 11px "UDデジタル教科書体",sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#3498db';
+  ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+  ctx.lineWidth = 2;
+
+  // 背景の丸角ラベル
+  const label = 'MASTER';
+  const padX = 6, padY = 3;
+  const w = ctx.measureText(label).width + padX * 2;
+  const h = 18;
+  const rx = 5;
+  const left = x - w, top = y;
+
+  ctx.beginPath();
+  ctx.moveTo(left + rx, top);
+  ctx.lineTo(x - rx, top);
+  ctx.quadraticCurveTo(x, top, x, top + rx);
+  ctx.lineTo(x, top + h - rx);
+  ctx.quadraticCurveTo(x, top + h, x - rx, top + h);
+  ctx.lineTo(left + rx, top + h);
+  ctx.quadraticCurveTo(left, top + h, left, top + h - rx);
+  ctx.lineTo(left, top + rx);
+  ctx.quadraticCurveTo(left, top, left + rx, top);
+  ctx.closePath();
+
+  ctx.fill();
+  ctx.stroke();
+
+  // 文字
+  ctx.fillStyle = 'white';
+  ctx.fillText(label, x - padX, top + 3);
+  ctx.restore();
+}
 
