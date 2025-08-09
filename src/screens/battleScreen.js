@@ -316,21 +316,21 @@ const battleScreenState = {
       }
 
       // ステージデータの取得
-      gameState.enemies = getEnemiesByStageId(gameState.currentStageId);
+      gameState.enemies   = getEnemiesByStageId(gameState.currentStageId).map(src => {
+        // 破壊的変更の影響を避けるためクローン
+        const e = { ...src };
+        // 画像は後続でセット、ここでは基本ステータスを初期化
+        e.hp = e.maxHp;
+        if (e.isBoss) {
+          const baseShield = (typeof e.shieldHp === 'number') ? e.shieldHp : 3;
+          e.originalShieldHp = baseShield;
+          e.shieldHp = baseShield;
+        } else {
+          e.originalShieldHp = undefined;
+        }
+        return e;
+      });
       gameState.kanjiPool = getKanjiByStageId(gameState.currentStageId);
-      
-      // 漢字プールの事前フィルタリング
-      battleState.kanjiPool_onyomi = gameState.kanjiPool.filter(kanji => {
-        return kanji.onyomi && 
-               ((Array.isArray(kanji.onyomi) && kanji.onyomi.length > 0) || 
-                (typeof kanji.onyomi === 'string' && kanji.onyomi.trim() !== ''));
-      });
-      
-      battleState.kanjiPool_kunyomi = gameState.kanjiPool.filter(kanji => {
-        return kanji.kunyomi && 
-               ((Array.isArray(kanji.kunyomi) && kanji.kunyomi.length > 0) || 
-                (typeof kanji.kunyomi === 'string' && kanji.kunyomi.trim() !== ''));
-      });
       
       if (!gameState.kanjiPool.length) {
         alert('このステージに紐づく漢字データがありません。\nステージ選択へ戻ります。');
@@ -343,14 +343,18 @@ const battleScreenState = {
       battleState.shuffledKanjiList = [...gameState.kanjiPool].sort(() => Math.random() - 0.5);
       battleState.currentKanjiIndex = 0;
 
-      // 敵画像をキャッシュから取得
+      // 敵画像をキャッシュから取得（クローン済みに対してセット）
       for (const e of gameState.enemies) {
         e.img = images[e.id] || null;
-        e.hp = e.maxHp;
-        
-        // ボスのシールドHPの初期値を保存（ここを追加）
-        if (e.isBoss && e.shieldHp !== undefined) {
-          e.originalShieldHp = e.shieldHp;
+        e.hp  = e.maxHp;
+        if (e.isBoss) {
+          const baseShield = (typeof e.originalShieldHp === 'number')
+            ? e.originalShieldHp
+            : (typeof e.shieldHp === 'number' ? e.shieldHp : 3);
+          e.originalShieldHp = baseShield;
+          e.shieldHp = baseShield;
+        } else {
+          e.originalShieldHp = undefined;
         }
       }
 
@@ -684,64 +688,64 @@ const battleScreenState = {
       const progKun = prog ? prog.kunyomi : null;
       const progOn  = prog ? prog.onyomi  : null;
 
-      // 訓読み（トークンごとに色分け）
-      this.ctx.font = '12px "UDデジタル教科書体",sans-serif';
-      this.ctx.textAlign = 'left';
-      let x = bx + 10;
-      let y = by + 85;
-      // ラベルは白
-      this.ctx.fillStyle = 'white';
-      this.ctx.fillText('訓読み: ', x, y);
-      x += this.ctx.measureText('訓読み: ').width;
+      // 折り返しヘルパー（ラベル幅を考慮、トークン単位）
+      const drawWrappedTokens = (label, tokens, y, masteredSet) => {
+        this.ctx.font = '12px "UDデジタル教科書体",sans-serif';
+        this.ctx.textAlign = 'left';
+        const left = bx + 10;
+        const maxW = bw - 20;
+        const labelW = this.ctx.measureText(label).width;
 
-      const kunTokens = (battleState.lastAnswered.kunyomi || []);
-      kunTokens.forEach((token, idx) => {
-        const isMastered = !!(progKun && progKun.has(token));
-        this.ctx.fillStyle = isMastered ? '#3498db' : 'white';
-        this.ctx.fillText(token, x, y);
-        x += this.ctx.measureText(token).width;
-        if (idx < kunTokens.length - 1) {
-          this.ctx.fillStyle = 'white';
-          this.ctx.fillText('、', x, y);
-          x += this.ctx.measureText('、').width;
-        }
-      });
+        let x = left;
+        let firstLine = true;
+        // 先にラベル
+        this.ctx.fillStyle = 'white';
+        this.ctx.fillText(label, x, y);
+        x += labelW;
 
-      // 音読み（トークンごとに色分け）
-      x = bx + 10;
-      y = by + 105;
-      this.ctx.fillStyle = 'white';
-      this.ctx.fillText('音読み: ', x, y);
-      x += this.ctx.measureText('音読み: ').width;
+        const pieces = [];
+        tokens.forEach((t, i) => {
+          pieces.push({ text: t, mastered: !!(masteredSet && masteredSet.has(t)) });
+          if (i < tokens.length - 1) pieces.push({ text: '、', mastered: false });
+        });
 
-      const onTokens = (battleState.lastAnswered.onyomi || []);
-      onTokens.forEach((token, idx) => {
-        const isMastered = !!(progOn && progOn.has(token));
-        this.ctx.fillStyle = isMastered ? '#3498db' : 'white';
-        this.ctx.fillText(token, x, y);
-        x += this.ctx.measureText(token).width;
-        if (idx < onTokens.length - 1) {
-          this.ctx.fillStyle = 'white';
-          this.ctx.fillText('、', x, y);
-          x += this.ctx.measureText('、').width;
-        }
-      });
+        pieces.forEach(p => {
+          const w = this.ctx.measureText(p.text).width;
+          if (x + w > left + maxW) {
+            // 改行
+            y += 18; // 行高
+            firstLine = false;
+            x = left + labelW; // 2行目以降はラベル分インデント
+          }
+          this.ctx.fillStyle = p.mastered ? '#3498db' : 'white';
+          this.ctx.fillText(p.text, x, y);
+          x += w;
+        });
+
+        return y + 18; // 次に描くベースYを返す
+      };
+
+      // 訓読み（正解済みのみ青、折り返し）
+      let nextY = drawWrappedTokens('訓読み: ', (battleState.lastAnswered.kunyomi || []), by + 85, progKun);
+
+      // 音読み（正解済みのみ青、折り返し）
+      nextY = drawWrappedTokens('音読み: ', (battleState.lastAnswered.onyomi || []), nextY, progOn);
 
       // 画数（常に白色）
       this.ctx.fillStyle = 'white';
-      this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, by + 125);
+      this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY);
 
-      // 間違った答え表示（既存のまま）
+      // 間違った答え表示（既存）
       if (this.lastIncorrectAnswer) {
         this.ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
-        this.ctx.fillRect(bx + 10, by + 140, bw - 20, 22);
+        this.ctx.fillRect(bx + 10, nextY + 10, bw - 20, 22);
         this.ctx.strokeStyle = 'rgba(231, 76, 60, 0.8)';
         this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(bx + 10, by + 140, bw - 20, 22);
+        this.ctx.strokeRect(bx + 10, nextY + 10, bw - 20, 22);
         this.ctx.fillStyle = '#e74c3c';
         this.ctx.font = 'bold 12px "UDデジタル教科書体",sans-serif';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(`あなたの答え: ${this.lastIncorrectAnswer}`, bx + bw/2, by + 155);
+        this.ctx.fillText(`あなたの答え: ${this.lastIncorrectAnswer}`, bx + bw/2, nextY + 21);
       }
     }
     // ← ここまで追加
