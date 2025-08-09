@@ -30,8 +30,8 @@ const BUTTON_CONFIG = {
   y: 540
 };
 
-// 合計幅を計算
-const totalWidth = (BUTTON_CONFIG.width * 4) + (BUTTON_CONFIG.gap * 3);
+// 合計幅を計算（5ボタンに拡張）
+const totalWidth = (BUTTON_CONFIG.width * 5) + (BUTTON_CONFIG.gap * 4);
 // 開始X座標を計算（中央揃え）
 const startX = (800 - totalWidth) / 2; // キャンバス幅800pxを想定
 
@@ -70,6 +70,16 @@ const monsterButton = {
   height: BUTTON_CONFIG.height, 
   text: 'モンスター',
   icon: '👾'
+};
+
+// 追加: プロフィール/称号ボタン
+const profileButton = { 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 4, 
+  y: BUTTON_CONFIG.y, 
+  width: BUTTON_CONFIG.width, 
+  height: BUTTON_CONFIG.height, 
+  text: 'プロフィール/称号',
+  icon: '🏆'
 };
 
 // マーカー半径
@@ -827,12 +837,14 @@ const stageSelectScreenState = {
     const isReviewHovered = isMouseOverRect(this.mouseX, this.mouseY, reviewButton);
     const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
     const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
+    const isProfileHovered = isMouseOverRect(this.mouseX, this.mouseY, profileButton);
 
     // リッチボタンで描画（色分けとアイコン付き）
     this._drawRichFooterButton(ctx, backButton, '#808080', isBackHovered); // グレー系
     this._drawRichFooterButton(ctx, reviewButton, '#2980b9', isReviewHovered); // 青系
     this._drawRichFooterButton(ctx, dexButton, '#2980b9', isDexHovered); // 青系
     this._drawRichFooterButton(ctx, monsterButton, '#2980b9', isMonsterHovered); // 青系
+    this._drawRichFooterButton(ctx, profileButton, '#2980b9', isProfileHovered); // 青系
   },
 
   /** フッター専用のリッチボタン描画（アイコン付き） */
@@ -1084,6 +1096,13 @@ const stageSelectScreenState = {
     if (isMouseOverRect(x, y, monsterButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'monsterDex');
+      return;
+    }
+
+    // プロフィール/称号ボタン
+    if (isMouseOverRect(x, y, profileButton)) {
+      publish('playSE', 'decide');
+      publish('changeScreen', 'profile');
       return;
     }
   },

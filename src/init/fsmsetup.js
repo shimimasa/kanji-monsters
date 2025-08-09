@@ -25,6 +25,8 @@ import courseSelectScreen from '../screens/courseSelectScreen.js';
 import continentSelectScreen from '../screens/continentSelectScreen.js';
 import worldStageSelectScreen from '../screens/worldStageSelectScreen.js';
 import proverbMonsterDexState from '../screens/Dex/proverbMonsterDexScreen.js';
+// 追加
+import profileScreen       from '../screens/profileScreen.js';
 
 export async function setupFSM() {
   const { stageData } = await loadAllGameData();
@@ -52,6 +54,8 @@ export async function setupFSM() {
     continentSelect:  continentSelectScreen,
     worldStageSelect: worldStageSelectScreen,
     proverbMonsterDex: proverbMonsterDexState,
+    // 追加
+    profile:          profileScreen,
     // 共通バトル画面を追加
     battle:           battleFactory('default'),
   };
@@ -69,7 +73,9 @@ export async function setupFSM() {
     
     // 特定の画面名の場合は直接遷移する（安全リスト）
     const safeScreens = ['title', 'menu', 'stageSelect', 'stageLoading', 'battle', 
-                        'worldStageSelect', 'continentSelect', 'courseSelect'];
+                        'worldStageSelect', 'continentSelect', 'courseSelect',
+                        // 追加
+                        'profile'];
     
     if (safeScreens.includes(name)) {
       console.log(`安全な画面[${name}]への遷移を許可`);

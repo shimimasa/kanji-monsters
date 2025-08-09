@@ -144,6 +144,49 @@ const worldStageSelectScreen = {
 
     // uiRootを安全に取得
     const uiRoot = getUiRoot();
+
+    // ヘッダーを追加
+    const headerDiv = document.createElement('div');
+    headerDiv.style.display = 'flex';
+    headerDiv.style.justifyContent = 'space-between';
+    headerDiv.style.alignItems = 'center';
+    headerDiv.style.padding = '10px 20px';
+    headerDiv.style.background = 'rgba(0,0,0,0.6)';
+    headerDiv.style.borderBottom = '1px solid #8B4513';
+    headerDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+
+    const backBtn = document.createElement('button');
+    backBtn.textContent = '← もどる';
+    backBtn.onclick = () => publish('changeScreen', 'continentSelect');
+    backBtn.style.padding = '8px 12px';
+    backBtn.style.background = '#8B4513';
+    backBtn.style.color = 'white';
+    backBtn.style.border = 'none';
+    backBtn.style.borderRadius = '5px';
+    backBtn.style.cursor = 'pointer';
+    backBtn.style.fontSize = '14px';
+    backBtn.style.fontFamily = '"UDデジタル教科書体", sans-serif';
+
+    const title = document.createElement('h2');
+    title.textContent = 'ワールドステージ選択';
+    title.style.margin = '0';
+    title.style.fontSize = '18px';
+    title.style.fontFamily = '"UDデジタル教科書体", sans-serif';
+
+    const profileBtn = document.createElement('button');
+    profileBtn.textContent = 'プロフィール / 称号';
+    profileBtn.onclick = () => publish('changeScreen', 'profile');
+    profileBtn.style.padding = '8px 12px';
+    profileBtn.style.background = '#8B4513';
+    profileBtn.style.color = 'white';
+    profileBtn.style.border = 'none';
+    profileBtn.style.borderRadius = '5px';
+    profileBtn.style.cursor = 'pointer';
+    profileBtn.style.fontSize = '14px';
+    profileBtn.style.fontFamily = '"UDデジタル教科書体", sans-serif';
+
+    headerDiv.append(backBtn, title, profileBtn);
+    uiRoot.appendChild(headerDiv);
   },
 
   /** ステージリストを更新する（漢検レベル切り替え時に呼ばれる） */
