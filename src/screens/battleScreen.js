@@ -683,23 +683,23 @@ const battleScreenState = {
       
       // 訓読みのハイライト効果
       if (this.readingHighlight.active && this.readingHighlight.type === 'kunyomi') {
-        this.ctx.fillStyle = 'yellow'; // ハイライト色
+        this.ctx.fillStyle = 'yellow';
       } else {
-        this.ctx.fillStyle = 'white';  // 通常色
+        this.ctx.fillStyle = '#3498db'; // 青に変更
       }
       this.ctx.textAlign = 'left';
-      this.ctx.fillText(`訓読み: ${kun}`, bx + 10, by + 85); // Y座標を調整
+      this.ctx.fillText(`訓読み: ${kun}`, bx + 10, by + 85);
       
       // 音読み（カタカナ）
       const on = battleState.lastAnswered.onyomi.join('、');
       
       // 音読みのハイライト効果
       if (this.readingHighlight.active && this.readingHighlight.type === 'onyomi') {
-        this.ctx.fillStyle = 'yellow'; // ハイライト色
+        this.ctx.fillStyle = 'yellow';
       } else {
-        this.ctx.fillStyle = 'white';  // 通常色
+        this.ctx.fillStyle = '#3498db'; // 青に変更
       }
-      this.ctx.fillText(`音読み: ${on}`, bx + 10, by + 105); // Y座標を調整
+      this.ctx.fillText(`音読み: ${on}`, bx + 10, by + 105);
 
       // 画数（常に白色）
       this.ctx.fillStyle = 'white';
@@ -830,15 +830,14 @@ const battleScreenState = {
     }
 
     // ── メッセージ欄 ──（右下に配置、横幅を拡張）
-    const msgX = this.canvas.width - 420; // 380から420に拡張
-    const msgY = 450; // ボトムエリアの開始位置
-    const msgW = 400; // 360から400に拡張
-    const msgH = 130; // 高さを調整（プレイヤーパネルと同じ）
+    const msgX = this.canvas.width - 540; // 420→540に拡張
+    const msgY = 450;
+    const msgW = 520; // 400→520に拡張
+    const msgH = 160; // 130→160に拡張
 
-    // 半透明の黒背景から石版風デザインに変更
     this.drawPanelBackground(this.ctx, msgX, msgY, msgW, msgH, 'stone');
 
-    // メッセージログタイトル追加（まとまり感向上）
+    // タイトル
     this.drawTextWithOutline(
       "バトルログ",
       msgX + msgW/2,
@@ -850,46 +849,41 @@ const battleScreenState = {
       'top',
       1
     );
-    
-    // メッセージログ表示（タイプライター効果対応）
-    const N = 5; // 表示行数
+
+    // 表示準備
+    const padding = 8;
+    const lineHeight = 18;
+    const innerLeft = msgX + padding;
+    const innerTop  = msgY + 28;         // タイトル下から
+    const innerRight = msgX + msgW - padding;
+    const innerBottom = msgY + msgH - 12; // 下部余白
+    const maxLinesByHeight = Math.max(1, Math.floor((innerBottom - innerTop) / lineHeight));
+
+    const N = 10; // 原本メッセージの取得数（折り返し後は高さに合わせて切り詰め）
     const len = battleState.log.length;
     const maxOffset = Math.max(0, len - N);
     this.logOffset = Math.min(Math.max(0, this.logOffset), maxOffset);
     const start = Math.max(0, len - N - this.logOffset);
     let lines = battleState.log.slice(start, start + N);
-    
+
     this.ctx.font = '14px "UDデジタル教科書体", sans-serif';
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'top';
-    
-    // タイプライターエフェクトの更新処理
+
+    // タイプライター効果の更新
     if (this.typewriterEffect.active) {
       this.typewriterEffect.charTimer--;
-      
       if (this.typewriterEffect.charTimer <= 0) {
-        // 次の文字を表示
         this.typewriterEffect.displayedChars++;
         this.typewriterEffect.charTimer = this.typewriterEffect.charInterval;
-        
-        // タイプ音を一定間隔で再生
         if (this.typewriterEffect.displayedChars % this.typewriterEffect.soundInterval === 0) {
-          // タイプ音の再生（軽いクリック音）- 'type'が未定義の場合は'decide'を使用
-          try {
-            publish('playSE', 'decide', 0.1); // 音量小さめ
-          } catch (error) {
-            // SE再生に失敗した場合は無視
-            console.warn('タイプ音の再生に失敗しました:', error);
-          }
+          try { publish('playSE', 'decide', 0.1); } catch {}
         }
-        
-        // 全ての文字を表示し終えたらエフェクト終了
         if (this.typewriterEffect.displayedChars >= this.typewriterEffect.targetMessage.length) {
           this.typewriterEffect.active = false;
         }
       }
-      
-      // 対象メッセージを切り詰めたバージョンに置き換え
+      // 部分文字列に差し替え
       if (this.typewriterEffect.messageIndex >= 0 && 
           this.typewriterEffect.messageIndex < lines.length) {
         const displayedText = this.typewriterEffect.targetMessage.substring(
@@ -899,91 +893,149 @@ const battleScreenState = {
         lines[this.typewriterEffect.messageIndex] = displayedText;
       }
     }
-    
-    // メッセージログの描画
+
+    // 折り返しヘルパー（1行目と2行目以降で幅を変えられる）
+    const wrapWithWidths = (ctx, text, firstWidth, nextWidth) => {
+      const out = [];
+      let current = '';
+      let width = firstWidth;
+      for (const ch of text) {
+        const trial = current + ch;
+        if (ctx.measureText(trial).width <= width) {
+          current = trial;
+        } else {
+          if (current) out.push(current);
+          current = ch;
+          width = nextWidth; // 2行目以降はnextWidth
+        }
+      }
+      if (current) out.push(current);
+      return out;
+    };
+
+    // クリップ
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.rect(msgX + 4, msgY + 24, msgW - 8, msgH - 30);
+    this.ctx.clip();
+
+    // メッセージを折り返しして平坦化（セグメント列をtop->down順で生成）
+    const iconSize = 16;
+    const iconMargin = 4;
+
+    const segments = [];
     lines.forEach((l, i) => {
       const color = this.getMessageColor(l);
-      const baseX = msgX + 8;
-      const baseY = msgY + 28 + i * 20; // タイトル分を下にずらす
-      
-      // アイコンサイズとマージン
-      const iconSize = 16;
-      const iconMargin = 4;
-      let textOffsetX = 0; // テキストのオフセット
-      
-      // メッセージ内容に応じてアイコンを描画
-      let iconImg = null;
-      
+
+      // アイコン種別判定（従来ロジックを踏襲）
+      let iconType = 'none'; // 'attack' | 'heal' | 'hint' | 'check' | 'star' | 'none'
       if (l.includes('ダメージ') || l.includes('こうげき')) {
-        iconImg = images.iconAttack;
+        iconType = 'attack';
       } else if (l.includes('せいかい！') || l.includes('弱点にヒット') || l.includes('ボーナス')) {
-        // チェックマークアイコンがない場合は、攻撃アイコンを緑色で描画
-        iconImg = images.iconAttack;
-        // または専用のチェックマークを描画
-        this.ctx.save();
-        this.ctx.fillStyle = '#2ecc71';
-        this.ctx.font = `${iconSize}px sans-serif`;
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('✓', baseX + iconSize/2, baseY + 10);
-        this.ctx.restore();
-        textOffsetX = iconSize + iconMargin;
+        iconType = 'check';
       } else if (l.includes('かいふく')) {
-        iconImg = images.iconHeal;
+        iconType = 'heal';
       } else if (l.includes('をたおした') || l.includes('あらわれた')) {
-        // モンスター関連のメッセージには剣のアイコン
-        iconImg = images.iconAttack;
+        iconType = 'attack';
       } else if (l.includes('経験値') || l.includes('レベル')) {
-        // 経験値・レベル関連には星マーク
-        this.ctx.save();
-        this.ctx.fillStyle = '#f1c40f';
-        this.ctx.font = `${iconSize}px sans-serif`;
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('★', baseX + iconSize/2, baseY + 10);
-        this.ctx.restore();
-        textOffsetX = iconSize + iconMargin;
+        iconType = 'star';
       } else if (l.includes('ヒント')) {
-        iconImg = images.iconHint;
+        iconType = 'hint';
       }
-      
-      // アイコン画像を描画（チェックマークや星以外）
-      if (iconImg && !l.includes('せいかい！') && !l.includes('弱点にヒット') && 
-          !l.includes('ボーナス') && !l.includes('経験値') && !l.includes('レベル')) {
-        this.ctx.save();
-        
-        // アイコンの色調整（メッセージの種類に応じて）
-        if (l.includes('ダメージ') || l.includes('こうげき')) {
-          // 攻撃系は少し赤みを帯びさせる
-          this.ctx.filter = 'hue-rotate(0deg) saturate(1.2)';
-        } else if (l.includes('かいふく')) {
-          // 回復系は緑色を強調
-          this.ctx.filter = 'hue-rotate(90deg) saturate(1.5)';
-        } else if (l.includes('ヒント')) {
-          // ヒント系は黄色を強調
-          this.ctx.filter = 'hue-rotate(45deg) saturate(1.3)';
+
+      // 1行目幅（アイコン分を引く）、2行目以降幅
+      const firstWidth = iconType === 'check' || iconType === 'star'
+        ? (innerRight - (innerLeft + iconSize + iconMargin))
+        : (iconType !== 'none'
+            ? (innerRight - (innerLeft + iconSize + iconMargin))
+            : (innerRight - innerLeft));
+      const nextWidth  = innerRight - innerLeft;
+
+      const wrapped = wrapWithWidths(this.ctx, l, firstWidth, nextWidth);
+
+      wrapped.forEach((textSeg, segIdx) => {
+        segments.push({
+          msgIndex: i,
+          text: textSeg,
+          color,
+          iconType,
+          firstSeg: segIdx === 0
+        });
+      });
+    });
+
+    // 下からmaxLinesByHeightだけ取得
+    const visibleSegments = segments.slice(-maxLinesByHeight);
+
+    // 描画（上から下へ）。同一メッセージの最初にだけアイコン描画
+    const drawnIconFor = new Set();
+    let drawY = innerTop;
+
+    visibleSegments.forEach(seg => {
+      const baseX = innerLeft;
+
+      // アイコン描画は1メッセージにつき最初の可視行のみ
+      let textX = baseX;
+      if (!drawnIconFor.has(seg.msgIndex) && seg.firstSeg && seg.iconType !== 'none') {
+        if (seg.iconType === 'check') {
+          this.ctx.save();
+          this.ctx.fillStyle = '#2ecc71';
+          this.ctx.font = `${iconSize}px sans-serif`;
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText('✓', baseX + iconSize/2, drawY + 10);
+          this.ctx.restore();
+          textX = baseX + iconSize + iconMargin;
+        } else if (seg.iconType === 'star') {
+          this.ctx.save();
+          this.ctx.fillStyle = '#f1c40f';
+          this.ctx.font = `${iconSize}px sans-serif`;
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText('★', baseX + iconSize/2, drawY + 10);
+          this.ctx.restore();
+          textX = baseX + iconSize + iconMargin;
+        } else {
+          // 画像アイコン（攻撃/回復/ヒント）
+          let iconImg = null;
+          if (seg.iconType === 'attack') iconImg = images.iconAttack;
+          else if (seg.iconType === 'heal') iconImg = images.iconHeal;
+          else if (seg.iconType === 'hint') iconImg = images.iconHint;
+
+          if (iconImg) {
+            this.ctx.save();
+            if (seg.iconType === 'attack') {
+              this.ctx.filter = 'hue-rotate(0deg) saturate(1.2)';
+            } else if (seg.iconType === 'heal') {
+              this.ctx.filter = 'hue-rotate(90deg) saturate(1.5)';
+            } else if (seg.iconType === 'hint') {
+              this.ctx.filter = 'hue-rotate(45deg) saturate(1.3)';
+            }
+            this.ctx.drawImage(iconImg, baseX, drawY + 2, iconSize, iconSize);
+            this.ctx.restore();
+            textX = baseX + iconSize + iconMargin;
+          }
         }
-        
-        this.ctx.drawImage(iconImg, baseX, baseY + 2, iconSize, iconSize);
-        this.ctx.restore();
-        textOffsetX = iconSize + iconMargin;
+        drawnIconFor.add(seg.msgIndex);
       }
-      
-      // テキストを描画（アイコン分オフセット）
+
       this.drawTextWithOutline(
-        l,
-        baseX + textOffsetX,
-        baseY,
-        color,
+        seg.text,
+        textX,
+        drawY,
+        seg.color,
         'black',
         '14px "UDデジタル教科書体", sans-serif',
         'left',
         'top',
-        1 // 縁取りの太さを細く
+        1
       );
+      drawY += lineHeight;
     });
-    
-    // メッセージログのスクロールヒント表示
+
+    this.ctx.restore();
+
+    // スクロールヒント（件数基準は従来どおり）
     if (len > N) {
       this.drawTextWithOutline(
         "↑↓ スクロール可能 ↑↓",
@@ -2708,6 +2760,42 @@ drawEnemyStatusPanel(ctx) {
     }
   },
 
+  /** 漢字カードを生成 */
+  _createKanjiCard(kanjiData) {
+    const collected = this.dexSet.has(kanjiData.id);
+
+    const card = document.createElement('div');
+    card.className = 'kanji-card';
+    if (!collected) {
+      card.classList.add('locked');
+    }
+    // 追加: バッジ配置のため
+    card.style.position = 'relative';
+
+    // 漢字
+    const kanjiEl = document.createElement('div');
+    kanjiEl.className = 'kanji-character';
+    kanjiEl.textContent = collected ? kanjiData.kanji : '？';
+    card.appendChild(kanjiEl);
+
+    // 追加: マスター済みならバッジ表示（セッション内進捗参照）
+    const mastered = !!(gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiData.id]?.mastered);
+    if (mastered) {
+      const badge = document.createElement('div');
+      badge.textContent = 'MASTER';
+      badge.style.position = 'absolute';
+      badge.style.top = '6px';
+      badge.style.right = '6px';
+      badge.style.fontSize = '12px';
+      badge.style.color = '#fff';
+      badge.style.background = '#3498db';
+      badge.style.padding = '2px 6px';
+      badge.style.borderRadius = '3px';
+      badge.style.boxShadow = '0 1px 2px rgba(0,0,0,.3)';
+      card.appendChild(badge);
+    }
+  },
+
 };
 
 export default battleScreenState;
@@ -2843,8 +2931,15 @@ function onAttack() {
     // 2) 基本ダメージ計算
     let baseDamage = gameState.playerStats.attack;
     
-    // ダメージに少しゆらぎを持たせる（例: 攻撃力の±10%）
-    let randomFactor = (Math.random() * 0.2) - 0.1; // -0.1 〜 +0.1
+    // 追加: マスターかんじボーナス（基礎値2倍、1回消費）
+    if (battleState.masteryBonusActive) {
+      baseDamage = Math.floor(baseDamage * 2);
+      battleState.masteryBonusActive = false;
+      battleState.log.push('マスターかんじボーナス！2ばい！');
+    }
+    
+    // ダメージに少しゆらぎ（±10%）
+    let randomFactor = (Math.random() * 0.2) - 0.1;
     let dmg = Math.round(baseDamage * (1 + randomFactor));
     
     // 属性システム：敵の弱点判定
@@ -2855,12 +2950,14 @@ function onAttack() {
     const isInKunyomi = gameState.currentKanji.kunyomi.includes(answer);
     const isInOnyomi = gameState.currentKanji.onyomi.includes(answer);
     
+    // 追加: 読み進捗更新・マスター判定
+    updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
+    
     if (isInKunyomi && !isInOnyomi) {
       readingType = 'kunyomi';
     } else if (isInOnyomi && !isInKunyomi) {
       readingType = 'onyomi';
     } else if (isInKunyomi && isInOnyomi) {
-      // 両方に含まれる場合は、敵の弱点に合わせて判定
       readingType = gameState.currentEnemy.weakness;
     }
     
@@ -2878,7 +2975,6 @@ function onAttack() {
     
     // 5連続正解ボーナス判定
     if (battleState.comboCount === 5) {
-      // 連続正解ボーナス：ダメージ増加のみ（経験値ボーナスは削除）
       dmg = Math.floor(dmg * 1.5);
       battleState.log.push('れんぞくせいかいボーナス！');
       battleState.comboCount = 0;
@@ -3238,9 +3334,19 @@ function onHeal() {
     // 回復前のHPを保存
     const prevHp = gameState.playerStats.hp;
     publish('playSE', 'heal');
+    let healAmount = calculateHealAmount(gameState.playerStats.level);
+
+    // 追加: 5連続正解ボーナス（回復時）
+    if (battleState.comboCount === 5) {
+      healAmount = Math.floor(healAmount * 1.5);
+      battleState.log.push('れんぞくせいかいボーナス！');
+      battleState.comboCount = 0;
+    }
+
+    // 変更: 変数を使って回復
     gameState.playerStats.hp = Math.min(
       gameState.playerStats.maxHp,
-      gameState.playerStats.hp + calculateHealAmount(gameState.playerStats.level)
+      gameState.playerStats.hp + healAmount
     );
     battleState.playerHpTarget    = gameState.playerStats.hp;
     battleState.playerHpAnimating = true;
@@ -3475,6 +3581,9 @@ function pickFromPool(pool, poolName) {
     meaning: selectedKanji.meaning,
     strokes: selectedKanji.strokes,
   };
+
+  // 追加: マスター済み再出題なら、この出題中の1回だけ2倍ボーナスを有効化
+  battleState.masteryBonusActive = isKanjiMastered(selectedKanji.id);
 
   gameState.showHint = false;
   addToLog(`「${gameState.currentKanji.text}」をよもう！`);
@@ -3758,5 +3867,41 @@ function calculateHealAmount(playerLevel) {
   
   // 合計回復量（基本値 + レベルボーナス）
   return baseHeal + levelBonus;
+}
+
+// 読み進捗のエントリを確保
+function ensureProgressEntry(kanjiId) {
+  const prog = gameState.kanjiReadProgress[kanjiId];
+  if (!prog) {
+    gameState.kanjiReadProgress[kanjiId] = {
+      onyomi: new Set(),
+      kunyomi: new Set(),
+      mastered: false,
+    };
+  }
+  return gameState.kanjiReadProgress[kanjiId];
+}
+
+// 現在の問題の読み進捗を更新し、マスター済みか判定
+function updateKanjiMasteryAfterCorrect(currentKanji, answer) {
+  if (!currentKanji || !currentKanji.id) return;
+  const id = currentKanji.id;
+  const prog = ensureProgressEntry(id);
+
+  // 種別判定（両方に含まれる可能性もある）
+  const isKun = (currentKanji.kunyomi || []).includes(answer);
+  const isOn = (currentKanji.onyomi || []).includes(answer);
+  if (isKun) prog.kunyomi.add(answer);
+  if (isOn) prog.onyomi.add(answer);
+
+  const allKunOk = (currentKanji.kunyomi || []).every(r => prog.kunyomi.has(r));
+  const allOnOk  = (currentKanji.onyomi || []).every(r => prog.onyomi.has(r));
+  prog.mastered = allKunOk && allOnOk;
+}
+
+// その漢字がマスター済みか
+function isKanjiMastered(kanjiId) {
+  const prog = gameState.kanjiReadProgress[kanjiId];
+  return !!(prog && prog.mastered);
 }
 
