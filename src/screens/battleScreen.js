@@ -1421,29 +1421,32 @@ if (gameState.currentKanji) {
     this.ctx.fillText(helpText[mode], this.canvas.width / 2, this.canvas.height - 20);
 
 
-        // 前回漢字パネル内（枠と漢字を描いた直後あたり）
-   const lastId = battleState.lastAnswered?.id;
-   const progForPrev = (lastId && gameState.kanjiReadProgress)
-     ? gameState.kanjiReadProgress[lastId]
-     : null;
-    const isPrevMastered = !!(progForPrev && progForPrev.mastered);
-    // 右上にMASTERバッジ
-    if (isPrevMastered) {
-      drawMasterBadge(this.ctx, bx + bw - 6, by + 6);
-    }
+        // 前回漢字パネルのオーバーレイ（バッジ/フラッシュ）
+    if (battleState.lastAnswered) {
+      const bx = 20, by = 70, bw = 140, bh = 180;
 
-    // 前回漢字パネルの最初（枠を描いた直後）に
-    const prevLast = battleState.lastAnswered;
-    if (battleScreenState.masteryFlash?.active && prevLast && battleScreenState.masteryFlash.kanjiId === prevLast.id) {
-      const t = battleScreenState.masteryFlash.timer;
-      const alpha = Math.max(0, Math.min(1, t / 30));
-      this.ctx.save();
-      this.ctx.strokeStyle = `rgba(241, 196, 15, ${0.6 * alpha})`;
-      this.ctx.lineWidth = 3;
-      this.ctx.strokeRect(bx - 2, by - 2, bw + 4, bh + 4);
-      this.ctx.restore();
-      battleScreenState.masteryFlash.timer--;
-      if (battleScreenState.masteryFlash.timer <= 0) battleScreenState.masteryFlash.active = false;
+      const lastId = battleState.lastAnswered.id;
+      const progForPrev = (gameState.kanjiReadProgress && gameState.kanjiReadProgress[lastId]) || null;
+      const isPrevMastered = !!(progForPrev && progForPrev.mastered);
+
+      // 右上にMASTERバッジ
+      if (isPrevMastered) {
+        drawMasterBadge(this.ctx, bx + bw - 6, by + 6);
+      }
+
+      // マスター達成のフラッシュ枠
+      const prevLast = battleState.lastAnswered;
+      if (battleScreenState.masteryFlash?.active && prevLast && battleScreenState.masteryFlash.kanjiId === prevLast.id) {
+        const t = battleScreenState.masteryFlash.timer;
+        const alpha = Math.max(0, Math.min(1, t / 30));
+        this.ctx.save();
+        this.ctx.strokeStyle = `rgba(241, 196, 15, ${0.6 * alpha})`;
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeRect(bx - 2, by - 2, bw + 4, bh + 4);
+        this.ctx.restore();
+        battleScreenState.masteryFlash.timer--;
+        if (battleScreenState.masteryFlash.timer <= 0) battleScreenState.masteryFlash.active = false;
+      }
     }
   },
 
