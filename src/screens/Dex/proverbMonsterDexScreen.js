@@ -235,18 +235,11 @@ const proverbMonsterDexState = {
 
   /** 現在のページを描画する（DOM操作） */
   renderPage() {
-    let container = document.getElementById('proverbMonsterContainer');
-    if (!container) {
-      // コンテナがなければ作成
-      container = document.createElement('div');
-      container.id = 'proverbMonsterContainer';
-      container.className = 'monster-container proverb-monster-container';
-      document.body.appendChild(container);
-    }
-
-    // 既存の要素を全てクリア
+    // monsterDexScreen と同じ既存コンテナを使用して、同じグリッドCSSを適用する
+    const container = document.getElementById('monsterContainer');
+    if (!container) return;
     container.innerHTML = '';
-    container.style.display = 'grid'; // 表示形式をgridに設定
+    container.style.display = 'grid';
 
     // 地域コンプリート状況を計算
     const regionCompletion = this.calculateRegionCompletion();
@@ -395,7 +388,7 @@ const proverbMonsterDexState = {
   /** 画面離脱時のクリーンアップ */
   exit() {
     // カードUIを非表示に戻す
-    const container = document.getElementById('proverbMonsterContainer');
+    const container = document.getElementById('monsterContainer');
     if (container) {
       container.style.display = 'none';
       container.innerHTML = '';

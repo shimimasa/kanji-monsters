@@ -111,15 +111,16 @@ const worldStageSelectScreen = {
 
   /** 画面表示時の初期化 */
   enter(arg) {
-    // BGM 再生 & canvas 取得
+    // BGM 再生
     publish('playBGM', 'title');
-    this.canvas = (arg && typeof arg.getContext === 'function')
-      ? arg
-      : document.getElementById('gameCanvas');
+    // 引数が Canvas の場合と props の場合の両方に対応
+    const isCanvasArg = arg && typeof arg.getContext === 'function';
+    this.canvas = isCanvasArg ? arg : document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
 
-    // 大陸情報を取得
-    this.continentInfo = arg?.props || {};
+    // continentSelect からは props オブジェクトがそのまま渡ってくる
+    // stageLoading 等から Canvas が来るケースでは props は空
+    this.continentInfo = (!isCanvasArg && arg && typeof arg === 'object') ? arg : {};
     console.log("受け取った大陸情報:", JSON.stringify(this.continentInfo));
     
     // 初期値を設定
