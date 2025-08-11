@@ -13,7 +13,8 @@ const reviewQueue = (() => {
   const load = () => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      items = raw ? JSON.parse(raw) : [];
+      const parsed = raw ? JSON.parse(raw) : [];
+      items = Array.isArray(parsed) ? parsed : [];  // ← 常に配列に矯正
     } catch (e) {
       console.error('ReviewQueue の読み込みに失敗しました:', e);
       items = [];

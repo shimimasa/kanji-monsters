@@ -338,6 +338,11 @@ const battleScreenState = {
         return;
       }
       
+      // 弱点別プールをステージ開始時に再計算
+      const hasAny = (v) => (Array.isArray(v) && v.length > 0) || (typeof v === 'string' && v.trim().length > 0);
+      battleState.kanjiPool_onyomi = gameState.kanjiPool.filter(k => hasAny(k.onyomi));
+      battleState.kanjiPool_kunyomi = gameState.kanjiPool.filter(k => hasAny(k.kunyomi));
+
       gameState.currentEnemyIndex = 0;
       battleState.recentKanjiIds = [];
       battleState.shuffledKanjiList = [...gameState.kanjiPool].sort(() => Math.random() - 0.5);
@@ -1415,10 +1420,13 @@ if (gameState.currentKanji) {
     this.ctx.textAlign = 'center';
     this.ctx.fillText(helpText[mode], this.canvas.width / 2, this.canvas.height - 20);
 
-    // 前回漢字パネル内（枠と漢字を描いた直後あたり）
-    const progForPrev = (gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id]) || null;
-    const isPrevMastered = !!(progForPrev && progForPrev.mastered);
 
+        // 前回漢字パネル内（枠と漢字を描いた直後あたり）
+   const lastId = battleState.lastAnswered?.id;
+   const progForPrev = (lastId && gameState.kanjiReadProgress)
+     ? gameState.kanjiReadProgress[lastId]
+     : null;
+    const isPrevMastered = !!(progForPrev && progForPrev.mastered);
     // 右上にMASTERバッジ
     if (isPrevMastered) {
       drawMasterBadge(this.ctx, bx + bw - 6, by + 6);
@@ -3569,7 +3577,8 @@ export function pickNextKanji() {
 
   // 4. 両方のプールが尽きた場合の最終フォールバック
   console.warn('⚠️ 全てのプールが尽きました。全体プールから強制選択します。');
-  return pickFromPool(gameState.kanjiPool, '最終フォールバック');
+
+   return pickFromPool(gameState.kanjiPool, '最終フォールバック');
 }
 
 /**
