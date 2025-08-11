@@ -45,8 +45,8 @@ const BUTTON_CONFIG = {
   y: 540
 };
 
-// 合計幅を計算（5ボタンに拡張：stageSelect と同構成）
-const totalWidth = (BUTTON_CONFIG.width * 5) + (BUTTON_CONFIG.gap * 4);
+// 合計幅を計算（復習を撤去したため4ボタンに最適化）
+const totalWidth = (BUTTON_CONFIG.width * 4) + (BUTTON_CONFIG.gap * 3);
 // 開始X座標を計算（中央揃え）
 const startX = (800 - totalWidth) / 2; // キャンバス幅800pxを想定
 
@@ -60,17 +60,8 @@ const backButton = {
   icon: '⬅️'
 };
 
-const reviewButton = {
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 1,
-  y: BUTTON_CONFIG.y,
-  width: BUTTON_CONFIG.width,
-  height: BUTTON_CONFIG.height,
-  text: '復習',
-  icon: '📖'
-};
-
 const dexButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 1, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -79,7 +70,7 @@ const dexButton = {
 };
 
 const monsterButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -87,12 +78,12 @@ const monsterButton = {
   icon: '👾'
 };
 
-// 追加: プロフィール/称号ボタン（stageSelect と同じ）
-const profileButton = {
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 4,
-  y: BUTTON_CONFIG.y,
-  width: BUTTON_CONFIG.width,
-  height: BUTTON_CONFIG.height,
+// 追加: プロフィール/称号ボタン
+const profileButton = { 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
+  y: BUTTON_CONFIG.y, 
+  width: BUTTON_CONFIG.width, 
+  height: BUTTON_CONFIG.height, 
   text: 'プロフィール/称号',
   icon: '🏆'
 };
@@ -625,12 +616,14 @@ const worldStageSelectScreen = {
       this.drawFallbackContinentMap(mapX, mapY, mapWidth, mapHeight);
     }
 
-    // 左側のステージリスト背景パネル
+    // 左側のステージリスト背景パネル（総復習モードでは描画しない）
     const panelX = 10;
     const panelY = 70; // 元の60から70に変更
     const panelW = cw / 2 - 20;
     const panelH = ch - 140; // フッターバー分の高さを調整
-    this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
+    if (!this.isReviewMode) {
+      this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
+    }
 
     // 漢検級タブ描画
     const tabCount = tabs.length;
@@ -681,41 +674,41 @@ const worldStageSelectScreen = {
       ctx.shadowOffsetY = 0;
     });
 
-    // 大陸名とレベルを表示
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 26px "UDデジタル教科書体", sans-serif'; // フォントをさらに大きく
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
+    // 大陸名とレベルの見出し（総復習モードでは表示しない）
+    if (!this.isReviewMode) {
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 26px "UDデジタル教科書体", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
 
-    // 漢検レベルのテキスト
-    const levelText = typeof this.selectedTabLevel === 'number' ? 
-      `漢検${this.selectedTabLevel}級` : `漢検${this.selectedTabLevel}`;
+      const levelText = typeof this.selectedTabLevel === 'number'
+        ? `漢検${this.selectedTabLevel}級`
+        : `漢検${this.selectedTabLevel}`;
 
-    // 背景に半透明の黒を追加して視認性を向上
-    const textWidth = ctx.measureText(`${this.continentInfo.continent || ''} (${levelText})`).width;
-    const textBgPadding = 10;
-    const textBgX = panelX + panelW / 2 - textWidth / 2 - textBgPadding;
-    const textBgY = panelY + 10;
-    const textBgWidth = textWidth + textBgPadding * 2;
-    const textBgHeight = 36;
+      const textWidth = ctx.measureText(`${this.continentInfo.continent || ''} (${levelText})`).width;
+      const textBgPadding = 10;
+      const textBgX = panelX + panelW / 2 - textWidth / 2 - textBgPadding;
+      const textBgY = panelY + 10;
+      const textBgWidth = textWidth + textBgPadding * 2;
+      const textBgHeight = 36;
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-    ctx.fillRect(textBgX, textBgY, textBgWidth, textBgHeight);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(textBgX, textBgY, textBgWidth, textBgHeight);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      ctx.fillRect(textBgX, textBgY, textBgWidth, textBgHeight);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(textBgX, textBgY, textBgWidth, textBgHeight);
 
-    // 影付きテキスト
-    ctx.fillStyle = 'white';
-    ctx.shadowColor = 'rgba(0,0,0,0.7)';
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-    ctx.fillText(`${this.continentInfo.continent || ''} (${levelText})`, panelX + panelW / 2, panelY + 15);
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
+      ctx.fillStyle = 'white';
+      ctx.shadowColor = 'rgba(0,0,0,0.7)';
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.fillText(`${this.continentInfo.continent || ''} (${levelText})`, panelX + panelW / 2, panelY + 15);
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    }
 
     // ステージボタンの描画
     if (this.stageButtons && this.stageButtons.length > 0) {

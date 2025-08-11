@@ -30,8 +30,8 @@ const BUTTON_CONFIG = {
   y: 540
 };
 
-// 合計幅を計算（5ボタンに拡張）
-const totalWidth = (BUTTON_CONFIG.width * 5) + (BUTTON_CONFIG.gap * 4);
+// 合計幅を計算（復習を撤去したため4ボタンに最適化）
+const totalWidth = (BUTTON_CONFIG.width * 4) + (BUTTON_CONFIG.gap * 3);
 // 開始X座標を計算（中央揃え）
 const startX = (800 - totalWidth) / 2; // キャンバス幅800pxを想定
 
@@ -45,17 +45,8 @@ const backButton = {
   icon: '⬅️'
 };
 
-const reviewButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 1, 
-  y: BUTTON_CONFIG.y, 
-  width: BUTTON_CONFIG.width, 
-  height: BUTTON_CONFIG.height, 
-  text: '復習',
-  icon: '📖'
-};
-
 const dexButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 1, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -64,7 +55,7 @@ const dexButton = {
 };
 
 const monsterButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -74,7 +65,7 @@ const monsterButton = {
 
 // 追加: プロフィール/称号ボタン
 const profileButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 4, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
