@@ -252,45 +252,35 @@ const worldStageSelectScreen = {
       console.warn(`警告: ${this.selectedGrade}年生のステージが見つかりません。`);
     }
 
-    // --- ステージボタンの作成 ---
+    // --- ステージボタンの作成（パネル内に必ず収まるように自動フィット） ---
     const stageCount = this.stages.length;
-    // ボタンリストの開始Y座標を修正
-    const startY = 110; // 元の80から110に変更して下に移動
-    const leftPanelWidth = this.canvas.width / 2;
-
-    // ボタンのサイズ設定を動的に決定
-    let buttonHeight, buttonMargin, fontSize;
-    if (stageCount > 8) {
-      // ステージ数が多い場合（10個前後）
-      buttonHeight = 36;  // 高さをさらに小さく
-      buttonMargin = 5;   // 余白をさらに詰める
-      fontSize = 14;      // フォントも小さく
-    } else if (stageCount > 5) {
-      // ステージ数が中程度の場合
-      buttonHeight = 40;  // 高さを小さく
-      buttonMargin = 8;   // 余白を詰める
-      fontSize = 16;      // フォントも少し小さく
-    } else {
-      // 通常の場合
-      buttonHeight = 50;
-      buttonMargin = 15;
-      fontSize = 20;
+    // 左パネルの座標・寸法は直前の計算を再利用
+    // panelX, panelY, panelW, panelH はこのスコープ上部で定義済み
+    const listStartY = panelY + 40;                 // タイトル分の余白
+    const listBottom = panelY + panelH - 12;        // パネル下端に少し余白
+    let buttonMargin = 6;
+    let buttonHeight = 50;                          // 最大高さ
+    if (stageCount > 0) {
+      const totalAvail = Math.max(0, listBottom - listStartY);
+      const fitted = Math.floor((totalAvail - (stageCount - 1) * buttonMargin) / stageCount);
+      buttonHeight = Math.max(26, Math.min(50, fitted)); // 下限を少し下げる
+      if (buttonHeight <= 30) buttonMargin = 4;
     }
+    const fontSize = Math.max(12, Math.min(20, Math.floor(buttonHeight * 0.42)));
+    // 横幅はパネル内に確実に収める（左右に20pxのインセット）
+    const buttonX = panelX + 20;
+    const buttonWidth = Math.max(100, panelW - 40);
 
-    const buttonWidth = leftPanelWidth - 60;
-
-    this.stageButtons = this.stages.map((stage, index) => {
-      return {
-        id: stage.stageId,
-        text: stage.name,
-        x: 30,
-        y: startY + index * (buttonHeight + buttonMargin),
-        width: buttonWidth,
-        height: buttonHeight,
-        fontSize: fontSize, // フォントサイズも保持
-        stage: stage, // ステージデータも保持
-      };
-    });
+    this.stageButtons = this.stages.map((stage, index) => ({
+      id: stage.stageId,
+      text: stage.name,
+      x: buttonX,
+      y: listStartY + index * (buttonHeight + buttonMargin),
+      width: buttonWidth,
+      height: buttonHeight,
+      fontSize,
+      stage,
+    }));
   },
 
   /** ステージのクリア状況を確認 */
@@ -893,15 +883,15 @@ const worldStageSelectScreen = {
     const screenY = (eventY - rect.top) * scaleY;
 
     // 総復習モードのクリック（大ボタン）
-    if (this.selectedTabLevel === 'review' || this.selectedGrade === 0) {
+    const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
+    if (isReview) {
       const btn = this.reviewChallengeButton;
       if (isMouseOverRect(screenX, screenY, btn)) {
         publish('playSE', 'decide');
         if (ReviewQueue.size() > 0) {
           publish('changeScreen', 'reviewStage');
         } else {
-          // フォールバック: 現在のタブに紐づく級が無ければ 4級(7) を既定
-          const g = this.selectedGrade || 7;
+          const g = this.selectedGrade || 7; // 既定は4級相当
           const bonusId = `bonus_g${g}`;
           gameState.currentStageId = bonusId;
           resetStageProgress(bonusId);
@@ -909,8 +899,7 @@ const worldStageSelectScreen = {
         }
         return;
       }
-      // 総復習モードでは以降の処理（ステージボタン/マーカー）はスキップ
-      return;
+      // タブ／フッターはこの後も処理する。ステージボタン／マーカーは後段で無効化する。
     }
 
     // タブクリック判定
@@ -930,43 +919,40 @@ const worldStageSelectScreen = {
       }
     }
 
-    // ステージボタンのクリック判定（1回目は選択、2回目で遷移）
-    for (const button of this.stageButtons) {
-      if (isMouseOverRect(screenX, screenY, button)) {
-        publish('playSE', 'decide');
-        
-        // すでに選択中のステージをクリックした場合は遷移
-        if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
-          gameState.currentStageId = button.id;
-          resetStageProgress(button.id);
-          publish('changeScreen', 'stageLoading');
-        } else {
-          // 1回目のクリック: ステージを選択状態にする
-          this.selectedStage = button.stage;
+    // ステージボタンのクリック判定（総復習モードでは無効）
+    if (!isReview) {
+      for (const button of this.stageButtons) {
+        if (isMouseOverRect(screenX, screenY, button)) {
+          publish('playSE', 'decide');
+          if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
+            gameState.currentStageId = button.id;
+            resetStageProgress(button.id);
+            publish('changeScreen', 'stageLoading');
+          } else {
+            this.selectedStage = button.stage;
+          }
+          return;
         }
-        return;
       }
     }
 
-    // マップマーカーのクリック判定（1回目は選択、2回目で遷移）
-    for (const stage of this.stages) {
-      if (stage.pos) {
-        const { x, y } = stage.pos;
-        if (screenX >= x - MARKER_SIZE/2 && screenX <= x + MARKER_SIZE/2 && 
-            screenY >= y - MARKER_SIZE/2 && screenY <= y + MARKER_SIZE/2) {
-          
-          publish('playSE', 'decide');
-          
-          // すでに選択中のステージをクリックした場合は遷移
-          if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
-            gameState.currentStageId = stage.stageId;
-            resetStageProgress(stage.stageId);
-            publish('changeScreen', 'stageLoading');
-          } else {
-            // 1回目のクリック: ステージを選択状態にする
-            this.selectedStage = stage;
+    // マップマーカーのクリック判定（総復習モードでは無効）
+    if (!isReview) {
+      for (const stage of this.stages) {
+        if (stage.pos) {
+          const { x, y } = stage.pos;
+          if (screenX >= x - MARKER_SIZE/2 && screenX <= x + MARKER_SIZE/2 && 
+              screenY >= y - MARKER_SIZE/2 && screenY <= y + MARKER_SIZE/2) {
+            publish('playSE', 'decide');
+            if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
+              gameState.currentStageId = stage.stageId;
+              resetStageProgress(stage.stageId);
+              publish('changeScreen', 'stageLoading');
+            } else {
+              this.selectedStage = stage;
+            }
+            return;
           }
-          return;
         }
       }
     }
