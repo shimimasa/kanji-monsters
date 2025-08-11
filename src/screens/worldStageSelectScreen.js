@@ -880,8 +880,18 @@ const worldStageSelectScreen = {
 
     // 復習ボタン
     if (isMouseOverRect(screenX, screenY, reviewButton)) {
-      publish('playSE', 'decide');
-      publish('changeScreen', 'reviewStage');
+      publish('playSE','decide');
+      if (ReviewQueue.size() > 0) {
+        publish('changeScreen','reviewStage');
+      } else {
+        // 現在選択中の学年タブに対応するステージから1つ選ぶ
+        const first = stageData.find(s => s.grade === this.selectedGrade);
+        if (first) {
+          gameState.currentStageId = first.stageId;
+          resetStageProgress(first.stageId);
+          publish('changeScreen', 'stageLoading');
+        }
+      }
       return;
     }
 
@@ -895,7 +905,7 @@ const worldStageSelectScreen = {
     // モンスターデックスボタン
     if (isMouseOverRect(screenX, screenY, monsterButton)) {
       publish('playSE', 'decide');
-      publish('changeScreen', 'proverbMonsterDex'); // 既存仕様を維持
+      publish('changeScreen', 'proverbMonsterDex');
       return;
     }
 

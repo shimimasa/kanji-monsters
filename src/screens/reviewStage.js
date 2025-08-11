@@ -53,7 +53,8 @@ const reviewStage = {
       .filter(id => id != null);
 
     if (this.kanjiIds.length === 0) {
-      publish('changeScreen', 'stageSelect');
+      // publish('changeScreen', 'gradeQuiz', { grade: gameState.currentGrade ?? 0 });
+      publish('changeScreen', 'stageSelect'); // まずは現状維持でもOK
       return;
     }
 

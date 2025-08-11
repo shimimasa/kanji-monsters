@@ -159,8 +159,21 @@ const stageSelectScreenState = {
     // ── 追加：復習ボタンの有効/無効とクリックイベント登録 ──
     const btnReview = document.getElementById('btnReview');
     if (btnReview) {
-      btnReview.disabled = reviewQueue.size() === 0;
-      btnReview.onclick  = () => publish('changeScreen', 'reviewStage');
+      btnReview.disabled = false; // ← 無効化しない
+      btnReview.onclick = () => {
+        publish('playSE','decide');
+        if (reviewQueue.size() > 0) {
+          publish('changeScreen','reviewStage');
+        } else {
+          // 既存のおすすめ選択を利用（あなたのファイルにある selectReviewStage() が使えます）
+          const selectedStage = this.selectReviewStage();
+          if (selectedStage) {
+            gameState.currentStageId = selectedStage.stageId;
+            resetStageProgress(selectedStage.stageId);
+            publish('changeScreen', 'stageLoading');
+          }
+        }
+      };
     }
 
     // uiRootを安全に取得
@@ -1080,8 +1093,17 @@ const stageSelectScreenState = {
 
     // 復習するボタン押下時 → レビュー画面へ遷移
     if (isMouseOverRect(x, y, reviewButton)) {
-      publish('playSE', 'decide');
-      publish('changeScreen', 'reviewStage');
+      publish('playSE','decide');
+      if (reviewQueue.size() > 0) {
+        publish('changeScreen','reviewStage');
+      } else {
+        const selectedStage = this.selectReviewStage();
+        if (selectedStage) {
+          gameState.currentStageId = selectedStage.stageId;
+          resetStageProgress(selectedStage.stageId);
+          publish('changeScreen', 'stageLoading');
+        }
+      }
       return;
     }
 
