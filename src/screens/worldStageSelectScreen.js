@@ -190,6 +190,9 @@ const worldStageSelectScreen = {
     this.isReviewMode = (this.selectedTabLevel === "review" || this.selectedGrade === 0);
     if (this.isReviewMode) {
       this.stages = [];
+      this.stageButtons = [];      // ← 直前の級のボタンを消す
+      this.selectedStage = null;   // ← 選択状態もリセット
+      this.hoveredStage = null;    // ← ホバー情報もリセット
       return;
     }
     // 選択された大陸と学年（grade）でフィルタリング
@@ -319,6 +322,11 @@ const worldStageSelectScreen = {
     // ホバー中のステージを検出
     this.hoveredStage = null;
 
+    // 総復習モードではステージ側のホバー判定を行わない
+    if (this.isReviewMode) {
+      return;
+    }
+
     // ステージボタンのホバー判定
     if (this.stageButtons) {
       for (const button of this.stageButtons) {
@@ -329,8 +337,8 @@ const worldStageSelectScreen = {
       }
     }
 
-    // マップマーカーのホバー判定
-    for (const stage of this.stages) {
+    // マップマーカーのホバー判定（総復習モードでは無効）
+    for (const stage of (!this.isReviewMode ? this.stages : [])) {
       if (!stage?.pos) continue; // ボーナス等、posがないステージはスキップ
       const { x, y } = stage.pos;
       if (this.mouseX >= x && this.mouseX <= x + MARKER_SIZE && 
@@ -710,8 +718,8 @@ const worldStageSelectScreen = {
       ctx.shadowOffsetY = 0;
     }
 
-    // ステージボタンの描画
-    if (this.stageButtons && this.stageButtons.length > 0) {
+    // ステージボタンの描画（総復習モードでは表示しない）
+    if (!this.isReviewMode && this.stageButtons && this.stageButtons.length > 0) {
       // const nextStage = this.getNextStage();
       
       this.stageButtons.forEach(button => {
@@ -902,6 +910,7 @@ const worldStageSelectScreen = {
         return;
       }
       // 総復習モードでは以降の処理（ステージボタン/マーカー）はスキップ
+      return;
     }
 
     // タブクリック判定
