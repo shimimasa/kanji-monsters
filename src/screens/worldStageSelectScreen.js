@@ -901,8 +901,12 @@ const worldStageSelectScreen = {
       if (ReviewQueue.size() > 0) {
         publish('changeScreen','reviewStage');
       } else {
-        // 復習待ちが無ければ、現在のタブ（学年）でまとめテストへ
-        publish('changeScreen', 'gradeQuiz', { grade: this.selectedGrade, numQuestions: 10 });
+        // 復習待ちが無ければ、現在のタブ（学年）の学年ボーナスへ
+        const g = this.selectedGrade ?? 7;
+        const bonusId = `bonus_g${g}`;
+        gameState.currentStageId = bonusId;
+        resetStageProgress(bonusId);
+        publish('changeScreen', 'stageLoading');
       }
       return;
     }

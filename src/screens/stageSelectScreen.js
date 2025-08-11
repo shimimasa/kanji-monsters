@@ -165,9 +165,12 @@ const stageSelectScreenState = {
         if (reviewQueue.size() > 0) {
           publish('changeScreen','reviewStage');
         } else {
-          // 復習待ちが無ければ学年まとめテストへ
-          const g = gameState.currentGrade ?? 0;
-          publish('changeScreen', 'gradeQuiz', { grade: g, numQuestions: 10 });
+          // 復習待ちが無ければ学年ボーナスへ
+          const g = gameState.currentGrade ?? 1;
+          const bonusId = `bonus_g${g}`;
+          gameState.currentStageId = bonusId;
+          resetStageProgress(bonusId);
+          publish('changeScreen', 'stageLoading');
         }
       };
     }
@@ -1027,10 +1030,13 @@ const stageSelectScreenState = {
         if (reviewQueue.size() > 0) {
           publish('changeScreen','reviewStage');
         } else {
-          // 推奨ステージから学年だけ借用し、まとめテストへ
+          // 推奨ステージから学年だけ借用して学年ボーナスへ
           const selectedStage = this.selectReviewStage();
-          const g = selectedStage?.grade ?? (gameState.currentGrade ?? 1);
-          publish('changeScreen', 'gradeQuiz', { grade: g, numQuestions: 10 });
+          const g = selectedStage?.grade ?? 1;
+          const bonusId = `bonus_g${g}`;
+          gameState.currentStageId = bonusId;
+          resetStageProgress(bonusId);
+          publish('changeScreen', 'stageLoading');
         }
         return;
       }
@@ -1094,7 +1100,10 @@ const stageSelectScreenState = {
         publish('changeScreen','reviewStage');
       } else {
         const g = gameState.currentGrade ?? 1;
-        publish('changeScreen', 'gradeQuiz', { grade: g, numQuestions: 10 });
+        const bonusId = `bonus_g${g}`;
+        gameState.currentStageId = bonusId;
+        resetStageProgress(bonusId);
+        publish('changeScreen', 'stageLoading');
       }
       return;
     }

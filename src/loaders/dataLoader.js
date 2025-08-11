@@ -117,6 +117,26 @@ export async function loadAllGameData() {
     }
     setStageKanjiMap(kanjiMap);
 
+    // --- 学年ボーナスステージを動的に追加（1〜10年） ---
+    // stageId: bonus_g{grade}
+    // name   : "{n}年 学年ボーナス"（7〜10は級表記）
+    // grade  : 対象学年
+    // region : 1〜6は"ボーナス"、7〜10は世界タブのフィルタ基準（アジア/ヨーロッパ/アメリカ大陸/アフリカ大陸）
+    // enemyIdList: 学年ボス1体（見つからなければ空配列）
+    const gradeToKankenName = (g) => (g===7?'4級':g===8?'3級':g===9?'準2級':'2級');
+    const gradeToWorldRegion = (g) => (g===7?'アジア':g===8?'ヨーロッパ':g===9?'アメリカ大陸':'アフリカ大陸');
+    for (let g = 1; g <= 10; g++) {
+      const id = `bonus_g${g}`;
+      if (!stageData.some(s => s.stageId === id)) {
+        const name = (g <= 6) ? `${g}年 学年ボーナス` : `学年ボーナス（${gradeToKankenName(g)}）`;
+        const region = (g <= 6) ? 'ボーナス' : gradeToWorldRegion(g);
+        const boss = findBonusBossForGrade(g, enemyData);
+        const enemyIdList = boss ? [boss.id] : [];
+        stageData.push({ stageId: id, name, grade: g, region, enemyIdList });
+        console.log(`👍 追加: ${id} name=${name}, grade=${g}, region=${region}, enemies=${enemyIdList.length}`);
+      }
+    }
+
     return { kanjiData, enemyData, stageData };
   } catch (error) {
     console.error("ゲームデータの読み込み中にエラーが発生しました:", error);
@@ -126,6 +146,14 @@ export async function loadAllGameData() {
 
 
 export function getEnemiesByStageId(stageId) {
+  // 学年ボーナス: 学年ボスのみ
+  const bonusMatchForEnemy = /^bonus_g(\d+)$/i.exec(stageId);
+  if (bonusMatchForEnemy) {
+    const g = parseInt(bonusMatchForEnemy[1], 10);
+    const boss = findBonusBossForGrade(g, enemyData);
+    return boss ? [boss] : [];
+  }
+
   const stage = stageData.find(s => s.stageId === stageId);
   if (!stage || !stage.enemyIdList) return [];
   
@@ -217,6 +245,13 @@ export function setStageKanjiMap(map) {
 export function getKanjiByStageId(stageId) {
   // ステージIDを正規化（大文字小文字を区別しない）
   const normalizedId = stageId.toLowerCase();
+  // 学年ボーナス: 学年の全漢字を出題
+  const bonusM = /^bonus_g(\d+)$/i.exec(stageId);
+  if (bonusM) {
+    const g = parseInt(bonusM[1], 10);
+    console.log(`bonus_g${g}: 学年全漢字プールを使用します`);
+    return getKanjiByGrade(g);
+  }
   
   // 中学生ステージの場合、学年に基づいて漢字プールを取得
   if (normalizedId.startsWith('asie_')) {
@@ -310,6 +345,32 @@ export function getMonsterById(id) {
  */
 export function getAllMonsterIds() {
   return enemyData.map(item => item.id);
+}
+
+// --- 学年ボーナス用のボス探索ヘルパ ---
+function findBonusBossForGrade(grade, allEnemies) {
+  if (!Array.isArray(allEnemies) || allEnemies.length === 0) return null;
+  // 1) 明示ボス（isBoss=true）かつ学年一致を優先
+  const bosses = allEnemies.filter(e => e && e.grade === grade && e.isBoss);
+  if (bosses.length > 0) return bosses[0];
+  // 2) 学年一致の中でID順最後
+  const sameGrade = allEnemies.filter(e => e && e.grade === grade);
+  if (sameGrade.length > 0) {
+    const sorted = [...sameGrade].sort((a, b) => String(a.id).localeCompare(String(b.id)));
+    const last = sorted[sorted.length - 1];
+    // 念のためボス扱い
+    if (last && !last.isBoss) last.isBoss = true;
+    return last;
+  }
+  // 3) 何もなければ北海道の最後をボス扱い
+  const hkd = allEnemies.filter(e => String(e.id).startsWith('HKD-E'));
+  if (hkd.length > 0) {
+    const sortedHkd = [...hkd].sort((a, b) => String(a.id).localeCompare(String(b.id)));
+    const lastHkd = sortedHkd[sortedHkd.length - 1];
+    if (lastHkd && !lastHkd.isBoss) lastHkd.isBoss = true;
+    return lastHkd;
+  }
+  return null;
 }
 
 
