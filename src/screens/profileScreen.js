@@ -11,6 +11,16 @@ const profileScreen = {
     // 既存コンテナあれば掃除
     if (this.container) this.container.remove();
 
+    // キャンバスを一時的に隠す（背景が残って見えないようにする）
+    const canvas = document.getElementById('gameCanvas');
+    this._canvasRef = canvas || null;
+    if (canvas) {
+      this._prevCanvasVisibility = canvas.style.visibility;
+      this._prevCanvasPointer = canvas.style.pointerEvents;
+      canvas.style.visibility = 'hidden';
+      canvas.style.pointerEvents = 'none';
+    }
+
     // コンテナ生成
     this.container = document.createElement('div');
     this.container.id = 'profileScreenContainer';
@@ -21,7 +31,7 @@ const profileScreen = {
       width: '100vw',
       height: '100vh',
       overflowY: 'auto',
-      background: 'rgba(0,0,0,0.7)', // 背景を少し濃く
+      background: 'rgba(0,0,0,0.9)', // 背景をより濃く（透けをさらに抑制）
       color: 'white',
       fontFamily: '"UDデジタル教科書体", sans-serif',
       padding: '16px',
@@ -182,6 +192,14 @@ const profileScreen = {
     if (this.container) {
       this.container.remove();
       this.container = null;
+    }
+    // キャンバスの表示状態を元に戻す
+    if (this._canvasRef) {
+      this._canvasRef.style.visibility = this._prevCanvasVisibility ?? '';
+      this._canvasRef.style.pointerEvents = this._prevCanvasPointer ?? '';
+      this._canvasRef = null;
+      this._prevCanvasVisibility = null;
+      this._prevCanvasPointer = null;
     }
   },
 
