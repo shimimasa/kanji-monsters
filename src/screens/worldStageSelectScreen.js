@@ -254,10 +254,15 @@ const worldStageSelectScreen = {
 
     // --- ステージボタンの作成（パネル内に必ず収まるように自動フィット） ---
     const stageCount = this.stages.length;
-    // 左パネルの座標・寸法は直前の計算を再利用
-    // panelX, panelY, panelW, panelH はこのスコープ上部で定義済み
-    const listStartY = panelY + 40;                 // タイトル分の余白
-    const listBottom = panelY + panelH - 12;        // パネル下端に少し余白
+    // このスコープ内で左パネルのジオメトリを再計算（update() と同じ設定）
+    const cw = this.canvas ? this.canvas.width : 800;
+    const ch = this.canvas ? this.canvas.height : 600;
+    const panelX = 10;
+    const panelY = 70;                 // 上余白
+    const panelW = cw / 2 - 20;        // 左半分 - マージン
+    const panelH = ch - 140;           // フッター分を除いた高さ
+    const listStartY = panelY + 40;    // タイトル分の余白
+    const listBottom = panelY + panelH - 12; // パネル下端に少し余白
     let buttonMargin = 6;
     let buttonHeight = 50;                          // 最大高さ
     if (stageCount > 0) {
