@@ -1023,14 +1023,14 @@ const stageSelectScreenState = {
       // 「今日の復習に挑戦！」ボタンのクリック判定
       const button = this.reviewChallengeButton;
       if (isMouseOverRect(x, y, button)) {
-        // 推奨ステージを選択
-        const selectedStage = this.selectReviewStage();
-        if (selectedStage) {
-          gameState.currentStageId = selectedStage.stageId;
-          resetStageProgress(selectedStage.stageId);
-          
-          publish('playSE', 'decide');
-          publish('changeScreen', 'stageLoading');
+        publish('playSE','decide');
+        if (reviewQueue.size() > 0) {
+          publish('changeScreen','reviewStage');
+        } else {
+          // 推奨ステージから学年だけ借用し、まとめテストへ
+          const selectedStage = this.selectReviewStage();
+          const g = selectedStage?.grade ?? (gameState.currentGrade ?? 1);
+          publish('changeScreen', 'gradeQuiz', { grade: g, numQuestions: 10 });
         }
         return;
       }
@@ -1087,18 +1087,14 @@ const stageSelectScreenState = {
       return;
     }
 
-    // 復習するボタン押下時 → レビュー画面へ遷移
+    // 復習するボタン押下時 → 復習 or まとめテスト
     if (isMouseOverRect(x, y, reviewButton)) {
       publish('playSE','decide');
       if (reviewQueue.size() > 0) {
         publish('changeScreen','reviewStage');
       } else {
-        const selectedStage = this.selectReviewStage();
-        if (selectedStage) {
-          gameState.currentStageId = selectedStage.stageId;
-          resetStageProgress(selectedStage.stageId);
-          publish('changeScreen', 'stageLoading');
-        }
+        const g = gameState.currentGrade ?? 1;
+        publish('changeScreen', 'gradeQuiz', { grade: g, numQuestions: 10 });
       }
       return;
     }
