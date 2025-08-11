@@ -100,13 +100,13 @@ const profileButton = {
 // マーカー半径
 const MARKER_SIZE = 32;
 
-// タブ定義（先頭に「総復習」を追加。kanken_level は特殊値 'review' を使用）
+// タブ定義（総復習タブを一番右に配置）
 const tabs = [
-  { label: '総復習', kanken_level: "review", grade: 0 },
   { label: '4級',   kanken_level: "4",  grade: 7 },
   { label: '3級',   kanken_level: "3",  grade: 8 },
   { label: '準2級', kanken_level: "準2", grade: 9 },
   { label: '2級',   kanken_level: "2",  grade: 10 },
+  { label: '総復習', kanken_level: "review", grade: 0 },
 ];
 
 // 選択中のステージを追跡するプロパティを追加（約85行目付近）
@@ -584,9 +584,8 @@ const worldStageSelectScreen = {
       const pulse = Math.sin(this.animationTime * 0.003) * 0.2 + 0.8;
       const buttonColor = `hsl(${200 + Math.sin(this.animationTime * 0.002) * 30}, 70%, ${50 + pulse * 10}%)`;
       this.drawRichButton(ctx, btn.x, btn.y, btn.width, btn.height, btn.text, buttonColor, isHovered);
-
-      // ここで終了（通常のステージリストやマーカーは描画しない）
-      return;
+      // 総復習モードではステージボタン/マーカーは描画しないが、
+      // この後のフッター描画処理は引き続き実行する（returnしない）
     }
 
     // 右側の大陸地図を描画
