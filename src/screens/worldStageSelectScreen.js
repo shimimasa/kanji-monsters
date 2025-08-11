@@ -323,13 +323,12 @@ const worldStageSelectScreen = {
 
     // マップマーカーのホバー判定
     for (const stage of this.stages) {
-      if (stage.pos) {
-        const { x, y } = stage.pos;
-        if (this.mouseX >= x && this.mouseX <= x + MARKER_SIZE && 
-            this.mouseY >= y && this.mouseY <= y + MARKER_SIZE) {
-          this.hoveredStage = stage;
-          return;
-        }
+      if (!stage?.pos) continue; // ボーナス等、posがないステージはスキップ
+      const { x, y } = stage.pos;
+      if (this.mouseX >= x && this.mouseX <= x + MARKER_SIZE && 
+          this.mouseY >= y && this.mouseY <= y + MARKER_SIZE) {
+        this.hoveredStage = stage;
+        return;
       }
     }
   },

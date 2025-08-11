@@ -339,6 +339,7 @@ const stageSelectScreenState = {
     // マップマーカーのホバー判定
     if (gameState.currentGrade !== 0) {
       for (const stage of this.stages) {
+        if (!stage.pos) continue;
         const { x, y } = stage.pos;
         if (this.mouseX >= x && this.mouseX <= x + MARKER_SIZE && 
             this.mouseY >= y && this.mouseY <= y + MARKER_SIZE) {
@@ -752,6 +753,7 @@ const stageSelectScreenState = {
         const nextStage = this.getNextStage();
         
         stages.forEach(stage => {
+          if (!stage.pos) return;
           const { x, y } = stage.pos;
           const isCleared = this.isStageCleared(stage.stageId);
           // 次のステージの自動点滅を無効化
@@ -1066,6 +1068,7 @@ const stageSelectScreenState = {
       // 各ステージマーカーのクリック判定（1回目は選択、2回目で遷移）
       if (gameState.currentGrade !== 0) {
         for (const stage of this.stages) {
+          if (!stage.pos) continue;
           const { x: sx, y: sy } = stage.pos;
           if (x >= sx && x <= sx + MARKER_SIZE && y >= sy && y <= sy + MARKER_SIZE) {
             publish('playSE', 'decide');
