@@ -156,23 +156,11 @@ const stageSelectScreenState = {
     this.canvas.addEventListener('touchstart', this._clickHandler);
     this.canvas.addEventListener('mousemove', this._mousemoveHandler);
 
-    // ── 追加：復習ボタンの有効/無効とクリックイベント登録 ──
+    // 復習ボタン（ヘッダー側）は使用しないため非表示
     const btnReview = document.getElementById('btnReview');
     if (btnReview) {
-      btnReview.disabled = false; // ← 無効化しない
-      btnReview.onclick = () => {
-        publish('playSE','decide');
-        if (reviewQueue.size() > 0) {
-          publish('changeScreen','reviewStage');
-        } else {
-          // 復習待ちが無ければ学年ボーナスへ
-          const g = gameState.currentGrade ?? 1;
-          const bonusId = `bonus_g${g}`;
-          gameState.currentStageId = bonusId;
-          resetStageProgress(bonusId);
-          publish('changeScreen', 'stageLoading');
-        }
-      };
+      btnReview.style.display = 'none';
+      btnReview.onclick = null;
     }
 
     // uiRootを安全に取得
@@ -846,17 +834,15 @@ const stageSelectScreenState = {
     ctx.fillStyle = gradient;
     ctx.fillRect(footerBarX, footerBarY, footerBarWidth, gradientHeight);
 
-    // ホバー判定
+    // ホバー判定（復習ボタンは撤去）
     const isBackHovered = isMouseOverRect(this.mouseX, this.mouseY, backButton);
-    const isReviewHovered = isMouseOverRect(this.mouseX, this.mouseY, reviewButton);
     const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
     const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
     const isProfileHovered = isMouseOverRect(this.mouseX, this.mouseY, profileButton);
 
     // リッチボタンで描画（色分けとアイコン付き）
     this._drawRichFooterButton(ctx, backButton, '#808080', isBackHovered); // グレー系
-    this._drawRichFooterButton(ctx, reviewButton, '#2980b9', isReviewHovered); // 青系
-    this._drawRichFooterButton(ctx, dexButton, '#2980b9', isDexHovered); // 青系
+    this._drawRichFooterButton(ctx, dexButton, '#2980b9', isDexHovered);   // 青系
     this._drawRichFooterButton(ctx, monsterButton, '#2980b9', isMonsterHovered); // 青系
     this._drawRichFooterButton(ctx, profileButton, '#2980b9', isProfileHovered); // 青系
   },
@@ -1096,20 +1082,7 @@ const stageSelectScreenState = {
       return;
     }
 
-    // 復習するボタン押下時 → 復習 or まとめテスト
-    if (isMouseOverRect(x, y, reviewButton)) {
-      publish('playSE','decide');
-      if (reviewQueue.size() > 0) {
-        publish('changeScreen','reviewStage');
-      } else {
-        const g = gameState.currentGrade ?? 1;
-        const bonusId = `bonus_g${g}`;
-        gameState.currentStageId = bonusId;
-        resetStageProgress(bonusId);
-        publish('changeScreen', 'stageLoading');
-      }
-      return;
-    }
+    // フッターの復習ボタンは撤去（総復習モードの大ボタンのみで復習可能）
 
     // 漢字図鑑ボタン
     if (isMouseOverRect(x, y, dexButton)) {

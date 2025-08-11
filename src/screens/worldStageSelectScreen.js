@@ -100,12 +100,13 @@ const profileButton = {
 // マーカー半径
 const MARKER_SIZE = 32;
 
-// 漢検級タブ定義を修正（68行目付近）- すべて文字列に統一
+// タブ定義（先頭に「総復習」を追加。kanken_level は特殊値 'review' を使用）
 const tabs = [
-  { label: '4級',   kanken_level: "4", grade: 7 },
-  { label: '3級',   kanken_level: "3", grade: 8 },
+  { label: '総復習', kanken_level: "review", grade: 0 },
+  { label: '4級',   kanken_level: "4",  grade: 7 },
+  { label: '3級',   kanken_level: "3",  grade: 8 },
   { label: '準2級', kanken_level: "準2", grade: 9 },
-  { label: '2級',   kanken_level: "2", grade: 10 },
+  { label: '2級',   kanken_level: "2",  grade: 10 },
 ];
 
 // 選択中のステージを追跡するプロパティを追加（約85行目付近）
@@ -125,6 +126,16 @@ const worldStageSelectScreen = {
   selectedGrade: 7, // デフォルトは7（4級）
   continentInfo: null, // 選択された大陸の情報
   _inputLocked: false, // 二重発火防止の簡易ロック
+  // 総復習モード用の大ボタン
+  reviewChallengeButton: {
+    x: 50,
+    y: 200,
+    width: 300,
+    height: 80,
+    text: '今日の復習に挑戦！'
+  },
+  // 現在が総復習モードかのフラグ
+  isReviewMode: false,
 
   /** 画面表示時の初期化 */
   enter(arg) {
@@ -184,6 +195,12 @@ const worldStageSelectScreen = {
 
   /** ステージリストを更新する（漢検レベル切り替え時に呼ばれる） */
   updateStageList() {
+    // 総復習モードの切替
+    this.isReviewMode = (this.selectedTabLevel === "review" || this.selectedGrade === 0);
+    if (this.isReviewMode) {
+      this.stages = [];
+      return;
+    }
     // 選択された大陸と学年（grade）でフィルタリング
     console.log(`ステージリスト更新: grade=${this.selectedGrade}, continent=${this.continentInfo.continent}, region=${this.continentInfo.region}`);
     
@@ -516,7 +533,7 @@ const worldStageSelectScreen = {
     const cw = canvas.width, ch = canvas.height;
     ctx.clearRect(0, 0, cw, ch);
 
-    // アニメーション時間を更新
+    // 背景（グラデーション）
     this.animationTime += dt || 16; // デフォルト16ms
 
     // 背景を描画（グラデーション）
@@ -525,6 +542,52 @@ const worldStageSelectScreen = {
     bgGradient.addColorStop(1, '#2c5282'); // やや明るい青
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, cw, ch);
+
+    // ── 総復習モード専用UI ──
+    if (this.isReviewMode) {
+      // 右側に世界地図（既存の worldMap を使用）
+      const mapX = cw / 2;
+      const mapY = 60;
+      const mapWidth = cw / 2;
+      const mapHeight = ch - 120;
+      if (images.worldMap) {
+        ctx.drawImage(images.worldMap, mapX, mapY, mapWidth, mapHeight);
+      } else {
+        // フォールバック：背景矩形
+        ctx.fillStyle = '#1a365d';
+        ctx.fillRect(mapX, mapY, mapWidth, mapHeight);
+      }
+
+      // 左側パネル
+      const panelX = 10;
+      const panelY = 60;
+      const panelW = cw / 2 - 20;
+      const panelH = ch - 140;
+      this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
+
+      // タイトル
+      ctx.fillStyle = 'white';
+      ctx.font = '24px "UDデジタル教科書体", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('総復習モード', panelX + panelW / 2, panelY + 20);
+
+      // 説明
+      ctx.font = '14px "UDデジタル教科書体", sans-serif';
+      ctx.fillStyle = '#ccc';
+      ctx.fillText('あなたに最適なステージを自動選択します', panelX + panelW / 2, panelY + 55);
+
+      // 大ボタン
+      const btn = this.reviewChallengeButton;
+      const isHovered = isMouseOverRect(this.mouseX, this.mouseY, btn);
+      // 少し動きのある配色
+      const pulse = Math.sin(this.animationTime * 0.003) * 0.2 + 0.8;
+      const buttonColor = `hsl(${200 + Math.sin(this.animationTime * 0.002) * 30}, 70%, ${50 + pulse * 10}%)`;
+      this.drawRichButton(ctx, btn.x, btn.y, btn.width, btn.height, btn.text, buttonColor, isHovered);
+
+      // ここで終了（通常のステージリストやマーカーは描画しない）
+      return;
+    }
 
     // 右側の大陸地図を描画
     const mapX = cw / 2;
@@ -829,6 +892,26 @@ const worldStageSelectScreen = {
     const screenX = (eventX - rect.left) * scaleX;
     const screenY = (eventY - rect.top) * scaleY;
 
+    // 総復習モードのクリック（大ボタン）
+    if (this.selectedTabLevel === 'review' || this.selectedGrade === 0) {
+      const btn = this.reviewChallengeButton;
+      if (isMouseOverRect(screenX, screenY, btn)) {
+        publish('playSE', 'decide');
+        if (ReviewQueue.size() > 0) {
+          publish('changeScreen', 'reviewStage');
+        } else {
+          // フォールバック: 現在のタブに紐づく級が無ければ 4級(7) を既定
+          const g = this.selectedGrade || 7;
+          const bonusId = `bonus_g${g}`;
+          gameState.currentStageId = bonusId;
+          resetStageProgress(bonusId);
+          publish('changeScreen', 'stageLoading');
+        }
+        return;
+      }
+      // 総復習モードでは以降の処理（ステージボタン/マーカー）はスキップ
+    }
+
     // タブクリック判定
     const tabCount = tabs.length;
     const tabW = this.canvas.width / tabCount;
@@ -894,21 +977,7 @@ const worldStageSelectScreen = {
       return;
     }
 
-    // 復習ボタン
-    if (isMouseOverRect(screenX, screenY, reviewButton)) {
-      publish('playSE','decide');
-      if (ReviewQueue.size() > 0) {
-        publish('changeScreen','reviewStage');
-      } else {
-        // 復習待ちが無ければ、現在のタブ（学年）の学年ボーナスへ
-        const g = this.selectedGrade ?? 7;
-        const bonusId = `bonus_g${g}`;
-        gameState.currentStageId = bonusId;
-        resetStageProgress(bonusId);
-        publish('changeScreen', 'stageLoading');
-      }
-      return;
-    }
+    // フッターの復習ボタンは撤去（総復習モードの大ボタンのみで復習可能）
 
     // 漢字図鑑ボタン
     if (isMouseOverRect(screenX, screenY, dexButton)) {
@@ -1018,17 +1087,15 @@ const worldStageSelectScreen = {
     ctx.fillStyle = gradient;
     ctx.fillRect(footerBarX, footerBarY, footerBarWidth, gradientHeight);
 
-    // ホバー判定
-    const isBackHovered    = isMouseOverRect(this.mouseX, this.mouseY, backButton);
-    const isReviewHovered  = isMouseOverRect(this.mouseX, this.mouseY, reviewButton);
-    const isDexHovered     = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
+    // ホバー判定（復習ボタンは撤去）
+    const isBackHovered = isMouseOverRect(this.mouseX, this.mouseY, backButton);
+    const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
     const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
     const isProfileHovered = isMouseOverRect(this.mouseX, this.mouseY, profileButton);
 
     // リッチボタンで描画（stageSelect と同じ配色・スタイル）
-    this._drawRichFooterButton(ctx, backButton,    '#808080', isBackHovered);    // グレー系
-    this._drawRichFooterButton(ctx, reviewButton,  '#2980b9', isReviewHovered);  // 青系
-    this._drawRichFooterButton(ctx, dexButton,     '#2980b9', isDexHovered);     // 青系
+    this._drawRichFooterButton(ctx, backButton, '#808080', isBackHovered); // グレー系
+    this._drawRichFooterButton(ctx, dexButton, '#2980b9', isDexHovered);   // 青系
     this._drawRichFooterButton(ctx, monsterButton, '#2980b9', isMonsterHovered); // 青系
     this._drawRichFooterButton(ctx, profileButton, '#2980b9', isProfileHovered); // 青系
   },
