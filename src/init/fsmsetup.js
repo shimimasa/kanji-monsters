@@ -27,6 +27,7 @@ import worldStageSelectScreen from '../screens/worldStageSelectScreen.js';
 import proverbMonsterDexState from '../screens/Dex/proverbMonsterDexScreen.js';
 // 追加
 import profileScreen       from '../screens/profileScreen.js';
+import gradeQuizScreen     from '../screens/gradeQuizScreen.js';
 
 export async function setupFSM() {
   const { stageData } = await loadAllGameData();
@@ -54,6 +55,7 @@ export async function setupFSM() {
     continentSelect:  continentSelectScreen,
     worldStageSelect: worldStageSelectScreen,
     proverbMonsterDex: proverbMonsterDexState,
+    gradeQuiz:        gradeQuizScreen,
     // 追加
     profile:          profileScreen,
     // 共通バトル画面を追加

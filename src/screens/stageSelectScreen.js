@@ -165,13 +165,9 @@ const stageSelectScreenState = {
         if (reviewQueue.size() > 0) {
           publish('changeScreen','reviewStage');
         } else {
-          // 既存のおすすめ選択を利用（あなたのファイルにある selectReviewStage() が使えます）
-          const selectedStage = this.selectReviewStage();
-          if (selectedStage) {
-            gameState.currentStageId = selectedStage.stageId;
-            resetStageProgress(selectedStage.stageId);
-            publish('changeScreen', 'stageLoading');
-          }
+          // 復習待ちが無ければ学年まとめテストへ
+          const g = gameState.currentGrade ?? 0;
+          publish('changeScreen', 'gradeQuiz', { grade: g, numQuestions: 10 });
         }
       };
     }

@@ -3,6 +3,23 @@ import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
+import ReviewQueue from '../models/reviewQueue.js';
+import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
+
+// 文字正規化（reviewStage と同仕様）
+function hiraShift(ch) { return String.fromCharCode(ch.charCodeAt(0) - 0x60); }
+function toHiragana(input) {
+  return (input || '')
+    .trim()
+    .replace(/\s+/g, '')
+    .replace(/[\u30a1-\u30f6]/g, hiraShift);
+}
+function getReadings(kanji) {
+  const set = new Set();
+  if (kanji?.kunyomi) kanji.kunyomi.split(' ').forEach(r => r && set.add(toHiragana(r.trim())));
+  if (kanji?.onyomi)  kanji.onyomi.split(' ').forEach(r => r && set.add(toHiragana(r.trim())));
+  return [...set];
+}
 
 // uiRoot の安全な取得に修正
 const getUiRoot = () => {
@@ -884,13 +901,8 @@ const worldStageSelectScreen = {
       if (ReviewQueue.size() > 0) {
         publish('changeScreen','reviewStage');
       } else {
-        // 現在選択中の学年タブに対応するステージから1つ選ぶ
-        const first = stageData.find(s => s.grade === this.selectedGrade);
-        if (first) {
-          gameState.currentStageId = first.stageId;
-          resetStageProgress(first.stageId);
-          publish('changeScreen', 'stageLoading');
-        }
+        // 復習待ちが無ければ、現在のタブ（学年）でまとめテストへ
+        publish('changeScreen', 'gradeQuiz', { grade: this.selectedGrade, numQuestions: 10 });
       }
       return;
     }
