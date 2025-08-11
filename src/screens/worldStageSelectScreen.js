@@ -28,8 +28,8 @@ const BUTTON_CONFIG = {
   y: 540
 };
 
-// 合計幅を計算
-const totalWidth = (BUTTON_CONFIG.width * 3) + (BUTTON_CONFIG.gap * 2);
+// 合計幅を計算（5ボタンに拡張：stageSelect と同構成）
+const totalWidth = (BUTTON_CONFIG.width * 5) + (BUTTON_CONFIG.gap * 4);
 // 開始X座標を計算（中央揃え）
 const startX = (800 - totalWidth) / 2; // キャンバス幅800pxを想定
 
@@ -43,8 +43,17 @@ const backButton = {
   icon: '⬅️'
 };
 
+const reviewButton = {
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 1,
+  y: BUTTON_CONFIG.y,
+  width: BUTTON_CONFIG.width,
+  height: BUTTON_CONFIG.height,
+  text: '復習',
+  icon: '📖'
+};
+
 const dexButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 1, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -53,12 +62,22 @@ const dexButton = {
 };
 
 const monsterButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
   text: 'モンスター',
   icon: '👾'
+};
+
+// 追加: プロフィール/称号ボタン（stageSelect と同じ）
+const profileButton = {
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 4,
+  y: BUTTON_CONFIG.y,
+  width: BUTTON_CONFIG.width,
+  height: BUTTON_CONFIG.height,
+  text: 'プロフィール/称号',
+  icon: '🏆'
 };
 
 // マーカー半径
@@ -142,51 +161,7 @@ const worldStageSelectScreen = {
     this.canvas.addEventListener('touchstart', this._clickHandler);
     this.canvas.addEventListener('mousemove', this._mousemoveHandler);
 
-    // uiRootを安全に取得
-    const uiRoot = getUiRoot();
-
-    // ヘッダーを追加
-    const headerDiv = document.createElement('div');
-    headerDiv.style.display = 'flex';
-    headerDiv.style.justifyContent = 'space-between';
-    headerDiv.style.alignItems = 'center';
-    headerDiv.style.padding = '10px 20px';
-    headerDiv.style.background = 'rgba(0,0,0,0.6)';
-    headerDiv.style.borderBottom = '1px solid #8B4513';
-    headerDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
-
-    const backBtn = document.createElement('button');
-    backBtn.textContent = '← もどる';
-    backBtn.onclick = () => publish('changeScreen', 'continentSelect');
-    backBtn.style.padding = '8px 12px';
-    backBtn.style.background = '#8B4513';
-    backBtn.style.color = 'white';
-    backBtn.style.border = 'none';
-    backBtn.style.borderRadius = '5px';
-    backBtn.style.cursor = 'pointer';
-    backBtn.style.fontSize = '14px';
-    backBtn.style.fontFamily = '"UDデジタル教科書体", sans-serif';
-
-    const title = document.createElement('h2');
-    title.textContent = 'ワールドステージ選択';
-    title.style.margin = '0';
-    title.style.fontSize = '18px';
-    title.style.fontFamily = '"UDデジタル教科書体", sans-serif';
-
-    const profileBtn = document.createElement('button');
-    profileBtn.textContent = 'プロフィール / 称号';
-    profileBtn.onclick = () => publish('changeScreen', 'profile');
-    profileBtn.style.padding = '8px 12px';
-    profileBtn.style.background = '#8B4513';
-    profileBtn.style.color = 'white';
-    profileBtn.style.border = 'none';
-    profileBtn.style.borderRadius = '5px';
-    profileBtn.style.cursor = 'pointer';
-    profileBtn.style.fontSize = '14px';
-    profileBtn.style.fontFamily = '"UDデジタル教科書体", sans-serif';
-
-    headerDiv.append(backBtn, title, profileBtn);
-    uiRoot.appendChild(headerDiv);
+    // ヘッダーUIは使用しない（stageSelect と同じフッター構成に統一）
   },
 
   /** ステージリストを更新する（漢検レベル切り替え時に呼ばれる） */
@@ -902,6 +877,13 @@ const worldStageSelectScreen = {
       return;
     }
 
+    // 復習ボタン
+    if (isMouseOverRect(screenX, screenY, reviewButton)) {
+      publish('playSE', 'decide');
+      publish('changeScreen', 'reviewStage');
+      return;
+    }
+
     // 漢字図鑑ボタン
     if (isMouseOverRect(screenX, screenY, dexButton)) {
       publish('playSE', 'decide');
@@ -912,7 +894,14 @@ const worldStageSelectScreen = {
     // モンスターデックスボタン
     if (isMouseOverRect(screenX, screenY, monsterButton)) {
       publish('playSE', 'decide');
-      publish('changeScreen', 'proverbMonsterDex'); // monsterDexからproverbMonsterDexに変更
+      publish('changeScreen', 'proverbMonsterDex'); // 既存仕様を維持
+      return;
+    }
+
+    // プロフィール/称号ボタン
+    if (isMouseOverRect(screenX, screenY, profileButton)) {
+      publish('playSE', 'decide');
+      publish('changeScreen', 'profile');
       return;
     }
   },
@@ -978,7 +967,7 @@ const worldStageSelectScreen = {
     }
   },
 
-  /** フッターバーとボタンの描画 */
+  /** フッターバーの描画 */
   _drawFooterBar(ctx, canvasWidth, canvasHeight) {
     // フッターバーの背景を描画
     const footerBarX = startX - 10;
@@ -1004,14 +993,66 @@ const worldStageSelectScreen = {
     ctx.fillRect(footerBarX, footerBarY, footerBarWidth, gradientHeight);
 
     // ホバー判定
-    const isBackHovered = isMouseOverRect(this.mouseX, this.mouseY, backButton);
-    const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
+    const isBackHovered    = isMouseOverRect(this.mouseX, this.mouseY, backButton);
+    const isReviewHovered  = isMouseOverRect(this.mouseX, this.mouseY, reviewButton);
+    const isDexHovered     = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
     const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
+    const isProfileHovered = isMouseOverRect(this.mouseX, this.mouseY, profileButton);
 
-    // ボタンの描画
-    this.drawRichButton(ctx, backButton.x, backButton.y, backButton.width, backButton.height, backButton.text, isBackHovered ? '#4A90E2' : '#ccc', isBackHovered);
-    this.drawRichButton(ctx, dexButton.x, dexButton.y, dexButton.width, dexButton.height, dexButton.text, isDexHovered ? '#4A90E2' : '#ccc', isDexHovered);
-    this.drawRichButton(ctx, monsterButton.x, monsterButton.y, monsterButton.width, monsterButton.height, monsterButton.text, isMonsterHovered ? '#4A90E2' : '#ccc', isMonsterHovered);
+    // リッチボタンで描画（stageSelect と同じ配色・スタイル）
+    this._drawRichFooterButton(ctx, backButton,    '#808080', isBackHovered);    // グレー系
+    this._drawRichFooterButton(ctx, reviewButton,  '#2980b9', isReviewHovered);  // 青系
+    this._drawRichFooterButton(ctx, dexButton,     '#2980b9', isDexHovered);     // 青系
+    this._drawRichFooterButton(ctx, monsterButton, '#2980b9', isMonsterHovered); // 青系
+    this._drawRichFooterButton(ctx, profileButton, '#2980b9', isProfileHovered); // 青系
+  },
+
+  /** フッター専用のリッチボタン描画（stageSelect と同じ） */
+  _drawRichFooterButton(ctx, button, baseColor, isHovered) {
+    ctx.save();
+    const scale = isHovered ? 1.02 : 1.0;
+    const hoverColor = isHovered ? this.lightenColor(baseColor, 15) : baseColor;
+    let { x, y, width, height } = button;
+    if (isHovered) {
+      const centerX = x + width / 2;
+      const centerY = y + height / 2;
+      const scaledWidth = width * scale;
+      const scaledHeight = height * scale;
+      x = centerX - scaledWidth / 2;
+      y = centerY - scaledHeight / 2;
+      width = scaledWidth;
+      height = scaledHeight;
+    }
+    const shadowOffset = isHovered ? 3 : 2;
+    const shadowOpacity = isHovered ? 0.4 : 0.3;
+    ctx.fillStyle = `rgba(0, 0, 0, ${shadowOpacity})`;
+    ctx.fillRect(x + shadowOffset, y + shadowOffset, width, height);
+    const gradient = ctx.createLinearGradient(x, y, x, y + height);
+    gradient.addColorStop(0, this.lightenColor(hoverColor, 20));
+    gradient.addColorStop(1, this.darkenColor(hoverColor, 20));
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y, width, height);
+    ctx.strokeStyle = this.darkenColor(hoverColor, 30);
+    ctx.lineWidth = isHovered ? 2 : 1;
+    ctx.strokeRect(x, y, width, height);
+    const highlightGradient = ctx.createLinearGradient(x, y, x, y + height * 0.3);
+    const highlightOpacity = isHovered ? 0.4 : 0.3;
+    highlightGradient.addColorStop(0, `rgba(255, 255, 255, ${highlightOpacity})`);
+    highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = highlightGradient;
+    ctx.fillRect(x, y, width * 0.8, height * 0.3);
+    // アイコン＋テキスト
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    if (button.icon) {
+      ctx.font = '16px sans-serif';
+      ctx.fillText(button.icon, x + width * 0.25, y + height / 2);
+    }
+    ctx.font = '14px "UDデジタル教科書体", sans-serif';
+    const textX = button.icon ? x + width * 0.65 : x + width / 2;
+    ctx.fillText(button.text, textX, y + height / 2);
+    ctx.restore();
   },
 
   /** 確実にリスナーを解除 */

@@ -49,6 +49,15 @@ const kanjiDexScreen = {
       ? arg
       : document.getElementById('gameCanvas');
     this.ctx    = this.canvas.getContext('2d');
+
+    // 背面のキャンバスを不可視化（前画面の斜線などが透けないように）
+    this._canvasRef = this.canvas || null;
+    if (this._canvasRef) {
+      this._prevCanvasVisibility = this._canvasRef.style.visibility;
+      this._prevCanvasPointer    = this._canvasRef.style.pointerEvents;
+      this._canvasRef.style.visibility   = 'hidden';
+      this._canvasRef.style.pointerEvents = 'none';
+    }
     
     // localStorageから収集済みデータを取得し、全漢字IDリストを生成
     this.allList = kanjiData.map(k => k.id);
@@ -115,6 +124,15 @@ const kanjiDexScreen = {
     this.container.className = 'kanji-dex-container';
     this.container.style.border = 'none';
     this.container.style.outline = 'none';
+    // 透け防止のため全面固定＋不透明背景に
+    this.container.style.position = 'fixed';
+    this.container.style.left = '0';
+    this.container.style.top = '0';
+    this.container.style.width = '100vw';
+    this.container.style.height = '100vh';
+    this.container.style.zIndex = '100000';
+    this.container.style.background = '#2c1810'; // 図鑑の背景色に合わせた濃色
+    this.container.style.overflowY = 'auto';
 
     // 収集率統計エリア
     const statsDiv = document.createElement('div');
@@ -664,6 +682,15 @@ const kanjiDexScreen = {
     }
     this.canvas = this.ctx = null;
     this.selectedKanjiId = null;
+
+    // キャンバスの可視状態を復元
+    if (this._canvasRef) {
+      this._canvasRef.style.visibility   = this._prevCanvasVisibility ?? '';
+      this._canvasRef.style.pointerEvents = this._prevCanvasPointer ?? '';
+      this._canvasRef = null;
+      this._prevCanvasVisibility = null;
+      this._prevCanvasPointer = null;
+    }
   },
 
   /** ソート機能を実装 */
