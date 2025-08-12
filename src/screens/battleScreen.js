@@ -1413,29 +1413,39 @@ if (gameState.currentKanji) {
       }
     }
 
-    // 既存: レイアウトやボタン描画が終わったあたり
+        // 既存: レイアウトやボタン描画が終わったあたり
 
-           // 1) 配置境界を決める（数値は既存UIの見た目に合わせて）
-    const leftBound  = 200;                     // ステージ選択ボタンの右あたり
-    const rightBound = this.canvas.width - 280; // 敵HPパネルの左あたり
+    // 1) 配置境界（ステージ選択の右〜敵HPの左）
+    const leftBound  = 200;
+    const rightBound = this.canvas.width - 280;
     const hintMaxW   = Math.max(160, rightBound - leftBound);
-    const hintH      = 44;
 
-    // 弱点テキストのY（漢字ボックス上に描画している値と揃える）
-    const weaknessY  = (this.canvas ? 200 : 200) - 160 / 2 - 20; // kanjiY - kanjiBoxH/2 - 20 と同値
-    // 2) Y位置: 弱点表示の「上」に表示（上端に寄り過ぎないようにクリップ）
-    let hintY = Math.max(20, weaknessY - hintH - 8);
-
-    // 3) 表示テキスト（保持している最新ヒントを使用）
+    // 2) テキストとフォントサイズ（枠幅に収まるまで縮小）
     const bannerText = (typeof this.currentHintText === 'string') ? this.currentHintText : '';
-
     if (bannerText) {
-      // 4) テキスト幅に合わせて横幅を決定（はみ出す場合は縮小）
-      const padX = 14;
-      this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
-      const textW = Math.ceil(this.ctx.measureText(bannerText).width);
-      const hintW = Math.min(hintMaxW, Math.max(180, textW + padX * 2));
+      const padX = 10;
+      let fontSize = 18;
+      const measure = (fs) => {
+        this.ctx.font = `bold ${fs}px "UDデジタル教科書体", sans-serif`;
+        return Math.ceil(this.ctx.measureText(bannerText).width);
+      };
+      let textW = measure(fontSize);
+      const maxContentW = hintMaxW - padX * 2;
+      while (textW > maxContentW && fontSize > 12) {
+        fontSize -= 1;
+        textW = measure(fontSize);
+      }
+
+      // 3) 枠サイズ（高さはフォントに追従して小さめに）
+      const hintW = Math.max(160, Math.min(hintMaxW, textW + padX * 2));
+      const hintH = Math.max(28, Math.min(36, Math.round(fontSize * 1.9)));
       const hintX = Math.max(leftBound, Math.min((leftBound + rightBound - hintW) / 2, rightBound - hintW));
+
+      // 4) Y位置: 弱点表示の「上」。ヘッダーと被らないように下限を設ける
+      const TOP_SAFE_Y = 75;
+      const GAP_ABOVE_WEAKNESS = 14;
+      const weaknessY = 200 - 160 / 2 - 20; // kanjiY - kanjiBoxH/2 - 20 と同値
+      let hintY = Math.max(TOP_SAFE_Y, weaknessY - hintH - GAP_ABOVE_WEAKNESS);
 
       // 5) 入力欄との重なりをチェックして必要なら退避
       const canvasRect = this.canvas?.getBoundingClientRect?.();
@@ -1455,28 +1465,25 @@ if (gameState.currentKanji) {
                           hintY + hintH < inputRect.y ||
                           inputRect.y + inputRect.h < hintY);
         if (overlap) {
-          hintY = Math.max(20, inputRect.y - hintH - 12); // 入力欄の上へ退避
+          hintY = Math.max(TOP_SAFE_Y, inputRect.y - hintH - 12);
         }
       }
 
-      // 6) バナー描画
-      drawHintBanner(this.ctx, hintX, hintY, hintW, hintH, bannerText);
+      // 6) バナー描画（フォントサイズを反映）
+      drawHintBanner(this.ctx, hintX, hintY, hintW, hintH, bannerText, fontSize);
     }
 
-    function drawHintBanner(ctx, x, y, w, h, text) {
+    function drawHintBanner(ctx, x, y, w, h, text, fs) {
       ctx.save();
-      // 背景
       const g = ctx.createLinearGradient(x, y, x, y + h);
       g.addColorStop(0, '#f39c12'); g.addColorStop(1, '#d35400');
       ctx.fillStyle = g;
       ctx.fillRect(x, y, w, h);
-      // 枠
       ctx.strokeStyle = '#8e4400';
       ctx.lineWidth = 2;
       ctx.strokeRect(x, y, w, h);
-      // テキスト
       ctx.fillStyle = 'white';
-      ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+      ctx.font = `bold ${fs}px "UDデジタル教科書体", sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(text, x + w / 2, y + h / 2);
