@@ -599,77 +599,41 @@ const battleScreenState = {
       this.drawComboIndicator(this.ctx);
     }
 
-    // ヒントを表示（ヒントレベルに応じて表示内容を変更）
-    if (gameState.hintLevel > 0) {
-      let hintText = '';
-      let hintColor = 'yellow';
-      
-      switch(gameState.hintLevel) {
-        case 1:
-          hintText = `ヒント（基本）: 画数は${gameState.currentKanji.strokes}`;
-          hintColor = '#3498db'; // 青色
-          break;
-        case 2:
-          // 音読みと訓読みのどちらかをランダムに選ぶ（ただし毎回同じになるよう固定する）
-          const kanjiId = gameState.currentKanji.id;
-          const isOnyomi = (kanjiId % 2 === 0); // IDの偶数奇数で固定
-          const readings = isOnyomi ? gameState.currentKanji.onyomi : gameState.currentKanji.kunyomi;
+        // ヒントを表示（ヒントレベルに応じて表示内容を変更）
+        if (gameState.hintLevel > 0) {
+          let hintText = '';
+          let hintColor = 'yellow';
           
-          if (readings && readings.length > 0) {
-            const firstReading = readings[0];
-            const hintText2 = firstReading.substring(0, 1) + '○○';
-            hintText = `ヒント（読み）: ${isOnyomi ? '音読み' : '訓読み'}は「${hintText2}」から始まる`;
-          } else {
-            hintText = `ヒント（読み）: ${isOnyomi ? '訓読み' : '音読み'}で読むことが多い`;
+          switch(gameState.hintLevel) {
+            case 1:
+              hintText = `ヒント（基本）: 画数は${gameState.currentKanji.strokes}`;
+              hintColor = '#3498db'; // 青色
+              break;
+            case 2:
+              // 音読みと訓読みのどちらかをランダムに選ぶ（ただし毎回同じになるよう固定する）
+              const kanjiId = gameState.currentKanji.id;
+              const isOnyomi = (kanjiId % 2 === 0); // IDの偶数奇数で固定
+              const readings = isOnyomi ? gameState.currentKanji.onyomi : gameState.currentKanji.kunyomi;
+              
+              if (readings && readings.length > 0) {
+                const firstReading = readings[0];
+                const hintText2 = firstReading.substring(0, 1) + '○○';
+                hintText = `ヒント（読み）: ${isOnyomi ? '音読み' : '訓読み'}は「${hintText2}」から始まる`;
+              } else {
+                hintText = `ヒント（読み）: ${isOnyomi ? '訓読み' : '音読み'}で読むことが多い`;
+              }
+              hintColor = '#f39c12'; // オレンジ色
+              break;
+            case 3:
+              hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
+              hintColor = '#e74c3c'; // 赤色
+              break;
           }
-          hintColor = '#f39c12'; // オレンジ色
-          break;
-        case 3:
-          hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
-          hintColor = '#e74c3c'; // 赤色
-          break;
-      }
-      
-      // ヒントの背景を描画
-      const kanjiBoxH = 160;
-      const hintBoxWidth = this.ctx.measureText(hintText).width + 40;
-      const hintBoxHeight = 30;
-      const hintBoxX = kanjiX - hintBoxWidth / 2;
-      const hintBoxY = kanjiY + kanjiBoxH / 2 + 10;
-      
-      // 半透明の背景
-      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      this.ctx.fillRect(hintBoxX, hintBoxY, hintBoxWidth, hintBoxHeight);
-      
-      // 枠線
-      this.ctx.strokeStyle = hintColor;
-      this.ctx.lineWidth = 2;
-      this.ctx.strokeRect(hintBoxX, hintBoxY, hintBoxWidth, hintBoxHeight);
-      
-      // ヒントレベルに応じたアイコン表示
-      const icons = ['💡', '💡💡', '💡💡💡'];
-      const iconText = icons[gameState.hintLevel - 1];
-      
-      // アイコンを描画
-      this.ctx.font = '14px sans-serif';
-      this.ctx.fillStyle = hintColor;
-      this.ctx.textAlign = 'left';
-      this.ctx.textBaseline = 'middle';
-      this.ctx.fillText(iconText, hintBoxX + 10, hintBoxY + hintBoxHeight / 2);
-      
-      // ヒントテキストを描画
-      this.drawTextWithOutline(
-        hintText,
-        hintBoxX + 40, // アイコン分の余白を確保
-        hintBoxY + hintBoxHeight / 2,
-        hintColor,
-        'black',
-        '16px "UDデジタル教科書体",sans-serif',
-        'left',
-        'middle',
-        1
-      );
-    }
+          
+          // 旧：漢字ボックスの下にヒント枠を描画していた処理は廃止
+          // 上部のヒントバナーで描画するため、テキストだけ保持
+          this.currentHintText = hintText;
+        }
 
     // ← ここから追加：前回解答表示エリア（左側）
     if (battleState.lastAnswered) {
@@ -1451,69 +1415,73 @@ if (gameState.currentKanji) {
 
     // 既存: レイアウトやボタン描画が終わったあたり
 
-        // 1) 配置境界を決める（数値は既存UIの見た目に合わせて）
-        const leftBound  = 200;                     // ステージ選択ボタンの右あたり
-        const rightBound = this.canvas.width - 280; // 敵HPパネルの左あたり
-        const hintMaxW   = Math.max(160, rightBound - leftBound);
-        const hintH      = 44;
-    
-        // 2) Y位置: 「弱点は○読み！」の少し上（なければ固定値）
-        let hintY = 70; // 退避のため再代入可能にする
-    
-        // 3) ヒントテキスト（既存の文言を使う）
-        const hintText = this.currentHintText || '';
-    
-        // 4) テキスト幅に合わせて横幅を決定（はみ出す場合は縮小）
-        const padX = 14;
-        this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
-        const textW = Math.ceil(this.ctx.measureText(hintText).width);
-        const hintW = Math.min(hintMaxW, Math.max(180, textW + padX * 2));
-        const hintX = Math.max(leftBound, Math.min((leftBound + rightBound - hintW) / 2, rightBound - hintW));
-    
-        // 5) 入力欄との重なりをチェックして必要なら退避
-        const canvasRect = this.canvas?.getBoundingClientRect?.();
-        const el = this.inputEl;
-        if (el && canvasRect) {
-          const elRect = el.getBoundingClientRect();
-          const scaleX = this.canvas.width / canvasRect.width;
-          const scaleY = this.canvas.height / canvasRect.height;
-          const inputRect = {
-            x: (elRect.left - canvasRect.left) * scaleX,
-            y: (elRect.top  - canvasRect.top)  * scaleY,
-            w: elRect.width  * scaleX,
-            h: elRect.height * scaleY,
-          };
-          const overlap = !(hintX + hintW < inputRect.x ||
-                            inputRect.x + inputRect.w < hintX ||
-                            hintY + hintH < inputRect.y ||
-                            inputRect.y + inputRect.h < hintY);
-          if (overlap) {
-            hintY = Math.max(20, inputRect.y - hintH - 12); // 入力欄の上へ退避
-          }
+           // 1) 配置境界を決める（数値は既存UIの見た目に合わせて）
+    const leftBound  = 200;                     // ステージ選択ボタンの右あたり
+    const rightBound = this.canvas.width - 280; // 敵HPパネルの左あたり
+    const hintMaxW   = Math.max(160, rightBound - leftBound);
+    const hintH      = 44;
+
+    // 弱点テキストのY（漢字ボックス上に描画している値と揃える）
+    const weaknessY  = (this.canvas ? 200 : 200) - 160 / 2 - 20; // kanjiY - kanjiBoxH/2 - 20 と同値
+    // 2) Y位置: 弱点表示の「上」に表示（上端に寄り過ぎないようにクリップ）
+    let hintY = Math.max(20, weaknessY - hintH - 8);
+
+    // 3) 表示テキスト（保持している最新ヒントを使用）
+    const bannerText = (typeof this.currentHintText === 'string') ? this.currentHintText : '';
+
+    if (bannerText) {
+      // 4) テキスト幅に合わせて横幅を決定（はみ出す場合は縮小）
+      const padX = 14;
+      this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+      const textW = Math.ceil(this.ctx.measureText(bannerText).width);
+      const hintW = Math.min(hintMaxW, Math.max(180, textW + padX * 2));
+      const hintX = Math.max(leftBound, Math.min((leftBound + rightBound - hintW) / 2, rightBound - hintW));
+
+      // 5) 入力欄との重なりをチェックして必要なら退避
+      const canvasRect = this.canvas?.getBoundingClientRect?.();
+      const el = this.inputEl;
+      if (el && canvasRect) {
+        const elRect = el.getBoundingClientRect();
+        const scaleX = this.canvas.width / canvasRect.width;
+        const scaleY = this.canvas.height / canvasRect.height;
+        const inputRect = {
+          x: (elRect.left - canvasRect.left) * scaleX,
+          y: (elRect.top  - canvasRect.top)  * scaleY,
+          w: elRect.width  * scaleX,
+          h: elRect.height * scaleY,
+        };
+        const overlap = !(hintX + hintW < inputRect.x ||
+                          inputRect.x + inputRect.w < hintX ||
+                          hintY + hintH < inputRect.y ||
+                          inputRect.y + inputRect.h < hintY);
+        if (overlap) {
+          hintY = Math.max(20, inputRect.y - hintH - 12); // 入力欄の上へ退避
         }
-    
-        // 6) バナー描画
-        drawHintBanner(this.ctx, hintX, hintY, hintW, hintH, hintText);
-    
-        function drawHintBanner(ctx, x, y, w, h, text) {
-          ctx.save();
-          // 背景
-          const g = ctx.createLinearGradient(x, y, x, y + h);
-          g.addColorStop(0, '#f39c12'); g.addColorStop(1, '#d35400');
-          ctx.fillStyle = g;
-          ctx.fillRect(x, y, w, h);
-          // 枠
-          ctx.strokeStyle = '#8e4400';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(x, y, w, h);
-          // テキスト
-          ctx.fillStyle = 'white';
-          ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(text, x + w / 2, y + h / 2);
-          ctx.restore();
-        }
+      }
+
+      // 6) バナー描画
+      drawHintBanner(this.ctx, hintX, hintY, hintW, hintH, bannerText);
+    }
+
+    function drawHintBanner(ctx, x, y, w, h, text) {
+      ctx.save();
+      // 背景
+      const g = ctx.createLinearGradient(x, y, x, y + h);
+      g.addColorStop(0, '#f39c12'); g.addColorStop(1, '#d35400');
+      ctx.fillStyle = g;
+      ctx.fillRect(x, y, w, h);
+      // 枠
+      ctx.strokeStyle = '#8e4400';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, w, h);
+      // テキスト
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, x + w / 2, y + h / 2);
+      ctx.restore();
+    }
   },
 
   /**
