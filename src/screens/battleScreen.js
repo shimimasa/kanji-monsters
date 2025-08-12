@@ -630,9 +630,12 @@ const battleScreenState = {
               hintColor = '#e74c3c'; // 赤色
               break;
             case 4:
-              // 消灯：以降はバナーも非表示
-              battleScreenState.currentHintText = '';
-              addToLog('ヒントを非表示にしました');
+              // 既に消灯状態なら何もしない（重複通知防止）
+              if (gameState.hintLevel >= 4) return;
+              const next = (gameState.hintLevel || 0) + 1;
+              gameState.hintLevel = Math.min(4, next);
+              hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
+              hintColor = '#e74c3c'; // 赤色
               break;
           }
           
@@ -1497,6 +1500,23 @@ if (gameState.currentKanji) {
       ctx.fillText(text, x + w / 2, y + h / 2);
       ctx.restore();
     }
+
+    // バトルログ矩形（右下固定・可変幅）
+    const cw = this.canvas.width;
+    const ch = this.canvas.height;
+    const margin = 20;
+    const minW = 420;
+    const maxW = 560;
+
+    const logW = Math.min(maxW, Math.max(minW, Math.floor(cw * 0.55)));
+    const logH = 140;                 // 既存値を使っているなら流用可
+    const logX = cw - margin - logW;  // 右寄せ
+    const logY = ch - margin - logH;  // 下寄せ
+
+    // 以降、バトルログの背景・枠・テキスト描画は logX,logY,logW,logH を使用
+    // テキストの左右パディングは 12〜16px 程度に（例）
+    const pad = 14;
+    const textAreaW = logW - pad * 2;
   },
 
   /**
@@ -3534,9 +3554,10 @@ function onHeal() {
 
 // ヒント切替
 function onHint() {
-  // 段階的にヒントレベルを上げる（0→1→2→3→4で消灯）
-  const next = Math.min(4, (gameState.hintLevel || 0) + 1);
-  gameState.hintLevel = next;
+  // 既に消灯状態なら何もしない（重複通知防止）
+  if (gameState.hintLevel >= 4) return;
+  const next = (gameState.hintLevel || 0) + 1;
+  gameState.hintLevel = Math.min(4, next);
 
    // ヒントレベルに応じたメッセージをログに表示
    switch (gameState.hintLevel) {
@@ -3562,9 +3583,12 @@ function onHint() {
        addToLog(`ヒント（意味）: ${gameState.currentKanji.meaning}`);
        break;
      case 4:
-       // 消灯：以降はバナーも非表示
-       battleScreenState.currentHintText = '';
-       addToLog('ヒントを非表示にしました');
+       // 既に消灯状態なら何もしない（重複通知防止）
+       if (gameState.hintLevel >= 4) return;
+       const next = (gameState.hintLevel || 0) + 1;
+       gameState.hintLevel = Math.min(4, next);
+       hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
+       hintColor = '#e74c3c'; // 赤色
        break;
    }
 }
