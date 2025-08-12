@@ -366,42 +366,88 @@ const continentSelectState = {
       this.ctx.ellipse(marker.x, marker.y, 8 * scale, 8 * scale, 0, 0, 2 * Math.PI);
       this.ctx.fill();
 
-      // 漢検レベル表示
-      this.ctx.fillStyle = '#FFFFFF';
-      this.ctx.strokeStyle = '#000000';
-      this.ctx.lineWidth = 2;
-      this.ctx.textAlign = 'center';
-      this.ctx.font = `bold ${16 * scale}px sans-serif`;
+            // 漢検レベル表示
+            this.ctx.fillStyle = '#FFFFFF';
+            this.ctx.strokeStyle = '#000000';
+            this.ctx.lineWidth = 2;
+            this.ctx.textAlign = 'center';
+            this.ctx.font = `bold ${16 * scale}px sans-serif`;
       
-      // 漢検レベルを表示
-      const levelText = typeof marker.kanken_level === 'number' ? 
-        `${marker.kanken_level}級` : `${marker.kanken_level}`;
-      this.ctx.strokeText(levelText, marker.x, marker.y + 5);
-      this.ctx.fillText(levelText, marker.x, marker.y + 5);
-
-      // ホバー時の追加エフェクト
-      if (isHovered) {
-        // 外側の光る輪
-        this.ctx.strokeStyle = '#FFD700';
-        this.ctx.lineWidth = 4;
-        this.ctx.beginPath();
-        this.ctx.ellipse(marker.x, marker.y, 35 * scale, 35 * scale, 0, 0, 2 * Math.PI);
-        this.ctx.stroke();
-        
-        // 回転する光る粒子効果
-        for (let i = 0; i < 12; i++) {
-          const angle = (this.animationTime * 0.003 + i * Math.PI / 6) % (2 * Math.PI);
-          const radius = 45 + Math.sin(this.animationTime * 0.005 + i) * 5;
-          const sparkleX = marker.x + Math.cos(angle) * radius;
-          const sparkleY = marker.y + Math.sin(angle) * radius;
-          
-          const sparkleAlpha = 0.5 + 0.5 * Math.sin(this.animationTime * 0.008 + i);
-          this.ctx.fillStyle = `rgba(255, 215, 0, ${sparkleAlpha})`;
-          this.ctx.beginPath();
-          this.ctx.ellipse(sparkleX, sparkleY, 4, 4, 0, 0, 2 * Math.PI);
-          this.ctx.fill();
-        }
-      }
+            const levelText = (typeof marker.kanken_level === 'number')
+              ? `${marker.kanken_level}級`
+              : `${marker.kanken_level}`;
+            this.ctx.strokeText(levelText, marker.x, marker.y + 5);
+            this.ctx.fillText(levelText, marker.x, marker.y + 5);
+      
+            // --- 学年目安バッジ（4級〜2級のみ） -----------------------
+            const schoolHint = (() => {
+              const lv = String(marker.kanken_level);
+              if (lv === '4') return '中1目安';
+              if (lv === '3') return '中2目安';
+              if (lv === '準2' || lv === '准2' || lv === '準２') return '中3目安';
+              if (lv === '2') return '高1〜2目安';
+              return '';
+            })();
+      
+            if (schoolHint) {
+              const fs = Math.max(10, Math.floor(12 * scale));
+              this.ctx.font = `bold ${fs}px sans-serif`;
+              const textW = Math.ceil(this.ctx.measureText(schoolHint).width);
+              const padX = Math.max(6, Math.floor(8 * scale));
+              const padY = Math.max(3, Math.floor(4 * scale));
+              const badgeW = textW + padX * 2;
+              const badgeH = fs + padY * 2;
+      
+              // マーカーの右上に配置（重なりにくい位置）
+              const bx = marker.x + Math.floor(40 * scale);
+              const by = marker.y - Math.floor(35 * scale);
+      
+              // 角丸ピル
+              const r = Math.min(12, Math.floor(badgeH / 2));
+              this.ctx.beginPath();
+              this.ctx.moveTo(bx + r, by);
+              this.ctx.arcTo(bx + badgeW, by, bx + badgeW, by + badgeH, r);
+              this.ctx.arcTo(bx + badgeW, by + badgeH, bx, by + badgeH, r);
+              this.ctx.arcTo(bx, by + badgeH, bx, by, r);
+              this.ctx.arcTo(bx, by, bx + badgeW, by, r);
+              this.ctx.closePath();
+      
+              this.ctx.fillStyle = 'rgba(0,0,0,0.65)';
+              this.ctx.fill();
+              this.ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+              this.ctx.lineWidth = 1;
+              this.ctx.stroke();
+      
+              this.ctx.fillStyle = '#FFFFFF';
+              this.ctx.textAlign = 'center';
+              this.ctx.textBaseline = 'middle';
+              this.ctx.fillText(schoolHint, bx + badgeW / 2, by + badgeH / 2 + 0.5);
+            }
+            // -------------------------------------------------------
+      
+            // ホバー時の追加エフェクト
+            if (isHovered) {
+              // 外側の光る輪
+              this.ctx.strokeStyle = '#FFD700';
+              this.ctx.lineWidth = 4;
+              this.ctx.beginPath();
+              this.ctx.ellipse(marker.x, marker.y, 35 * scale, 35 * scale, 0, 0, 2 * Math.PI);
+              this.ctx.stroke();
+      
+              // 回転する光る粒子効果
+              for (let i = 0; i < 12; i++) {
+                const angle = (this.animationTime * 0.003 + i * Math.PI / 6) % (2 * Math.PI);
+                const radius = 45 + Math.sin(this.animationTime * 0.005 + i) * 5;
+                const sparkleX = marker.x + Math.cos(angle) * radius;
+                const sparkleY = marker.y + Math.sin(angle) * radius;
+      
+                const sparkleAlpha = 0.5 + 0.5 * Math.sin(this.animationTime * 0.008 + i);
+                this.ctx.fillStyle = `rgba(255, 215, 0, ${sparkleAlpha})`;
+                this.ctx.beginPath();
+                this.ctx.ellipse(sparkleX, sparkleY, 4, 4, 0, 0, 2 * Math.PI);
+                this.ctx.fill();
+              }
+            }
     });
   },
 
@@ -453,24 +499,39 @@ const continentSelectState = {
     this.ctx.lineWidth = 1;
     this.ctx.strokeRect(tooltipX + 2, tooltipY + 2, tooltipWidth - 4, tooltipHeight - 4);
 
-    // ツールチップのテキスト
-    this.ctx.fillStyle = '#FFFFFF';
-    this.ctx.textAlign = 'left';
-    this.ctx.font = 'bold 16px sans-serif';
-    this.ctx.fillText(`${marker.name}`, tooltipX + 10, tooltipY + 25);
+        // ツールチップのテキスト
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.textAlign = 'left';
+        this.ctx.font = 'bold 16px sans-serif';
+        this.ctx.fillText(`${marker.name}`, tooltipX + 10, tooltipY + 25);
     
-    // 漢検レベル情報
-    this.ctx.font = '14px sans-serif';
-    this.ctx.fillStyle = '#FFD700';
+        // 漢検レベル情報
+        this.ctx.font = '14px sans-serif';
+        this.ctx.fillStyle = '#FFD700';
     
-    // 漢検レベルを表示
-    const levelText = typeof marker.kanken_level === 'number' ? 
-      `漢検 ${marker.kanken_level}級 相当` : `漢検 ${marker.kanken_level} 相当`;
-    this.ctx.fillText(levelText, tooltipX + 10, tooltipY + 50);
+        const levelText = (typeof marker.kanken_level === 'number')
+          ? `漢検 ${marker.kanken_level}級 相当`
+          : `漢検 ${marker.kanken_level} 相当`;
+        this.ctx.fillText(levelText, tooltipX + 10, tooltipY + 50);
     
-    this.ctx.fillStyle = '#CCCCCC';
-    this.ctx.font = '12px sans-serif';
-    this.ctx.fillText('クリックして挑戦する', tooltipX + 10, tooltipY + 70);
+        // 学年目安（補足）
+        const schoolHint = (() => {
+          const lv = String(marker.kanken_level);
+          if (lv === '4') return '中1目安';
+          if (lv === '3') return '中2目安';
+          if (lv === '準2' || lv === '准2' || lv === '準２') return '中3目安';
+          if (lv === '2') return '高1〜2目安';
+          return '';
+        })();
+        if (schoolHint) {
+          this.ctx.fillStyle = '#A0E3FF';
+          this.ctx.font = '12px sans-serif';
+          this.ctx.fillText(`目安: ${schoolHint}`, tooltipX + 10, tooltipY + 68);
+        }
+    
+        this.ctx.fillStyle = '#CCCCCC';
+        this.ctx.font = '12px sans-serif';
+        this.ctx.fillText('クリックして挑戦する', tooltipX + 10, tooltipY + 84);
   },
 
   handleMouseMove(e) {
