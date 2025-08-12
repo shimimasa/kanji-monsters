@@ -1470,7 +1470,28 @@ if (gameState.currentKanji) {
     const hintW = Math.min(hintMaxW, Math.max(180, textW + padX * 2));
     const hintX = Math.max(leftBound, Math.min((leftBound + rightBound - hintW) / 2, rightBound - hintW));
 
-    // 5) バナー描画
+        // 5) バナー描画（入力欄と重なる場合は直前でYを退避）
+    // 入力欄のDOM座標をキャンバス座標に変換して重なりチェック
+    const canvasRect = this.canvas?.getBoundingClientRect?.();
+    const el = this.inputEl;
+    if (el && canvasRect) {
+      const elRect = el.getBoundingClientRect();
+      const scaleX = this.canvas.width / canvasRect.width;
+      const scaleY = this.canvas.height / canvasRect.height;
+      const inputRect = {
+        x: (elRect.left - canvasRect.left) * scaleX,
+        y: (elRect.top  - canvasRect.top)  * scaleY,
+        w: elRect.width  * scaleX,
+        h: elRect.height * scaleY,
+      };
+      const overlap = !(hintX + hintW < inputRect.x ||
+                        inputRect.x + inputRect.w < hintX ||
+                        baseHintY + hintH < inputRect.y ||
+                        inputRect.y + inputRect.h < baseHintY);
+      if (overlap) {
+        baseHintY = Math.max(20, inputRect.y - hintH - 12); // 入力欄の上へ退避
+      }
+    }
     drawHintBanner(this.ctx, hintX, baseHintY, hintW, hintH, hintText);
 
     // 6) 予防: 入力欄と万一重なる場合は上に退避
