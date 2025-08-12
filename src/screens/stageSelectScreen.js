@@ -197,25 +197,32 @@ const stageSelectScreenState = {
       this.stageButtons = [];
       return;
     }
-
     // --- この部分を新しいロジックに置き換え ---
     const stageCount = this.stages.length;
-    const startY = 80; // ボタンリストの開始Y座標
-    const leftPanelWidth = this.canvas.width / 2;
 
-    // ボタンのサイズ設定を動的に決定
-    let buttonHeight, buttonMargin, fontSize;
-    if (stageCount > 7) {
-      // ステージ数が多い場合 (4年生: 9個)
-      buttonHeight = 40;  // 高さを小さく
-      buttonMargin = 8;   // 余白を詰める
-      fontSize = 16;      // フォントも少し小さく
-    } else {
-      // 通常の場合
-      buttonHeight = 50;
-      buttonMargin = 15;
-      fontSize = 20;
+    // キャンバス/パネルの幾何
+    const cw = this.canvas?.width || 800;
+    const ch = this.canvas?.height || 600;
+    const panelY = 60;
+    const panelH = ch - 140;
+    const leftPanelWidth = cw / 2;
+
+    // リスト領域（上端と下端）
+    const listStartY = 80;                    // 既存デザインに合わせた開始位置
+    const listBottom = panelY + panelH - 12;  // 下端はパネル内に収める
+
+    // 空き高さからボタン高さを自動算出
+    let buttonMargin = 6;
+    let buttonHeight = 50;
+    if (stageCount > 0) {
+      const totalAvail = Math.max(0, listBottom - listStartY);
+      const fitted = Math.floor((totalAvail - (stageCount - 1) * buttonMargin) / stageCount);
+      buttonHeight = Math.max(28, Math.min(50, fitted)); // 28〜50の範囲でフィット
+      if (buttonHeight <= 32) buttonMargin = 4;          // かなり詰まる場合は余白も縮小
     }
+
+    // フォントサイズも高さに追従
+    const fontSize = Math.max(12, Math.min(20, Math.floor(buttonHeight * 0.42)));
 
     const buttonWidth = leftPanelWidth - 60;
 
@@ -224,13 +231,14 @@ const stageSelectScreenState = {
         id: stage.stageId,
         text: stage.name,
         x: 30,
-        y: startY + index * (buttonHeight + buttonMargin),
+        y: listStartY + index * (buttonHeight + buttonMargin),
         width: buttonWidth,
         height: buttonHeight,
-        fontSize: fontSize, // フォントサイズも保持
-        stage: stage, // ステージデータも保持
+        fontSize: fontSize,
+        stage: stage,
       };
     });
+
   },
 
   /** ステージのクリア状況を確認 */

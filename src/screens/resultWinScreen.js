@@ -139,23 +139,7 @@ const resultWinState = {
           this.drawMistakeScrollPanel(ctx, 50, 420, 250, 150);
         }
 
-    if (this.bonusSummary) {
-      const y0 = 250;
-      ctx.font = '24px sans-serif';
-      ctx.fillText(`学年ボーナス結果`, canvas.width/2, y0);
-      ctx.font = '18px sans-serif';
-      ctx.fillText(`連戦数: ${this.bonusSummary.fights}`, canvas.width/2, y0 + 30);
-      ctx.fillText(`正答率: ${this.bonusSummary.accuracyPct}% / 残HP: ${this.bonusSummary.remHpPct}%`, canvas.width/2, y0 + 55);
-      ctx.fillText(`ランク: ${this.bonusSummary.rank}（倍率 x${this.bonusSummary.multiplier}）`, canvas.width/2, y0 + 80);
-      ctx.fillText(`獲得EXP: ${this.bonusSummary.xp}（内訳: base ${this.bonusSummary.baseXP} / 初回 ${this.bonusSummary.firstClearBonus}）`, canvas.width/2, y0 + 105);
-
-      // 称号進捗（A以上の時のみ増加）
-      const tp = this.bonusSummary.titleProgress;
-      if (tp?.gained) {
-        const next = tp.nextThreshold ? `次の称号まで ${tp.nextThreshold - tp.count} 回` : `称号コンプリート！`;
-        ctx.fillText(`称号進捗: クリア ${tp.count} 回（${next}）`, canvas.width/2, y0 + 130);
-      }
-    }
+   
   },
 
   /**

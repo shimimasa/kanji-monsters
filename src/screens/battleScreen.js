@@ -1448,6 +1448,58 @@ if (gameState.currentKanji) {
         if (battleScreenState.masteryFlash.timer <= 0) battleScreenState.masteryFlash.active = false;
       }
     }
+
+    // 既存: レイアウトやボタン描画が終わったあたり
+
+    // 1) 配置境界を決める（数値は既存UIの見た目に合わせて）
+    const leftBound  = 200;                     // ステージ選択ボタンの右あたり
+    const rightBound = this.canvas.width - 280; // 敵HPパネルの左あたり
+    const hintMaxW   = Math.max(160, rightBound - leftBound);
+    const hintH      = 44;
+
+    // 2) Y位置: 「弱点は○読み！」の少し上（なければ固定値）
+    const baseHintY = 70; // 60〜80のレンジで微調整OK
+
+    // 3) ヒントテキスト（既存の文言を使う）
+    const hintText = this.currentHintText || ''; // あなたの実装に合わせて取得
+
+    // 4) テキスト幅に合わせて横幅を決定（はみ出す場合は縮小）
+    const padX = 14;
+    this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+    const textW = Math.ceil(this.ctx.measureText(hintText).width);
+    const hintW = Math.min(hintMaxW, Math.max(180, textW + padX * 2));
+    const hintX = Math.max(leftBound, Math.min((leftBound + rightBound - hintW) / 2, rightBound - hintW));
+
+    // 5) バナー描画
+    drawHintBanner(this.ctx, hintX, baseHintY, hintW, hintH, hintText);
+
+    // 6) 予防: 入力欄と万一重なる場合は上に退避
+    const inputRect = { x: inputX, y: inputY - 24, w: inputW, h: 48 };  // 既存の入力欄座標を使用
+    const overlap = !(hintX + hintW < inputRect.x || inputRect.x + inputRect.w < hintX ||
+                      baseHintY + hintH < inputRect.y || inputRect.y + inputRect.h < baseHintY);
+    if (overlap) {
+      drawHintBanner(this.ctx, hintX, Math.max(20, inputRect.y - hintH - 12), hintW, hintH, hintText);
+    }
+
+    function drawHintBanner(ctx, x, y, w, h, text) {
+      ctx.save();
+      // 背景
+      const g = ctx.createLinearGradient(x, y, x, y + h);
+      g.addColorStop(0, '#f39c12'); g.addColorStop(1, '#d35400');
+      ctx.fillStyle = g;
+      ctx.fillRect(x, y, w, h);
+      // 枠
+      ctx.strokeStyle = '#8e4400';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, w, h);
+      // テキスト
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, x + w / 2, y + h / 2);
+      ctx.restore();
+    }
   },
 
   /**
