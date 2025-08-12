@@ -5,14 +5,14 @@ import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { images } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
 
-// 地方マーカーの定義（新しい日本地図の地理的位置に合わせて調整）
+// 地方マーカーの定義（mapRect基準の割合）
 const regionMarkers = [
-  { grade: 1, name: '北海道', x: 665, y: 170, color: '#4A90E2' },  // 右上（北海道）
-  { grade: 2, name: '東北', x: 615, y: 220, color: '#7ED321' },    // 本州北部
-  { grade: 3, name: '関東', x: 595, y: 290, color: '#F5A623' },    // 本州中央東側
-  { grade: 4, name: '中部', x: 535, y: 315, color: '#BD10E0' },    // 本州中央
-  { grade: 5, name: '近畿', x: 475, y: 355, color: '#B8E986' },    // 本州中央西側
-  { grade: 6, name: '中国', x: 415, y: 375, color: '#50E3C2' },    // 本州西側
+  { grade: 1, name: '北海道', px: 0.82,  py: 0.175, color: '#4A90E2' },
+  { grade: 2, name: '東北',   px: 0.721, py: 0.30,  color: '#7ED321' },
+  { grade: 3, name: '関東',   px: 0.683, py: 0.475, color: '#F5A623' },
+  { grade: 4, name: '中部',   px: 0.567, py: 0.538, color: '#BD10E0' },
+  { grade: 5, name: '近畿',   px: 0.452, py: 0.638, color: '#B8E986' },
+  { grade: 6, name: '中国',   px: 0.337, py: 0.688, color: '#50E3C2' },
 ];
 
 const backButton = { x: 10, y: 540, width: 120, height: 40, text: 'タイトルへ' };
@@ -341,67 +341,71 @@ const regionSelectState = {
       this.drawRegionBoundaryHighlight(this.hoveredMarker);
     }
 
-    const baseMapX = this.canvas.width * 0.3;                 // 旧配置の基準
-    const deltaX   = this.mapRect ? (this.mapRect.x - baseMapX) : 0;
+    // 地図の実座標（フォールバックあり）
+    const map = this.mapRect ?? {
+      x: this.canvas.width * 0.3,
+      y: 100,
+      width: this.canvas.width * 0.65,
+      height: this.canvas.height - 200
+    };
 
     regionMarkers.forEach(marker => {
       const isHovered = this.hoveredMarker === marker;
       const isNext = nextRegion === marker.grade;
       const pulseScale = 1 + Math.sin(this.animationTime * 0.003) * 0.1;
-      
+
+      // 比率 → 実座標（中央寄せでもズレない）
+      const x = map.x + marker.px * map.width;
+      const y = map.y + marker.py * map.height;
+
       // ホバー時の拡大効果を強化
       let scale = pulseScale;
       if (isHovered) {
-        scale = 1.4 + Math.sin(this.animationTime * 0.01) * 0.1; // より大きく、より動的に
+        scale = 1.4 + Math.sin(this.animationTime * 0.01) * 0.1;
       }
-      
-      // 達成率を計算
+
+      // 達成率
       const progress = this.calculateRegionProgress(marker.grade);
-      
-      // マーカーの影（ホバー時は影も大きく）
+
+      // 影
       const shadowOffset = isHovered ? 5 : 3;
       this.ctx.fillStyle = `rgba(0, 0, 0, ${isHovered ? 0.4 : 0.3})`;
       this.ctx.beginPath();
-      this.ctx.ellipse(marker.x + shadowOffset, marker.y + shadowOffset, 25 * scale, 25 * scale, 0, 0, 2 * Math.PI);
+      this.ctx.ellipse(x + shadowOffset, y + shadowOffset, 25 * scale, 25 * scale, 0, 0, 2 * Math.PI);
       this.ctx.fill();
 
-      // ホバー時の光る背景効果
+      // 光る背景
       if (isHovered) {
         const glowRadius = 40 * scale;
-        const gradient = this.ctx.createRadialGradient(marker.x, marker.y, 0, marker.x, marker.y, glowRadius);
-        gradient.addColorStop(0, `${marker.color}40`); // 透明度40%
-        gradient.addColorStop(0.7, `${marker.color}20`); // 透明度20%
+        const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
+        gradient.addColorStop(0, `${marker.color}40`);
+        gradient.addColorStop(0.7, `${marker.color}20`);
         gradient.addColorStop(1, 'transparent');
-        
+
         this.ctx.fillStyle = gradient;
         this.ctx.beginPath();
-        this.ctx.ellipse(marker.x, marker.y, glowRadius, glowRadius, 0, 0, 2 * Math.PI);
+        this.ctx.ellipse(x, y, glowRadius, glowRadius, 0, 0, 2 * Math.PI);
         this.ctx.fill();
       }
 
-      // マーカー本体
+      // 本体
       if (images.regionMarker) {
-        // マーカー画像が利用可能な場合
         const size = 50 * scale;
-        this.ctx.drawImage(images.regionMarker, marker.x - size/2, marker.y - size/2, size, size);
+        this.ctx.drawImage(images.regionMarker, x - size / 2, y - size / 2, size, size);
       } else {
-        // 代替：円形マーカー
-        // 外側の輪（ホバー時は明るく）
         this.ctx.fillStyle = isHovered ? this.lightenColor(marker.color, 30) : marker.color;
         this.ctx.beginPath();
-        this.ctx.ellipse(marker.x, marker.y, 25 * scale, 25 * scale, 0, 0, 2 * Math.PI);
+        this.ctx.ellipse(x, y, 25 * scale, 25 * scale, 0, 0, 2 * Math.PI);
         this.ctx.fill();
-        
-        // 内側の輪
+
         this.ctx.fillStyle = '#FFFFFF';
         this.ctx.beginPath();
-        this.ctx.ellipse(marker.x, marker.y, 18 * scale, 18 * scale, 0, 0, 2 * Math.PI);
+        this.ctx.ellipse(x, y, 18 * scale, 18 * scale, 0, 0, 2 * Math.PI);
         this.ctx.fill();
-        
-        // 中央の点
+
         this.ctx.fillStyle = isHovered ? this.lightenColor(marker.color, 30) : marker.color;
         this.ctx.beginPath();
-        this.ctx.ellipse(marker.x, marker.y, 8 * scale, 8 * scale, 0, 0, 2 * Math.PI);
+        this.ctx.ellipse(x, y, 8 * scale, 8 * scale, 0, 0, 2 * Math.PI);
         this.ctx.fill();
       }
 
@@ -411,48 +415,23 @@ const regionSelectState = {
       this.ctx.lineWidth = 2;
       this.ctx.textAlign = 'center';
       this.ctx.font = `bold ${16 * scale}px sans-serif`;
-      this.ctx.strokeText(marker.grade.toString(), marker.x, marker.y + 5);
-      this.ctx.fillText(marker.grade.toString(), marker.x, marker.y + 5);
+      this.ctx.strokeText(marker.grade.toString(), x, y + 5);
+      this.ctx.fillText(marker.grade.toString(), x, y + 5);
 
-      // 達成率プログレスバーを描画（位置調整）
-      this.drawProgressBar(marker.x, marker.y + 40 * scale, progress, isHovered);
+      // 進捗バーと%表示
+      this.drawProgressBar(x, y + 40 * scale, progress, isHovered);
 
-      // 達成率テキスト（位置調整）
       this.ctx.fillStyle = '#FFFFFF';
       this.ctx.strokeStyle = '#000000';
       this.ctx.lineWidth = 1;
       this.ctx.textAlign = 'center';
       this.ctx.font = `bold ${12 * (isHovered ? 1.1 : 1)}px sans-serif`;
-      this.ctx.strokeText(`${progress}%`, marker.x, marker.y + 65 * scale);
-      this.ctx.fillText(`${progress}%`, marker.x, marker.y + 65 * scale);
+      this.ctx.strokeText(`${progress}%`, x, y + 65 * scale);
+      this.ctx.fillText(`${progress}%`, x, y + 65 * scale);
 
       // NEXTインジケーター
       if (isNext) {
-        this.drawNextIndicator(marker.x, marker.y);
-      }
-
-      // ホバー時の追加エフェクト
-      if (isHovered) {
-        // 外側の光る輪
-        this.ctx.strokeStyle = '#FFD700';
-        this.ctx.lineWidth = 4;
-        this.ctx.beginPath();
-        this.ctx.ellipse(marker.x, marker.y, 35 * scale, 35 * scale, 0, 0, 2 * Math.PI);
-        this.ctx.stroke();
-        
-        // 回転する光る粒子効果
-        for (let i = 0; i < 12; i++) {
-          const angle = (this.animationTime * 0.003 + i * Math.PI / 6) % (2 * Math.PI);
-          const radius = 45 + Math.sin(this.animationTime * 0.005 + i) * 5;
-          const sparkleX = marker.x + Math.cos(angle) * radius;
-          const sparkleY = marker.y + Math.sin(angle) * radius;
-          
-          const sparkleAlpha = 0.5 + 0.5 * Math.sin(this.animationTime * 0.008 + i);
-          this.ctx.fillStyle = `rgba(255, 215, 0, ${sparkleAlpha})`;
-          this.ctx.beginPath();
-          this.ctx.ellipse(sparkleX, sparkleY, 4, 4, 0, 0, 2 * Math.PI);
-          this.ctx.fill();
-        }
+        this.drawNextIndicator(x, y);
       }
     });
   },
@@ -737,31 +716,33 @@ const regionSelectState = {
     const worldX = (screenX - this.camera.x) / this.camera.scale;
     const worldY = (screenY - this.camera.y) / this.camera.scale;
 
-        // マーカーとの当たり判定
-        const previousHovered = this.hoveredMarker;
-        this.hoveredMarker = null;
-    
-        // 画像中央寄せ分のXオフセットを補正して判定
-        const baseMapX    = this.canvas.width * 0.3;                 // 旧基準
-        const currentMapX = this.mapRect?.x ?? baseMapX;             // 現在の地図X（中央寄せ後）
-        const deltaX      = currentMapX - baseMapX;
-    
-        for (const marker of regionMarkers) {
-          const drawX = marker.x + deltaX;
-          const drawY = marker.y;
-          const distance = Math.sqrt((worldX - drawX) ** 2 + (worldY - drawY) ** 2);
-          if (distance <= 35) { // 当たり判定を少し大きく
-            this.hoveredMarker = marker;
-            this.canvas.style.cursor = 'pointer';
-    
-            // 新しくホバーした場合はホバー音を再生
-            if (previousHovered !== marker) {
-              publish('playSE', 'hover');
-            }
-            break;
-          }
+    // 地図の実座標（フォールバックあり）
+    const map = this.mapRect ?? {
+      x: this.canvas.width * 0.3,
+      y: 100,
+      width: this.canvas.width * 0.65,
+      height: this.canvas.height - 200
+    };
+
+    // マーカーとの当たり判定（割合→実座標）
+    const previousHovered = this.hoveredMarker;
+    this.hoveredMarker = null;
+
+    for (const marker of regionMarkers) {
+      const x = map.x + marker.px * map.width;
+      const y = map.y + marker.py * map.height;
+      const distance = Math.sqrt((worldX - x) ** 2 + (worldY - y) ** 2);
+      if (distance <= 35) { // 当たり判定を少し大きく
+        this.hoveredMarker = marker;
+        this.canvas.style.cursor = 'pointer';
+
+        if (previousHovered !== marker) {
+          publish('playSE', 'hover');
         }
-    
+        break;
+      }
+    }
+
     if (!this.hoveredMarker) {
       this.canvas.style.cursor = 'default';
     }
@@ -799,21 +780,24 @@ const regionSelectState = {
     const worldX = (screenX - this.camera.x) / this.camera.scale;
     const worldY = (screenY - this.camera.y) / this.camera.scale;
 
-        // 地方マーカーのクリック処理（中央寄せ補正込み）
-        const baseMapX    = this.canvas.width * 0.3;                 // 旧基準
-        const currentMapX = this.mapRect?.x ?? baseMapX;             // 現在の地図X（中央寄せ後）
-        const deltaX      = currentMapX - baseMapX;
-    
-        for (const marker of regionMarkers) {
-          const drawX = marker.x + deltaX;
-          const drawY = marker.y;
-          const distance = Math.sqrt((worldX - drawX) ** 2 + (worldY - drawY) ** 2);
-          if (distance <= 35) {
-            // ズームアニメーションを開始
-            this.startZoomAnimation(marker);
-            return;
-          }
-        }
+    // 地図の実座標（フォールバックあり）
+    const map = this.mapRect ?? {
+      x: this.canvas.width * 0.3,
+      y: 100,
+      width: this.canvas.width * 0.65,
+      height: this.canvas.height - 200
+    };
+
+    // 地方マーカーのクリック処理（割合→実座標で判定）
+    for (const marker of regionMarkers) {
+      const x = map.x + marker.px * map.width;
+      const y = map.y + marker.py * map.height;
+      const distance = Math.sqrt((worldX - x) ** 2 + (worldY - y) ** 2);
+      if (distance <= 35) {
+        this.startZoomAnimation(marker);
+        return;
+      }
+    }
 
     // 戻るボタンのクリック処理（カメラ変換の影響を受けない）
     if (isMouseOverRect(screenX, screenY, backButton)) {
