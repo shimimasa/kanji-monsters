@@ -22,6 +22,93 @@ function getReadings(kanji) {
   return [...set];
 }
 
+// ===== 学年目安バッジ（4級〜2級）ユーティリティと描画 =====
+function __wss_gradeToSchoolHint(g) {
+  return (g===7?'中1目安':g===8?'中2目安':g===9?'中3目安':g===10?'高1〜2目安':'');
+}
+function __wss_kankenTooltip(g) {
+  return (g===7?'このレベルは中1相当の漢字が中心です':
+          g===8?'このレベルは中2相当の漢字が中心です':
+          g===9?'このレベルは中3相当の漢字が中心です':
+          g===10?'このレベルは高校初級相当の漢字が中心です':'');
+}
+function __wss_drawBadge(ctx, text, x, y) {
+  ctx.save();
+  ctx.font = '12px "UDデジタル教科書体", sans-serif';
+  const padX=8, padY=4, h=18, r=h/2;
+  const w = Math.ceil(ctx.measureText(text).width) + padX*2;
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(text, x + w/2, y + h/2);
+  ctx.restore();
+  return {x,y,w,h};
+}
+
+/**
+ * 画面下地の描画が終わった最後に呼び出してください。
+ * - 見出し付近に現在級のバッジ
+ * - 各ステージボタン右肩にバッジ
+ * - 簡易ツールチップ
+ */
+function __wss_renderSchoolHintOverlays(self, ctx) {
+  try {
+    const rects = [];
+
+    // ページ見出し用（選択級）
+    if (self.selectedGrade >= 7) {
+      const badgeText = __wss_gradeToSchoolHint(self.selectedGrade);
+      const r = __wss_drawBadge(ctx, badgeText, 20, 58);
+      r.tip = __wss_kankenTooltip(self.selectedGrade);
+      rects.push(r);
+    }
+    // ステージボタン右肩用
+    if (Array.isArray(self.stageButtons)) {
+      for (const b of self.stageButtons) {
+        const g = b?.stage?.grade;
+        if (g >= 7) {
+          const r = __wss_drawBadge(ctx, __wss_gradeToSchoolHint(g), b.x + b.width - 92, b.y + 6);
+          r.tip = __wss_kankenTooltip(g);
+          rects.push(r);
+        }
+      }
+    }
+    // ホバー判定とツールチップ
+    if (rects.length > 0 && Number.isFinite(self.mouseX) && Number.isFinite(self.mouseY)) {
+      for (const r of rects) {
+        if (self.mouseX >= r.x && self.mouseX <= r.x + r.w &&
+            self.mouseY >= r.y && self.mouseY <= r.y + r.h) {
+          const tip = r.tip;
+          if (!tip) break;
+          const tx = self.mouseX + 12, ty = self.mouseY + 18;
+          const tw = Math.ceil(ctx.measureText(tip).width) + 14, th = 22;
+          ctx.save();
+          ctx.fillStyle = 'rgba(0,0,0,0.85)';
+          ctx.fillRect(tx, ty, tw, th);
+          ctx.strokeStyle = '#FFD700'; ctx.lineWidth = 1;
+          ctx.strokeRect(tx, ty, tw, th);
+          ctx.fillStyle = '#fff';
+          ctx.font = '12px "UDデジタル教科書体", sans-serif';
+          ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+          ctx.fillText(tip, tx + 7, ty + th/2);
+          ctx.restore();
+          break;
+        }
+      }
+    }
+  } catch(e) {
+    console.warn('schoolHint overlay error:', e);
+  }
+}
+// ====== ここまで ======
+
 // uiRoot の安全な取得に修正
 const getUiRoot = () => {
   let uiRoot = document.getElementById('uiOverlay');
@@ -886,8 +973,12 @@ const worldStageSelectScreen = {
     // フッターバーの描画
     this._drawFooterBar(ctx, cw, ch);
 
-    // ツールチップの描画
-    this.drawTooltip(this.hoveredStage);
+        // ツールチップの描画（総復習モード以外）
+        if (gameState.currentGrade !== 0) {
+          this.drawTooltip(this.hoveredStage);
+        }
+        // ← 追加: 学年目安バッジと簡易ツールチップを最後に重ねる
+        __wss_renderSchoolHintOverlays(this, ctx);
   },
 
   /** クリックイベント処理 */
