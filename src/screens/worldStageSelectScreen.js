@@ -5,6 +5,7 @@ import { images } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
 import ReviewQueue from '../models/reviewQueue.js';
 import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
+import { isBonusUnlocked } from '../core/bonusManager.js';
 
 // 文字正規化（reviewStage と同仕様）
 function hiraShift(ch) { return String.fromCharCode(ch.charCodeAt(0) - 0x60); }
@@ -385,6 +386,16 @@ const worldStageSelectScreen = {
     const isCleared = this.isStageCleared(stage.stageId);
     ctx.fillStyle = isCleared ? '#4CAF50' : '#FFC107';
     ctx.fillText(isCleared ? 'クリア済み' : '未クリア', tooltipX + 10, tooltipY + yOffset);
+
+    // 学年ボーナスの未解放メッセージ
+    const m2 = /^bonus_g(\d+)$/i.exec(stage.stageId);
+    if (m2) {
+      const g = parseInt(m2[1], 10);
+      if (!isBonusUnlocked(g)) {
+        ctx.fillStyle = '#ffb74d';
+        ctx.fillText('この学年の通常ステージをすべてクリアで解放', tooltipX + 10, tooltipY + yOffset + 20);
+      }
+    }
   },
 
   /** リッチなボタンを描画するメソッド */
@@ -772,6 +783,24 @@ const worldStageSelectScreen = {
           ctx.fillStyle = '#FFD700';
           ctx.font = '10px sans-serif';
           ctx.fillText('NEXT!', button.x + button.width - 50, button.y + button.height - 15);
+        }
+
+        // 学年ボーナスのロック表示（鍵＋半透明）
+        const mBonus = /^bonus_g(\d+)$/i.exec(stage.stageId);
+        if (mBonus) {
+          const g = parseInt(mBonus[1], 10);
+          const unlocked = isBonusUnlocked(g);
+          if (!unlocked) {
+            this.ctx.save();
+            this.ctx.fillStyle = 'rgba(0,0,0,0.45)';
+            this.ctx.fillRect(button.x, button.y, button.width, button.height);
+            this.ctx.fillStyle = '#FFD700';
+            this.ctx.font = `${Math.max(12, Math.floor(button.height * 0.4))}px sans-serif`;
+            this.ctx.textAlign = 'left';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText('🔒', button.x + 10, button.y + button.height / 2);
+            this.ctx.restore();
+          }
         }
       });
     } else {

@@ -5,6 +5,7 @@ import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import reviewQueue from '../models/reviewQueue.js';
 import { stageData } from '../loaders/dataLoader.js';
+import { calcBonusReward, isFirstClear, markBonusFirstClear, isBonusUnlocked } from '../core/bonusManager.js';
 
 // uiRoot の安全な取得に修正
 const getUiRoot = () => {
@@ -367,6 +368,16 @@ const stageSelectScreenState = {
     const isCleared = this.isStageCleared(stage.stageId);
     ctx.fillStyle = isCleared ? '#4CAF50' : '#FFC107';
     ctx.fillText(isCleared ? 'クリア済み' : '未クリア', tooltipX + 10, tooltipY + yOffset);
+
+    // 学年ボーナスの未解放メッセージ
+    const m2 = /^bonus_g(\d+)$/i.exec(stage.stageId);
+    if (m2) {
+      const g = parseInt(m2[1], 10);
+      if (!isBonusUnlocked(g)) {
+        ctx.fillStyle = '#ffb74d';
+        ctx.fillText('この学年の通常ステージをすべてクリアで解放', tooltipX + 10, tooltipY + yOffset + 20);
+      }
+    }
   },
 
   /** 総復習用の統計情報を描画 */
@@ -723,6 +734,24 @@ const stageSelectScreenState = {
             ctx.fillStyle = '#FFD700';
             ctx.font = '10px sans-serif';
             ctx.fillText('NEXT!', button.x + button.width - 50, button.y + button.height - 15);
+          }
+
+          // 学年ボーナスのロック表示（鍵＋半透明）
+          const mBonus = /^bonus_g(\d+)$/i.exec(stage.stageId);
+          if (mBonus) {
+            const g = parseInt(mBonus[1], 10);
+            const unlocked = isBonusUnlocked(g);
+            if (!unlocked) {
+              ctx.save();
+              ctx.fillStyle = 'rgba(0,0,0,0.45)';
+              ctx.fillRect(button.x, button.y, button.width, button.height);
+              ctx.fillStyle = '#FFD700';
+              ctx.font = `${Math.max(12, Math.floor(button.height * 0.4))}px sans-serif`;
+              ctx.textAlign = 'left';
+              ctx.textBaseline = 'middle';
+              ctx.fillText('🔒', button.x + 10, button.y + button.height / 2);
+              ctx.restore();
+            }
           }
         });
       }

@@ -150,8 +150,52 @@ export function getEnemiesByStageId(stageId) {
   const bonusMatchForEnemy = /^bonus_g(\d+)$/i.exec(stageId);
   if (bonusMatchForEnemy) {
     const g = parseInt(bonusMatchForEnemy[1], 10);
-    const boss = findBonusBossForGrade(g, enemyData);
-    return boss ? [boss] : [];
+    const fights = g <= 6 ? 3 : 4;
+
+    // 学年内の通常ステージを抽出（ボーナス自身は除外）
+    const gradeStages = stageData.filter(s => s.grade === g && !/^bonus_/i.test(s.stageId));
+    const byId = new Map(enemyData.map(e => [e.id, e]));
+
+    // 各ステージからボス（isBoss=true）を優先、無ければ末尾ID(最大)を採用
+    const picked = [];
+    const pickedIds = new Set();
+    for (const s of gradeStages) {
+      if (!Array.isArray(s.enemyIdList) || s.enemyIdList.length === 0) continue;
+      const enemies = s.enemyIdList.map(id => byId.get(id)).filter(Boolean);
+      let boss = enemies.find(e => e.isBoss);
+      if (!boss) {
+        const sorted = [...enemies].sort((a,b) => String(a.id).localeCompare(String(b.id)));
+        boss = sorted[sorted.length - 1];
+      }
+      if (boss && !pickedIds.has(boss.id)) {
+        // 念のためボス扱い
+        if (!boss.isBoss) boss.isBoss = true;
+        picked.push(boss);
+        pickedIds.add(boss.id);
+      }
+      if (picked.length >= fights) break;
+    }
+
+    // 足りない場合は学年内の敵からID末尾が大の順で補完（重複なし）
+    if (picked.length < fights) {
+      const gradeEnemyIds = new Set(
+        gradeStages.flatMap(s => Array.isArray(s.enemyIdList) ? s.enemyIdList : [])
+      );
+      const candidates = [...gradeEnemyIds]
+        .map(id => byId.get(id)).filter(Boolean)
+        .sort((a,b) => String(a.id).localeCompare(String(b.id)));
+
+      for (let i = candidates.length - 1; i >= 0 && picked.length < fights; i--) {
+        const e = candidates[i];
+        if (!pickedIds.has(e.id)) {
+          if (!e.isBoss) e.isBoss = true;
+          picked.push(e);
+          pickedIds.add(e.id);
+        }
+      }
+    }
+
+    return picked;
   }
 
   const stage = stageData.find(s => s.stageId === stageId);

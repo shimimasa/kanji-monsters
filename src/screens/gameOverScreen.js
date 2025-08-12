@@ -4,6 +4,8 @@
 import { publish } from '../core/eventBus.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState } from '../core/gameState.js';
+import { calcFailXP } from '../core/bonusManager.js';
+import { addPlayerExp } from '../core/gameState.js';
 
 const retryButton = {
   x: 250,
@@ -52,6 +54,18 @@ const gameOverState = {
     
     // イベントハンドラ登録
     this.registerHandlers();
+
+    const stageId = (gameState.currentStageId || '');
+    const m = /^bonus_g(\d+)$/i.exec(stageId);
+    if (m) {
+      const grade = parseInt(m[1], 10);
+      const clearedFights = Math.max(0, gameState.currentEnemyIndex); // 倒した数
+      const failXP = calcFailXP(grade, clearedFights);
+      if (failXP > 0) {
+        addPlayerExp(failXP);
+        console.log(`[学年ボーナス] 途中敗退報酬 +${failXP}XP（${clearedFights}体）`);
+      }
+    }
   },
   
   /** 毎フレーム呼び出し（描画） */

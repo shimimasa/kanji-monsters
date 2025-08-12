@@ -370,8 +370,8 @@ const battleScreenState = {
       battleState.lastAnswered = null;
 
       // 敵の生成と最初の漢字を選択
-      spawnEnemy();
-      pickNextKanji();
+        spawnEnemy();
+        pickNextKanji();
       this.logOffset = 0;
 
       // イベントハンドラの登録
@@ -949,7 +949,7 @@ const battleScreenState = {
     this.ctx.rect(msgX + 4, msgY + 24, msgW - 8, msgH - 30);
     this.ctx.clip();
 
-    // メッセージを折り返しして平坦化（セグメント列をtop->down順で生成）
+    // メッセージを折り返して平坦化（セグメント列をtop->down順で生成）
     const iconSize = 16;
     const iconMargin = 4;
 
@@ -1869,7 +1869,7 @@ drawEnemyStatusPanel(ctx) {
     contentX + contentW / 2, barY + barH / 2,
     'white', 'black', '14px "UDデジタル教科書体", sans-serif', 'center', 'middle', 2
   );
-},
+  },
 
   /** 画面離脱時のクリーンアップ */
   exit() {
@@ -3127,48 +3127,52 @@ function onAttack() {
         console.error('実績チェック中にエラーが発生しました:', error);
       });
       
-      // 経験値獲得量を計算
-      const expGained = gameState.currentEnemy.exp || 30; // フォールバック値として30を設定
-      
-      // 敵の位置（中心点）を計算
-      const enemyX = 480 + 240/2; // ex + ew/2
-      const enemyY = 80 + 120/2;  // ey + eh/2
-      
-      // プレイヤー経験値バーの位置を計算
-      // プレイヤーステータスパネルの経験値バーの位置を取得
-      const panelX = 20;
-      const panelY = battleScreenState.canvas.height - 120;
-      const expBarY = panelY + 25 + 35; // 経験値バーのY座標
-      const expBarX = panelX + 140; // 経験値バーの中央あたり
-      
-      // パーティクルエフェクトを開始
-      battleScreenState.startExpParticleEffect(
-        enemyX, enemyY, // 敵の位置（発生源）
-        expBarX, expBarY, // 経験値バーの位置（目標）
-        expGained // 獲得経験値
-      );
-      
-      // 経験値獲得メッセージを表示
-      battleState.log.push(`${expGained}の経験値を獲得した！`);
-      
-      // 経験値パーティクルエフェクト後に経験値を実際に加算
-      setTimeout(() => {
-        // 経験値を加算して、レベルアップ判定を行う
-        const levelUpResult = addPlayerExp(expGained);
+      // 経験値獲得量（学年ボーナス中はリザルト一括付与のため0）
+      const inBonus = /^bonus_g/i.test(String(gameState.currentStageId || ''));
+      const expGained = inBonus ? 0 : (gameState.currentEnemy.exp || 30);
+
+      if (expGained > 0) {
+        // パーティクル → メッセージ（現状ロジック）
+        // 敵の位置（中心点）を計算
+        const enemyX = 480 + 240/2; // ex + ew/2
+        const enemyY = 80 + 120/2;  // ey + eh/2
         
-        // レベルアップした場合の演出処理
-        if (levelUpResult.leveledUp) {
-          // レベルアップSE再生
-          publish('playSE', 'levelUp');
+        // プレイヤー経験値バーの位置を計算
+        // プレイヤーステータスパネルの経験値バーの位置を取得
+        const panelX = 20;
+        const panelY = battleScreenState.canvas.height - 120;
+        const expBarY = panelY + 25 + 35; // 経験値バーのY座標
+        const expBarX = panelX + 140; // 経験値バーの中央あたり
+        
+        // パーティクルエフェクトを開始
+        battleScreenState.startExpParticleEffect(
+          enemyX, enemyY, // 敵の位置（発生源）
+          expBarX, expBarY, // 経験値バーの位置（目標）
+          expGained // 獲得経験値
+        );
+        
+        // 経験値獲得メッセージを表示
+        battleState.log.push(`${expGained}の経験値を獲得した！`);
+        
+        // 経験値パーティクルエフェクト後に経験値を実際に加算
+        setTimeout(() => {
+          // 経験値を加算して、レベルアップ判定を行う
+          const levelUpResult = addPlayerExp(expGained);
           
-          // レベルアップメッセージをログに追加
-          battleState.log.push(`レベルが ${levelUpResult.newLevel} にあがった！`);
-          addToLog(`攻撃力が上がった！ HP最大値が増えた！`);
-          
-          // レベルアップ強化エフェクトを開始
-          battleScreenState.startLevelUpEffect(120); // 2秒間表示
-        }
-      }, 1000); // パーティクルエフェクトが見える程度の遅延
+          // レベルアップした場合の演出処理
+          if (levelUpResult.leveledUp) {
+            // レベルアップSE再生
+            publish('playSE', 'levelUp');
+            
+            // レベルアップメッセージをログに追加
+            battleState.log.push(`レベルが ${levelUpResult.newLevel} にあがった！`);
+            addToLog(`攻撃力が上がった！ HP最大値が増えた！`);
+            
+            // レベルアップ強化エフェクトを開始
+            battleScreenState.startLevelUpEffect(120); // 2秒間表示
+          }
+        }, 1000); // パーティクルエフェクトが見える程度の遅延
+      }
       
       // 敵が残っていれば次の敵をスポーン、最後の敵ならステージクリア待機
       if (gameState.currentEnemyIndex < gameState.enemies.length - 1) {
@@ -3181,6 +3185,16 @@ function onAttack() {
           pickNextKanji();
           battleState.turn = 'player';
           battleState.inputEnabled = true;
+          
+          // 学年ボーナス連戦: バトル間 自動回復30%
+          if (/^bonus_g/i.test(String(gameState.currentStageId || ''))) {
+            const stats = gameState.playerStats;
+            const heal = Math.floor(stats.maxHp * 0.3);
+            stats.hp = Math.min(stats.maxHp, stats.hp + heal);
+            battleState.playerHpTarget = stats.hp;
+            battleState.playerHpAnimating = true;
+            battleState.log.push('連戦の合間にHPが回復した！（+30%）');
+          }
           
           // 次の問題に進む際にヒントレベルをリセット
           gameState.hintLevel = 0;

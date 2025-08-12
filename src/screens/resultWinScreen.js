@@ -5,6 +5,7 @@ import { publish } from '../core/eventBus.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState, battleState, recordStageCleared } from '../core/gameState.js';
 import { checkAchievements } from '../core/achievementManager.js';
+import { calcBonusReward, isFirstClear, markBonusFirstClear } from '../core/bonusManager.js';
 
 const nextStageButton = {
   x: 300,
@@ -23,6 +24,7 @@ const resultWinState = {
   mouseY: 0,
   animationTime: 0, // アニメーション用タイマー
   resultData: null, // 結果データを保存
+  bonusSummary: null, // 学年ボーナスの結果データを保持
 
   /** 画面表示時の初期化 */
   async enter(canvas, resultData) {
@@ -70,6 +72,31 @@ const resultWinState = {
     
     // アニメーションタイマーを初期化
     this.animationTime = 0;
+
+    this.bonusSummary = null;
+
+    const stageId = gameState.currentStageId || '';
+    const m = /^bonus_g(\d+)$/i.exec(stageId);
+    if (m) {
+      const grade = parseInt(m[1], 10);
+      const fights = gameState.enemies?.length || 0;
+      const cleared = fights; // クリア済み連戦数（勝利なので=fights）
+      const total = (this.resultData.correct?.length || 0) + (this.resultData.wrong?.length || 0);
+      const accuracyPct = total > 0 ? Math.floor((this.resultData.correct.length / total) * 100) : 100;
+      const remHpPct = Math.floor((gameState.playerStats.hp / gameState.playerStats.maxHp) * 100);
+      const firstClear = isFirstClear(grade);
+
+      const result = calcBonusReward({ grade, fights, cleared, accuracyPct, remHpPct, firstClear });
+
+      // 一括で経験値付与
+      const { addPlayerExp } = await import('../core/gameState.js');
+      addPlayerExp(result.xp);
+
+      // 初回フラグ保存
+      if (firstClear) markBonusFirstClear(grade);
+
+      this.bonusSummary = { grade, fights, accuracyPct, remHpPct, ...result };
+    }
     
     // イベントハンドラ登録
     this.registerHandlers();
@@ -105,6 +132,24 @@ const resultWinState = {
     // 6. 間違えた漢字の巻物風表示
     if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
       this.drawMistakeScrollPanel(ctx, 50, 420, 250, 150);
+    }
+
+    if (this.bonusSummary) {
+      const y0 = 250;
+      ctx.font = '24px sans-serif';
+      ctx.fillText(`学年ボーナス結果`, canvas.width/2, y0);
+      ctx.font = '18px sans-serif';
+      ctx.fillText(`連戦数: ${this.bonusSummary.fights}`, canvas.width/2, y0 + 30);
+      ctx.fillText(`正答率: ${this.bonusSummary.accuracyPct}% / 残HP: ${this.bonusSummary.remHpPct}%`, canvas.width/2, y0 + 55);
+      ctx.fillText(`ランク: ${this.bonusSummary.rank}（倍率 x${this.bonusSummary.multiplier}）`, canvas.width/2, y0 + 80);
+      ctx.fillText(`獲得EXP: ${this.bonusSummary.xp}（内訳: base ${this.bonusSummary.baseXP} / 初回 ${this.bonusSummary.firstClearBonus}）`, canvas.width/2, y0 + 105);
+
+      // 称号進捗（A以上の時のみ増加）
+      const tp = this.bonusSummary.titleProgress;
+      if (tp?.gained) {
+        const next = tp.nextThreshold ? `次の称号まで ${tp.nextThreshold - tp.count} 回` : `称号コンプリート！`;
+        ctx.fillText(`称号進捗: クリア ${tp.count} 回（${next}）`, canvas.width/2, y0 + 130);
+      }
     }
   },
 
@@ -480,6 +525,7 @@ const resultWinState = {
     this.canvas = null;
     this.ctx = null;
     this.resultData = null;
+    this.bonusSummary = null;
   },
 
   /** イベントハンドラ登録 */

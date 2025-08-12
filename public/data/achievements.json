@@ -277,5 +277,44 @@
       "type": "healsSuccessful",
       "value": 100
     }
-  }
+  },
+  { "id": "title_conqueror_g1",  "title": "1年 征服者",  "description": "学年ボーナスをA以上で3回クリア（1年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g1",   "title": "1年 守護者",  "description": "学年ボーナスをA以上で5回クリア（1年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g1",   "title": "1年 覇者",    "description": "学年ボーナスをA以上で10回クリア（1年）", "condition": { "type": "manual", "value": 1 } },
+
+  { "id": "title_conqueror_g2",  "title": "2年 征服者",  "description": "学年ボーナスをA以上で3回クリア（2年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g2",   "title": "2年 守護者",  "description": "学年ボーナスをA以上で5回クリア（2年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g2",   "title": "2年 覇者",    "description": "学年ボーナスをA以上で10回クリア（2年）", "condition": { "type": "manual", "value": 1 } },
+
+  { "id": "title_conqueror_g3",  "title": "3年 征服者",  "description": "学年ボーナスをA以上で3回クリア（3年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g3",   "title": "3年 守護者",  "description": "学年ボーナスをA以上で5回クリア（3年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g3",   "title": "3年 覇者",    "description": "学年ボーナスをA以上で10回クリア（3年）", "condition": { "type": "manual", "value": 1 } },
+
+  { "id": "title_conqueror_g4",  "title": "4年 征服者",  "description": "学年ボーナスをA以上で3回クリア（4年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g4",   "title": "4年 守護者",  "description": "学年ボーナスをA以上で5回クリア（4年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g4",   "title": "4年 覇者",    "description": "学年ボーナスをA以上で10回クリア（4年）", "condition": { "type": "manual", "value": 1 } },
+
+  { "id": "title_conqueror_g5",  "title": "5年 征服者",  "description": "学年ボーナスをA以上で3回クリア（5年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g5",   "title": "5年 守護者",  "description": "学年ボーナスをA以上で5回クリア（5年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g5",   "title": "5年 覇者",    "description": "学年ボーナスをA以上で10回クリア（5年）", "condition": { "type": "manual", "value": 1 } },
+
+  { "id": "title_conqueror_g6",  "title": "6年 征服者",  "description": "学年ボーナスをA以上で3回クリア（6年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g6",   "title": "6年 守護者",  "description": "学年ボーナスをA以上で5回クリア（6年）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g6",   "title": "6年 覇者",    "description": "学年ボーナスをA以上で10回クリア（6年）", "condition": { "type": "manual", "value": 1 } },
+
+  { "id": "title_conqueror_g7",  "title": "4級 征服者",  "description": "学年ボーナスをA以上で3回クリア（4級）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g7",   "title": "4級 守護者",  "description": "学年ボーナスをA以上で5回クリア（4級）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g7",   "title": "4級 覇者",    "description": "学年ボーナスをA以上で10回クリア（4級）", "condition": { "type": "manual", "value": 1 } },
+
+  { "id": "title_conqueror_g8",  "title": "3級 征服者",  "description": "学年ボーナスをA以上で3回クリア（3級）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g8",   "title": "3級 守護者",  "description": "学年ボーナスをA以上で5回クリア（3級）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g8",   "title": "3級 覇者",    "description": "学年ボーナスをA以上で10回クリア（3級）", "condition": { "type": "manual", "value": 1 } },
+
+  { "id": "title_conqueror_g9",  "title": "準2級 征服者","description": "学年ボーナスをA以上で3回クリア（準2級）", "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g9",   "title": "準2級 守護者","description": "学年ボーナスをA以上で5回クリア（準2級）", "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g9",   "title": "準2級 覇者",  "description": "学年ボーナスをA以上で10回クリア（準2級）","condition": { "type": "manual", "value": 1 } },
+
+  { "id": "title_conqueror_g10", "title": "2級 征服者",  "description": "学年ボーナスをA以上で3回クリア（2級）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g10",  "title": "2級 守護者",  "description": "学年ボーナスをA以上で5回クリア（2級）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g10",  "title": "2級 覇者",    "description": "学年ボーナスをA以上で10回クリア（2級）", "condition": { "type": "manual", "value": 1 } }
 ] 
