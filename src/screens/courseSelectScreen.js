@@ -12,20 +12,29 @@ const courseSelectScreen = {
     const cw = this.canvas.width;
     const ch = this.canvas.height;
     
-    // 左右のエリアを定義
-    this.japanButton = {
-      x: 50,
-      y: 150,
-      width: cw / 2 - 75,
-      height: ch - 250
-    };
-    
-    this.worldButton = {
-      x: cw / 2 + 25,
-      y: 150,
-      width: cw / 2 - 75,
-      height: ch - 250
-    };
+        // 左右のエリアを定義
+        this.japanButton = {
+          x: 50,
+          y: 150,
+          width: cw / 2 - 75,
+          height: ch - 250
+        };
+        
+        this.worldButton = {
+          x: cw / 2 + 25,
+          y: 150,
+          width: cw / 2 - 75,
+          height: ch - 250
+        };
+        
+        // タイトルへボタン（下部左）
+        this.backButton = {
+          x: 10,
+          y: ch - 60,
+          width: 120,
+          height: 40,
+          text: 'タイトルへ'
+        };
     
     // イベントハンドラを登録
     this.registerHandlers();
@@ -70,13 +79,18 @@ const courseSelectScreen = {
       '中学生の漢字（世界編）',
       images.worldMap
     );
+        // ヒントテキスト
+        ctx.fillStyle = '#7f8c8d';
+        ctx.font = '16px "UDデジタル教科書体", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('※ 画面をタップして選択してください', cw / 2, ch - 30);
     
-    // 戻るボタン
-    ctx.fillStyle = '#7f8c8d';
-    ctx.font = '16px "UDデジタル教科書体", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('※ 画面をタップして選択してください', cw / 2, ch - 30);
+        // タイトルへボタン（下部左）
+        if (this.backButton) {
+          this.backButton.y = ch - 60; // 画面高さに追従
+          drawButton(ctx, this.backButton.x, this.backButton.y, this.backButton.width, this.backButton.height, this.backButton.text);
+        }
   },
   
   /** コースエリアを描画 */
@@ -159,12 +173,19 @@ const courseSelectScreen = {
       return;
     }
 
-    // 世界編（中学生）エリアがクリックされた場合
-    if (isMouseOverRect(x, y, this.worldButton)) {
-      publish('playSE', 'decide');
-      publish('changeScreen', 'continentSelect');
-      return;
-    }
+        // 世界編（中学生）エリアがクリックされた場合
+        if (isMouseOverRect(x, y, this.worldButton)) {
+          publish('playSE', 'decide');
+          publish('changeScreen', 'continentSelect');
+          return;
+        }
+    
+        // タイトルへボタン
+        if (this.backButton && isMouseOverRect(x, y, this.backButton)) {
+          publish('playSE', 'decide');
+          publish('changeScreen', 'title');
+          return;
+        }
   },
 
   render() {
