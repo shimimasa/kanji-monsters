@@ -122,17 +122,22 @@ const resultWinState = {
       this.drawPerfectClearCrown(ctx, canvas.width / 2 + 200, 80);
     }
 
-    // 4. 結果表示パネル
-    this.drawResultPanel(ctx, canvas.width / 2 - 150, 200, 300, 180);
-
-    // 5. リッチなボタン
-    const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
-    this.drawRichButton(ctx, nextStageButton, isHovered);
-
-    // 6. 間違えた漢字の巻物風表示
-    if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
-      this.drawMistakeScrollPanel(ctx, 50, 420, 250, 150);
-    }
+        // 4. 結果表示パネル
+        if (this.bonusSummary) {
+          // 学年ボーナス専用のパネルのみ描画（通常パネルはスキップ）
+          this.drawBonusResultPanel(ctx, canvas.width / 2 - 180, 200, 360, 210);
+        } else {
+          this.drawResultPanel(ctx, canvas.width / 2 - 150, 200, 300, 180);
+        }
+    
+        // 5. リッチなボタン
+        const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
+        this.drawRichButton(ctx, nextStageButton, isHovered);
+    
+        // 6. 間違えた漢字の巻物風表示
+        if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
+          this.drawMistakeScrollPanel(ctx, 50, 420, 250, 150);
+        }
 
     if (this.bonusSummary) {
       const y0 = 250;
@@ -399,6 +404,70 @@ const resultWinState = {
     
     ctx.restore();
   },
+
+// 追加: 学年ボーナス専用の結果パネル
+drawBonusResultPanel(ctx, x, y, width, height) {
+  if (!this.bonusSummary) return;
+  const s = this.bonusSummary;
+
+  ctx.save();
+
+  // 影
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+  ctx.fillRect(x + 5, y + 5, width, height);
+
+  // 背景（木目調を流用）
+  const panelGradient = ctx.createLinearGradient(x, y, x, y + height);
+  panelGradient.addColorStop(0, '#DEB887');
+  panelGradient.addColorStop(0.5, '#D2B48C');
+  panelGradient.addColorStop(1, '#BC9A6A');
+  ctx.fillStyle = panelGradient;
+  ctx.fillRect(x, y, width, height);
+
+  // 枠
+  ctx.strokeStyle = '#8B4513';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x, y, width, height);
+  ctx.strokeStyle = '#A0522D';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x + 5, y + 5, width - 10, height - 10);
+
+  // タイトル
+  ctx.font = 'bold 24px "UDデジタル教科書体", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#8B4513';
+  ctx.fillText('戦績', x + width/2, y + 30);
+
+  // セクション見出し
+  ctx.font = '22px sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('学年ボーナス結果', x + width/2, y + 65);
+
+  // 本文
+  const lines = [
+    `連戦数: ${s.fights}`,
+    `正答率: ${s.accuracyPct}% / 残HP: ${s.remHpPct}%`,
+    `ランク: ${s.rank}（倍率 x${s.multiplier}）`,
+    `獲得EXP: ${s.xp}（内訳: base ${s.baseXP} / 初回 ${s.firstClearBonus}）`,
+  ];
+  const tp = s.titleProgress;
+  if (tp?.gained) {
+    const nextText = tp.nextThreshold ? `次の称号まで ${tp.nextThreshold - tp.count} 回` : '称号コンプリート！';
+    lines.push(`称号進捗: クリア ${tp.count} 回（${nextText}）`);
+  }
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#654321';
+  ctx.font = '18px "UDデジタル教科書体", sans-serif';
+  let yy = y + 95;
+  for (const t of lines) {
+    ctx.fillText(t, x + 20, yy);
+    yy += 24;
+  }
+
+  ctx.restore();
+},
+
 
   /**
    * リッチなボタンを描画
