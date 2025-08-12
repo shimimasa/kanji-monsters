@@ -661,14 +661,27 @@ const regionSelectState = {
       return localStorageCleared || gameStateCleared;
     });
 
-    // カメラ変換を考慮した画面座標を計算
-    const screenX = marker.x * this.camera.scale + this.camera.x;
-    const screenY = marker.y * this.camera.scale + this.camera.y;
+    // 地図の実座標（フォールバックあり）
+    const map = this.mapRect ?? {
+      x: this.canvas.width * 0.3,
+      y: 100,
+      width: this.canvas.width * 0.65,
+      height: this.canvas.height - 200
+    };
+
+    // 比率 → ワールド座標 → スクリーン座標（カメラ適用）
+    const worldX = map.x + marker.px * map.width;
+    const worldY = map.y + marker.py * map.height;
+    const screenX = worldX * this.camera.scale + this.camera.x;
+    const screenY = worldY * this.camera.scale + this.camera.y;
 
     const tooltipX = screenX + 40;
     const tooltipY = screenY - 50;
     const tooltipWidth = 200;
     const tooltipHeight = 90;
+
+    // 安全ガード
+    if (!Number.isFinite(tooltipX) || !Number.isFinite(tooltipY)) return;
 
     // ツールチップの背景（グラデーション）
     const gradient = this.ctx.createLinearGradient(tooltipX, tooltipY, tooltipX, tooltipY + tooltipHeight);
@@ -687,13 +700,12 @@ const regionSelectState = {
     this.ctx.lineWidth = 1;
     this.ctx.strokeRect(tooltipX + 2, tooltipY + 2, tooltipWidth - 4, tooltipHeight - 4);
 
-    // ツールチップのテキスト
+    // テキスト
     this.ctx.fillStyle = '#FFFFFF';
     this.ctx.textAlign = 'left';
     this.ctx.font = 'bold 16px sans-serif';
     this.ctx.fillText(`${marker.grade}年生 ${marker.name}地方`, tooltipX + 10, tooltipY + 25);
     
-    // 進捗情報
     this.ctx.font = '14px sans-serif';
     this.ctx.fillStyle = progress === 100 ? '#FFD700' : '#FFFFFF';
     this.ctx.fillText(`進捗: ${progress}%`, tooltipX + 10, tooltipY + 50);
