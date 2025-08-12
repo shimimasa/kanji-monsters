@@ -391,8 +391,9 @@ const battleScreenState = {
       this.playerExpTarget = expInCurrentLevel;
       this.playerExpAnimating = false;
 
-      // ヒントレベルを初期化
+      // ヒント初期化
       gameState.hintLevel = 0;
+      this.currentHintText = '';
       
       console.log("✅ battleScreen.enter() 完了");
       
@@ -627,6 +628,11 @@ const battleScreenState = {
             case 3:
               hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
               hintColor = '#e74c3c'; // 赤色
+              break;
+            case 4:
+              // 消灯：以降はバナーも非表示
+              battleScreenState.currentHintText = '';
+              addToLog('ヒントを非表示にしました');
               break;
           }
           
@@ -1421,7 +1427,9 @@ if (gameState.currentKanji) {
     const hintMaxW   = Math.max(160, rightBound - leftBound);
 
     // 2) テキストとフォントサイズ（枠幅に収まるまで縮小）
-    const bannerText = (typeof this.currentHintText === 'string') ? this.currentHintText : '';
+    const bannerText = (gameState.hintLevel > 0 && gameState.hintLevel < 4 && typeof this.currentHintText === 'string')
+      ? this.currentHintText
+      : '';
     if (bannerText) {
       const padX = 10;
       let fontSize = 18;
@@ -1442,8 +1450,8 @@ if (gameState.currentKanji) {
       const hintX = Math.max(leftBound, Math.min((leftBound + rightBound - hintW) / 2, rightBound - hintW));
 
       // 4) Y位置: 弱点表示の「上」。ヘッダーと被らないように下限を設ける
-      const TOP_SAFE_Y = 75;
-      const GAP_ABOVE_WEAKNESS = 14;
+      const TOP_SAFE_Y = 100;           // ヘッダ（タイトル/ステージ選択）と確実に分離
+      const GAP_ABOVE_WEAKNESS = 18;    // 弱点テキストとの間隔を広めに
       const weaknessY = 200 - 160 / 2 - 20; // kanjiY - kanjiBoxH/2 - 20 と同値
       let hintY = Math.max(TOP_SAFE_Y, weaknessY - hintH - GAP_ABOVE_WEAKNESS);
 
@@ -3239,6 +3247,7 @@ function onAttack() {
           
           // 次の問題に進む際にヒントレベルをリセット
           gameState.hintLevel = 0;
+
         }, 500);
       } else {
         // 最後の敵を倒した場合：ステージクリアを保留状態にする
@@ -3525,36 +3534,39 @@ function onHeal() {
 
 // ヒント切替
 function onHint() {
-  // 段階的にヒントレベルを上げる（最大3）
-  gameState.hintLevel = (gameState.hintLevel + 1) % 4;
-  
-  // ヒントレベルに応じたメッセージをログに表示
-  switch(gameState.hintLevel) {
-    case 0:
-      addToLog('ヒントを非表示にした');
-      break;
-    case 1:
-      addToLog(`ヒント（基本）: 画数は${gameState.currentKanji.strokes}`);
-      break;
-    case 2:
-      // 音読みと訓読みのどちらかをランダムに選んで部分的に表示
-      const isOnyomi = Math.random() > 0.5;
-      const readings = isOnyomi ? gameState.currentKanji.onyomi : gameState.currentKanji.kunyomi;
-      
-      if (readings && readings.length > 0) {
-        // 読みの最初の1文字を表示
-        const firstReading = readings[0];
-        const hintText = firstReading.substring(0, 1) + '○○';
-        addToLog(`ヒント（読み）: ${isOnyomi ? '音読み' : '訓読み'}は「${hintText}」から始まる`);
-  } else {
-        // 該当する読みがない場合は別のヒント
-        addToLog(`ヒント（読み）: ${isOnyomi ? '訓読み' : '音読み'}で読むことが多い`);
-      }
-      break;
-    case 3:
-      addToLog(`ヒント（意味）: ${gameState.currentKanji.meaning}`);
-      break;
-  }
+  // 段階的にヒントレベルを上げる（0→1→2→3→4で消灯）
+  const next = Math.min(4, (gameState.hintLevel || 0) + 1);
+  gameState.hintLevel = next;
+
+   // ヒントレベルに応じたメッセージをログに表示
+   switch (gameState.hintLevel) {
+     case 1:
+       addToLog(`ヒント（基本）: 画数は${gameState.currentKanji.strokes}`);
+       break;
+     case 2:
+       // 音読みと訓読みのどちらかをランダムに選んで部分的に表示
+       const isOnyomi = Math.random() > 0.5;
+       const readings = isOnyomi ? gameState.currentKanji.onyomi : gameState.currentKanji.kunyomi;
+       
+       if (readings && readings.length > 0) {
+         // 読みの最初の1文字を表示
+         const firstReading = readings[0];
+         const hintText = firstReading.substring(0, 1) + '○○';
+         addToLog(`ヒント（読み）: ${isOnyomi ? '音読み' : '訓読み'}は「${hintText}」から始まる`);
+   } else {
+         // 該当する読みがない場合は別のヒント
+         addToLog(`ヒント（読み）: ${isOnyomi ? '訓読み' : '音読み'}で読むことが多い`);
+       }
+       break;
+     case 3:
+       addToLog(`ヒント（意味）: ${gameState.currentKanji.meaning}`);
+       break;
+     case 4:
+       // 消灯：以降はバナーも非表示
+       battleScreenState.currentHintText = '';
+       addToLog('ヒントを非表示にしました');
+       break;
+   }
 }
 
 // 敵行動（フラッシュ効果を追加）
@@ -3594,7 +3606,15 @@ function enemyTurn() {
 export function pickNextKanji() {
   // ヒントレベルをリセット
   gameState.hintLevel = 0;
-  
+  // バナーも消去
+  if (battleScreenState && typeof battleScreenState === 'object') {
+      battleScreenState.currentHintText = '';
+  // 次の問題に進む際にヒントを完全消去
+  gameState.hintLevel = 0;
+  battleScreenState.currentHintText = '';    
+  }
+
+
   console.log('🎯 pickNextKanji() 開始 (属性システム対応)');
 
   const currentEnemy = gameState.currentEnemy;
