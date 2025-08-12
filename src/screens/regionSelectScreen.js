@@ -65,6 +65,8 @@ const regionSelectState = {
     this.canvas.addEventListener('click', this._clickHandler);
     this.canvas.addEventListener('touchstart', this._clickHandler);
     this.canvas.addEventListener('mousemove', this._mouseMoveHandler);
+
+    this.mapRect = null;
   },
 
   /**
@@ -216,13 +218,16 @@ const regionSelectState = {
     
     if (japanMapImage) {
       // 地図を画面の右半分にバランス良く表示
-      const mapX = this.canvas.width * 0.3; // 左側30%の位置から開始
-      const mapY = 100; // 上部に余白を確保
-      const mapWidth = this.canvas.width * 0.65; // 画面幅の65%を使用
-      const mapHeight = this.canvas.height - 200; // 下部に余白を確保
+      const mapWidth  = this.canvas.width * 0.65;
+      const mapHeight = this.canvas.height - 200;
+      const mapX = Math.round((this.canvas.width - mapWidth) / 2); // 中央寄せ
+      const mapY = 100;
       
       // 地図画像を描画
       this.ctx.drawImage(japanMapImage, mapX, mapY, mapWidth, mapHeight);
+      
+      // 共有用に保存
+      this.mapRect = { x: mapX, y: mapY, width: mapWidth, height: mapHeight };
       
       // 地図に軽い影効果を追加してより立体的に
       this.ctx.save();
@@ -335,6 +340,9 @@ const regionSelectState = {
     if (this.hoveredMarker) {
       this.drawRegionBoundaryHighlight(this.hoveredMarker);
     }
+
+    const baseMapX = this.canvas.width * 0.3;                 // 旧配置の基準
+    const deltaX   = this.mapRect ? (this.mapRect.x - baseMapX) : 0;
 
     regionMarkers.forEach(marker => {
       const isHovered = this.hoveredMarker === marker;
@@ -459,10 +467,10 @@ const regionSelectState = {
     
     if (boundaryImage) {
       // 地図と同じ座標・サイズで境界線画像を描画
-      const mapX = this.canvas.width * 0.3;
-      const mapY = 100;
-      const mapWidth = this.canvas.width * 0.65;
-      const mapHeight = this.canvas.height - 200;
+      const mapX = this.mapRect?.x ?? (this.canvas.width * 0.3);
+      const mapY = this.mapRect?.y ?? 100;
+      const mapWidth  = this.mapRect?.width  ?? (this.canvas.width * 0.65);
+      const mapHeight = this.mapRect?.height ?? (this.canvas.height - 200);
       
       // ホバー時のハイライト効果（点滅）
       const blinkAlpha = 0.4 + 0.3 * Math.sin(this.animationTime * 0.008);
@@ -733,8 +741,13 @@ const regionSelectState = {
     const previousHovered = this.hoveredMarker;
     this.hoveredMarker = null;
     
+    const baseMapX = this.canvas.width * 0.3;
+    const deltaX   = this.mapRect ? (this.mapRect.x - baseMapX) : 0;
+
     for (const marker of regionMarkers) {
-      const distance = Math.sqrt((worldX - marker.x) ** 2 + (worldY - marker.y) ** 2);
+      const drawX = marker.x + deltaX;
+      const drawY = marker.y;
+      const distance = Math.sqrt((worldX - drawX) ** 2 + (worldY - drawY) ** 2);
       if (distance <= 35) { // 当たり判定を少し大きく
         this.hoveredMarker = marker;
         this.canvas.style.cursor = 'pointer';
@@ -785,8 +798,13 @@ const regionSelectState = {
     const worldY = (screenY - this.camera.y) / this.camera.scale;
 
     // 地方マーカーのクリック処理
+    const baseMapX = this.canvas.width * 0.3;
+    const deltaX   = this.mapRect ? (this.mapRect.x - baseMapX) : 0;
+
     for (const marker of regionMarkers) {
-      const distance = Math.sqrt((worldX - marker.x) ** 2 + (worldY - marker.y) ** 2);
+      const drawX = marker.x + deltaX;
+      const drawY = marker.y;
+      const distance = Math.sqrt((worldX - drawX) ** 2 + (worldY - drawY) ** 2);
       if (distance <= 35) {
         // ズームアニメーションを開始
         this.startZoomAnimation(marker);

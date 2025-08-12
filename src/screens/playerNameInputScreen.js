@@ -20,7 +20,7 @@ const playerNameInputState = {
     if (this.nameInputElement) {
       this.nameInputElement.style.display = 'block';
       this.nameInputElement.value = "";
-      this.nameInputElement.maxLength = 10;
+      this.nameInputElement.maxLength = 5;
       
       // 位置調整
       const canvasRect = this.canvas.getBoundingClientRect();
@@ -50,7 +50,7 @@ const playerNameInputState = {
     ctx.fillText('なまえを にゅうりょく してください', cw / 2, 150);
     
     ctx.font = '20px "UDデジタル教科書体",sans-serif';
-    ctx.fillText('(10もじまで)', cw / 2, 200);
+    ctx.fillText('(5もじまで)', cw / 2, 200);
 
     // 入力欄の枠（HTMLの入力欄が見えるように透明な枠を描画）
     ctx.strokeStyle = 'white';
@@ -136,8 +136,14 @@ const playerNameInputState = {
     const trimmedName = this.nameInputElement.value.trim();
     
     // 入力値の検証
-    if (trimmedName === "" || trimmedName === "ななしのごんべえ" || trimmedName === "ゲスト" || trimmedName === "新規プレイヤー") {
-      alert("有効な なまえを いれてください。");
+    if (
+      trimmedName === "" ||
+      trimmedName.length > 5 ||                     // ← 5文字超は不可
+      trimmedName === "ななしのごんべえ" ||
+      trimmedName === "ゲスト" ||
+      trimmedName === "新規プレイヤー"
+    ) {
+      alert("有効な なまえを いれてください。（5もじまで）");
       this.nameInputElement.value = "";
       this.nameInputElement.focus();
       return;

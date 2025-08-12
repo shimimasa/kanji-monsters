@@ -158,25 +158,36 @@ const stageSelectScreenState = {
     // uiRootを安全に取得
     const uiRoot = getUiRoot();
 
-    // --- ① 色弱モード切替トグル ------------------
-    const cbToggle = document.createElement('label');
-    cbToggle.innerHTML = `
-      <input type="checkbox" id="cbMode">
-      <span></span>
-    `;
-    uiRoot.appendChild(cbToggle);
-    // 追加: 後で削除できるようにプロパティとして保持
-    this.cbToggle = cbToggle;
+    // 追加: 画面先頭の定数群の近くに
+    const SHOW_STAGE_DEBUG_TOGGLES = false;
 
-    // --- ② フォント+20% トグル ---------------------
-    const fontToggle = document.createElement('label');
-    fontToggle.innerHTML = `
-      <input type="checkbox" id="bigFont">
-      <span>文字サイズ +20%</span>
-    `;
-    uiRoot.appendChild(fontToggle);
-    // 追加: 後で削除できるようにプロパティとして保持
-    this.fontToggle = fontToggle;
+    if (SHOW_STAGE_DEBUG_TOGGLES) {
+      // --- ① 色弱モード切替トグル ------------------
+      const cbToggle = document.createElement('label');
+      cbToggle.innerHTML = `
+        <input type="checkbox" id="cbMode">
+        <span></span>
+      `;
+      uiRoot.appendChild(cbToggle);
+      this.cbToggle = cbToggle;
+
+      // --- ② フォント+20% トグル ---------------------
+      const fontToggle = document.createElement('label');
+      fontToggle.innerHTML = `
+        <input type="checkbox" id="bigFont">
+        <span>文字サイズ +20%</span>
+      `;
+      uiRoot.appendChild(fontToggle);
+      this.fontToggle = fontToggle;
+    } else {
+      // 念のため既存が残っていれば除去（他画面から戻った時の安全策）
+      ['bigFont','cbMode'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input && input.parentElement) input.parentElement.remove();
+      });
+      this.cbToggle = null;
+      this.fontToggle = null;
+    }
 
     // 選択中のステージをクリア
     this.selectedStage = null;
