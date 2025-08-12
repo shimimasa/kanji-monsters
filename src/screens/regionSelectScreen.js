@@ -737,29 +737,31 @@ const regionSelectState = {
     const worldX = (screenX - this.camera.x) / this.camera.scale;
     const worldY = (screenY - this.camera.y) / this.camera.scale;
 
-    // マーカーとの当たり判定
-    const previousHovered = this.hoveredMarker;
-    this.hoveredMarker = null;
+        // マーカーとの当たり判定
+        const previousHovered = this.hoveredMarker;
+        this.hoveredMarker = null;
     
-    const baseMapX = this.canvas.width * 0.3;
-    const deltaX   = this.mapRect ? (this.mapRect.x - baseMapX) : 0;
-
-    for (const marker of regionMarkers) {
-      const drawX = marker.x + deltaX;
-      const drawY = marker.y;
-      const distance = Math.sqrt((worldX - drawX) ** 2 + (worldY - drawY) ** 2);
-      if (distance <= 35) { // 当たり判定を少し大きく
-        this.hoveredMarker = marker;
-        this.canvas.style.cursor = 'pointer';
-        
-        // 新しくホバーした場合はホバー音を再生
-        if (previousHovered !== marker) {
-          publish('playSE', 'hover');
+        // 画像中央寄せ分のXオフセットを補正して判定
+        const baseMapX    = this.canvas.width * 0.3;                 // 旧基準
+        const currentMapX = this.mapRect?.x ?? baseMapX;             // 現在の地図X（中央寄せ後）
+        const deltaX      = currentMapX - baseMapX;
+    
+        for (const marker of regionMarkers) {
+          const drawX = marker.x + deltaX;
+          const drawY = marker.y;
+          const distance = Math.sqrt((worldX - drawX) ** 2 + (worldY - drawY) ** 2);
+          if (distance <= 35) { // 当たり判定を少し大きく
+            this.hoveredMarker = marker;
+            this.canvas.style.cursor = 'pointer';
+    
+            // 新しくホバーした場合はホバー音を再生
+            if (previousHovered !== marker) {
+              publish('playSE', 'hover');
+            }
+            break;
+          }
         }
-        break;
-      }
-    }
-
+    
     if (!this.hoveredMarker) {
       this.canvas.style.cursor = 'default';
     }
@@ -797,20 +799,21 @@ const regionSelectState = {
     const worldX = (screenX - this.camera.x) / this.camera.scale;
     const worldY = (screenY - this.camera.y) / this.camera.scale;
 
-    // 地方マーカーのクリック処理
-    const baseMapX = this.canvas.width * 0.3;
-    const deltaX   = this.mapRect ? (this.mapRect.x - baseMapX) : 0;
-
-    for (const marker of regionMarkers) {
-      const drawX = marker.x + deltaX;
-      const drawY = marker.y;
-      const distance = Math.sqrt((worldX - drawX) ** 2 + (worldY - drawY) ** 2);
-      if (distance <= 35) {
-        // ズームアニメーションを開始
-        this.startZoomAnimation(marker);
-        return;
-      }
-    }
+        // 地方マーカーのクリック処理（中央寄せ補正込み）
+        const baseMapX    = this.canvas.width * 0.3;                 // 旧基準
+        const currentMapX = this.mapRect?.x ?? baseMapX;             // 現在の地図X（中央寄せ後）
+        const deltaX      = currentMapX - baseMapX;
+    
+        for (const marker of regionMarkers) {
+          const drawX = marker.x + deltaX;
+          const drawY = marker.y;
+          const distance = Math.sqrt((worldX - drawX) ** 2 + (worldY - drawY) ** 2);
+          if (distance <= 35) {
+            // ズームアニメーションを開始
+            this.startZoomAnimation(marker);
+            return;
+          }
+        }
 
     // 戻るボタンのクリック処理（カメラ変換の影響を受けない）
     if (isMouseOverRect(screenX, screenY, backButton)) {

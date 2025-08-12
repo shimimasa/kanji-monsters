@@ -394,7 +394,9 @@ const battleScreenState = {
       // ヒント初期化
       gameState.hintLevel = 0;
       this.currentHintText = '';
-      
+      // 下部ヘルプ（ピル型）初期化＆初回ガイド
+      this.helpHint = { visible: true, text: 'Enterキーでこうげき', timer: 120, alpha: 1 };
+
       console.log("✅ battleScreen.enter() 完了");
       
     } catch (error) {
@@ -1380,19 +1382,55 @@ if (gameState.currentKanji) {
       false
     );
     
-    // 選択中のコマンドに関する説明を表示
-    const helpText = {
-      'attack': 'Enterキーで攻撃を繰り返し',
-      'heal': 'Enterキーで回復を繰り返し',
-      'hint': 'Enterキーでヒントを表示'
-    };
-    
-    // 画面下部に選択中のコマンドのヘルプテキストを表示
-    this.ctx.font = '14px "UDデジタル教科書体", sans-serif';
-    this.ctx.fillStyle = 'white';
-    this.ctx.textAlign = 'center';
-    this.ctx.fillText(helpText[mode], this.canvas.width / 2, this.canvas.height - 20);
+    // 画面下部のヘルプ（ピル型、一時表示＋フェード）
+if (!this.helpHint) this.helpHint = { visible: false, text: '', timer: 0, alpha: 0 };
+const hh = this.helpHint;
+if (hh.visible) {
+  const FADE = 24; // 最後の24Fでフェード
+  hh.timer--;
+  if (hh.timer <= 0) {
+    hh.visible = false;
+  } else {
+    hh.alpha = (hh.timer < FADE) ? (hh.timer / FADE) : 1;
 
+    const ctx = this.ctx;
+    const fsBase = 18;
+    const fs = Math.max(16, Math.min(18, Math.round(fsBase * (0.95 + 0.05 * hh.alpha))));
+    ctx.save();
+    ctx.font = `bold ${fs}px "UDデジタル教科書体", sans-serif`;
+    const padX = 14, padY = 8;
+    const textW = Math.ceil(ctx.measureText(hh.text).width);
+    const w = textW + padX * 2;
+    const h = fs + padY * 2;
+    const x = (this.canvas.width - w) / 2;
+    const y = this.canvas.height - 24 - h;
+
+    ctx.globalAlpha = hh.alpha;
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 2;
+
+    // 丸角ピル
+    const r = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+    ctx.fill();
+
+    // テキスト
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(hh.text, x + w / 2, y + h / 2);
+    ctx.restore();
+  }
+}
 
         // 前回漢字パネルのオーバーレイ（バッジ/フラッシュ）
     if (battleState.lastAnswered) {
@@ -3959,6 +3997,8 @@ function addToLog(message) {
 // 以下の関数をbattleScreenStateオブジェクトの外部に定義
 // これらのヘルパー関数を追加
 function onAttackHandler() {
+    // 下部ヘルプ: こうげき
+    battleScreenState.helpHint = { visible: true, text: 'Enterキーでこうげき', timer: 120, alpha: 1 };
   // 関数内で使用する変数や関数を直接参照せず、
   // battleScreenStateのメソッドを通して安全に呼び出す
   try {
@@ -3969,9 +4009,12 @@ function onAttackHandler() {
     console.error('攻撃処理でエラーが発生しました:', error);
     battleState.inputEnabled = true;
   }
+  
 }
 
 function onHealHandler() {
+    // 下部ヘルプ: かいふく
+    battleScreenState.helpHint = { visible: true, text: 'Enterキーでかいふく', timer: 120, alpha: 1 };
   try {
     battleScreenState.handleHeal();
   } catch (error) {
@@ -3981,6 +4024,8 @@ function onHealHandler() {
 }
 
 function onHintHandler() {
+    // 下部ヘルプ: ヒント
+    battleScreenState.helpHint = { visible: true, text: 'Enterキーでヒント', timer: 120, alpha: 1 };
   try {
     battleScreenState.handleHint();
   } catch (error) {
