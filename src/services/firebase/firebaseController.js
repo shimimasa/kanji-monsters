@@ -240,3 +240,42 @@ export async function loadAllStageClearStatus() {
     }
 }
 
+export async function deleteUserData(uid) {
+  if (!db || !uid) {
+    console.warn('deleteUserData: db or uid missing');
+    return false;
+  }
+  try {
+    const userRef = db.collection('users').doc(uid);
+
+    // profile/playerStats を削除
+    try {
+      await userRef.collection('profile').doc('playerStats').delete();
+      console.log('Firestore: profile/playerStats deleted');
+    } catch (e) {
+      console.warn('Firestore: profile/playerStats delete skipped or failed', e);
+    }
+
+    // progress コレクション配下の全ドキュメント削除
+    try {
+      const progressSnap = await userRef.collection('progress').get();
+      if (!progressSnap.empty) {
+        const batch = db.batch();
+        progressSnap.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+        console.log(`Firestore: progress deleted (${progressSnap.size} docs)`);
+      }
+    } catch (e) {
+      console.warn('Firestore: progress delete skipped or failed', e);
+    }
+
+    // 必要なら他ドキュメントも削除（存在する場合のみ）
+    // 例: state ドキュメント等、運用に合わせて拡張可能
+
+    return true;
+  } catch (e) {
+    console.error('deleteUserData failed:', e);
+    return false;
+  }
+}
+

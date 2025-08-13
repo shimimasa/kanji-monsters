@@ -52,10 +52,6 @@ const settingsScreenState = {
           const audioPanel = this.createAudioPanel();
           settingsContainer.appendChild(audioPanel);
           
-          // 表示・アクセシビリティ設定パネル
-          const displayPanel = this.createDisplayPanel();
-          settingsContainer.appendChild(displayPanel);
-          
           // ボタンセクションを作成
           const buttonSection = this.createButtonSection();
           settingsContainer.appendChild(buttonSection);
@@ -563,8 +559,8 @@ const settingsScreenState = {
         // 成功メッセージ表示
         alert('全てのデータが正常にリセットされました。\nタイトル画面に戻ります。');
         
-        // タイトル画面へ遷移
-        publish('changeScreen', 'title');
+        // 完全リセットのためリロード
+        window.location.reload();
         
       } catch (error) {
         console.error('データリセット処理中にエラーが発生しました:', error);
@@ -594,6 +590,8 @@ const settingsScreenState = {
         key.startsWith('dex_') ||
         key.startsWith('battle_') ||
         key.startsWith('achievement_') ||
+        key.startsWith('clear_') ||           // ← 追加: ステージクリアフラグ
+        key === 'kanjiGameSave' ||            // ← 追加: メインセーブ
         key === 'bgmVolume' ||
         key === 'seVolume' ||
         key === 'cbMode' ||

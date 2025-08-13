@@ -186,9 +186,9 @@ function drawAchievementNotifications(ctx) {
   // ─────────── プレイヤー名自動入力 ───────────
   // データ未設定時に名前を聞いて gameState にセット、Firestore に書き込む
   if (!gameState.playerName || ['ゲスト', 'ななしのごんべえ', '新規プレイヤー'].includes(gameState.playerName)) {
-    const inputName = prompt('プレイヤー名を入力してください（10文字以内）', '');
+    const inputName = prompt('プレイヤー名を入力してください（5文字以内）', '');
     if (inputName) {
-      const name = inputName.trim().slice(0, 10);
+      const name = inputName.trim().slice(0, 5);
       updatePlayerName(name);
       if (user && user.uid) {
           await initializeNewPlayerData(user.uid, name);
@@ -254,4 +254,16 @@ subscribe('addToKanjiDex', id => {
 // ... アプリ初期化後などの適切な位置で ...
 subscribe('addToReview', id => {
   reviewQueue.add(id);
+});
+
+// Firestoreユーザーデータ削除イベント
+subscribe('deleteUserData', async (uid, callback) => {
+  try {
+    const { deleteUserData } = await import('./services/firebase/firebaseController.js');
+    const ok = await deleteUserData(uid);
+    callback && callback({ success: !!ok });
+  } catch (e) {
+    console.error('deleteUserData handler failed:', e);
+    callback && callback({ success: false, error: e?.message || 'unknown error' });
+  }
 });

@@ -113,25 +113,27 @@ const regionSelectState = {
     this.zoomProgress = 0;
     this.zoomTarget = targetMarker;
     this.zoomStartTime = this.animationTime;
-    
-    // 新しい地図位置に合わせてズーム先の座標とスケールを計算
+
     const canvasCenterX = this.canvas.width / 2;
     const canvasCenterY = this.canvas.height / 2;
-    
-    // ズーム時のスケール（地方によって微調整）
+
     let targetScale = 2.2;
-    if (targetMarker.grade === 1) { // 北海道は少し大きく
-      targetScale = 2.5;
-    } else if (targetMarker.grade === 4) { // 中部は広いので少し小さく
-      targetScale = 2.0;
-    }
-    
-    // マーカーが画面中央に来るようにカメラ位置を計算
-    this.camera.targetX = canvasCenterX - (targetMarker.x * targetScale);
-    this.camera.targetY = canvasCenterY - (targetMarker.y * targetScale);
+    if (targetMarker.grade === 1) targetScale = 2.5;
+    else if (targetMarker.grade === 4) targetScale = 2.0;
+
+    const map = this.mapRect ?? {
+      x: this.canvas.width * 0.3,
+      y: 100,
+      width: this.canvas.width * 0.65,
+      height: this.canvas.height - 200
+    };
+    const targetXWorld = map.x + targetMarker.px * map.width;
+    const targetYWorld = map.y + targetMarker.py * map.height;
+
+    this.camera.targetX = canvasCenterX - (targetXWorld * targetScale);
+    this.camera.targetY = canvasCenterY - (targetYWorld * targetScale);
     this.camera.targetScale = targetScale;
-    
-    // ズーム効果音を再生
+
     publish('playSE', 'decide');
   },
 
