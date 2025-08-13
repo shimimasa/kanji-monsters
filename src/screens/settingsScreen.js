@@ -620,16 +620,23 @@ const settingsScreenState = {
         // Firebaseコントローラーを通じてユーザーデータを削除
         console.log(`Firebase user data deletion started for UID: ${uid}`);
         
-        // deleteUserData関数をFirebaseコントローラーから呼び出し
-        publish('deleteUserData', uid, async (result) => {
-          if (result && result.success) {
-            console.log('Firebase user data cleared successfully');
-            resolve();
-          } else {
-            console.error('Failed to clear Firebase user data:', result?.error || 'Unknown error');
-            reject(new Error(result?.error || 'Failed to delete user data'));
-          }
-        });
+                // deleteUserData関数をFirebaseコントローラーから呼び出し
+
+          publish('deleteUserData', {
+            uid,
+            callback: async (result) => {
+               if (result && result.success) {
+                 console.log('Firebase user data cleared successfully');
+  
+                resolve();
+               } else {
+                 console.error('Failed to clear Firebase user data:', result?.error || 'Unknown error');
+  
+                reject(new Error(result?.error || 'Failed to delete user data'));
+               }
+  
+            }
+          });
         
         // タイムアウト処理（10秒）
         setTimeout(() => {
