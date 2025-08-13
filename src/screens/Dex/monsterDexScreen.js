@@ -156,7 +156,6 @@ const monsterDexState = {
   currentRegionFilter: 'all', // 'all', 1, 2, 3, 4, 5, 6
   currentSortOrder: 'id', // 'id' (図鑑番号順), 'name' (五十音順)
 
-  /** 画面表示時の初期化 */
   enter(canvas) {
     this.canvas = canvas || document.getElementById('gameCanvas');
     this.canvas.style.display = 'none'; // Canvasは使わないので非表示
@@ -164,8 +163,14 @@ const monsterDexState = {
     // データの読み込み
     this.dexSet = loadDex();
     this.seenSet = loadSeenMonsters();
-    this.allMonsterIds = getAllMonsterIds();
-    
+   // 小学生6学年のみ（世界編・ことわざは除外）
+   this.allMonsterIds = getAllMonsterIds().filter(id => {
+     const m = getMonsterById(id);
+     const idStr = String(id);
+     const isWorld = (m && m.grade >= 7) || idStr.startsWith('PRV-'); // 二重のガード
+     return m && !isWorld;
+   });
+
     // 初期状態では全てのモンスターを表示
     this.applyFiltersAndSort();
     this.currentPage = 0; // 常に最初のページから表示
