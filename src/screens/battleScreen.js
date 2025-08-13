@@ -3129,18 +3129,22 @@ function onAttack() {
       readingType = gameState.currentEnemy.weakness;
     }
     
-    // 敵の弱点と一致するかチェック
-    if (readingType && gameState.currentEnemy.weakness === readingType) {
-      isWeaknessHit = true;
-      dmg = Math.floor(dmg * 1.5);
-      battleState.log.push('弱点にヒット！大ダメージ！');
-      publish('playSE', 'weak'); // ← 追加
-      
-      // 弱点ヒット統計データの更新
-      gameState.playerStats.weaknessHits++;
-      
-      console.log(`🎯 弱点ヒット! 敵の弱点: ${gameState.currentEnemy.weakness}, プレイヤーの読み: ${readingType}`);
-    }
+        // 敵の弱点と一致するかチェック
+        if (readingType && gameState.currentEnemy.weakness === readingType) {
+          isWeaknessHit = true;
+          dmg = Math.floor(dmg * 1.5);
+          battleState.log.push('弱点にヒット！大ダメージ！');
+    
+          // 追加: ボスのシールドが残っているときは弱点SEを鳴らさない
+          const enemy = gameState.currentEnemy;
+          if (!(enemy.isBoss && enemy.shieldHp > 0)) {
+            publish('playSE', 'weak');
+          }
+    
+          // 弱点ヒット統計データの更新
+          gameState.playerStats.weaknessHits++;
+          console.log(`🎯 弱点ヒット! 敵の弱点: ${enemy.weakness}, プレイヤーの読み: ${readingType}`);
+        }
     
     // 5連続正解ボーナス判定
     if (battleState.comboCount === 5) {
@@ -3169,8 +3173,6 @@ function onAttack() {
           if (gameState.currentEnemy.shieldHp === 0) {
             battleState.log.push('ボスの防御が崩れた！');
           }
-
-
           
           // シールドを削った場合は敵にダメージを与えない
           dmg = 0;

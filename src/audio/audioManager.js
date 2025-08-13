@@ -95,7 +95,8 @@ export class AudioManager {
         master:  '/assets/audio/se_master.mp3',
         shield1: '/assets/audio/se_shield1.mp3',
         shield2: '/assets/audio/se_shield2.mp3',
-        shield3: '/assets/audio/se_shield3.mp3'
+        shield3: '/assets/audio/se_shield3.mp3',
+        levelUp: '/assets/audio/se_level.mp3'
       }
     };
   
