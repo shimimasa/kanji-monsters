@@ -918,11 +918,19 @@ const battleScreenState = {
       return out;
     };
 
-    // クリップ
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.rect(msgX + 4, msgY + 24, msgW - 8, msgH - 30);
-    this.ctx.clip();
+        // クリップ
+        this.ctx.save();
+
+        // 背景と枠（視認性向上）
+        this.ctx.fillStyle = 'rgba(20,20,20,0.85)';
+        this.ctx.fillRect(msgX, msgY, msgW, msgH);
+        this.ctx.strokeStyle = '#B8860B';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(msgX, msgY, msgW, msgH);
+    
+        this.ctx.beginPath();
+        this.ctx.rect(msgX + 4, msgY + 24, msgW - 8, msgH - 30);
+        this.ctx.clip();
 
     // メッセージを折り返して平坦化（セグメント列をtop->down順で生成）
     const iconSize = 16;
@@ -983,6 +991,7 @@ const battleScreenState = {
       let textX = baseX;
       if (!drawnIconFor.has(seg.msgIndex) && seg.firstSeg && seg.iconType !== 'none') {
         if (seg.iconType === 'check') {
+          
           this.ctx.save();
           this.ctx.fillStyle = '#2ecc71';
           this.ctx.font = `${iconSize}px sans-serif`;
@@ -1024,16 +1033,17 @@ const battleScreenState = {
         drawnIconFor.add(seg.msgIndex);
       }
 
+      const fillColor = seg.color || '#F3E9D7';
       this.drawTextWithOutline(
         seg.text,
         textX,
         drawY,
-        seg.color,
-        'black',
-        '14px "UDデジタル教科書体", sans-serif',
+        fillColor,
+        'rgba(0,0,0,0.9)',
+        '16px "UDデジタル教科書体", sans-serif',
         'left',
         'top',
-        1
+        3
       );
       drawY += lineHeight;
     });
