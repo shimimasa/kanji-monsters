@@ -3616,44 +3616,50 @@ function onHeal() {
 
 // ヒント切替
 function onHint() {
-  // 既に消灯状態なら何もしない（重複通知防止）
-  if (gameState.hintLevel >= 4) return;
-  const next = (gameState.hintLevel || 0) + 1;
-  gameState.hintLevel = Math.min(4, next);
+  const current = Number(gameState.hintLevel || 0);
+  if (current >= 4) {
+    addToLog('ヒントはここまで！');
+    return;
+  }
+  const level = current + 1;
+  gameState.hintLevel = level;
 
-   // ヒントレベルに応じたメッセージをログに表示
-   switch (gameState.hintLevel) {
-     case 1:
-       addToLog(`ヒント（基本）: 画数は${gameState.currentKanji.strokes}`);
-       break;
-     case 2:
-       // 音読みと訓読みのどちらかをランダムに選んで部分的に表示
-       const isOnyomi = Math.random() > 0.5;
-       const readings = isOnyomi ? gameState.currentKanji.onyomi : gameState.currentKanji.kunyomi;
-       
-       if (readings && readings.length > 0) {
-         // 読みの最初の1文字を表示
-         const firstReading = readings[0];
-         const hintText = firstReading.substring(0, 1) + '○○';
-         addToLog(`ヒント（読み）: ${isOnyomi ? '音読み' : '訓読み'}は「${hintText}」から始まる`);
-   } else {
-         // 該当する読みがない場合は別のヒント
-         addToLog(`ヒント（読み）: ${isOnyomi ? '訓読み' : '音読み'}で読むことが多い`);
-       }
-       break;
-     case 3:
-       addToLog(`ヒント（意味）: ${gameState.currentKanji.meaning}`);
-       break;
-     case 4:
-       // 既に消灯状態なら何もしない（重複通知防止）
-       if (gameState.hintLevel >= 4) return;
-       const next = (gameState.hintLevel || 0) + 1;
-       gameState.hintLevel = Math.min(4, next);
-       hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
-       hintColor = '#e74c3c'; // 赤色
-       break;
-   }
+  const k = gameState.currentKanji || {};
+  const onyomi = Array.isArray(k.onyomi) ? k.onyomi : [];
+  const kunyomi = Array.isArray(k.kunyomi) ? k.kunyomi : [];
+
+  switch (level) {
+    case 1: {
+      const strokes = k.strokes ?? '?';
+      addToLog(`ヒント（基本）: 画数は${strokes}`);
+      break;
+    }
+    case 2: {
+      const useOn = (onyomi.length > 0 && (Math.random() >= 0.5 || kunyomi.length === 0));
+      const list = useOn ? onyomi : kunyomi;
+      const first = list[0] || '';
+      const masked = first ? first.substring(0, 1) + '○○' : '不明';
+      addToLog(`ヒント（読み）: ${useOn ? '音読み' : '訓読み'}は「${masked}」から始まる`);
+      break;
+    }
+    case 3: {
+      addToLog(`ヒント（意味）: ${k.meaning ?? '（準備中）'}`);
+      break;
+    }
+    case 4: {
+      // 最終ヒント: 読みのどちらかをフル提示
+      if (onyomi.length > 0 || kunyomi.length > 0) {
+        const useOn = onyomi.length > 0 ? (Math.random() >= 0.5 || kunyomi.length === 0) : false;
+        const list = useOn ? onyomi : kunyomi;
+        addToLog(`ヒント（決め手）: ${useOn ? '音読み' : '訓読み'}は「${list[0]}」`);
+      } else {
+        addToLog('ヒント（決め手）: データがありません');
+      }
+      break;
+    }
+  }
 }
+
 
 // 敵行動（フラッシュ効果を追加）
 function enemyTurn() {

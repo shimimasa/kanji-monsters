@@ -1070,44 +1070,60 @@ const stageSelectScreenState = {
     } else {
       // 通常モード（学年別）の処理
       
-      // ステージボタンのクリック判定（1回目は選択、2回目で遷移）
-      if (this.stageButtons) {
-        for (const button of this.stageButtons) {
-          if (isMouseOverRect(x, y, button)) {
-            publish('playSE', 'decide');
-            
-            // すでに選択中のステージをクリックした場合は遷移
-            if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
-              gameState.currentStageId = button.id;
-              resetStageProgress(button.id);
-              publish('changeScreen', 'stageLoading');
-            } else {
-              // 1回目のクリック: ステージを選択状態にする
-              this.selectedStage = button.stage;
+      for (const button of this.stageButtons) {
+        if (isMouseOverRect(x, y, button)) {
+          publish('playSE', 'decide');
+          
+          // すでに選択中のステージをクリックした場合は遷移
+          if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
+            const targetId = button.id;
+            const mBonus = /^bonus_g(\d+)$/i.exec(targetId);
+            if (mBonus) {
+              const g = parseInt(mBonus[1], 10);
+              if (!isBonusUnlocked(g)) {
+                publish('playSE', 'wrong');
+                alert('この学年ボーナスはまだ解放されていません。\n通常ステージをすべてクリアすると解放されます。');
+                return;
+              }
             }
-            return;
+            gameState.currentStageId = targetId;
+            resetStageProgress(targetId);
+            publish('changeScreen', 'stageLoading');
+          } else {
+            // 1回目のクリック: ステージを選択状態にする
+            this.selectedStage = button.stage;
           }
+          return;
         }
       }
 
       // 各ステージマーカーのクリック判定（1回目は選択、2回目で遷移）
       if (gameState.currentGrade !== 0) {
         for (const stage of this.stages) {
-          if (!stage.pos) continue;
-          const { x: sx, y: sy } = stage.pos;
-          if (x >= sx && x <= sx + MARKER_SIZE && y >= sy && y <= sy + MARKER_SIZE) {
-            publish('playSE', 'decide');
-            
-            // すでに選択中のステージをクリックした場合は遷移
-            if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
-              gameState.currentStageId = stage.stageId;
-              resetStageProgress(stage.stageId);
-              publish('changeScreen', 'stageLoading');
-            } else {
-              // 1回目のクリック: ステージを選択状態にする
-              this.selectedStage = stage;
+          if (stage.pos) {
+            const { x, y } = stage.pos;
+            if (screenX >= x - MARKER_SIZE/2 && screenX <= x + MARKER_SIZE/2 && 
+                screenY >= y - MARKER_SIZE/2 && screenY <= y + MARKER_SIZE/2) {
+              publish('playSE', 'decide');
+              if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
+                const targetId = stage.stageId;
+                const mBonus = /^bonus_g(\d+)$/i.exec(targetId);
+                if (mBonus) {
+                  const g = parseInt(mBonus[1], 10);
+                  if (!isBonusUnlocked(g)) {
+                    publish('playSE', 'wrong');
+                    alert('この学年ボーナスはまだ解放されていません。\n通常ステージをすべてクリアすると解放されます。');
+                    return;
+                  }
+                }
+                gameState.currentStageId = targetId;
+                resetStageProgress(targetId);
+                publish('changeScreen', 'stageLoading');
+              } else {
+                this.selectedStage = stage;
+              }
+              return;
             }
-            return;
           }
         }
       }
