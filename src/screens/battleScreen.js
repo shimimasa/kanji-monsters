@@ -862,6 +862,10 @@ this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
     const start = Math.max(0, len - N - this.logOffset);
     let lines = battleState.log.slice(start, start + N);
 
+   // 新しい順に上から表示（必要なければ false）
+   const newestFirst = true;
+   const renderLines = newestFirst ? [...lines].reverse() : lines;
+
     this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'top';
@@ -946,7 +950,7 @@ this.ctx.clip();
     const iconMargin = 4;
 
     const segments = [];
-    lines.forEach((l, i) => {
+    renderLines.forEach((l, i) => {
       const color = this.getMessageColor(l);
 
       // アイコン種別判定（従来ロジックを踏襲）
@@ -2183,7 +2187,7 @@ this.canvas.addEventListener('touchend', this._touchEndHandler);
     this.canvas.removeEventListener('touchstart', this._clickHandler);
     this.canvas.removeEventListener('mousemove', this._mousemoveHandler);
     this.canvas.removeEventListener('wheel', this._wheelHandler);
-// 追加
+// 追加: タッチイベントリスナーを解除
 this.canvas.removeEventListener('touchstart', this._touchStartHandler);
 this.canvas.removeEventListener('touchmove', this._touchMoveHandler);
 this.canvas.removeEventListener('touchend', this._touchEndHandler);
