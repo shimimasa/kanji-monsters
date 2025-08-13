@@ -1047,43 +1047,43 @@ this.ctx.clip();
     });
     this.ctx.restore();
     
-    // 右側スクロールバー（トラック＋サム）
-    const trackW = 12;
-    const trackX = msgX + msgW - trackW - 6;
-    const trackY = msgY + 26;
-    const trackH = msgH - 34;
+        // 右側スクロールバー（トラック＋サム）
+        const trackW = 12;
+        const trackX = msgX + msgW - trackW - 6;
+        const trackY = msgY + 26;
+        const trackH = msgH - 34;
     
-    // スクロール量（メッセージ件数ベース）
-    const N = 10;
-    const len = battleState.log.length;
-    const maxOffset = Math.max(0, len - N);
+        // スクロール量（メッセージ件数ベース）: 上で算出した N/len/maxOffset を再利用
+        // const N = 10;
+        // const len = battleState.log.length;
+        // const maxOffset = Math.max(0, len - N);
     
-    // サム高さ（可視割合に応じて決定）
-    const minThumbH = 24;
-    const thumbH = Math.max(minThumbH, Math.floor(trackH * (N / Math.max(N, len))));
-    const progress = maxOffset > 0 ? (this.logOffset || 0) / maxOffset : 0;
-    const thumbY = trackY + Math.floor((trackH - thumbH) * progress);
+        // サム高さ（可視割合に応じて決定）
+        const minThumbH = 24;
+        const thumbH = Math.max(minThumbH, Math.floor(trackH * (N / Math.max(N, len))));
+        const progress = maxOffset > 0 ? (this.logOffset || 0) / maxOffset : 0;
+        const thumbY = trackY + Math.floor((trackH - thumbH) * progress);
     
-    // トラック
-    this.ctx.fillStyle = 'rgba(0,0,0,0.35)';
-    this.ctx.fillRect(trackX, trackY, trackW, trackH);
-    this.ctx.strokeStyle = '#B8860B';
-    this.ctx.lineWidth = 1;
-    this.ctx.strokeRect(trackX, trackY, trackW, trackH);
+        // トラック
+        this.ctx.fillStyle = 'rgba(0,0,0,0.35)';
+        this.ctx.fillRect(trackX, trackY, trackW, trackH);
+        this.ctx.strokeStyle = '#B8860B';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(trackX, trackY, trackW, trackH);
     
-    // サム
-    this.ctx.fillStyle = '#D6A650';
-    this.ctx.fillRect(trackX + 1, thumbY, trackW - 2, thumbH);
-    this.ctx.strokeStyle = '#8B5A2B';
-    this.ctx.lineWidth = 1;
-    this.ctx.strokeRect(trackX + 1, thumbY, trackW - 2, thumbH);
+        // サム
+        this.ctx.fillStyle = '#D6A650';
+        this.ctx.fillRect(trackX + 1, thumbY, trackW - 2, thumbH);
+        this.ctx.strokeStyle = '#8B5A2B';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(trackX + 1, thumbY, trackW - 2, thumbH);
     
-    // イベント用に保持
-    this.logScrollbar = {
-      trackX, trackY, trackW, trackH,
-      thumbX: trackX + 1, thumbY, thumbW: trackW - 2, thumbH,
-      maxOffset
-    };
+        // イベント用に保持
+        this.logScrollbar = {
+          trackX, trackY, trackW, trackH,
+          thumbX: trackX + 1, thumbY, thumbW: trackW - 2, thumbH,
+          maxOffset
+        };
 
         // スクロールヒント（内容があふれる場合のみ・初回だけ表示して自動フェード）
         if (len > N) {
