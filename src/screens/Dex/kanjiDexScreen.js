@@ -178,9 +178,15 @@ const kanjiDexScreen = {
     gradeLabel.className = 'kanji-grade-label';
     gradeLabel.textContent = '学年：';
     gradeSelect.className = 'kanji-grade-filter';
+
+    const labelForGrade = (g) => {
+      if (g <= 6) return `${g}年生`;
+      return ({ 7: '中1', 8: '中2', 9: '中3', 10: '高校' })[g] || `${g}`;
+    };
+
     let opts = '<option value="all">すべて</option>';
     for (let g = 1; g <= 10; g++) {
-      opts += `<option value="${g}">${g}年生</option>`;
+      opts += `<option value="${g}">${labelForGrade(g)}</option>`;
     }
     gradeSelect.innerHTML = opts;
     gradeSelect.value = this.gradeFilter;
