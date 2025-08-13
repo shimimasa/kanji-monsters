@@ -257,13 +257,16 @@ subscribe('addToReview', id => {
 });
 
 // Firestoreユーザーデータ削除イベント
-subscribe('deleteUserData', async (uid, callback) => {
-  try {
-    const { deleteUserData } = await import('./services/firebase/firebaseController.js');
-    const ok = await deleteUserData(uid);
-    callback && callback({ success: !!ok });
-  } catch (e) {
-    console.error('deleteUserData handler failed:', e);
-    callback && callback({ success: false, error: e?.message || 'unknown error' });
-  }
-});
+
+   subscribe('deleteUserData', async (payload) => {
+     try {
+       const { uid, callback } = payload || {};
+       const { deleteUserData } = await import('./services/firebase/firebaseController.js');
+       const ok = uid ? await deleteUserData(uid) : false;
+       callback && callback({ success: !!ok });
+     } catch (e) {
+       console.error('deleteUserData handler failed:', e);
+       if (payload && payload.callback) payload.callback({ success: false, error: e?.message || 'unknown error' });
+     }
+   });
+;

@@ -613,36 +613,27 @@ const settingsScreenState = {
     console.log(`LocalStorage cleaned: ${keysToRemove.length} keys removed`);
   },
 
-  /** Firebase Firestoreのユーザーデータを削除 - 完全実装 */
   async _clearFirebaseUserData(uid) {
     return new Promise(async (resolve, reject) => {
       try {
-        // Firebaseコントローラーを通じてユーザーデータを削除
         console.log(`Firebase user data deletion started for UID: ${uid}`);
-        
-                // deleteUserData関数をFirebaseコントローラーから呼び出し
-
-          publish('deleteUserData', {
-            uid,
-            callback: async (result) => {
-               if (result && result.success) {
-                 console.log('Firebase user data cleared successfully');
-  
-                resolve();
-               } else {
-                 console.error('Failed to clear Firebase user data:', result?.error || 'Unknown error');
-  
-                reject(new Error(result?.error || 'Failed to delete user data'));
-               }
-  
+       const to = setTimeout(() => {
+         reject(new Error('Firebase data deletion timeout'));
+       }, 10000);
+       publish('deleteUserData', {
+          uid,
+          callback: async (result) => {
+            if (result && result.success) {
+              console.log('Firebase user data cleared successfully');
+             clearTimeout(to);
+            resolve();
+            } else {
+              console.error('Failed to clear Firebase user data:', result?.error || 'Unknown error');
+             clearTimeout(to);
+            reject(new Error(result?.error || 'Failed to delete user data'));
             }
-          });
-        
-        // タイムアウト処理（10秒）
-        setTimeout(() => {
-          reject(new Error('Firebase data deletion timeout'));
-        }, 10000);
-        
+          }
+        });
       } catch (error) {
         console.error('Error in _clearFirebaseUserData:', error);
         reject(error);
