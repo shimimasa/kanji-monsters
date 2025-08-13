@@ -834,7 +834,7 @@ const battleScreenState = {
 // 旧: this.drawPanelBackground(this.ctx, msgX, msgY, msgW, msgH, 'stone');
 
 // ── メッセージ欄（右下・可変幅）──
-const margin = 20;
+const margin = 12;
 const msgMinW = 500;
 const msgMaxW = 640;
 const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 0.62)));
@@ -1090,11 +1090,21 @@ this.ctx.clip();
         this.ctx.strokeRect(trackX + 1, thumbY, trackW - 2, thumbH);
     
         // イベント用に保持
-        this.logScrollbar = {
-          trackX, trackY, trackW, trackH,
-          thumbX: trackX + 1, thumbY, thumbW: trackW - 2, thumbH,
-          maxOffset
-        };
+this.logScrollbar = {
+  trackX, trackY, trackW, trackH,
+  thumbX: trackX + 1, thumbY, thumbW: trackW - 2, thumbH,
+  maxOffset
+};
+
+// 追加: カーソル形状（ヒット感を上げる）
+if (this.mouseX != null && this.mouseY != null) {
+  const sb = this.logScrollbar;
+  const overThumb = (this.mouseX >= sb.thumbX && this.mouseX <= sb.thumbX + sb.thumbW &&
+                     this.mouseY >= sb.thumbY && this.mouseY <= sb.thumbY + sb.thumbH);
+  const overTrack = (this.mouseX >= sb.trackX && this.mouseX <= sb.trackX + sb.trackW &&
+                     this.mouseY >= sb.trackY && this.mouseY <= sb.trackY + sb.trackH);
+  this.canvas.style.cursor = overThumb ? 'grab' : (overTrack ? 'ns-resize' : 'default');
+}
 
         // スクロールヒント（内容があふれる場合のみ・初回だけ表示して自動フェード）
         if (len > N) {
@@ -2099,6 +2109,58 @@ drawEnemyStatusPanel(ctx) {
 				}
 			};
       this.canvas.addEventListener('wheel', this._wheelHandler);
+
+// 追加: タッチ対応（トグルドラッグ）
+this._touchStartHandler = e => {
+  const t = e.changedTouches[0];
+  const rect = this.canvas.getBoundingClientRect();
+  const scaleX = this.canvas.width / rect.width;
+  const scaleY = this.canvas.height / rect.height;
+  const gx = (t.clientX - rect.left) * scaleX;
+  const gy = (t.clientY - rect.top) * scaleY;
+  if (this.logScrollbar) {
+    const sb = this.logScrollbar;
+    const inThumb = gx >= sb.thumbX && gx <= sb.thumbX + sb.thumbW && gy >= sb.thumbY && gy <= sb.thumbY + sb.thumbH;
+    const inTrack = gx >= sb.trackX && gx <= sb.trackX + sb.trackW && gy >= sb.trackY && gy <= sb.trackY + sb.trackH;
+    if (inThumb) {
+      this.draggingLogThumb = true;
+      this._dragStartY = gy;
+      this._dragStartOffset = this.logOffset || 0;
+      this._logHintDismissed = true;
+      e.preventDefault();
+      return;
+    }
+    if (inTrack && !inThumb) {
+      const rel = Math.max(0, Math.min(1, (gy - sb.trackY - sb.thumbH / 2) / Math.max(1, sb.trackH - sb.thumbH)));
+      this.logOffset = Math.round(rel * (sb.maxOffset || 0));
+      this._logHintDismissed = true;
+      e.preventDefault();
+      return;
+    }
+  }
+};
+this._touchMoveHandler = e => {
+  if (!this.draggingLogThumb || !this.logScrollbar) return;
+  const t = e.changedTouches[0];
+  const rect = this.canvas.getBoundingClientRect();
+  const scaleY = this.canvas.height / rect.height;
+  this.mouseY = (t.clientY - rect.top) * scaleY;
+  const { trackH, thumbH, maxOffset } = this.logScrollbar;
+  const range = Math.max(1, trackH - thumbH);
+  const dy = this.mouseY - (this._dragStartY || this.mouseY);
+  const base = this._dragStartOffset || 0;
+  this.logOffset = Math.max(0, Math.min(maxOffset, Math.round(base + (dy / range) * maxOffset)));
+  e.preventDefault();
+};
+this._touchEndHandler = () => {
+  this.draggingLogThumb = false;
+  this._dragStartY = null;
+  this._dragStartOffset = null;
+};
+
+this.canvas.addEventListener('touchstart', this._touchStartHandler, { passive: false });
+this.canvas.addEventListener('touchmove', this._touchMoveHandler, { passive: false });
+this.canvas.addEventListener('touchend', this._touchEndHandler);
       
       // マウスダウン・アップイベントのハンドラを保存
       this._mousedownHandler = e => this.handleMouseDown(e);
@@ -2121,6 +2183,10 @@ drawEnemyStatusPanel(ctx) {
     this.canvas.removeEventListener('touchstart', this._clickHandler);
     this.canvas.removeEventListener('mousemove', this._mousemoveHandler);
     this.canvas.removeEventListener('wheel', this._wheelHandler);
+// 追加
+this.canvas.removeEventListener('touchstart', this._touchStartHandler);
+this.canvas.removeEventListener('touchmove', this._touchMoveHandler);
+this.canvas.removeEventListener('touchend', this._touchEndHandler);
     
     // マウスイベントハンドラを解除
     this.canvas.removeEventListener('mousedown', this._mousedownHandler);
