@@ -143,6 +143,18 @@ const battleScreenState = {
   // 修正2: pressedButtonsプロパティを追加
   pressedButtons: new Set(),
 
+    // 表示固定用（行動ごとに4行をピン留め）
+    visibleLogBlock: [],
+    visibleBlockUntil: 0,
+    showLogBlock(lines, pinMs = 1600) {
+      this.visibleLogBlock = Array.isArray(lines)
+        ? lines.filter(Boolean).slice(0, 4)
+        : [];
+      this.visibleBlockUntil = Date.now() + (pinMs | 0);
+      // 表示中はヒントのテキストヒントも非表示方向へ
+      this._logHintDismissed = true;
+    },
+
   /**
    * 漢字ボックスのエフェクトを開始するメソッド
    * @param {string} color - エフェクトの色
@@ -855,16 +867,24 @@ this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
     const innerBottom = msgY + msgH - 12; // 下部余白
     const maxLinesByHeight = Math.max(1, Math.floor((innerBottom - innerTop) / lineHeight));
 
-    const N = 10; // 原本メッセージの取得数（折り返し後は高さに合わせて切り詰め）
+    const N = 10; // 原本メッセージの取得数
     const len = battleState.log.length;
     const maxOffset = Math.max(0, len - N);
     this.logOffset = Math.min(Math.max(0, this.logOffset), maxOffset);
     const start = Math.max(0, len - N - this.logOffset);
     let lines = battleState.log.slice(start, start + N);
-
-      // 古い→新しい（上→下）
-      const newestFirst = false;
-       const renderLines = newestFirst ? [...lines].reverse() : lines;
+  
+    // ピン留めブロックが有効なら優先表示
+    const now = Date.now();
+    if (this.visibleBlockUntil > now && this.visibleLogBlock.length) {
+      lines = this.visibleLogBlock;
+    } else if (this.visibleBlockUntil <= now && this.visibleLogBlock.length) {
+      this.visibleLogBlock = [];
+    }
+  
+    // 古い→新しい（上→下）
+    const newestFirst = false;
+    const renderLines = newestFirst ? [...lines].reverse() : lines;
 
     this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
     this.ctx.textAlign = 'left';
@@ -3115,6 +3135,7 @@ this.canvas.removeEventListener('touchend', this._touchEndHandler);
     }
   },
 
+
 };
 
 export default battleScreenState;
@@ -3155,13 +3176,14 @@ function spawnEnemy() {
   // ボス戦かどうかに応じてメッセージを変更
   if (e.isBoss) {
     addToLog(`ボス ${e.name} があらわれた！`);
-    // ボスのシールド情報をログに表示
-    if (e.shieldHp > 0) {
-      addToLog(`${e.name}は防御態勢をとっている！`);
-    }
+    if (e.shieldHp > 0) addToLog(`${e.name}は防御態勢をとっている！`);
   } else {
     addToLog(`${e.name} があらわれた！`);
   }
+  battleScreenState.showLogBlock([
+    `${e.isBoss ? 'ボス ' : ''}${e.name} があらわれた！`,
+    (e.isBoss && e.shieldHp > 0) ? 'シールドを展開している！' : ''
+  ]);
   
   publish('playSE', 'appear');
   
