@@ -862,18 +862,19 @@ this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
     const start = Math.max(0, len - N - this.logOffset);
     let lines = battleState.log.slice(start, start + N);
 
-   // 新しい順に上から表示（必要なければ false）
-   const newestFirst = true;
-   const renderLines = newestFirst ? [...lines].reverse() : lines;
+      // 古い→新しい（上→下）
+      const newestFirst = false;
+       const renderLines = newestFirst ? [...lines].reverse() : lines;
 
     this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'top';
 
-    // タイプライター効果の更新
-    if (this.typewriterEffect.active) {
-      this.typewriterEffect.charTimer--;
-      if (this.typewriterEffect.charTimer <= 0) {
+  // タイプライター効果の更新
+  if (this.typewriterEffect.active) {
+       this.typewriterEffect.charInterval = 2; // 1→2で表示をゆっくりに
+        this.typewriterEffect.charTimer--;
+        if (this.typewriterEffect.charTimer <= 0) {
         this.typewriterEffect.displayedChars++;
         this.typewriterEffect.charTimer = this.typewriterEffect.charInterval;
         if (this.typewriterEffect.displayedChars % this.typewriterEffect.soundInterval === 0) {
@@ -997,8 +998,15 @@ this.ctx.clip();
     const drawnIconFor = new Set();
     let drawY = innerTop;
 
-    visibleSegments.forEach(seg => {
-      const baseX = innerLeft;
+       visibleSegments.forEach((seg, idx) => {
+         const baseX = innerLeft;
+        const isNewestLine = idx === visibleSegments.length - 1;
+        if (isNewestLine && !this.typewriterEffect.active) {
+          this.ctx.save();
+          this.ctx.fillStyle = 'rgba(255,215,0,0.08)'; // 薄い金色
+          this.ctx.fillRect(msgX + 4, drawY - 2, msgW - 8, lineHeight + 4);
+          this.ctx.restore();
+        }
 
       // アイコン描画は1メッセージにつき最初の可視行のみ
       let textX = baseX;
