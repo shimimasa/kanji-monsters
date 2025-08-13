@@ -602,49 +602,45 @@ const battleScreenState = {
       this.drawComboIndicator(this.ctx);
     }
 
-        // ヒントを表示（ヒントレベルに応じて表示内容を変更）
-        if (gameState.hintLevel > 0) {
-          let hintText = '';
-          let hintColor = 'yellow';
-          
-          switch(gameState.hintLevel) {
-            case 1:
-              hintText = `ヒント（基本）: 画数は${gameState.currentKanji.strokes}`;
-              hintColor = '#3498db'; // 青色
-              break;
-            case 2:
-              // 音読みと訓読みのどちらかをランダムに選ぶ（ただし毎回同じになるよう固定する）
-              const kanjiId = gameState.currentKanji.id;
-              const isOnyomi = (kanjiId % 2 === 0); // IDの偶数奇数で固定
-              const readings = isOnyomi ? gameState.currentKanji.onyomi : gameState.currentKanji.kunyomi;
-              
-              if (readings && readings.length > 0) {
-                const firstReading = readings[0];
-                const hintText2 = firstReading.substring(0, 1) + '○○';
-                hintText = `ヒント（読み）: ${isOnyomi ? '音読み' : '訓読み'}は「${hintText2}」から始まる`;
-              } else {
-                hintText = `ヒント（読み）: ${isOnyomi ? '訓読み' : '音読み'}で読むことが多い`;
-              }
-              hintColor = '#f39c12'; // オレンジ色
-              break;
-            case 3:
-              hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
-              hintColor = '#e74c3c'; // 赤色
-              break;
-            case 4:
-              // 既に消灯状態なら何もしない（重複通知防止）
-              if (gameState.hintLevel >= 4) return;
-              const next = (gameState.hintLevel || 0) + 1;
-              gameState.hintLevel = Math.min(4, next);
-              hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
-              hintColor = '#e74c3c'; // 赤色
-              break;
-          }
-          
-          // 旧：漢字ボックスの下にヒント枠を描画していた処理は廃止
-          // 上部のヒントバナーで描画するため、テキストだけ保持
-          this.currentHintText = hintText;
-        }
+                // ヒントを表示（ヒントレベルに応じて表示内容を変更）
+                if (gameState.hintLevel > 0) {
+                  let hintText = '';
+                  let hintColor = 'yellow';
+                  
+                  switch(gameState.hintLevel) {
+                    case 1:
+                      hintText = `ヒント（基本）: 画数は${gameState.currentKanji.strokes}`;
+                      hintColor = '#3498db'; // 青色
+                      break;
+                    case 2:
+                      // 音読みと訓読みのどちらかをランダムに選ぶ（ただし毎回同じになるよう固定する）
+                      const kanjiId = gameState.currentKanji.id;
+                      const isOnyomi = (kanjiId % 2 === 0); // IDの偶数奇数で固定
+                      const readings = isOnyomi ? gameState.currentKanji.onyomi : gameState.currentKanji.kunyomi;
+                      
+                      if (readings && readings.length > 0) {
+                        const firstReading = readings[0];
+                        const hintText2 = firstReading.substring(0, 1) + '○○';
+                        hintText = `ヒント（読み）: ${isOnyomi ? '音読み' : '訓読み'}は「${hintText2}」から始まる`;
+                      } else {
+                        hintText = `ヒント（読み）: ${isOnyomi ? '訓読み' : '音読み'}で読むことが多い`;
+                      }
+                      hintColor = '#f39c12'; // オレンジ色
+                      break;
+                    case 3:
+                      hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
+                      hintColor = '#e74c3c'; // 赤色
+                      break;
+                    case 4:
+                      // 最終ヒント：描画のみ。ここでreturn/状態変更はしない
+                      hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
+                      hintColor = '#e74c3c'; // 赤色
+                      break;
+                  }
+                  
+                  // 上部のヒントバナーで描画するため、テキストだけ保持
+                  this.currentHintText = hintText;
+                }
 
     // ← ここから追加：前回解答表示エリア（左側）
     if (battleState.lastAnswered) {
