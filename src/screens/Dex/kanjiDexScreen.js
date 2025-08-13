@@ -22,22 +22,24 @@ const BTN = {
 const kanjiDexScreen = {
   canvas: null,
   ctx:    null,
-  dexSet: null,     // 収集済み漢字IDのSet<string>
-  allList: [],      // 全漢字IDの配列
-  scroll: 0,        // 表示開始インデックス
-  selectedKanjiId: null,  // 選択された漢字IDを保持するプロパティを追加
+  dexSet: null,
+  allList: [],
+  scroll: 0,
+  selectedKanjiId: null,
   _clickHandler: null,
   _keyHandler:   null,
-  
-  // 新しいプロパティを追加
-  sortMode: 'default',    // 'default', 'grade', 'strokes'
-  showCollectedOnly: false, // フィルタリング状態
-  filteredList: [],       // フィルタリング後のリスト
-  
+
+  // 新しいプロパティ
+  sortMode: 'default',
+  showCollectedOnly: false,
+  filteredList: [],
+  // ← 追加: 学年フィルタ（'all' | 1..10）
+  gradeFilter: 'all',
+
   // DOM要素の参照
   container: null,
   cardGrid: null,
-  cardsPerPage: 20, // 1ページあたりのカード数
+  cardsPerPage: 20,
 
   /** enter：画面表示時の初期化 */
   enter(arg) {
@@ -159,10 +161,9 @@ const kanjiDexScreen = {
     navDiv.style.border = 'none';
     navDiv.style.outline = 'none';
 
-    // 左側のコントロール
     const leftControls = document.createElement('div');
     leftControls.className = 'nav-controls-left';
-    
+
     const backButton = document.createElement('button');
     backButton.textContent = '📚 ステージ選択へ';
     backButton.addEventListener('click', () => {
@@ -170,6 +171,25 @@ const kanjiDexScreen = {
       publish('changeScreen', 'stageSelect');
     });
     leftControls.appendChild(backButton);
+
+    // ← 追加: 学年セレクト
+    const gradeSelect = document.createElement('select');
+    gradeSelect.className = 'kanji-grade-filter';
+    let opts = '<option value="all">すべて</option>';
+    for (let g = 1; g <= 10; g++) {
+      opts += `<option value="${g}">${g}年生</option>`;
+    }
+    gradeSelect.innerHTML = opts;
+    gradeSelect.value = this.gradeFilter;
+    gradeSelect.addEventListener('change', (e) => {
+      this.gradeFilter = e.target.value === 'all' ? 'all' : parseInt(e.target.value, 10);
+      this.scroll = 0;
+      this.updateFilteredList();
+      this.updateNavigationButtons();
+      this.renderKanjiCards();
+      publish('playSE', 'decide');
+    });
+    leftControls.appendChild(gradeSelect);
 
     // 中央のコントロール（ソート）
     const centerControls = document.createElement('div');
@@ -753,8 +773,14 @@ const kanjiDexScreen = {
     } else {
       this.filteredList = [...this.allList];
     }
+    // ← 追加: 学年フィルタ
+    if (this.gradeFilter !== 'all') {
+      this.filteredList = this.filteredList.filter(id => {
+        const k = getKanjiById(id);
+        return k && k.grade === this.gradeFilter;
+      });
+    }
   },
-
   /** フィルタリング状態を切り替え */
   toggleFilter() {
     this.showCollectedOnly = !this.showCollectedOnly;
