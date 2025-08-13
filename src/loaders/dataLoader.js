@@ -360,12 +360,21 @@ export function getKanjiByGrade(grade) {
 
 // 追加: ID から単一の漢字データを取得するヘルパ関数
 export function getKanjiById(id) {
-  const k = kanjiData.find(item => item.id === id);
-  if (!k) {
-    console.warn(`kanjiData に ID=${id} のデータが見つかりません`);
-    return null;
+  // まず小学生データ
+  let k = kanjiData.find(item => item.id === id);
+  if (k) return k;
+
+  // 中学生・高校相当（7〜10）にも対応
+  for (let g = 7; g <= 10; g++) {
+    const arr = kanjiByGrade?.[g];
+    if (Array.isArray(arr)) {
+      const f = arr.find(item => item.id === id);
+      if (f) return f;
+    }
   }
-  return k;
+
+  console.warn(`kanjiData に ID=${id} のデータが見つかりません`);
+  return null;
 }
 
 // 以下を追加：monsterDexScreen.js からインポートする getMonsterById / getAllMonsterIds
