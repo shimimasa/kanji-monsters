@@ -89,7 +89,13 @@ export class AudioManager {
         correct: '/assets/audio/se_correct.mp3',
         wrong:   '/assets/audio/se_wrong.mp3',
         decide:  '/assets/audio/se_decide.mp3',
-        defeat:  '/assets/audio/se_defeat.mp3'
+        defeat:  '/assets/audio/se_defeat.mp3',
+        // ← 追加
+        weak:    '/assets/audio/se_weak.mp3',
+        master:  '/assets/audio/se_master.mp3',
+        shield1: '/assets/audio/se_shield1.mp3',
+        shield2: '/assets/audio/se_shield2.mp3',
+        shield3: '/assets/audio/se_shield3.mp3'
       }
     };
   

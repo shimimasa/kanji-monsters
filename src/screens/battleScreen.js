@@ -3103,6 +3103,7 @@ function onAttack() {
       baseDamage = Math.floor(baseDamage * 2);
       battleState.masteryBonusActive = false;
       battleState.log.push('マスターかんじボーナス！2ばい！');
+      publish('playSE', 'master'); // ← 追加
     }
     
     // ダメージに少しゆらぎ（±10%）
@@ -3133,6 +3134,7 @@ function onAttack() {
       isWeaknessHit = true;
       dmg = Math.floor(dmg * 1.5);
       battleState.log.push('弱点にヒット！大ダメージ！');
+      publish('playSE', 'weak'); // ← 追加
       
       // 弱点ヒット統計データの更新
       gameState.playerStats.weaknessHits++;
@@ -3157,10 +3159,18 @@ function onAttack() {
           gameState.currentEnemy.shieldHp--;
           battleState.log.push(`せいかい！${readingMsg}`);
           battleState.log.push('シールドにヒビが入った！');
-          
+
+          // ← 追加: 残量に応じてSE
+          const hp = gameState.currentEnemy.shieldHp;
+          if (hp === 2) publish('playSE', 'shield1');
+          else if (hp === 1) publish('playSE', 'shield2');
+          else if (hp === 0) publish('playSE', 'shield3');
+
           if (gameState.currentEnemy.shieldHp === 0) {
             battleState.log.push('ボスの防御が崩れた！');
           }
+
+
           
           // シールドを削った場合は敵にダメージを与えない
           dmg = 0;
