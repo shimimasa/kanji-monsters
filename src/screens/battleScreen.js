@@ -833,7 +833,18 @@ const battleScreenState = {
   
 // 旧: this.drawPanelBackground(this.ctx, msgX, msgY, msgW, msgH, 'stone');
 
-    // タイトルは背景描画後に高コントラストで描画（下方で描画）
+// ── メッセージ欄（右下・可変幅）──
+const margin = 20;
+const msgMinW = 500;
+const msgMaxW = 640;
+const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 0.62)));
+const msgH = 148;
+const msgX = this.canvas.width - margin - msgW;
+const msgY = this.canvas.height - margin - msgH;
+// イベント用の矩形
+this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
+
+// タイトルは背景描画後に高コントラストで描画（下方で描画）
 
     // 表示準備
     const padding = 8;
@@ -907,6 +918,10 @@ this.ctx.fillRect(msgX, msgY, msgW, msgH);
 this.ctx.strokeStyle = '#B8860B';
 this.ctx.lineWidth = 2;
 this.ctx.strokeRect(msgX, msgY, msgW, msgH);
+
+
+    const pad = 14;
+    const textAreaW = msgW - pad * 2;
 
 // タイトル（高コントラスト）
 this.drawTextWithOutline(
@@ -1589,27 +1604,6 @@ if (hh.visible) {
       ctx.restore();
     }
 
-       // バトルログ矩形（右下固定・可変幅）
-    // const cw = this.canvas.width;
-    // const ch = this.canvas.height;
-    // ここでの msgX/msgY/msgW/msgH の再定義は不要（上で定義済み）
-    // this.logRect も上で設定済み
-
-    // 以降、バトルログの背景・枠・テキスト描画は logX,logY,logW,logH を使用
-    // テキストの左右パディングは 12〜16px 程度に（例）
-    const pad = 14;
-    const textAreaW = msgW - pad * 2;
-
-    // ── メッセージ欄 ──（右下、横幅を拡張・可変）
-    const margin = 20;
-    const msgMinW = 500;
-    const msgMaxW = 640;
-    const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 0.62)));
-    const msgH = 148;
-    const msgX = this.canvas.width - margin - msgW;
-    const msgY = this.canvas.height - margin - msgH;
-    // ログ矩形をイベント用に保持
-    this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
   },
 
   /**
