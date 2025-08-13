@@ -174,6 +174,9 @@ const kanjiDexScreen = {
 
     // ← 追加: 学年セレクト
     const gradeSelect = document.createElement('select');
+    const gradeLabel = document.createElement('span');
+    gradeLabel.className = 'kanji-grade-label';
+    gradeLabel.textContent = '学年：';
     gradeSelect.className = 'kanji-grade-filter';
     let opts = '<option value="all">すべて</option>';
     for (let g = 1; g <= 10; g++) {
@@ -189,6 +192,7 @@ const kanjiDexScreen = {
       this.renderKanjiCards();
       publish('playSE', 'decide');
     });
+    leftControls.appendChild(gradeLabel);
     leftControls.appendChild(gradeSelect);
 
     // 中央のコントロール（ソート）

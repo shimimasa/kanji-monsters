@@ -60,3 +60,45 @@
 .kanji-modal .modal-content {
   border: 1px solid #8B4513 !important;
 } 
+
+/* === 漢字図鑑 学年プルダウン === */
+.kanji-dex-navigation .kanji-grade-label {
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.kanji-dex-navigation .kanji-grade-filter {
+  background: linear-gradient(145deg, #F5DEB3, #DEB887);
+  color: #8B4513;
+  border: 2px solid #8B4513;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  min-width: 120px;
+  appearance: none;           /* OSデフォルト感を抑える */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.kanji-dex-navigation .kanji-grade-filter:hover {
+  background: linear-gradient(145deg, #DEB887, #D2B48C);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+
+.kanji-dex-navigation .kanji-grade-filter:focus {
+  outline: none;
+  border-color: #CD853F;
+  box-shadow: 0 0 0 3px rgba(205,133,63,0.3);
+}
+
+.kanji-dex-navigation .kanji-grade-filter option {
+  background: #F5DEB3;
+  color: #8B4513;
+  font-weight: bold;
+} 
