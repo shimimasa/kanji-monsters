@@ -4186,3 +4186,44 @@ function drawMasterBadge(ctx, x, y) {
   ctx.restore();
 }
 
+// 例: battleScreen.js 内のログ描画処理で使用
+const LOG_STYLE = {
+  bg: 'rgba(20,20,20,0.85)',
+  border: '#B8860B',
+  text: '#F3E9D7',
+  stroke: 'rgba(0,0,0,0.9)',
+  strokeW: 3,
+  font: '16px "UDデジタル教科書体", sans-serif',
+  lineH: 22,
+  pad: 12,
+};
+
+function drawBattleLog(ctx, x, y, w, h, lines) {
+  ctx.fillStyle = LOG_STYLE.bg;
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = LOG_STYLE.border;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x, y, w, h);
+
+  ctx.font = LOG_STYLE.font;
+  let cy = y + LOG_STYLE.pad;
+  for (const raw of lines) {
+    const { text, color = LOG_STYLE.text } = colorize(raw);
+    ctx.lineWidth = LOG_STYLE.strokeW;
+    ctx.strokeStyle = LOG_STYLE.stroke;
+    ctx.fillStyle = color;
+    ctx.textBaseline = 'top';
+    ctx.fillText(text, x + LOG_STYLE.pad, cy);
+    ctx.strokeText(text, x + LOG_STYLE.pad, cy);
+    cy += LOG_STYLE.lineH;
+  }
+}
+
+function colorize(s) {
+  if (s.includes('大ダメージ') || s.includes('弱点')) return { text: s, color: '#FFA94D' };     // オレンジ
+  if (s.includes('回復')) return { text: s, color: '#7FE7C4' };                                 // ミント
+  if (s.startsWith('★') || s.includes('ボーナス')) return { text: s, color: '#FFD700' };        // ゴールド
+  if (s.includes('たおした')) return { text: s, color: '#F3E9D7' };
+  return { text: s };
+}
+
