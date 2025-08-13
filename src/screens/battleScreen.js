@@ -834,30 +834,18 @@ const battleScreenState = {
       this.inputEl.style.boxSizing = 'border-box';
     }
 
-    // ── メッセージ欄 ──（右下に配置、横幅を拡張）
-    const msgX = this.canvas.width - 380; // 旧寄り
-    const msgY = 450;
-    const msgW = 360;
-    const msgH = 130;
+   // ── メッセージ欄 ──（右下に配置、横幅を拡張）
+const msgX = this.canvas.width - 440; // 右端から20pxマージン
+const msgY = 450;
+const msgW = 420;  // 横幅を拡張
+const msgH = 140;  // わずかに高さUP
+// 旧: this.drawPanelBackground(this.ctx, msgX, msgY, msgW, msgH, 'stone');
 
-    this.drawPanelBackground(this.ctx, msgX, msgY, msgW, msgH, 'stone');
-
-    // タイトル
-    this.drawTextWithOutline(
-      "バトルログ",
-      msgX + msgW/2,
-      msgY + 8,
-      'white',
-      'black',
-      'bold 14px "UDデジタル教科書体", sans-serif',
-      'center',
-      'top',
-      1
-    );
+    // タイトルは背景描画後に高コントラストで描画（下方で描画）
 
     // 表示準備
     const padding = 8;
-    const lineHeight = 18;
+    const lineHeight = 22;
     const innerLeft = msgX + padding;
     const innerTop  = msgY + 28;         // タイトル下から
     const innerRight = msgX + msgW - padding;
@@ -871,7 +859,7 @@ const battleScreenState = {
     const start = Math.max(0, len - N - this.logOffset);
     let lines = battleState.log.slice(start, start + N);
 
-    this.ctx.font = '14px "UDデジタル教科書体", sans-serif';
+    this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'top';
 
@@ -919,18 +907,32 @@ const battleScreenState = {
     };
 
         // クリップ
-        this.ctx.save();
+this.ctx.save();
 
-        // 背景と枠（視認性向上）
-        this.ctx.fillStyle = 'rgba(20,20,20,0.85)';
-        this.ctx.fillRect(msgX, msgY, msgW, msgH);
-        this.ctx.strokeStyle = '#B8860B';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(msgX, msgY, msgW, msgH);
-    
-        this.ctx.beginPath();
-        this.ctx.rect(msgX + 4, msgY + 24, msgW - 8, msgH - 30);
-        this.ctx.clip();
+// 背景と枠（視認性向上）
+this.ctx.fillStyle = 'rgba(20,20,20,0.85)';
+this.ctx.fillRect(msgX, msgY, msgW, msgH);
+this.ctx.strokeStyle = '#B8860B';
+this.ctx.lineWidth = 2;
+this.ctx.strokeRect(msgX, msgY, msgW, msgH);
+
+// タイトル（高コントラスト）
+this.drawTextWithOutline(
+  "バトルログ",
+  msgX + msgW/2,
+  msgY + 8,
+  'white',
+  'black',
+  'bold 14px "UDデジタル教科書体", sans-serif',
+  'center',
+  'top',
+  2
+);
+
+// クリップ開始（タイトル領域を除外）
+this.ctx.beginPath();
+this.ctx.rect(msgX + 4, msgY + 24, msgW - 8, msgH - 30);
+this.ctx.clip();
 
     // メッセージを折り返して平坦化（セグメント列をtop->down順で生成）
     const iconSize = 16;
