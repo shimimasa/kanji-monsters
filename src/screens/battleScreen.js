@@ -1045,23 +1045,69 @@ this.ctx.clip();
       );
       drawY += lineHeight;
     });
-
     this.ctx.restore();
+    
+    // 右側スクロールバー（トラック＋サム）
+    const trackW = 12;
+    const trackX = msgX + msgW - trackW - 6;
+    const trackY = msgY + 26;
+    const trackH = msgH - 34;
+    
+    // スクロール量（メッセージ件数ベース）
+    const N = 10;
+    const len = battleState.log.length;
+    const maxOffset = Math.max(0, len - N);
+    
+    // サム高さ（可視割合に応じて決定）
+    const minThumbH = 24;
+    const thumbH = Math.max(minThumbH, Math.floor(trackH * (N / Math.max(N, len))));
+    const progress = maxOffset > 0 ? (this.logOffset || 0) / maxOffset : 0;
+    const thumbY = trackY + Math.floor((trackH - thumbH) * progress);
+    
+    // トラック
+    this.ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    this.ctx.fillRect(trackX, trackY, trackW, trackH);
+    this.ctx.strokeStyle = '#B8860B';
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeRect(trackX, trackY, trackW, trackH);
+    
+    // サム
+    this.ctx.fillStyle = '#D6A650';
+    this.ctx.fillRect(trackX + 1, thumbY, trackW - 2, thumbH);
+    this.ctx.strokeStyle = '#8B5A2B';
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeRect(trackX + 1, thumbY, trackW - 2, thumbH);
+    
+    // イベント用に保持
+    this.logScrollbar = {
+      trackX, trackY, trackW, trackH,
+      thumbX: trackX + 1, thumbY, thumbW: trackW - 2, thumbH,
+      maxOffset
+    };
 
-    // スクロールヒント（件数基準は従来どおり）
-    if (len > N) {
-      this.drawTextWithOutline(
-        "↑↓ スクロール可能 ↑↓",
-        msgX + msgW/2,
-        msgY + msgH - 18,
-        'rgba(255, 255, 255, 0.7)',
-        'black',
-        '10px "UDデジタル教科書体", sans-serif',
-        'center',
-        'top',
-        1
-      );
-    }
+        // スクロールヒント（内容があふれる場合のみ・初回だけ表示して自動フェード）
+        if (len > N) {
+          if (this._logHintDismissed !== true) {
+            if (this._logHintTimer == null) this._logHintTimer = 180; // 約3秒
+            if (this._logHintTimer > 0) {
+              this.drawTextWithOutline(
+                "↑↓ ホイール / 右のバーでスクロール",
+                msgX + msgW/2,
+                msgY + msgH - 18,
+                `rgba(255, 255, 255, ${Math.min(0.9, this._logHintTimer / 120)})`,
+                'black',
+                '10px "UDデジタル教科書体", sans-serif',
+                'center',
+                'top',
+                1
+              );
+              this._logHintTimer--;
+            }
+          }
+        } else {
+          // あふれていなければヒントを消す
+          this._logHintDismissed = true;
+        }
 
     // レベルアップメッセージの描画
     if (this.levelUpMessage) {
@@ -1550,14 +1596,17 @@ if (hh.visible) {
     // バトルログ矩形（右下固定・可変幅）
     const cw = this.canvas.width;
     const ch = this.canvas.height;
-    const margin = 20;
-    const minW = 420;
-    const maxW = 560;
-
-    const logW = Math.min(maxW, Math.max(minW, Math.floor(cw * 0.55)));
-    const logH = 140;                 // 既存値を使っているなら流用可
-    const logX = cw - margin - logW;  // 右寄せ
-    const logY = ch - margin - logH;  // 下寄せ
+    	// ── メッセージ欄 ──（右下、横幅を拡張・可変）
+	const margin = 20;
+	const msgMinW = 500;
+	const msgMaxW = 640;
+	const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 0.62)));
+	const msgH = 148;
+	const msgX = this.canvas.width - margin - msgW;
+	const msgY = this.canvas.height - margin - msgH;
+	// ログ矩形をイベント用に保持
+	this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
+    
 
     // 以降、バトルログの背景・枠・テキスト描画は logX,logY,logW,logH を使用
     // テキストの左右パディングは 12〜16px 程度に（例）
@@ -2020,42 +2069,43 @@ drawEnemyStatusPanel(ctx) {
       this.canvas.addEventListener('click', this._clickHandler);
       this.canvas.addEventListener('touchstart', this._clickHandler);
       
-      // マウス移動ハンドラーを追加
       this._mousemoveHandler = e => {
-        const rect = this.canvas.getBoundingClientRect();
-        
-        // Canvasの実際の表示サイズと内部解像度の比率を計算
-        const scaleX = this.canvas.width / rect.width;
-        const scaleY = this.canvas.height / rect.height;
-        
-        // マウス座標を800x600のゲーム内座標に変換
-        this.mouseX = (e.clientX - rect.left) * scaleX;
-        this.mouseY = (e.clientY - rect.top) * scaleY;
-      };
+				const rect = this.canvas.getBoundingClientRect();
+				const scaleX = this.canvas.width / rect.width;
+				const scaleY = this.canvas.height / rect.height;
+				this.mouseX = (e.clientX - rect.left) * scaleX;
+				this.mouseY = (e.clientY - rect.top) * scaleY;
+
+				// スクロールバーのドラッグ
+				if (this.draggingLogThumb && this.logScrollbar && this.logScrollbar.maxOffset >= 0) {
+					const { trackY, trackH, thumbH, maxOffset } = this.logScrollbar;
+					const range = Math.max(1, trackH - thumbH);
+					const dy = this.mouseY - (this._dragStartY || this.mouseY);
+					const delta = dy / range;
+					const base = this._dragStartOffset || 0;
+					const next = Math.max(0, Math.min(maxOffset, Math.round(base + delta * maxOffset)));
+					this.logOffset = next;
+				}
+			};
       this.canvas.addEventListener('mousemove', this._mousemoveHandler);
       
-      // ホイールイベント登録
       this._wheelHandler = e => {
-        const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left, y = e.clientY - rect.top;
-        // メッセージログの位置を更新
-        const msgX = this.canvas.width - 330;
-        const msgY = 450;
-        const msgW = 310;
-        const msgH = 130;
-        
-        if (x >= msgX && x <= msgX + msgW && y >= msgY && y <= msgY + msgH) {
-          e.preventDefault();
-          const N = 5;
-          const len = battleState.log.length;
-          const maxOffset = Math.max(0, len - N);
+				const rect = this.canvas.getBoundingClientRect();
+				const x = e.clientX - rect.left, y = e.clientY - rect.top;
+				const r = this.logRect;
+				if (r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
+					e.preventDefault();
+					const N = 10;
+					const len = battleState.log.length;
+					const maxOffset = Math.max(0, len - N);
           if (e.deltaY < 0) {
-            this.logOffset = Math.min(this.logOffset + 1, maxOffset);
+            this.logOffset = Math.min((this.logOffset || 0) + 1, maxOffset);
           } else {
-            this.logOffset = Math.max(0, this.logOffset - 1);
+            this.logOffset = Math.max(0, (this.logOffset || 0) - 1);
           }
-        }
-      };
+          this._logHintDismissed = true;
+				}
+			};
       this.canvas.addEventListener('wheel', this._wheelHandler);
       
       // マウスダウン・アップイベントのハンドラを保存
@@ -2912,27 +2962,52 @@ drawEnemyStatusPanel(ctx) {
 
   
 
-  // マウスダウンイベントハンドラを追加
-  handleMouseDown(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  	// マウスダウンイベントハンドラを追加
+	handleMouseDown(e) {
+		const rect = this.canvas.getBoundingClientRect();
+		const scaleX = this.canvas.width / rect.width;
+		const scaleY = this.canvas.height / rect.height;
+		const gx = (e.clientX - rect.left) * scaleX;
+		const gy = (e.clientY - rect.top) * scaleY;
 
-    // ボタンの押下状態を更新
-    Object.entries(BTN).forEach(([key, b]) => {
-      if (isMouseOverRect(x, y, b)) {
-        this.pressedButtons.add(key);
-      }
-    });
-  },
+		// スクロールバー ヒットテスト
+		if (this.logScrollbar) {
+			const sb = this.logScrollbar;
+			const inThumb = gx >= sb.thumbX && gx <= sb.thumbX + sb.thumbW && gy >= sb.thumbY && gy <= sb.thumbY + sb.thumbH;
+			const inTrack = gx >= sb.trackX && gx <= sb.trackX + sb.trackW && gy >= sb.trackY && gy <= sb.trackY + sb.trackH;
 
-  // マウスアップイベントハンドラを追加
-  handleMouseUp(e) {
-    // pressedButtonsが存在することを確認してからクリア
-    if (this.pressedButtons) {
-      this.pressedButtons.clear();
-    }
-  },
+			      // サムをドラッグ開始
+            if (inThumb) {
+              this.draggingLogThumb = true;
+              this._dragStartY = gy;
+              this._dragStartOffset = this.logOffset || 0;
+              this._logHintDismissed = true;
+              e.preventDefault();
+              return;
+            }
+            // トラッククリックでジャンプ
+            if (inTrack && !inThumb) {
+              const rel = Math.max(0, Math.min(1, (gy - sb.trackY - sb.thumbH / 2) / Math.max(1, sb.trackH - sb.thumbH)));
+              this.logOffset = Math.round(rel * (sb.maxOffset || 0));
+              this._logHintDismissed = true;
+              e.preventDefault();
+              return;
+            }
+		}
+
+		// ボタンの押下状態を更新
+		Object.entries(BTN).forEach(([key, b]) => {
+			if (isMouseOverRect(gx, gy, b)) this.pressedButtons.add(key);
+		});
+	},
+
+	// マウスアップイベントハンドラを追加
+	handleMouseUp(e) {
+		this.draggingLogThumb = false;
+		this._dragStartY = null;
+		this._dragStartOffset = null;
+		if (this.pressedButtons) this.pressedButtons.clear();
+	},
 
   /** 漢字カードを生成 */
   _createKanjiCard(kanjiData) {
