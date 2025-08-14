@@ -3465,46 +3465,44 @@ function onAttack() {
         }, 1000); // パーティクルエフェクトが見える程度の遅延
       }
       
-      // 敵が残っていれば次の敵をスポーン、最後の敵ならステージクリア待機
-      if (gameState.currentEnemyIndex < gameState.enemies.length - 1) {
-        setTimeout(() => {
-          // 敵撃破後に入力欄をクリア
-          const inputEl = battleScreenState.inputEl;
-          if (inputEl) inputEl.value = '';
-          gameState.currentEnemyIndex++;
-          spawnEnemy();
-          pickNextKanji();
-          battleState.turn = 'player';
-          battleState.inputEnabled = true;
-          
-          // 学年ボーナス連戦: バトル間 自動回復30%
-          if (/^bonus_g/i.test(String(gameState.currentStageId || ''))) {
-            const stats = gameState.playerStats;
-            const heal = Math.floor(stats.maxHp * 0.3);
-            stats.hp = Math.min(stats.maxHp, stats.hp + heal);
-            battleState.playerHpTarget = stats.hp;
-            battleState.playerHpAnimating = true;
-            battleState.log.push('連戦の合間にHPが回復した！（+30%）');
-            battleScreenState.showLogBlock([
-              '連戦の合間にHPが回復した！（+30%）'
-            ]);
-          }
-          
-          // 次の問題に進む際にヒントレベルをリセット
-          gameState.hintLevel = 0;
+             // 敵が残っていれば次の敵をスポーン、最後の敵ならステージクリア待機
+             if (gameState.currentEnemyIndex < gameState.enemies.length - 1) {
+                      waitForDefeatAnimationThen(() => {
+                         // 敵撃破後に入力欄をクリア
+                         const inputEl = battleScreenState.inputEl;
+                         if (inputEl) inputEl.value = '';
+                         gameState.currentEnemyIndex++;
+                         spawnEnemy();
+                         pickNextKanji();
+                         battleState.turn = 'player';
+                         battleState.inputEnabled = true;
+                         
+                         // 学年ボーナス連戦: バトル間 自動回復30%
+                         if (/^bonus_g/i.test(String(gameState.currentStageId || ''))) {
+                           const stats = gameState.playerStats;
+                           const heal = Math.floor(stats.maxHp * 0.3);
+                           stats.hp = Math.min(stats.maxHp, stats.hp + heal);
+                           battleState.playerHpTarget = stats.hp;
+                           battleState.playerHpAnimating = true;
+                           battleState.log.push('連戦の合間にHPが回復した！（+30%）');
+                           battleScreenState.showLogBlock([
+                             '連戦の合間にHPが回復した！（+30%）'
+                           ]);
+                         }
+                         
+                         // 次の問題に進む際にヒントレベルをリセット
+                         gameState.hintLevel = 0;
 
-        }, 500);
-      } else {
-        // 最後の敵を倒した場合：ステージクリアを保留状態にする
-        setTimeout(() => {
-          // 最後の敵撃破後に入力欄をクリア
-          const inputEl = battleScreenState.inputEl;
-          if (inputEl) inputEl.value = '';
-          // 直接 victoryCallback を呼ばずに保留状態にする
-          battleScreenState.stageClearPending = true;
-        }, 500);
-      }
-      return;
+                      });
+                     } else {
+                       // 最後の敵を倒した場合：ステージクリアを保留状態にする
+                      waitForDefeatAnimationThen(() => {
+                        const inputEl = battleScreenState.inputEl;
+                        if (inputEl) inputEl.value = '';
+                        battleScreenState.stageClearPending = true;
+                      });
+                     }
+                     return;
     } else {
       // ← 敵を倒していない場合の処理：敵のターンに移行
       battleState.lastCommandMode = 'attack';
@@ -4042,6 +4040,19 @@ export function cleanup() {
   // バトル画面固有のリスナ解除は不要（main.js が一元管理しているため）
   canvas = null;
   inputEl = null;
+}
+
+// 敵撃破アニメ（battleState.enemyAction === 'defeat'）の終了を待ってから callback を実行
+function waitForDefeatAnimationThen(callback) {
+  const check = () => {
+    if (battleState.enemyAction === 'defeat' && battleState.enemyActionTimer > 0) {
+      requestAnimationFrame(check);
+    } else {
+      // 念のため次フレームで実行
+      requestAnimationFrame(() => callback());
+    }
+  };
+  check();
 }
 
 /* ---------- ユーティリティ ---------- */
