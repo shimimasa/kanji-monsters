@@ -101,7 +101,22 @@ function showMonsterModal(monster) {
   const closeBtn = document.createElement('button');
   closeBtn.classList.add('modal-close');
   closeBtn.textContent = '×';
-  closeBtn.onclick = () => modal.remove();
+
+  // 追加: Escで閉じる（登録/解除を忘れない）
+  const onEsc = (e) => {
+    if (e.key === 'Escape') {
+      modal.remove();
+      window.removeEventListener('keydown', onEsc);
+      publish('playSE', 'cancel');
+    }
+  };
+  window.addEventListener('keydown', onEsc);
+
+  closeBtn.onclick = () => {
+    modal.remove();
+    window.removeEventListener('keydown', onEsc);
+    publish('playSE', 'cancel');
+  };
   
   // モンスター画像
   const img = document.createElement('img');
@@ -131,6 +146,8 @@ function showMonsterModal(monster) {
   modal.onclick = (e) => {
     if (e.target === modal) {
       modal.remove();
+      window.removeEventListener('keydown', onEsc); // 追加
+      publish('playSE', 'cancel');
     }
   };
   
