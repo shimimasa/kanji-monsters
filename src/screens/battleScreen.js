@@ -852,29 +852,9 @@ const margin = 12;
 const msgMinW = 500;
 const msgMaxW = 640;
 const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 0.62)));
-let   msgH = 148; // 仮
-let   msgX = this.canvas.width - margin - msgW;
-let   msgY = this.canvas.height - margin - msgH;
-
-// … lines を決定した直後（renderLines 計算直後）に追加
-const visibleCount = Math.max(1, (Array.isArray(lines) ? lines.length : 1));
-const lineHeight   = visibleCount >= 3 ? 22 : 24;   // 少し広め
-const titleH       = 24;
-const padBottom    = 12;
-msgH = titleH + padBottom + lineHeight * visibleCount;
-msgY = this.canvas.height - margin - msgH;
-this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
 
 // タイトルは背景描画後に高コントラストで描画（下方で描画）
 
-    // 表示準備
-    const padding = 8;
-　  const logLineHeight = 22;
-    const innerLeft = msgX + padding;
-    const innerTop  = msgY + 28;         // タイトル下から
-    const innerRight = msgX + msgW - padding;
-    const innerBottom = msgY + msgH - 12; // 下部余白
-    const maxLinesByHeight = Math.max(1, Math.floor((innerBottom - innerTop) / logLineHeight));
 	let N = 10; // デフォルトは行スクロール
 	let len = battleState.log.length;
 	let maxOffset = Math.max(0, len - N);
@@ -899,6 +879,24 @@ this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
  	const newestFirst = false;
  	const renderLines = newestFirst ? [...lines].reverse() : lines;
 
+    // ▼ lines 決定後にサイズと座標を計算（TDZ回避）
+    const visibleCount   = Math.max(1, (Array.isArray(lines) ? lines.length : 1));
+    const logLineHeight  = visibleCount >= 3 ? 22 : 24;
+    const titleH         = 24;
+    const padBottom      = 12;
+  
+    const msgH = titleH + padBottom + logLineHeight * visibleCount;
+    const msgX = this.canvas.width  - margin - msgW;
+    const msgY = this.canvas.height - margin - msgH;
+    this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
+  
+    // 表示準備
+    const padding    = 8;
+    const innerLeft  = msgX + padding;
+    const innerTop   = msgY + 28;            // タイトル下
+    const innerRight = msgX + msgW - padding;
+    const innerBottom= msgY + msgH - 12;     // 下部余白
+    const maxLinesByHeight = Math.max(1, Math.floor((innerBottom - innerTop) / logLineHeight));
     this.ctx.font = '18px "UDデジタル教科書体", sans-serif';
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'top';
