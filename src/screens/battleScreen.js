@@ -3325,6 +3325,10 @@ function onAttack() {
     if (battleState.comboCount === 5) {
       dmg = Math.floor(dmg * 1.5);
       battleState.log.push('れんぞくせいかいボーナス！');
+      battleScreenState.showLogBlock([
+        'れんぞくせいかいボーナス！',
+        'ダメージ1.5ばい！'
+      ]);
       battleState.comboCount = 0;
     }
     
@@ -3339,18 +3343,25 @@ function onAttack() {
           battleState.log.push(`せいかい！${readingMsg}`);
           battleState.log.push('シールドにヒビが入った！');
 
-          // ← 追加: 残量に応じてSE
-          const hp = gameState.currentEnemy.shieldHp;
-          if (hp === 2) publish('playSE', 'shield1');
-          else if (hp === 1) publish('playSE', 'shield2');
-          else if (hp === 0) publish('playSE', 'shield3');
-
-          if (gameState.currentEnemy.shieldHp === 0) {
-            battleState.log.push('ボスの防御が崩れた！');
-          }
+                    // ← 追加: 残量に応じてSE
+                    const hp = gameState.currentEnemy.shieldHp;
+                    if (hp === 2) publish('playSE', 'shield1');
+                    else if (hp === 1) publish('playSE', 'shield2');
+                    else if (hp === 0) publish('playSE', 'shield3');
           
-          // シールドを削った場合は敵にダメージを与えない
-          dmg = 0;
+                    if (gameState.currentEnemy.shieldHp === 0) {
+                      battleState.log.push('ボスの防御が崩れた！');
+                    }
+          
+                    // 行動パック表示（ピン留め）
+                    battleScreenState.showLogBlock([
+                      `せいかい！${readingMsg}`,
+                      '弱点にヒット！大ダメージ！',
+                      gameState.currentEnemy.shieldHp > 0 ? 'シールドにヒビが入った！' : 'ボスの防御が崩れた！'
+                    ]);
+          
+                    // シールドを削った場合は敵にダメージを与えない
+                    dmg = 0;
           
           // シールド破壊後も入力を継続できるように処理を修正
           battleState.lastCommandMode = 'attack';
@@ -3382,8 +3393,13 @@ function onAttack() {
         battleState.log.push(`せいかい！${readingMsg}、${gameState.currentEnemy.name}に${dmg}のダメージ！`);
       }
     } else {
-      // 通常の敵の場合：通常通りのダメージ
-      battleState.log.push(`せいかい！${readingMsg}、${gameState.currentEnemy.name}に${dmg}のダメージ！`);
+           
+     // 行動パック表示（ピン留め）
+     battleScreenState.showLogBlock([
+      `せいかい！${readingMsg}`,
+      isWeaknessHit ? '弱点にヒット！大ダメージ！' : '',
+      `${gameState.currentEnemy.name}に${dmg}のダメージ！`
+    ]);
     }
     
     // ダメージ適用（ボス戦でシールドを削った場合はdmg=0なので実質ダメージなし）
@@ -3401,6 +3417,9 @@ function onAttack() {
       battleState.log.push(
         `${gameState.playerName}は${gameState.currentEnemy.name}をたおした！`
       );
+      battleScreenState.showLogBlock([
+        `${gameState.playerName}は${gameState.currentEnemy.name}をたおした！`
+      ]);
       publish('playSE', 'defeat');
       battleState.enemyAction      = 'defeat';
       battleState.enemyActionTimer = ENEMY_DEFEAT_ANIM_DURATION;
@@ -3461,7 +3480,10 @@ function onAttack() {
             // レベルアップメッセージをログに追加
             battleState.log.push(`レベルが ${levelUpResult.newLevel} にあがった！`);
             addToLog(`攻撃力が上がった！ HP最大値が増えた！`);
-            
+            battleScreenState.showLogBlock([
+              `レベルが ${levelUpResult.newLevel} にあがった！`,
+              '攻撃力が上がった！ HP最大値が増えた！'
+            ]);
             // レベルアップ強化エフェクトを開始
             battleScreenState.startLevelUpEffect(120); // 2秒間表示
           }
@@ -3488,6 +3510,9 @@ function onAttack() {
             battleState.playerHpTarget = stats.hp;
             battleState.playerHpAnimating = true;
             battleState.log.push('連戦の合間にHPが回復した！（+30%）');
+            battleScreenState.showLogBlock([
+              '連戦の合間にHPが回復した！（+30%）'
+            ]);
           }
           
           // 次の問題に進む際にヒントレベルをリセット
@@ -3541,6 +3566,10 @@ function onAttack() {
     publish('addToReview', gameState.currentKanji.id);
     publish('playSE', 'wrong');
     addToLog(`こうげきしっぱい！${readingMsg}`);
+    battleScreenState.showLogBlock([
+      'こうげきしっぱい！',
+      readingMsg
+    ]);
     
     // 統計データの更新（不正解）
     gameState.playerStats.totalIncorrect++;
@@ -3717,10 +3746,18 @@ function onHeal() {
       gameState.playerStats.maxHp,
       gameState.playerStats.hp + healAmount
     );
+    const healed = gameState.playerStats.hp - prevHp;
     battleState.playerHpTarget    = gameState.playerStats.hp;
     battleState.playerHpAnimating = true;
     // 回復成功ログ（新仕様）
     battleState.log.push(`かいふくせいこう！${readingMsg}`);
+
+    // 行動パック表示（ピン留め）
+    battleScreenState.showLogBlock([
+      'かいふくせいこう！',
+      readingMsg,
+      `HPが${healed}かいふく！`
+    ]);
 
     // 回復成功統計の更新
     gameState.playerStats.healsSuccessful++;
@@ -3740,6 +3777,10 @@ function onHeal() {
     publish('addToReview', gameState.currentKanji.id);
     publish('playSE', 'wrong');
     addToLog(`かいふくしっぱい！${readingMsg}`);
+    battleScreenState.showLogBlock([
+      'かいふくしっぱい！',
+      readingMsg
+    ]);
 
     // 統計データの更新（不正解）
     gameState.playerStats.totalIncorrect++;
@@ -3795,6 +3836,7 @@ function onHint() {
     case 1: {
       const strokes = k.strokes ?? '?';
       addToLog(`ヒント（基本）: 画数は${strokes}`);
+      battleScreenState.showLogBlock([`ヒント（基本）: 画数は${strokes}`]);
       break;
     }
     case 2: {
@@ -3803,11 +3845,13 @@ function onHint() {
       const first = list[0] || '';
       const masked = first ? first.substring(0, 1) + '○○' : '不明';
       addToLog(`ヒント（読み）: ${useOn ? '音読み' : '訓読み'}は「${masked}」から始まる`);
+      battleScreenState.showLogBlock([`ヒント（読み）: ${useOn ? '音読み' : '訓読み'}は「${masked}」から始まる`]);
       break;
     }
     case 3: {
-      addToLog(`ヒント（意味）: ${k.meaning ?? '（準備中）'}`);
-      break;
+        addToLog(`ヒント（意味）: ${k.meaning ?? '（準備中）'}`);
+        battleScreenState.showLogBlock([`ヒント（意味）: ${k.meaning ?? '（準備中）'}`]);
+        break;
     }
     case 4: {
       // 最終ヒント: 読みのどちらかをフル提示
@@ -3815,8 +3859,10 @@ function onHint() {
         const useOn = onyomi.length > 0 ? (Math.random() >= 0.5 || kunyomi.length === 0) : false;
         const list = useOn ? onyomi : kunyomi;
         addToLog(`ヒント（決め手）: ${useOn ? '音読み' : '訓読み'}は「${list[0]}」`);
+        battleScreenState.showLogBlock([`ヒント（決め手）: ${useOn ? '音読み' : '訓読み'}は「${list[0]}」`]);
       } else {
         addToLog('ヒント（決め手）: データがありません');
+        battleScreenState.showLogBlock(['ヒント（決め手）: データがありません']);
       }
       break;
     }
@@ -3846,6 +3892,12 @@ function enemyTurn() {
   // ── ここまで追加 ──
   
   publish('playSE', 'damage');
+
+  // 行動パック表示（ピン留め）
+  battleScreenState.showLogBlock([
+    `${gameState.currentEnemy.name} のこうげき！`,
+    `${gameState.playerName}に${atk}のダメージ！`
+  ]);
 
   if (gameState.playerStats.hp <= 0) {
     // タイマーがある場合は停止
@@ -3978,6 +4030,14 @@ function pickFromPool(pool, poolName) {
 
   gameState.showHint = false;
   addToLog(`「${gameState.currentKanji.text}」をよもう！`);
+  const weakLabel =
+  gameState.currentKanji.weakness === 'onyomi' ? '音読み' :
+  gameState.currentKanji.weakness === 'kunyomi' ? '訓読み' : '';
+battleScreenState.showLogBlock([
+  'あたらしい もんだい！',
+  `「${gameState.currentKanji.text}」をよもう！`,
+  weakLabel ? `弱点は「${weakLabel}」！` : ''
+]);
   
   console.log(`✅ ${poolName}から選択: ${selectedKanji.kanji} (ID: ${selectedKanji.id})`);
   console.log('📝 直近リスト:', battleState.recentKanjiIds);
@@ -4303,6 +4363,10 @@ function updateKanjiMasteryAfterCorrect(currentKanji, answer) {
   if (!before && prog.mastered) {
     battleScreenState.masteryFlash = { active: true, timer: 30, kanjiId: currentKanji.id };
     addToLog('ぜんぶよめた！マスターかんじになった！');
+    battleScreenState.showLogBlock([
+      'ぜんぶよめた！',
+      'マスターかんじになった！'
+    ]);
   }
 }
 
