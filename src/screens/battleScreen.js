@@ -143,17 +143,20 @@ const battleScreenState = {
   // 修正2: pressedButtonsプロパティを追加
   pressedButtons: new Set(),
 
-    // 表示固定用（行動ごとに4行をピン留め）
-    visibleLogBlock: [],
-    visibleBlockUntil: 0,
-    showLogBlock(lines, pinMs = 1600) {
-      this.visibleLogBlock = Array.isArray(lines)
-        ? lines.filter(Boolean).slice(0, 4)
-        : [];
-      this.visibleBlockUntil = Date.now() + (pinMs | 0);
-      // 表示中はヒントのテキストヒントも非表示方向へ
-      this._logHintDismissed = true;
-    },
+		// ブロック表示（履歴＋現在位置）
+		blockHistory: [],
+		currentBlockIndex: -1,
+		showLogBlock(lines) {
+			const block = (Array.isArray(lines) ? lines : [String(lines || '')])
+				.filter(Boolean).map(String).slice(0, 4);
+			if (!this.blockHistory) this.blockHistory = [];
+			this.blockHistory.push(block);
+			this.currentBlockIndex = this.blockHistory.length - 1;
+			// 後方互換（未使用でも残す）
+			this.visibleLogBlock = block;
+			this._logHintDismissed = true;
+			this.logOffset = this.currentBlockIndex; // スクロールと同期
+		},  
 
   /**
    * 漢字ボックスのエフェクトを開始するメソッド
@@ -867,31 +870,37 @@ this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
     const innerBottom = msgY + msgH - 12; // 下部余白
     const maxLinesByHeight = Math.max(1, Math.floor((innerBottom - innerTop) / lineHeight));
 
-    const N = 10; // 原本メッセージの取得数
-    const len = battleState.log.length;
-    const maxOffset = Math.max(0, len - N);
-    this.logOffset = Math.min(Math.max(0, this.logOffset), maxOffset);
-    const start = Math.max(0, len - N - this.logOffset);
-    let lines = battleState.log.slice(start, start + N);
-  
-    // ピン留めブロックが有効なら優先表示
-    const now = Date.now();
-    if (this.visibleBlockUntil > now && this.visibleLogBlock.length) {
-      lines = this.visibleLogBlock;
-    } else if (this.visibleBlockUntil <= now && this.visibleLogBlock.length) {
-      this.visibleLogBlock = [];
-    }
-  
-    // 古い→新しい（上→下）
-    const newestFirst = false;
-    const renderLines = newestFirst ? [...lines].reverse() : lines;
+	let N = 10; // デフォルトは行スクロール
+	let len = battleState.log.length;
+	let maxOffset = Math.max(0, len - N);
+	this.logOffset = Math.min(Math.max(0, this.logOffset || 0), maxOffset);
+	let start = Math.max(0, len - N - this.logOffset);
+	let lines = battleState.log.slice(start, start + N);
+
+	// ブロック表示があればそれを最優先（時間制限なし）
+	if (this.blockHistory && this.blockHistory.length > 0) {
+		if (typeof this.currentBlockIndex !== 'number' || this.currentBlockIndex < 0) {
+			this.currentBlockIndex = this.blockHistory.length - 1;
+		}
+		lines = this.blockHistory[this.currentBlockIndex] || [];
+		// スクロールバー用の値をブロック数に合わせて上書き
+		len = this.blockHistory.length;
+		N = 1;                    // 1ページ=1ブロック
+		maxOffset = Math.max(0, len - 1);
+		this.logOffset = this.currentBlockIndex;
+	}
+ 
+ 	// 古い→新しい（上→下）
+ 	const newestFirst = false;
+ 	const renderLines = newestFirst ? [...lines].reverse() : lines;
 
     this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'top';
 
-  // タイプライター効果の更新
-  if (this.typewriterEffect.active) {
+
+// タイプライター効果の更新（ブロック表示中は無効化）
+  if ((!this.blockHistory || this.blockHistory.length === 0) && this.typewriterEffect.active) {
        this.typewriterEffect.charInterval = 2; // 1→2で表示をゆっくりに
         this.typewriterEffect.charTimer--;
         if (this.typewriterEffect.charTimer <= 0) {
@@ -904,9 +913,10 @@ this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
           this.typewriterEffect.active = false;
         }
       }
-      // 部分文字列に差し替え
-      if (this.typewriterEffect.messageIndex >= 0 && 
-          this.typewriterEffect.messageIndex < lines.length) {
+// 部分文字列に差し替え（ブロック表示時は行わない）
+  if ((!this.blockHistory || this.blockHistory.length === 0) &&
+      this.typewriterEffect.messageIndex >= 0 &&
+     this.typewriterEffect.messageIndex < lines.length) {
         const displayedText = this.typewriterEffect.targetMessage.substring(
           0, 
           this.typewriterEffect.displayedChars
@@ -2117,8 +2127,9 @@ drawEnemyStatusPanel(ctx) {
 					const dy = this.mouseY - (this._dragStartY || this.mouseY);
 					const delta = dy / range;
 					const base = this._dragStartOffset || 0;
-					const next = Math.max(0, Math.min(maxOffset, Math.round(base + delta * maxOffset)));
-					this.logOffset = next;
+          					const next = Math.max(0, Math.min(maxOffset, Math.round(base + delta * maxOffset)));
+          					this.logOffset = next;
+          					if (this.blockHistory && this.blockHistory.length > 0) this.currentBlockIndex = next;
 				}
 			};
       this.canvas.addEventListener('mousemove', this._mousemoveHandler);
@@ -2129,15 +2140,23 @@ drawEnemyStatusPanel(ctx) {
 				const r = this.logRect;
 				if (r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
 					e.preventDefault();
-					const N = 10;
-					const len = battleState.log.length;
-					const maxOffset = Math.max(0, len - N);
-          if (e.deltaY < 0) {
-            this.logOffset = Math.min((this.logOffset || 0) + 1, maxOffset);
-          } else {
-            this.logOffset = Math.max(0, (this.logOffset || 0) - 1);
-          }
-          this._logHintDismissed = true;
+
+			if (this.blockHistory && this.blockHistory.length > 0) {
+				const maxIndex = this.blockHistory.length - 1;
+				if (e.deltaY < 0) {
+					this.currentBlockIndex = Math.max(0, (this.currentBlockIndex || 0) - 1);
+				} else {
+					this.currentBlockIndex = Math.min(maxIndex, (this.currentBlockIndex || 0) + 1);
+				}
+				this.logOffset = this.currentBlockIndex;
+			} else {
+				const N = 10;
+				const len = battleState.log.length;
+				const maxOffset = Math.max(0, len - N);
+				if (e.deltaY < 0) this.logOffset = Math.min((this.logOffset || 0) + 1, maxOffset);
+				else this.logOffset = Math.max(0, (this.logOffset || 0) - 1);
+			}
+ 			this._logHintDismissed = true;
 				}
 			};
       this.canvas.addEventListener('wheel', this._wheelHandler);
@@ -2162,13 +2181,15 @@ this._touchStartHandler = e => {
       e.preventDefault();
       return;
     }
-    if (inTrack && !inThumb) {
-      const rel = Math.max(0, Math.min(1, (gy - sb.trackY - sb.thumbH / 2) / Math.max(1, sb.trackH - sb.thumbH)));
-      this.logOffset = Math.round(rel * (sb.maxOffset || 0));
-      this._logHintDismissed = true;
-      e.preventDefault();
-      return;
-    }
+      		if (inTrack && !inThumb) {
+      			const rel = Math.max(0, Math.min(1, (gy - sb.trackY - sb.thumbH / 2) / Math.max(1, sb.trackH - sb.thumbH)));
+      			const next = Math.round(rel * (sb.maxOffset || 0));
+      			this.logOffset = next;
+      			if (this.blockHistory && this.blockHistory.length > 0) this.currentBlockIndex = next;
+             this._logHintDismissed = true;
+             e.preventDefault();
+             return;
+           }
   }
 };
 this._touchMoveHandler = e => {
@@ -2181,7 +2202,9 @@ this._touchMoveHandler = e => {
   const range = Math.max(1, trackH - thumbH);
   const dy = this.mouseY - (this._dragStartY || this.mouseY);
   const base = this._dragStartOffset || 0;
-  this.logOffset = Math.max(0, Math.min(maxOffset, Math.round(base + (dy / range) * maxOffset)));
+	const next = Math.max(0, Math.min(maxOffset, Math.round(base + (dy / range) * maxOffset)));
+	this.logOffset = next;
+	if (this.blockHistory && this.blockHistory.length > 0) this.currentBlockIndex = next;
   e.preventDefault();
 };
 this._touchEndHandler = () => {
@@ -3066,23 +3089,26 @@ this.canvas.removeEventListener('touchend', this._touchEndHandler);
 			const inThumb = gx >= sb.thumbX && gx <= sb.thumbX + sb.thumbW && gy >= sb.thumbY && gy <= sb.thumbY + sb.thumbH;
 			const inTrack = gx >= sb.trackX && gx <= sb.trackX + sb.trackW && gy >= sb.trackY && gy <= sb.trackY + sb.trackH;
 
-			      // サムをドラッグ開始
-            if (inThumb) {
-              this.draggingLogThumb = true;
-              this._dragStartY = gy;
-              this._dragStartOffset = this.logOffset || 0;
-              this._logHintDismissed = true;
-              e.preventDefault();
-              return;
-            }
-            // トラッククリックでジャンプ
-            if (inTrack && !inThumb) {
-              const rel = Math.max(0, Math.min(1, (gy - sb.trackY - sb.thumbH / 2) / Math.max(1, sb.trackH - sb.thumbH)));
-              this.logOffset = Math.round(rel * (sb.maxOffset || 0));
-              this._logHintDismissed = true;
-              e.preventDefault();
-              return;
-            }
+			       			// サムをドラッグ開始
+ 			if (inThumb) {
+        this.draggingLogThumb = true;
+        this._dragStartY = gy;
+				this._dragStartOffset = (this.blockHistory && this.blockHistory.length > 0)
+					? (this.currentBlockIndex || 0) : (this.logOffset || 0);
+        this._logHintDismissed = true;
+        e.preventDefault();
+        return;
+      }
+      // トラッククリックでジャンプ
+      if (inTrack && !inThumb) {
+        const rel = Math.max(0, Math.min(1, (gy - sb.trackY - sb.thumbH / 2) / Math.max(1, sb.trackH - sb.thumbH)));
+				const next = Math.round(rel * (sb.maxOffset || 0));
+				this.logOffset = next;
+				if (this.blockHistory && this.blockHistory.length > 0) this.currentBlockIndex = next;
+        this._logHintDismissed = true;
+        e.preventDefault();
+        return;
+      }
 		}
 
 		// ボタンの押下状態を更新
