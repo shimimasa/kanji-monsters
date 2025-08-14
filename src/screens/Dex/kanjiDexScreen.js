@@ -4,6 +4,7 @@
 import { publish } from '../../core/eventBus.js';
 import { loadDex } from '../../models/kanjiDex.js';
 import { getKanjiById, kanjiData, getKanjiByGrade } from '../../loaders/dataLoader.js';
+import { gameState } from '../../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../../ui/uiRenderer.js';
 
 const BTN = {
@@ -444,38 +445,78 @@ const kanjiDexScreen = {
     return card;
   },
 
-  /** モーダルを表示 */
   showModal(kanjiId) {
-    const kanjiData = getKanjiById(kanjiId);
-    if (!kanjiData) return;
-    
-    // モーダルコンテナを作成
+    const k = getKanjiById(kanjiId);
+    if (!k) return;
+
+    const frag = document.createDocumentFragment();   // ← 追加
     const modalContainer = document.createElement('div');
     modalContainer.className = 'kanji-modal';
     modalContainer.id = 'kanjiModal';
-    
-    // モーダルコンテンツ
+
     const modalContent = document.createElement('div');
     modalContent.className = 'modal-content';
-    
-    // 閉じるボタン
+
     const closeBtn = document.createElement('button');
     closeBtn.className = 'modal-close';
     closeBtn.textContent = '×';
-    closeBtn.addEventListener('click', () => {
-      this.closeModal();
-    });
+    closeBtn.addEventListener('click', () => this.closeModal());
     modalContent.appendChild(closeBtn);
-    
-    // 漢字を大きく表示
+
     const kanjiEl = document.createElement('h1');
     kanjiEl.className = 'modal-kanji';
-    kanjiEl.textContent = kanjiData.kanji;
+    kanjiEl.textContent = k.kanji;
     modalContent.appendChild(kanjiEl);
-    
-    // 漢字情報
+
+    // まずは骨格だけを同期で表示（体感を速く）
+    const progressSection = document.createElement('div');
+    progressSection.className = 'kanji-reading-progress';
+    progressSection.style.margin = '8px 0 12px';
+    progressSection.textContent = '読みの進捗を読み込み中…';
+    modalContent.appendChild(progressSection);
+
     const infoSection = document.createElement('div');
     infoSection.className = 'kanji-detail-info';
+    modalContent.appendChild(infoSection);
+
+    modalContainer.appendChild(modalContent);
+   frag.appendChild(modalContainer);
+   document.body.appendChild(frag); // 一括追加でレイアウト1回
+
+    // 重い部分は次フレームに分割して描画（カクつき防止）
+    requestAnimationFrame(() => {
+      const toArray = v => Array.isArray(v) ? v : (typeof v === 'string' ? v.split(' ').filter(Boolean) : []);
+      const prog = (gameState && gameState.kanjiReadProgress && gameState.kanjiReadProgress[k.id]) || null;
+      const kunSet = prog?.kunyomi || new Set();
+      const onSet  = prog?.onyomi  || new Set();
+
+      const makeRow = (label, list, masteredSet) => {
+        const row = document.createElement('p');
+        row.style.margin = '4px 0';
+        const strong = document.createElement('strong');
+        strong.textContent = label + ': ';
+        row.appendChild(strong);
+        list.forEach((r, i) => {
+          const span = document.createElement('span');
+          span.textContent = r + (i < list.length - 1 ? '、' : '');
+          span.style.color = (masteredSet && masteredSet.has && masteredSet.has(r)) ? '#3498db' : '#bbb';
+          row.appendChild(span);
+        });
+        return row;
+      };
+
+      progressSection.textContent = ''; // 骨格置換
+      progressSection.appendChild(makeRow('訓読み', toArray(k.kunyomi || []), kunSet));
+      progressSection.appendChild(makeRow('音読み', toArray(k.onyomi  || []), onSet));
+    });
+      // 既存の詳細ブロックはここで構築（必要分のみ）
+      // 例: 学年/画数/意味など…（既存の infoSection 生成コードをここに移してOK）
+    
+    //modalContent.appendChild(progressSection);
+    
+    // 漢字情報
+    //const infoSection = document.createElement('div');
+    //infoSection.className = 'kanji-detail-info';
     
     // 基本情報
     const basicInfo = document.createElement('div');

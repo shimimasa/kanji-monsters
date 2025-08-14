@@ -147,16 +147,18 @@ const battleScreenState = {
 		blockHistory: [],
 		currentBlockIndex: -1,
 		// showLogBlock を2行基本（必要なら3行）に
-  showLogBlock(lines, maxLines = 2) {
-    const block = (Array.isArray(lines) ? lines : [String(lines || '')])
-      .filter(Boolean).map(String).slice(0, maxLines <= 3 ? maxLines : 2);
-    if (!this.blockHistory) this.blockHistory = [];
-    this.blockHistory.push(block);
-    this.currentBlockIndex = this.blockHistory.length - 1;
-    this.visibleLogBlock = block;
-    this._logHintDismissed = true;
-    this.logOffset = this.currentBlockIndex;
-  },
+    showLogBlock(lines, maxLines = 2) {
+      const block = (Array.isArray(lines) ? lines : [String(lines || '')])
+        .filter(Boolean).map(String).slice(0, maxLines <= 3 ? maxLines : 2);
+      if (!this.blockHistory) this.blockHistory = [];
+      this.blockHistory.push(block);
+      this.currentBlockIndex = this.blockHistory.length - 1;
+      this.visibleLogBlock = block;
+      this._logHintDismissed = true;
+      this.logOffset = this.currentBlockIndex;
+  
+
+    },
 
   /**
    * 漢字ボックスのエフェクトを開始するメソッド
@@ -384,10 +386,17 @@ const battleScreenState = {
       battleState.playerHpAnimating = false;
       battleState.lastAnswered = null;
 
-      // 敵の生成と最初の漢字を選択
-        spawnEnemy();
-        pickNextKanji();
-      this.logOffset = 0;
+            // 敵の生成と最初の漢字を選択
+            spawnEnemy();
+            pickNextKanji();
+            this.logOffset = 0;
+      
+           // ステージ開始ごとにブロック履歴をリセット（ステージ跨ぎ持ち越し防止）
+           this.blockHistory = [];
+           this.currentBlockIndex = -1;
+           this.visibleLogBlock = [];
+           try { localStorage.removeItem('bs_blockHistory'); } catch {}
+      
 
       // イベントハンドラの登録
       this.registerHandlers();
