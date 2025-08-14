@@ -512,14 +512,23 @@ const kanjiDexScreen = {
           const chip = document.createElement('span');
           const mastered = masteredSet && masteredSet.has && masteredSet.has(r);
           if (mastered) masteredCount++;
-          chip.textContent = mastered ? `✓ ${r}` : r;
+  
+          chip.textContent = mastered ? `✓ ${r}` : `○ ${r}`;
           chip.style.display = 'inline-block';
           chip.style.padding = '4px 8px';
           chip.style.borderRadius = '999px';
           chip.style.fontSize = '13px';
-          chip.style.border = mastered ? '1px solid #1f4f8d' : '1px solid rgba(255,255,255,0.25)';
-          chip.style.background = mastered ? '#2d6cdf' : 'rgba(255,255,255,0.08)';
-          chip.style.color = mastered ? '#fff' : '#ddd';
+  
+          if (mastered) {
+            chip.style.border = '1px solid #1f4f8d';
+            chip.style.background = '#2d6cdf';
+            chip.style.color = '#fff';
+          } else {
+            chip.style.border = '1px dashed rgba(255,255,255,0.6)';
+            chip.style.background = 'rgba(255,255,255,0.15)';
+            chip.style.color = '#fff';
+          }
+  
           chip.title = mastered ? '読めた' : '未読';
           wrap.appendChild(chip);
         });
