@@ -446,13 +446,15 @@ const kanjiDexScreen = {
   },
 
   showModal(kanjiId) {
-    const k = getKanjiById(kanjiId);
-    if (!k) return;
+        if (document.getElementById('kanjiModal')) return; // 多重起動防止
+        const k = getKanjiById(kanjiId);
+         if (!k) return;
 
-    const frag = document.createDocumentFragment();   // ← 追加
-    const modalContainer = document.createElement('div');
-    modalContainer.className = 'kanji-modal';
-    modalContainer.id = 'kanjiModal';
+        const frag = document.createDocumentFragment();
+        const modalContainer = document.createElement('div');
+        modalContainer.className = 'kanji-modal';
+        modalContainer.id = 'kanjiModal';
+        modalContainer.style.zIndex = '100001';
 
     const modalContent = document.createElement('div');
     modalContent.className = 'modal-content';
@@ -519,31 +521,27 @@ const kanjiDexScreen = {
     //infoSection.className = 'kanji-detail-info';
     
     // 基本情報
+
     const basicInfo = document.createElement('div');
     basicInfo.className = 'kanji-basic-info';
-    
-    if (kanjiData.onyomi) {
+    if (k.onyomi) {
       const onyomiEl = document.createElement('p');
-      onyomiEl.innerHTML = `<strong>音読み:</strong> ${kanjiData.onyomi}`;
+      onyomiEl.innerHTML = `<strong>音読み:</strong> ${k.onyomi}`;
       basicInfo.appendChild(onyomiEl);
     }
-    
-    if (kanjiData.kunyomi) {
+    if (k.kunyomi) {
       const kunyomiEl = document.createElement('p');
-      kunyomiEl.innerHTML = `<strong>訓読み:</strong> ${kanjiData.kunyomi}`;
+      kunyomiEl.innerHTML = `<strong>訓読み:</strong> ${k.kunyomi}`;
       basicInfo.appendChild(kunyomiEl);
     }
-    
-    if (kanjiData.meaning) {
+    if (k.meaning) {
       const meaningEl = document.createElement('p');
-      meaningEl.innerHTML = `<strong>意味:</strong> ${kanjiData.meaning}`;
+      meaningEl.innerHTML = `<strong>意味:</strong> ${k.meaning}`;
       basicInfo.appendChild(meaningEl);
     }
-    
     const gradeStrokesEl = document.createElement('p');
-    gradeStrokesEl.innerHTML = `<strong>学年:</strong> ${kanjiData.grade || '?'}年 <strong>画数:</strong> ${kanjiData.strokes}画`;
+    gradeStrokesEl.innerHTML = `<strong>学年:</strong> ${k.grade || '?'}年 <strong>画数:</strong> ${k.strokes}画`;
     basicInfo.appendChild(gradeStrokesEl);
-    
     infoSection.appendChild(basicInfo);
     
     // 学習記録セクション
@@ -623,9 +621,8 @@ const kanjiDexScreen = {
     infoSection.appendChild(statsSection);
     modalContent.appendChild(infoSection);
     
-    modalContainer.appendChild(modalContent);
-    document.body.appendChild(modalContainer);
-    
+
+    modalContainer.appendChild(modalContent); // すでにfragでappend済み
     // モーダル外クリックで閉じる
     modalContainer.addEventListener('click', (e) => {
       if (e.target === modalContainer) {

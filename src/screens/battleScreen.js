@@ -143,25 +143,25 @@ const battleScreenState = {
     // 修正2: pressedButtonsプロパティを追加
     pressedButtons: new Set(),
 
-    // 表示モード: 'current'（最新のみ） or 'blockPaged'（ブロック履歴ページング）
-    logMode: 'current',
-  
-      // ブロック表示（履歴＋現在位置）
-      blockHistory: [],
-      currentBlockIndex: -1,
-		// showLogBlock を2行基本（必要なら3行）に
-    showLogBlock(lines, maxLines = 2) {
-      const block = (Array.isArray(lines) ? lines : [String(lines || '')])
-        .filter(Boolean).map(String).slice(0, maxLines <= 3 ? maxLines : 2);
-      if (!this.blockHistory) this.blockHistory = [];
-      this.blockHistory.push(block);
-      this.currentBlockIndex = this.blockHistory.length - 1;
-      this.visibleLogBlock = block;
-      this._logHintDismissed = true;
-      this.logOffset = this.currentBlockIndex;
-  
+      // 表示モード: 'current'（最新のみ） or 'blockPaged'（ブロック履歴ページング）
+  logMode: 'current',
 
-    },
+  // ブロック表示（履歴＋現在位置）
+  blockHistory: [],
+  currentBlockIndex: -1,
+  // showLogBlock を2行基本（必要なら3行）に
+   showLogBlock(lines, maxLines = 3) {
+     const block = (Array.isArray(lines) ? lines : [String(lines || '')])
+       .filter(Boolean).map(String).slice(0, Math.min(maxLines, 3));
+    if (!this.blockHistory) this.blockHistory = [];
+    this.blockHistory.push(block);
+    this.currentBlockIndex = this.blockHistory.length - 1;
+    this.visibleLogBlock = block;
+    this._logHintDismissed = true;
+    this.logOffset = this.currentBlockIndex;
+
+
+ },
 
   /**
    * 漢字ボックスのエフェクトを開始するメソッド
@@ -995,8 +995,8 @@ this.ctx.clip();
     const iconSize = 16;
     const iconMargin = 4;
 
-    // 2行ブロックをそのまま表示（各行は省略で1行化）
-    const linesForDraw = renderLines.slice(0, Math.min(2, renderLines.length));
+    // 3行ブロックをそのまま表示（各行は省略で1行化）
+    const linesForDraw = renderLines.slice(0, Math.min(3, renderLines.length));
     let drawY = innerTop;
     linesForDraw.forEach((l, idx) => {
       const color = this.getMessageColor(l);
