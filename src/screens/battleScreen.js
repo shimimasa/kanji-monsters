@@ -826,37 +826,39 @@ const battleScreenState = {
     
 
     /* 入力欄 */
-    if (this.inputEl) {
-      this.inputEl.style.display = 'block';
-      this.inputEl.style.position = 'fixed';
-      this.inputEl.style.left = '50%';
-      this.inputEl.style.transform = 'translateX(-50%)';
-      
-      // レスポンシブ対応：画面サイズに応じて位置を調整
-      const isSmallScreen = window.innerWidth <= 768;
-      if (isSmallScreen) {
-        // スマホの場合：ビューポートの下部に配置
-        this.inputEl.style.bottom = '25vh';
-        this.inputEl.style.top = 'auto';
-        this.inputEl.style.width = '70vw';
-        this.inputEl.style.maxWidth = '280px';
-        this.inputEl.style.fontSize = '16px';
-      } else {
-        // PC の場合：従来の位置
-        this.inputEl.style.top = '320px';
-        this.inputEl.style.bottom = 'auto';
-        this.inputEl.style.width = '280px';
-        this.inputEl.style.fontSize = '20px';
-      }
-      
-      this.inputEl.style.padding = '8px 12px';
-      this.inputEl.style.textAlign = 'center';
-      this.inputEl.style.zIndex = '1000';
-      this.inputEl.style.backgroundColor = 'white';
-      this.inputEl.style.border = '2px solid #ccc';
-      this.inputEl.style.borderRadius = '5px';
-      this.inputEl.style.boxSizing = 'border-box';
-    }
+if (this.inputEl) {
+  this.inputEl.style.display = 'block';
+  this.inputEl.style.position = 'fixed';
+  this.inputEl.style.zIndex = '1000';
+
+  // PC/タブレットのサイズ
+  const isTablet = window.innerWidth <= 1024;
+  this.inputEl.style.width = isTablet ? 'min(70vw, 360px)' : '280px';
+  this.inputEl.style.fontSize = isTablet ? '18px' : '20px';
+  this.inputEl.style.padding = '8px 12px';
+  this.inputEl.style.textAlign = 'center';
+  this.inputEl.style.backgroundColor = 'white';
+  this.inputEl.style.border = '2px solid #ccc';
+  this.inputEl.style.borderRadius = '5px';
+  this.inputEl.style.boxSizing = 'border-box';
+
+  // キャンバス基準の中央下（漢字とボタンの間）に固定
+  const rect = this.canvas.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+
+  // 初回0対策を含めて寸法取得
+  const cs = getComputedStyle(this.inputEl);
+  const inputW = this.inputEl.offsetWidth || parseInt(cs.width) || 280;
+  const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 36;
+
+  const targetCanvasY = 330; // 漢字(約200)とボタン(380)の中間
+  const cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
+
+  this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
+  this.inputEl.style.top = `${Math.round(cssTop)}px`;
+  this.inputEl.style.bottom = 'auto';
+  this.inputEl.style.transform = 'none';
+}
 
   
 // 旧: this.drawPanelBackground(this.ctx, msgX, msgY, msgW, msgH, 'stone');
@@ -3362,6 +3364,10 @@ function onAttack() {
           // 弱点を突いていない場合：ダメージを1に固定
           dmg = 1;
           battleState.log.push(`せいかい！${readingMsg}、しかし${gameState.currentEnemy.name}の防御は固い！`);
+          battleScreenState.showLogBlock([
+            `せいかい！${readingMsg}`,
+            `${gameState.currentEnemy.name}のシールドがかたい！ダメージは1！`
+          ]);
         }
       } else {
         // シールドHPが0の場合：通常通りのダメージ

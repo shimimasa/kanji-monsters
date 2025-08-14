@@ -493,21 +493,67 @@ const kanjiDexScreen = {
       const onSet  = prog?.onyomi  || new Set();
 
       const makeRow = (label, list, masteredSet) => {
-        const row = document.createElement('p');
-        row.style.margin = '4px 0';
-        const strong = document.createElement('strong');
-        strong.textContent = label + ': ';
-        row.appendChild(strong);
-        list.forEach((r, i) => {
-          const span = document.createElement('span');
-          span.textContent = r + (i < list.length - 1 ? '、' : '');
-          span.style.color = (masteredSet && masteredSet.has && masteredSet.has(r)) ? '#3498db' : '#bbb';
-          row.appendChild(span);
+        const row = document.createElement('div');
+        row.style.margin = '6px 0';
+
+        const header = document.createElement('strong');
+        const total = list.length;
+        let masteredCount = 0;
+        header.textContent = `${label}（${total}）`;
+        row.appendChild(header);
+
+        const wrap = document.createElement('div');
+        wrap.style.display = 'flex';
+        wrap.style.flexWrap = 'wrap';
+        wrap.style.gap = '6px';
+        wrap.style.marginTop = '4px';
+
+        list.forEach((r) => {
+          const chip = document.createElement('span');
+          const mastered = masteredSet && masteredSet.has && masteredSet.has(r);
+          if (mastered) masteredCount++;
+          chip.textContent = mastered ? `✓ ${r}` : r;
+          chip.style.display = 'inline-block';
+          chip.style.padding = '4px 8px';
+          chip.style.borderRadius = '999px';
+          chip.style.fontSize = '13px';
+          chip.style.border = mastered ? '1px solid #1f4f8d' : '1px solid rgba(255,255,255,0.25)';
+          chip.style.background = mastered ? '#2d6cdf' : 'rgba(255,255,255,0.08)';
+          chip.style.color = mastered ? '#fff' : '#ddd';
+          chip.title = mastered ? '読めた' : '未読';
+          wrap.appendChild(chip);
         });
+
+        header.textContent = `${label}（${masteredCount}/${total}）`;
+        row.appendChild(wrap);
         return row;
       };
 
-      progressSection.textContent = ''; // 骨格置換
+      progressSection.textContent = '';
+
+      const legend = document.createElement('div');
+      legend.style.display = 'flex';
+      legend.style.gap = '12px';
+      legend.style.alignItems = 'center';
+      legend.style.margin = '4px 0 8px';
+      const mkLegendChip = (text, mastered) => {
+        const s = document.createElement('span');
+        s.textContent = text;
+        s.style.display = 'inline-block';
+        s.style.padding = '2px 8px';
+        s.style.borderRadius = '999px';
+        s.style.fontSize = '12px';
+        if (mastered) {
+          s.style.background = '#2d6cdf'; s.style.color = '#fff'; s.style.border = '1px solid #1f4f8d';
+        } else {
+          s.style.background = 'rgba(255,255,255,0.08)'; s.style.color = '#ddd'; s.style.border = '1px solid rgba(255,255,255,0.25)';
+        }
+        return s;
+      };
+      legend.appendChild(mkLegendChip('✓ 読めた', true));
+      legend.appendChild(mkLegendChip('未読', false));
+      progressSection.appendChild(legend);
+
       progressSection.appendChild(makeRow('訓読み', toArray(k.kunyomi || []), kunSet));
       progressSection.appendChild(makeRow('音読み', toArray(k.onyomi  || []), onSet));
     });
