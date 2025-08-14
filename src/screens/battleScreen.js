@@ -21,9 +21,10 @@ const BTN = {
   hint:   { x: 470, y: 380, w: 110, h: 50,  label: 'ヒント' },
 };
 
-const ENEMY_DAMAGE_ANIM_DURATION = 10; // ダメージ時の振動フレーム数
-const ENEMY_ATTACK_ANIM_DURATION = 15; // 攻撃時の突進フレーム数
-const ENEMY_DEFEAT_ANIM_DURATION = 30; // フレーム数（30フレームで約0.5秒）
+
+const ENEMY_DAMAGE_ANIM_DURATION = 30; // 約0.5秒（攻撃ヒット演出: 400〜600ms）
+const ENEMY_ATTACK_ANIM_DURATION = 45; // 約0.75秒（敵の突進/被ダメ: 600〜800ms）
+const ENEMY_DEFEAT_ANIM_DURATION = 60; // 約1.0秒（撃破演出: 800〜1000ms）
 const PLAYER_HP_ANIM_SPEED = 2;
 
 const battleScreenState = {
@@ -3342,15 +3343,16 @@ function onAttack() {
           battleState.inputEnabled = false;
           
           // 1秒後に敵のターンを実行し、その後プレイヤーターンに戻す
-          setTimeout(() => {
-            enemyTurn();
-            // 敵の攻撃後、次の問題を出題してプレイヤーターンに戻す
-            setTimeout(() => {
-              pickNextKanji();
-              battleState.turn = 'player';
-              battleState.inputEnabled = true;
-            }, 1500); // 敵の攻撃アニメーション分の時間を確保
-          }, 1000);
+                      setTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
+                         enemyTurn();
+                        // 敵ターン終了→次の問題表示: 1.7s
+                        setTimeout(() => {
+                           pickNextKanji();
+                           battleState.turn = 'player';
+                           battleState.inputEnabled = true;
+
+                        }, 1700);
+                     }, 1300);
           
           // 入力欄をクリア
           inputEl.value = '';
@@ -3509,16 +3511,15 @@ function onAttack() {
       battleState.turn = 'enemy';
       battleState.inputEnabled = false;
       
-      // 1秒後に敵のターンを実行し、その後プレイヤーターンに戻す
-      setTimeout(() => {
-        enemyTurn();
-        // 敵の攻撃後、次の問題を出題してプレイヤーターンに戻す
-        setTimeout(() => {
-          pickNextKanji();
-          battleState.turn = 'player';
-          battleState.inputEnabled = true;
-        }, 1500); // 敵の攻撃アニメーション分の時間を確保
-      }, 1000);
+              setTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
+                 enemyTurn();
+                // 敵ターン終了→次の問題表示: 1.7s
+                setTimeout(() => {
+                   pickNextKanji();
+                   battleState.turn = 'player';
+                   battleState.inputEnabled = true;
+                }, 1700);
+              }, 1300);
     }
     
   } else {
@@ -3597,24 +3598,15 @@ function onAttack() {
     
     console.log('🔄 敵のターンに移行します');
     
-    // 1秒後に敵の攻撃を実行
-    setTimeout(() => {
-      console.log('👹 敵の攻撃を開始');
-      enemyTurn();
-      
-      // 敵の攻撃後、1.5秒後に次の問題を出題してプレイヤーターンに戻す
-      setTimeout(() => {
-        console.log('📝 次の漢字を出題');
-        pickNextKanji();
-        
-        // プレイヤーターンに戻す
-        setTimeout(() => {
-          console.log('🎮 プレイヤーターンに戻ります');
-          battleState.turn = 'player';
-          battleState.inputEnabled = true;
-        }, 500);
-      }, 1500); // 敵の攻撃アニメーション分の時間を確保
-    }, 1000);
+      　      setTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
+               enemyTurn();
+              // 敵ターン終了→次の問題表示: 1.7s
+              setTimeout(() => {
+                 pickNextKanji();
+                 battleState.turn = 'player';
+                 battleState.inputEnabled = true;
+              }, 1700);
+            }, 1300);
   }
   
   // 入力欄をクリア
@@ -3777,17 +3769,20 @@ function onHeal() {
   // 入力欄をクリア
   inputEl.value = '';
 
-  // 3) 敵ターン＆プレイヤー復帰
-  battleState.turn = 'enemy';
-  setTimeout(() => {
-    enemyTurn();
-    // 敵の行動ログの後で、次の漢字を提示
-    pickNextKanji();
-    setTimeout(() => {
-      battleState.turn = 'player';
-      battleState.inputEnabled = true;
-    }, 500);
-  }, 1000);
+
+      // プレイヤー行動→敵ターン開始待ち: 1.3s
+      setTimeout(() => {
+        enemyTurn();
+        // 敵ターン終了→次の問題表示: 1.7s
+        setTimeout(() => {
+          pickNextKanji();
+          // 入力再開までの待機: 0.65s
+          setTimeout(() => {
+            battleState.turn = 'player';
+            battleState.inputEnabled = true;
+          }, 650);
+        }, 1700);
+      }, 1300);
 }
   
 
