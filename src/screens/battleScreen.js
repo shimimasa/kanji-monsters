@@ -729,15 +729,15 @@ const battleScreenState = {
         return y + 18; // 次に描くベースYを返す
       };
 
-      // 訓読み（正解済みのみ青、折り返し）
-      let nextY = drawWrappedTokens('訓読み: ', (battleState.lastAnswered.kunyomi || []), by + 85, progKun);
-
       // 音読み（正解済みのみ青、折り返し）
-      nextY = drawWrappedTokens('音読み: ', (battleState.lastAnswered.onyomi || []), nextY, progOn);
+let nextY = drawWrappedTokens('音読み: ', (battleState.lastAnswered.onyomi || []), by + 85, progOn);
 
-      // 画数（常に白色）
-      this.ctx.fillStyle = 'white';
-      this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY);
+// 訓読み（正解済みのみ青、折り返し）
+nextY = drawWrappedTokens('訓読み: ', (battleState.lastAnswered.kunyomi || []), nextY, progKun);
+
+// 画数（常に白色）
+this.ctx.fillStyle = 'white';
+this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY);
 
       // 間違った答え表示（既存）
       if (this.lastIncorrectAnswer) {
