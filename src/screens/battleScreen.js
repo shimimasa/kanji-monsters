@@ -928,23 +928,17 @@ const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 
       }
     }
 
-    // 折り返しヘルパー（1行目と2行目以降で幅を変えられる）
-    const wrapWithWidths = (ctx, text, firstWidth, nextWidth) => {
-      const out = [];
-      let current = '';
-      let width = firstWidth;
-      for (const ch of text) {
-        const trial = current + ch;
-        if (ctx.measureText(trial).width <= width) {
-          current = trial;
-        } else {
-          if (current) out.push(current);
-          current = ch;
-          width = nextWidth; // 2行目以降はnextWidth
-        }
+    // 省略表示ヘルパー（幅に収めて末尾に…）
+    const truncateToWidth = (ctx, text, width) => {
+      let t = String(text || '');
+      if (ctx.measureText(t).width <= width) return t;
+      let lo = 0, hi = t.length;
+      while (lo < hi) {
+        const mid = Math.ceil((lo + hi) / 2);
+        const s = t.slice(0, mid) + '…';
+        if (ctx.measureText(s).width <= width) lo = mid; else hi = mid - 1;
       }
-      if (current) out.push(current);
-      return out;
+      return t.slice(0, lo) + '…';
     };
 
         // クリップ
@@ -983,116 +977,59 @@ this.ctx.clip();
     const iconSize = 16;
     const iconMargin = 4;
 
-    const segments = [];
-    renderLines.forEach((l, i) => {
-      const color = this.getMessageColor(l);
-
-      // アイコン種別判定（従来ロジックを踏襲）
-      let iconType = 'none'; // 'attack' | 'heal' | 'hint' | 'check' | 'star' | 'none'
-      if (l.includes('ダメージ') || l.includes('こうげき')) {
-        iconType = 'attack';
-      } else if (l.includes('せいかい！') || l.includes('弱点にヒット') || l.includes('ボーナス')) {
-        iconType = 'check';
-      } else if (l.includes('かいふく')) {
-        iconType = 'heal';
-      } else if (l.includes('をたおした') || l.includes('あらわれた')) {
-        iconType = 'attack';
-      } else if (l.includes('経験値') || l.includes('レベル')) {
-        iconType = 'star';
-      } else if (l.includes('ヒント')) {
-        iconType = 'hint';
-      }
-
-      // 1行目幅（アイコン分を引く）、2行目以降幅
-      const firstWidth = iconType === 'check' || iconType === 'star'
-        ? (innerRight - (innerLeft + iconSize + iconMargin))
-        : (iconType !== 'none'
-            ? (innerRight - (innerLeft + iconSize + iconMargin))
-            : (innerRight - innerLeft));
-      const nextWidth  = innerRight - innerLeft;
-
-      const wrapped = wrapWithWidths(this.ctx, l, firstWidth, nextWidth);
-
-      wrapped.forEach((textSeg, segIdx) => {
-        segments.push({
-          msgIndex: i,
-          text: textSeg,
-          color,
-          iconType,
-          firstSeg: segIdx === 0
-        });
-      });
-    });
-
-    // 下からmaxLinesByHeightだけ取得
-    const visibleSegments = segments.slice(-maxLinesByHeight);
-
-    // 描画（上から下へ）。同一メッセージの最初にだけアイコン描画
-    const drawnIconFor = new Set();
+    // 2行ブロックをそのまま表示（各行は省略で1行化）
+    const linesForDraw = renderLines.slice(0, Math.min(2, renderLines.length));
     let drawY = innerTop;
+    linesForDraw.forEach((l, idx) => {
+      const color = this.getMessageColor(l);
+      // アイコン種別
+      let iconType = 'none';
+      if (l.includes('ダメージ') || l.includes('こうげき')) iconType = 'attack';
+      else if (l.includes('せいかい！') || l.includes('弱点にヒット') || l.includes('ボーナス')) iconType = 'check';
+      else if (l.includes('かいふく')) iconType = 'heal';
+      else if (l.includes('をたおした') || l.includes('あらわれた')) iconType = 'attack';
+      else if (l.includes('経験値') || l.includes('レベル')) iconType = 'star';
+      else if (l.includes('ヒント')) iconType = 'hint';
 
-       visibleSegments.forEach((seg, idx) => {
-        const baseX = innerLeft;
-        const isNewestLine = idx === visibleSegments.length - 1;
-        if (isNewestLine && !this.typewriterEffect.active) {
-                     this.ctx.save();
-                     this.ctx.fillStyle = 'rgba(255,215,0,0.08)'; // 薄い金色
-                     this.ctx.fillRect(msgX + 4, drawY - 2, msgW - 8, logLineHeight + 4);
-                     this.ctx.restore();
-                   }
-
-      // アイコン描画は1メッセージにつき最初の可視行のみ
-      let textX = baseX;
-      if (!drawnIconFor.has(seg.msgIndex) && seg.firstSeg && seg.iconType !== 'none') {
-        if (seg.iconType === 'check') {
-          
-          this.ctx.save();
-          this.ctx.fillStyle = '#2ecc71';
-          this.ctx.font = `${iconSize}px sans-serif`;
-          this.ctx.textAlign = 'center';
-          this.ctx.textBaseline = 'middle';
-          this.ctx.fillText('✓', baseX + iconSize/2, drawY + 10);
-          this.ctx.restore();
-          textX = baseX + iconSize + iconMargin;
-        } else if (seg.iconType === 'star') {
-          this.ctx.save();
-          this.ctx.fillStyle = '#f1c40f';
-          this.ctx.font = `${iconSize}px sans-serif`;
-          this.ctx.textAlign = 'center';
-          this.ctx.textBaseline = 'middle';
-          this.ctx.fillText('★', baseX + iconSize/2, drawY + 10);
-          this.ctx.restore();
-          textX = baseX + iconSize + iconMargin;
-        } else {
-          // 画像アイコン（攻撃/回復/ヒント）
-          let iconImg = null;
-          if (seg.iconType === 'attack') iconImg = images.iconAttack;
-          else if (seg.iconType === 'heal') iconImg = images.iconHeal;
-          else if (seg.iconType === 'hint') iconImg = images.iconHint;
-
-          if (iconImg) {
-            this.ctx.save();
-            if (seg.iconType === 'attack') {
-              this.ctx.filter = 'hue-rotate(0deg) saturate(1.2)';
-            } else if (seg.iconType === 'heal') {
-              this.ctx.filter = 'hue-rotate(90deg) saturate(1.5)';
-            } else if (seg.iconType === 'hint') {
-              this.ctx.filter = 'hue-rotate(45deg) saturate(1.3)';
-            }
-            this.ctx.drawImage(iconImg, baseX, drawY + 2, iconSize, iconSize);
-            this.ctx.restore();
-            textX = baseX + iconSize + iconMargin;
-          }
-        }
-        drawnIconFor.add(seg.msgIndex);
+      const baseX = innerLeft;
+      // 最新行に薄いハイライト
+      const isNewestLine = idx === linesForDraw.length - 1 && !this.typewriterEffect.active;
+      if (isNewestLine) {
+        this.ctx.save();
+        this.ctx.fillStyle = 'rgba(255,215,0,0.08)';
+        this.ctx.fillRect(msgX + 4, drawY - 2, msgW - 8, logLineHeight + 4);
+        this.ctx.restore();
       }
-
-      const fillColor = seg.color || '#F3E9D7';
+      // アイコン描画
+      let textX = baseX;
+      const iconSize = 16, iconMargin = 4;
+      if (iconType === 'check' || iconType === 'star') {
+        this.ctx.save();
+        this.ctx.fillStyle = (iconType === 'check') ? '#2ecc71' : '#f1c40f';
+        this.ctx.font = `${iconSize}px sans-serif`;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(iconType === 'check' ? '✓' : '★', baseX + iconSize/2, drawY + 10);
+        this.ctx.restore();
+        textX = baseX + iconSize + iconMargin;
+      } else {
+        let iconImg = null;
+        if (iconType === 'attack') iconImg = images.iconAttack;
+        else if (iconType === 'heal') iconImg = images.iconHeal;
+        else if (iconType === 'hint') iconImg = images.iconHint;
+        if (iconImg) {
+          this.ctx.drawImage(iconImg, baseX, drawY + 2, iconSize, iconSize);
+          textX = baseX + iconSize + iconMargin;
+        }
+      }
+      // 幅を測って省略
+      const maxW = innerRight - textX;
+      const text = truncateToWidth(this.ctx, l, maxW);
       this.drawTextWithOutline(
-        seg.text,
+        text,
         textX,
         drawY,
-        fillColor,
+        color || '#F3E9D7',
         'rgba(0,0,0,0.9)',
         '16px "UDデジタル教科書体", sans-serif',
         'left',
