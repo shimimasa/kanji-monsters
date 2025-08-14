@@ -146,17 +146,17 @@ const battleScreenState = {
 		// ブロック表示（履歴＋現在位置）
 		blockHistory: [],
 		currentBlockIndex: -1,
-		showLogBlock(lines) {
-			const block = (Array.isArray(lines) ? lines : [String(lines || '')])
-				.filter(Boolean).map(String).slice(0, 4);
-			if (!this.blockHistory) this.blockHistory = [];
-			this.blockHistory.push(block);
-			this.currentBlockIndex = this.blockHistory.length - 1;
-			// 後方互換（未使用でも残す）
-			this.visibleLogBlock = block;
-			this._logHintDismissed = true;
-			this.logOffset = this.currentBlockIndex; // スクロールと同期
-		},  
+		// showLogBlock を2行基本（必要なら3行）に
+  showLogBlock(lines, maxLines = 2) {
+    const block = (Array.isArray(lines) ? lines : [String(lines || '')])
+      .filter(Boolean).map(String).slice(0, maxLines <= 3 ? maxLines : 2);
+    if (!this.blockHistory) this.blockHistory = [];
+    this.blockHistory.push(block);
+    this.currentBlockIndex = this.blockHistory.length - 1;
+    this.visibleLogBlock = block;
+    this._logHintDismissed = true;
+    this.logOffset = this.currentBlockIndex;
+  },
 
   /**
    * 漢字ボックスのエフェクトを開始するメソッド
@@ -848,15 +848,21 @@ const battleScreenState = {
   
 // 旧: this.drawPanelBackground(this.ctx, msgX, msgY, msgW, msgH, 'stone');
 
-// ── メッセージ欄（右下・可変幅）──
 const margin = 12;
 const msgMinW = 500;
 const msgMaxW = 640;
 const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 0.62)));
-const msgH = 148;
-const msgX = this.canvas.width - margin - msgW;
-const msgY = this.canvas.height - margin - msgH;
-// イベント用の矩形
+let   msgH = 148; // 仮
+let   msgX = this.canvas.width - margin - msgW;
+let   msgY = this.canvas.height - margin - msgH;
+
+// … lines を決定した直後（renderLines 計算直後）に追加
+const visibleCount = Math.max(1, (Array.isArray(lines) ? lines.length : 1));
+const lineHeight   = visibleCount >= 3 ? 22 : 24;   // 少し広め
+const titleH       = 24;
+const padBottom    = 12;
+msgH = titleH + padBottom + lineHeight * visibleCount;
+msgY = this.canvas.height - margin - msgH;
 this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
 
 // タイトルは背景描画後に高コントラストで描画（下方で描画）
@@ -894,7 +900,7 @@ this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
  	const newestFirst = false;
  	const renderLines = newestFirst ? [...lines].reverse() : lines;
 
-    this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
+    this.ctx.font = '18px "UDデジタル教科書体", sans-serif';
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'top';
 
