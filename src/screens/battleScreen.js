@@ -140,12 +140,15 @@ const battleScreenState = {
   isPrevKanjiPanelOpen: false,
   lastAnsweredKanji: null,
 
-  // 修正2: pressedButtonsプロパティを追加
-  pressedButtons: new Set(),
+    // 修正2: pressedButtonsプロパティを追加
+    pressedButtons: new Set(),
 
-		// ブロック表示（履歴＋現在位置）
-		blockHistory: [],
-		currentBlockIndex: -1,
+    // 表示モード: 'current'（最新のみ） or 'blockPaged'（ブロック履歴ページング）
+    logMode: 'current',
+  
+      // ブロック表示（履歴＋現在位置）
+      blockHistory: [],
+      currentBlockIndex: -1,
 		// showLogBlock を2行基本（必要なら3行）に
     showLogBlock(lines, maxLines = 2) {
       const block = (Array.isArray(lines) ? lines : [String(lines || '')])
@@ -871,18 +874,24 @@ const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 
 	let start = Math.max(0, len - N - this.logOffset);
 	let lines = battleState.log.slice(start, start + N);
 
-	// ブロック表示があればそれを最優先（時間制限なし）
-	if (this.blockHistory && this.blockHistory.length > 0) {
-		if (typeof this.currentBlockIndex !== 'number' || this.currentBlockIndex < 0) {
-			this.currentBlockIndex = this.blockHistory.length - 1;
-		}
-		lines = this.blockHistory[this.currentBlockIndex] || [];
-		// スクロールバー用の値をブロック数に合わせて上書き
-		len = this.blockHistory.length;
-		N = 1;                    // 1ページ=1ブロック
-		maxOffset = Math.max(0, len - 1);
-		this.logOffset = this.currentBlockIndex;
-	}
+		// ブロック表示 or 現在表示の選択
+  	if (this.logMode === 'blockPaged' && this.blockHistory && this.blockHistory.length > 0) {
+      if (typeof this.currentBlockIndex !== 'number' || this.currentBlockIndex < 0) {
+        this.currentBlockIndex = this.blockHistory.length - 1;
+      }
+      lines = this.blockHistory[this.currentBlockIndex] || [];
+      // スクロールバー用の値をブロック数に合わせて上書き
+      len = this.blockHistory.length;
+      N = 1;                    // 1ページ=1ブロック
+      maxOffset = Math.max(0, len - 1);
+      this.logOffset = this.currentBlockIndex;
+  	} else if (this.logMode === 'current') {
+  		// 常に最新の行動のみ（2行まで）
+  		lines = (this.visibleLogBlock && this.visibleLogBlock.length)
+  			? this.visibleLogBlock
+  			: battleState.log.slice(-2);
+  		len = 1; N = 1; maxOffset = 0; this.logOffset = 0;
+    }
  
  	// 古い→新しい（上→下）
  	const newestFirst = false;
@@ -1049,77 +1058,66 @@ this.ctx.clip();
     });
     this.ctx.restore();
     
-        // 右側スクロールバー（トラック＋サム）
-        const trackW = 12;
-        const trackX = msgX + msgW - trackW - 6;
-        const trackY = msgY + 26;
-        const trackH = msgH - 34;
-    
-        // スクロール量（メッセージ件数ベース）: 上で算出した N/len/maxOffset を再利用
-        // const N = 10;
-        // const len = battleState.log.length;
-        // const maxOffset = Math.max(0, len - N);
-    
-        // サム高さ（可視割合に応じて決定）
-        const minThumbH = 24;
-        const thumbH = Math.max(minThumbH, Math.floor(trackH * (N / Math.max(N, len))));
-        const progress = maxOffset > 0 ? (this.logOffset || 0) / maxOffset : 0;
-        const thumbY = trackY + Math.floor((trackH - thumbH) * progress);
-    
-        // トラック
-        this.ctx.fillStyle = 'rgba(0,0,0,0.35)';
-        this.ctx.fillRect(trackX, trackY, trackW, trackH);
-        this.ctx.strokeStyle = '#B8860B';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(trackX, trackY, trackW, trackH);
-    
-        // サム
-        this.ctx.fillStyle = '#D6A650';
-        this.ctx.fillRect(trackX + 1, thumbY, trackW - 2, thumbH);
-        this.ctx.strokeStyle = '#8B5A2B';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(trackX + 1, thumbY, trackW - 2, thumbH);
-    
-        // イベント用に保持
-this.logScrollbar = {
-  trackX, trackY, trackW, trackH,
-  thumbX: trackX + 1, thumbY, thumbW: trackW - 2, thumbH,
-  maxOffset
-};
 
-// 追加: カーソル形状（ヒット感を上げる）
-if (this.mouseX != null && this.mouseY != null) {
-  const sb = this.logScrollbar;
-  const overThumb = (this.mouseX >= sb.thumbX && this.mouseX <= sb.thumbX + sb.thumbW &&
-                     this.mouseY >= sb.thumbY && this.mouseY <= sb.thumbY + sb.thumbH);
-  const overTrack = (this.mouseX >= sb.trackX && this.mouseX <= sb.trackX + sb.trackW &&
-                     this.mouseY >= sb.trackY && this.mouseY <= sb.trackY + sb.trackH);
-  this.canvas.style.cursor = overThumb ? 'grab' : (overTrack ? 'ns-resize' : 'default');
+// 右側スクロールバー（currentモードでは非表示）
+if (this.logMode === 'blockPaged') {
+  const trackW = 12;
+  const trackX = msgX + msgW - trackW - 6;
+  const trackY = msgY + 26;
+  const trackH = msgH - 34;
+  const minThumbH = 24;
+  const thumbH = Math.max(minThumbH, Math.floor(trackH * (N / Math.max(N, len))));
+  const progress = maxOffset > 0 ? (this.logOffset || 0) / maxOffset : 0;
+  const thumbY = trackY + Math.floor((trackH - thumbH) * progress);
+  this.ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  this.ctx.fillRect(trackX, trackY, trackW, trackH);
+  this.ctx.strokeStyle = '#B8860B';
+  this.ctx.lineWidth = 1;
+  this.ctx.strokeRect(trackX, trackY, trackW, trackH);
+  this.ctx.fillStyle = '#D6A650';
+  this.ctx.fillRect(trackX + 1, thumbY, trackW - 2, thumbH);
+  this.ctx.strokeStyle = '#8B5A2B';
+  this.ctx.lineWidth = 1;
+  this.ctx.strokeRect(trackX + 1, thumbY, trackW - 2, thumbH);
+  this.logScrollbar = {
+    trackX, trackY, trackW, trackH,
+    thumbX: trackX + 1, thumbY, thumbW: trackW - 2, thumbH,
+    maxOffset
+  };
+  if (this.mouseX != null && this.mouseY != null) {
+    const sb = this.logScrollbar;
+    const overThumb = (this.mouseX >= sb.thumbX && this.mouseX <= sb.thumbX + sb.thumbW &&
+                       this.mouseY >= sb.thumbY && this.mouseY <= sb.thumbY + sb.thumbH);
+    const overTrack = (this.mouseX >= sb.trackX && this.mouseX <= sb.trackX + sb.trackW &&
+                       this.mouseY >= sb.trackY && this.mouseY <= sb.trackY + sb.trackH);
+    this.canvas.style.cursor = overThumb ? 'grab' : (overTrack ? 'ns-resize' : 'default');
+  }
+} else {
+  this.logScrollbar = null;
 }
 
-        // スクロールヒント（内容があふれる場合のみ・初回だけ表示して自動フェード）
-        if (len > N) {
-          if (this._logHintDismissed !== true) {
-            if (this._logHintTimer == null) this._logHintTimer = 180; // 約3秒
-            if (this._logHintTimer > 0) {
-              this.drawTextWithOutline(
-                "↑↓ ホイール / 右のバーでスクロール",
-                msgX + msgW/2,
-                msgY + msgH - 18,
-                `rgba(255, 255, 255, ${Math.min(0.9, this._logHintTimer / 120)})`,
-                'black',
-                '10px "UDデジタル教科書体", sans-serif',
-                'center',
-                'top',
-                1
-              );
-              this._logHintTimer--;
-            }
-          }
-        } else {
-          // あふれていなければヒントを消す
-          this._logHintDismissed = true;
-        }
+  // スクロールヒント（blockPagedのときだけ）
+  if (this.logMode === 'blockPaged' && len > N) {
+    if (this._logHintDismissed !== true) {
+      if (this._logHintTimer == null) this._logHintTimer = 180; // 約3秒
+      if (this._logHintTimer > 0) {
+        this.drawTextWithOutline(
+          "↑↓ ホイール / 右のバーでスクロール",
+          msgX + msgW/2,
+          msgY + msgH - 18,
+          `rgba(255, 255, 255, ${Math.min(0.9, this._logHintTimer / 120)})`,
+          'black',
+          '10px "UDデジタル教科書体", sans-serif',
+          'center',
+          'top',
+          1
+        );
+        this._logHintTimer--;
+      }
+    }
+  } else {
+    this._logHintDismissed = true;
+  }       
 
     // レベルアップメッセージの描画
     if (this.levelUpMessage) {
