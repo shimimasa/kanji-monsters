@@ -869,13 +869,12 @@ this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
 
     // 表示準備
     const padding = 8;
-    const lineHeight = 22;
+　  const logLineHeight = 22;
     const innerLeft = msgX + padding;
     const innerTop  = msgY + 28;         // タイトル下から
     const innerRight = msgX + msgW - padding;
     const innerBottom = msgY + msgH - 12; // 下部余白
-    const maxLinesByHeight = Math.max(1, Math.floor((innerBottom - innerTop) / lineHeight));
-
+    const maxLinesByHeight = Math.max(1, Math.floor((innerBottom - innerTop) / logLineHeight));
 	let N = 10; // デフォルトは行スクロール
 	let len = battleState.log.length;
 	let maxOffset = Math.max(0, len - N);
@@ -1035,14 +1034,14 @@ this.ctx.clip();
     let drawY = innerTop;
 
        visibleSegments.forEach((seg, idx) => {
-         const baseX = innerLeft;
+        const baseX = innerLeft;
         const isNewestLine = idx === visibleSegments.length - 1;
         if (isNewestLine && !this.typewriterEffect.active) {
-          this.ctx.save();
-          this.ctx.fillStyle = 'rgba(255,215,0,0.08)'; // 薄い金色
-          this.ctx.fillRect(msgX + 4, drawY - 2, msgW - 8, lineHeight + 4);
-          this.ctx.restore();
-        }
+                     this.ctx.save();
+                     this.ctx.fillStyle = 'rgba(255,215,0,0.08)'; // 薄い金色
+                     this.ctx.fillRect(msgX + 4, drawY - 2, msgW - 8, logLineHeight + 4);
+                     this.ctx.restore();
+                   }
 
       // アイコン描画は1メッセージにつき最初の可視行のみ
       let textX = baseX;
@@ -1102,7 +1101,7 @@ this.ctx.clip();
         'top',
         3
       );
-      drawY += lineHeight;
+      drawY += logLineHeight;
     });
     this.ctx.restore();
     
