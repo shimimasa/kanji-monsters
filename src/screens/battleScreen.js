@@ -226,6 +226,11 @@ const battleScreenState = {
         return;
       }
       
+          // ▼▼▼ 追加：各ステージ開始時に回復回数をリセット ▼▼▼
+    gameState.playerStats.healCount = 3; // 各ステージで3回まで回復可能
+    console.log('🔄 回復回数をリセット: 3回');
+    // ▲▲▲ ここまで追加 ▲▲▲
+
       // ステージIDに基づいて適切なBGMを選択
       const bgmKey = this.getBGMKeyForStage(gameState.currentStageId);
       console.log(`🎵 ステージ ${gameState.currentStageId} のBGM: ${bgmKey}`);
@@ -1973,6 +1978,16 @@ if (hh.visible) {
     'left', 'top', 2
   );
   // --- ▲ここまで▲ ---
+  // ▼▼▼ 追加：回復回数表示 ▼▼▼
+  const healCount = gameState.playerStats.healCount || 0;
+  this.drawTextWithOutline(
+    `回復: ${healCount}/3回`,
+    contentX + contentW, barY + barH + 18,
+    healCount > 0 ? '#2ecc71' : '#e74c3c', // 残りがあれば緑、なければ赤
+    '#F5DEB3', '14px "UDデジタル教科書体", sans-serif',
+    'right', 'top', 2
+  );
+  // ▲▲▲ ここまで追加 ▲▲▲
 },
 
 // battleScreen.js内の既存のdrawEnemyStatusPanel関数を、以下のコードで完全に置き換えてください。
@@ -3679,9 +3694,14 @@ function onHeal() {
   // プレイヤーターンかつ入力許可中でなければ終了
   if (battleState.turn !== 'player' || !battleState.inputEnabled) return;
 
-  // 回復回数チェック
-  if (gameState.playerStats.healCount <= 0) {
-    alert('回復はもう使えません！');
+  // 回復回数チェック（修正版：より詳細なログ出力）
+  const remainingHeals = gameState.playerStats.healCount || 0;
+  console.log(`🔍 回復回数チェック: 残り${remainingHeals}回`);
+  
+  if (remainingHeals <= 0) {
+    alert('このステージでの回復はもう使えません！');
+    // 入力を再度有効にする
+    battleState.inputEnabled = true;
     return;
   }
 
@@ -3752,8 +3772,19 @@ function onHeal() {
     // 回復成功統計の更新
 gameState.playerStats.healsSuccessful++;
 
-// 回復回数を1消費（下限0）
-gameState.playerStats.healCount = Math.max(0, (gameState.playerStats.healCount || 0) - 1);
+    // ▼▼▼ 修正：回復回数を1消費（下限0）＋ログ出力 ▼▼▼
+    const beforeCount = gameState.playerStats.healCount;
+    gameState.playerStats.healCount = Math.max(0, (gameState.playerStats.healCount || 0) - 1);
+    const afterCount = gameState.playerStats.healCount;
+    console.log(`💊 回復使用: ${beforeCount}回 → ${afterCount}回`);
+    
+    // 残り回数が少ない場合の警告メッセージ
+    if (afterCount === 1) {
+      battleState.log.push('かいふくはあと1回だけ使えます');
+    } else if (afterCount === 0) {
+      battleState.log.push('このステージでのかいふくはもう使えません');
+    }
+    // ▲▲▲ ここまで修正 ▲▲▲
 
     // チャレンジモードの場合、残り時間を加算
     if (gameState.gameMode === 'challenge') {
