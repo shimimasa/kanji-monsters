@@ -563,8 +563,8 @@ const kanjiDexScreen = {
       legend.appendChild(mkLegendChip('未読', false));
       progressSection.appendChild(legend);
 
-      progressSection.appendChild(makeRow('訓読み', toArray(k.kunyomi || []), kunSet));
       progressSection.appendChild(makeRow('音読み', toArray(k.onyomi  || []), onSet));
+      progressSection.appendChild(makeRow('訓読み', toArray(k.kunyomi || []), kunSet));
     });
       // 既存の詳細ブロックはここで構築（必要分のみ）
       // 例: 学年/画数/意味など…（既存の infoSection 生成コードをここに移してOK）

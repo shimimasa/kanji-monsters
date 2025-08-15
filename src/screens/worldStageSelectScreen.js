@@ -782,11 +782,25 @@ const worldStageSelectScreen = {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
 
-      const levelText = typeof this.selectedTabLevel === 'number'
-        ? `漢検${this.selectedTabLevel}級`
-        : `漢検${this.selectedTabLevel}`;
+      // タブに合わせて大陸名を切り替え
+      const displayContinent = (() => {
+        switch (String(this.selectedTabLevel)) {
+          case '4':   return 'アジア';
+          case '3':   return 'ヨーロッパ';
+          case '準2': return 'アメリカ';
+          case '2':   return 'アフリカ';
+          default:    return this.continentInfo.continent || '';
+        }
+      })();
 
-      const textWidth = ctx.measureText(`${this.continentInfo.continent || ''} (${levelText})`).width;
+      // 級の表示（"準2級" / "4級" など。先頭の"漢検"は付けない）
+      const levelOnlyText = (String(this.selectedTabLevel) === '準2')
+        ? '準2級'
+        : `${this.selectedTabLevel}級`;
+
+      const title = `${displayContinent}（${levelOnlyText}）`;
+
+      const textWidth = ctx.measureText(title).width;
       const textBgPadding = 10;
       const textBgX = panelX + panelW / 2 - textWidth / 2 - textBgPadding;
       const textBgY = panelY + 10;
@@ -804,7 +818,7 @@ const worldStageSelectScreen = {
       ctx.shadowBlur = 4;
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 2;
-      ctx.fillText(`${this.continentInfo.continent || ''} (${levelText})`, panelX + panelW / 2, panelY + 15);
+      ctx.fillText(title, panelX + panelW / 2, panelY + 15);
       ctx.shadowColor = 'transparent';
       ctx.shadowBlur = 0;
       ctx.shadowOffsetX = 0;

@@ -26,6 +26,23 @@ const ENEMY_DAMAGE_ANIM_DURATION = 30; // 約0.5秒（攻撃ヒット演出: 400
 const ENEMY_ATTACK_ANIM_DURATION = 45; // 約0.75秒（敵の突進/被ダメ: 600〜800ms）
 const ENEMY_DEFEAT_ANIM_DURATION = 60; // 約1.0秒（撃破演出: 800〜1000ms）
 const PLAYER_HP_ANIM_SPEED = 2;
+const DEBUG = false; // 高頻度ログを抑制するトグル
+
+// タイムアウト（setTimeout）を一括管理する簡単ユーティリティ
+function setManagedTimeout(fn, ms) {
+  const id = setTimeout(fn, ms);
+  if (!Array.isArray(battleScreenState._timeouts)) battleScreenState._timeouts = [];
+  battleScreenState._timeouts.push(id);
+  return id;
+}
+function clearManagedTimeout(id) {
+  clearTimeout(id);
+  const arr = battleScreenState._timeouts;
+  if (Array.isArray(arr)) {
+    const idx = arr.indexOf(id);
+    if (idx !== -1) arr.splice(idx, 1);
+  }
+}
 
 const battleScreenState = {
   canvas: null,
@@ -39,6 +56,7 @@ const battleScreenState = {
   _mousemoveHandler: null, // マウス移動ハンドラーを追加
   logOffset: 0,
   timerId: null,
+  _timeouts: [],
 
   // マウス座標を保存するプロパティを追加
   mouseX: 0,
@@ -164,6 +182,8 @@ const battleScreenState = {
 
  },
 
+
+ 
   /**
    * 漢字ボックスのエフェクトを開始するメソッド
    * @param {string} color - エフェクトの色
@@ -175,7 +195,7 @@ const battleScreenState = {
     this.kanjiBoxEffect.duration = duration;
     this.kanjiBoxEffect.color = color;
     this.kanjiBoxEffect.pulsePhase = 0;
-    console.log('漢字ボックスエフェクト開始:', color, duration); // デバッグ用
+    if (DEBUG) console.log('漢字ボックスエフェクト開始:', color, duration); // デバッグ用
   },
   
   /**
@@ -188,7 +208,7 @@ const battleScreenState = {
     this.shakeEffect.timer = duration;
     this.shakeEffect.duration = duration;
     this.shakeEffect.intensity = intensity;
-    console.log('シェイクエフェクト開始:', duration, intensity); // デバッグ用
+    if (DEBUG) console.log('シェイクエフェクト開始:', duration, intensity); // デバッグ用
   },
 
   /** 画面がアクティブになったときの初期化 */
@@ -2204,7 +2224,7 @@ this.canvas.removeEventListener('touchend', this._touchEndHandler);
     // === ここからが新しい座標変換ロジック ===
     e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
 
-    console.log('handleClick実行');
+    if (DEBUG) console.log('handleClick実行');
 
     let eventX, eventY;
     // e.changedTouchesが存在すればタッチイベント、なければマウスイベントと判定
@@ -2226,15 +2246,15 @@ this.canvas.removeEventListener('touchend', this._touchEndHandler);
     const x = (eventX - rect.left) * scaleX;
     const y = (eventY - rect.top) * scaleY;
     
-    console.log('クリック座標:', x, y);
+    if (DEBUG) console.log('クリック座標:', x, y);
     
     // BTNオブジェクトのプロパティを確認
-    console.log('BTN.back:', BTN.back);
-    console.log('BTN.stage:', BTN.stage);
-    console.log('BTN.attack:', BTN.attack);
+    if (DEBUG) console.log('BTN.back:', BTN.back);
+    if (DEBUG) console.log('BTN.stage:', BTN.stage);
+    if (DEBUG) console.log('BTN.attack:', BTN.attack);
     
     // ボタンの当たり判定を詳細にデバッグ
-    Object.entries(BTN).forEach(([key, btn]) => {
+    if (DEBUG) Object.entries(BTN).forEach(([key, btn]) => {
       const isHit = isMouseOverRect(x, y, btn);
       console.log(`ボタン[${key}] 座標(${btn.x},${btn.y},${btn.w},${btn.h}) ヒット:${isHit}`);
     });
@@ -2308,7 +2328,7 @@ this.canvas.removeEventListener('touchend', this._touchEndHandler);
       : battleState.comboCount;
     
     // デバッグログ
-    console.log('🔢 コンボ表示:', {
+    if (DEBUG) console.log('🔢 コンボ表示:', {
       comboCount: comboCount,
       battleStateCombo: battleState.comboCount,
       animationActive: this.comboAnimation.active
@@ -3169,30 +3189,29 @@ function spawnEnemy() {
 
 // battleScreen.js の onAttack 関数を修正
 function onAttack() {
-  console.log('🗡 onAttack() called — turn:', battleState.turn, 'inputEnabled:', battleState.inputEnabled);
+  if (DEBUG) console.log('🗡 onAttack() called — turn:', battleState.turn, 'inputEnabled:', battleState.inputEnabled);
 
   // 1) プレイヤーターンかつ入力許可中でなければ終了
-  if (battleState.turn !== 'player' || !battleState.inputEnabled) return;
-  battleState.inputEnabled = false;
+if (battleState.turn !== 'player' || !battleState.inputEnabled) return;
 
-  // 2) 入力を取得してひらがなに変換
-  const inputEl = battleScreenState.inputEl;
-  if (!inputEl) return;
-  const raw = inputEl.value.trim();
-  const answer = toHiragana(raw);
+// 2) 入力を取得してひらがなに変換
+const inputEl = battleScreenState.inputEl;
+if (!inputEl) { battleState.inputEnabled = true; return; }
+battleState.inputEnabled = false;
+const raw = inputEl.value.trim();
+const answer = toHiragana(raw);
 
-  // ── 読みメッセージ生成 ──
-  const onyomiStr = gameState.currentKanji.onyomi.join('、');
-  const kunyomiStr = gameState.currentKanji.kunyomi.join('、');
-  const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」`;
+// ── 読みメッセージ生成 ──
+const onyomiStr = (gameState.currentKanji.onyomi || []).join('、');
+const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
+const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」`;
 
-  // ── 正解判定 ──
   const correctReadings = getReadings(gameState.currentKanji);
   const correct = correctReadings.includes(answer);
 
   if (correct) {
     // 正解処理
-    console.log('正解！エフェクト開始'); // デバッグ用
+    if (DEBUG) console.log('正解！エフェクト開始'); // デバッグ用
     
     // 漢字ボックスのエフェクトを開始（黄色で光らせる）
     battleScreenState.startKanjiBoxEffect('rgba(241, 196, 15, 0.8)', 20);
@@ -3225,7 +3244,7 @@ function onAttack() {
     const kanjiItem = kanjiData.find(k => k.id === gameState.currentKanji.id);
     if (kanjiItem) {
       kanjiItem.correctCount = (kanjiItem.correctCount || 0) + 1;
-      console.log(`📈 漢字ID:${gameState.currentKanji.id} の正解カウント: ${kanjiItem.correctCount}`);
+      if (DEBUG) console.log(`📈 漢字ID:${gameState.currentKanji.id} の正解カウント: ${kanjiItem.correctCount}`);
     }
     
     // チャレンジモードの場合、残り時間を加算
@@ -3266,8 +3285,10 @@ function onAttack() {
     let isWeaknessHit = false;
     
     // プレイヤーの答えが音読みか訓読みかを正確に判定
-    const isInKunyomi = gameState.currentKanji.kunyomi.includes(answer);
-    const isInOnyomi = gameState.currentKanji.onyomi.includes(answer);
+    const kunyomiArr = Array.isArray(gameState.currentKanji.kunyomi) ? gameState.currentKanji.kunyomi : [];
+    const onyomiArr  = Array.isArray(gameState.currentKanji.onyomi)  ? gameState.currentKanji.onyomi  : [];
+    const isInKunyomi = kunyomiArr.includes(answer);
+    const isInOnyomi  = onyomiArr.includes(answer);
     
     // 追加: 読み進捗更新・マスター判定
     updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
@@ -3294,7 +3315,7 @@ function onAttack() {
     
           // 弱点ヒット統計データの更新
           gameState.playerStats.weaknessHits++;
-          console.log(`🎯 弱点ヒット! 敵の弱点: ${enemy.weakness}, プレイヤーの読み: ${readingType}`);
+          if (DEBUG) console.log(`🎯 弱点ヒット! 敵の弱点: ${enemy.weakness}, プレイヤーの読み: ${readingType}`);
         }
     
     // 5連続正解ボーナス判定
@@ -3345,16 +3366,15 @@ function onAttack() {
           battleState.inputEnabled = false;
           
           // 1秒後に敵のターンを実行し、その後プレイヤーターンに戻す
-                      setTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
-                         enemyTurn();
-                        // 敵ターン終了→次の問題表示: 1.7s
-                        setTimeout(() => {
-                           pickNextKanji();
-                           battleState.turn = 'player';
-                           battleState.inputEnabled = true;
-
-                        }, 1700);
-                     }, 1300);
+setManagedTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
+  enemyTurn();
+  // 敵ターン終了→次の問題表示: 1.7s
+  setManagedTimeout(() => {
+    pickNextKanji();
+    battleState.turn = 'player';
+    battleState.inputEnabled = true;
+  }, 1700);
+}, 1300);
           
           // 入力欄をクリア
           inputEl.value = '';
@@ -3515,15 +3535,15 @@ function onAttack() {
       battleState.turn = 'enemy';
       battleState.inputEnabled = false;
       
-              setTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
-                 enemyTurn();
-                // 敵ターン終了→次の問題表示: 1.7s
-                setTimeout(() => {
-                   pickNextKanji();
-                   battleState.turn = 'player';
-                   battleState.inputEnabled = true;
-                }, 1700);
-              }, 1300);
+      setManagedTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
+        enemyTurn();
+        // 敵ターン終了→次の問題表示: 1.7s
+        setManagedTimeout(() => {
+          pickNextKanji();
+          battleState.turn = 'player';
+          battleState.inputEnabled = true;
+        }, 1700);
+      }, 1300);
     }
     
   } else {
@@ -3558,13 +3578,13 @@ function onAttack() {
     const kanjiItem = kanjiData.find(k => k.id === gameState.currentKanji.id);
     if (kanjiItem) {
       kanjiItem.incorrectCount = (kanjiItem.incorrectCount || 0) + 1;
-      console.log(`📉 漢字ID:${gameState.currentKanji.id} の不正解カウント: ${kanjiItem.incorrectCount}`);
+      if (DEBUG) console.log(`📉 漢字ID:${gameState.currentKanji.id} の不正解カウント: ${kanjiItem.incorrectCount}`);
     }
     
     // ★ コンボカウントを確実にリセット ★
     battleState.comboCount = 0;
     battleState.comboTimer = 0;
-    console.log('❌ 不正解によりコンボがリセットされました');
+    if (DEBUG) console.log('❌ 不正解によりコンボがリセットされました');
     
     // 不正解時の正しい読みをハイライト表示
     const onyomiReadings = gameState.currentKanji.onyomi || [];
@@ -3654,7 +3674,7 @@ function levenshteinDistance(a, b) {
 
 // 回復ボタン
 function onHeal() {
-  console.log('💚 onHeal() called — turn:', battleState.turn, 'inputEnabled:', battleState.inputEnabled);
+  if (DEBUG) console.log('💚 onHeal() called — turn:', battleState.turn, 'inputEnabled:', battleState.inputEnabled);
 
   // プレイヤーターンかつ入力許可中でなければ終了
   if (battleState.turn !== 'player' || !battleState.inputEnabled) return;
@@ -3666,16 +3686,17 @@ function onHeal() {
   }
 
   battleState.inputEnabled = false;
-
+  battleState.lastCommandMode = 'heal';
+  
   // 入力を取得してひらがなに変換
   const inputEl = battleScreenState.inputEl;
-  if (!inputEl) return;
+  if (!inputEl) { battleState.inputEnabled = true; return; }
   const raw    = inputEl.value.trim();
   const answer = toHiragana(raw);
-
+  
   // 読みメッセージ生成
-  const onyomiStr = gameState.currentKanji.onyomi.join('、');
-  const kunyomiStr = gameState.currentKanji.kunyomi.join('、');
+  const onyomiStr = (gameState.currentKanji.onyomi || []).join('、');
+  const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
   const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」`;
 
   // 正解判定
@@ -3729,7 +3750,10 @@ function onHeal() {
     ]);
 
     // 回復成功統計の更新
-    gameState.playerStats.healsSuccessful++;
+gameState.playerStats.healsSuccessful++;
+
+// 回復回数を1消費（下限0）
+gameState.playerStats.healCount = Math.max(0, (gameState.playerStats.healCount || 0) - 1);
 
     // チャレンジモードの場合、残り時間を加算
     if (gameState.gameMode === 'challenge') {
@@ -3758,14 +3782,11 @@ function onHeal() {
 
     // チャレンジモードの時だけダメージを受ける
     if (gameState.gameMode === 'challenge') {
-      // 失敗時：ダメージ
       const atk = gameState.currentEnemy.atk || 5;
-      gameState.playerStats.hp = Math.max(
-        0,
-        gameState.playerStats.hp - atk
-      );
+      gameState.playerStats.hp = Math.max(0, gameState.playerStats.hp - atk);
       if (gameState.playerStats.hp === 0) {
-        return setTimeout(() => publish('changeScreen','gameOver'), 500);
+        if (battleScreenState.timerId) { clearInterval(battleScreenState.timerId); battleScreenState.timerId = null; }
+        return setManagedTimeout(() => publish('changeScreen', 'gameOver'), 1500);
       }
     }
   }
@@ -3775,13 +3796,13 @@ function onHeal() {
 
 
       // プレイヤー行動→敵ターン開始待ち: 1.3s
-      setTimeout(() => {
+      setManagedTimeout(() => {
         enemyTurn();
         // 敵ターン終了→次の問題表示: 1.7s
-        setTimeout(() => {
+        setManagedTimeout(() => {
           pickNextKanji();
           // 入力再開までの待機: 0.65s
-          setTimeout(() => {
+          setManagedTimeout(() => {
             battleState.turn = 'player';
             battleState.inputEnabled = true;
           }, 650);
@@ -3887,14 +3908,11 @@ export function pickNextKanji() {
   gameState.hintLevel = 0;
   // バナーも消去
   if (battleScreenState && typeof battleScreenState === 'object') {
-      battleScreenState.currentHintText = '';
-  // 次の問題に進む際にヒントを完全消去
-  gameState.hintLevel = 0;
-  battleScreenState.currentHintText = '';    
+    battleScreenState.currentHintText = '';
   }
 
 
-  console.log('🎯 pickNextKanji() 開始 (属性システム対応)');
+  if (DEBUG) console.log('🎯 pickNextKanji() 開始 (属性システム対応)');
 
   const currentEnemy = gameState.currentEnemy;
   if (!currentEnemy || !currentEnemy.weakness) {
@@ -3903,7 +3921,7 @@ export function pickNextKanji() {
     return pickFromPool(gameState.kanjiPool, '全体プール');
   }
 
-  console.log(`🎯 敵の弱点: ${currentEnemy.weakness}`);
+  if (DEBUG) console.log(`🎯 敵の弱点: ${currentEnemy.weakness}`);
 
   // 1. 敵の弱点に応じて第一候補リストを選択
   const primaryPool = currentEnemy.weakness === 'onyomi' 
@@ -3920,15 +3938,15 @@ export function pickNextKanji() {
   // 2. 第一候補リストから出題可能な漢字を探す
   const primaryResult = pickFromPool(primaryPool, '第一候補');
   if (primaryResult) {
-    console.log('✅ 第一候補プールから問題を選択しました');
+    if (DEBUG) console.log('✅ 第一候補プールから問題を選択しました');
     return primaryResult;
   }
 
   // 3. 第一候補が尽きた場合、フォールバックプールから選択
-  console.log('⚠️ 第一候補プールが尽きました。フォールバックプールを使用します。');
+  if (DEBUG) console.log('⚠️ 第一候補プールが尽きました。フォールバックプールを使用します。');
   const fallbackResult = pickFromPool(fallbackPool, 'フォールバック');
   if (fallbackResult) {
-    console.log('✅ フォールバックプールから問題を選択しました');
+    if (DEBUG) console.log('✅ フォールバックプールから問題を選択しました');
     return fallbackResult;
   }
 
@@ -4011,8 +4029,8 @@ battleScreenState.showLogBlock([
   weakLabel ? `弱点は「${weakLabel}」！` : ''
 ]);
   
-  console.log(`✅ ${poolName}から選択: ${selectedKanji.kanji} (ID: ${selectedKanji.id})`);
-  console.log('📝 直近リスト:', battleState.recentKanjiIds);
+  if (DEBUG) console.log(`✅ ${poolName}から選択: ${selectedKanji.kanji} (ID: ${selectedKanji.id})`);
+  if (DEBUG) console.log('📝 直近リスト:', battleState.recentKanjiIds);
   
   return true;
 }
@@ -4039,13 +4057,22 @@ function updateEnemyUI(name, hp, maxHp) {
 
 
 export function cleanup() {  
-  // バトル画面を離れるときに、入力欄を非表示にする
-  if (inputEl) {
-    inputEl.style.display = 'none';
+  const input = battleScreenState.inputEl;
+  if (input) input.style.display = 'none';
+
+  // チャレンジタイマー停止
+  if (battleScreenState.timerId) { clearInterval(battleScreenState.timerId); battleScreenState.timerId = null; }
+
+  // ペンディング中のタイムアウト解除
+  if (Array.isArray(battleScreenState._timeouts)) {
+    battleScreenState._timeouts.forEach(id => clearTimeout(id));
+    battleScreenState._timeouts.length = 0;
   }
-  // バトル画面固有のリスナ解除は不要（main.js が一元管理しているため）
-  canvas = null;
-  inputEl = null;
+
+  battleScreenState.unregisterHandlers?.();
+  battleScreenState.canvas = null;
+  battleScreenState.ctx = null;
+  battleScreenState.inputEl = null;
 }
 
 // 敵撃破アニメ（battleState.enemyAction === 'defeat'）の終了を待ってから callback を実行
