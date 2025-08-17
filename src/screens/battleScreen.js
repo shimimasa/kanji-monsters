@@ -1003,12 +1003,12 @@ this.ctx.strokeRect(msgX, msgY, msgW, msgH);
 
 // タイトル（高コントラスト）
 this.drawTextWithOutline(
-  "バトルログ",
+  "▽",
   msgX + msgW/2,
   msgY + 8,
   'white',
   'black',
-  'bold 14px "UDデジタル教科書体", sans-serif',
+  'bold 20px "UDデジタル教科書体", sans-serif',
   'center',
   'top',
   2
