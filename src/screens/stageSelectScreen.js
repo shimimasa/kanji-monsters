@@ -7,6 +7,192 @@ import reviewQueue from '../models/reviewQueue.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { calcBonusReward, isFirstClear, markBonusFirstClear, isBonusUnlocked } from '../core/bonusManager.js';
 
+
+/** 角丸矩形を描画するヘルパー関数 */
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+/** 学年に応じたアイコンを返す */
+function getGradeIcon(grade) {
+  const icons = {
+    1: '🌱', // 芽
+    2: '🌿', // 葉
+    3: '🌸', // 桜
+    4: '🏔️', // 山
+    5: '🏛️', // 神殿
+    6: '🗾', // 日本地図
+    0: '🔄'  // 復習
+  };
+  return icons[grade] || '📚';
+}
+
+/** 学年に応じた地方名を返す */
+function getGradeRegion(grade) {
+  const regions = {
+    1: '北海道',
+    2: '東北',
+    3: '関東',
+    4: '中部',
+    5: '近畿',
+    6: '九州他',
+    0: ''
+  };
+  return regions[grade] || '';
+}
+
+/** 改善されたタブを描画する関数 */
+function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime, mode = 'grade') {
+  const tabCount = tabs.length;
+  const tabW = canvasWidth / tabCount;
+  const tabH = 60; // 高さを増加
+  
+  // 背景グラデーション
+  const bgGradient = ctx.createLinearGradient(0, 0, 0, tabH);
+  bgGradient.addColorStop(0, '#2d3748');
+  bgGradient.addColorStop(1, '#1a202c');
+  ctx.fillStyle = bgGradient;
+  ctx.fillRect(0, 0, canvasWidth, tabH);
+  
+  tabs.forEach((tab, i) => {
+    const x0 = i * tabW;
+    const isSelected = (mode === 'grade') ? 
+      (tab.grade === selectedValue) : 
+      (tab.kanken_level === selectedValue);
+    
+    // タブの基本形状
+    const cornerRadius = 8;
+    const insetY = isSelected ? 0 : 8;
+    const insetH = isSelected ? tabH : tabH - 8;
+    
+    ctx.save();
+    
+    // 選択中タブの背景
+    if (isSelected) {
+      // 光るエフェクト
+      const glowGradient = ctx.createRadialGradient(
+        x0 + tabW/2, tabH/2, 0,
+        x0 + tabW/2, tabH/2, tabW/2
+      );
+      glowGradient.addColorStop(0, 'rgba(66, 153, 225, 0.3)');
+      glowGradient.addColorStop(1, 'rgba(66, 153, 225, 0)');
+      ctx.fillStyle = glowGradient;
+      ctx.fillRect(x0, 0, tabW, tabH);
+      
+      // メインの背景グラデーション
+      const selectedGradient = ctx.createLinearGradient(x0, insetY, x0, insetY + insetH);
+      selectedGradient.addColorStop(0, '#4299e1');
+      selectedGradient.addColorStop(0.5, '#3182ce');
+      selectedGradient.addColorStop(1, '#2b6cb0');
+      ctx.fillStyle = selectedGradient;
+    } else {
+      // 非選択タブの背景
+      const unselectedGradient = ctx.createLinearGradient(x0, insetY, x0, insetY + insetH);
+      unselectedGradient.addColorStop(0, '#4a5568');
+      unselectedGradient.addColorStop(1, '#2d3748');
+      ctx.fillStyle = unselectedGradient;
+    }
+    
+    // 角丸矩形を描画
+    drawRoundedRect(ctx, x0 + 2, insetY, tabW - 4, insetH, cornerRadius);
+    ctx.fill();
+    
+    // 枠線
+    if (isSelected) {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      // 内側の光る枠線
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1;
+      drawRoundedRect(ctx, x0 + 3, insetY + 1, tabW - 6, insetH - 2, cornerRadius - 1);
+      ctx.stroke();
+    }
+    
+    // アイコンとテキスト
+    const centerX = x0 + tabW / 2;
+    const centerY = insetY + insetH / 2;
+    
+    // アイコン（学年モード）
+    const icon = getGradeIcon(tab.grade);
+    const mainText = tab.label;
+    const subText = getGradeRegion(tab.grade);
+    
+    // アイコンの描画
+    if (icon && tab.grade !== 0) {
+      ctx.font = isSelected ? '20px sans-serif' : '16px sans-serif';
+      ctx.fillStyle = isSelected ? '#ffffff' : '#cbd5e0';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(icon, centerX, centerY - 12);
+    }
+    
+    // メインテキスト
+    ctx.font = isSelected ? 'bold 16px "UDデジタル教科書体", sans-serif' : '14px "UDデジタル教科書体", sans-serif';
+    ctx.fillStyle = isSelected ? '#ffffff' : '#e2e8f0';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    if (tab.grade === 0) {
+      // 総復習タブは特別デザイン
+      ctx.fillStyle = isSelected ? '#ffd700' : '#f7fafc';
+      ctx.fillText('🔄 ' + mainText, centerX, centerY);
+    } else {
+      ctx.fillText(mainText, centerX, centerY + 2);
+      
+      // サブテキスト
+      if (subText) {
+        ctx.font = '10px "UDデジタル教科書体", sans-serif';
+        ctx.fillStyle = isSelected ? 'rgba(255, 255, 255, 0.8)' : 'rgba(226, 232, 240, 0.7)';
+        ctx.fillText(subText, centerX, centerY + 16);
+      }
+    }
+    
+    // 選択中タブの下部ハイライト
+    if (isSelected) {
+      const highlightGradient = ctx.createLinearGradient(x0, tabH - 4, x0, tabH);
+      highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+      highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0.2)');
+      ctx.fillStyle = highlightGradient;
+      ctx.fillRect(x0 + 2, tabH - 4, tabW - 4, 4);
+    }
+    
+    // アニメーション効果（パルス）
+    if (isSelected) {
+      const pulse = Math.sin(animationTime * 0.003) * 0.1 + 0.9;
+      ctx.globalAlpha = pulse;
+      const pulseGradient = ctx.createRadialGradient(
+        centerX, centerY, 0,
+        centerX, centerY, tabW / 3
+      );
+      pulseGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+      pulseGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = pulseGradient;
+      ctx.fillRect(x0, insetY, tabW, insetH);
+    }
+    
+    ctx.restore();
+  });
+  
+  // 全体の影
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+  ctx.fillRect(0, tabH, canvasWidth, 3);
+  ctx.restore();
+}
+
+
 // uiRoot の安全な取得に修正
 const getUiRoot = () => {
   let uiRoot = document.getElementById('uiOverlay');
@@ -220,7 +406,7 @@ const stageSelectScreenState = {
     const leftPanelWidth = cw / 2;
 
     // リスト領域（上端と下端）- 見出し分のスペースを確保
-    const listStartY = 120;                   // 見出し分を考慮して下に移動（80→120）
+    const listStartY = 130;                   // 見出し分を考慮して下に移動（80→120）
     const listBottom = panelY + panelH - 12;  // 下端はパネル内に収める
 
     // 空き高さからボタン高さを自動算出
@@ -636,25 +822,13 @@ update(dt) {
 
   // 左側のステージリスト背景パネル
   const panelX = 10;
-  const panelY = 60;
+  const panelY = 70;
   const panelW = cw / 2 - 20;
-  const panelH = ch - 140;
+  const panelH = ch - 150;
   this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
 
-  // === 学年タブ描画 ===
-  const tabCount = tabs.length;
-  const tabW = cw / tabCount;
-  const tabH = 50;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.font = '16px sans-serif';
-  tabs.forEach((tab, i) => {
-    const x0 = i * tabW;
-    ctx.fillStyle = (tab.grade === gameState.currentGrade) ? '#ddd' : '#ccc';
-    ctx.fillRect(x0, 0, tabW, tabH);
-    ctx.fillStyle = '#000';
-    ctx.fillText(tab.label, x0 + tabW / 2, tabH / 2);
-  });
+  drawEnhancedTabs(ctx, tabs, gameState.currentGrade, cw, this.animationTime, 'grade');
+
 
   // === 地方名と学年の見出し追加 ===
   if (gameState.currentGrade !== 0) {
@@ -662,11 +836,11 @@ update(dt) {
     const getRegionByGrade = (grade) => {
       switch(grade) {
         case 1: return '北海道';
-        case 2: return '東北';
-        case 3: return '関東';
-        case 4: return '中部';
-        case 5: return '近畿';
-        case 6: return '中国・四国・九州・沖縄';
+        case 2: return '東北地方';
+        case 3: return '関東地方';
+        case 4: return '中部地方';
+        case 5: return '近畿地方';
+        case 6: return '中国地方';
         default: return '';
       }
     };
@@ -1082,7 +1256,7 @@ update(dt) {
     // タブクリック判定
     const tabCount = tabs.length;
     const tabW = this.canvas.width / tabCount;
-    const tabH = 50;
+    const tabH = 60;
     if (y >= 0 && y <= tabH) {
       const idx = Math.floor(x / tabW);
       const tab = tabs[idx];

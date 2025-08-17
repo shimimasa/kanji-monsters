@@ -7,6 +7,188 @@ import ReviewQueue from '../models/reviewQueue.js';
 import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
 import { isBonusUnlocked } from '../core/bonusManager.js';
 
+// === 1. importの後に共通関数を追加 ===
+
+/** 角丸矩形を描画するヘルパー関数 */
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+/** 漢検レベルに応じたアイコンを返す */
+function getKankenIcon(level) {
+  const icons = {
+    '4': '🥉',    // 銅メダル
+    '3': '🥈',    // 銀メダル
+    '準2': '🏅',  // メダル
+    '2': '🥇',    // 金メダル
+    'review': '🔄'
+  };
+  return icons[level] || '📜';
+}
+
+/** 漢検レベルに応じた大陸名を返す */
+function getKankenContinent(level) {
+  const continents = {
+    '4': 'アジア',
+    '3': 'ヨーロッパ',
+    '準2': 'アメリカ',
+    '2': 'アフリカ',
+    'review': ''
+  };
+  return continents[level] || '';
+}
+
+/** 改善されたタブを描画する関数（漢検版） */
+function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime, mode = 'kanken') {
+  const tabCount = tabs.length;
+  const tabW = canvasWidth / tabCount;
+  const tabH = 60; // 高さを増加
+  
+  // 背景グラデーション
+  const bgGradient = ctx.createLinearGradient(0, 0, 0, tabH);
+  bgGradient.addColorStop(0, '#2d3748');
+  bgGradient.addColorStop(1, '#1a202c');
+  ctx.fillStyle = bgGradient;
+  ctx.fillRect(0, 0, canvasWidth, tabH);
+  
+  tabs.forEach((tab, i) => {
+    const x0 = i * tabW;
+    const isSelected = (tab.kanken_level === selectedValue);
+    
+    // タブの基本形状
+    const cornerRadius = 8;
+    const insetY = isSelected ? 0 : 8;
+    const insetH = isSelected ? tabH : tabH - 8;
+    
+    ctx.save();
+    
+    // 選択中タブの背景
+    if (isSelected) {
+      // 光るエフェクト
+      const glowGradient = ctx.createRadialGradient(
+        x0 + tabW/2, tabH/2, 0,
+        x0 + tabW/2, tabH/2, tabW/2
+      );
+      glowGradient.addColorStop(0, 'rgba(66, 153, 225, 0.3)');
+      glowGradient.addColorStop(1, 'rgba(66, 153, 225, 0)');
+      ctx.fillStyle = glowGradient;
+      ctx.fillRect(x0, 0, tabW, tabH);
+      
+      // メインの背景グラデーション
+      const selectedGradient = ctx.createLinearGradient(x0, insetY, x0, insetY + insetH);
+      selectedGradient.addColorStop(0, '#4299e1');
+      selectedGradient.addColorStop(0.5, '#3182ce');
+      selectedGradient.addColorStop(1, '#2b6cb0');
+      ctx.fillStyle = selectedGradient;
+    } else {
+      // 非選択タブの背景
+      const unselectedGradient = ctx.createLinearGradient(x0, insetY, x0, insetY + insetH);
+      unselectedGradient.addColorStop(0, '#4a5568');
+      unselectedGradient.addColorStop(1, '#2d3748');
+      ctx.fillStyle = unselectedGradient;
+    }
+    
+    // 角丸矩形を描画
+    drawRoundedRect(ctx, x0 + 2, insetY, tabW - 4, insetH, cornerRadius);
+    ctx.fill();
+    
+    // 枠線
+    if (isSelected) {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      // 内側の光る枠線
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 1;
+      drawRoundedRect(ctx, x0 + 3, insetY + 1, tabW - 6, insetH - 2, cornerRadius - 1);
+      ctx.stroke();
+    }
+    
+    // アイコンとテキスト
+    const centerX = x0 + tabW / 2;
+    const centerY = insetY + insetH / 2;
+    
+    // アイコン（漢検モード）
+    const icon = getKankenIcon(tab.kanken_level);
+    const mainText = tab.label;
+    const subText = getKankenContinent(tab.kanken_level);
+    
+    // アイコンの描画
+    if (icon && tab.kanken_level !== 'review') {
+      ctx.font = isSelected ? '20px sans-serif' : '16px sans-serif';
+      ctx.fillStyle = isSelected ? '#ffffff' : '#cbd5e0';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(icon, centerX, centerY - 12);
+    }
+    
+    // メインテキスト
+    ctx.font = isSelected ? 'bold 16px "UDデジタル教科書体", sans-serif' : '14px "UDデジタル教科書体", sans-serif';
+    ctx.fillStyle = isSelected ? '#ffffff' : '#e2e8f0';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    if (tab.kanken_level === 'review') {
+      // 総復習タブは特別デザイン
+      ctx.fillStyle = isSelected ? '#ffd700' : '#f7fafc';
+      ctx.fillText('🔄 ' + mainText, centerX, centerY);
+    } else {
+      ctx.fillText(mainText, centerX, centerY + 2);
+      
+      // サブテキスト
+      if (subText) {
+        ctx.font = '10px "UDデジタル教科書体", sans-serif';
+        ctx.fillStyle = isSelected ? 'rgba(255, 255, 255, 0.8)' : 'rgba(226, 232, 240, 0.7)';
+        ctx.fillText(subText, centerX, centerY + 16);
+      }
+    }
+    
+    // 選択中タブの下部ハイライト
+    if (isSelected) {
+      const highlightGradient = ctx.createLinearGradient(x0, tabH - 4, x0, tabH);
+      highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+      highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0.2)');
+      ctx.fillStyle = highlightGradient;
+      ctx.fillRect(x0 + 2, tabH - 4, tabW - 4, 4);
+    }
+    
+    // アニメーション効果（パルス）
+    if (isSelected) {
+      const pulse = Math.sin(animationTime * 0.003) * 0.1 + 0.9;
+      ctx.globalAlpha = pulse;
+      const pulseGradient = ctx.createRadialGradient(
+        centerX, centerY, 0,
+        centerX, centerY, tabW / 3
+      );
+      pulseGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+      pulseGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = pulseGradient;
+      ctx.fillRect(x0, insetY, tabW, insetH);
+    }
+    
+    ctx.restore();
+  });
+  
+  // 全体の影
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+  ctx.fillRect(0, tabH, canvasWidth, 3);
+  ctx.restore();
+}
+
+
+
 // 文字正規化（reviewStage と同仕様）
 function hiraShift(ch) { return String.fromCharCode(ch.charCodeAt(0) - 0x60); }
 function toHiragana(input) {
@@ -346,10 +528,10 @@ const worldStageSelectScreen = {
     const cw = this.canvas ? this.canvas.width : 800;
     const ch = this.canvas ? this.canvas.height : 600;
     const panelX = 10;
-    const panelY = 70;                 // 上余白
+    const panelY = 80;                 // 上余白
     const panelW = cw / 2 - 20;        // 左半分 - マージン
-    const panelH = ch - 140;           // フッター分を除いた高さ
-    const listStartY = panelY + 40;    // タイトル分の余白
+    const panelH = ch - 150;           // フッター分を除いた高さ
+    const listStartY = panelY + 50;    // タイトル分の余白
     const listBottom = panelY + panelH - 12; // パネル下端に少し余白
     let buttonMargin = 6;
     let buttonHeight = 50;                          // 最大高さ
@@ -726,54 +908,9 @@ const worldStageSelectScreen = {
       this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
     }
 
-    // 漢検級タブ描画
-    const tabCount = tabs.length;
-    const tabW = cw / tabCount;
-    const tabH = 50;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif'; // フォントを太字で大きく
-    tabs.forEach((tab, i) => {
-      const x0 = i * tabW;
-      const isSelected = tab.kanken_level === this.selectedTabLevel;
-      
-      // グラデーション背景を作成
-      const gradient = ctx.createLinearGradient(x0, 0, x0, tabH);
-      if (isSelected) {
-        gradient.addColorStop(0, '#4299e1');
-        gradient.addColorStop(1, '#2b6cb0');
-      } else {
-        gradient.addColorStop(0, '#4a5568');
-        gradient.addColorStop(1, '#2d3748');
-      }
-      
-      ctx.fillStyle = gradient;
-      ctx.fillRect(x0, 0, tabW, tabH);
-      
-      // 選択中のタブには枠線を追加
-      if (isSelected) {
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x0 + 1, 1, tabW - 2, tabH - 2);
-      }
-      
-      // 影付きテキスト
-      if (isSelected) {
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 3;
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
-      }
-      
-      ctx.fillStyle = '#fff';
-      ctx.fillText(tab.label, x0 + tabW / 2, tabH / 2);
-      
-      // 影をリセット
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-    });
+    // 改善されたタブ描画 
+drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kanken');
+
 
     // 大陸名とレベルの見出し（総復習モードでは表示しない）
     if (!this.isReviewMode) {
@@ -1044,7 +1181,7 @@ const worldStageSelectScreen = {
     // タブクリック判定
     const tabCount = tabs.length;
     const tabW = this.canvas.width / tabCount;
-    const tabH = 50;
+    const tabH = 60;
     
     if (screenY <= tabH) {
       const tabIndex = Math.floor(screenX / tabW);
