@@ -114,81 +114,175 @@ const kanjiDexScreen = {
     window.addEventListener('keydown', this._keyHandler);
   },
 
-  /** DOMヘッダーを作成 */
   createDOMHeader() {
     // 既存のコンテナがあれば削除
     if (this.container) {
       this.container.remove();
     }
-
+  
     // メインコンテナを作成
     this.container = document.createElement('div');
     this.container.id = 'kanjiDexContainer';
     this.container.className = 'kanji-dex-container';
-    this.container.style.border = 'none';
-    this.container.style.outline = 'none';
-    // 透け防止のため全面固定＋不透明背景に
-    this.container.style.position = 'fixed';
-    this.container.style.left = '0';
-    this.container.style.top = '0';
-    this.container.style.width = '100vw';
-    this.container.style.height = '100vh';
-    this.container.style.zIndex = '100000';
-    this.container.style.background = '#2c1810'; // 図鑑の背景色に合わせた濃色
-    this.container.style.overflowY = 'auto';
-
-    // 収集率統計エリア
+    Object.assign(this.container.style, {
+      position: 'fixed',
+      left: '0',
+      top: '0',
+      width: '100vw',
+      height: '100vh',
+      zIndex: '100000',
+      background: '#2c1810', // 図鑑の背景色
+      overflowY: 'auto',
+      border: 'none',
+      outline: 'none'
+    });
+  
+    // === 統計エリア（ネイビーブルー系） ===
     const statsDiv = document.createElement('div');
     statsDiv.className = 'kanji-collection-stats';
+    Object.assign(statsDiv.style, {
+      background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.7), rgba(59, 130, 246, 0.4))',
+      border: '1px solid rgba(59, 130, 246, 0.3)',
+      borderRadius: '12px',
+      padding: '16px',
+      margin: '16px',
+      backdropFilter: 'blur(10px)',
+      boxShadow: '0 2px 8px rgba(30, 58, 138, 0.2)'
+    });
     
     const statsText = document.createElement('div');
     statsText.className = 'kanji-stats-text';
+    Object.assign(statsText.style, {
+      color: '#ffffff',
+      fontSize: '18px',
+      fontWeight: '600',
+      marginBottom: '8px'
+    });
     const collectionRate = Math.round((this.dexSet.size / this.allList.length) * 100);
     statsText.textContent = `漢字収集率: ${this.dexSet.size}/${this.allList.length} (${collectionRate}%)`;
     
     const progressBar = document.createElement('div');
     progressBar.className = 'kanji-progress-bar';
+    Object.assign(progressBar.style, {
+      background: 'rgba(255, 255, 255, 0.1)',
+      borderRadius: '10px',
+      height: '12px',
+      overflow: 'hidden',
+      border: '1px solid rgba(255, 255, 255, 0.2)'
+    });
+    
     const progressFill = document.createElement('div');
     progressFill.className = 'kanji-progress-fill';
-    progressFill.style.width = `${collectionRate}%`;
-    progressBar.appendChild(progressFill);
+    Object.assign(progressFill.style, {
+      background: 'linear-gradient(90deg, #28a745, #20c997)',
+      height: '100%',
+      width: `${collectionRate}%`,
+      transition: 'width 0.6s ease',
+      borderRadius: '10px'
+    });
     
+    progressBar.appendChild(progressFill);
     statsDiv.appendChild(statsText);
     statsDiv.appendChild(progressBar);
-
-    // ナビゲーションエリア
+  
+    // === ナビゲーションエリア（メインのネイビーブルー） ===
     const navDiv = document.createElement('div');
     navDiv.className = 'kanji-dex-navigation';
-    navDiv.style.border = 'none';
-    navDiv.style.outline = 'none';
-
+    Object.assign(navDiv.style, {
+      background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.85), rgba(59, 130, 246, 0.6))',
+      border: '1px solid rgba(59, 130, 246, 0.4)',
+      borderRadius: '12px',
+      padding: '16px',
+      margin: '16px',
+      backdropFilter: 'blur(10px)',
+      boxShadow: '0 4px 12px rgba(30, 58, 138, 0.3)',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: '12px'
+    });
+  
+    // === 左側コントロール ===
     const leftControls = document.createElement('div');
     leftControls.className = 'nav-controls-left';
-
+    Object.assign(leftControls.style, {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px'
+    });
+  
+    // 戻るボタン
     const backButton = document.createElement('button');
-    backButton.className = 'btn-back'; // クラス追加
+    backButton.className = 'btn-back';
     backButton.textContent = '📚 ステージ選択へ';
+    Object.assign(backButton.style, {
+      background: 'linear-gradient(135deg, #6c757d, #5a6268)',
+      color: 'white',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      borderRadius: '8px',
+      padding: '8px 16px',
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: '500',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+    });
+    
+    // ホバーエフェクト
+    backButton.addEventListener('mouseenter', () => {
+      Object.assign(backButton.style, {
+        background: 'linear-gradient(135deg, #5a6268, #495057)',
+        transform: 'translateY(-2px)',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+      });
+    });
+    
+    backButton.addEventListener('mouseleave', () => {
+      Object.assign(backButton.style, {
+        background: 'linear-gradient(135deg, #6c757d, #5a6268)',
+        transform: 'translateY(0)',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+      });
+    });
+  
     backButton.addEventListener('click', () => {
       publish('playSE', 'decide');
       publish('changeScreen', 'stageSelect');
     });
     leftControls.appendChild(backButton);
-
-    // ← 追加: 学年セレクト
-    const gradeSelect = document.createElement('select');
+  
+    // 学年セレクト
     const gradeLabel = document.createElement('span');
     gradeLabel.className = 'kanji-grade-label';
     gradeLabel.textContent = '学年：';
+    Object.assign(gradeLabel.style, {
+      color: '#ffffff',
+      fontWeight: '500',
+      marginRight: '8px'
+    });
+  
+    const gradeSelect = document.createElement('select');
     gradeSelect.className = 'kanji-grade-filter';
-
+    Object.assign(gradeSelect.style, {
+      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05))',
+      color: 'white',
+      border: '1px solid rgba(255, 255, 255, 0.3)',
+      borderRadius: '6px',
+      padding: '6px 12px',
+      fontSize: '14px',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease'
+    });
+  
     const labelForGrade = (g) => {
       if (g <= 6) return `${g}年生`;
       return ({ 7: '中1', 8: '中2', 9: '中3', 10: '高校' })[g] || `${g}`;
     };
-
+  
     let opts = '<option value="all">すべて</option>';
     for (let g = 1; g <= 10; g++) {
-      opts += `<option value="${g}">${labelForGrade(g)}</option>`;
+      opts += `<option value="${g}" style="background: rgba(30, 58, 138, 0.9); color: white;">${labelForGrade(g)}</option>`;
     }
     gradeSelect.innerHTML = opts;
     gradeSelect.value = this.gradeFilter;
@@ -200,114 +294,241 @@ const kanjiDexScreen = {
       this.renderKanjiCards();
       publish('playSE', 'decide');
     });
+  
     leftControls.appendChild(gradeLabel);
     leftControls.appendChild(gradeSelect);
-
-    // 中央のコントロール（ソート）
+  
+    // === 中央コントロール（ソートボタン） ===
     const centerControls = document.createElement('div');
     centerControls.className = 'nav-controls-center';
-    
-    const sortByGradeBtn = document.createElement('button');
-    sortByGradeBtn.className = `btn-sort ${this.sortMode === 'grade' ? 'sort-active' : ''}`;
-    sortByGradeBtn.textContent = '📊 学年順';
-    sortByGradeBtn.addEventListener('click', () => {
-      this.sortList('grade');
-      this.updateNavigationButtons();
-      this.renderKanjiCards();
-      publish('playSE', 'decide');
+    Object.assign(centerControls.style, {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      justifyContent: 'center',
+      flex: '1'
     });
-    
-    const sortByStrokesBtn = document.createElement('button');
-    sortByStrokesBtn.className = `btn-sort ${this.sortMode === 'strokes' ? 'sort-active' : ''}`;
-    sortByStrokesBtn.textContent = '✏️ 画数順';
-    sortByStrokesBtn.addEventListener('click', () => {
-      this.sortList('strokes');
-      this.updateNavigationButtons();
-      this.renderKanjiCards();
-      publish('playSE', 'decide');
-    });
-    
-    const sortByMasteryBtn = document.createElement('button');
-    sortByMasteryBtn.className = `btn-sort ${this.sortMode === 'mastery' ? 'sort-active' : ''}`;
-    sortByMasteryBtn.textContent = '⭐ 習熟度順';
-    sortByMasteryBtn.addEventListener('click', () => {
-      this.sortList('mastery');
-      this.updateNavigationButtons();
-      this.renderKanjiCards();
-      publish('playSE', 'decide');
-    });
-    
+  
+    // ソートボタンを作成する関数
+    const createSortButton = (text, mode, isActive) => {
+      const btn = document.createElement('button');
+      btn.className = `btn-sort ${isActive ? 'sort-active' : ''}`;
+      btn.textContent = text;
+      
+      const baseStyle = {
+        background: isActive ? 
+          'linear-gradient(135deg, #f39c12, #e67e22)' : 
+          'linear-gradient(135deg, #ffc107, #e0a800)',
+        color: isActive ? 'white' : '#000',
+        border: isActive ? '2px solid #fff' : '1px solid rgba(255, 255, 255, 0.2)',
+        borderRadius: '8px',
+        padding: '8px 16px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: '600',
+        transition: 'all 0.3s ease',
+        boxShadow: isActive ? 
+          '0 0 12px rgba(243, 156, 18, 0.5)' : 
+          '0 2px 4px rgba(0, 0, 0, 0.2)'
+      };
+      
+      Object.assign(btn.style, baseStyle);
+      
+      // ホバーエフェクト
+      btn.addEventListener('mouseenter', () => {
+        if (!isActive) {
+          Object.assign(btn.style, {
+            background: 'linear-gradient(135deg, #e0a800, #d39e00)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+          });
+        }
+      });
+      
+      btn.addEventListener('mouseleave', () => {
+        if (!isActive) {
+          Object.assign(btn.style, baseStyle);
+        }
+      });
+      
+      btn.addEventListener('click', () => {
+        this.sortList(mode);
+        this.updateNavigationButtons();
+        this.renderKanjiCards();
+        publish('playSE', 'decide');
+      });
+      
+      return btn;
+    };
+  
+    const sortByGradeBtn = createSortButton('📊 学年順', 'grade', this.sortMode === 'grade');
+    const sortByStrokesBtn = createSortButton('✏️ 画数順', 'strokes', this.sortMode === 'strokes');
+    const sortByMasteryBtn = createSortButton('⭐ 習熟度順', 'mastery', this.sortMode === 'mastery');
+  
     centerControls.appendChild(sortByGradeBtn);
     centerControls.appendChild(sortByStrokesBtn);
     centerControls.appendChild(sortByMasteryBtn);
-
-    // 右側のコントロール（フィルター＋ページネーション）
+  
+    // === 右側コントロール ===
     const rightControls = document.createElement('div');
     rightControls.className = 'nav-controls-right';
-    
-    // フィルタートグル
+    Object.assign(rightControls.style, {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px'
+    });
+  
+    // トグルスイッチ
     const filterToggle = document.createElement('label');
     filterToggle.className = 'kanji-toggle-switch';
-    
+    Object.assign(filterToggle.style, {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      cursor: 'pointer'
+    });
+  
     const filterInput = document.createElement('input');
     filterInput.type = 'checkbox';
     filterInput.checked = this.showCollectedOnly;
+    Object.assign(filterInput.style, {
+      appearance: 'none',
+      width: '48px',
+      height: '24px',
+      background: this.showCollectedOnly ? 
+        'linear-gradient(135deg, #28a745, #218838)' : 
+        'linear-gradient(135deg, #6c757d, #5a6268)',
+      borderRadius: '12px',
+      position: 'relative',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      border: '1px solid rgba(255, 255, 255, 0.3)'
+    });
+  
+    // トグルの円
+    const toggleCircle = document.createElement('span');
+    Object.assign(toggleCircle.style, {
+      position: 'absolute',
+      width: '20px',
+      height: '20px',
+      background: 'white',
+      borderRadius: '50%',
+      top: '1px',
+      left: this.showCollectedOnly ? '26px' : '1px',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+      pointerEvents: 'none'
+    });
+  
+    filterInput.style.position = 'relative';
+    filterInput.appendChild(toggleCircle);
+  
     filterInput.addEventListener('change', () => {
       this.toggleFilter();
+      Object.assign(filterInput.style, {
+        background: this.showCollectedOnly ? 
+          'linear-gradient(135deg, #28a745, #218838)' : 
+          'linear-gradient(135deg, #6c757d, #5a6268)'
+      });
+      Object.assign(toggleCircle.style, {
+        left: this.showCollectedOnly ? '26px' : '1px'
+      });
       this.updateNavigationButtons();
       this.renderKanjiCards();
       publish('playSE', 'decide');
     });
-    
-    const filterSlider = document.createElement('span');
-    filterSlider.className = 'slider';
-    
+  
     const filterLabel = document.createElement('span');
     filterLabel.className = 'toggle-label';
     filterLabel.textContent = '収集済のみ';
-    
-    filterToggle.appendChild(filterInput);
-    filterToggle.appendChild(filterSlider);
-    filterToggle.appendChild(filterLabel);
-    
-    // ページネーション
-    const prevBtn = document.createElement('button');
-    prevBtn.className = 'btn-pagination';
-    prevBtn.textContent = '⬅️ 前のページ';
-    prevBtn.addEventListener('click', () => {
-      this.prevPage();
+    Object.assign(filterLabel.style, {
+      color: '#ffffff',
+      fontWeight: '500',
+      userSelect: 'none'
     });
+  
+    filterToggle.appendChild(filterInput);
+    filterToggle.appendChild(filterLabel);
+  
+    // ページネーションボタン
+    const createPageButton = (text, action, disabled = false) => {
+      const btn = document.createElement('button');
+      btn.className = 'btn-pagination';
+      btn.textContent = text;
+      btn.disabled = disabled;
+      
+      const baseStyle = {
+        background: disabled ? 
+          'linear-gradient(135deg, #6c757d, #5a6268)' : 
+          'linear-gradient(135deg, #4a90e2, #357abd)',
+        color: disabled ? '#adb5bd' : 'white',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        borderRadius: '8px',
+        padding: '8px 16px',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        fontSize: '14px',
+        transition: 'all 0.3s ease',
+        boxShadow: disabled ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.2)'
+      };
+      
+      Object.assign(btn.style, baseStyle);
+      
+      if (!disabled) {
+        btn.addEventListener('mouseenter', () => {
+          Object.assign(btn.style, {
+            background: 'linear-gradient(135deg, #357abd, #2e6da4)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+          });
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+          Object.assign(btn.style, baseStyle);
+        });
+      }
+      
+      btn.addEventListener('click', action);
+      return btn;
+    };
+  
+    const prevBtn = createPageButton('⬅️ 前のページ', () => this.prevPage(), this.scroll <= 0);
     
     const pageInfo = document.createElement('span');
     pageInfo.className = 'page-info';
-    
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'btn-pagination';
-    nextBtn.textContent = '次のページ ➡️';
-    nextBtn.addEventListener('click', () => {
-      this.nextPage();
+    Object.assign(pageInfo.style, {
+      background: 'rgba(255, 255, 255, 0.15)',
+      color: 'white',
+      padding: '6px 12px',
+      borderRadius: '6px',
+      fontWeight: '600',
+      border: '1px solid rgba(255, 255, 255, 0.3)',
+      minWidth: '80px',
+      textAlign: 'center'
     });
     
+    const maxScroll = Math.max(0, this.filteredList.length - this.cardsPerPage);
+    const nextBtn = createPageButton('次のページ ➡️', () => this.nextPage(), this.scroll >= maxScroll);
+  
     rightControls.appendChild(filterToggle);
     rightControls.appendChild(prevBtn);
     rightControls.appendChild(pageInfo);
     rightControls.appendChild(nextBtn);
-
+  
+    // 全体を組み立て
     navDiv.appendChild(leftControls);
     navDiv.appendChild(centerControls);
     navDiv.appendChild(rightControls);
-
+  
     // コンテナに追加
     this.container.appendChild(statsDiv);
     this.container.appendChild(navDiv);
-
+  
     // DOMに追加
     document.body.appendChild(this.container);
     
     // ナビゲーションボタンの状態を更新
     this.updateNavigationButtons();
   },
-
   /** DOMコンテンツ（カードグリッド）を作成 */
   createDOMContent() {
     // カードグリッドコンテナを作成
