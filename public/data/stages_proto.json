@@ -2,13 +2,13 @@
   {
     "grade": 1,
     "region": "北海道",
-    "pref": "北海道北",
+    "pref": "北海道",
     "pos": {
       "x": 600,
       "y": 240
     },
     "stageId": "hokkaido_area1",
-    "name": "北海道地方１",
+    "name": "北海道",
     "enemyIdList": [
       "HKD-E01",
       "HKD-E02",
@@ -115,7 +115,7 @@
       "y": 100
     },
     "stageId": "tohoku_area1",
-    "name": "東北地方青森県",
+    "name": "青森県",
     "enemyIdList": [
       "AOM-E01",
       "AOM-E02",
@@ -172,7 +172,7 @@
       "y": 200
     },
     "stageId": "tohoku_area2",
-    "name": "東北地方岩手県",
+    "name": "岩手県",
     "enemyIdList": [
       "IWT-E01",
       "IWT-E02",
@@ -229,7 +229,7 @@
       "y": 200
     },
     "stageId": "tohoku_area3",
-    "name": "東北地方秋田県",
+    "name": "秋田県",
     "enemyIdList": [
       "AKT-E01",
       "AKT-E02",
@@ -286,7 +286,7 @@
       "y": 350
     },
     "stageId": "tohoku_area4",
-    "name": "東北地方宮城県",
+    "name": "宮城県",
     "enemyIdList": [
       "MYG-E01",
       "MYG-E02",
@@ -338,7 +338,7 @@
       "y": 350
     },
     "stageId": "tohoku_area5",
-    "name": "東北地方山形県",
+    "name": "山形県",
     "enemyIdList": [
       "YMG-E01",
       "YMG-E02",
@@ -390,7 +390,7 @@
       "y": 450
     },
     "stageId": "tohoku_area6",
-    "name": "東北地方福島県",
+    "name": "福島県",
     "enemyIdList": [
       "HKS-E01",
       "HKS-E02",
@@ -435,7 +435,7 @@
       "y": 100
     },
     "stageId": "kanto_area1",
-    "name": "関東地方栃木県",
+    "name": "栃木県",
     "enemyIdList": [
       "TCG-E01",
       "TCG-E02",
@@ -497,7 +497,7 @@
       "y": 140
     },
     "stageId": "kanto_area2",
-    "name": "関東地方群馬県",
+    "name": "群馬県",
     "enemyIdList": [
       "GNM-E01",
       "GNM-E02",
@@ -559,7 +559,7 @@
       "y": 200
     },
     "stageId": "kanto_area3",
-    "name": "関東地方茨城県",
+    "name": "茨城県",
     "enemyIdList": [
       "IBK-E01",
       "IBK-E02",
@@ -621,7 +621,7 @@
       "y": 270
     },
     "stageId": "kanto_area4",
-    "name": "関東地方埼玉県",
+    "name": "埼玉県",
     "enemyIdList": [
       "SIT-E01",
       "SIT-E02",
@@ -678,7 +678,7 @@
       "y": 380
     },
     "stageId": "kanto_area5",
-    "name": "関東地方千葉県",
+    "name": "千葉県",
     "enemyIdList": [
       "TB-E01",
       "TB-E02",
@@ -740,7 +740,7 @@
       "y": 330
     },
     "stageId": "kanto_area6",
-    "name": "関東地方東京都",
+    "name": "東京都",
     "enemyIdList": [
       "TKY-E01",
       "TKY-E02",
@@ -797,7 +797,7 @@
       "y": 390
     },
     "stageId": "kanto_area7",
-    "name": "関東地方神奈川県",
+    "name": "神奈川県",
     "enemyIdList": [
       "KNG-E01",
       "KNG-E02",
@@ -919,7 +919,7 @@
       "y": 130
     },
     "stageId": "chubu_area1",
-    "name": "中部地方新潟県",
+    "name": "新潟県",
     "enemyIdList": [
       "NGT-E01",
       "NGT-E02",
@@ -966,7 +966,7 @@
       "y": 250
     },
     "stageId": "chubu_area2",
-    "name": "中部地方富山県",
+    "name": "富山県",
     "enemyIdList": [
       "TYM-E01",
       "TYM-E02",
@@ -1013,7 +1013,7 @@
       "y": 280
     },
     "stageId": "chubu_area3",
-    "name": "中部地方石川県",
+    "name": "石川県",
     "enemyIdList": [
       "ISK-E01",
       "ISK-E02",
@@ -1060,7 +1060,7 @@
       "y": 350
     },
     "stageId": "chubu_area4",
-    "name": "中部地方福井県",
+    "name": "福井県",
     "enemyIdList": [
       "HKI-E01",
       "HKI-E02",
@@ -1107,7 +1107,7 @@
       "y": 280
     },
     "stageId": "chubu_area5",
-    "name": "中部地方長野県",
+    "name": "長野県",
     "enemyIdList": [
       "NGN-E01",
       "NGN-E02",
@@ -1154,7 +1154,7 @@
       "y": 340
     },
     "stageId": "chubu_area6",
-    "name": "中部地方岐阜県",
+    "name": "岐阜県",
     "enemyIdList": [
       "GF-E01",
       "GF-E02",
@@ -1201,7 +1201,7 @@
       "y": 350
     },
     "stageId": "chubu_area7",
-    "name": "中部地方山梨県",
+    "name": "山梨県",
     "enemyIdList": [
       "YMN-E01",
       "YMN-E02",
@@ -1248,7 +1248,7 @@
       "y": 430
     },
     "stageId": "chubu_area8",
-    "name": "中部地方静岡県",
+    "name": "静岡県",
     "enemyIdList": [
       "SZO-E01",
       "SZO-E02",
@@ -1300,7 +1300,7 @@
       "y": 450
     },
     "stageId": "chubu_area9",
-    "name": "中部地方愛知県",
+    "name": "愛知県",
     "enemyIdList": [
       "AIC-E01",
       "AIC-E02",
@@ -1365,7 +1365,7 @@
       "y": 200
     },
     "stageId": "kinki_area1",
-    "name": "近畿地方滋賀県",
+    "name": "滋賀県",
     "enemyIdList": [
       "SG-E01",
       "SG-E02",
@@ -1417,7 +1417,7 @@
       "y": 330
     },
     "stageId": "kinki_area2",
-    "name": "近畿地方三重県",
+    "name": "三重県",
     "enemyIdList": [
       "ME-E01",
       "ME-E02",
@@ -1469,7 +1469,7 @@
       "y": 160
     },
     "stageId": "kinki_area3",
-    "name": "近畿地方京都府",
+    "name": "京都府",
     "enemyIdList": [
       "KYT-E01",
       "KYT-E02",
@@ -1521,7 +1521,7 @@
       "y": 350
     },
     "stageId": "kinki_area4",
-    "name": "近畿地方奈良県",
+    "name": "奈良県",
     "enemyIdList": [
       "NR-E01",
       "NR-E02",
@@ -1573,7 +1573,7 @@
       "y": 300
     },
     "stageId": "kinki_area5",
-    "name": "近畿地方大阪府",
+    "name": "大阪府",
     "enemyIdList": [
       "OSK-E01",
       "OSK-E02",
@@ -1625,7 +1625,7 @@
       "y": 450
     },
     "stageId": "kinki_area6",
-    "name": "近畿地方和歌山県",
+    "name": "和歌山県",
     "enemyIdList": [
       "WKY-E01",
       "WKY-E02",
@@ -1682,7 +1682,7 @@
       "y": 200
     },
     "stageId": "kinki_area7",
-    "name": "近畿地方兵庫県",
+    "name": "兵庫県",
     "enemyIdList": [
       "HYG-E01",
       "HYG-E02",
@@ -1748,7 +1748,7 @@
       "y": 230
     },
     "stageId": "chugoku_area1",
-    "name": "中国地方鳥取県",
+    "name": "鳥取県",
     "enemyIdList": [
       "TTR-E01",
       "TTR-E02",
@@ -1810,7 +1810,7 @@
       "y": 310
     },
     "stageId": "chugoku_area2",
-    "name": "中国地方岡山県",
+    "name": "岡山県",
     "enemyIdList": [
       "OKY-E01",
       "OKY-E02",
@@ -1877,7 +1877,7 @@
       "y": 240
     },
     "stageId": "chugoku_area3",
-    "name": "中国地方島根県",
+    "name": "島根県",
     "enemyIdList": [
       "SMN-E01",
       "SMN-E02",
@@ -1944,7 +1944,7 @@
       "y": 350
     },
     "stageId": "chugoku_area4",
-    "name": "中国地方広島県",
+    "name": "広島県",
     "enemyIdList": [
       "HRS-E01",
       "HRS-E02",
@@ -2011,7 +2011,7 @@
       "y": 400
     },
     "stageId": "chugoku_area5",
-    "name": "中国地方山口県",
+    "name": "山口県",
     "enemyIdList": [
       "YMGC-E01",
       "YMGC-E02",
