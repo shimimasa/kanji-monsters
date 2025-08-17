@@ -725,55 +725,88 @@ const kanjiDexScreen = {
     if (!this.container) return;
     
     // ページ情報を更新
-    const pageInfo = this.container.querySelector('.page-info');
-    if (pageInfo) {
-      const currentPage = Math.floor(this.scroll / this.cardsPerPage) + 1;
-      const totalPages = Math.ceil(this.filteredList.length / this.cardsPerPage);
-      pageInfo.textContent = `${currentPage} / ${totalPages}`;
-    }
-    
-    // ソートボタンのアクティブ状態を更新
-  const sortButtons = this.container.querySelectorAll('.btn-sort');
-  sortButtons.forEach(btn => btn.classList.remove('sort-active'));
-  
-  if (this.sortMode === 'grade') {
-    sortButtons[0]?.classList.add('sort-active');
-  } else if (this.sortMode === 'strokes') {
-    sortButtons[1]?.classList.add('sort-active');
-  } else if (this.sortMode === 'mastery') {
-    sortButtons[2]?.classList.add('sort-active');
+  const pageInfo = this.container.querySelector('.page-info');
+  if (pageInfo) {
+    const currentPage = Math.floor(this.scroll / this.cardsPerPage) + 1;
+    const totalPages = Math.ceil(this.filteredList.length / this.cardsPerPage);
+    pageInfo.textContent = `${currentPage} / ${totalPages}`;
   }
+  
+  // ソートボタンのアクティブ状態を更新（ビジュアル改善）
+  const sortButtons = this.container.querySelectorAll('.btn-sort');
+  sortButtons.forEach((btn, index) => {
+    const isActive = (
+      (this.sortMode === 'grade' && index === 0) ||
+      (this.sortMode === 'strokes' && index === 1) ||
+      (this.sortMode === 'mastery' && index === 2)
+    );
     
-  // ページネーションボタンの状態更新（改善版）
-  const prevBtn = this.container.querySelector('.btn-pagination');
-  const nextBtn = this.container.querySelector('.btn-pagination:last-of-type');
+    // アクティブ状態のスタイルを直接適用
+    if (isActive) {
+      Object.assign(btn.style, {
+        background: 'linear-gradient(135deg, #f39c12, #e67e22)',
+        color: 'white',
+        border: '2px solid #fff',
+        boxShadow: '0 0 12px rgba(243, 156, 18, 0.5)'
+      });
+    } else {
+      Object.assign(btn.style, {
+        background: 'linear-gradient(135deg, #ffc107, #e0a800)',
+        color: '#000',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+      });
+    }
+  });
+  
+  // ページネーションボタンの状態更新
+  const paginationBtns = this.container.querySelectorAll('.btn-pagination');
+  const prevBtn = paginationBtns[0];
+  const nextBtn = paginationBtns[1];
   
   if (prevBtn) {
-    prevBtn.disabled = this.scroll <= 0;
-    prevBtn.classList.toggle('disabled', this.scroll <= 0);
+    const isDisabled = this.scroll <= 0;
+    prevBtn.disabled = isDisabled;
+    
+    Object.assign(prevBtn.style, {
+      background: isDisabled ? 
+        'linear-gradient(135deg, #6c757d, #5a6268)' : 
+        'linear-gradient(135deg, #4a90e2, #357abd)',
+      color: isDisabled ? '#adb5bd' : 'white',
+      cursor: isDisabled ? 'not-allowed' : 'pointer',
+      boxShadow: isDisabled ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.2)'
+    });
   }
   
   if (nextBtn) {
     const maxScroll = Math.max(0, this.filteredList.length - this.cardsPerPage);
-    nextBtn.disabled = this.scroll >= maxScroll;
-    nextBtn.classList.toggle('disabled', this.scroll >= maxScroll);
+    const isDisabled = this.scroll >= maxScroll;
+    nextBtn.disabled = isDisabled;
+    
+    Object.assign(nextBtn.style, {
+      background: isDisabled ? 
+        'linear-gradient(135deg, #6c757d, #5a6268)' : 
+        'linear-gradient(135deg, #4a90e2, #357abd)',
+      color: isDisabled ? '#adb5bd' : 'white',
+      cursor: isDisabled ? 'not-allowed' : 'pointer',
+      boxShadow: isDisabled ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.2)'
+    });
   }
-    
-    
-    // 収集率統計を更新
-    const statsText = this.container.querySelector('.kanji-stats-text');
-    const progressFill = this.container.querySelector('.kanji-progress-fill');
-    
-    if (statsText && progressFill) {
-      const collectionRate = Math.round((this.dexSet.size / this.allList.length) * 100);
-      if (this.showCollectedOnly) {
-        statsText.textContent = `表示中: ${this.filteredList.length} / 収集済: ${this.dexSet.size} (${collectionRate}%)`;
-      } else {
-        statsText.textContent = `漢字収集率: ${this.dexSet.size}/${this.allList.length} (${collectionRate}%)`;
-      }
-      progressFill.style.width = `${collectionRate}%`;
+  
+  // 収集率統計を更新
+  const statsText = this.container.querySelector('.kanji-stats-text');
+  const progressFill = this.container.querySelector('.kanji-progress-fill');
+  
+  if (statsText && progressFill) {
+    const collectionRate = Math.round((this.dexSet.size / this.allList.length) * 100);
+    if (this.showCollectedOnly) {
+      statsText.textContent = `表示中: ${this.filteredList.length} / 収集済: ${this.dexSet.size} (${collectionRate}%)`;
+    } else {
+      statsText.textContent = `漢字収集率: ${this.dexSet.size}/${this.allList.length} (${collectionRate}%)`;
     }
-  },
+    progressFill.style.width = `${collectionRate}%`;
+  }
+},
 
   /** update：毎フレーム描画 */
   update(dt) {
