@@ -6,10 +6,10 @@ import { images } from '../loaders/assetsLoader.js';
 // 大陸マーカーの定義を修正（7行目付近）
 const continentMarkers = [
   // 漢検レベルを文字列として明示的に定義し、regionも追加
-  { name: 'アジア', kanken_level: "4", x: 550, y: 250, color: '#7ED321', region: 'アジア' },
-  { name: 'ヨーロッパ', kanken_level: "3", x: 450, y: 230, color: '#4169e1', region: 'ヨーロッパ' },
-  { name: 'アメリカ大陸', kanken_level: "準2", x: 200, y: 250, color: '#F5A623', region: 'アメリカ大陸' },
-  { name: 'アフリカ', kanken_level: "2", x: 420, y: 350, color: '#ff7f50', region: 'アフリカ大陸' } // regionを「アフリカ大陸」に修正
+  { name: 'アジア', kanken_level: "4", x: 300, y: 250, color: '#7ED321', region: 'アジア' },
+  { name: 'ヨーロッパ', kanken_level: "3", x: 200, y: 230, color: '#4169e1', region: 'ヨーロッパ' },
+  { name: 'アメリカ大陸', kanken_level: "準2", x: 550, y: 250, color: '#F5A623', region: 'アメリカ大陸' },
+  { name: 'アフリカ', kanken_level: "2", x: 150, y: 300, color: '#ff7f50', region: 'アフリカ大陸' } // regionを「アフリカ大陸」に修正
 ];
 
 const backButton = { x: 10, y: 540, width: 120, height: 40, text: '戻る' };

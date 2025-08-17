@@ -172,7 +172,7 @@ const profileButton = {
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
-  text: 'プロフィール/称号',
+  text: 'プロフィール',
   icon: '🏆'
 };
 
