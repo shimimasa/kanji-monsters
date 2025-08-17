@@ -732,21 +732,8 @@ const kanjiDexScreen = {
       pageInfo.textContent = `${currentPage} / ${totalPages}`;
     }
     
-    // ページングボタンの有効/無効を更新
-    const prevBtn = this.container.querySelector('.nav-controls-right button:first-of-type');
-    const nextBtn = this.container.querySelector('.nav-controls-right button:last-of-type');
-    
-    if (prevBtn) {
-      prevBtn.disabled = this.scroll <= 0;
-    }
-    
-    if (nextBtn) {
-      const maxScroll = Math.max(0, this.filteredList.length - this.cardsPerPage);
-      nextBtn.disabled = this.scroll >= maxScroll;
-    }
-    
     // ソートボタンのアクティブ状態を更新
-    const sortButtons = this.container.querySelectorAll('.btn-sort');
+  const sortButtons = this.container.querySelectorAll('.btn-sort');
   sortButtons.forEach(btn => btn.classList.remove('sort-active'));
   
   if (this.sortMode === 'grade') {
@@ -756,8 +743,9 @@ const kanjiDexScreen = {
   } else if (this.sortMode === 'mastery') {
     sortButtons[2]?.classList.add('sort-active');
   }
-  // ページネーションボタンの状態更新
-  const prevBtn = this.container.querySelector('.btn-pagination:first-of-type');
+    
+  // ページネーションボタンの状態更新（改善版）
+  const prevBtn = this.container.querySelector('.btn-pagination');
   const nextBtn = this.container.querySelector('.btn-pagination:last-of-type');
   
   if (prevBtn) {
@@ -770,6 +758,7 @@ const kanjiDexScreen = {
     nextBtn.disabled = this.scroll >= maxScroll;
     nextBtn.classList.toggle('disabled', this.scroll >= maxScroll);
   }
+    
     
     // 収集率統計を更新
     const statsText = this.container.querySelector('.kanji-stats-text');
