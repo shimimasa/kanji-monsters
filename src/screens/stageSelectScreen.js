@@ -208,6 +208,7 @@ const stageSelectScreenState = {
       this.stageButtons = [];
       return;
     }
+    
     // --- この部分を新しいロジックに置き換え ---
     const stageCount = this.stages.length;
 
@@ -218,8 +219,8 @@ const stageSelectScreenState = {
     const panelH = ch - 140;
     const leftPanelWidth = cw / 2;
 
-    // リスト領域（上端と下端）
-    const listStartY = 80;                    // 既存デザインに合わせた開始位置
+    // リスト領域（上端と下端）- 見出し分のスペースを確保
+    const listStartY = 120;                   // 見出し分を考慮して下に移動（80→120）
     const listBottom = panelY + panelH - 12;  // 下端はパネル内に収める
 
     // 空き高さからボタン高さを自動算出
@@ -249,7 +250,6 @@ const stageSelectScreenState = {
         stage: stage,
       };
     });
-
   },
 
   /** ステージのクリア状況を確認 */
