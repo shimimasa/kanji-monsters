@@ -1455,6 +1455,24 @@ if (gameState.currentKanji) {
   this.ctx.shadowBlur = 0;
   this.ctx.shadowOffsetX = 0;
   this.ctx.shadowOffsetY = 0;
+
+  // ★★★ 追加: 現在の問題がマスター済みならMASTERバッジを表示 ★★★
+  const currentKanjiId = gameState.currentKanji.id;
+  if (currentKanjiId && isKanjiMastered(currentKanjiId)) {
+    // 漢字ボックスの右上にMASTERバッジを表示
+    const badgeX = adjustedX + scaledW - 6;
+    const badgeY = adjustedY + 6;
+    drawMasterBadge(this.ctx, badgeX, badgeY);
+    
+    // オプション: マスター済み漢字の場合、枠を少し光らせる効果も追加
+    this.ctx.save();
+    this.ctx.strokeStyle = 'rgba(52, 152, 219, 0.6)'; // 青色の光る枠
+    this.ctx.lineWidth = 3;
+    this.ctx.shadowColor = 'rgba(52, 152, 219, 0.8)';
+    this.ctx.shadowBlur = 8;
+    this.ctx.strokeRect(adjustedX, adjustedY, scaledW, scaledH);
+    this.ctx.restore();
+  }
 }
 
     // ボタンの描画時に選択されているコマンドを強調表示
@@ -3760,6 +3778,9 @@ function onHeal() {
     // 統計データの更新（正解）
     gameState.playerStats.totalCorrect++;
     gameState.playerStats.comboCount++;
+
+    // ★★★ 追加: 読み進捗更新・マスター判定 ★★★
+    updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
 
     // 回復前のHPを保存
     const prevHp = gameState.playerStats.hp;
