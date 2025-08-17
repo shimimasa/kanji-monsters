@@ -45,7 +45,7 @@ function getGradeRegion(grade) {
     3: '関東',
     4: '中部',
     5: '近畿',
-    6: '九州他',
+    6: '中国',
     0: ''
   };
   return regions[grade] || '';

@@ -166,6 +166,7 @@ const kanjiDexScreen = {
     leftControls.className = 'nav-controls-left';
 
     const backButton = document.createElement('button');
+    backButton.className = 'btn-back'; // クラス追加
     backButton.textContent = '📚 ステージ選択へ';
     backButton.addEventListener('click', () => {
       publish('playSE', 'decide');
@@ -207,8 +208,8 @@ const kanjiDexScreen = {
     centerControls.className = 'nav-controls-center';
     
     const sortByGradeBtn = document.createElement('button');
+    sortByGradeBtn.className = `btn-sort ${this.sortMode === 'grade' ? 'sort-active' : ''}`;
     sortByGradeBtn.textContent = '📊 学年順';
-    sortByGradeBtn.className = this.sortMode === 'grade' ? 'sort-active' : '';
     sortByGradeBtn.addEventListener('click', () => {
       this.sortList('grade');
       this.updateNavigationButtons();
@@ -217,8 +218,8 @@ const kanjiDexScreen = {
     });
     
     const sortByStrokesBtn = document.createElement('button');
+    sortByStrokesBtn.className = `btn-sort ${this.sortMode === 'strokes' ? 'sort-active' : ''}`;
     sortByStrokesBtn.textContent = '✏️ 画数順';
-    sortByStrokesBtn.className = this.sortMode === 'strokes' ? 'sort-active' : '';
     sortByStrokesBtn.addEventListener('click', () => {
       this.sortList('strokes');
       this.updateNavigationButtons();
@@ -227,8 +228,8 @@ const kanjiDexScreen = {
     });
     
     const sortByMasteryBtn = document.createElement('button');
+    sortByMasteryBtn.className = `btn-sort ${this.sortMode === 'mastery' ? 'sort-active' : ''}`;
     sortByMasteryBtn.textContent = '⭐ 習熟度順';
-    sortByMasteryBtn.className = this.sortMode === 'mastery' ? 'sort-active' : '';
     sortByMasteryBtn.addEventListener('click', () => {
       this.sortList('mastery');
       this.updateNavigationButtons();
@@ -271,6 +272,7 @@ const kanjiDexScreen = {
     
     // ページネーション
     const prevBtn = document.createElement('button');
+    prevBtn.className = 'btn-pagination';
     prevBtn.textContent = '⬅️ 前のページ';
     prevBtn.addEventListener('click', () => {
       this.prevPage();
@@ -280,6 +282,7 @@ const kanjiDexScreen = {
     pageInfo.className = 'page-info';
     
     const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn-pagination';
     nextBtn.textContent = '次のページ ➡️';
     nextBtn.addEventListener('click', () => {
       this.nextPage();
@@ -743,16 +746,30 @@ const kanjiDexScreen = {
     }
     
     // ソートボタンのアクティブ状態を更新
-    const sortButtons = this.container.querySelectorAll('.nav-controls-center button');
-    sortButtons.forEach(btn => btn.classList.remove('sort-active'));
-    
-    if (this.sortMode === 'grade') {
-      sortButtons[0]?.classList.add('sort-active');
-    } else if (this.sortMode === 'strokes') {
-      sortButtons[1]?.classList.add('sort-active');
-    } else if (this.sortMode === 'mastery') {
-      sortButtons[2]?.classList.add('sort-active');
-    }
+    const sortButtons = this.container.querySelectorAll('.btn-sort');
+  sortButtons.forEach(btn => btn.classList.remove('sort-active'));
+  
+  if (this.sortMode === 'grade') {
+    sortButtons[0]?.classList.add('sort-active');
+  } else if (this.sortMode === 'strokes') {
+    sortButtons[1]?.classList.add('sort-active');
+  } else if (this.sortMode === 'mastery') {
+    sortButtons[2]?.classList.add('sort-active');
+  }
+  // ページネーションボタンの状態更新
+  const prevBtn = this.container.querySelector('.btn-pagination:first-of-type');
+  const nextBtn = this.container.querySelector('.btn-pagination:last-of-type');
+  
+  if (prevBtn) {
+    prevBtn.disabled = this.scroll <= 0;
+    prevBtn.classList.toggle('disabled', this.scroll <= 0);
+  }
+  
+  if (nextBtn) {
+    const maxScroll = Math.max(0, this.filteredList.length - this.cardsPerPage);
+    nextBtn.disabled = this.scroll >= maxScroll;
+    nextBtn.classList.toggle('disabled', this.scroll >= maxScroll);
+  }
     
     // 収集率統計を更新
     const statsText = this.container.querySelector('.kanji-stats-text');
