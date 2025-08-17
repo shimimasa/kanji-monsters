@@ -152,7 +152,7 @@ function showMonsterModal(monster) {
   modal.onclick = (e) => {
     if (e.target === modal) {
       modal.remove();
-      window.removeEventListener('keydown', onEsc); // 追加
+      window.removeEventListener('keydown', onEsc);
       publish('playSE', 'cancel');
     }
   };
@@ -160,15 +160,13 @@ function showMonsterModal(monster) {
   document.body.appendChild(modal);
   publish('playSE', 'decide');
 }
-// --- ヘルパー関数の定義ここまで ---
-
 
 const proverbMonsterDexState = {
   canvas: null,
   dexSet: null,
   seenSet: null,
   allMonsterIds: [],
-  filteredMonsterIds: [], // フィルタリング後のモンスターID配列
+  filteredMonsterIds: [],
   
   // ページ管理用の状態を追加
   itemsPerPage: 15, // 1ページに表示する数 (3行x5列)
@@ -179,10 +177,20 @@ const proverbMonsterDexState = {
   currentRegionFilter: 'all', // 'all', 7, 8, 9, 10
   currentSortOrder: 'id', // 'id' (図鑑番号順), 'name' (五十音順)
 
+  // DOM管理用プロパティ
+  container: null,
+
   /** 画面表示時の初期化 */
   enter(canvas) {
     this.canvas = canvas || document.getElementById('gameCanvas');
-    this.canvas.style.display = 'none'; // Canvasは使わないので非表示
+    
+    // キャンバスを不可視化（KanjiDexと同様）
+    if (this.canvas) {
+      this._prevCanvasVisibility = this.canvas.style.visibility;
+      this._prevCanvasPointer = this.canvas.style.pointerEvents;
+      this.canvas.style.visibility = 'hidden';
+      this.canvas.style.pointerEvents = 'none';
+    }
 
     // データの読み込み
     this.dexSet = loadDex();
@@ -191,10 +199,50 @@ const proverbMonsterDexState = {
     
     // 初期状態では全てのモンスターを表示
     this.applyFiltersAndSort();
-    this.currentPage = 0; // 常に最初のページから表示
+    this.currentPage = 0;
 
+    // DOMコンテナを作成
+    this.createDOMContainer();
+    
     // ページを描画
     this.renderPage();
+
+    // キーボードイベント（KanjiDexと同様）
+    this._keyHandler = e => {
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        this.changePage(this.currentPage - 1);
+      } else if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        this.changePage(this.currentPage + 1);
+      }
+    };
+    window.addEventListener('keydown', this._keyHandler);
+  },
+
+  /** DOMコンテナを作成（KanjiDexと統一） */
+  createDOMContainer() {
+    // 既存のコンテナがあれば削除
+    if (this.container) {
+      this.container.remove();
+    }
+
+    // メインコンテナを作成
+    this.container = document.createElement('div');
+    this.container.id = 'proverbMonsterDexContainer';
+    this.container.className = 'proverb-monster-dex-container';
+    Object.assign(this.container.style, {
+      position: 'fixed',
+      left: '0',
+      top: '0',
+      width: '100vw',
+      height: '100vh',
+      zIndex: '100000',
+      background: '#2c1810', // 図鑑の背景色（KanjiDexと同じ）
+      overflowY: 'auto',
+      border: 'none',
+      outline: 'none'
+    });
+
+    document.body.appendChild(this.container);
   },
 
   /** 地域ごとのコンプリート状況を計算 */
@@ -249,135 +297,334 @@ const proverbMonsterDexState = {
     this.totalPages = Math.ceil(this.filteredMonsterIds.length / this.itemsPerPage);
   },
 
-  /** 現在のページを描画する（DOM操作） */
+  /** 現在のページを描画する（KanjiDexスタイルに統一） */
   renderPage() {
-    // monsterDexScreen と同じ既存コンテナを使用して、同じグリッドCSSを適用する
-    const container = document.getElementById('monsterContainer');
-    if (!container) return;
-    container.innerHTML = '';
-    container.style.display = 'grid';
+    if (!this.container) return;
+
+    // 既存の要素を全てクリア
+    this.container.innerHTML = '';
 
     // 地域コンプリート状況を計算
     const regionCompletion = this.calculateRegionCompletion();
 
-    // --- 収集率表示エリアを作成 ---
-    const collectionStats = document.createElement('div');
-    collectionStats.className = 'collection-stats';
+    // === 統計エリア（KanjiDexと同じネイビーブルー系） ===
+    const statsDiv = document.createElement('div');
+    statsDiv.className = 'proverb-monster-collection-stats';
+    Object.assign(statsDiv.style, {
+      background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.7), rgba(59, 130, 246, 0.4))',
+      border: '1px solid rgba(59, 130, 246, 0.3)',
+      borderRadius: '12px',
+      padding: '16px',
+      margin: '16px',
+      backdropFilter: 'blur(10px)',
+      boxShadow: '0 2px 8px rgba(30, 58, 138, 0.2)'
+    });
     
     const totalCollected = this.dexSet.size;
     const totalMonsters = this.allMonsterIds.length;
     const collectionRate = totalMonsters > 0 ? Math.round((totalCollected / totalMonsters) * 100) : 0;
     
     const statsText = document.createElement('div');
-    statsText.className = 'stats-text';
-    statsText.textContent = `ことわざモンスター収集率: ${collectionRate}% (${totalCollected} / ${totalMonsters})`;
+    statsText.className = 'proverb-monster-stats-text';
+    Object.assign(statsText.style, {
+      color: '#ffffff',
+      fontSize: '18px',
+      fontWeight: '600',
+      marginBottom: '8px'
+    });
+    statsText.textContent = `ことわざモンスター収集率: ${totalCollected}/${totalMonsters} (${collectionRate}%)`;
     
     const progressBar = document.createElement('div');
-    progressBar.className = 'progress-bar';
+    progressBar.className = 'proverb-monster-progress-bar';
+    Object.assign(progressBar.style, {
+      background: 'rgba(255, 255, 255, 0.1)',
+      borderRadius: '10px',
+      height: '12px',
+      overflow: 'hidden',
+      border: '1px solid rgba(255, 255, 255, 0.2)'
+    });
     
     const progressFill = document.createElement('div');
-    progressFill.className = 'progress-fill';
-    progressFill.style.width = `${collectionRate}%`;
+    progressFill.className = 'proverb-monster-progress-fill';
+    Object.assign(progressFill.style, {
+      background: 'linear-gradient(90deg, #28a745, #20c997)',
+      height: '100%',
+      width: `${collectionRate}%`,
+      transition: 'width 0.6s ease',
+      borderRadius: '10px'
+    });
     
     progressBar.appendChild(progressFill);
-    collectionStats.appendChild(statsText);
-    collectionStats.appendChild(progressBar);
-    container.appendChild(collectionStats);
+    statsDiv.appendChild(statsText);
+    statsDiv.appendChild(progressBar);
 
-    // --- ページナビゲーションUIを作成 ---
-    const nav = document.createElement('div');
-    nav.className = 'dex-navigation';
+    // === ナビゲーションエリア（KanjiDexと同じスタイル） ===
+    const navDiv = document.createElement('div');
+    navDiv.className = 'proverb-monster-dex-navigation';
+    Object.assign(navDiv.style, {
+      background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.85), rgba(59, 130, 246, 0.6))',
+      border: '1px solid rgba(59, 130, 246, 0.4)',
+      borderRadius: '12px',
+      padding: '16px',
+      margin: '16px',
+      backdropFilter: 'blur(10px)',
+      boxShadow: '0 4px 12px rgba(30, 58, 138, 0.3)',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: '12px'
+    });
+
+    // === 左側コントロール ===
+    const leftControls = document.createElement('div');
+    leftControls.className = 'nav-controls-left';
+    Object.assign(leftControls.style, {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px'
+    });
 
     // 戻るボタン
-    const backToMenuButton = document.createElement('button');
-    backToMenuButton.textContent = 'ステージ選択へ';
-    backToMenuButton.onclick = () => publish('changeScreen', 'worldStageSelect');
-
-    // 地域フィルタードロップダウン（コンプリート報酬アイコン付き）
-    const regionFilter = document.createElement('select');
-    regionFilter.className = 'region-filter';
+    const backButton = document.createElement('button');
+    backButton.className = 'btn-back';
+    backButton.textContent = '📜 ステージ選択へ';
+    Object.assign(backButton.style, {
+      background: 'linear-gradient(135deg, #6c757d, #5a6268)',
+      color: 'white',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      borderRadius: '8px',
+      padding: '8px 16px',
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: '500',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+    });
     
-    let optionsHTML = '<option value="all">すべて表示</option>';
+    backButton.addEventListener('mouseenter', () => {
+      Object.assign(backButton.style, {
+        background: 'linear-gradient(135deg, #5a6268, #495057)',
+        transform: 'translateY(-2px)',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+      });
+    });
+    
+    backButton.addEventListener('mouseleave', () => {
+      Object.assign(backButton.style, {
+        background: 'linear-gradient(135deg, #6c757d, #5a6268)',
+        transform: 'translateY(0)',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+      });
+    });
+
+    backButton.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      publish('changeScreen', 'worldStageSelect');
+    });
+    leftControls.appendChild(backButton);
+
+    // 地域セレクト
+    const regionLabel = document.createElement('span');
+    regionLabel.className = 'proverb-region-label';
+    regionLabel.textContent = '地域：';
+    Object.assign(regionLabel.style, {
+      color: '#ffffff',
+      fontWeight: '500',
+      marginRight: '8px'
+    });
+
+    const regionSelect = document.createElement('select');
+    regionSelect.className = 'proverb-region-filter';
+    Object.assign(regionSelect.style, {
+      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05))',
+      color: 'white',
+      border: '1px solid rgba(255, 255, 255, 0.3)',
+      borderRadius: '6px',
+      padding: '6px 12px',
+      fontSize: '14px',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease'
+    });
+
+    let optionsHTML = '<option value="all">すべて</option>';
     for (let grade = 7; grade <= 10; grade++) {
       const regionName = regionMap[grade];
       const kankenLevel = kankenLevelMap[grade];
       const completion = regionCompletion[grade];
       const crownIcon = completion.isComplete ? ' 👑' : '';
-      optionsHTML += `<option value="${grade}">${regionName}（${kankenLevel}）${crownIcon}</option>`;
+      optionsHTML += `<option value="${grade}" style="background: rgba(30, 58, 138, 0.9); color: white;">${regionName}（${kankenLevel}）${crownIcon}</option>`;
     }
-    regionFilter.innerHTML = optionsHTML;
+    regionSelect.innerHTML = optionsHTML;
+    regionSelect.value = this.currentRegionFilter;
     
-    regionFilter.value = this.currentRegionFilter;
-    regionFilter.onchange = (e) => {
+    regionSelect.addEventListener('change', (e) => {
       this.currentRegionFilter = e.target.value === 'all' ? 'all' : parseInt(e.target.value);
       this.applyFiltersAndSort();
-      this.currentPage = 0; // 1ページ目にリセット
-      this.renderPage();
-      publish('playSE', 'decide');
-    };
-
-    // ソートボタン
-    const sortByIdButton = document.createElement('button');
-    sortByIdButton.textContent = '図鑑番号順';
-    sortByIdButton.className = this.currentSortOrder === 'id' ? 'sort-active' : '';
-    sortByIdButton.onclick = () => {
-      this.currentSortOrder = 'id';
-      this.applyFiltersAndSort();
       this.currentPage = 0;
       this.renderPage();
       publish('playSE', 'decide');
+    });
+
+    leftControls.appendChild(regionLabel);
+    leftControls.appendChild(regionSelect);
+
+    // === 中央コントロール（ソートボタン） ===
+    const centerControls = document.createElement('div');
+    centerControls.className = 'nav-controls-center';
+    Object.assign(centerControls.style, {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      justifyContent: 'center',
+      flex: '1'
+    });
+
+    // ソートボタンを作成する関数
+    const createSortButton = (text, mode, isActive) => {
+      const btn = document.createElement('button');
+      btn.className = `btn-sort ${isActive ? 'sort-active' : ''}`;
+      btn.textContent = text;
+      
+      const baseStyle = {
+        background: isActive ? 
+          'linear-gradient(135deg, #f39c12, #e67e22)' : 
+          'linear-gradient(135deg, #ffc107, #e0a800)',
+        color: isActive ? 'white' : '#000',
+        border: isActive ? '2px solid #fff' : '1px solid rgba(255, 255, 255, 0.2)',
+        borderRadius: '8px',
+        padding: '8px 16px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: '600',
+        transition: 'all 0.3s ease',
+        boxShadow: isActive ? 
+          '0 0 12px rgba(243, 156, 18, 0.5)' : 
+          '0 2px 4px rgba(0, 0, 0, 0.2)'
+      };
+      
+      Object.assign(btn.style, baseStyle);
+      
+      if (!isActive) {
+        btn.addEventListener('mouseenter', () => {
+          Object.assign(btn.style, {
+            background: 'linear-gradient(135deg, #e0a800, #d39e00)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+          });
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+          Object.assign(btn.style, baseStyle);
+        });
+      }
+      
+      btn.addEventListener('click', () => {
+        this.currentSortOrder = mode;
+        this.applyFiltersAndSort();
+        this.currentPage = 0;
+        this.renderPage();
+        publish('playSE', 'decide');
+      });
+      
+      return btn;
     };
 
-    const sortByNameButton = document.createElement('button');
-    sortByNameButton.textContent = '五十音順';
-    sortByNameButton.className = this.currentSortOrder === 'name' ? 'sort-active' : '';
-    sortByNameButton.onclick = () => {
-      this.currentSortOrder = 'name';
-      this.applyFiltersAndSort();
-      this.currentPage = 0;
-      this.renderPage();
-      publish('playSE', 'decide');
+    const sortByIdBtn = createSortButton('📊 図鑑番号順', 'id', this.currentSortOrder === 'id');
+    const sortByNameBtn = createSortButton('🔤 五十音順', 'name', this.currentSortOrder === 'name');
+
+    centerControls.appendChild(sortByIdBtn);
+    centerControls.appendChild(sortByNameBtn);
+
+    // === 右側コントロール（ページネーション） ===
+    const rightControls = document.createElement('div');
+    rightControls.className = 'nav-controls-right';
+    Object.assign(rightControls.style, {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px'
+    });
+
+    // ページネーションボタン
+    const createPageButton = (text, action, disabled = false) => {
+      const btn = document.createElement('button');
+      btn.className = 'btn-pagination';
+      btn.textContent = text;
+      btn.disabled = disabled;
+      
+      const baseStyle = {
+        background: disabled ? 
+          'linear-gradient(135deg, #6c757d, #5a6268)' : 
+          'linear-gradient(135deg, #4a90e2, #357abd)',
+        color: disabled ? '#adb5bd' : 'white',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        borderRadius: '8px',
+        padding: '8px 16px',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        fontSize: '14px',
+        transition: 'all 0.3s ease',
+        boxShadow: disabled ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.2)'
+      };
+      
+      Object.assign(btn.style, baseStyle);
+      
+      if (!disabled) {
+        btn.addEventListener('mouseenter', () => {
+          Object.assign(btn.style, {
+            background: 'linear-gradient(135deg, #357abd, #2e6da4)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+          });
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+          Object.assign(btn.style, baseStyle);
+        });
+      }
+      
+      btn.addEventListener('click', action);
+      return btn;
     };
 
-    // ページネーション
-    const prevButton = document.createElement('button');
-    prevButton.textContent = '前のページ';
-    prevButton.disabled = this.currentPage === 0;
-    prevButton.onclick = () => this.changePage(this.currentPage - 1);
-
+    const prevBtn = createPageButton('⬅️ 前のページ', () => this.changePage(this.currentPage - 1), this.currentPage === 0);
+    
     const pageInfo = document.createElement('span');
     pageInfo.className = 'page-info';
-    pageInfo.textContent = `${this.currentPage + 1} / ${this.totalPages} ページ`;
+    Object.assign(pageInfo.style, {
+      background: 'rgba(255, 255, 255, 0.15)',
+      color: 'white',
+      padding: '6px 12px',
+      borderRadius: '6px',
+      fontWeight: '600',
+      border: '1px solid rgba(255, 255, 255, 0.3)',
+      minWidth: '80px',
+      textAlign: 'center'
+    });
+    pageInfo.textContent = `${this.currentPage + 1} / ${this.totalPages}`;
+    
+    const nextBtn = createPageButton('次のページ ➡️', () => this.changePage(this.currentPage + 1), this.currentPage >= this.totalPages - 1);
 
-    const nextButton = document.createElement('button');
-    nextButton.textContent = '次のページ';
-    nextButton.disabled = this.currentPage >= this.totalPages - 1;
-    nextButton.onclick = () => this.changePage(this.currentPage + 1);
+    rightControls.appendChild(prevBtn);
+    rightControls.appendChild(pageInfo);
+    rightControls.appendChild(nextBtn);
 
-    // ナビゲーション要素を配置
-    const controlsLeft = document.createElement('div');
-    controlsLeft.className = 'nav-controls-left';
-    controlsLeft.appendChild(backToMenuButton);
-    controlsLeft.appendChild(regionFilter);
+    // 全体を組み立て
+    navDiv.appendChild(leftControls);
+    navDiv.appendChild(centerControls);
+    navDiv.appendChild(rightControls);
 
-    const controlsCenter = document.createElement('div');
-    controlsCenter.className = 'nav-controls-center';
-    controlsCenter.appendChild(sortByIdButton);
-    controlsCenter.appendChild(sortByNameButton);
+    // === カードグリッドエリア ===
+    const cardGrid = document.createElement('div');
+    cardGrid.className = 'proverb-monster-card-grid';
+    Object.assign(cardGrid.style, {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+      gap: '16px',
+      padding: '16px',
+      margin: '0 16px'
+    });
 
-    const controlsRight = document.createElement('div');
-    controlsRight.className = 'nav-controls-right';
-    controlsRight.appendChild(prevButton);
-    controlsRight.appendChild(pageInfo);
-    controlsRight.appendChild(nextButton);
-
-    nav.appendChild(controlsLeft);
-    nav.appendChild(controlsCenter);
-    nav.appendChild(controlsRight);
-    container.appendChild(nav);
-    // --- ナビゲーションUIここまで ---
-
-    // --- 現在のページのカードを生成 ---
+    // 現在のページのモンスターカードを生成
     const startIndex = this.currentPage * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     const pageIds = this.filteredMonsterIds.slice(startIndex, endIndex);
@@ -385,45 +632,115 @@ const proverbMonsterDexState = {
     pageIds.forEach(id => {
       const monsterData = getMonsterById(id);
       if (monsterData) {
-        monsterData.collected = this.dexSet.has(id); // 収集済みか判定
+        monsterData.collected = this.dexSet.has(id);
         const card = createCard(monsterData);
-        container.appendChild(card);
+        
+        // カードのスタイルを統一（KanjiDexと同様）
+        Object.assign(card.style, {
+          background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.8), rgba(160, 82, 45, 0.6))',
+          border: '2px solid #8B4513',
+          borderRadius: '12px',
+          padding: '12px',
+          textAlign: 'center',
+          cursor: monsterData.collected ? 'pointer' : 'default',
+          transition: 'all 0.3s ease',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+          color: '#fff'
+        });
+
+        if (monsterData.collected) {
+          card.addEventListener('mouseenter', () => {
+            Object.assign(card.style, {
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
+            });
+          });
+          
+          card.addEventListener('mouseleave', () => {
+            Object.assign(card.style, {
+              transform: 'translateY(0)',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+            });
+          });
+        } else {
+          Object.assign(card.style, {
+            opacity: '0.6',
+            filter: 'grayscale(100%)'
+          });
+        }
+        
+        cardGrid.appendChild(card);
       }
     });
+
+    // コンテナに全て追加
+    this.container.appendChild(statsDiv);
+    this.container.appendChild(navDiv);
+    this.container.appendChild(cardGrid);
   },
   
   /** ページを切り替える */
   changePage(newPage) {
     if (newPage >= 0 && newPage < this.totalPages) {
       this.currentPage = newPage;
-      this.renderPage(); // ページを再描画
+      this.renderPage();
       publish('playSE', 'decide');
     }
   },
 
   /** 画面離脱時のクリーンアップ */
   exit() {
-    // カードUIを非表示に戻す
-    const container = document.getElementById('monsterContainer');
-    if (container) {
-      container.style.display = 'none';
-      container.innerHTML = '';
+    // DOM要素を削除
+    if (this.container) {
+      this.container.remove();
+      this.container = null;
     }
+    
     // モーダルが残っている場合は削除
     const modal = document.querySelector('.proverb-monster-modal');
     if (modal) {
       modal.remove();
     }
-    // Canvasを再表示
+    
+    // イベント解除
+    if (this._keyHandler) {
+      window.removeEventListener('keydown', this._keyHandler);
+    }
+
+    // キャンバスの可視状態を復元（KanjiDexと同様）
     if (this.canvas) {
-      this.canvas.style.display = '';
+      this.canvas.style.visibility = this._prevCanvasVisibility ?? '';
+      this.canvas.style.pointerEvents = this._prevCanvasPointer ?? '';
+    }
+    
+    this.canvas = null;
+  },
+  
+  /** 毎フレーム描画（背景のみ） */
+  update(dt) {
+    // 背景（書斎風）を描画（KanjiDexと同様）
+    if (this.canvas && this.canvas.getContext) {
+      const ctx = this.canvas.getContext('2d');
+      
+      // 背景（書斎風）を描画
+      ctx.fillStyle = '#2c1810';
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      
+      // 古文書風の背景テクスチャ
+      ctx.fillStyle = 'rgba(139, 69, 19, 0.1)';
+      for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+          if ((i + j) % 2 === 0) {
+            ctx.fillRect(i * 80, j * 60, 40, 30);
+          }
+        }
+      }
     }
   },
   
-  // この画面はDOMで完結するため、updateとrenderは空でOK
-  update(dt) {},
-  render() {}
+  render() {
+    this.update(0);
+  }
 };
 
 export default proverbMonsterDexState;
-
