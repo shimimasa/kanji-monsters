@@ -583,270 +583,321 @@ const stageSelectScreenState = {
       (B > 255 ? 255 : B < 0 ? 0 : B)).toString(16).slice(1);
   },
 
-  /** 毎フレーム描画・更新 */
-  update(dt) {
-    const { ctx, canvas, stages } = this;
-    const cw = canvas.width, ch = canvas.height;
-    ctx.clearRect(0, 0, cw, ch);
+// stageSelectScreen.js の update メソッド内の修正部分
 
-    // アニメーション時間を更新
-    this.animationTime += dt || 16; // デフォルト16ms
+/** 毎フレーム描画・更新 */
+update(dt) {
+  const { ctx, canvas, stages } = this;
+  const cw = canvas.width, ch = canvas.height;
+  ctx.clearRect(0, 0, cw, ch);
 
-    // クロスフェードアニメーションの更新
-    if (this.crossfadeState.active) {
-      this.crossfadeState.timer++;
-      if (this.crossfadeState.timer >= this.crossfadeState.duration) {
-        this.crossfadeState.active = false;
-      }
+  // アニメーション時間を更新
+  this.animationTime += dt || 16;
+
+  // クロスフェードアニメーションの更新
+  if (this.crossfadeState.active) {
+    this.crossfadeState.timer++;
+    if (this.crossfadeState.timer >= this.crossfadeState.duration) {
+      this.crossfadeState.active = false;
     }
+  }
 
-    // 背景画像をキャンバスの右半分に描画（クロスフェード対応）
-    const imageX = cw / 2;
+  // 背景画像をキャンバスの右半分に描画（クロスフェード対応）
+  const imageX = cw / 2;
+  
+  if (this.crossfadeState.active) {
+    // クロスフェード中
+    const progress = this.crossfadeState.timer / this.crossfadeState.duration;
+    const oldAlpha = 1 - progress;
+    const newAlpha = progress;
     
-    if (this.crossfadeState.active) {
-      // クロスフェード中
-      const progress = this.crossfadeState.timer / this.crossfadeState.duration;
-      const oldAlpha = 1 - progress;
-      const newAlpha = progress;
-      
-      // 古い画像をフェードアウト
-      if (this.crossfadeState.oldImage) {
-        ctx.save();
-        ctx.globalAlpha = oldAlpha;
-        ctx.drawImage(this.crossfadeState.oldImage, imageX, 0, cw / 2, ch);
-        ctx.restore();
+    if (this.crossfadeState.oldImage) {
+      ctx.save();
+      ctx.globalAlpha = oldAlpha;
+      ctx.drawImage(this.crossfadeState.oldImage, imageX, 0, cw / 2, ch);
+      ctx.restore();
+    }
+    
+    if (this.crossfadeState.newImage) {
+      ctx.save();
+      ctx.globalAlpha = newAlpha;
+      ctx.drawImage(this.crossfadeState.newImage, imageX, 0, cw / 2, ch);
+      ctx.restore();
+    }
+  } else {
+    // 通常表示
+    const grade = gameState.currentGrade ?? 0;
+    const key = grade === 0 ? 'stageSelect0' : `stageSelect${grade}`;
+    const bgImg = images[key] || images.stageSelect0;
+    if (bgImg) {
+      ctx.drawImage(bgImg, imageX, 0, cw / 2, ch);
+    }
+  }
+
+  // 左側のステージリスト背景パネル
+  const panelX = 10;
+  const panelY = 60;
+  const panelW = cw / 2 - 20;
+  const panelH = ch - 140;
+  this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
+
+  // === 学年タブ描画 ===
+  const tabCount = tabs.length;
+  const tabW = cw / tabCount;
+  const tabH = 50;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '16px sans-serif';
+  tabs.forEach((tab, i) => {
+    const x0 = i * tabW;
+    ctx.fillStyle = (tab.grade === gameState.currentGrade) ? '#ddd' : '#ccc';
+    ctx.fillRect(x0, 0, tabW, tabH);
+    ctx.fillStyle = '#000';
+    ctx.fillText(tab.label, x0 + tabW / 2, tabH / 2);
+  });
+
+  // === 地方名と学年の見出し追加 ===
+  if (gameState.currentGrade !== 0) {
+    // 学年に対応する地方名を取得
+    const getRegionByGrade = (grade) => {
+      switch(grade) {
+        case 1: return '北海道';
+        case 2: return '東北';
+        case 3: return '関東';
+        case 4: return '中部';
+        case 5: return '近畿';
+        case 6: return '中国・四国・九州・沖縄';
+        default: return '';
       }
-      
-      // 新しい画像をフェードイン
-      if (this.crossfadeState.newImage) {
-        ctx.save();
-        ctx.globalAlpha = newAlpha;
-        ctx.drawImage(this.crossfadeState.newImage, imageX, 0, cw / 2, ch);
-        ctx.restore();
-      }
-    } else {
-      // 通常表示
-      const grade = gameState.currentGrade ?? 0;
-      const key = grade === 0 ? 'stageSelect0' : `stageSelect${grade}`;
-      const bgImg = images[key] || images.stageSelect0;
-      if (bgImg) {
-        ctx.drawImage(bgImg, imageX, 0, cw / 2, ch);
-      }
+    };
+
+    const regionName = getRegionByGrade(gameState.currentGrade);
+    const gradeText = `${gameState.currentGrade}年`;
+    const headerText = `${regionName}（${gradeText}）`;
+
+    // 見出しの背景とテキストを描画
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 24px "UDデジタル教科書体", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+
+    // テキストの幅を測定して背景を描画
+    const textWidth = ctx.measureText(headerText).width;
+    const textBgPadding = 12;
+    const textBgX = panelX + panelW / 2 - textWidth / 2 - textBgPadding;
+    const textBgY = panelY + 10;
+    const textBgWidth = textWidth + textBgPadding * 2;
+    const textBgHeight = 34;
+
+    // 背景（半透明の黒）
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    ctx.fillRect(textBgX, textBgY, textBgWidth, textBgHeight);
+    
+    // 枠線
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(textBgX, textBgY, textBgWidth, textBgHeight);
+
+    // テキスト（影付き）
+    ctx.fillStyle = 'white';
+    ctx.shadowColor = 'rgba(0,0,0,0.7)';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    ctx.fillText(headerText, panelX + panelW / 2, panelY + 15);
+    
+    // 影をリセット
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+  }
+
+  // 総復習モードと通常モードで分岐
+  if (gameState.currentGrade === 0) {
+    // 総復習モード専用UI
+    
+    // タイトル
+    ctx.fillStyle = 'white';
+    ctx.font = '24px "UDデジタル教科書体", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('総復習モード', panelX + panelW / 2, panelY + 20);
+
+    // 説明文
+    ctx.font = '14px "UDデジタル教科書体", sans-serif';
+    ctx.fillStyle = '#ccc';
+    ctx.fillText('あなたに最適なステージを自動選択します', panelX + panelW / 2, panelY + 55);
+
+    // メインの復習ボタン
+    const button = this.reviewChallengeButton;
+    const isHovered = isMouseOverRect(this.mouseX, this.mouseY, button);
+    
+    // 点滅エフェクト
+    const pulse = Math.sin(this.animationTime * 0.003) * 0.2 + 0.8;
+    const buttonColor = `hsl(${120 + Math.sin(this.animationTime * 0.002) * 30}, 70%, ${50 + pulse * 10}%)`;
+    
+    this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered);
+
+    // アイコン追加
+    ctx.fillStyle = 'white';
+    ctx.font = '24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🎯', button.x + 30, button.y + button.height / 2);
+
+    // 統計情報パネル
+    this.drawReviewStats(ctx);
+
+  } else {
+    // 通常モード（学年別ステージ選択）
+    
+    // ステージボタンの描画（リッチなデザイン版）
+    if (this.stageButtons) {
+      this.stageButtons.forEach(button => {
+        const stage = button.stage;
+        const isCleared = this.isStageCleared(stage.stageId);
+        const isNext = false; // 自動点滅を無効化
+        const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
+
+        // ボタンの色を決定
+        let buttonColor = '#2980b9'; // デフォルト青
+        if (isCleared) {
+          buttonColor = '#27ae60'; // クリア済みは緑
+        } else if (isNext) {
+          buttonColor = '#e74c3c'; // 次に挑戦すべきは赤
+        }
+
+        // 選択中のボタンは目立つ色に変更
+        const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
+        if (isSelected) {
+          buttonColor = '#FF8C00'; // 選択中は鮮やかなオレンジ色
+        }
+
+        // リッチなボタンを描画
+        this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered);
+
+        // 追加情報の描画
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.font = '12px sans-serif';
+
+        // 選択中のボタンには特別なマーク（チェックマーク）を表示
+        if (isSelected) {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = '16px sans-serif';
+          ctx.fillText('✓', button.x + 10, button.y + 5);
+        }
+
+        // クリア状況（星アイコン）
+        if (isCleared) {
+          ctx.fillStyle = '#FFD700';
+          ctx.font = '16px sans-serif';
+          ctx.fillText('⭐', button.x + button.width - 25, button.y + 5);
+        }
+
+        // 推奨レベル
+        if (stage.recommendedLevel) {
+          ctx.fillStyle = '#fff';
+          ctx.font = '10px sans-serif';
+          ctx.fillText(`推奨Lv.${stage.recommendedLevel}`, button.x + 5, button.y + button.height - 15);
+        }
+
+        // 次に挑戦すべきステージの表示
+        if (isNext) {
+          ctx.fillStyle = '#FFD700';
+          ctx.font = '10px sans-serif';
+          ctx.fillText('NEXT!', button.x + button.width - 50, button.y + button.height - 15);
+        }
+
+        // 学年ボーナスのロック表示（鍵＋半透明）
+        const mBonus = /^bonus_g(\d+)$/i.exec(stage.stageId);
+        if (mBonus) {
+          const g = parseInt(mBonus[1], 10);
+          const unlocked = isBonusUnlocked(g);
+          if (!unlocked) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(0,0,0,0.45)';
+            ctx.fillRect(button.x, button.y, button.width, button.height);
+            ctx.fillStyle = '#FFD700';
+            ctx.font = `${Math.max(12, Math.floor(button.height * 0.4))}px sans-serif`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🔒', button.x + 10, button.y + button.height / 2);
+            ctx.restore();
+          }
+        }
+      });
     }
 
-    // 左側のステージリスト背景パネル
-    const panelX = 10;
-    const panelY = 60;
-    const panelW = cw / 2 - 20;
-    const panelH = ch - 140; // フッターバー分の高さを調整
-    this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
-
-    // 追加：学年タブ描画
-    const tabCount = tabs.length;
-    const tabW = cw / tabCount;
-    const tabH = 50;
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font         = '16px sans-serif';
-    tabs.forEach((tab, i) => {
-      const x0 = i * tabW;
-      ctx.fillStyle = (tab.grade === gameState.currentGrade) ? '#ddd' : '#ccc';
-      ctx.fillRect(x0, 0, tabW, tabH);
-      ctx.fillStyle = '#000';
-      ctx.fillText(tab.label, x0 + tabW / 2, tabH / 2);
-    });
-
-    // 総復習モードと通常モードで分岐
-    if (gameState.currentGrade === 0) {
-      // 総復習モード専用UI
-      
-      // タイトル
-      ctx.fillStyle = 'white';
-      ctx.font = '24px "UDデジタル教科書体", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText('総復習モード', panelX + panelW / 2, panelY + 20);
-
-      // 説明文
-      ctx.font = '14px "UDデジタル教科書体", sans-serif';
-      ctx.fillStyle = '#ccc';
-      ctx.fillText('あなたに最適なステージを自動選択します', panelX + panelW / 2, panelY + 55);
-
-      // メインの復習ボタン
-      const button = this.reviewChallengeButton;
-      const isHovered = isMouseOverRect(this.mouseX, this.mouseY, button);
-      
-      // 点滅エフェクト
-      const pulse = Math.sin(this.animationTime * 0.003) * 0.2 + 0.8;
-      const buttonColor = `hsl(${120 + Math.sin(this.animationTime * 0.002) * 30}, 70%, ${50 + pulse * 10}%)`;
-      
-      this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered);
-
-      // アイコン追加
-      ctx.fillStyle = 'white';
-      ctx.font = '24px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('🎯', button.x + 30, button.y + button.height / 2);
-
-      // 統計情報パネル
-      this.drawReviewStats(ctx);
-
-    } else {
-      // 通常モード（学年別ステージ選択）
-      
-      // ステージボタンの描画（リッチなデザイン版）
-      if (this.stageButtons) {
-        // const nextStage = this.getNextStage();
-        
-        this.stageButtons.forEach(button => {
-          const stage = button.stage;
-          const isCleared = this.isStageCleared(stage.stageId);
-          // const isNext = nextStage && nextStage.stageId === stage.stageId;
-          const isNext = false; // 自動点滅を無効化
-          const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
-
-          // ボタンの色を決定
-          let buttonColor = '#2980b9'; // デフォルト青
-          if (isCleared) {
-            buttonColor = '#27ae60'; // クリア済みは緑
-          } else if (isNext) {
-            buttonColor = '#e74c3c'; // 次に挑戦すべきは赤
-          }
-
-          // 選択中のボタンは目立つ色に変更
-          const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
-          if (isSelected) {
-            buttonColor = '#FF8C00'; // 選択中は鮮やかなオレンジ色
-          }
-
-          // リッチなボタンを描画
-          this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered);
-
-          // 追加情報の描画
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'top';
-          ctx.font = '12px sans-serif';
-
-          // 選択中のボタンには特別なマーク（チェックマーク）を表示
-          if (isSelected) {
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = '16px sans-serif';
-            ctx.fillText('✓', button.x + 10, button.y + 5);
-          }
-
-          // クリア状況（星アイコン）
-          if (isCleared) {
-            ctx.fillStyle = '#FFD700';
-            ctx.font = '16px sans-serif';
-            ctx.fillText('⭐', button.x + button.width - 25, button.y + 5);
-          }
-
-          // 推奨レベル
-          if (stage.recommendedLevel) {
-            ctx.fillStyle = '#fff';
-            ctx.font = '10px sans-serif';
-            ctx.fillText(`推奨Lv.${stage.recommendedLevel}`, button.x + 5, button.y + button.height - 15);
-          }
-
-          // 次に挑戦すべきステージの表示
-          if (isNext) {
-            ctx.fillStyle = '#FFD700';
-            ctx.font = '10px sans-serif';
-            ctx.fillText('NEXT!', button.x + button.width - 50, button.y + button.height - 15);
-          }
-
-          // 学年ボーナスのロック表示（鍵＋半透明）
-          const mBonus = /^bonus_g(\d+)$/i.exec(stage.stageId);
-          if (mBonus) {
-            const g = parseInt(mBonus[1], 10);
-            const unlocked = isBonusUnlocked(g);
-            if (!unlocked) {
-              ctx.save();
-              ctx.fillStyle = 'rgba(0,0,0,0.45)';
-              ctx.fillRect(button.x, button.y, button.width, button.height);
-              ctx.fillStyle = '#FFD700';
-              ctx.font = `${Math.max(12, Math.floor(button.height * 0.4))}px sans-serif`;
-              ctx.textAlign = 'left';
-              ctx.textBaseline = 'middle';
-              ctx.fillText('🔒', button.x + 10, button.y + button.height / 2);
-              ctx.restore();
-            }
-          }
-        });
-      }
-
-      // 各ステージのマーカーを動的に描画（ステータス別表示）
-      if (gameState.currentGrade !== 0) {
-        const nextStage = this.getNextStage();
-        
-        stages.forEach(stage => {
-          if (!stage.pos) return;
-          const { x, y } = stage.pos;
-          const isCleared = this.isStageCleared(stage.stageId);
-          // 次のステージの自動点滅を無効化
-          // const nextStage = this.getNextStage();
-          // const isNext = nextStage && nextStage.stageId === stage.stageId;
-          const isNext = false; // 自動点滅を無効化
-          const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
-          
-          let markerImage = images.markerPref;
-          let scale = 1;
-          let alpha = 1;
-
-          // ステータス別の表示
-          if (isSelected) {
-            // 選択中のステージ: より強い点滅アニメーション
-            const pulse = Math.sin(this.animationTime * 0.01) * 0.5 + 0.5;
-            scale = 1 + pulse * 0.3;
-            alpha = 0.8 + pulse * 0.2;
-            ctx.save();
-            ctx.globalAlpha = alpha;
-            ctx.filter = 'hue-rotate(120deg) saturate(2) brightness(1.3)';
-          } else if (isCleared) {
-            // クリア済み: 金色のマーカー
-            markerImage = images.markerCleared || images.markerPref;
-            ctx.save();
-            ctx.globalAlpha = 1;
-            ctx.filter = 'hue-rotate(45deg) saturate(1.5) brightness(1.2)';
-          } else if (isNext) {
-            // 次に挑戦すべきステージ: 点滅アニメーション
-            const pulse = Math.sin(this.animationTime * 0.005) * 0.3 + 0.7;
-            scale = 1 + pulse * 0.2;
-            alpha = pulse;
-            ctx.save();
-            ctx.globalAlpha = alpha;
-          } else {
-            // 未挑戦: 通常表示
-            ctx.save();
-            ctx.globalAlpha = 0.7;
-          }
-
-          if (markerImage) {
-            const drawSize = MARKER_SIZE * scale;
-            const offsetX = (drawSize - MARKER_SIZE) / 2;
-            const offsetY = (drawSize - MARKER_SIZE) / 2;
-            ctx.drawImage(markerImage, x - offsetX, y - offsetY, drawSize, drawSize);
-          } else {
-            ctx.fillStyle = isCleared ? '#FFD700' : (isNext ? '#FF6B35' : '#f00');
-            const drawSize = MARKER_SIZE * scale;
-            const offsetX = (drawSize - MARKER_SIZE) / 2;
-            const offsetY = (drawSize - MARKER_SIZE) / 2;
-            ctx.fillRect(x - offsetX, y - offsetY, drawSize, drawSize);
-          }
-
-          ctx.restore();
-        });
-      }
-    }
-
-    // フッターバーの描画
-    this._drawFooterBar(ctx, cw, ch);
-
-    // ツールチップの描画（総復習モード以外）
+    // 各ステージのマーカーを動的に描画（ステータス別表示）
     if (gameState.currentGrade !== 0) {
-      this.drawTooltip(this.hoveredStage);
+      const nextStage = this.getNextStage();
+      
+      stages.forEach(stage => {
+        if (!stage.pos) return;
+        const { x, y } = stage.pos;
+        const isCleared = this.isStageCleared(stage.stageId);
+        const isNext = false; // 自動点滅を無効化
+        const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
+        
+        let markerImage = images.markerPref;
+        let scale = 1;
+        let alpha = 1;
+
+        // ステータス別の表示
+        if (isSelected) {
+          // 選択中のステージ: より強い点滅アニメーション
+          const pulse = Math.sin(this.animationTime * 0.01) * 0.5 + 0.5;
+          scale = 1 + pulse * 0.3;
+          alpha = 0.8 + pulse * 0.2;
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.filter = 'hue-rotate(120deg) saturate(2) brightness(1.3)';
+        } else if (isCleared) {
+          // クリア済み: 金色のマーカー
+          markerImage = images.markerCleared || images.markerPref;
+          ctx.save();
+          ctx.globalAlpha = 1;
+          ctx.filter = 'hue-rotate(45deg) saturate(1.5) brightness(1.2)';
+        } else if (isNext) {
+          // 次に挑戦すべきステージ: 点滅アニメーション
+          const pulse = Math.sin(this.animationTime * 0.005) * 0.3 + 0.7;
+          scale = 1 + pulse * 0.2;
+          alpha = pulse;
+          ctx.save();
+          ctx.globalAlpha = alpha;
+        } else {
+          // 未挑戦: 通常表示
+          ctx.save();
+          ctx.globalAlpha = 0.7;
+        }
+
+        if (markerImage) {
+          const drawSize = MARKER_SIZE * scale;
+          const offsetX = (drawSize - MARKER_SIZE) / 2;
+          const offsetY = (drawSize - MARKER_SIZE) / 2;
+          ctx.drawImage(markerImage, x - offsetX, y - offsetY, drawSize, drawSize);
+        } else {
+          ctx.fillStyle = isCleared ? '#FFD700' : (isNext ? '#FF6B35' : '#f00');
+          const drawSize = MARKER_SIZE * scale;
+          const offsetX = (drawSize - MARKER_SIZE) / 2;
+          const offsetY = (drawSize - MARKER_SIZE) / 2;
+          ctx.fillRect(x - offsetX, y - offsetY, drawSize, drawSize);
+        }
+
+        ctx.restore();
+      });
     }
-  },
+  }
+
+  // フッターバーの描画
+  this._drawFooterBar(ctx, cw, ch);
+
+  // ツールチップの描画（総復習モード以外）
+  if (gameState.currentGrade !== 0) {
+    this.drawTooltip(this.hoveredStage);
+  }
+},
 
   /** フッターバーとボタンの描画 */
   _drawFooterBar(ctx, canvasWidth, canvasHeight) {
