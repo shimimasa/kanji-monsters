@@ -51,6 +51,10 @@ const settingsScreenState = {
           // オーディオ設定パネル
           const audioPanel = this.createAudioPanel();
           settingsContainer.appendChild(audioPanel);
+
+          // バトル設定パネル
+          const battlePanel = this.createBattlePanel();
+          settingsContainer.appendChild(battlePanel);
           
           // ボタンセクションを作成
           const buttonSection = this.createButtonSection();
@@ -315,6 +319,108 @@ const settingsScreenState = {
         console.log('SE音量設定完了:', parseFloat(e.target.value));
       });
     },
+
+    // 2. バトル設定パネルを作成する新しいメソッド
+/** バトル設定パネルを作成 */
+createBattlePanel() {
+  const panel = document.createElement('div');
+  panel.className = 'settings-panel';
+  
+  const title = document.createElement('h3');
+  title.className = 'panel-title';
+  title.textContent = 'バトル設定';
+  panel.appendChild(title);
+  
+  // 回復回数設定
+  const healGroup = document.createElement('div');
+  healGroup.className = 'setting-group';
+  
+  const healLabel = document.createElement('div');
+  healLabel.className = 'setting-label-with-tooltip';
+  
+  const healLabelText = document.createElement('span');
+  healLabelText.className = 'setting-label';
+  healLabelText.textContent = '回復回数の上限';
+  
+  const healTooltipTrigger = document.createElement('span');
+  healTooltipTrigger.className = 'tooltip-trigger';
+  healTooltipTrigger.textContent = '？';
+  
+  healLabel.appendChild(healLabelText);
+  healLabel.appendChild(healTooltipTrigger);
+  
+  // スライダーと値表示のコンテナ
+  const healControlContainer = document.createElement('div');
+  healControlContainer.className = 'slider-container';
+  
+  const healSlider = document.createElement('input');
+  healSlider.type = 'range';
+  healSlider.id = 'healCountSlider';
+  healSlider.className = 'heal-count-slider';
+  healSlider.min = '1';
+  healSlider.max = '5';
+  healSlider.step = '1';
+  healSlider.value = '3'; // デフォルト値
+  
+  const healValue = document.createElement('span');
+  healValue.className = 'heal-count-value';
+  healValue.textContent = '3回';
+  
+  healControlContainer.appendChild(healSlider);
+  healControlContainer.appendChild(healValue);
+  
+  healGroup.appendChild(healLabel);
+  healGroup.appendChild(healControlContainer);
+  panel.appendChild(healGroup);
+  
+  // ツールチップとイベントリスナーを設定
+  this._setupTooltipEvents(
+    healTooltipTrigger,
+    '各ステージで使用できる回復の回数上限を設定します。難易度を調整したい時にご利用ください。'
+  );
+  this.setupBattleEvents(healSlider, healValue);
+  
+  return panel;
+},
+
+// 3. バトル設定のイベントリスナーを設定する新しいメソッド
+/** バトル設定のイベントリスナーを設定 */
+setupBattleEvents(healSlider, healValue) {
+  // 初期値をローカルストレージから取得
+  const savedHealCount = localStorage.getItem('maxHealCount');
+  const initialHealCount = savedHealCount ? parseInt(savedHealCount, 10) : 3;
+  
+  // スライダーと表示を初期値に設定
+  healSlider.value = initialHealCount;
+  healValue.textContent = initialHealCount + '回';
+  
+  // リアルタイム更新（スライダー操作中）
+  healSlider.addEventListener('input', (e) => {
+    const count = parseInt(e.target.value, 10);
+    healValue.textContent = count + '回';
+  });
+  
+  // 設定変更完了時の処理
+  healSlider.addEventListener('change', (e) => {
+    const count = parseInt(e.target.value, 10);
+    
+    // ローカルストレージに保存
+    localStorage.setItem('maxHealCount', count.toString());
+    
+    // フィードバックSE再生
+    publish('playSE', 'decide');
+    
+    console.log('回復回数上限設定完了:', count);
+    
+    // 設定変更の視覚的フィードバック
+    healValue.style.color = '#2ecc71';
+    healValue.style.fontWeight = 'bold';
+    setTimeout(() => {
+      healValue.style.color = '';
+      healValue.style.fontWeight = '';
+    }, 500);
+  });
+},
 
    /** アクセシビリティ設定のイベントリスナーを設定 */
    setupAccessibilityEvents() {

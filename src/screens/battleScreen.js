@@ -226,10 +226,11 @@ const battleScreenState = {
         return;
       }
       
-          // ▼▼▼ 追加：各ステージ開始時に回復回数をリセット ▼▼▼
-    gameState.playerStats.healCount = 3; // 各ステージで3回まで回復可能
-    console.log('🔄 回復回数をリセット: 3回');
-    // ▲▲▲ ここまで追加 ▲▲▲
+     // ▼▼▼ 修正：設定から回復回数上限を取得 ▼▼▼
+    const maxHealCount = this.getMaxHealCountFromSettings();
+    gameState.playerStats.healCount = maxHealCount;
+    console.log(`🔄 回復回数をリセット: ${maxHealCount}回（設定値）`);
+    // ▲▲▲ ここまで修正 ▲▲▲
 
       // ステージIDに基づいて適切なBGMを選択
       const bgmKey = this.getBGMKeyForStage(gameState.currentStageId);
@@ -459,7 +460,25 @@ const battleScreenState = {
       publish('changeScreen', 'stageSelect');
     }
   },
-
+// 2. 設定から回復回数上限を取得する新しいメソッド
+/** 設定から回復回数の上限を取得 */
+getMaxHealCountFromSettings() {
+  try {
+    const savedHealCount = localStorage.getItem('maxHealCount');
+    if (savedHealCount) {
+      const count = parseInt(savedHealCount, 10);
+      // 1-5の範囲内で有効な値かチェック
+      if (count >= 1 && count <= 5) {
+        return count;
+      }
+    }
+    // デフォルト値
+    return 3;
+  } catch (error) {
+    console.error('回復回数設定の取得に失敗:', error);
+    return 3; // エラー時のフォールバック
+  }
+},
   /**
    * ステージIDから適切なBGMキーを取得する
    * @param {string} stageId - ステージID
@@ -1978,10 +1997,11 @@ if (hh.visible) {
     'left', 'top', 2
   );
   // --- ▲ここまで▲ ---
-  // ▼▼▼ 追加：回復回数表示 ▼▼▼
+  // ▼▼▼ 修正：回復回数表示を動的に ▼▼▼
   const healCount = gameState.playerStats.healCount || 0;
+  const maxHealCount = this.getMaxHealCountFromSettings();
   this.drawTextWithOutline(
-    `回復: ${healCount}/3回`,
+    `回復: ${healCount}/${maxHealCount}回`,
     contentX + contentW, barY + barH + 18,
     healCount > 0 ? '#2ecc71' : '#e74c3c', // 残りがあれば緑、なければ赤
     '#F5DEB3', '14px "UDデジタル教科書体", sans-serif',
@@ -3694,16 +3714,18 @@ function onHeal() {
   // プレイヤーターンかつ入力許可中でなければ終了
   if (battleState.turn !== 'player' || !battleState.inputEnabled) return;
 
-  // 回復回数チェック（修正版：より詳細なログ出力）
+  // ▼▼▼ 修正：動的な回復回数チェック ▼▼▼
   const remainingHeals = gameState.playerStats.healCount || 0;
-  console.log(`🔍 回復回数チェック: 残り${remainingHeals}回`);
+  const maxHealCount = battleScreenState.getMaxHealCountFromSettings();
+  console.log(`🔍 回復回数チェック: 残り${remainingHeals}回 (上限: ${maxHealCount}回)`);
   
   if (remainingHeals <= 0) {
-    alert('このステージでの回復はもう使えません！');
+    alert(`このステージでの回復はもう使えません！（上限: ${maxHealCount}回）`);
     // 入力を再度有効にする
     battleState.inputEnabled = true;
     return;
   }
+  // ▲▲▲ ここまで修正 ▲▲▲
 
   battleState.inputEnabled = false;
   battleState.lastCommandMode = 'heal';

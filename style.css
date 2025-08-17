@@ -2675,3 +2675,210 @@ html,body{ font-size:var(--fs-base); }
   0% { text-shadow: 0 0 2px rgba(205, 127, 50, 0.3); transform: scale(1); }
   100% { text-shadow: 0 0 6px rgba(205, 127, 50, 0.6); transform: scale(1.03); }
 }
+
+/* 回復回数設定用のCSSスタイル */
+
+/* バトル設定パネル */
+.settings-panel {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+}
+
+/* 設定グループのスタイル */
+.setting-group {
+  margin-bottom: 16px;
+}
+
+/* ラベルとツールチップのコンテナ */
+.setting-label-with-tooltip {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.setting-label {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "UDデジタル教科書体", sans-serif;
+}
+
+/* スライダーコンテナ */
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 回復回数スライダーのスタイル */
+.heal-count-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 200px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.heal-count-slider:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.heal-count-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.heal-count-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.heal-count-slider::-webkit-slider-thumb:active {
+  transform: scale(0.95);
+}
+
+.heal-count-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.heal-count-slider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* 回復回数値表示 */
+.heal-count-value {
+  color: #3498db;
+  font-weight: bold;
+  font-size: 16px;
+  min-width: 40px;
+  text-align: center;
+  font-family: "UDデジタル教科書体", sans-serif;
+  transition: all 0.3s ease;
+}
+
+/* パネルタイトル */
+.panel-title {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  font-family: "UDデジタル教科書体", sans-serif;
+}
+
+/* ツールチップトリガー */
+.tooltip-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(52, 152, 219, 0.8);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: help;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.tooltip-trigger:hover {
+  background: rgba(52, 152, 219, 1);
+  transform: scale(1.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ツールチップ本体 */
+.settings-tooltip {
+  position: absolute;
+  background: rgba(44, 62, 80, 0.95);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  max-width: 250px;
+  z-index: 1000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: all 0.2s ease;
+  font-family: "UDデジタル教科書体", sans-serif;
+  line-height: 1.4;
+}
+
+.settings-tooltip.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* スライダーのトラック改善 */
+.heal-count-slider::-webkit-slider-track {
+  background: linear-gradient(to right, 
+    rgba(231, 76, 60, 0.7) 0%, 
+    rgba(241, 196, 15, 0.7) 50%, 
+    rgba(46, 204, 113, 0.7) 100%);
+  border-radius: 3px;
+}
+
+.heal-count-slider::-moz-range-track {
+  background: linear-gradient(to right, 
+    rgba(231, 76, 60, 0.7) 0%, 
+    rgba(241, 196, 15, 0.7) 50%, 
+    rgba(46, 204, 113, 0.7) 100%);
+  border-radius: 3px;
+  border: none;
+}
+
+/* アクセシビリティ：フォーカス時のスタイル */
+.heal-count-slider:focus {
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+.heal-count-slider:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 600px) {
+  .slider-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .heal-count-slider {
+    width: 100%;
+    min-width: 200px;
+  }
+  
+  .heal-count-value {
+    align-self: center;
+  }
+}
