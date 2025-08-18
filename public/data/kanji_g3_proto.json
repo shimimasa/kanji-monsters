@@ -647,7 +647,8 @@
     "strokes": 10,
     "onyomi": [
       "キュウ",
-      "グウ"
+      "グウ",
+      "ク"
     ],
     "kunyomi": [
       "みや"
@@ -728,7 +729,8 @@
     "grade": 3,
     "strokes": 13,
     "onyomi": [
-      "ギョウ"
+      "ギョウ",
+      "ゴウ"
     ],
     "kunyomi": [
       "わざ"
@@ -846,10 +848,9 @@
       "グ"
     ],
     "kunyomi": [
-      "そな"
     ],
     "meaning": "そなえること。ものを そろえること。",
-    "exampleSentence": "道具を 具（そな）える。",
+    "exampleSentence": "道具（ぐ）を買う。",
     "correctCount": 0,
     "incorrectCount": 0,
     "lastReviewDate": null,
@@ -1003,7 +1004,8 @@
     "grade": 3,
     "strokes": 10,
     "onyomi": [
-      "コ"
+      "コ",
+      "ク"
     ],
     "kunyomi": [],
     "meaning": "くら。ものを しまう ばしょ。",
@@ -1340,7 +1342,8 @@
     "grade": 3,
     "strokes": 8,
     "onyomi": [
-      "ジ"
+      "ジ",
+      "ズ"
     ],
     "kunyomi": [
       "こと"
@@ -1459,7 +1462,8 @@
     "grade": 3,
     "strokes": 5,
     "onyomi": [
-      "シュ"
+      "シュ",
+      "ス"
     ],
     "kunyomi": [
       "ぬし",
@@ -1484,7 +1488,8 @@
       "ス"
     ],
     "kunyomi": [
-      "まも"
+      "まも",
+      "も"
     ],
     "meaning": "まもること。",
     "exampleSentence": "家族を 守（まも）る。",
@@ -1582,7 +1587,8 @@
     "grade": 3,
     "strokes": 9,
     "onyomi": [
-      "シュウ"
+      "シュウ",
+      "ジュウ"
     ],
     "kunyomi": [
       "ひろ"
@@ -1769,7 +1775,8 @@
       "ジョ"
     ],
     "kunyomi": [
-      "たす"
+      "たす",
+      "すけ"
     ],
     "meaning": "たすけること。",
     "exampleSentence": "困っている 友達を、助（たす）ける。",
@@ -1968,7 +1975,9 @@
       "ジン"
     ],
     "kunyomi": [
-      "かみ"
+      "かみ",
+      "かん",
+      "こう"
     ],
     "meaning": "かみ。",
     "exampleSentence": "神（かみ）様を、信じる。",
@@ -2169,13 +2178,14 @@
     "grade": 3,
     "strokes": 13,
     "onyomi": [
-      "ソウ"
+      "ソウ",
+      "ソ"
     ],
     "kunyomi": [
-      "おも"
+      ""
     ],
     "meaning": "おもうこと。かんがえること。",
-    "exampleSentence": "未来を 想（おも）う。",
+    "exampleSentence": "未来を 想（そう）像する。",
     "correctCount": 0,
     "incorrectCount": 0,
     "lastReviewDate": null,
@@ -2332,7 +2342,8 @@
     ],
     "kunyomi": [
       "か",
-      "よ"
+      "よ",
+      "しろ"
     ],
     "meaning": "かわり。",
     "exampleSentence": "先生の 代（か）わりに、教える。",
@@ -2443,7 +2454,8 @@
     "grade": 3,
     "strokes": 12,
     "onyomi": [
-      "チャク"
+      "チャク",
+      "ジャク"
     ],
     "kunyomi": [
       "き",
@@ -2702,7 +2714,9 @@
     "grade": 3,
     "strokes": 9,
     "onyomi": [
-      "ド"
+      "ド",
+      "ト",
+      "タク"
     ],
     "kunyomi": [
       "たび"
@@ -2960,7 +2974,7 @@
     "grade": 3,
     "strokes": 15,
     "onyomi": [
-      "ソウ"
+      ""
     ],
     "kunyomi": [
       "はこ"
@@ -3019,6 +3033,7 @@
     "strokes": 4,
     "onyomi": [
       "ハン",
+      "ホン",
       "タン"
     ],
     "kunyomi": [
@@ -3183,7 +3198,8 @@
       "ヒョウ"
     ],
     "kunyomi": [
-      "こおり"
+      "こおり",
+      "ひ"
     ],
     "meaning": "こおり。みずが こおって かたくなったもの。",
     "exampleSentence": "氷（こおり）が、水に うかんでいる。",
@@ -3298,7 +3314,8 @@
     "grade": 3,
     "strokes": 10,
     "onyomi": [
-      "ビョウ"
+      "ビョウ",
+      "ヘイ"
     ],
     "kunyomi": [
       "やまい",
@@ -3421,7 +3438,7 @@
       "ベン"
     ],
     "kunyomi": [
-      "つと"
+      ""
     ],
     "meaning": "つとめること。",
     "exampleSentence": "勉強を、がんばる。",
@@ -3479,7 +3496,8 @@
     "grade": 3,
     "strokes": 8,
     "onyomi": [
-      "メイ"
+      "メイ",
+      "ミョウ"
     ],
     "kunyomi": [
       "いのち"
@@ -3503,7 +3521,8 @@
     ],
     "kunyomi": [
       "おも",
-      "おもて"
+      "おもて",
+      "つら"
     ],
     "meaning": "おもて。",
     "exampleSentence": "面（おもて）を、見る。",
@@ -3581,9 +3600,12 @@
     "strokes": 5,
     "onyomi": [
       "ユ",
+      "ユイ",
       "ユウ"
     ],
-    "kunyomi": [],
+    "kunyomi": [
+    "よし"
+    ],
     "meaning": "よし。ものごとの げんいんや りゆう。",
     "exampleSentence": "この 出来事の 由（よし）を、先生に 伝える。",
     "correctCount": 0,
@@ -3640,7 +3662,8 @@
     "grade": 3,
     "strokes": 12,
     "onyomi": [
-      "ユウ"
+      "ユウ",
+      "ユ"
     ],
     "kunyomi": [
       "あそ"
@@ -3794,7 +3817,8 @@
     "grade": 3,
     "strokes": 10,
     "onyomi": [
-      "リュウ"
+      "リュウ",
+      "ル"
     ],
     "kunyomi": [
       "なが"
@@ -3852,7 +3876,8 @@
     "grade": 3,
     "strokes": 14,
     "onyomi": [
-      "リョク"
+      "リョク",
+      "ロク"
     ],
     "kunyomi": [
       "みどり"
@@ -3872,7 +3897,8 @@
     "grade": 3,
     "strokes": 5,
     "onyomi": [
-      "レイ"
+      "レイ",
+      "ライ"  
     ],
     "kunyomi": [],
     "meaning": "れい。ひとに 感謝の 気持ちを あらわすこと。",
@@ -3948,7 +3974,8 @@
     "grade": 3,
     "strokes": 8,
     "onyomi": [
-      "ワ"
+      "ワ",
+      "オ"
     ],
     "kunyomi": [
       "やわ",

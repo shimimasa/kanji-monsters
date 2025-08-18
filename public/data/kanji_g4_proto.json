@@ -99,9 +99,7 @@
     "kanji": "茨",
     "grade": 4,
     "strokes": 9,
-    "onyomi": [
-      "シ"
-    ],
+    "onyomi": [],
     "kunyomi": [
       "いばら"
     ],
@@ -571,6 +569,46 @@
     "kunyomi": [],
     "meaning": "き。春、夏、秋、冬の、一年の四つの区切りのこと。",
     "exampleSentence": "日本には、美しい四季（しき）があり、季節（きせつ）ごとにちがう景色が楽しめる。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
+    "id": "g4-032",
+    "stageId": ["chubu_area2"],
+    "kanji": "媛",
+    "grade": 4,
+    "strokes": 12,
+    "onyomi": [
+      "エン"
+    ],
+    "kunyomi": [
+      "ひめ"
+    ],
+    "meaning": "ひめ。天皇や、身分の高い人のむすめ。小さくて、かわいらしいもの。",
+    "exampleSentence": "おじさんが住んでいる愛媛（えひめ）県は、みかんの生産で有名だと聞いた。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
+    "id": "g4-033",
+    "stageId": ["chubu_area2"],
+    "kanji": "岡",
+    "grade": 4,
+    "strokes": 8,
+    "onyomi": [
+      ""
+    ],
+    "kunyomi": [
+      "おか"
+    ],
+    "meaning": "おか。まわりより、少しだけ高くなっている、なだらかな土地。",
+    "exampleSentence": "天気の良い日に、近所の丘（おか）にのぼって、町全体の景色をながめた。",
     "correctCount": 0,
     "incorrectCount": 0,
     "lastReviewDate": null,
@@ -1462,11 +1500,10 @@
     "grade": 4,
     "strokes": 7,
     "onyomi": [
-      "ジ"
+      "ジ",
+      "ニ"
     ],
-    "kunyomi": [
-      "こ"
-    ],
+    "kunyomi": [],
     "meaning": "じ。としのいかない、小さなこどものこと。",
     "exampleSentence": "この公園には、たくさんの児童（じどう）が元気に遊べる遊具がおいてある。",
     "correctCount": 0,
@@ -2152,7 +2189,8 @@
       "ソク"
     ],
     "kunyomi": [
-      "がわ"
+      "がわ",
+      "かわ"
     ],
     "meaning": "がわ。ものの右や左、まわりの部分。近く。そば。",
     "exampleSentence": "道路を歩くときは、車に気をつけて、安全な歩道側（ほどうがわ）を通るようにしている。",
@@ -2688,6 +2726,26 @@
     "tags": []
   },
   {
+    "id": "g4-156",
+    "stageId": ["chubu_area8"],
+    "kanji": "縄",
+    "grade": 4,
+    "strokes": 9,
+    "onyomi": [
+      "ジョウ"
+    ],
+    "kunyomi": [
+      "なわ"
+    ],
+    "meaning": "しばるもの",
+    "exampleSentence": "縄（なわ）とび大会を開催した。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
     "id": "g4-157",
     "stageId": ["chubu_area8"],
     "kanji": "必",
@@ -2968,7 +3026,8 @@
     "strokes": 8,
     "onyomi": [
       "ホウ",
-      "ハッ"
+      "ハッ",
+      "ホッ"
     ],
     "kunyomi": [],
     "meaning": "ほう。社会の秩序をたもつために、みんなが守るべき、きまり。",
@@ -3027,7 +3086,8 @@
     "grade": 4,
     "strokes": 5,
     "onyomi": [
-      "マツ"
+      "マツ",
+      "バツ"
     ],
     "kunyomi": [
       "すえ"
@@ -3493,46 +3553,6 @@
     "tags": []
   },
   {
-    "id": "g4-032",
-    "stageId": ["chubu_area2"],
-    "kanji": "媛",
-    "grade": 4,
-    "strokes": 12,
-    "onyomi": [
-      "エン"
-    ],
-    "kunyomi": [
-      "ひめ"
-    ],
-    "meaning": "ひめ。天皇や、身分の高い人のむすめ。小さくて、かわいらしいもの。",
-    "exampleSentence": "おじさんが住んでいる愛媛（えひめ）県は、みかんの生産で有名だと聞いた。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
-  },
-  {
-    "id": "g4-033",
-    "stageId": ["chubu_area2"],
-    "kanji": "岡",
-    "grade": 4,
-    "strokes": 8,
-    "onyomi": [
-      "コウ"
-    ],
-    "kunyomi": [
-      "おか"
-    ],
-    "meaning": "おか。まわりより、少しだけ高くなっている、なだらかな土地。",
-    "exampleSentence": "天気の良い日に、近所の丘（おか）にのぼって、町全体の景色をながめた。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
-  },
-  {
     "id": "g4-053",
     "stageId": ["chubu_area3"],
     "kanji": "賀",
@@ -3557,7 +3577,7 @@
     "grade": 4,
     "strokes": 15,
     "onyomi": [
-      "セキ"
+      ""
     ],
     "kunyomi": [
       "がた"
@@ -3675,12 +3695,9 @@
     "kanji": "埼",
     "grade": 4,
     "strokes": 11,
-    "onyomi": [
-      "キ"
-    ],
+    "onyomi": [],
     "kunyomi": [
-      "さい",
-      "さき"
+      "さい"
     ],
     "meaning": "さき。つきでた土地の、はし。みさき。",
     "exampleSentence": "ぼくが住んでいる埼玉（さいたま）県は、都心へのアクセスが便利な場所だ。",
@@ -3830,9 +3847,7 @@
     "kanji": "梨",
     "grade": 4,
     "strokes": 11,
-    "onyomi": [
-      "リ"
-    ],
+    "onyomi": [],
     "kunyomi": [
       "なし"
     ],
@@ -3892,9 +3907,7 @@
     "kanji": "崎",
     "grade": 4,
     "strokes": 11,
-    "onyomi": [
-      "キ"
-    ],
+    "onyomi": [],
     "kunyomi": [
       "さき"
     ],
@@ -3920,6 +3933,24 @@
     ],
     "meaning": "しろ。てきから身をまもるために、石や土で高くきずいたたてもの。",
     "exampleSentence": "お城（しろ）のまわりにある、深いおほりを、船にのって見学した。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
+    "id": "g4-204",
+    "stageId": ["chubu_area9"],
+    "kanji": "阜",
+    "grade": 4,
+    "strokes": 8,
+    "onyomi": [
+      "フ"
+    ],
+    "kunyomi": [],
+    "meaning": "",
+    "exampleSentence": "岐阜（ぎふ）県に行く。",
     "correctCount": 0,
     "incorrectCount": 0,
     "lastReviewDate": null,
