@@ -472,35 +472,7 @@ updateShieldBreakEffect() {
     if (DEBUG) console.log('漢字ボックスエフェクト開始:', color, duration); // デバッグ用
   },
 
-  // ↓↓↓ ここに新しいメソッドを追加 ↓↓↓
-  getShieldColor(currentHp, maxHp) {
-    // アーティファクト1のメソッドをここに貼り付け
-  },
-  
-  drawShieldCracks(ctx, centerX, centerY, radius, crackLevel, shieldHp) {
-    // アーティファクト1のメソッドをここに貼り付け
-  },
-  
-  drawSingleCrack(ctx, centerX, centerY, radius, angle, lengthRatio) {
-    // アーティファクト1のメソッドをここに貼り付け
-  },
-  
-  drawWebCracks(ctx, centerX, centerY, innerRadius) {
-    // アーティファクト1のメソッドをここに貼り付け
-  },
-  
-  drawShieldWarningEffect(ctx, centerX, centerY, radius) {
-    // アーティファクト1のメソッドをここに貼り付け
-  },
-  
-  startShieldBreakEffect(centerX, centerY, radius) {
-    // アーティファクト1のメソッドをここに貼り付け
-  },
-  
-  updateShieldBreakEffect() {
-    // アーティファクト1のメソッドをここに貼り付け
-  },
-  // ↑↑↑ ここまで追加 ↑↑↑
+
   
   /**
    * シェイクエフェクトを開始するメソッド
