@@ -201,6 +201,7 @@ const battleScreenState = {
  * @returns {Object} RGB値のオブジェクト
  */
 getShieldColor(currentHp, maxHp) {
+  console.log('getShieldColor呼び出し:', currentHp, maxHp); // デバッグ用
   const integrity = currentHp / maxHp;
   
   if (integrity > 0.66) {
@@ -1096,72 +1097,102 @@ getMaxHealCountFromSettings() {
     this.ctx.translate(ex + ew/2 + offsetX, ey + eh/2 + offsetY);
     this.ctx.rotate(rotateAngle);
 
-    // ★★★ シールド描画を敵画像の前に配置 ★★★
+  // 敵描画部分のシールド描画コードを以下で置き換えてください
+
+// ★★★ シールド描画を敵画像の前に配置 ★★★
 if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
-  console.log('シールド描画開始:', enemy.shieldHp); // デバッグ用
-  
-  const shieldRadius = Math.max(ew, eh) * 0.6;
-  const maxShieldHp = enemy.originalShieldHp || 3;
-  const currentShieldHp = enemy.shieldHp;
-  
-  // シールドの状態を計算（3段階）
-  const shieldIntegrity = currentShieldHp / maxShieldHp;
-  
-  // 基本の脈動効果
-  const basePulse = Math.sin(Date.now() / 300) + 1; // 0-2の範囲
-  
-  // 段階別の透明度とエフェクト
-  let shieldOpacity, crackLevel;
-  
-  if (currentShieldHp === 3) {
-    // 完全なシールド
-    shieldOpacity = 0.3 + basePulse * 0.1; // 0.3-0.5
-    crackLevel = 0;
-  } else if (currentShieldHp === 2) {
-    // 1回目のダメージ後 - 小さなヒビ
-    shieldOpacity = 0.25 + basePulse * 0.08; // 0.25-0.41
-    crackLevel = 1;
-  } else if (currentShieldHp === 1) {
-    // 2回目のダメージ後 - 大きなヒビ
-    shieldOpacity = 0.2 + basePulse * 0.12; // 0.2-0.44（不安定）
-    crackLevel = 2;
+  try {
+    console.log('シールド描画開始:', enemy.shieldHp); // デバッグ用
+    
+    const shieldRadius = Math.max(ew, eh) * 0.6;
+    const maxShieldHp = enemy.originalShieldHp || 3;
+    const currentShieldHp = enemy.shieldHp;
+    
+    // シールドの状態を計算（3段階）
+    const shieldIntegrity = currentShieldHp / maxShieldHp;
+    
+    // 基本の脈動効果
+    const basePulse = Math.sin(Date.now() / 300) + 1; // 0-2の範囲
+    
+    // 段階別の透明度とエフェクト
+    let shieldOpacity, crackLevel;
+    
+    if (currentShieldHp === 3) {
+      // 完全なシールド
+      shieldOpacity = 0.3 + basePulse * 0.1; // 0.3-0.5
+      crackLevel = 0;
+    } else if (currentShieldHp === 2) {
+      // 1回目のダメージ後 - 小さなヒビ
+      shieldOpacity = 0.25 + basePulse * 0.08; // 0.25-0.41
+      crackLevel = 1;
+    } else if (currentShieldHp === 1) {
+      // 2回目のダメージ後 - 大きなヒビ
+      shieldOpacity = 0.2 + basePulse * 0.12; // 0.2-0.44（不安定）
+      crackLevel = 2;
+    }
+    
+    // シールドの色も段階的に変化（エラーハンドリング付き）
+    let shieldColor;
+    try {
+      shieldColor = this.getShieldColor(currentShieldHp, maxShieldHp);
+      if (!shieldColor || typeof shieldColor.r === 'undefined') {
+        throw new Error('シールドカラーが正しく取得できません');
+      }
+    } catch (error) {
+      console.warn('シールドカラー取得エラー:', error);
+      // フォールバック色（青）
+      shieldColor = { r: 100, g: 180, b: 255 };
+    }
+    
+    // グラデーションのバリアを作成
+    const shieldGrad = this.ctx.createRadialGradient(0, 0, shieldRadius * 0.7, 0, 0, shieldRadius);
+    shieldGrad.addColorStop(0, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, 0)`);
+    shieldGrad.addColorStop(0.7, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, ${shieldOpacity * 0.5})`);
+    shieldGrad.addColorStop(1, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, ${shieldOpacity})`);
+    
+    this.ctx.fillStyle = shieldGrad;
+    this.ctx.beginPath();
+    this.ctx.arc(0, 0, shieldRadius, 0, Math.PI * 2);
+    this.ctx.fill();
+    
+    // バリアの輪郭線（段階的に不安定に）
+    const outlineAlpha = Math.min(1, shieldOpacity + 0.2);
+    this.ctx.strokeStyle = `rgba(${Math.min(255, shieldColor.r + 50)}, ${Math.min(255, shieldColor.g + 50)}, ${Math.min(255, shieldColor.b + 50)}, ${outlineAlpha})`;
+    this.ctx.lineWidth = 2;
+    
+    // 不安定効果（HP低下時）
+    if (currentShieldHp < maxShieldHp) {
+      this.ctx.lineWidth = 2 + Math.sin(Date.now() / 100) * 0.5;
+    }
+    
+    this.ctx.stroke();
+    
+    // ヒビエフェクトを描画（エラーハンドリング付き）
+    try {
+      if (typeof this.drawShieldCracks === 'function') {
+        this.drawShieldCracks(this.ctx, 0, 0, shieldRadius, crackLevel, currentShieldHp);
+      }
+    } catch (error) {
+      console.warn('シールドクラック描画エラー:', error);
+    }
+    
+    // 危険状態の警告エフェクト（シールドHP1の時）
+    if (currentShieldHp === 1) {
+      try {
+        if (typeof this.drawShieldWarningEffect === 'function') {
+          this.drawShieldWarningEffect(this.ctx, 0, 0, shieldRadius);
+        }
+      } catch (error) {
+        console.warn('シールド警告エフェクト描画エラー:', error);
+      }
+    }
+    
+    console.log('シールド描画完了'); // デバッグ用
+    
+  } catch (error) {
+    console.error('シールド描画中にエラーが発生しました:', error);
+    // エラーが発生してもゲームを継続
   }
-  
-  // シールドの色も段階的に変化
-  const shieldColor = this.getShieldColor(currentShieldHp, maxShieldHp);
-  
-  // グラデーションのバリアを作成
-  const shieldGrad = this.ctx.createRadialGradient(0, 0, shieldRadius * 0.7, 0, 0, shieldRadius);
-  shieldGrad.addColorStop(0, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, 0)`);
-  shieldGrad.addColorStop(0.7, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, ${shieldOpacity * 0.5})`);
-  shieldGrad.addColorStop(1, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, ${shieldOpacity})`);
-  
-  this.ctx.fillStyle = shieldGrad;
-  this.ctx.beginPath();
-  this.ctx.arc(0, 0, shieldRadius, 0, Math.PI * 2);
-  this.ctx.fill();
-  
-  // バリアの輪郭線（段階的に不安定に）
-  const outlineAlpha = shieldOpacity + 0.2;
-  this.ctx.strokeStyle = `rgba(${shieldColor.r + 50}, ${shieldColor.g + 50}, ${shieldColor.b + 50}, ${outlineAlpha})`;
-  this.ctx.lineWidth = 2;
-  
-  // 不安定効果（HP低下時）
-  if (currentShieldHp < maxShieldHp) {
-    this.ctx.lineWidth = 2 + Math.sin(Date.now() / 100) * 0.5;
-  }
-  
-  this.ctx.stroke();
-  
-  // ヒビエフェクトを描画
-  this.drawShieldCracks(this.ctx, 0, 0, shieldRadius, crackLevel, currentShieldHp);
-  
-  // 危険状態の警告エフェクト（シールドHP1の時）
-  if (currentShieldHp === 1) {
-    this.drawShieldWarningEffect(this.ctx, 0, 0, shieldRadius);
-  }
-  
-  console.log('シールド描画完了'); // デバッグ用
 }
 
     if (enemy && enemy.img) {
