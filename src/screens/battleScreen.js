@@ -208,6 +208,36 @@ const battleScreenState = {
     this.kanjiBoxEffect.pulsePhase = 0;
     if (DEBUG) console.log('漢字ボックスエフェクト開始:', color, duration); // デバッグ用
   },
+
+  // ↓↓↓ ここに新しいメソッドを追加 ↓↓↓
+  getShieldColor(currentHp, maxHp) {
+    // アーティファクト1のメソッドをここに貼り付け
+  },
+  
+  drawShieldCracks(ctx, centerX, centerY, radius, crackLevel, shieldHp) {
+    // アーティファクト1のメソッドをここに貼り付け
+  },
+  
+  drawSingleCrack(ctx, centerX, centerY, radius, angle, lengthRatio) {
+    // アーティファクト1のメソッドをここに貼り付け
+  },
+  
+  drawWebCracks(ctx, centerX, centerY, innerRadius) {
+    // アーティファクト1のメソッドをここに貼り付け
+  },
+  
+  drawShieldWarningEffect(ctx, centerX, centerY, radius) {
+    // アーティファクト1のメソッドをここに貼り付け
+  },
+  
+  startShieldBreakEffect(centerX, centerY, radius) {
+    // アーティファクト1のメソッドをここに貼り付け
+  },
+  
+  updateShieldBreakEffect() {
+    // アーティファクト1のメソッドをここに貼り付け
+  },
+  // ↑↑↑ ここまで追加 ↑↑↑
   
   /**
    * シェイクエフェクトを開始するメソッド
@@ -818,27 +848,7 @@ getMaxHealCountFromSettings() {
     this.ctx.translate(ex + ew/2 + offsetX, ey + eh/2 + offsetY);
     this.ctx.rotate(rotateAngle);
 
-    // ボスシールドの描画（敵画像の前に描画）
-    if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
-      const shieldRadius = Math.max(ew, eh) * 0.6; // 敵の大きさに合わせたバリア半径
-      const shieldOpacity = 0.3 + (Math.sin(Date.now() / 300) + 1) * 0.1; // 0.3〜0.5の間で脈動
-      
-      // グラデーションのバリアを作成
-      const shieldGrad = this.ctx.createRadialGradient(0, 0, shieldRadius * 0.7, 0, 0, shieldRadius);
-      shieldGrad.addColorStop(0, `rgba(100, 180, 255, 0)`);
-      shieldGrad.addColorStop(0.7, `rgba(100, 180, 255, ${shieldOpacity * 0.5})`);
-      shieldGrad.addColorStop(1, `rgba(120, 210, 255, ${shieldOpacity})`);
-      
-      this.ctx.fillStyle = shieldGrad;
-      this.ctx.beginPath();
-      this.ctx.arc(0, 0, shieldRadius, 0, Math.PI * 2);
-      this.ctx.fill();
-      
-      // バリアの輪郭線
-      this.ctx.strokeStyle = `rgba(200, 230, 255, ${shieldOpacity + 0.2})`;
-      this.ctx.lineWidth = 2;
-      this.ctx.stroke();
-    }
+    
 
     if (enemy && enemy.img) {
       // 透明度を適切に処理するための合成モードを設定
@@ -1890,6 +1900,10 @@ if (hh.visible) {
       ctx.textBaseline = 'middle';
       ctx.fillText(text, x + w / 2, y + h / 2);
       ctx.restore();
+    }
+
+    if (this.shieldBreakEffect && this.shieldBreakEffect.active) {
+      this.updateShieldBreakEffect();
     }
 
   },
@@ -3617,78 +3631,110 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
     }
     
     // ====== ボス戦のシールドシステム ======
-    if (gameState.currentEnemy.isBoss) {
-      // ボス戦の場合
-      if (gameState.currentEnemy.shieldHp > 0) {
-        // シールドがある場合
-        if (isWeaknessHit) {
-          // 弱点を突いた場合：シールドを削る
-          gameState.currentEnemy.shieldHp--;
-          battleState.log.push(`せいかい！${readingMsg}`);
-          battleState.log.push('シールドにヒビが入った！');
+if (gameState.currentEnemy.isBoss) {
+  // ボス戦の場合
+  if (gameState.currentEnemy.shieldHp > 0) {
+    // シールドがある場合
+    if (isWeaknessHit) {
+      // 弱点を突いた場合：シールドを削る
+      const prevShieldHp = gameState.currentEnemy.shieldHp;
+      gameState.currentEnemy.shieldHp--;
+      const currentShieldHp = gameState.currentEnemy.shieldHp;
+      
+      battleState.log.push(`せいかい！${readingMsg}`);
+      battleState.log.push('シールドにヒビが入った！');
 
-                    // ← 追加: 残量に応じてSE
-                    const hp = gameState.currentEnemy.shieldHp;
-                    if (hp === 2) publish('playSE', 'shield1');
-                    else if (hp === 1) publish('playSE', 'shield2');
-                    else if (hp === 0) publish('playSE', 'shield3');
-          
-                    if (gameState.currentEnemy.shieldHp === 0) {
-                      battleState.log.push('ボスの防御が崩れた！');
-                    }
-          
-                    // 行動パック表示（ピン留め）
-                    battleScreenState.showLogBlock([
-                      `せいかい！${readingMsg}`,
-                      '弱点にヒット！大ダメージ！',
-                      gameState.currentEnemy.shieldHp > 0 ? 'シールドにヒビが入った！' : 'ボスの防御が崩れた！'
-                    ]);
-          
-                    // シールドを削った場合は敵にダメージを与えない
-                    dmg = 0;
-          
-          // シールド破壊後も入力を継続できるように処理を修正
-          battleState.lastCommandMode = 'attack';
-          battleState.turn = 'enemy';
-          battleState.inputEnabled = false;
-          
-          // 1秒後に敵のターンを実行し、その後プレイヤーターンに戻す
-setManagedTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
-  enemyTurn();
-  // 敵ターン終了→次の問題表示: 1.7s
-  setManagedTimeout(() => {
-    pickNextKanji();
-    battleState.turn = 'player';
-    battleState.inputEnabled = true;
-  }, 1700);
-}, 1300);
-          
-          // 入力欄をクリア
-          inputEl.value = '';
-          return; // ここで処理を終了
-          
-        } else {
-          // 弱点を突いていない場合：ダメージを1に固定
-          dmg = 1;
-          battleState.log.push(`せいかい！${readingMsg}、しかし${gameState.currentEnemy.name}の防御は固い！`);
-          battleScreenState.showLogBlock([
-            `せいかい！${readingMsg}`,
-            `${gameState.currentEnemy.name}のシールドがかたい！ダメージは1！`
-          ]);
+      // ← 段階別のSEとメッセージ
+      if (currentShieldHp === 2) {
+        publish('playSE', 'shield1');
+        battleState.log.push('シールドが不安定になってきた...');
+        // シールドダメージエフェクト（軽度）
+        battleScreenState.startShakeEffect(10, 3);
+      } else if (currentShieldHp === 1) {
+        publish('playSE', 'shield2'); 
+        battleState.log.push('シールドが崩壊寸前だ！');
+        // シールドダメージエフェクト（中度）
+        battleScreenState.startShakeEffect(15, 5);
+        battleScreenState.startFlashEffect('rgba(255, 100, 100, 0.3)', 20);
+      } else if (currentShieldHp === 0) {
+        publish('playSE', 'shield3');
+        battleState.log.push('ボスの防御が完全に崩れた！');
+        
+        // シールド破壊の派手なエフェクト
+        battleScreenState.startShakeEffect(25, 8);
+        battleScreenState.startFlashEffect('rgba(255, 255, 255, 0.6)', 30);
+        
+        // 敵の位置を計算してシールド破壊エフェクトを開始
+        const enemyX = 500 + 240/2; // ex + ew/2
+        const enemyY = 120 + 120/2; // ey + eh/2（修正後の位置）
+        battleScreenState.startShieldBreakEffect(enemyX, enemyY, 150);
+      }
+
+      // 行動パック表示（段階に応じてメッセージを変更）
+      const shieldMessages = [
+        `せいかい！${readingMsg}`,
+        '弱点にヒット！大ダメージ！',
+      ];
+      
+      if (currentShieldHp > 0) {
+        shieldMessages.push('シールドにヒビが入った！');
+        if (currentShieldHp === 2) {
+          shieldMessages.push('シールドが不安定になってきた...');
+        } else if (currentShieldHp === 1) {
+          shieldMessages.push('シールドが崩壊寸前だ！');
         }
       } else {
-        // シールドHPが0の場合：通常通りのダメージ
-        battleState.log.push(`せいかい！${readingMsg}、${gameState.currentEnemy.name}に${dmg}のダメージ！`);
+        shieldMessages.push('ボスの防御が完全に崩れた！');
       }
+      
+      battleScreenState.showLogBlock(shieldMessages);
+
+      // シールドを削った場合は敵にダメージを与えない
+      dmg = 0;
+
+      // シールド破壊後も入力を継続できるように処理を修正
+      battleState.lastCommandMode = 'attack';
+      battleState.turn = 'enemy';
+      battleState.inputEnabled = false;
+      
+      // タイミングを調整（シールド破壊エフェクトを見せるため）
+      const waitTime = currentShieldHp === 0 ? 2000 : 1300; // 破壊時は2秒待機
+      
+      setManagedTimeout(() => {
+        enemyTurn();
+        setManagedTimeout(() => {
+          pickNextKanji();
+          battleState.turn = 'player';
+          battleState.inputEnabled = true;
+        }, 1700);
+      }, waitTime);
+      
+      // 入力欄をクリア
+      inputEl.value = '';
+      return; // ここで処理を終了
+      
     } else {
-           
-     // 行動パック表示（ピン留め）
-     battleScreenState.showLogBlock([
-      `せいかい！${readingMsg}`,
-      isWeaknessHit ? '弱点にヒット！大ダメージ！' : '',
-      `${gameState.currentEnemy.name}に${dmg}のダメージ！`
-    ]);
+      // 弱点を突いていない場合：ダメージを1に固定
+      dmg = 1;
+      battleState.log.push(`せいかい！${readingMsg}、しかし${gameState.currentEnemy.name}の防御は固い！`);
+      battleScreenState.showLogBlock([
+        `せいかい！${readingMsg}`,
+        `${gameState.currentEnemy.name}のシールドがかたい！ダメージは1！`
+      ]);
     }
+  } else {
+    // シールドHPが0の場合：通常通りのダメージ
+    battleState.log.push(`せいかい！${readingMsg}、${gameState.currentEnemy.name}に${dmg}のダメージ！`);
+  }
+} else {
+  // 通常の敵の場合の処理
+  // 行動パック表示（ピン留め）
+  battleScreenState.showLogBlock([
+    `せいかい！${readingMsg}`,
+    isWeaknessHit ? '弱点にヒット！大ダメージ！' : '',
+    `${gameState.currentEnemy.name}に${dmg}のダメージ！`
+  ]);
+}
     
     // ダメージ適用（ボス戦でシールドを削った場合はdmg=0なので実質ダメージなし）
     if (dmg > 0) {
@@ -4003,12 +4049,7 @@ function onHeal() {
     // 正解時に前回の不正解をクリア
     battleScreenState.lastIncorrectAnswer = null;
 
-     // ★★★ ここに石版攻撃エフェクトを追加（オプション） ★★★
-     const kanjiX = battleScreenState.canvas.width / 2;
-     const kanjiY = 200;
-     const kanjiBoxW = 180;
-     const kanjiBoxH = 160;
-     battleScreenState.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
+    // ★★★ ここに石版攻撃エフェクトを追加（オプション） ★★★
     
     battleState.lastAnswered = { ...gameState.currentKanji };
     battleState.comboCount++;
