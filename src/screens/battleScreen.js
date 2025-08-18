@@ -162,6 +162,17 @@ const battleScreenState = {
     // 修正2: pressedButtonsプロパティを追加
     pressedButtons: new Set(),
 
+    // ★★★ ここに石版攻撃エフェクト用プロパティを追加 ★★★
+  stoneAttackEffect: {
+    active: false,
+    timer: 0,
+    duration: 45, // 約0.75秒
+    cracks: [], // ヒビのパス情報
+    particles: [], // 破片パーティクル
+    flashIntensity: 0,
+    shakeIntensity: 0
+  },
+
       // 表示モード: 'current'（最新のみ） or 'blockPaged'（ブロック履歴ページング）
   logMode: 'current',
 
@@ -179,7 +190,7 @@ const battleScreenState = {
     this._logHintDismissed = true;
     this.logOffset = this.currentBlockIndex;
 
-
+    
  },
 
 
@@ -209,6 +220,210 @@ const battleScreenState = {
     this.shakeEffect.duration = duration;
     this.shakeEffect.intensity = intensity;
     if (DEBUG) console.log('シェイクエフェクト開始:', duration, intensity); // デバッグ用
+  },
+
+  // ★★★ ここに石版攻撃エフェクト関連メソッドを追加 ★★★
+  /**
+   * 石版攻撃エフェクトを開始するメソッド
+   */
+  startStoneAttackEffect(centerX, centerY, width, height) {
+    const effect = this.stoneAttackEffect;
+    effect.active = true;
+    effect.timer = effect.duration;
+    effect.cracks = [];
+    effect.particles = [];
+    effect.flashIntensity = 1.0;
+    effect.shakeIntensity = 8;
+    
+    // ヒビのパターンを生成（放射状 + ランダム）
+    this.generateCracks(centerX, centerY, width, height);
+    
+    // 破片パーティクルを生成
+    this.generateStoneParticles(centerX, centerY, width, height);
+    
+    // 既存のシェイクエフェクトも併用
+    this.startShakeEffect(20, 6);
+    
+    // 攻撃音を再生
+    publish('playSE', 'correct'); // 既存のSEを使用
+    
+    console.log('🪨 石版攻撃エフェクト開始');
+  },
+
+  /**
+   * ヒビのパターンを生成
+   */
+  generateCracks(centerX, centerY, width, height) {
+    const cracks = this.stoneAttackEffect.cracks;
+    const numMainCracks = 3 + Math.floor(Math.random() * 3); // 3-5本のメインクラック
+    
+    // メインクラック（中心から放射状）
+    for (let i = 0; i < numMainCracks; i++) {
+      const angle = (Math.PI * 2 * i / numMainCracks) + (Math.random() - 0.5) * 0.8;
+      const length = (Math.min(width, height) / 2) * (0.6 + Math.random() * 0.4);
+      
+      const crack = {
+        startX: centerX + (Math.random() - 0.5) * 20,
+        startY: centerY + (Math.random() - 0.5) * 20,
+        endX: centerX + Math.cos(angle) * length,
+        endY: centerY + Math.sin(angle) * length,
+        branches: [], // 枝分かれ
+        opacity: 0.8 + Math.random() * 0.2
+      };
+      
+      // ランダムな枝分かれを追加
+      if (Math.random() > 0.4) {
+        const branchAngle = angle + (Math.random() - 0.5) * 1.0;
+        const branchLength = length * (0.3 + Math.random() * 0.4);
+        const branchStartRatio = 0.3 + Math.random() * 0.4;
+        
+        crack.branches.push({
+          startX: crack.startX + (crack.endX - crack.startX) * branchStartRatio,
+          startY: crack.startY + (crack.endY - crack.startY) * branchStartRatio,
+          endX: crack.startX + Math.cos(branchAngle) * branchLength,
+          endY: crack.startY + Math.sin(branchAngle) * branchLength,
+          opacity: crack.opacity * 0.7
+        });
+      }
+      
+      cracks.push(crack);
+    }
+  },
+
+  /**
+   * 石の破片パーティクルを生成
+   */
+  generateStoneParticles(centerX, centerY, width, height) {
+    const particles = this.stoneAttackEffect.particles;
+    const numParticles = 8 + Math.floor(Math.random() * 6); // 8-13個の破片
+    
+    for (let i = 0; i < numParticles; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 4;
+      const size = 2 + Math.random() * 4;
+      
+      particles.push({
+        x: centerX + (Math.random() - 0.5) * width * 0.6,
+        y: centerY + (Math.random() - 0.5) * height * 0.6,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 1, // 重力を考慮して上向き初速
+        size: size,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.3,
+        life: 0,
+        maxLife: 30 + Math.random() * 15,
+        color: `rgb(${180 + Math.random() * 40}, ${170 + Math.random() * 40}, ${160 + Math.random() * 30})`, // 石っぽい色
+        opacity: 1.0
+      });
+    }
+  },
+
+  /**
+   * 石版攻撃エフェクトの更新と描画
+   */
+  updateStoneAttackEffect() {
+    const effect = this.stoneAttackEffect;
+    if (!effect.active) return;
+    
+    effect.timer--;
+    const progress = 1 - (effect.timer / effect.duration);
+    
+    // フラッシュ強度の減衰
+    effect.flashIntensity = Math.max(0, 1 - progress * 2);
+    
+    // パーティクルの更新
+    for (let i = effect.particles.length - 1; i >= 0; i--) {
+      const particle = effect.particles[i];
+      particle.life++;
+      
+      // 物理更新
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      particle.vy += 0.2; // 重力
+      particle.rotation += particle.rotationSpeed;
+      
+      // フェードアウト
+      const lifeRatio = particle.life / particle.maxLife;
+      particle.opacity = Math.max(0, 1 - lifeRatio);
+      
+      // 寿命チェック
+      if (particle.life >= particle.maxLife) {
+        effect.particles.splice(i, 1);
+      }
+    }
+    
+    // エフェクト終了判定
+    if (effect.timer <= 0) {
+      effect.active = false;
+      effect.cracks = [];
+      effect.particles = [];
+    }
+  },
+
+  /**
+   * 石版攻撃エフェクトの描画
+   */
+  drawStoneAttackEffect(kanjiBoxX, kanjiBoxY, kanjiBoxW, kanjiBoxH) {
+    const effect = this.stoneAttackEffect;
+    if (!effect.active) return;
+    
+    this.ctx.save();
+    
+    // クリッピング（漢字ボックス内のみに描画を制限）
+    this.ctx.beginPath();
+    this.ctx.rect(kanjiBoxX, kanjiBoxY, kanjiBoxW, kanjiBoxH);
+    this.ctx.clip();
+    
+    // フラッシュエフェクト
+    if (effect.flashIntensity > 0) {
+      this.ctx.fillStyle = `rgba(255, 255, 255, ${effect.flashIntensity * 0.4})`;
+      this.ctx.fillRect(kanjiBoxX, kanjiBoxY, kanjiBoxW, kanjiBoxH);
+    }
+    
+    // ヒビの描画
+    this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+    this.ctx.lineWidth = 2;
+    this.ctx.lineCap = 'round';
+    
+    for (const crack of effect.cracks) {
+      this.ctx.globalAlpha = crack.opacity;
+      
+      // メインクラック
+      this.ctx.beginPath();
+      this.ctx.moveTo(crack.startX, crack.startY);
+      this.ctx.lineTo(crack.endX, crack.endY);
+      this.ctx.stroke();
+      
+      // 枝分かれ
+      for (const branch of crack.branches) {
+        this.ctx.globalAlpha = branch.opacity;
+        this.ctx.beginPath();
+        this.ctx.moveTo(branch.startX, branch.startY);
+        this.ctx.lineTo(branch.endX, branch.endY);
+        this.ctx.stroke();
+      }
+    }
+    
+    this.ctx.restore();
+    
+    // 破片パーティクル（クリッピング外でも描画）
+    for (const particle of effect.particles) {
+      this.ctx.save();
+      this.ctx.globalAlpha = particle.opacity;
+      this.ctx.translate(particle.x, particle.y);
+      this.ctx.rotate(particle.rotation);
+      
+      // 石の破片を四角形で描画
+      this.ctx.fillStyle = particle.color;
+      this.ctx.fillRect(-particle.size/2, -particle.size/2, particle.size, particle.size);
+      
+      // 破片の輪郭
+      this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeRect(-particle.size/2, -particle.size/2, particle.size, particle.size);
+      
+      this.ctx.restore();
+    }
   },
 
   /** 画面がアクティブになったときの初期化 */
@@ -1347,6 +1562,9 @@ if (this.logMode === 'blockPaged') {
       this.updateAndDrawExpParticles();
     }
 
+    // ★★★ ここに石版攻撃エフェクトの更新処理を追加 ★★★
+  this.updateStoneAttackEffect();
+
     // コンボタイマーの更新処理を強化
     if (battleState.comboCount > 0 && battleState.comboTimer > 0) {
       battleState.comboTimer--;
@@ -1473,6 +1691,12 @@ if (gameState.currentKanji) {
     this.ctx.strokeRect(adjustedX, adjustedY, scaledW, scaledH);
     this.ctx.restore();
   }
+  
+  // ★★★ ここに石版攻撃エフェクトの描画処理を追加 ★★★
+if (this.stoneAttackEffect.active) {
+  this.drawStoneAttackEffect(adjustedX, adjustedY, scaledW, scaledH);
+}
+
 }
 
     // ボタンの描画時に選択されているコマンドを強調表示
@@ -3268,6 +3492,16 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
     
     // 漢字ボックスのエフェクトを開始（黄色で光らせる）
     battleScreenState.startKanjiBoxEffect('rgba(241, 196, 15, 0.8)', 20);
+
+    // ★★★ ここに石版攻撃エフェクトを追加 ★★★
+    // 漢字ボックスの座標を取得
+    const kanjiX = battleScreenState.canvas.width / 2;
+    const kanjiY = 200;
+    const kanjiBoxW = 180;
+    const kanjiBoxH = 160;
+    
+    // 石版攻撃エフェクトを開始
+    battleScreenState.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
     
     // 前回正解した漢字の情報を保存
     battleScreenState.lastAnsweredKanji = { ...gameState.currentKanji };
@@ -3768,6 +4002,13 @@ function onHeal() {
     
     // 正解時に前回の不正解をクリア
     battleScreenState.lastIncorrectAnswer = null;
+
+     // ★★★ ここに石版攻撃エフェクトを追加（オプション） ★★★
+     const kanjiX = battleScreenState.canvas.width / 2;
+     const kanjiY = 200;
+     const kanjiBoxW = 180;
+     const kanjiBoxH = 160;
+     battleScreenState.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
     
     battleState.lastAnswered = { ...gameState.currentKanji };
     battleState.comboCount++;
