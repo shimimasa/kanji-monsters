@@ -201,19 +201,33 @@ const battleScreenState = {
  * @returns {Object} RGB値のオブジェクト
  */
 getShieldColor(currentHp, maxHp) {
-  console.log('getShieldColor呼び出し:', currentHp, maxHp); // デバッグ用
-  const integrity = currentHp / maxHp;
+  console.log('🛡️ getShieldColor実行:', currentHp, maxHp);
   
+  if (!currentHp || !maxHp || maxHp === 0) {
+    console.warn('⚠️ 無効なHP値:', currentHp, maxHp);
+    return { r: 100, g: 180, b: 255 }; // デフォルト青色
+  }
+  
+  const integrity = currentHp / maxHp;
+  console.log('🛡️ シールド完全性:', integrity);
+  
+  let color;
   if (integrity > 0.66) {
     // 健全状態：青系
-    return { r: 100, g: 180, b: 255 };
+    color = { r: 100, g: 180, b: 255 };
+    console.log(' 健全状態 - 青色');
   } else if (integrity > 0.33) {
     // 警戒状態：青紫系
-    return { r: 150, g: 120, b: 255 };
+    color = { r: 150, g: 120, b: 255 };
+    console.log(' 警戒状態 - 青紫色');
   } else {
     // 危険状態：赤紫系
-    return { r: 200, g: 100, b: 200 };
+    color = { r: 200, g: 100, b: 200 };
+    console.log(' 危険状態 - 赤紫色');
   }
+  
+  console.log(' 返す色:', color);
+  return color;
 },
 
 /**
