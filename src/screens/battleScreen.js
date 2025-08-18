@@ -193,7 +193,256 @@ const battleScreenState = {
     
  },
 
+// 195行目付近の空のメソッドを以下の内容で置き換えてください
 
+/**
+ * シールドの色を段階的に変化させる
+ * @param {number} currentHp - 現在のシールドHP
+ * @param {number} maxHp - 最大シールドHP
+ * @returns {Object} RGB値のオブジェクト
+ */
+getShieldColor(currentHp, maxHp) {
+  const integrity = currentHp / maxHp;
+  
+  if (integrity > 0.66) {
+    // 健全状態：青系
+    return { r: 100, g: 180, b: 255 };
+  } else if (integrity > 0.33) {
+    // 警戒状態：青紫系
+    return { r: 150, g: 120, b: 255 };
+  } else {
+    // 危険状態：赤紫系
+    return { r: 200, g: 100, b: 200 };
+  }
+},
+
+/**
+ * シールドのヒビを描画
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D コンテキスト
+ * @param {number} centerX - 中心X座標
+ * @param {number} centerY - 中心Y座標
+ * @param {number} radius - シールドの半径
+ * @param {number} crackLevel - ヒビのレベル（0-2）
+ * @param {number} shieldHp - 現在のシールドHP
+ */
+drawShieldCracks(ctx, centerX, centerY, radius, crackLevel, shieldHp) {
+  if (crackLevel === 0) return; // ヒビなし
+  
+  ctx.save();
+  
+  // ヒビの基本設定
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'round';
+  
+  // 時間ベースの微細な揺れ（ヒビが成長している感じ）
+  const time = Date.now() * 0.001;
+  const wobble = Math.sin(time * 3) * 0.02;
+  
+  if (crackLevel >= 1) {
+    // 1段階目：小さなヒビ（上部に2-3本）
+    this.drawSingleCrack(ctx, centerX, centerY, radius, -Math.PI/2 + wobble, 0.3);
+    this.drawSingleCrack(ctx, centerX, centerY, radius, -Math.PI/3 + wobble, 0.25);
+    this.drawSingleCrack(ctx, centerX, centerY, radius, -2*Math.PI/3 + wobble, 0.25);
+  }
+  
+  if (crackLevel >= 2) {
+    // 2段階目：大きなヒビ（全体に広がる）
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255, 200, 200, 0.9)';
+    
+    // メインのヒビ（縦に貫通）
+    this.drawSingleCrack(ctx, centerX, centerY, radius, -Math.PI/2 + wobble, 0.8);
+    this.drawSingleCrack(ctx, centerX, centerY, radius, Math.PI/2 + wobble, 0.7);
+    
+    // サブのヒビ（放射状）
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI * 2 * i / 6) + wobble;
+      const length = 0.4 + Math.random() * 0.2;
+      this.drawSingleCrack(ctx, centerX, centerY, radius, angle, length);
+    }
+    
+    // クモの巣状のヒビ
+    this.drawWebCracks(ctx, centerX, centerY, radius * 0.6);
+  }
+  
+  ctx.restore();
+},
+
+/**
+ * 単一のヒビを描画
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D コンテキスト
+ * @param {number} centerX - 中心X座標
+ * @param {number} centerY - 中心Y座標
+ * @param {number} radius - シールドの半径
+ * @param {number} angle - ヒビの角度
+ * @param {number} lengthRatio - ヒビの長さ（0-1）
+ */
+drawSingleCrack(ctx, centerX, centerY, radius, angle, lengthRatio) {
+  const startRadius = radius * 0.2;
+  const endRadius = radius * lengthRatio;
+  
+  const startX = centerX + Math.cos(angle) * startRadius;
+  const startY = centerY + Math.sin(angle) * startRadius;
+  const endX = centerX + Math.cos(angle) * endRadius;
+  const endY = centerY + Math.sin(angle) * endRadius;
+  
+  ctx.beginPath();
+  ctx.moveTo(startX, startY);
+  
+  // ヒビを少し曲がらせる（自然な感じに）
+  const midX = (startX + endX) / 2 + Math.sin(angle + Math.PI/2) * (Math.random() - 0.5) * 10;
+  const midY = (startY + endY) / 2 + Math.cos(angle + Math.PI/2) * (Math.random() - 0.5) * 10;
+  
+  ctx.quadraticCurveTo(midX, midY, endX, endY);
+  ctx.stroke();
+},
+
+/**
+ * クモの巣状のヒビを描画
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D コンテキスト
+ * @param {number} centerX - 中心X座標
+ * @param {number} centerY - 中心Y座標
+ * @param {number} innerRadius - 内側の半径
+ */
+drawWebCracks(ctx, centerX, centerY, innerRadius) {
+  ctx.strokeStyle = 'rgba(255, 220, 220, 0.6)';
+  ctx.lineWidth = 1;
+  
+  // 同心円状のヒビ
+  for (let r = innerRadius * 0.5; r <= innerRadius; r += innerRadius * 0.25) {
+    ctx.beginPath();
+    // 完全な円ではなく、部分的な弧を描画
+    for (let i = 0; i < 8; i++) {
+      const startAngle = (Math.PI * 2 * i / 8);
+      const endAngle = startAngle + (Math.PI / 8);
+      
+      if (Math.random() > 0.3) { // 70%の確率でヒビを描画
+        ctx.arc(centerX, centerY, r, startAngle, endAngle);
+      }
+    }
+    ctx.stroke();
+  }
+},
+
+/**
+ * シールド危険状態の警告エフェクト
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D コンテキスト
+ * @param {number} centerX - 中心X座標
+ * @param {number} centerY - 中心Y座標
+ * @param {number} radius - シールドの半径
+ */
+drawShieldWarningEffect(ctx, centerX, centerY, radius) {
+  // 点滅する赤い警告リング
+  const time = Date.now();
+  const flashAlpha = (Math.sin(time * 0.01) + 1) * 0.3; // 0-0.6の範囲で点滅
+  
+  ctx.save();
+  ctx.strokeStyle = `rgba(255, 50, 50, ${flashAlpha})`;
+  ctx.lineWidth = 3;
+  ctx.setLineDash([5, 5]); // 破線効果
+  
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius + 5, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  // 警告パーティクル
+  for (let i = 0; i < 6; i++) {
+    const angle = (time * 0.005 + i * Math.PI / 3) % (Math.PI * 2);
+    const particleRadius = radius + 10 + Math.sin(time * 0.01 + i) * 5;
+    const particleX = centerX + Math.cos(angle) * particleRadius;
+    const particleY = centerY + Math.sin(angle) * particleRadius;
+    
+    ctx.fillStyle = `rgba(255, 100, 100, ${flashAlpha})`;
+    ctx.beginPath();
+    ctx.arc(particleX, particleY, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  ctx.restore();
+},
+
+/**
+ * シールド破壊時の爆発エフェクト
+ * @param {number} centerX - 中心X座標
+ * @param {number} centerY - 中心Y座標
+ * @param {number} radius - 爆発の半径
+ */
+startShieldBreakEffect(centerX, centerY, radius) {
+  // 爆発エフェクト用のパーティクルシステムを初期化
+  this.shieldBreakEffect = {
+    active: true,
+    particles: [],
+    centerX: centerX,
+    centerY: centerY,
+    timer: 60, // 1秒間のエフェクト
+    maxTimer: 60
+  };
+  
+  // パーティクルを生成
+  for (let i = 0; i < 20; i++) {
+    const angle = (Math.PI * 2 * i) / 20;
+    const speed = 3 + Math.random() * 4;
+    
+    this.shieldBreakEffect.particles.push({
+      x: centerX,
+      y: centerY,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0,
+      maxLife: 40 + Math.random() * 20,
+      size: 3 + Math.random() * 3,
+      color: `hsl(${200 + Math.random() * 60}, 100%, ${60 + Math.random() * 30}%)`,
+      alpha: 1
+    });
+  }
+  
+  // 破壊SE再生
+  publish('playSE', 'shieldBreak');
+},
+
+/**
+ * シールド破壊エフェクトの更新（update関数内で呼び出し）
+ */
+updateShieldBreakEffect() {
+  if (!this.shieldBreakEffect || !this.shieldBreakEffect.active) return;
+  
+  const effect = this.shieldBreakEffect;
+  effect.timer--;
+  
+  // パーティクルの更新
+  for (let i = effect.particles.length - 1; i >= 0; i--) {
+    const particle = effect.particles[i];
+    
+    particle.life++;
+    particle.x += particle.vx;
+    particle.y += particle.vy;
+    particle.vx *= 0.98; // 摩擦
+    particle.vy *= 0.98;
+    
+    // フェードアウト
+    particle.alpha = 1 - (particle.life / particle.maxLife);
+    
+    // パーティクル描画
+    this.ctx.save();
+    this.ctx.globalAlpha = particle.alpha;
+    this.ctx.fillStyle = particle.color;
+    this.ctx.beginPath();
+    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.restore();
+    
+    // 寿命切れのパーティクルを削除
+    if (particle.life >= particle.maxLife) {
+      effect.particles.splice(i, 1);
+    }
+  }
+  
+  // エフェクト終了判定
+  if (effect.timer <= 0 && effect.particles.length === 0) {
+    this.shieldBreakEffect.active = false;
+  }
+},
  
   /**
    * 漢字ボックスのエフェクトを開始するメソッド
@@ -866,6 +1115,10 @@ getMaxHealCountFromSettings() {
     }
 
     this.ctx.restore();
+
+    
+
+    
 
     // ── 漢字 & ヒント ──
     // 問題漢字を枠付き＆拡大描画
