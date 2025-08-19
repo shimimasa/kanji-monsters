@@ -1222,6 +1222,24 @@
     "tags": []
   },
   {
+    "id": "g4-134",
+    "stageId": ["chubu_area7"],
+    "kanji": "埼",
+    "grade": 4,
+    "strokes": 11,
+    "onyomi": [],
+    "kunyomi": [
+      "さい"
+    ],
+    "meaning": "さき。つきでた土地の、はし。みさき。",
+    "exampleSentence": "ぼくが住んでいる埼玉（さいたま）県は、都心へのアクセスが便利な場所だ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
     "id": "g4-071",
     "stageId": "chubu_area1",
     "kanji": "材",

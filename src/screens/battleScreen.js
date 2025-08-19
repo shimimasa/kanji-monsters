@@ -1036,88 +1036,89 @@ getMaxHealCountFromSettings() {
       this.ctx.strokeRect(b.x, b.y, b.w, b.h);
     });
 
-    /* 敵 */
-    const enemy = gameState.currentEnemy;
-    const ex = 500, ey = 120, ew = 240, eh = 120; // eyを80から120に変更
+    /* 敵（新しいモンスター枠付き） */
+const enemy = gameState.currentEnemy;
+const ex = 500, ey = 120, ew = 240, eh = 120;
 
-    // アニメーション用オフセット計算
-    let offsetX = 0, offsetY = 0, rotateAngle = 0, alpha = 1;
-    if (battleState.enemyAction === 'damage' && battleState.enemyActionTimer > 0) {
-      // 振動エフェクト（ランダムに±幅を動かす）
-      offsetX = (Math.random() - 0.5) * 20; 
-      offsetY = (Math.random() - 0.5) * 10;
-      battleState.enemyActionTimer--;
-      if (battleState.enemyActionTimer === 0) {
-        battleState.enemyAction = null;
-      }
-    }
-    else if (battleState.enemyAction === 'attack' && battleState.enemyActionTimer > 0) {
-      // 突進エフェクト（経過に応じて手前に移動して戻る）
-      const total = ENEMY_ATTACK_ANIM_DURATION;
-      const half  = total / 2;
-      const t     = battleState.enemyActionTimer;
-      const progress = (half - Math.abs(t - half)) / half; // 0→1→0 の波
-      offsetX = -progress * 30; // 左に最大30px
-      battleState.enemyActionTimer--;
-      if (battleState.enemyActionTimer === 0) {
-        battleState.enemyAction = null;
-      }
-    }
+// アニメーション用オフセット計算
+let offsetX = 0, offsetY = 0, rotateAngle = 0, alpha = 1;
+if (battleState.enemyAction === 'damage' && battleState.enemyActionTimer > 0) {
+  offsetX = (Math.random() - 0.5) * 20; 
+  offsetY = (Math.random() - 0.5) * 10;
+  battleState.enemyActionTimer--;
+  if (battleState.enemyActionTimer === 0) {
+    battleState.enemyAction = null;
+  }
+}
+else if (battleState.enemyAction === 'attack' && battleState.enemyActionTimer > 0) {
+  const total = ENEMY_ATTACK_ANIM_DURATION;
+  const half  = total / 2;
+  const t     = battleState.enemyActionTimer;
+  const progress = (half - Math.abs(t - half)) / half;
+  offsetX = -progress * 30;
+  battleState.enemyActionTimer--;
+  if (battleState.enemyActionTimer === 0) {
+    battleState.enemyAction = null;
+  }
+}
 
-    // ここから追加：撃破時の倒れるアニメーション
-    if (battleState.enemyAction === 'defeat' && battleState.enemyActionTimer > 0) {
-      const total    = ENEMY_DEFEAT_ANIM_DURATION;
-      const timer    = battleState.enemyActionTimer;
-      const progress = (total - timer) / total;      // 0→1
-      rotateAngle    = progress * (Math.PI / 2);     // 最大90度倒れる
-      alpha          = 1 - progress;                 // 徐々にフェードアウト
-      battleState.enemyActionTimer--;
-      if (battleState.enemyActionTimer === 0) {
-        battleState.enemyAction = null;
-      }
-    }
+if (battleState.enemyAction === 'defeat' && battleState.enemyActionTimer > 0) {
+  const total    = ENEMY_DEFEAT_ANIM_DURATION;
+  const timer    = battleState.enemyActionTimer;
+  const progress = (total - timer) / total;
+  rotateAngle    = progress * (Math.PI / 2);
+  alpha          = 1 - progress;
+  battleState.enemyActionTimer--;
+  if (battleState.enemyActionTimer === 0) {
+    battleState.enemyAction = null;
+  }
+}
 
-    // ── 敵描画：回転と透明度を反映 ──
-    this.ctx.save();
-    this.ctx.globalAlpha = alpha;
-    this.ctx.translate(ex + ew/2 + offsetX, ey + eh/2 + offsetY);
-    this.ctx.rotate(rotateAngle);
+// 1. モンスター枠を描画
+const frameArea = drawMonsterFrame(this.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy);
 
-  // 敵描画部分のシールド描画コードを以下で置き換えてください
+// 2. 枠内でモンスター画像を描画
+this.ctx.save();
+this.ctx.globalAlpha = alpha;
+
+// クリッピング（枠からはみ出さないように）
+this.ctx.beginPath();
+this.ctx.rect(frameArea.x, frameArea.y, frameArea.width, frameArea.height);
+this.ctx.clip();
+
+// モンスター画像の位置を枠内に調整
+const imageX = frameArea.x + (frameArea.width - ew) / 2 + offsetX;
+const imageY = frameArea.y + (frameArea.height - eh) / 2 + offsetY;
+
+// 回転の中心点を調整
+this.ctx.translate(imageX + ew/2, imageY + eh/2);
+this.ctx.rotate(rotateAngle);
 
 // ★★★ シールド描画を敵画像の前に配置 ★★★
 if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
   try {
-    console.log('シールド描画開始:', enemy.shieldHp); // デバッグ用
+    console.log('シールド描画開始:', enemy.shieldHp);
     
     const shieldRadius = Math.max(ew, eh) * 0.6;
     const maxShieldHp = enemy.originalShieldHp || 3;
     const currentShieldHp = enemy.shieldHp;
     
-    // シールドの状態を計算（3段階）
     const shieldIntegrity = currentShieldHp / maxShieldHp;
+    const basePulse = Math.sin(Date.now() / 300) + 1;
     
-    // 基本の脈動効果
-    const basePulse = Math.sin(Date.now() / 300) + 1; // 0-2の範囲
-    
-    // 段階別の透明度とエフェクト
     let shieldOpacity, crackLevel;
     
     if (currentShieldHp === 3) {
-      // 完全なシールド
-      shieldOpacity = 0.3 + basePulse * 0.1; // 0.3-0.5
+      shieldOpacity = 0.3 + basePulse * 0.1;
       crackLevel = 0;
     } else if (currentShieldHp === 2) {
-      // 1回目のダメージ後 - 小さなヒビ
-      shieldOpacity = 0.25 + basePulse * 0.08; // 0.25-0.41
+      shieldOpacity = 0.25 + basePulse * 0.08;
       crackLevel = 1;
     } else if (currentShieldHp === 1) {
-      // 2回目のダメージ後 - 大きなヒビ
-      shieldOpacity = 0.2 + basePulse * 0.12; // 0.2-0.44（不安定）
+      shieldOpacity = 0.2 + basePulse * 0.12;
       crackLevel = 2;
     }
     
-    // シールドの色も段階的に変化（エラーハンドリング付き）
     let shieldColor;
     try {
       shieldColor = this.getShieldColor(currentShieldHp, maxShieldHp);
@@ -1126,11 +1127,9 @@ if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
       }
     } catch (error) {
       console.warn('シールドカラー取得エラー:', error);
-      // フォールバック色（青）
       shieldColor = { r: 100, g: 180, b: 255 };
     }
     
-    // グラデーションのバリアを作成
     const shieldGrad = this.ctx.createRadialGradient(0, 0, shieldRadius * 0.7, 0, 0, shieldRadius);
     shieldGrad.addColorStop(0, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, 0)`);
     shieldGrad.addColorStop(0.7, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, ${shieldOpacity * 0.5})`);
@@ -1141,19 +1140,16 @@ if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
     this.ctx.arc(0, 0, shieldRadius, 0, Math.PI * 2);
     this.ctx.fill();
     
-    // バリアの輪郭線（段階的に不安定に）
     const outlineAlpha = Math.min(1, shieldOpacity + 0.2);
     this.ctx.strokeStyle = `rgba(${Math.min(255, shieldColor.r + 50)}, ${Math.min(255, shieldColor.g + 50)}, ${Math.min(255, shieldColor.b + 50)}, ${outlineAlpha})`;
     this.ctx.lineWidth = 2;
     
-    // 不安定効果（HP低下時）
     if (currentShieldHp < maxShieldHp) {
       this.ctx.lineWidth = 2 + Math.sin(Date.now() / 100) * 0.5;
     }
     
     this.ctx.stroke();
     
-    // ヒビエフェクトを描画（エラーハンドリング付き）
     try {
       if (typeof this.drawShieldCracks === 'function') {
         this.drawShieldCracks(this.ctx, 0, 0, shieldRadius, crackLevel, currentShieldHp);
@@ -1162,7 +1158,6 @@ if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
       console.warn('シールドクラック描画エラー:', error);
     }
     
-    // 危険状態の警告エフェクト（シールドHP1の時）
     if (currentShieldHp === 1) {
       try {
         if (typeof this.drawShieldWarningEffect === 'function') {
@@ -1173,30 +1168,31 @@ if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
       }
     }
     
-    console.log('シールド描画完了'); // デバッグ用
+    console.log('シールド描画完了');
     
   } catch (error) {
     console.error('シールド描画中にエラーが発生しました:', error);
-    // エラーが発生してもゲームを継続
   }
 }
 
-    if (enemy && enemy.img) {
-      // 透明度を適切に処理するための合成モードを設定
-      this.ctx.globalCompositeOperation = 'source-over';
-      // 画像を描画
-      this.ctx.drawImage(enemy.img, -ew/2, -eh/2, ew, eh);
-    } else {
-      // 画像がない場合は代替表示
-      this.ctx.fillStyle = '#6b8e23';
-      this.ctx.fillRect(-ew/2, -eh/2, ew, eh);
-      this.ctx.fillStyle = 'white';
-      this.ctx.font = 'bold 20px sans-serif';
-      this.ctx.textAlign = 'center';
-      this.ctx.fillText(enemy ? enemy.name : 'モンスター', 0, 0);
-    }
+if (enemy && enemy.img) {
+  // 透過処理の問題を軽減するため、背景を少し暗くする
+  this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+  this.ctx.fillRect(-ew/2 - 2, -eh/2 - 2, ew + 4, eh + 4);
+  
+  this.ctx.globalCompositeOperation = 'source-over';
+  this.ctx.drawImage(enemy.img, -ew/2, -eh/2, ew, eh);
+} else {
+  // 画像がない場合は代替表示
+  this.ctx.fillStyle = '#6b8e23';
+  this.ctx.fillRect(-ew/2, -eh/2, ew, eh);
+  this.ctx.fillStyle = 'white';
+  this.ctx.font = 'bold 20px sans-serif';
+  this.ctx.textAlign = 'center';
+  this.ctx.fillText(enemy ? enemy.name : 'モンスター', 0, 0);
+}
 
-    this.ctx.restore();
+this.ctx.restore();
 
     
 
@@ -5175,3 +5171,167 @@ function colorize(s) {
   return { text: s };
 }
 
+
+/**
+ * モンスター出現枠を描画する関数
+ */
+
+function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'normal') {
+  ctx.save();
+  
+  // 敵のタイプに応じて枠のスタイルを決定
+  let frameStyle = style;
+  if (enemy) {
+    if (enemy.isBoss) {
+      frameStyle = 'boss';
+    } else if (enemy.level >= 10) {
+      frameStyle = 'elite';
+    }
+  }
+  
+  // 枠の基本設定
+  const cornerRadius = 8;
+  const frameThickness = 6;
+  const innerPadding = 8;
+  
+  // スタイル別の色設定
+  const styles = {
+    normal: {
+      outerColor: '#4a5568',
+      innerColor: '#2d3748',
+      glowColor: '#63b3ed',
+      bgColor: 'rgba(45, 55, 72, 0.8)',
+      accentColor: '#4299e1'
+    },
+    elite: {
+      outerColor: '#9f7aea',
+      innerColor: '#553c9a',
+      glowColor: '#d53f8c',
+      bgColor: 'rgba(85, 60, 154, 0.8)',
+      accentColor: '#b794f6'
+    },
+    boss: {
+      outerColor: '#e53e3e',
+      innerColor: '#c53030',
+      glowColor: '#fc8181',
+      bgColor: 'rgba(197, 48, 48, 0.8)',
+      accentColor: '#feb2b2'
+    }
+  };
+  
+  const currentStyle = styles[frameStyle];
+  
+  // 1. 外側の光るエフェクト（ボス・エリート用）
+  if (frameStyle !== 'normal') {
+    const time = Date.now() * 0.003;
+    const glowIntensity = (Math.sin(time) + 1) * 0.3 + 0.4;
+    
+    ctx.shadowColor = currentStyle.glowColor;
+    ctx.shadowBlur = 15;
+    ctx.strokeStyle = currentStyle.glowColor;
+    ctx.globalAlpha = glowIntensity;
+    ctx.lineWidth = 3;
+    drawRoundedRect(ctx, x - 3, y - 3, width + 6, height + 6, cornerRadius + 3, true);
+    ctx.globalAlpha = 1;
+  }
+  
+  // 2. 背景（半透明）
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = currentStyle.bgColor;
+  drawRoundedRect(ctx, x, y, width, height, cornerRadius);
+  
+  // 3. 外枠
+  ctx.strokeStyle = currentStyle.outerColor;
+  ctx.lineWidth = frameThickness;
+  drawRoundedRect(ctx, x, y, width, height, cornerRadius, true);
+  
+  // 4. 内側の装飾枠
+  const innerX = x + frameThickness;
+  const innerY = y + frameThickness;
+  const innerWidth = width - frameThickness * 2;
+  const innerHeight = height - frameThickness * 2;
+  
+  ctx.strokeStyle = currentStyle.innerColor;
+  ctx.lineWidth = 2;
+  drawRoundedRect(ctx, innerX, innerY, innerWidth, innerHeight, cornerRadius - 2, true);
+  
+  // 5. 角の装飾（ボス・エリート用）
+  if (frameStyle !== 'normal') {
+    drawCornerDecorations(ctx, x, y, width, height, currentStyle.accentColor, frameStyle);
+  }
+  
+  // 6. 中央の表示エリア（モンスター画像用）
+  const displayX = x + frameThickness + innerPadding;
+  const displayY = y + frameThickness + innerPadding;
+  const displayWidth = width - (frameThickness + innerPadding) * 2;
+  const displayHeight = height - (frameThickness + innerPadding) * 2;
+  
+  ctx.restore();
+  
+  // 表示エリアの座標を返す
+  return {
+    x: displayX,
+    y: displayY,
+    width: displayWidth,
+    height: displayHeight
+  };
+}
+
+/**
+ * 角の装飾を描画
+ */
+function drawCornerDecorations(ctx, x, y, width, height, color, frameStyle) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  
+  const cornerSize = frameStyle === 'boss' ? 20 : 15;
+  const offset = 3;
+  
+  // 四隅の装飾線
+  const corners = [
+    { x: x + offset, y: y + offset, dirX: 1, dirY: 1 },
+    { x: x + width - offset, y: y + offset, dirX: -1, dirY: 1 },
+    { x: x + offset, y: y + height - offset, dirX: 1, dirY: -1 },
+    { x: x + width - offset, y: y + height - offset, dirX: -1, dirY: -1 }
+  ];
+  
+  corners.forEach(corner => {
+    ctx.beginPath();
+    ctx.moveTo(corner.x, corner.y + corner.dirY * cornerSize);
+    ctx.lineTo(corner.x, corner.y);
+    ctx.lineTo(corner.x + corner.dirX * cornerSize, corner.y);
+    ctx.stroke();
+    
+    if (frameStyle === 'boss') {
+      ctx.beginPath();
+      ctx.moveTo(corner.x + corner.dirX * 5, corner.y + corner.dirY * 10);
+      ctx.lineTo(corner.x + corner.dirX * 10, corner.y + corner.dirY * 5);
+      ctx.stroke();
+    }
+  });
+}
+
+/**
+ * 角丸矩形を描画するヘルパー関数
+ */
+function drawRoundedRect(ctx, x, y, width, height, radius, strokeOnly = false) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+  
+  if (strokeOnly) {
+    ctx.stroke();
+  } else {
+    ctx.fill();
+  }
+}

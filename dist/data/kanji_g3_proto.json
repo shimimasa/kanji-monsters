@@ -148,7 +148,7 @@
     ],
     "kunyomi": [],
     "meaning": "なかま。",
-    "exampleSentence": "クラスの員（いん）数。",
+    "exampleSentence": "クラスの全員（ぜんいん）。",
     "correctCount": 0,
     "incorrectCount": 0,
     "lastReviewDate": null,
@@ -3115,7 +3115,7 @@
   },
   {
     "id": "g3-158",
-    "stageId": ["kanto_area5", "kanto_area7"    ],
+    "stageId": ["kanto_area5", "kanto_area7"],
     "kanji": "美",
     "grade": 3,
     "strokes": 9,
@@ -3235,6 +3235,27 @@
   {
     "id": "g3-164",
     "stageId": ["kanto_area5", "kanto_area7"],
+    "kanji": "病",
+    "grade": 3,
+    "strokes": 10,
+    "onyomi": [
+      "ビョウ"
+    ],
+    "kunyomi": [
+      "やまい",
+      "や"
+    ],
+    "meaning": "やまい。からだの ぐあいが わるいこと。",
+    "exampleSentence": "病（やまい）気が、早く 治ると いいな。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
+    "id": "g3-165",
+    "stageId": ["kanto_area5", "kanto_area7"],
     "kanji": "品",
     "grade": 3,
     "strokes": 9,
@@ -3253,7 +3274,7 @@
     "tags": []
   },
   {
-    "id": "g3-165",
+    "id": "g3-166",
     "stageId": ["kanto_area5", "kanto_area7"],
     "kanji": "負",
     "grade": 3,
@@ -3274,7 +3295,7 @@
     "tags": []
   },
   {
-    "id": "g3-166",
+    "id": "g3-167",
     "stageId": ["kanto_area5", "kanto_area7"],
     "kanji": "部",
     "grade": 3,
@@ -3285,27 +3306,6 @@
     "kunyomi": [],
     "meaning": "ぶぶん。",
     "exampleSentence": "学校の 部（ぶ）活動に、参加する。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
-  },
-  {
-    "id": "g3-167",
-    "stageId": ["kanto_area5", "kanto_area7"],
-    "kanji": "病",
-    "grade": 3,
-    "strokes": 10,
-    "onyomi": [
-      "ビョウ"
-    ],
-    "kunyomi": [
-      "やまい",
-      "や"
-    ],
-    "meaning": "やまい。からだの ぐあいが わるいこと。",
-    "exampleSentence": "病（やまい）気が、早く 治ると いいな。",
     "correctCount": 0,
     "incorrectCount": 0,
     "lastReviewDate": null,
