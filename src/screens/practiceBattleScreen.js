@@ -1,24 +1,3 @@
-/**
-   * マスター進捗更新
-   */
-_updateKanjiMasteryAfterCorrect(currentKanji, answer)
-      if (!gameState.kanjiReadProgress) {
-        gameState.kanjiReadProgress = {};
-      }
-      
-      const id = currentKanji.id;
-      if (!gameState.kanjiReadProgress[id]) {
-        gameState.kanjiReadProgress[id] = {
-          onyomi: new Set(),
-          kunyomi: new Set(),
-          mastered: false
-        };
-      }
-      
-      const prog = gameState.kanjiReadProgress[id];
-      
-      const isKun = (currentKanji.kunyomi || []).includes(answer);
-      const isOn = (currentKanji.onyomi|| []).includes(answer);
 // 練習バトル画面 - エラー修正版
 
 import battleScreenState from './battleScreen.js';
