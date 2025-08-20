@@ -1,5 +1,23 @@
 [
   {
+    "id": "g6-089",
+    "stageId": ["chugoku_area3"],
+    "kanji": "胃",
+    "grade": 6,
+    "strokes": 9,
+    "onyomi": [
+      "イ"
+    ],
+    "kunyomi": [],
+    "meaning": "い。食べ物を消化するための、体の中の器官。",
+    "exampleSentence": "食べ過ぎると、胃（い）がもたれて、気持ちが悪くなることがある。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
     "id": "g6-001",
     "stageId": ["chugoku_area1"],
     "kanji": "異",
@@ -129,6 +147,25 @@
     ],
     "meaning": "そって。あるものに、ぴったりとくっついて進むこと。",
     "exampleSentence": "川に沿って（そって）歩くと、昔ながらの古い家々が並んでいるのが見えた。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  
+  {
+    "id": "g6-182",
+    "stageId": ["chugoku_area5"],
+    "kanji": "恩",
+    "grade": 6,
+    "strokes": 10,
+    "onyomi": [
+      "オン"
+    ],
+    "kunyomi": [],
+    "meaning": "おん。人から受けた、めぐみや親切。",
+    "exampleSentence": "先生には、いつも親身になって相談に乗っていただき、感謝の恩義（おんぎ）を感じている。",
     "correctCount": 0,
     "incorrectCount": 0,
     "lastReviewDate": null,
@@ -679,6 +716,24 @@
     ],
     "meaning": "あな。地面や物に、くぼみや、通り道があること。",
     "exampleSentence": "地面に掘られた深い穴（あな）の中に、何かが隠されているようだ。",
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
+  },
+  {
+    "id": "g6-183",
+    "stageId": ["chugoku_area5"],
+    "kanji": "券",
+    "grade": 6,
+    "strokes": 8,
+    "onyomi": [
+      "ケン"
+    ],
+    "kunyomi": [],
+    "meaning": "けん。ある権利を証明する紙。",
+    "exampleSentence": "映画館で、入場券（にゅうじょうけん）を買い、中に入った。",
     "correctCount": 0,
     "incorrectCount": 0,
     "lastReviewDate": null,
@@ -3520,60 +3575,7 @@
     "masteryLevel": 0,
     "tags": []
   },
-  {
-    "id": "g6-089",
-    "stageId": ["chugoku_area3"],
-    "kanji": "胃",
-    "grade": 6,
-    "strokes": 9,
-    "onyomi": [
-      "イ"
-    ],
-    "kunyomi": [],
-    "meaning": "い。食べ物を消化するための、体の中の器官。",
-    "exampleSentence": "食べ過ぎると、胃（い）がもたれて、気持ちが悪くなることがある。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
-  },
-  {
-    "id": "g6-182",
-    "stageId": ["chugoku_area5"],
-    "kanji": "恩",
-    "grade": 6,
-    "strokes": 10,
-    "onyomi": [
-      "オン"
-    ],
-    "kunyomi": [],
-    "meaning": "おん。人から受けた、めぐみや親切。",
-    "exampleSentence": "先生には、いつも親身になって相談に乗っていただき、感謝の恩義（おんぎ）を感じている。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
-  },
-  {
-    "id": "g6-183",
-    "stageId": ["chugoku_area5"],
-    "kanji": "券",
-    "grade": 6,
-    "strokes": 8,
-    "onyomi": [
-      "ケン"
-    ],
-    "kunyomi": [],
-    "meaning": "けん。ある権利を証明する紙。",
-    "exampleSentence": "映画館で、入場券（にゅうじょうけん）を買い、中に入った。",
-    "correctCount": 0,
-    "incorrectCount": 0,
-    "lastReviewDate": null,
-    "masteryLevel": 0,
-    "tags": []
-  },
+ 
   {
     "id": "g6-184",
     "stageId": ["chugoku_area5"],
