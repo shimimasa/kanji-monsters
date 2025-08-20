@@ -42,7 +42,34 @@ const practiceBattleScreenState = {
     // 最初の未マスター漢字を出題
     this._pickNextUnmasteredKanji();
     
+    // 練習モード専用の攻撃処理を設定
+    this._setupPracticeAttackHandler();
+    
     console.log('📚 練習モードを開始しました');
+  },
+
+  /**
+   * 練習モード専用の攻撃処理を設定
+   */
+  _setupPracticeAttackHandler() {
+    // グローバルなonAttack関数を練習モード用にオーバーライド
+    if (typeof window !== 'undefined') {
+      window.practiceOnAttack = () => {
+        console.log('🎯 練習モード専用攻撃処理が呼ばれました');
+        this.handleAttack();
+      };
+      
+      // 既存のonAttack関数を保存して置き換え
+      this._originalOnAttack = window.onAttack;
+      window.onAttack = window.practiceOnAttack;
+    }
+    
+    // battleScreenStateのhandleAttackも一時的に置き換え
+    this._originalBattleHandleAttack = battleScreenState.handleAttack;
+    battleScreenState.handleAttack = () => {
+      console.log('🎯 battleScreenState.handleAttackから練習モードへリダイレクト');
+      this.handleAttack();
+    };
   },
 
   /**
@@ -133,6 +160,11 @@ const practiceBattleScreenState = {
    */
   handleAttack() {
     console.log('🎯 練習モード攻撃処理開始');
+    console.log('📊 現在の状態:', {
+      turn: battleState.turn,
+      inputEnabled: battleState.inputEnabled,
+      practiceMode: this.practiceMode
+    });
     
     if (battleState.turn !== 'player' || !battleState.inputEnabled) {
       console.log('❌ 攻撃条件不適合:', { turn: battleState.turn, inputEnabled: battleState.inputEnabled });
@@ -151,25 +183,37 @@ const practiceBattleScreenState = {
     
     if (!raw) {
       console.log('❌ 入力が空です');
+      return;
+    }
+    
+    // 入力を無効化
+    battleState.inputEnabled = false;
+    console.log('🔒 入力を無効化しました');
+    
+    const answer = this._toHiragana(raw);
+    console.log('📝 変換後:', answer);
+    
+    // 現在の漢字の確認
+    if (!gameState.currentKanji) {
+      console.log('❌ 現在の漢字が設定されていません');
       battleState.inputEnabled = true;
       return;
     }
     
-    battleState.inputEnabled = false;
-    
-    const answer = this._toHiragana(raw);
-    console.log('📝 変換後:', answer);
+    console.log('📚 現在の漢字:', gameState.currentKanji);
     
     // 正解判定
     const correctReadings = this._getReadings(gameState.currentKanji);
     console.log('📚 正解の読み:', correctReadings);
     
     const isCorrect = correctReadings.includes(answer);
-    console.log('🎯 判定結果:', isCorrect);
+    console.log('🎯 判定結果:', isCorrect ? '正解' : '不正解');
     
     // 統計更新
     this.practiceStats.totalPracticed++;
+    console.log('📊 統計更新:', this.practiceStats);
     
+    // 結果処理
     if (isCorrect) {
       this._handlePracticeCorrect(answer);
     } else {
@@ -178,17 +222,21 @@ const practiceBattleScreenState = {
     
     // 入力欄をクリア
     inputEl.value = '';
+    console.log('🧹 入力欄をクリアしました');
   },
 
   /**
    * 練習での正解処理
    */
   _handlePracticeCorrect(answer) {
+    console.log('✅ 正解処理開始');
+    
     this.practiceStats.correctCount++;
     
     // エフェクト
     if (this.startKanjiBoxEffect) {
       this.startKanjiBoxEffect('rgba(46, 204, 113, 0.8)', 20);
+      console.log('✨ 漢字ボックスエフェクト開始');
     }
     
     // 正解SE
@@ -202,14 +250,18 @@ const practiceBattleScreenState = {
     const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
     const readingMsg = `正しい読み: 音「${onyomiStr}」訓「${kunyomiStr}」`;
     
+    if (!Array.isArray(battleState.log)) battleState.log = [];
     battleState.log.push(`正解！ ${readingMsg}`);
     
     console.log(`✅ 正解: ${gameState.currentKanji.text} = ${answer}`);
+    console.log('📝 ログに追加:', `正解！ ${readingMsg}`);
     
     // 次の問題へ（1.5秒後）
     setTimeout(() => {
+      console.log('⏰ 次の問題に進みます');
       this._pickNextUnmasteredKanji();
       battleState.inputEnabled = true;
+      console.log('🔓 入力を再有効化しました');
     }, 1500);
   },
 
@@ -217,6 +269,8 @@ const practiceBattleScreenState = {
    * 練習での不正解処理
    */
   _handlePracticeIncorrect(answer) {
+    console.log('❌ 不正解処理開始');
+    
     this.practiceStats.incorrectCount++;
     
     // 不正解SE
@@ -227,14 +281,18 @@ const practiceBattleScreenState = {
     const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
     const readingMsg = `正しい読み: 音「${onyomiStr}」訓「${kunyomiStr}」`;
     
+    if (!Array.isArray(battleState.log)) battleState.log = [];
     battleState.log.push(`不正解。${readingMsg}`);
     battleState.log.push('もう一度挑戦しよう！');
     
     console.log(`❌ 不正解: ${gameState.currentKanji.text} ≠ ${answer}`);
+    console.log('📝 ログに追加:', `不正解。${readingMsg}`);
     
     // 同じ問題を継続（1.5秒後）
     setTimeout(() => {
+      console.log('⏰ 同じ問題を継続します');
       battleState.inputEnabled = true;
+      console.log('🔓 入力を再有効化しました');
     }, 1500);
   },
 
