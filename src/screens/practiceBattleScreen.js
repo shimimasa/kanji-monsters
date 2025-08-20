@@ -1,17 +1,12 @@
 // src/screens/practiceBattleScreen.js
-// 練習バトル画面 - 通常のバトル画面から敵要素のみを除外
+// 練習バトル画面 - 修正版
 
 import battleScreenState from './battleScreen.js';
 import { gameState, battleState } from '../core/gameState.js';
 import { getKanjiByStageId, isKanjiMastered } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
 
-// ★★★ グローバル関数を練習モード用に一時的に置き換える ★★★
-let originalOnAttack = null;
-let originalOnHeal = null;
-let originalOnHint = null;
-
-// ★★★ battleScreenStateを継承し、敵のみを無効化 ★★★
+// 練習バトル画面状態
 const practiceBattleScreenState = {
   // 既存のbattleScreenStateの全機能を継承
   ...battleScreenState,
@@ -35,7 +30,7 @@ const practiceBattleScreenState = {
     this.onPracticeComplete = onComplete;
     gameState.gameMode = 'practice';
     
-    // ★★★ 先にグローバル関数を置き換えてから通常初期化を実行 ★★★
+    // ★★★ 最初に練習モード用のハンドラを設定 ★★★
     this._setupPracticeHandlers();
     
     // 通常のバトル画面初期化を実行
@@ -62,36 +57,48 @@ const practiceBattleScreenState = {
    * 練習モード専用のハンドラを設定
    */
   _setupPracticeHandlers() {
-    // ★★★ グローバル関数を保存して置き換え ★★★
+    console.log('🔧 練習モード用ハンドラを設定中...');
+    
+    // ★★★ 元のメソッドを保存してから置き換え ★★★
+    this._originalHandleAttack = this.handleAttack;
+    this._originalHandleHeal = this.handleHeal;
+    this._originalHandleHint = this.handleHint;
+    
+    // ★★★ 練習モード用のメソッドで置き換え ★★★
+    this.handleAttack = () => {
+      console.log('🎯 練習モード handleAttack が呼ばれました');
+      this.handlePracticeAttack();
+    };
+    
+    this.handleHeal = () => {
+      console.log('💚 練習モード handleHeal が呼ばれました');
+      this.handlePracticeHeal();
+    };
+    
+    this.handleHint = () => {
+      console.log('💡 練習モード handleHint が呼ばれました');
+      this.handlePracticeHint();
+    };
+    
+    // ★★★ グローバル関数も置き換え（フォールバック用） ★★★
     if (typeof window !== 'undefined') {
-      // 元の関数を保存
-      originalOnAttack = window.onAttack;
-      originalOnHeal = window.onHeal;
-      originalOnHint = window.onHint;
-      
-      // 練習モード用の関数で置き換え
       window.onAttack = () => {
-        console.log('🎯 練習モード onAttack が呼ばれました');
+        console.log('🌐 グローバル onAttack から練習モードにリダイレクト');
         this.handlePracticeAttack();
       };
       
       window.onHeal = () => {
-        console.log('💚 練習モード onHeal が呼ばれました');
+        console.log('🌐 グローバル onHeal から練習モードにリダイレクト');
         this.handlePracticeHeal();
       };
       
       window.onHint = () => {
-        console.log('💡 練習モード onHint が呼ばれました');
+        console.log('🌐 グローバル onHint から練習モードにリダイレクト');
         this.handlePracticeHint();
       };
     }
     
-    // ★★★ battleScreenStateのhandleAttackメソッドも置き換え ★★★
-    this._originalHandleAttack = battleScreenState.handleAttack;
-    battleScreenState.handleAttack = () => {
-      console.log('🔄 battleScreenState.handleAttack から練習モードにリダイレクト');
-      this.handlePracticeAttack();
-    };
+    console.log('✅ 練習モード用ハンドラ設定完了');
   },
 
   /**
@@ -151,7 +158,7 @@ const practiceBattleScreenState = {
     const randomIndex = Math.floor(Math.random() * this.unmasteredKanji.length);
     const selectedKanji = this.unmasteredKanji[randomIndex];
     
-    // battleScreenの漢字設定ロジックを流用
+    // 読み情報を処理
     const processReadings = (readings) => {
       if (!readings) return [];
       if (Array.isArray(readings)) {
@@ -202,7 +209,10 @@ const practiceBattleScreenState = {
         turn: battleState.turn, 
         inputEnabled: battleState.inputEnabled 
       });
-      return;
+      // 強制的に状態を修正
+      battleState.turn = 'player';
+      battleState.inputEnabled = true;
+      console.log('🔧 状態を修正しました');
     }
     
     const inputEl = this.inputEl;
@@ -261,7 +271,8 @@ const practiceBattleScreenState = {
     
     if (battleState.turn !== 'player' || !battleState.inputEnabled) {
       console.log('❌ 回復条件不適合');
-      return;
+      battleState.turn = 'player';
+      battleState.inputEnabled = true;
     }
     
     const inputEl = this.inputEl;
@@ -351,8 +362,12 @@ const practiceBattleScreenState = {
     this.practiceStats.correctCount++;
     
     // ★★★ 漢字パネルへの攻撃エフェクト（石版攻撃） ★★★
-    if (actionType === 'attack' && this.startKanjiBoxEffect) {
-      this.startKanjiBoxEffect('rgba(46, 204, 113, 0.8)', 20);
+    if (actionType === 'attack') {
+      // 緑色の成功エフェクト
+      if (this.startKanjiBoxEffect) {
+        this.startKanjiBoxEffect('rgba(46, 204, 113, 0.8)', 20);
+        console.log('✨ 漢字ボックス成功エフェクト開始');
+      }
       
       // 石版攻撃エフェクトも発動
       if (this.startStoneAttackEffect && this.canvas) {
@@ -361,9 +376,8 @@ const practiceBattleScreenState = {
         const kanjiBoxW = 180;
         const kanjiBoxH = 160;
         this.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
+        console.log('💥 石版攻撃エフェクト開始');
       }
-      
-      console.log('✨ 漢字ボックス攻撃エフェクト開始');
     }
     
     // 正解SE
@@ -394,6 +408,7 @@ const practiceBattleScreenState = {
     setTimeout(() => {
       console.log('⏰ 次の問題に進みます');
       this._pickNextUnmasteredKanji();
+      battleState.turn = 'player';
       battleState.inputEnabled = true;
     }, 1500);
   },
@@ -431,6 +446,7 @@ const practiceBattleScreenState = {
     // 同じ問題を継続（1.5秒後）
     setTimeout(() => {
       console.log('⏰ 同じ問題を継続します');
+      battleState.turn = 'player';
       battleState.inputEnabled = true;
     }, 1500);
   },
@@ -761,21 +777,20 @@ const practiceBattleScreenState = {
   exit() {
     console.log('🎯 練習バトル画面を終了します');
     
-    // ★★★ グローバル関数を元に戻す ★★★
-    if (typeof window !== 'undefined') {
-      if (originalOnAttack) window.onAttack = originalOnAttack;
-      if (originalOnHeal) window.onHeal = originalOnHeal;
-      if (originalOnHint) window.onHint = originalOnHint;
-      
-      originalOnAttack = null;
-      originalOnHeal = null;
-      originalOnHint = null;
+    // ★★★ 元のメソッドを復元 ★★★
+    if (this._originalHandleAttack) {
+      this.handleAttack = this._originalHandleAttack;
+      this._originalHandleAttack = null;
     }
     
-    // ★★★ battleScreenStateのメソッドも元に戻す ★★★
-    if (this._originalHandleAttack) {
-      battleScreenState.handleAttack = this._originalHandleAttack;
-      this._originalHandleAttack = null;
+    if (this._originalHandleHeal) {
+      this.handleHeal = this._originalHandleHeal;
+      this._originalHandleHeal = null;
+    }
+    
+    if (this._originalHandleHint) {
+      this.handleHint = this._originalHandleHint;
+      this._originalHandleHint = null;
     }
     
     // 元のexitメソッドを呼び出し
