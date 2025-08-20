@@ -151,22 +151,41 @@ const practiceBattleScreenState = {
    * 攻撃処理をオーバーライド（練習用の正解判定）
    */
   handleAttack() {
-    if (battleState.turn !== 'player' || !battleState.inputEnabled) return;
+    console.log('🎯 練習モード攻撃処理開始');
+    
+    if (battleState.turn !== 'player' || !battleState.inputEnabled) {
+      console.log('❌ 攻撃条件不適合:', { turn: battleState.turn, inputEnabled: battleState.inputEnabled });
+      return;
+    }
     
     const inputEl = this.inputEl;
     if (!inputEl) {
+      console.log('❌ 入力欄が見つかりません');
       battleState.inputEnabled = true;
       return;
     }
     
-    battleState.inputEnabled = false;
     const raw = inputEl.value.trim();
+    console.log('📝 入力値:', raw);
+    
+    if (!raw) {
+      console.log('❌ 入力が空です');
+      return;
+    }
+    
+    battleState.inputEnabled = false;
     
     // ★★★ 元のバトル画面の正解判定ロジックを流用 ★★★
     if (battleScreenState._checkAnswer) {
+      console.log('✅ battleScreen._checkAnswerを使用');
       const isCorrect = battleScreenState._checkAnswer.call(this, raw);
       this._handlePracticeResult(isCorrect, raw);
+    } else if (battleScreenState.checkAnswer) {
+      console.log('✅ battleScreen.checkAnswerを使用');
+      const isCorrect = battleScreenState.checkAnswer.call(this, raw);
+      this._handlePracticeResult(isCorrect, raw);
     } else {
+      console.log('⚠️ フォールバック処理を使用');
       // フォールバック
       this._handlePracticeAttackFallback(raw);
     }
@@ -331,22 +350,55 @@ const practiceBattleScreenState = {
    * 画面の描画更新（battleScreenのupdateを一部修正）
    */
   update(dt) {
-    // ★★★ 元のupdateメソッドを呼び出し、その後敵関連の描画のみ無効化 ★★★
+    // ★★★ 敵関連の要素を完全に無効化して描画 ★★★
     
-    // 一時的に敵を非表示にして通常の描画を実行
+    // 敵とモンスターUI関連を完全に無効化
     const originalEnemy = gameState.currentEnemy;
+    const originalEnemies = gameState.enemies;
     gameState.currentEnemy = null;
+    gameState.enemies = [];
     
-    // 元の描画処理を実行
+    // 元の描画処理を実行（敵なしで）
     if (battleScreenState.update) {
       battleScreenState.update.call(this, dt);
     }
     
+    // 敵のUIボックスを上書きして隠す
+    this._hideEnemyUI();
+    
     // 練習モード専用の情報を追加描画
     this._drawPracticeInfo();
     
-    // 敵の状態を復元（ただし、練習モードでは常にnull）
-    gameState.currentEnemy = originalEnemy;
+    // 状態を復元（練習モードでは常にnull/空配列のまま）
+    // gameState.currentEnemy = originalEnemy;  // これはコメントアウト
+    // gameState.enemies = originalEnemies;     // これもコメントアウト
+  },
+
+  /**
+   * 敵のUIを隠す
+   */
+  _hideEnemyUI() {
+    if (!this.ctx) return;
+    
+    // モンスター表示エリアを背景色で塗りつぶし
+    this.ctx.save();
+    
+    // ステージの背景と同じ色/パターンで上書き
+    // 一般的なモンスター表示位置（画面右上）を塗りつぶし
+    const monsterAreaX = this.canvas.width * 0.6;
+    const monsterAreaY = 80;
+    const monsterAreaW = this.canvas.width * 0.35;
+    const monsterAreaH = 200;
+    
+    // 背景グラデーションと同じパターンで塗りつぶし
+    const bgGradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+    bgGradient.addColorStop(0, '#1a237e');
+    bgGradient.addColorStop(1, '#3949ab');
+    
+    this.ctx.fillStyle = bgGradient;
+    this.ctx.fillRect(monsterAreaX, monsterAreaY, monsterAreaW, monsterAreaH);
+    
+    this.ctx.restore();
   },
 
   /**
@@ -369,27 +421,46 @@ const practiceBattleScreenState = {
     const stageKanji = getKanjiByStageId(gameState.currentStageId);
     const totalKanji = stageKanji.length;
     const masteredCount = totalKanji - this.unmasteredKanji.length;
-    const progressText = `${masteredCount}/${totalKanji}`;
+    const progressText = `マスター: ${masteredCount}/${totalKanji}`;
     
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    this.ctx.fillRect(this.canvas.width - 100, 10, 90, 30);
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    this.ctx.fillRect(this.canvas.width - 150, 10, 140, 30);
     this.ctx.fillStyle = 'white';
     this.ctx.font = '14px sans-serif';
-    this.ctx.fillText(progressText, this.canvas.width - 55, 25);
+    this.ctx.fillText(progressText, this.canvas.width - 80, 25);
     
     // 練習統計（画面下部）
     if (this.practiceStats.totalPracticed > 0) {
       const { totalPracticed, correctCount } = this.practiceStats;
       const accuracy = Math.round((correctCount / totalPracticed) * 100);
-      const statsText = `${totalPracticed}問 正答率${accuracy}%`;
+      const statsText = `練習: ${totalPracticed}問 正答率${accuracy}%`;
       
-      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      this.ctx.fillRect(10, this.canvas.height - 40, 200, 30);
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      this.ctx.fillRect(10, this.canvas.height - 40, 250, 30);
       this.ctx.fillStyle = 'white';
       this.ctx.font = '12px sans-serif';
       this.ctx.textAlign = 'left';
       this.ctx.fillText(statsText, 20, this.canvas.height - 25);
     }
+    
+    // 練習専用メッセージ（モンスターエリアに表示）
+    const messageX = this.canvas.width * 0.6 + 20;
+    const messageY = 120;
+    
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    this.ctx.fillRect(messageX, messageY, 200, 80);
+    this.ctx.strokeStyle = '#4caf50';
+    this.ctx.lineWidth = 3;
+    this.ctx.strokeRect(messageX, messageY, 200, 80);
+    
+    this.ctx.fillStyle = '#2e7d32';
+    this.ctx.font = 'bold 16px sans-serif';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('練習中', messageX + 100, messageY + 25);
+    
+    this.ctx.font = '14px sans-serif';
+    this.ctx.fillText('漢字を読んで', messageX + 100, messageY + 45);
+    this.ctx.fillText('マスターしよう！', messageX + 100, messageY + 65);
     
     this.ctx.restore();
   },
