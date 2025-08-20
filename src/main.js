@@ -19,6 +19,8 @@ import { FSM } from './core/stateMachine.js';
 import { setupFSM } from './init/fsmsetup.js';
 import { checkAchievements } from './core/achievementManager.js';
 import { addKanji } from './models/kanjiDex.js';
+import practiceBattleScreen from './screens/practiceBattleScreen.js';
+
 
 /* ----------------------------- 実績通知システム ----------------------------- */
 const achievementNotificationQueue = [];

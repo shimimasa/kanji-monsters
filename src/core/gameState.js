@@ -24,7 +24,8 @@ export const gameState = {
     /* 画面遷移 ------------------------------------------------------------- */
             // 'title' | 'menu' | 'battle' | 'stageClear' ...
     currentStageId: null,
-    gameMode: 'challenge', // 'jikkuri' または 'challenge'
+    // ★★★ 練習モードを追加 ★★★
+    gameMode: 'challenge', // 'jikkuri', 'challenge', 'practice'
   
     /* プレイヤー ----------------------------------------------------------- */
     playerName: '',
@@ -61,6 +62,16 @@ export const gameState = {
 
     /* 実績システム --------------------------------------------------------- */
     unlockedAchievements: new Set(),  // 解除した実績のIDを保存
+
+    /* ★★★ 練習モード用の進捗管理 ★★★ */
+    practiceProgress: {
+      // stageId: { allMastered: boolean, lastPracticed: timestamp }
+    },
+
+    /* ★★★ 漢字マスター状況管理 ★★★ */
+    kanjiReadProgress: {
+      // kanjiId: { onyomi: Set, kunyomi: Set, mastered: boolean }
+    },
 };
   
   export function updatePlayerStats(changes) {
@@ -201,7 +212,10 @@ export const gameState = {
       const saveData = {
         playerName: gameState.playerName,
         playerStats: gameState.playerStats,
-        unlockedAchievements: Array.from(gameState.unlockedAchievements)
+        unlockedAchievements: Array.from(gameState.unlockedAchievements),
+        // ★★★ 練習進捗とマスター状況も保存 ★★★
+        practiceProgress: gameState.practiceProgress,
+        kanjiReadProgress: gameState.kanjiReadProgress
       };
       
       localStorage.setItem('kanjiGameSave', JSON.stringify(saveData));
@@ -256,6 +270,15 @@ export const gameState = {
       // 実績データを復元（ArrayからSetに変換）
       if (saveData.unlockedAchievements && Array.isArray(saveData.unlockedAchievements)) {
         gameState.unlockedAchievements = new Set(saveData.unlockedAchievements);
+      }
+
+      // ★★★ 練習進捗とマスター状況を復元 ★★★
+      if (saveData.practiceProgress) {
+        gameState.practiceProgress = saveData.practiceProgress;
+      }
+
+      if (saveData.kanjiReadProgress) {
+        gameState.kanjiReadProgress = saveData.kanjiReadProgress;
       }
 
       console.log('💾 ゲームデータを読み込みました');

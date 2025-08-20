@@ -211,18 +211,18 @@ const getUiRoot = () => {
 
 // フッターボタンを画面下部に水平一列に配置
 const BUTTON_CONFIG = {
-  width: 160,
+  width: 140,  // 幅を少し縮小（5ボタン対応）
   height: 40,
-  gap: 20,
+  gap: 15,     // 間隔を少し縮小
   y: 540
 };
 
-// 合計幅を計算（復習を撤去したため4ボタンに最適化）
-const totalWidth = (BUTTON_CONFIG.width * 4) + (BUTTON_CONFIG.gap * 3);
+// 合計幅を計算（5ボタンに変更）
+const totalWidth = (BUTTON_CONFIG.width * 5) + (BUTTON_CONFIG.gap * 4);
 // 開始X座標を計算（中央揃え）
 const startX = (800 - totalWidth) / 2; // キャンバス幅800pxを想定
 
-// 各ボタンのx座標を計算（テキストを短縮）
+// 各ボタンのx座標を計算
 const backButton = { 
   x: startX, 
   y: BUTTON_CONFIG.y, 
@@ -232,8 +232,18 @@ const backButton = {
   icon: '⬅️'
 };
 
-const dexButton = { 
+// ★★★ 練習ボタンを追加 ★★★
+const practiceButton = { 
   x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 1, 
+  y: BUTTON_CONFIG.y, 
+  width: BUTTON_CONFIG.width, 
+  height: BUTTON_CONFIG.height, 
+  text: '練習',
+  icon: '📝'
+};
+
+const dexButton = { 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -242,7 +252,7 @@ const dexButton = {
 };
 
 const monsterButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -250,9 +260,8 @@ const monsterButton = {
   icon: '👾'
 };
 
-// 追加: プロフィール/称号ボタン
 const profileButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 4, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -1098,14 +1107,16 @@ update(dt) {
     ctx.fillStyle = gradient;
     ctx.fillRect(footerBarX, footerBarY, footerBarWidth, gradientHeight);
 
-    // ホバー判定（復習ボタンは撤去）
+    // ★★★ ホバー判定に練習ボタンを追加 ★★★
     const isBackHovered = isMouseOverRect(this.mouseX, this.mouseY, backButton);
+    const isPracticeHovered = isMouseOverRect(this.mouseX, this.mouseY, practiceButton);
     const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
     const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
     const isProfileHovered = isMouseOverRect(this.mouseX, this.mouseY, profileButton);
 
-    // リッチボタンで描画（色分けとアイコン付き）
+    // リッチボタンで描画
     this._drawRichFooterButton(ctx, backButton, '#808080', isBackHovered); // グレー系
+    this._drawRichFooterButton(ctx, practiceButton, '#4CAF50', isPracticeHovered); // 緑系（練習用）
     this._drawRichFooterButton(ctx, dexButton, '#2980b9', isDexHovered);   // 青系
     this._drawRichFooterButton(ctx, monsterButton, '#2980b9', isMonsterHovered); // 青系
     this._drawRichFooterButton(ctx, profileButton, '#2980b9', isProfileHovered); // 青系
@@ -1362,7 +1373,12 @@ update(dt) {
       return;
     }
 
-    // フッターの復習ボタンは撤去（総復習モードの大ボタンのみで復習可能）
+    // ★★★ 練習ボタンのクリック処理を追加 ★★★
+    if (isMouseOverRect(x, y, practiceButton)) {
+      publish('playSE', 'decide');
+      this._startPracticeMode();
+      return;
+    }
 
     // 漢字図鑑ボタン
     if (isMouseOverRect(x, y, dexButton)) {
@@ -1386,6 +1402,36 @@ update(dt) {
     }
   },
 
+  // ★★★ 練習モード開始処理を追加 ★★★
+  /**
+   * 練習モードを開始する
+   */
+  _startPracticeMode() {
+    // 選択されたステージがある場合はそのステージで練習
+    if (this.selectedStage) {
+      console.log('🎯 練習モード開始:', this.selectedStage.stageId);
+      gameState.currentStageId = this.selectedStage.stageId;
+      gameState.gameMode = 'practice';
+      publish('changeScreen', 'practiceBattle');
+    } 
+    // 総復習モードの場合は推奨ステージで練習
+    else if (gameState.currentGrade === 0) {
+      const recommendedStage = this.selectReviewStage();
+      if (recommendedStage) {
+        console.log('🎯 総復習モード練習開始:', recommendedStage.stageId);
+        gameState.currentStageId = recommendedStage.stageId;
+        gameState.gameMode = 'practice';
+        publish('changeScreen', 'practiceBattle');
+      } else {
+        alert('練習できるステージがありません。');
+      }
+    }
+    // ステージが選択されていない場合
+    else {
+      alert('練習したいステージを先に選択してください。');
+    }
+  },
+  
   render() {
     this.update(0);
   }

@@ -307,18 +307,20 @@ const getUiRoot = () => {
   return uiRoot;
 };
 
+// ★★★ フッターボタンの設定を5ボタンに変更 ★★★
+
 // フッターボタンを画面下部に水平一列に配置
 const BUTTON_CONFIG = {
-  width: 160,
+  width: 140,  // 幅を少し縮小（5ボタン対応）
   height: 40,
-  gap: 20,
+  gap: 15,     // 間隔を少し縮小
   y: 540
 };
 
-// 合計幅を計算（復習を撤去したため4ボタンに最適化）
-const totalWidth = (BUTTON_CONFIG.width * 4) + (BUTTON_CONFIG.gap * 3);
+// 合計幅を計算（5ボタンに変更）
+const totalWidth = (BUTTON_CONFIG.width * 5) + (BUTTON_CONFIG.gap * 4);
 // 開始X座標を計算（中央揃え）
-const startX = (800 - totalWidth) / 2; // キャンバス幅800pxを想定
+const startX = (800 - totalWidth) / 2;
 
 // 各ボタンのx座標を計算（テキストを短縮）
 const backButton = { 
@@ -328,6 +330,16 @@ const backButton = {
   height: BUTTON_CONFIG.height, 
   text: 'もどる',
   icon: '⬅️'
+};
+
+// ★★★ 練習ボタンを追加 ★★★
+const practiceButton = { 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 1, 
+  y: BUTTON_CONFIG.y, 
+  width: BUTTON_CONFIG.width, 
+  height: BUTTON_CONFIG.height, 
+  text: '練習',
+  icon: '📝'
 };
 
 const dexButton = { 
@@ -1240,7 +1252,12 @@ drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kank
       return;
     }
 
-    // フッターの復習ボタンは撤去（総復習モードの大ボタンのみで復習可能）
+    // ★★★ 練習ボタンのクリック処理を追加 ★★★
+    if (isMouseOverRect(screenX, screenY, practiceButton)) {
+      publish('playSE', 'decide');
+      this._startPracticeMode();
+      return;
+    }
 
     // 漢字図鑑ボタン
     if (isMouseOverRect(screenX, screenY, dexButton)) {
@@ -1264,6 +1281,40 @@ drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kank
     }
   },
 
+  // ★★★ 練習モード開始処理を追加 ★★★
+  /**
+   * 練習モードを開始する（worldStageSelect版）
+   */
+  _startPracticeMode() {
+    // 選択されたステージがある場合はそのステージで練習
+    if (this.selectedStage) {
+      console.log('🎯 練習モード開始（世界）:', this.selectedStage.stageId);
+      gameState.currentStageId = this.selectedStage.stageId;
+      gameState.gameMode = 'practice';
+      publish('changeScreen', 'practiceBattle');
+    } 
+    // 総復習モードの場合は推奨ステージで練習
+    else if (this.isReviewMode) {
+      // 現在の級に応じたステージを選択
+      const gradeForReview = this.selectedGrade || 7;
+      const stagesForGrade = this.stages.filter(s => s.grade === gradeForReview);
+      
+      if (stagesForGrade.length > 0) {
+        const recommendedStage = stagesForGrade[0]; // 最初のステージを選択
+        console.log('🎯 総復習モード練習開始（世界）:', recommendedStage.stageId);
+        gameState.currentStageId = recommendedStage.stageId;
+        gameState.gameMode = 'practice';
+        publish('changeScreen', 'practiceBattle');
+      } else {
+        alert('練習できるステージがありません。');
+      }
+    }
+    // ステージが選択されていない場合
+    else {
+      alert('練習したいステージを先に選択してください。');
+    }
+  },
+  
   /** 代替大陸地図を描画 */
   drawFallbackContinentMap(x, y, width, height) {
     const ctx = this.ctx;
@@ -1350,17 +1401,19 @@ drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kank
     ctx.fillStyle = gradient;
     ctx.fillRect(footerBarX, footerBarY, footerBarWidth, gradientHeight);
 
-    // ホバー判定（復習ボタンは撤去）
+    // ★★★ ホバー判定に練習ボタンを追加 ★★★
     const isBackHovered = isMouseOverRect(this.mouseX, this.mouseY, backButton);
+    const isPracticeHovered = isMouseOverRect(this.mouseX, this.mouseY, practiceButton);
     const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
     const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
     const isProfileHovered = isMouseOverRect(this.mouseX, this.mouseY, profileButton);
 
-    // リッチボタンで描画（stageSelect と同じ配色・スタイル）
-    this._drawRichFooterButton(ctx, backButton, '#808080', isBackHovered); // グレー系
-    this._drawRichFooterButton(ctx, dexButton, '#2980b9', isDexHovered);   // 青系
-    this._drawRichFooterButton(ctx, monsterButton, '#2980b9', isMonsterHovered); // 青系
-    this._drawRichFooterButton(ctx, profileButton, '#2980b9', isProfileHovered); // 青系
+    // リッチボタンで描画
+    this._drawRichFooterButton(ctx, backButton, '#808080', isBackHovered);
+    this._drawRichFooterButton(ctx, practiceButton, '#4CAF50', isPracticeHovered); // 緑系（練習用）
+    this._drawRichFooterButton(ctx, dexButton, '#2980b9', isDexHovered);
+    this._drawRichFooterButton(ctx, monsterButton, '#2980b9', isMonsterHovered);
+    this._drawRichFooterButton(ctx, profileButton, '#2980b9', isProfileHovered);
   },
 
   /** フッター専用のリッチボタン描画（stageSelect と同じ） */

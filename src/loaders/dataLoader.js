@@ -426,4 +426,49 @@ function findBonusBossForGrade(grade, allEnemies) {
   return null;
 }
 
+// ★★★ 練習モード用のマスター判定関数を追加 ★★★
 
+/**
+ * 漢字がマスター済みかどうかを判定する
+ * @param {string} kanjiId 漢字のID
+ * @returns {boolean} マスター済みならtrue
+ */
+export function isKanjiMastered(kanjiId) {
+  // gameStateをインポート
+  import('../core/gameState.js').then(({ gameState }) => {
+    const progress = gameState.kanjiReadProgress?.[kanjiId];
+    return !!(progress && progress.mastered);
+  }).catch(() => {
+    return false;
+  });
+  
+  // 同期的にチェックするため、直接参照
+  if (typeof window !== 'undefined' && window.gameState) {
+    const progress = window.gameState.kanjiReadProgress?.[kanjiId];
+    return !!(progress && progress.mastered);
+  }
+  
+  return false;
+}
+
+/**
+ * ステージの全漢字がマスター済みかどうかを判定する
+ * @param {string} stageId ステージのID
+ * @returns {boolean} 全ての漢字がマスター済みならtrue
+ */
+export function isStageFullyMastered(stageId) {
+  const kanjiList = getKanjiByStageId(stageId);
+  if (kanjiList.length === 0) return true; // 漢字がないステージは完了扱い
+  
+  return kanjiList.every(kanji => isKanjiMastered(kanji.id));
+}
+
+/**
+ * ステージの未マスター漢字リストを取得する
+ * @param {string} stageId ステージのID
+ * @returns {Array} 未マスターの漢字データの配列
+ */
+export function getUnmasteredKanjiForStage(stageId) {
+  const kanjiList = getKanjiByStageId(stageId);
+  return kanjiList.filter(kanji => !isKanjiMastered(kanji.id));
+}
