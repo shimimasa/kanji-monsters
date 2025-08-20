@@ -6,6 +6,11 @@ import { gameState, battleState } from '../core/gameState.js';
 import { getKanjiByStageId, isKanjiMastered } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
 
+// ★★★ グローバル関数を練習モード用に一時的に置き換える ★★★
+let originalOnAttack = null;
+let originalOnHeal = null;
+let originalOnHint = null;
+
 // ★★★ battleScreenStateを継承し、敵のみを無効化 ★★★
 const practiceBattleScreenState = {
   // 既存のbattleScreenStateの全機能を継承
@@ -30,6 +35,9 @@ const practiceBattleScreenState = {
     this.onPracticeComplete = onComplete;
     gameState.gameMode = 'practice';
     
+    // ★★★ 先にグローバル関数を置き換えてから通常初期化を実行 ★★★
+    this._setupPracticeHandlers();
+    
     // 通常のバトル画面初期化を実行
     battleScreenState.enter.call(this, canvasEl);
     
@@ -42,33 +50,47 @@ const practiceBattleScreenState = {
     // 最初の未マスター漢字を出題
     this._pickNextUnmasteredKanji();
     
-    // 練習モード専用の攻撃処理を設定
-    this._setupPracticeAttackHandler();
-    
     console.log('📚 練習モードを開始しました');
+    console.log('🔧 入力設定状況:', {
+      inputEl: !!this.inputEl,
+      turn: battleState.turn,
+      inputEnabled: battleState.inputEnabled
+    });
   },
 
   /**
-   * 練習モード専用の攻撃処理を設定
+   * 練習モード専用のハンドラを設定
    */
-  _setupPracticeAttackHandler() {
-    // グローバルなonAttack関数を練習モード用にオーバーライド
+  _setupPracticeHandlers() {
+    // ★★★ グローバル関数を保存して置き換え ★★★
     if (typeof window !== 'undefined') {
-      window.practiceOnAttack = () => {
-        console.log('🎯 練習モード専用攻撃処理が呼ばれました');
-        this.handleAttack();
+      // 元の関数を保存
+      originalOnAttack = window.onAttack;
+      originalOnHeal = window.onHeal;
+      originalOnHint = window.onHint;
+      
+      // 練習モード用の関数で置き換え
+      window.onAttack = () => {
+        console.log('🎯 練習モード onAttack が呼ばれました');
+        this.handlePracticeAttack();
       };
       
-      // 既存のonAttack関数を保存して置き換え
-      this._originalOnAttack = window.onAttack;
-      window.onAttack = window.practiceOnAttack;
+      window.onHeal = () => {
+        console.log('💚 練習モード onHeal が呼ばれました');
+        this.handlePracticeHeal();
+      };
+      
+      window.onHint = () => {
+        console.log('💡 練習モード onHint が呼ばれました');
+        this.handlePracticeHint();
+      };
     }
     
-    // battleScreenStateのhandleAttackも一時的に置き換え
-    this._originalBattleHandleAttack = battleScreenState.handleAttack;
+    // ★★★ battleScreenStateのhandleAttackメソッドも置き換え ★★★
+    this._originalHandleAttack = battleScreenState.handleAttack;
     battleScreenState.handleAttack = () => {
-      console.log('🎯 battleScreenState.handleAttackから練習モードへリダイレクト');
-      this.handleAttack();
+      console.log('🔄 battleScreenState.handleAttack から練習モードにリダイレクト');
+      this.handlePracticeAttack();
     };
   },
 
@@ -79,11 +101,12 @@ const practiceBattleScreenState = {
     // 敵情報を削除
     gameState.currentEnemy = null;
     gameState.enemies = [];
+    gameState.currentEnemyIndex = 0;
     
-    // プレイヤーのHPは減らない
+    // プレイヤーのHPは満タンを維持
     gameState.playerStats.hp = gameState.playerStats.maxHp;
     
-    // 常にプレイヤーターン
+    // 常にプレイヤーターンで入力許可
     battleState.turn = 'player';
     battleState.inputEnabled = true;
     battleState.comboCount = 0;
@@ -95,9 +118,7 @@ const practiceBattleScreenState = {
       incorrectCount: 0
     };
     
-    // 背景画像を確実に取得
-    this.stageBgImage = battleScreenState.stageBgImage;
-    console.log('🖼️ 背景画像状態:', this.stageBgImage ? '利用可能' : '未取得');
+    console.log('🚫 敵要素を無効化しました');
   },
 
   /**
@@ -150,48 +171,60 @@ const practiceBattleScreenState = {
       strokes: selectedKanji.strokes,
     };
     
+    // ヒントレベルをリセット
+    gameState.hintLevel = 0;
+    
     // ログメッセージを追加
     if (!Array.isArray(battleState.log)) battleState.log = [];
-    battleState.log.push(`「${selectedKanji.kanji}」を読もう！`);
+    const logMessage = `「${selectedKanji.kanji}」を読もう！`;
+    battleState.log.push(logMessage);
+    
+    // showLogBlockメソッドが利用可能なら使用
+    if (this.showLogBlock) {
+      this.showLogBlock([
+        'あたらしい もんだい！',
+        logMessage
+      ]);
+    }
+    
+    console.log(`📝 新しい問題: ${selectedKanji.kanji} (ID: ${selectedKanji.id})`);
   },
 
   /**
-   * 攻撃処理（練習用の正解判定）
+   * 練習モード専用攻撃処理
    */
-  handleAttack() {
+  handlePracticeAttack() {
     console.log('🎯 練習モード攻撃処理開始');
-    console.log('📊 現在の状態:', {
-      turn: battleState.turn,
-      inputEnabled: battleState.inputEnabled,
-      practiceMode: this.practiceMode
-    });
     
+    // 基本的な状態チェック
     if (battleState.turn !== 'player' || !battleState.inputEnabled) {
-      console.log('❌ 攻撃条件不適合:', { turn: battleState.turn, inputEnabled: battleState.inputEnabled });
+      console.log('❌ 攻撃条件不適合:', { 
+        turn: battleState.turn, 
+        inputEnabled: battleState.inputEnabled 
+      });
       return;
     }
     
     const inputEl = this.inputEl;
     if (!inputEl) {
       console.log('❌ 入力欄が見つかりません');
-      battleState.inputEnabled = true;
       return;
     }
     
     const raw = inputEl.value.trim();
-    console.log('📝 入力値:', raw);
-    
     if (!raw) {
       console.log('❌ 入力が空です');
       return;
     }
     
-    // 入力を無効化
+    console.log('📝 入力値:', raw);
+    
+    // 入力を一時的に無効化
     battleState.inputEnabled = false;
-    console.log('🔒 入力を無効化しました');
+    battleState.lastCommandMode = 'attack';
     
     const answer = this._toHiragana(raw);
-    console.log('📝 変換後:', answer);
+    console.log('📝 変換後の答え:', answer);
     
     // 現在の漢字の確認
     if (!gameState.currentKanji) {
@@ -200,43 +233,137 @@ const practiceBattleScreenState = {
       return;
     }
     
-    console.log('📚 現在の漢字:', gameState.currentKanji);
-    
     // 正解判定
     const correctReadings = this._getReadings(gameState.currentKanji);
-    console.log('📚 正解の読み:', correctReadings);
-    
     const isCorrect = correctReadings.includes(answer);
-    console.log('🎯 判定結果:', isCorrect ? '正解' : '不正解');
+    
+    console.log('📚 正解の読み:', correctReadings);
+    console.log('🎯 判定結果:', isCorrect ? '✅正解' : '❌不正解');
     
     // 統計更新
     this.practiceStats.totalPracticed++;
-    console.log('📊 統計更新:', this.practiceStats);
     
-    // 結果処理
+    // 入力欄をクリア
+    inputEl.value = '';
+    
     if (isCorrect) {
       this._handlePracticeCorrect(answer);
     } else {
       this._handlePracticeIncorrect(answer);
     }
+  },
+
+  /**
+   * 練習モード専用回復処理
+   */
+  handlePracticeHeal() {
+    console.log('💚 練習モード回復処理開始');
     
-    // 入力欄をクリア
+    if (battleState.turn !== 'player' || !battleState.inputEnabled) {
+      console.log('❌ 回復条件不適合');
+      return;
+    }
+    
+    const inputEl = this.inputEl;
+    if (!inputEl) return;
+    
+    const raw = inputEl.value.trim();
+    if (!raw) return;
+    
+    battleState.inputEnabled = false;
+    battleState.lastCommandMode = 'heal';
+    
+    const answer = this._toHiragana(raw);
+    const correctReadings = this._getReadings(gameState.currentKanji);
+    const isCorrect = correctReadings.includes(answer);
+    
     inputEl.value = '';
-    console.log('🧹 入力欄をクリアしました');
+    this.practiceStats.totalPracticed++;
+    
+    if (isCorrect) {
+      this._handlePracticeCorrect(answer, 'heal');
+    } else {
+      this._handlePracticeIncorrect(answer, 'heal');
+    }
+  },
+
+  /**
+   * 練習モード専用ヒント処理
+   */
+  handlePracticeHint() {
+    console.log('💡 練習モードヒント処理開始');
+    
+    if (!gameState.currentKanji) return;
+    
+    const current = Number(gameState.hintLevel || 0);
+    if (current >= 4) {
+      this._addToPracticeLog('ヒントはここまで！');
+      return;
+    }
+    
+    const level = current + 1;
+    gameState.hintLevel = level;
+    
+    const k = gameState.currentKanji;
+    const onyomi = Array.isArray(k.onyomi) ? k.onyomi : [];
+    const kunyomi = Array.isArray(k.kunyomi) ? k.kunyomi : [];
+    
+    let hintMessage = '';
+    
+    switch (level) {
+      case 1:
+        hintMessage = `ヒント（基本）: 画数は${k.strokes || '?'}`;
+        break;
+      case 2:
+        const useOn = (onyomi.length > 0 && (Math.random() >= 0.5 || kunyomi.length === 0));
+        const list = useOn ? onyomi : kunyomi;
+        const first = list[0] || '';
+        const masked = first ? first.substring(0, 1) + '○○' : '不明';
+        hintMessage = `ヒント（読み）: ${useOn ? '音読み' : '訓読み'}は「${masked}」から始まる`;
+        break;
+      case 3:
+        hintMessage = `ヒント（意味）: ${k.meaning || '（準備中）'}`;
+        break;
+      case 4:
+        if (onyomi.length > 0 || kunyomi.length > 0) {
+          const useOn = onyomi.length > 0 ? (Math.random() >= 0.5 || kunyomi.length === 0) : false;
+          const list = useOn ? onyomi : kunyomi;
+          hintMessage = `ヒント（決め手）: ${useOn ? '音読み' : '訓読み'}は「${list[0]}」`;
+        } else {
+          hintMessage = 'ヒント（決め手）: データがありません';
+        }
+        break;
+    }
+    
+    this._addToPracticeLog(hintMessage);
+    
+    if (this.showLogBlock) {
+      this.showLogBlock([hintMessage]);
+    }
   },
 
   /**
    * 練習での正解処理
    */
-  _handlePracticeCorrect(answer) {
+  _handlePracticeCorrect(answer, actionType = 'attack') {
     console.log('✅ 正解処理開始');
     
     this.practiceStats.correctCount++;
     
-    // エフェクト
-    if (this.startKanjiBoxEffect) {
+    // ★★★ 漢字パネルへの攻撃エフェクト（石版攻撃） ★★★
+    if (actionType === 'attack' && this.startKanjiBoxEffect) {
       this.startKanjiBoxEffect('rgba(46, 204, 113, 0.8)', 20);
-      console.log('✨ 漢字ボックスエフェクト開始');
+      
+      // 石版攻撃エフェクトも発動
+      if (this.startStoneAttackEffect && this.canvas) {
+        const kanjiX = this.canvas.width / 2;
+        const kanjiY = 200;
+        const kanjiBoxW = 180;
+        const kanjiBoxH = 160;
+        this.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
+      }
+      
+      console.log('✨ 漢字ボックス攻撃エフェクト開始');
     }
     
     // 正解SE
@@ -250,25 +377,31 @@ const practiceBattleScreenState = {
     const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
     const readingMsg = `正しい読み: 音「${onyomiStr}」訓「${kunyomiStr}」`;
     
-    if (!Array.isArray(battleState.log)) battleState.log = [];
-    battleState.log.push(`正解！ ${readingMsg}`);
+    const actionMsg = actionType === 'heal' ? 'かいふくせいこう！' : 'せいかい！';
+    this._addToPracticeLog(`${actionMsg} ${readingMsg}`);
+    
+    if (this.showLogBlock) {
+      this.showLogBlock([
+        actionMsg,
+        readingMsg,
+        actionType === 'attack' ? '漢字パネルを攻撃した！' : 'HPが回復した！'
+      ]);
+    }
     
     console.log(`✅ 正解: ${gameState.currentKanji.text} = ${answer}`);
-    console.log('📝 ログに追加:', `正解！ ${readingMsg}`);
     
     // 次の問題へ（1.5秒後）
     setTimeout(() => {
       console.log('⏰ 次の問題に進みます');
       this._pickNextUnmasteredKanji();
       battleState.inputEnabled = true;
-      console.log('🔓 入力を再有効化しました');
     }, 1500);
   },
 
   /**
    * 練習での不正解処理
    */
-  _handlePracticeIncorrect(answer) {
+  _handlePracticeIncorrect(answer, actionType = 'attack') {
     console.log('❌ 不正解処理開始');
     
     this.practiceStats.incorrectCount++;
@@ -281,27 +414,46 @@ const practiceBattleScreenState = {
     const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
     const readingMsg = `正しい読み: 音「${onyomiStr}」訓「${kunyomiStr}」`;
     
-    if (!Array.isArray(battleState.log)) battleState.log = [];
-    battleState.log.push(`不正解。${readingMsg}`);
-    battleState.log.push('もう一度挑戦しよう！');
+    const actionMsg = actionType === 'heal' ? 'かいふくしっぱい！' : 'こうげきしっぱい！';
+    this._addToPracticeLog(`${actionMsg} ${readingMsg}`);
+    this._addToPracticeLog('もう一度挑戦しよう！');
+    
+    if (this.showLogBlock) {
+      this.showLogBlock([
+        actionMsg,
+        readingMsg,
+        'もう一度挑戦しよう！'
+      ]);
+    }
     
     console.log(`❌ 不正解: ${gameState.currentKanji.text} ≠ ${answer}`);
-    console.log('📝 ログに追加:', `不正解。${readingMsg}`);
     
     // 同じ問題を継続（1.5秒後）
     setTimeout(() => {
       console.log('⏰ 同じ問題を継続します');
       battleState.inputEnabled = true;
-      console.log('🔓 入力を再有効化しました');
     }, 1500);
+  },
+
+  /**
+   * 練習ログにメッセージを追加
+   */
+  _addToPracticeLog(message) {
+    if (!Array.isArray(battleState.log)) battleState.log = [];
+    battleState.log.push(message);
+    
+    // タイプライター効果があれば開始
+    if (this.startTypewriterEffect) {
+      this.startTypewriterEffect(message);
+    }
   },
 
   /**
    * 全漢字マスター完了メッセージ
    */
   _showAllMasteredMessage() {
-    battleState.log.push('このステージの漢字は全てマスター済みです！');
-    battleState.log.push('素晴らしい！完璧です！');
+    this._addToPracticeLog('このステージの漢字は全てマスター済みです！');
+    this._addToPracticeLog('素晴らしい！完璧です！');
     
     setTimeout(() => {
       this._completePractice();
@@ -315,8 +467,8 @@ const practiceBattleScreenState = {
     const { totalPracticed, correctCount, incorrectCount } = this.practiceStats;
     const accuracy = totalPracticed > 0 ? Math.round((correctCount / totalPracticed) * 100) : 0;
     
-    battleState.log.push('練習完了！お疲れさまでした！');
-    battleState.log.push(`統計: ${totalPracticed}問中 ${correctCount}問正解 (正答率${accuracy}%)`);
+    this._addToPracticeLog('練習完了！お疲れさまでした！');
+    this._addToPracticeLog(`統計: ${totalPracticed}問中 ${correctCount}問正解 (正答率${accuracy}%)`);
     
     console.log('🎯 練習完了:', this.practiceStats);
     
@@ -557,13 +709,27 @@ const practiceBattleScreenState = {
     if (isKun) prog.kunyomi.add(answer);
     if (isOn) prog.onyomi.add(answer);
     
+    const before = !!prog.mastered;
     const allKunOk = (currentKanji.kunyomi || []).every(r => prog.kunyomi.has(r));
     const allOnOk = (currentKanji.onyomi || []).every(r => prog.onyomi.has(r));
     prog.mastered = allKunOk && allOnOk;
     
-    if (prog.mastered) {
+    // 初めてマスターになった場合
+    if (!before && prog.mastered) {
       console.log(`🎉 漢字「${currentKanji.text}」をマスターしました！`);
-      battleState.log.push(`「${currentKanji.text}」をマスターしました！`);
+      this._addToPracticeLog(`「${currentKanji.text}」をマスターしました！`);
+      
+      // マスター達成エフェクト
+      if (this.masteryFlash) {
+        this.masteryFlash = { 
+          active: true, 
+          timer: 30, 
+          kanjiId: currentKanji.id 
+        };
+      }
+      
+      // マスター達成SE
+      publish('playSE', 'levelUp');
     }
   },
 
@@ -593,6 +759,25 @@ const practiceBattleScreenState = {
    * 画面離脱時のクリーンアップ
    */
   exit() {
+    console.log('🎯 練習バトル画面を終了します');
+    
+    // ★★★ グローバル関数を元に戻す ★★★
+    if (typeof window !== 'undefined') {
+      if (originalOnAttack) window.onAttack = originalOnAttack;
+      if (originalOnHeal) window.onHeal = originalOnHeal;
+      if (originalOnHint) window.onHint = originalOnHint;
+      
+      originalOnAttack = null;
+      originalOnHeal = null;
+      originalOnHint = null;
+    }
+    
+    // ★★★ battleScreenStateのメソッドも元に戻す ★★★
+    if (this._originalHandleAttack) {
+      battleScreenState.handleAttack = this._originalHandleAttack;
+      this._originalHandleAttack = null;
+    }
+    
     // 元のexitメソッドを呼び出し
     if (battleScreenState.exit) {
       battleScreenState.exit.call(this);
@@ -603,7 +788,55 @@ const practiceBattleScreenState = {
     this.onPracticeComplete = null;
     this.unmasteredKanji = [];
     
+    // ゲームモードをリセット
+    gameState.gameMode = 'normal';
+    
     console.log('🎯 練習バトル画面を終了しました');
+  },
+
+  /**
+   * マウスクリック処理（battleScreenStateから継承し、練習モード用に調整）
+   */
+  handleClick(e) {
+    // 基本的なクリック処理は親クラスに委譲
+    const result = battleScreenState.handleClick.call(this, e);
+    
+    // 追加で練習モード専用の処理があればここに記述
+    console.log('🖱️ 練習モードでクリック処理:', result);
+    
+    return result;
+  },
+
+  /**
+   * キーボード入力処理（Enterキーでの攻撃/回復/ヒント実行）
+   */
+  handleKeydown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (battleState.turn === 'player' && battleState.inputEnabled) {
+        const mode = battleState.lastCommandMode || 'attack';
+        
+        console.log(`⌨️ Enterキー押下: ${mode}モード実行`);
+        
+        setTimeout(() => {
+          try {
+            if (mode === 'attack') {
+              this.handlePracticeAttack();
+            } else if (mode === 'heal') {
+              this.handlePracticeHeal();
+            } else if (mode === 'hint') {
+              this.handlePracticeHint();
+            }
+          } catch (error) {
+            console.error('練習モード処理中にエラーが発生:', error);
+            battleState.inputEnabled = true;
+            if (this.inputEl) {
+              this.inputEl.value = '';
+            }
+          }
+        }, 0);
+      }
+    }
   }
 };
 
