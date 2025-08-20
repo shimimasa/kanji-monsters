@@ -1,4 +1,3 @@
-// src/screens/practiceBattleScreen.js
 // 練習バトル画面 - 修正版
 
 import battleScreenState from './battleScreen.js';
@@ -80,25 +79,65 @@ const practiceBattleScreenState = {
       this.handlePracticeHint();
     };
     
-    // ★★★ グローバル関数も置き換え（フォールバック用） ★★★
-    if (typeof window !== 'undefined') {
-      window.onAttack = () => {
-        console.log('🌐 グローバル onAttack から練習モードにリダイレクト');
-        this.handlePracticeAttack();
-      };
-      
-      window.onHeal = () => {
-        console.log('🌐 グローバル onHeal から練習モードにリダイレクト');
-        this.handlePracticeHeal();
-      };
-      
-      window.onHint = () => {
-        console.log('🌐 グローバル onHint から練習モードにリダイレクト');
-        this.handlePracticeHint();
-      };
-    }
+    // ★★★ Enterキー用のハンドラも設定 ★★★
+    this._setupPracticeKeyHandler();
     
     console.log('✅ 練習モード用ハンドラ設定完了');
+  },
+
+  /**
+   * 練習モード専用のキーボードハンドラを設定
+   */
+  _setupPracticeKeyHandler() {
+    // 既存のキーハンドラを保存
+    this._originalKeydownHandler = this._keydownHandler;
+    
+    // 練習モード専用のキーハンドラを作成
+    this._practiceKeydownHandler = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        console.log('⌨️ 練習モードでEnterキーが押されました');
+        
+        if (battleState.turn === 'player' && battleState.inputEnabled) {
+          const mode = battleState.lastCommandMode || 'attack';
+          console.log(`⌨️ 実行モード: ${mode}`);
+          
+          // 直接練習モードのメソッドを呼び出し
+          setTimeout(() => {
+            try {
+              if (mode === 'attack') {
+                console.log('⌨️ 攻撃モード実行');
+                this.handlePracticeAttack();
+              } else if (mode === 'heal') {
+                console.log('⌨️ 回復モード実行');
+                this.handlePracticeHeal();
+              } else if (mode === 'hint') {
+                console.log('⌨️ ヒントモード実行');
+                this.handlePracticeHint();
+              }
+            } catch (error) {
+              console.error('練習モード処理中にエラーが発生:', error);
+              battleState.inputEnabled = true;
+              if (this.inputEl) {
+                this.inputEl.value = '';
+              }
+            }
+          }, 0);
+        } else {
+          console.log('⌨️ 入力条件不適合:', {
+            turn: battleState.turn,
+            inputEnabled: battleState.inputEnabled
+          });
+        }
+      }
+    };
+    
+    // 入力欄にキーハンドラを設定
+    if (this.inputEl) {
+      this.inputEl.removeEventListener('keydown', this._keydownHandler);
+      this.inputEl.addEventListener('keydown', this._practiceKeydownHandler);
+      console.log('🔧 練習モード用キーハンドラを設定しました');
+    }
   },
 
   /**
@@ -810,16 +849,85 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * マウスクリック処理（battleScreenStateから継承し、練習モード用に調整）
+   * マウスクリック処理（練習モード専用に完全オーバーライド）
    */
   handleClick(e) {
-    // 基本的なクリック処理は親クラスに委譲
-    const result = battleScreenState.handleClick.call(this, e);
-    
-    // 追加で練習モード専用の処理があればここに記述
-    console.log('🖱️ 練習モードでクリック処理:', result);
-    
-    return result;
+    console.log('🖱️ 練習モードのクリック処理開始');
+
+    e.preventDefault();
+
+    let eventX, eventY;
+    if (e.changedTouches) {
+      eventX = e.changedTouches[0].clientX;
+      eventY = e.changedTouches[0].clientY;
+    } else {
+      eventX = e.clientX;
+      eventY = e.clientY;
+    }
+
+    const rect = this.canvas.getBoundingClientRect();
+    const scaleX = this.canvas.width / rect.width;
+    const scaleY = this.canvas.height / rect.height;
+    const x = (eventX - rect.left) * scaleX;
+    const y = (eventY - rect.top) * scaleY;
+
+    console.log('🖱️ クリック座標:', x, y);
+
+    // ボタンの定義（battleScreen.jsからコピー）
+    const BTN = {
+      back:   { x: 20,  y: 20,  w: 100, h: 30,  label: 'タイトルへ' },
+      stage:  { x: 140, y: 20,  w: 120, h: 30,  label: 'ステージ選択' },
+      attack: { x: 230, y: 380, w: 110, h: 50,  label: 'こうげき' },
+      heal:   { x: 350, y: 380, w: 110, h: 50,  label: 'かいふく' },
+      hint:   { x: 470, y: 380, w: 110, h: 50,  label: 'ヒント' },
+    };
+
+    // 当たり判定のヘルパー関数
+    const isMouseOverRect = (mx, my, rect) => {
+      return mx >= rect.x && mx <= rect.x + rect.w && 
+             my >= rect.y && my <= rect.y + rect.h;
+    };
+
+    // 「タイトルへ」ボタン
+    if (isMouseOverRect(x, y, BTN.back)) {
+      console.log('🏠 「タイトルへ」ボタンがクリックされました');
+      publish('changeScreen', 'title');
+      return true;
+    }
+
+    // 「ステージ選択」ボタン
+    if (isMouseOverRect(x, y, BTN.stage)) {
+      console.log('🗺️ 「ステージ選択」ボタンがクリックされました');
+      publish('changeScreen', 'stageSelect');
+      return true;
+    }
+
+    // 「こうげき」ボタン - 練習モード専用処理
+    if (isMouseOverRect(x, y, BTN.attack)) {
+      console.log('🎯 練習モード「こうげき」ボタンがクリックされました');
+      battleState.lastCommandMode = 'attack';
+      this.handlePracticeAttack(); // ★ 練習モード専用メソッドを直接呼び出し
+      return true;
+    }
+
+    // 「かいふく」ボタン - 練習モード専用処理
+    if (isMouseOverRect(x, y, BTN.heal)) {
+      console.log('💚 練習モード「かいふく」ボタンがクリックされました');
+      battleState.lastCommandMode = 'heal';
+      this.handlePracticeHeal(); // ★ 練習モード専用メソッドを直接呼び出し
+      return true;
+    }
+
+    // 「ヒント」ボタン - 練習モード専用処理
+    if (isMouseOverRect(x, y, BTN.hint)) {
+      console.log('💡 練習モード「ヒント」ボタンがクリックされました');
+      battleState.lastCommandMode = 'hint';
+      this.handlePracticeHint(); // ★ 練習モード専用メソッドを直接呼び出し
+      return true;
+    }
+
+    console.log('🖱️ どのボタンにもヒットしませんでした');
+    return false;
   },
 
   /**
