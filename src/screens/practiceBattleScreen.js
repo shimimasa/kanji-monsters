@@ -5,7 +5,6 @@ import battleScreenState from './battleScreen.js';
 import { gameState, battleState } from '../core/gameState.js';
 import { getKanjiByStageId, isKanjiMastered } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
-import { addToLog } from '../core/gameState.js';
 
 // ★★★ battleScreenStateを継承して練習モード専用の画面を作成 ★★★
 const practiceBattleScreenState = {
@@ -21,6 +20,15 @@ const practiceBattleScreenState = {
     totalPracticed: 0,          // 練習した問題数
     correctCount: 0,            // 正解数
     incorrectCount: 0           // 不正解数
+  },
+
+   /**
+   * ログにメッセージを追加する（battleScreenの機能を流用）
+   */
+   _addToLog(message) {
+    if (!Array.isArray(battleState.log)) battleState.log = [];
+    battleState.log.push(message);
+    console.log('📝 ログ追加:', message);
   },
 
   /**
@@ -119,9 +127,12 @@ const practiceBattleScreenState = {
     
     // イベントハンドラを登録
     this.registerHandlers();
-    
-    // 練習開始メッセージ
-    battleState.log = ['練習モードを開始します！', 'すべての漢字をマスターしよう！'];
+
+    // ★★★ _addToLogを使用 ★★★
+    battleState.log = [];
+    this._addToLog('練習モードを開始します！');
+    this._addToLog('すべての漢字をマスターしよう！');
+
   },
 
   /**
@@ -160,8 +171,8 @@ const practiceBattleScreenState = {
     // 現在の問題として設定
     this._setCurrentKanji(selectedKanji);
     
-    // 出題メッセージ
-    addToLog(`「${selectedKanji.kanji}」を読もう！`);
+    // ★★★ _addToLogを使用 ★★★
+    this._addToLog(`「${selectedKanji.kanji}」を読もう！`);
   },
 
   /**
@@ -232,7 +243,8 @@ const practiceBattleScreenState = {
     
     // 正解メッセージ
     const readingMsg = this._buildReadingMessage();
-    addToLog(`せいかい！ ${readingMsg}`);
+    // ★★★ _addToLogを使用 ★★★
+    this._addToLog(`せいかい！ ${readingMsg}`);
     
     console.log(`✅ 正解: ${gameState.currentKanji.text} = ${answer}`);
     
@@ -255,8 +267,10 @@ const practiceBattleScreenState = {
     
     // 不正解メッセージ
     const readingMsg = this._buildReadingMessage();
-    addToLog(`ちがいます。${readingMsg}`);
-    addToLog('もう一度挑戦しよう！');
+
+    // ★★★ _addToLogを使用 ★★★
+    this._addToLog(`ちがいます。${readingMsg}`);
+    this._addToLog('もう一度挑戦しよう！');
     
     console.log(`❌ 不正解: ${gameState.currentKanji.text} ≠ ${answer}`);
     
@@ -270,8 +284,9 @@ const practiceBattleScreenState = {
    * 全漢字マスター完了メッセージ
    */
   _showAllMasteredMessage() {
-    addToLog('このステージの漢字は全てマスター済みです！');
-    addToLog('素晴らしい！完璧です！');
+    // ★★★ _addToLogを使用 ★★★
+    this._addToLog('このステージの漢字は全てマスター済みです！');
+    this._addToLog('素晴らしい！完璧です！');
     
     setTimeout(() => {
       this._completePractice();
@@ -286,9 +301,10 @@ const practiceBattleScreenState = {
     const { totalPracticed, correctCount, incorrectCount } = this.practiceStats;
     const accuracy = totalPracticed > 0 ? Math.round((correctCount / totalPracticed) * 100) : 0;
     
-    addToLog('練習完了！お疲れさまでした！');
-    addToLog(`統計: ${totalPracticed}問中 ${correctCount}問正解 (正答率${accuracy}%)`);
-    addToLog('実戦バトルに挑戦してみよう！');
+    // ★★★ _addToLogを使用 ★★★
+    this._addToLog('練習完了！お疲れさまでした！');
+    this._addToLog(`統計: ${totalPracticed}問中 ${correctCount}問正解 (正答率${accuracy}%)`);
+    this._addToLog('実戦バトルに挑戦してみよう！');
     
     console.log('🎯 練習完了:', this.practiceStats);
     
@@ -510,20 +526,18 @@ const practiceBattleScreenState = {
     
     const prog = gameState.kanjiReadProgress[id];
     
-    // 読みを記録
     const isKun = (currentKanji.kunyomi || []).includes(answer);
     const isOn = (currentKanji.onyomi || []).includes(answer);
     if (isKun) prog.kunyomi.add(answer);
     if (isOn) prog.onyomi.add(answer);
     
-    // マスター判定
     const allKunOk = (currentKanji.kunyomi || []).every(r => prog.kunyomi.has(r));
     const allOnOk = (currentKanji.onyomi || []).every(r => prog.onyomi.has(r));
     prog.mastered = allKunOk && allOnOk;
     
     if (prog.mastered) {
       console.log(`🎉 漢字「${currentKanji.text}」をマスターしました！`);
-      addToLog(`「${currentKanji.text}」をマスターしました！`);
+      this._addToLog(`「${currentKanji.text}」をマスターしました！`);
     }
   },
 
