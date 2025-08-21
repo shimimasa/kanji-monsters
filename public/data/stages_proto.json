@@ -4,8 +4,8 @@
     "region": "北海道",
     "pref": "北海道",
     "pos": {
-      "x": 600,
-      "y": 240
+      "x": 550,
+      "y": 300
     },
     "stageId": "hokkaido_area1",
     "name": "北海道",
@@ -111,8 +111,8 @@
     "region": "東北",
     "pref": "青森",
     "pos": {
-      "x": 580,
-      "y": 100
+      "x": 590,
+      "y": 120
     },
     "stageId": "tohoku_area1",
     "name": "青森県",
@@ -737,7 +737,7 @@
     "pref": "東京",
     "pos": {
       "x": 580,
-      "y": 330
+      "y": 350
     },
     "stageId": "kanto_area6",
     "name": "東京都",
@@ -794,7 +794,7 @@
     "pref": "神奈川",
     "pos": {
       "x": 550,
-      "y": 390
+      "y": 400
     },
     "stageId": "kanto_area7",
     "name": "神奈川県",
@@ -915,8 +915,8 @@
     "region": "中部",
     "pref": "新潟",
     "pos": {
-      "x": 670,
-      "y": 130
+      "x": 690,
+      "y": 140
     },
     "stageId": "chubu_area1",
     "name": "新潟県",
@@ -962,8 +962,8 @@
     "region": "中部",
     "pref": "富山",
     "pos": {
-      "x": 550,
-      "y": 250
+      "x": 560,
+      "y": 270
     },
     "stageId": "chubu_area2",
     "name": "富山県",
@@ -1009,7 +1009,7 @@
     "region": "中部",
     "pref": "石川",
     "pos": {
-      "x": 490,
+      "x": 500,
       "y": 280
     },
     "stageId": "chubu_area3",
@@ -1056,7 +1056,7 @@
     "region": "中部",
     "pref": "福井",
     "pos": {
-      "x": 460,
+      "x": 470,
       "y": 350
     },
     "stageId": "chubu_area4",
@@ -1103,8 +1103,8 @@
     "region": "中部",
     "pref": "長野",
     "pos": {
-      "x": 600,
-      "y": 280
+      "x": 620,
+      "y": 300
     },
     "stageId": "chubu_area5",
     "name": "長野県",
@@ -1150,7 +1150,7 @@
     "region": "中部",
     "pref": "岐阜",
     "pos": {
-      "x": 530,
+      "x": 540,
       "y": 340
     },
     "stageId": "chubu_area6",
@@ -1198,7 +1198,7 @@
     "pref": "山梨",
     "pos": {
       "x": 650,
-      "y": 350
+      "y": 370
     },
     "stageId": "chubu_area7",
     "name": "山梨県",
@@ -1245,7 +1245,7 @@
     "pref": "静岡",
     "pos": {
       "x": 620,
-      "y": 430
+      "y": 450
     },
     "stageId": "chubu_area8",
     "name": "静岡県",
@@ -1873,7 +1873,7 @@
     "pref": "島根",
     "pos": {
       "x": 580,
-      "y": 240
+      "y": 260
     },
     "stageId": "chugoku_area3",
     "name": "島根県",
@@ -1940,7 +1940,7 @@
     "pref": "広島",
     "pos": {
       "x": 580,
-      "y": 350
+      "y": 360
     },
     "stageId": "chugoku_area4",
     "name": "広島県",
@@ -2007,7 +2007,7 @@
     "pref": "山口",
     "pos": {
       "x": 450,
-      "y": 400
+      "y": 420
     },
     "stageId": "chugoku_area5",
     "name": "山口県",
@@ -3619,7 +3619,7 @@
     "region": "アメリカ大陸",
     "pref": "チリ",
     "pos": {
-      "x": 580,
+      "x": 590,
       "y": 430
     },
     "stageId": "America_area8",
