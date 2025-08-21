@@ -2125,8 +2125,8 @@
     "region": "アジア",
     "pref": "インド",
     "pos": {
-      "x": 600,
-      "y": 350
+      "x": 450,
+      "y": 300
     },
     "stageId": "Asie_area2",
     "name": "インド",
@@ -2183,8 +2183,8 @@
     "region": "アジア",
     "pref": "インドネシア",
     "pos": {
-      "x": 620,
-      "y": 400
+      "x": 590,
+      "y": 450
     },
     "stageId": "Asie_area3",
     "name": "インドネシア",
@@ -2241,8 +2241,8 @@
     "region": "アジア",
     "pref": "パキスタン",
     "pos": {
-      "x": 550,
-      "y": 330
+      "x": 100,
+      "y": 250
     },
     "stageId": "Asie_area4",
     "name": "パキスタン",
@@ -2299,8 +2299,8 @@
     "region": "アジア",
     "pref": "韓国",
     "pos": {
-      "x": 500,
-      "y": 200
+      "x": 300,
+      "y": 100
     },
     "stageId": "Asie_area5",
     "name": "韓国",
@@ -2357,8 +2357,8 @@
     "region": "アジア",
     "pref": "タイ",
     "pos": {
-      "x": 450,
-      "y": 300
+      "x": 500,
+      "y": 400
     },
     "stageId": "Asie_area6",
     "name": "タイ",
@@ -2469,13 +2469,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "イラン",
+    "pref": "フィリピン",
     "pos": {
-      "x": 500,
+      "x": 200,
       "y": 350
     },
     "stageId": "Asie_area8",
-    "name": "イラン",
+    "name": "フィリピン",
     "enemyIdList": [
       "PRV-E071",
       "PRV-E072",
@@ -2529,13 +2529,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "サウジアラビア",
+    "pref": "タイ",
     "pos": {
       "x": 500,
       "y": 200
     },
     "stageId": "Asie_area9",
-    "name": "サウジアラビア",
+    "name": "タイ",
     "enemyIdList": [
       "PRV-E081",
       "PRV-E082",
@@ -2588,7 +2588,7 @@
     "region": "アジア",
     "pref": "モンゴル",
     "pos": {
-      "x": 600,
+      "x": 200,
       "y": 300
     },
     "stageId": "Asie_area10",
@@ -2947,8 +2947,8 @@
     "region": "ヨーロッパ",
     "pref": "ロシア",
     "pos": {
-      "x": 550,
-      "y": 450
+      "x": 650,
+      "y": 250
     },
     "stageId": "Europe_area6",
     "name": "ロシア",
@@ -3119,13 +3119,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "スイス",
+    "pref": "カザフスタン",
     "pos": {
-      "x": 620,
+      "x": 660,
       "y": 320
     },
     "stageId": "Europe_area9",
-    "name": "スイス",
+    "name": "カザフスタン",
     "enemyIdList": [
       "PRV-E181",
       "PRV-E182",
