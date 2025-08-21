@@ -2241,7 +2241,7 @@
     "region": "アジア",
     "pref": "パキスタン",
     "pos": {
-      "x": 100,
+      "x": 400,
       "y": 250
     },
     "stageId": "Asie_area4",
@@ -2299,8 +2299,8 @@
     "region": "アジア",
     "pref": "韓国",
     "pos": {
-      "x": 300,
-      "y": 100
+      "x": 600,
+      "y": 150
     },
     "stageId": "Asie_area5",
     "name": "韓国",
@@ -2357,8 +2357,8 @@
     "region": "アジア",
     "pref": "タイ",
     "pos": {
-      "x": 500,
-      "y": 400
+      "x": 540,
+      "y": 380
     },
     "stageId": "Asie_area6",
     "name": "タイ",
@@ -2414,7 +2414,7 @@
     "region": "アジア",
     "pref": "ベトナム",
     "pos": {
-      "x": 450,
+      "x": 580,
       "y": 350
     },
     "stageId": "Asie_area7",
@@ -2471,7 +2471,7 @@
     "region": "アジア",
     "pref": "フィリピン",
     "pos": {
-      "x": 200,
+      "x": 600,
       "y": 350
     },
     "stageId": "Asie_area8",
@@ -2531,8 +2531,8 @@
     "region": "アジア",
     "pref": "タイ",
     "pos": {
-      "x": 500,
-      "y": 200
+      "x": 550,
+      "y": 350
     },
     "stageId": "Asie_area9",
     "name": "タイ",
@@ -2588,8 +2588,8 @@
     "region": "アジア",
     "pref": "モンゴル",
     "pos": {
-      "x": 200,
-      "y": 300
+      "x": 550,
+      "y": 150
     },
     "stageId": "Asie_area10",
     "name": "モンゴル",
@@ -2658,8 +2658,8 @@
     "region": "ヨーロッパ",
     "pref": "フランス",
     "pos": {
-      "x": 600,
-      "y": 100
+      "x": 430,
+      "y": 400
     },
     "stageId": "Europe_area1",
     "name": "フランス",
@@ -2715,7 +2715,7 @@
     "region": "ヨーロッパ",
     "pref": "ドイツ",
     "pos": {
-      "x": 500,
+      "x": 480,
       "y": 300
     },
     "stageId": "Europe_area2",
@@ -2773,8 +2773,8 @@
     "region": "ヨーロッパ",
     "pref": "イタリア",
     "pos": {
-      "x": 480,
-      "y": 430
+      "x": 490,
+      "y": 410
     },
     "stageId": "Europe_area3",
     "name": "イタリア",
@@ -2831,8 +2831,8 @@
     "region": "ヨーロッパ",
     "pref": "イギリス",
     "pos": {
-      "x": 500,
-      "y": 350
+      "x": 450,
+      "y": 300
     },
     "stageId": "Europe_area4",
     "name": "イギリス",
@@ -2889,8 +2889,8 @@
     "region": "ヨーロッパ",
     "pref": "スペイン",
     "pos": {
-      "x": 520,
-      "y": 330
+      "x": 430,
+      "y": 380
     },
     "stageId": "Europe_area5",
     "name": "スペイン",
@@ -3003,13 +3003,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "オランダ",
+    "pref": "フィリピン",
     "pos": {
       "x": 570,
-      "y": 320
+      "y": 180
     },
     "stageId": "Europe_area7",
-    "name": "オランダ",
+    "name": "フィリピン",
     "enemyIdList": [
       "PRV-E161",
       "PRV-E162",
@@ -3061,13 +3061,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "ベルギー",
+    "pref": "ウクライナ",
     "pos": {
       "x": 570,
-      "y": 360
+      "y": 330
     },
     "stageId": "Europe_area8",
-    "name": "ベルギー",
+    "name": "ウクライナ",
     "enemyIdList": [
       "PRV-E171",
       "PRV-E172",
