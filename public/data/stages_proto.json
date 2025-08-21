@@ -2066,13 +2066,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "東アジア",
+    "pref": "中国",
     "pos": {
       "x": 600,
       "y": 200
     },
     "stageId": "Asie_area1",
-    "name": "東アジア",
+    "name": "中国",
     "enemyIdList": [
       "PRV-E001",
       "PRV-E002",
@@ -2123,13 +2123,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "東南アジア大陸部",
+    "pref": "インド",
     "pos": {
       "x": 600,
       "y": 350
     },
     "stageId": "Asie_area2",
-    "name": "東南アジア大陸部",
+    "name": "インド",
     "enemyIdList": [
       "PRV-E011",
       "PRV-E012",
@@ -2181,13 +2181,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "東南アジア海洋部",
+    "pref": "インドネシア",
     "pos": {
       "x": 620,
       "y": 400
     },
     "stageId": "Asie_area3",
-    "name": "東南アジア海洋部",
+    "name": "インドネシア",
     "enemyIdList": [
       "PRV-E021",
       "PRV-E022",
@@ -2239,13 +2239,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "南アジア",
+    "pref": "パキスタン",
     "pos": {
       "x": 550,
       "y": 330
     },
     "stageId": "Asie_area4",
-    "name": "南アジア",
+    "name": "パキスタン",
     "enemyIdList": [
       "PRV-E031",
       "PRV-E032",
@@ -2297,13 +2297,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "中央アジア",
+    "pref": "韓国",
     "pos": {
       "x": 500,
       "y": 200
     },
     "stageId": "Asie_area5",
-    "name": "中央アジア",
+    "name": "韓国",
     "enemyIdList": [
       "PRV-E041",
       "PRV-E042",
@@ -2355,13 +2355,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "ペルシア文化圏",
+    "pref": "タイ",
     "pos": {
       "x": 450,
       "y": 300
     },
     "stageId": "Asie_area6",
-    "name": "ペルシア文化圏",
+    "name": "タイ",
     "enemyIdList": [
       "PRV-E051",
       "PRV-E052",
@@ -2412,13 +2412,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "コーカサス",
+    "pref": "ベトナム",
     "pos": {
       "x": 450,
       "y": 350
     },
     "stageId": "Asie_area7",
-    "name": "コーカサス",
+    "name": "ベトナム",
     "enemyIdList": [
       "PRV-E061",
       "PRV-E062",
@@ -2469,13 +2469,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "アラビア半島",
+    "pref": "イラン",
     "pos": {
       "x": 500,
       "y": 350
     },
     "stageId": "Asie_area8",
-    "name": "アラビア半島",
+    "name": "イラン",
     "enemyIdList": [
       "PRV-E071",
       "PRV-E072",
@@ -2529,13 +2529,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "モンゴル草原",
+    "pref": "サウジアラビア",
     "pos": {
       "x": 500,
       "y": 200
     },
     "stageId": "Asie_area9",
-    "name": "モンゴル草原",
+    "name": "サウジアラビア",
     "enemyIdList": [
       "PRV-E081",
       "PRV-E082",
@@ -2586,13 +2586,13 @@
   {
     "grade": 7,
     "region": "アジア",
-    "pref": "中国",
+    "pref": "モンゴル",
     "pos": {
       "x": 600,
       "y": 300
     },
     "stageId": "Asie_area10",
-    "name": "中国",
+    "name": "モンゴル",
     "enemyIdList": [
       "PRV-E091",
       "PRV-E092",
@@ -2656,13 +2656,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "北欧",
+    "pref": "フランス",
     "pos": {
       "x": 600,
       "y": 100
     },
     "stageId": "Europe_area1",
-    "name": "北欧",
+    "name": "フランス",
     "enemyIdList": [
       "PRV-E101",
       "PRV-E102",
@@ -2713,13 +2713,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "ブリテン諸島",
+    "pref": "ドイツ",
     "pos": {
       "x": 500,
       "y": 300
     },
     "stageId": "Europe_area2",
-    "name": "ブリテン諸島",
+    "name": "ドイツ",
     "enemyIdList": [
       "PRV-E111",
       "PRV-E112",
@@ -2771,13 +2771,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "イベリア半島",
+    "pref": "イタリア",
     "pos": {
       "x": 480,
       "y": 430
     },
     "stageId": "Europe_area3",
-    "name": "イベリア半島",
+    "name": "イタリア",
     "enemyIdList": [
       "PRV-E121",
       "PRV-E122",
@@ -2829,13 +2829,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "フランス",
+    "pref": "イギリス",
     "pos": {
       "x": 500,
       "y": 350
     },
     "stageId": "Europe_area4",
-    "name": "フランス",
+    "name": "イギリス",
     "enemyIdList": [
       "PRV-E131",
       "PRV-E132",
@@ -2887,13 +2887,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "ドイツ",
+    "pref": "スペイン",
     "pos": {
       "x": 520,
       "y": 330
     },
     "stageId": "Europe_area5",
-    "name": "ドイツ",
+    "name": "スペイン",
     "enemyIdList": [
       "PRV-E141",
       "PRV-E142",
@@ -2945,13 +2945,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "イタリア",
+    "pref": "ロシア",
     "pos": {
       "x": 550,
       "y": 450
     },
     "stageId": "Europe_area6",
-    "name": "イタリア",
+    "name": "ロシア",
     "enemyIdList": [
       "PRV-E151",
       "PRV-E152",
@@ -3003,13 +3003,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "ポーランド",
+    "pref": "オランダ",
     "pos": {
       "x": 570,
       "y": 320
     },
     "stageId": "Europe_area7",
-    "name": "ポーランド",
+    "name": "オランダ",
     "enemyIdList": [
       "PRV-E161",
       "PRV-E162",
@@ -3061,13 +3061,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "東欧",
+    "pref": "ベルギー",
     "pos": {
       "x": 570,
       "y": 360
     },
     "stageId": "Europe_area8",
-    "name": "東欧",
+    "name": "ベルギー",
     "enemyIdList": [
       "PRV-E171",
       "PRV-E172",
@@ -3119,13 +3119,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "バルト三国",
+    "pref": "スイス",
     "pos": {
       "x": 620,
       "y": 320
     },
     "stageId": "Europe_area9",
-    "name": "バルト三国",
+    "name": "スイス",
     "enemyIdList": [
       "PRV-E181",
       "PRV-E182",
@@ -3176,13 +3176,13 @@
   {
     "grade": 8,
     "region": "ヨーロッパ",
-    "pref": "ロシア",
+    "pref": "ポーランド",
     "pos": {
       "x": 650,
       "y": 250
     },
     "stageId": "Europe_area10",
-    "name": "ロシア",
+    "name": "ポーランド",
     "enemyIdList": [
       "PRV-E191",
       "PRV-E192",
@@ -3218,13 +3218,13 @@
   {
     "grade": 9,
     "region": "アメリカ大陸",
-    "pref": "アラスカ",
+    "pref": "カナダ",
     "pos": {
       "x": 550,
       "y": 150
     },
     "stageId": "America_area1",
-    "name": "アラスカ",
+    "name": "カナダ",
     "enemyIdList": [
       "PRV-E201",
       "PRV-E202",
@@ -3276,13 +3276,13 @@
   {
     "grade": 9,
     "region": "アメリカ大陸",
-    "pref": "北米西海岸",
+    "pref": "アメリカ合衆国",
     "pos": {
       "x": 520,
       "y": 220
     },
     "stageId": "America_area2",
-    "name": "北米西海岸",
+    "name": "アメリカ合衆国",
     "enemyIdList": [
       "PRV-E211",
       "PRV-E212",
@@ -3333,13 +3333,13 @@
   {
     "grade": 9,
     "region": "アメリカ大陸",
-    "pref": "北米中西部",
+    "pref": "メキシコ",
     "pos": {
       "x": 550,
       "y": 250
     },
     "stageId": "America_area3",
-    "name": "北米中西部",
+    "name": "メキシコ",
     "enemyIdList": [
       "PRV-E221",
       "PRV-E222",
@@ -3390,13 +3390,13 @@
   {
     "grade": 9,
     "region": "アメリカ大陸",
-    "pref": "北米東海岸",
+    "pref": "キューバ",
     "pos": {
       "x": 600,
       "y": 200
     },
     "stageId": "America_area4",
-    "name": "北米東海岸",
+    "name": "キューバ",
     "enemyIdList": [
       "PRV-E231",
       "PRV-E232",
@@ -3504,13 +3504,13 @@
   {
     "grade": 9,
     "region": "アメリカ大陸",
-    "pref": "コスタリカ",
+    "pref": "キューバ",
     "pos": {
       "x": 600,
       "y": 380
     },
     "stageId": "America_area6",
-    "name": "コスタリカ",
+    "name": "キューバ",
     "enemyIdList": [
       "PRV-E251",
       "PRV-E252",
@@ -3561,13 +3561,13 @@
   {
     "grade": 9,
     "region": "アメリカ大陸",
-    "pref": "カリブ海諸島",
+    "pref": "コロンビア",
     "pos": {
       "x": 600,
       "y": 310
     },
     "stageId": "America_area7",
-    "name": "カリブ海諸島",
+    "name": "コロンビア",
     "enemyIdList": [
       "PRV-E261",
       "PRV-E262",
@@ -3618,13 +3618,13 @@
   {
     "grade": 9,
     "region": "アメリカ大陸",
-    "pref": "北アンデス",
+    "pref": "チリ",
     "pos": {
       "x": 600,
       "y": 350
     },
     "stageId": "America_area8",
-    "name": "北アンデス",
+    "name": "チリ",
     "enemyIdList": [
       "PRV-E271",
       "PRV-E272",
@@ -3673,13 +3673,13 @@
   {
     "grade": 9,
     "region": "アメリカ大陸",
-    "pref": "アマゾン盆地",
+    "pref": "ブラジル",
     "pos": {
       "x": 600,
       "y": 400
     },
     "stageId": "America_area9",
-    "name": "アマゾン盆地",
+    "name": "ブラジル",
     "enemyIdList": [
       "PRV-E281",
       "PRV-E282",
@@ -3731,13 +3731,13 @@
   {
     "grade": 9,
     "region": "アメリカ大陸",
-    "pref": "南アメリカ南部",
+    "pref": "アルゼンチン",
     "pos": {
       "x": 580,
       "y": 500
     },
     "stageId": "America_area10",
-    "name": "南アメリカ南部",
+    "name": "アルゼンチン",
     "enemyIdList": [
       "PRV-E291",
       "PRV-E292",
@@ -3817,13 +3817,13 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "北西アフリカ",
+    "pref": "ナイジェリア",
     "pos": {
       "x": 630,
       "y": 190
     },
     "stageId": "Africa_area1",
-    "name": "北西アフリカ",
+    "name": "ナイジェリア",
     "enemyIdList": [
       "PRV-E301",
       "PRV-E302",
@@ -3912,13 +3912,13 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "西アフリカ内陸",
+    "pref": "南アフリカ",
     "pos": {
       "x": 500,
       "y": 200
     },
     "stageId": "Africa_area3",
-    "name": "西アフリカ内陸",
+    "name": "南アフリカ",
     "enemyIdList": [
       "PRV-E321",
       "PRV-E322",
@@ -3960,13 +3960,13 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "西アフリカ海岸",
+    "pref": "アルジェリア",
     "pos": {
       "x": 450,
       "y": 260
     },
     "stageId": "Africa_area4",
-    "name": "西アフリカ海岸",
+    "name": "アルジェリア",
     "enemyIdList": [
       "PRV-E331",
       "PRV-E332",
@@ -4008,13 +4008,13 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "ナイジェリア",
+    "pref": "アンゴラ",
     "pos": {
       "x": 530,
       "y": 250
     },
     "stageId": "Africa_area5",
-    "name": "ナイジェリア",
+    "name": "アンゴラ",
     "enemyIdList": [
       "PRV-E341",
       "PRV-E342",
@@ -4056,13 +4056,13 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "中央アフリカ",
+    "pref": "ケニア",
     "pos": {
       "x": 590,
       "y": 270
     },
     "stageId": "Africa_area6",
-    "name": "中央アフリカ",
+    "name": "ケニア",
     "enemyIdList": [
       "PRV-E351",
       "PRV-E352",
@@ -4104,13 +4104,13 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "ソマリア ",
+    "pref": "モロッコ",
     "pos": {
       "x": 730,
       "y": 260
     },
     "stageId": "Africa_area7",
-    "name": "ソマリア",
+    "name": "モロッコ",
     "enemyIdList": [
       "PRV-E361",
       "PRV-E362",
@@ -4153,13 +4153,13 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "エチオピア",
+    "pref": "コンゴ民主共和国",
     "pos": {
       "x": 710,
       "y": 280
     },
     "stageId": "Africa_area8",
-    "name": "エチオピア",
+    "name": "コンゴ民主共和国",
     "enemyIdList": [
       "PRV-E371",
       "PRV-E372",
@@ -4202,13 +4202,13 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "東アフリカ",
+    "pref": "マダガスカル",
     "pos": {
       "x": 650,
       "y": 340
     },
     "stageId": "Africa_area9",
-    "name": "東アフリカ",
+    "name": "マダガスカル",
     "enemyIdList": [
       "PRV-E381",
       "PRV-E382",
@@ -4250,13 +4250,13 @@
   {
     "grade": 10,
     "region": "アフリカ大陸",
-    "pref": "南部アフリカ",
+    "pref": "南アフリカ",
     "pos": {
       "x": 590,
       "y": 450
     },
     "stageId": "Africa_area10",
-    "name": "南部アフリカ",
+    "name": "南アフリカ",
     "enemyIdList": [
       "PRV-E391",
       "PRV-E392",

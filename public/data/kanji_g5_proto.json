@@ -471,7 +471,7 @@
   },
   {
     "id": "g5-025",
-    "stageId": ["kinki_area2"],
+    "stageId": ["kinki_area1"],
     "kanji": "刊",
     "grade": 5,
     "strokes": 5,
@@ -996,7 +996,7 @@
   },
   {
     "id": "g5-050",
-    "stageId": ["kinki_area3"],
+    "stageId": ["kinki_area2"],
     "kanji": "限",
     "grade": 5,
     "strokes": 9,
@@ -1269,7 +1269,7 @@
   },
   {
     "id": "g5-064",
-    "stageId": ["kinki_area5"],
+    "stageId": ["kinki_area3"],
     "kanji": "告",
     "grade": 5,
     "strokes": 7,
@@ -1488,7 +1488,7 @@
   },
   {
     "id": "g5-075",
-    "stageId": ["kinki_area5"],
+    "stageId": ["kinki_area3"],
     "kanji": "殺",
     "grade": 5,
     "strokes": 10,
@@ -1510,7 +1510,7 @@
   },
   {
     "id": "g5-076",
-    "stageId": ["kinki_area3"],
+    "stageId": ["kinki_area4"],
     "kanji": "雑",
     "grade": 5,
     "strokes": 14,
@@ -1529,7 +1529,7 @@
   },
   {
     "id": "g5-077",
-    "stageId": ["kinki_area3"],
+    "stageId": ["kinki_area4"],
     "kanji": "酸",
     "grade": 5,
     "strokes": 14,
@@ -1567,7 +1567,7 @@
   },
   {
     "id": "g5-079",
-    "stageId": ["kinki_area6"],
+    "stageId": ["kinki_area4"],
     "kanji": "士",
     "grade": 5,
     "strokes": 3,
@@ -1605,7 +1605,7 @@
   },
   {
     "id": "g5-081",
-    "stageId": ["kinki_area6"],
+    "stageId": ["kinki_area4"],
     "kanji": "史",
     "grade": 5,
     "strokes": 5,
@@ -1990,7 +1990,7 @@
   },
   {
     "id": "g5-101",
-    "stageId": ["kinki_area6"],
+    "stageId": ["kinki_area5"],
     "kanji": "象",
     "grade": 5,
     "strokes": 12,
@@ -2009,7 +2009,7 @@
   },
   {
     "id": "g5-102",
-    "stageId": ["kinki_area7"],
+    "stageId": ["kinki_area5"],
     "kanji": "賞",
     "grade": 5,
     "strokes": 15,
@@ -2027,7 +2027,7 @@
   },
   {
     "id": "g5-103",
-    "stageId": ["kinki_area4"],
+    "stageId": ["kinki_area5"],
     "kanji": "条",
     "grade": 5,
     "strokes": 7,
@@ -2045,7 +2045,7 @@
   },
   {
     "id": "g5-104",
-    "stageId": ["kinki_area4"],
+    "stageId": ["kinki_area5"],
     "kanji": "状",
     "grade": 5,
     "strokes": 7,
@@ -2063,7 +2063,7 @@
   },
   {
     "id": "g5-105",
-    "stageId": ["kinki_area4"],
+    "stageId": ["kinki_area5"],
     "kanji": "常",
     "grade": 5,
     "strokes": 11,
@@ -2468,7 +2468,7 @@
   },
   {
     "id": "g5-126",
-    "stageId": ["kinki_area5"],
+    "stageId": ["kinki_area6"],
     "kanji": "増",
     "grade": 5,
     "strokes": 14,
@@ -2489,7 +2489,7 @@
   },
   {
     "id": "g5-127",
-    "stageId": ["kinki_area5"],
+    "stageId": ["kinki_area6"],
     "kanji": "則",
     "grade": 5,
     "strokes": 9,
@@ -2507,7 +2507,7 @@
   },
   {
     "id": "g5-128",
-    "stageId": ["kinki_area5"],
+    "stageId": ["kinki_area6"],
     "kanji": "測",
     "grade": 5,
     "strokes": 12,
@@ -2684,7 +2684,7 @@
   },
   {
     "id": "g5-137",
-    "stageId": ["kinki_area7"],
+    "stageId": ["kinki_area6"],
     "kanji": "貯",
     "grade": 5,
     "strokes": 12,
@@ -2722,7 +2722,7 @@
   },
   {
     "id": "g5-139",
-    "stageId": ["kinki_area7"],
+    "stageId": ["kinki_area6"],
     "kanji": "停",
     "grade": 5,
     "strokes": 11,
@@ -2818,7 +2818,7 @@
   },
   {
     "id": "g5-144",
-    "stageId": ["kinki_area7"],
+    "stageId": ["kinki_area6"],
     "kanji": "堂",
     "grade": 5,
     "strokes": 11,
@@ -2874,7 +2874,7 @@
   },
   {
     "id": "g5-147",
-    "stageId": ["kinki_area7"],
+    "stageId": ["kinki_area6"],
     "kanji": "得",
     "grade": 5,
     "strokes": 11,
@@ -2895,7 +2895,7 @@
   },
   {
     "id": "g5-148",
-    "stageId": ["kinki_area7"],
+    "stageId": ["kinki_area6"],
     "kanji": "毒",
     "grade": 5,
     "strokes": 8,
@@ -3050,7 +3050,7 @@
   },
   {
     "id": "g5-156",
-    "stageId": ["kinki_area6"],
+    "stageId": ["kinki_area7"],
     "kanji": "版",
     "grade": 5,
     "strokes": 8,
@@ -3068,7 +3068,7 @@
   },
   {
     "id": "g5-157",
-    "stageId": ["kinki_area6"],
+    "stageId": ["kinki_area7"],
     "kanji": "比",
     "grade": 5,
     "strokes": 4,
@@ -3088,7 +3088,7 @@
   },
   {
     "id": "g5-158",
-    "stageId": ["kinki_area6"],
+    "stageId": ["kinki_area7"],
     "kanji": "肥",
     "grade": 5,
     "strokes": 8,
@@ -3108,7 +3108,7 @@
   },
   {
     "id": "g5-159",
-    "stageId": ["kinki_area6"],
+    "stageId": ["kinki_area7"],
     "kanji": "非",
     "grade": 5,
     "strokes": 8,
@@ -3147,7 +3147,7 @@
   },
   {
     "id": "g5-161",
-    "stageId": ["kinki_area6"],
+    "stageId": ["kinki_area7"],
     "kanji": "備",
     "grade": 5,
     "strokes": 12,
