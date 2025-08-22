@@ -10,6 +10,37 @@ import { checkAchievements } from '../core/achievementManager.js';
 // battleStateに残り時間プロパティを追加
 battleState.timeRemaining = 60;
 
+const ENEMY_FRAME_CONFIG = {
+  normal: { min: 1, max: 5 },    // 1-5体目
+  elite: { min: 6, max: 9 },     // 6-9体目
+  boss: { min: 10, max: Infinity } // 10体目以降
+};
+
+// プレイヤーに進行状況を示すUI追加も可能
+function getProgressInfo() {
+  const order = gameState.currentEnemyIndex + 1;
+  if (order <= 5) return `ノーマル戦 ${order}/5`;
+  if (order <= 9) return `エリート戦 ${order - 5}/4`;
+  return `ボス戦`;
+}
+
+/**
+ * 設定可能な枠組み判定関数
+ */
+function getFrameStyleByOrderConfigurable(enemyIndex, isBoss = false) {
+  if (isBoss) return 'boss';
+  
+  const order = enemyIndex + 1;
+  
+  for (const [style, config] of Object.entries(ENEMY_FRAME_CONFIG)) {
+    if (order >= config.min && order <= config.max) {
+      return style;
+    }
+  }
+  
+  return 'boss'; // フォールバック
+}
+
 // 直近に出題された問題を避けるための設定値
 const RECENT_QUESTIONS_BUFFER_SIZE = 5; // 直近5問は出題しない
 
@@ -230,6 +261,27 @@ getShieldColor(currentHp, maxHp) {
   return color;
 },
 
+/**
+ * 敵の登場順からフレームスタイルを判定
+ * @param {number} enemyIndex - 敵の登場順（0ベース）
+ * @param {boolean} isBoss - ボスフラグ
+ * @returns {string} フレームスタイル ('normal', 'elite', 'boss')
+ */
+getFrameStyleByOrder(enemyIndex, isBoss = false) {
+  // ボス判定を最優先
+  if (isBoss) return 'boss';
+  
+  // 登場順による判定（1ベースに変換）
+  const order = enemyIndex + 1;
+  
+  if (order <= 5) {
+    return 'normal';    // 1-5体目：ノーマル
+  } else if (order <= 9) {
+    return 'elite';     // 6-9体目：エリート
+  } else {
+    return 'boss';      // 10体目以降：ボス扱い
+  }
+},
 /**
  * シールドのヒビを描画
  * @param {CanvasRenderingContext2D} ctx - Canvas 2D コンテキスト
@@ -5203,6 +5255,10 @@ function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'norma
   let shieldStyle = null;
   
   if (enemy) {
+
+    // ★★★ 修正：登場順による判定に変更 ★★★
+    frameStyle = getFrameStyleByOrder(gameState.currentEnemyIndex, enemy.isBoss);
+
     if (enemy.isBoss) {
       frameStyle = 'boss';
       // ★★★ シールド状態の判定を追加 ★★★
