@@ -1,4 +1,4 @@
-// 練習バトル画面 - UIレイアウト最適化版
+// 練習バトル画面 - 最終最適化版（ログ削除＆読み表示）
 
 import battleScreenState from './battleScreen.js';
 import { gameState, battleState } from '../core/gameState.js';
@@ -24,18 +24,18 @@ const practiceBattleScreenState = {
     todaysPracticeCount: 0
   },
 
-  // 📐 新しいレイアウト設定
+  // 📐 最適化されたレイアウト設定（ログエリア削除後）
   panelConfig: {
-    // 前回の漢字パネル（サイズ縮小）
-    previous: { x: 20, y: 70, w: 160, h: 160 },
-    // 現在学習中漢字パネル（新規追加）
-    current: { x: 20, y: 240, w: 160, h: 140 },
-    // 練習モードバッジ
-    modeBadge: { x: 10, y: 390, w: 120, h: 30 },
-    // 拡張マスター進捗パネル
-    progress: { x: 480, y: 10, w: 300, h: 160 },
-    // 詳細統計パネル
-    stats: { x: 10, y: 430, w: 350, h: 40 }
+    // 前回の漢字パネル（読み表示付きで少し拡大）
+    previous: { x: 20, y: 70, w: 180, h: 200 },
+    // 現在学習中漢字パネル（少し拡大）
+    current: { x: 20, y: 280, w: 180, h: 160 },
+    // 練習モードバッジ（下に移動）
+    modeBadge: { x: 20, y: 450, w: 140, h: 35 },
+    // 拡張マスター進捗パネル（少し拡大）
+    progress: { x: 480, y: 10, w: 300, h: 180 },
+    // 簡易統計バー（上部に移動）
+    quickStats: { x: 300, y: 20, w: 160, h: 30 }
   },
 
   /**
@@ -290,9 +290,8 @@ const practiceBattleScreenState = {
       
       gameState.hintLevel = 0;
       
+      // ログは最小限に（練習開始時のみ）
       if (!Array.isArray(battleState.log)) battleState.log = [];
-      const logMessage = `「${selectedKanji.kanji}」を読もう！`;
-      battleState.log.push(logMessage);
       
       console.log(`📝 新しい問題: ${selectedKanji.kanji} (ID: ${selectedKanji.id})`);
       
@@ -420,45 +419,14 @@ const practiceBattleScreenState = {
       
       const current = Number(gameState.hintLevel || 0);
       if (current >= 4) {
-        this._addToPracticeLog('ヒントはここまで！');
-        return;
+        return; // ヒント上限に達した場合は何もしない
       }
       
       const level = current + 1;
       gameState.hintLevel = level;
       
-      const k = gameState.currentKanji;
-      const onyomi = Array.isArray(k.onyomi) ? k.onyomi : [];
-      const kunyomi = Array.isArray(k.kunyomi) ? k.kunyomi : [];
-      
-      let hintMessage = '';
-      
-      switch (level) {
-        case 1:
-          hintMessage = `ヒント（基本）: 画数は${k.strokes || '?'}`;
-          break;
-        case 2:
-          const useOn = (onyomi.length > 0 && (Math.random() >= 0.5 || kunyomi.length === 0));
-          const list = useOn ? onyomi : kunyomi;
-          const first = list[0] || '';
-          const masked = first ? first.substring(0, 1) + '○○' : '不明';
-          hintMessage = `ヒント（読み）: ${useOn ? '音読み' : '訓読み'}は「${masked}」から始まる`;
-          break;
-        case 3:
-          hintMessage = `ヒント（意味）: ${k.meaning || '（準備中）'}`;
-          break;
-        case 4:
-          if (onyomi.length > 0 || kunyomi.length > 0) {
-            const useOn = onyomi.length > 0 ? (Math.random() >= 0.5 || kunyomi.length === 0) : false;
-            const list = useOn ? onyomi : kunyomi;
-            hintMessage = `ヒント（決め手）: ${useOn ? '音読み' : '訓読み'}は「${list[0]}」`;
-          } else {
-            hintMessage = 'ヒント（決め手）: データがありません';
-          }
-          break;
-      }
-      
-      this._addToPracticeLog(hintMessage);
+      // ヒントは内部処理のみ（ログには出力しない）
+      console.log(`💡 ヒントレベル${level}を表示`);
       
     } catch (error) {
       console.error('❌ ヒント処理エラー:', error);
@@ -474,7 +442,14 @@ const practiceBattleScreenState = {
     try {
       this.practiceStats.correctCount++;
       
-      battleState.lastAnswered = { ...gameState.currentKanji };
+      // 前回の答えを保存（正確な読み情報付き）
+      battleState.lastAnswered = { 
+        ...gameState.currentKanji,
+        correctAnswer: answer // 実際に正解した読みを記録
+      };
+      
+      // 不正解記録をクリア
+      this.lastIncorrectAnswer = null;
       
       if (actionType === 'attack') {
         if (this.startKanjiBoxEffect) {
@@ -500,20 +475,13 @@ const practiceBattleScreenState = {
         console.log(`📚 残り未マスター漢字: ${this.unmasteredKanji.length}件`);
       }
       
-      const onyomiStr = (gameState.currentKanji.onyomi || []).join('、');
-      const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
-      const readingMsg = `正しい読み: 音「${onyomiStr}」訓「${kunyomiStr}」`;
-      
-      const actionMsg = actionType === 'heal' ? 'かいふくせいこう！' : 'せいかい！';
-      this._addToPracticeLog(`${actionMsg} ${readingMsg}`);
-      
       console.log(`✅ 正解: ${gameState.currentKanji.text} = ${answer}`);
       
       setTimeout(() => {
         this._pickNextUnmasteredKanji();
         battleState.turn = 'player';
         battleState.inputEnabled = true;
-      }, 1500);
+      }, 1000); // 少し短縮
       
     } catch (error) {
       console.error('❌ 正解処理エラー:', error);
@@ -531,24 +499,21 @@ const practiceBattleScreenState = {
       this.practiceStats.incorrectCount++;
       
       this.lastIncorrectAnswer = answer;
-      battleState.lastAnswered = { ...gameState.currentKanji };
+      // 前回の答えを保存（不正解の場合でも読み情報は保存）
+      battleState.lastAnswered = { 
+        ...gameState.currentKanji,
+        incorrectAnswer: answer // 間違えた読みを記録
+      };
       
       publish('playSE', 'wrong');
       
-      const onyomiStr = (gameState.currentKanji.onyomi || []).join('、');
-      const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
-      const readingMsg = `正しい読み: 音「${onyomiStr}」訓「${kunyomiStr}」`;
-      
-      const actionMsg = actionType === 'heal' ? 'かいふくしっぱい！' : 'こうげきしっぱい！';
-      this._addToPracticeLog(`${actionMsg} ${readingMsg}`);
-      this._addToPracticeLog('もう一度挑戦しよう！');
-      
       console.log(`❌ 不正解: ${gameState.currentKanji.text} ≠ ${answer}`);
       
+      // 同じ問題を継続（短縮）
       setTimeout(() => {
         battleState.turn = 'player';
         battleState.inputEnabled = true;
-      }, 1500);
+      }, 1000);
       
     } catch (error) {
       console.error('❌ 不正解処理エラー:', error);
@@ -635,7 +600,7 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 画面の描画更新
+   * 画面の描画更新（ログエリアなし版）
    */
   update(dt) {
     try {
@@ -645,11 +610,10 @@ const practiceBattleScreenState = {
       gameState.currentEnemy = null;
       gameState.enemies = [];
       
-      if (battleScreenState.update) {
-        battleScreenState.update.call(this, dt);
-      }
+      // 通常描画（ログ部分をスキップ）
+      this._drawMinimalBattleUI(dt);
       
-      // 🎨 新しいレイアウトで描画
+      // 🎨 最適化されたUIを描画
       this._hideEnemyAndPlayerUIAreas();
       this._drawOptimizedPracticeUI();
       
@@ -658,6 +622,143 @@ const practiceBattleScreenState = {
       
     } catch (error) {
       console.error('❌ 描画更新エラー:', error);
+    }
+  },
+
+  /**
+   * 最小限のバトルUI描画（ログなし）
+   */
+  _drawMinimalBattleUI(dt) {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // ① 背景描画
+    if (this.stageBgImage) {
+      this.ctx.drawImage(this.stageBgImage, 0, 0, this.canvas.width, this.canvas.height);
+    } else {
+      const grad = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+      grad.addColorStop(0, '#1e3c72');
+      grad.addColorStop(1, '#2a5298');
+      this.ctx.fillStyle = grad;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    // ② 上部ボタン描画
+    const BTN = {
+      back:   { x: 20,  y: 20,  w: 100, h: 30,  label: 'タイトルへ' },
+      stage:  { x: 140, y: 20,  w: 120, h: 30,  label: 'ステージ選択' },
+    };
+
+    [BTN.back, BTN.stage].forEach(b => {
+      const isHovered = this.mouseX && this.mouseY ? 
+        (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h) : false;
+      
+      this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
+      this.ctx.fillRect(b.x, b.y, b.w, b.h);
+      
+      this.ctx.fillStyle = 'white';
+      this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
+      
+      this.ctx.strokeStyle = 'white';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(b.x, b.y, b.w, b.h);
+    });
+
+    // ③ 漢字ボックス描画
+    const kanjiX = this.canvas.width / 2;
+    const kanjiY = 200;
+    const kanjiBoxW = 180, kanjiBoxH = 160;
+    
+    let offsetX = 0, offsetY = 0, alpha = 1;
+    if (this.shakeEffect && this.shakeEffect.active) {
+      const intensity = this.shakeEffect.intensity * (this.shakeEffect.timer / this.shakeEffect.duration);
+      offsetX = (Math.random() * 2 - 1) * intensity;
+      offsetY = (Math.random() * 2 - 1) * intensity;
+    }
+
+    const adjustedX = kanjiX - (kanjiBoxW / 2) + offsetX;
+    const adjustedY = kanjiY - (kanjiBoxH / 2) + offsetY;
+
+    // 石版パネル描画
+    if (typeof drawStonePanel === 'function') {
+      drawStonePanel(this.ctx, adjustedX, adjustedY, kanjiBoxW, kanjiBoxH);
+    } else {
+      this.ctx.fillStyle = 'rgba(50, 50, 60, 0.85)';
+      this.ctx.fillRect(adjustedX, adjustedY, kanjiBoxW, kanjiBoxH);
+      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(adjustedX, adjustedY, kanjiBoxW, kanjiBoxH);
+    }
+
+    // 漢字表示
+    if (gameState.currentKanji) {
+      this.ctx.font = '80px serif';
+      this.ctx.fillStyle = 'white';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      this.ctx.shadowBlur = 5;
+      this.ctx.shadowOffsetX = 3;
+      this.ctx.shadowOffsetY = 3;
+      this.ctx.fillText(gameState.currentKanji.text, adjustedX + kanjiBoxW / 2, adjustedY + kanjiBoxH / 2);
+      this.ctx.shadowColor = 'transparent';
+      this.ctx.shadowBlur = 0;
+      this.ctx.shadowOffsetX = 0;
+      this.ctx.shadowOffsetY = 0;
+    }
+
+    // ④ 石版攻撃エフェクト
+    if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
+      this.drawStoneAttackEffect(adjustedX, adjustedY, kanjiBoxW, kanjiBoxH);
+    }
+
+    // ⑤ アクションボタン描画
+    const actionBTN = {
+      attack: { x: 230, y: 380, w: 110, h: 50, label: "こうげき" },
+      heal:   { x: 350, y: 380, w: 110, h: 50, label: "かいふく" },
+      hint:   { x: 470, y: 380, w: 110, h: 50, label: "ヒント" },
+    };
+
+    const mode = battleState.lastCommandMode || 'attack';
+    
+    Object.entries(actionBTN).forEach(([key, btn]) => {
+      const isSelected = (mode === key);
+      const isHovered = this.mouseX && this.mouseY ? 
+        (this.mouseX >= btn.x && this.mouseX <= btn.x + btn.w && this.mouseY >= btn.y && this.mouseY <= btn.y + btn.h) : false;
+      
+      this.ctx.fillStyle = isSelected ? '#e74c3c' : (isHovered ? '#4e6d8c' : '#2980b9');
+      this.ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
+      
+      this.ctx.fillStyle = 'white';
+      this.ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(btn.label, btn.x + btn.w/2, btn.y + btn.h/2);
+      
+      this.ctx.strokeStyle = 'white';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(btn.x, btn.y, btn.w, btn.h);
+    });
+
+    // ⑥ エフェクト更新
+    if (this.kanjiBoxEffect && this.kanjiBoxEffect.active) {
+      this.kanjiBoxEffect.timer--;
+      if (this.kanjiBoxEffect.timer <= 0) {
+        this.kanjiBoxEffect.active = false;
+      }
+    }
+
+    if (this.shakeEffect && this.shakeEffect.active) {
+      this.shakeEffect.timer--;
+      if (this.shakeEffect.timer <= 0) {
+        this.shakeEffect.active = false;
+      }
+    }
+
+    if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
+      this.updateStoneAttackEffect();
     }
   },
 
@@ -686,10 +787,10 @@ const practiceBattleScreenState = {
       
       // プレイヤーエリア
       if (this.stageBgImage) {
-        this.ctx.drawImage(this.stageBgImage, 20, 450, 280, 130, 20, 450, 280, 130);
+        this.ctx.drawImage(this.stageBgImage, 20, 500, 280, 100, 20, 500, 280, 100);
       } else {
         this.ctx.fillStyle = bgGradient;
-        this.ctx.fillRect(20, 450, 280, 130); // プレイヤーステータスパネル
+        this.ctx.fillRect(20, 500, 280, 100); // プレイヤーステータスパネル
       }
       
       this.ctx.restore();
@@ -700,24 +801,24 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 🎨 最適化されたUIを描画
+   * 🎨 最適化されたUIを描画（ログなし版）
    */
   _drawOptimizedPracticeUI() {
     try {
-      this._drawCompactPreviousKanjiPanel();      // 前回漢字（コンパクト）
-      this._drawCurrentKanjiDetailPanel();        // 現在漢字詳細（読みなし）
-      this._drawEnhancedProgressPanel();          // 拡張進捗パネル
-      this._drawPracticeModeBadge();              // 練習モードバッジ
-      this._drawDetailedStatsPanel();             // 詳細統計パネル
+      this._drawPreviousKanjiPanelWithReadings();  // 前回漢字（読み付き）
+      this._drawCurrentKanjiDetailPanel();         // 現在漢字詳細
+      this._drawEnhancedProgressPanel();           // 拡張進捗パネル
+      this._drawPracticeModeBadge();               // 練習モードバッジ
+      this._drawQuickStatsBar();                   // 簡易統計バー
     } catch (error) {
       console.error('❌ 最適化UI描画エラー:', error);
     }
   },
 
   /**
-   * 📦 コンパクトな前回漢字パネル
+   * 📖 前回漢字パネル（正確な読み表示付き）
    */
-  _drawCompactPreviousKanjiPanel() {
+  _drawPreviousKanjiPanelWithReadings() {
     if (!this.ctx || !battleState.lastAnswered) return;
     
     try {
@@ -728,45 +829,85 @@ const practiceBattleScreenState = {
       this.ctx.fillStyle = 'white';
       this.ctx.textAlign = 'center';
       
-      // タイトル（小さく）
-      this.ctx.font = 'bold 12px "UDデジタル教科書体",sans-serif';
-      this.ctx.fillText('前回の漢字', x + w/2, y + 15);
+      // タイトル
+      this.ctx.font = 'bold 14px "UDデジタル教科書体",sans-serif';
+      this.ctx.fillText('前回の漢字', x + w/2, y + 18);
       
-      // 漢字本体（中サイズ）
-      this.ctx.font = '40px serif';
-      this.ctx.fillText(battleState.lastAnswered.text, x + w/2, y + 60);
+      // 漢字本体
+      this.ctx.font = '48px serif';
+      this.ctx.fillText(battleState.lastAnswered.text, x + w/2, y + 70);
 
-      // 基本情報（コンパクト）
-      this.ctx.font = '11px "UDデジタル教科書体",sans-serif';
+      // 基本情報
+      this.ctx.font = '12px "UDデジタル教科書体",sans-serif';
       this.ctx.textAlign = 'left';
       this.ctx.fillStyle = 'white';
       
-      const infoY = y + 85;
+      let infoY = y + 100;
+      
+      // 画数と意味
       this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}画`, x + 10, infoY);
+      infoY += 16;
       
       if (battleState.lastAnswered.meaning) {
-        this.ctx.fillText(`意味: ${battleState.lastAnswered.meaning.substring(0, 8)}...`, x + 10, infoY + 15);
+        const meaning = battleState.lastAnswered.meaning.length > 14 
+          ? battleState.lastAnswered.meaning.substring(0, 14) + '...'
+          : battleState.lastAnswered.meaning;
+        this.ctx.fillText(`意味: ${meaning}`, x + 10, infoY);
+        infoY += 16;
       }
 
-      // 間違った答え（あれば）
-      if (this.lastIncorrectAnswer) {
-        const errorY = y + h - 25;
+      // 🆕 正確な読み表示
+      this.ctx.fillStyle = '#e8f5e8';
+      this.ctx.fillText('正しい読み:', x + 10, infoY);
+      infoY += 16;
+
+      // 音読み表示
+      const onyomiArr = battleState.lastAnswered.onyomi || [];
+      if (onyomiArr.length > 0) {
+        this.ctx.fillStyle = '#f39c12';
+        this.ctx.fillText(`音: ${onyomiArr.join('、')}`, x + 15, infoY);
+        infoY += 16;
+      }
+
+      // 訓読み表示
+      const kunyomiArr = battleState.lastAnswered.kunyomi || [];
+      if (kunyomiArr.length > 0) {
+        this.ctx.fillStyle = '#2ecc71';
+        this.ctx.fillText(`訓: ${kunyomiArr.join('、')}`, x + 15, infoY);
+        infoY += 16;
+      }
+
+      // あなたの答え表示
+      if (battleState.lastAnswered.correctAnswer) {
+        // 正解した場合
+        this.ctx.fillStyle = 'rgba(46, 204, 113, 0.3)';
+        this.ctx.fillRect(x + 8, y + h - 30, w - 16, 22);
+        this.ctx.strokeStyle = '#2ecc71';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(x + 8, y + h - 30, w - 16, 22);
+        
+        this.ctx.fillStyle = '#2ecc71';
+        this.ctx.font = 'bold 11px "UDデジタル教科書体",sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(`あなたの答え: ${battleState.lastAnswered.correctAnswer}`, x + w/2, y + h - 16);
+      } else if (this.lastIncorrectAnswer) {
+        // 不正解した場合
         this.ctx.fillStyle = 'rgba(231, 76, 60, 0.3)';
-        this.ctx.fillRect(x + 5, errorY, w - 10, 20);
+        this.ctx.fillRect(x + 8, y + h - 30, w - 16, 22);
         this.ctx.strokeStyle = '#e74c3c';
         this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(x + 5, errorY, w - 10, 20);
+        this.ctx.strokeRect(x + 8, y + h - 30, w - 16, 22);
         
         this.ctx.fillStyle = '#e74c3c';
-        this.ctx.font = 'bold 10px "UDデジタル教科書体",sans-serif';
+        this.ctx.font = 'bold 11px "UDデジタル教科書体",sans-serif';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(`あなた: ${this.lastIncorrectAnswer}`, x + w/2, errorY + 13);
+        this.ctx.fillText(`あなたの答え: ${this.lastIncorrectAnswer}`, x + w/2, y + h - 16);
       }
 
       // MASTERバッジ
       const prog = gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id];
       if (prog && prog.mastered) {
-        this._drawMasterBadge(this.ctx, x + w - 6, y + 6);
+        this._drawMasterBadge(this.ctx, x + w - 8, y + 8);
       }
       
     } catch (error) {
@@ -775,7 +916,7 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 📚 現在学習中漢字の詳細パネル（読みなし）
+   * 📚 現在学習中漢字の詳細パネル（読みなし・拡大版）
    */
   _drawCurrentKanjiDetailPanel() {
     if (!this.ctx || !gameState.currentKanji) return;
@@ -789,74 +930,75 @@ const practiceBattleScreenState = {
       this.ctx.textAlign = 'center';
       
       // タイトル
-      this.ctx.font = 'bold 12px "UDデジタル教科書体",sans-serif';
-      this.ctx.fillText('学習中の漢字', x + w/2, y + 15);
+      this.ctx.font = 'bold 14px "UDデジタル教科書体",sans-serif';
+      this.ctx.fillText('学習中の漢字', x + w/2, y + 18);
       
-      // 漢字本体（小さめ）
-      this.ctx.font = '32px serif';
-      this.ctx.fillText(gameState.currentKanji.text, x + w/2, y + 50);
+      // 漢字本体
+      this.ctx.font = '38px serif';
+      this.ctx.fillText(gameState.currentKanji.text, x + w/2, y + 60);
 
       // 詳細情報（読みは表示しない）
-      this.ctx.font = '11px "UDデジタル教科書体",sans-serif';
+      this.ctx.font = '12px "UDデジタル教科書体",sans-serif';
       this.ctx.textAlign = 'left';
       this.ctx.fillStyle = 'white';
       
-      let infoY = y + 70;
+      let infoY = y + 85;
       
       // 画数
-      this.ctx.fillText(`画数: ${gameState.currentKanji.strokes}画`, x + 10, infoY);
-      infoY += 15;
+      this.ctx.fillText(`画数: ${gameState.currentKanji.strokes}画`, x + 12, infoY);
+      infoY += 16;
       
-      // 意味（短縮表示）
+      // 意味（詳細表示）
       if (gameState.currentKanji.meaning) {
-        const meaning = gameState.currentKanji.meaning.length > 12 
-          ? gameState.currentKanji.meaning.substring(0, 12) + '...'
+        const meaning = gameState.currentKanji.meaning.length > 16 
+          ? gameState.currentKanji.meaning.substring(0, 16) + '...'
           : gameState.currentKanji.meaning;
-        this.ctx.fillText(`意味: ${meaning}`, x + 10, infoY);
-        infoY += 15;
+        this.ctx.fillText(`意味: ${meaning}`, x + 12, infoY);
+        infoY += 16;
       }
       
       // 部首（あれば）
       if (gameState.currentKanji.radical) {
-        this.ctx.fillText(`部首: ${gameState.currentKanji.radical}`, x + 10, infoY);
-        infoY += 15;
+        this.ctx.fillText(`部首: ${gameState.currentKanji.radical}`, x + 12, infoY);
+        infoY += 16;
       }
       
       // JLPTレベル（あれば）
       if (gameState.currentKanji.jlpt) {
-        this.ctx.fillText(`JLPT: ${gameState.currentKanji.jlpt}`, x + 10, infoY);
+        this.ctx.fillText(`JLPT: ${gameState.currentKanji.jlpt}`, x + 12, infoY);
+        infoY += 16;
       }
 
-      // 学習進捗ゲージ
+      // 学習進捗ゲージ（拡大版）
       const prog = gameState.kanjiReadProgress && gameState.kanjiReadProgress[gameState.currentKanji.id];
       if (prog) {
-        const gaugeY = y + h - 25;
-        const gaugeW = w - 20;
-        const gaugeH = 8;
+        const gaugeY = y + h - 35;
+        const gaugeW = w - 24;
+        const gaugeH = 10;
         
         // 全体のゲージ背景
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-        this.ctx.fillRect(x + 10, gaugeY, gaugeW, gaugeH);
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        this.ctx.fillRect(x + 12, gaugeY, gaugeW, gaugeH);
         
-        // 進捗計算（音読み + 訓読みの習得率）
+        // 進捗計算
         const totalReadings = (gameState.currentKanji.onyomi || []).length + (gameState.currentKanji.kunyomi || []).length;
         const masteredReadings = (prog.onyomi ? prog.onyomi.size : 0) + (prog.kunyomi ? prog.kunyomi.size : 0);
         const progressRatio = totalReadings > 0 ? masteredReadings / totalReadings : 0;
         
         // 進捗バー
         this.ctx.fillStyle = progressRatio >= 1 ? '#2ecc71' : '#3498db';
-        this.ctx.fillRect(x + 10, gaugeY, gaugeW * progressRatio, gaugeH);
+        this.ctx.fillRect(x + 12, gaugeY, gaugeW * progressRatio, gaugeH);
         
         // 枠線
         this.ctx.strokeStyle = 'white';
         this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(x + 10, gaugeY, gaugeW, gaugeH);
+        this.ctx.strokeRect(x + 12, gaugeY, gaugeW, gaugeH);
         
         // 進捗テキスト
-        this.ctx.font = '9px "UDデジタル教科書体",sans-serif';
+        this.ctx.font = '10px "UDデジタル教科書体",sans-serif';
         this.ctx.textAlign = 'center';
         this.ctx.fillStyle = 'white';
-        this.ctx.fillText(`${masteredReadings}/${totalReadings} 習得`, x + w/2, gaugeY + 20);
+        this.ctx.fillText(`習得: ${masteredReadings}/${totalReadings}`, x + w/2, gaugeY + 22);
       }
       
     } catch (error) {
@@ -865,7 +1007,7 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 📈 拡張マスター進捗パネル
+   * 📈 拡張マスター進捗パネル（拡大版）
    */
   _drawEnhancedProgressPanel() {
     if (!this.ctx) return;
@@ -888,8 +1030,8 @@ const practiceBattleScreenState = {
       this.ctx.textAlign = 'left';
       
       // タイトル
-      this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
-      this.ctx.fillText('📊 学習進捗ダッシュボード', x + 15, y + 25);
+      this.ctx.font = 'bold 20px "UDデジタル教科書体", sans-serif';
+      this.ctx.fillText('📊 学習進捗ダッシュボード', x + 18, y + 28);
 
       // 基本統計
       const stageKanji = getKanjiByStageId(gameState.currentStageId);
@@ -898,22 +1040,22 @@ const practiceBattleScreenState = {
       const progressPercent = Math.round((masteredCount / totalKanji) * 100);
 
       // 左側：マスター進捗
-      this.ctx.font = 'bold 14px "UDデジタル教科書体", sans-serif';
-      this.ctx.fillText('マスター進捗', x + 15, y + 50);
-      
-      this.ctx.font = 'bold 28px "UDデジタル教科書体", sans-serif';
-      this.ctx.fillStyle = '#4caf50';
-      this.ctx.fillText(`${masteredCount}`, x + 15, y + 75);
-      
       this.ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
+      this.ctx.fillText('マスター進捗', x + 18, y + 55);
+      
+      this.ctx.font = 'bold 32px "UDデジタル教科書体", sans-serif';
+      this.ctx.fillStyle = '#4caf50';
+      this.ctx.fillText(`${masteredCount}`, x + 18, y + 85);
+      
+      this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
       this.ctx.fillStyle = 'white';
-      this.ctx.fillText(`/ ${totalKanji} (${progressPercent}%)`, x + 65, y + 75);
+      this.ctx.fillText(`/ ${totalKanji} (${progressPercent}%)`, x + 75, y + 85);
 
       // プログレスバー（大）
-      const barX = x + 15;
-      const barY = y + 85;
-      const barW = w - 30;
-      const barH = 12;
+      const barX = x + 18;
+      const barY = y + 95;
+      const barW = w - 36;
+      const barH = 14;
       
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
       this.ctx.fillRect(barX, barY, barW, barH);
@@ -930,38 +1072,40 @@ const practiceBattleScreenState = {
       this.ctx.strokeRect(barX, barY, barW, barH);
 
       // 右側：セッション統計
-      const rightX = x + w/2 + 10;
+      const rightX = x + w/2 + 15;
       
-      this.ctx.font = 'bold 14px "UDデジタル教科書体", sans-serif';
+      this.ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
       this.ctx.fillStyle = 'white';
-      this.ctx.fillText('本日の学習', rightX, y + 50);
+      this.ctx.fillText('本日の学習', rightX, y + 55);
       
-      // 今日の練習回数
-      this.ctx.font = '12px "UDデジタル教科書体", sans-serif';
-      this.ctx.fillText(`練習回数: ${this.practiceStats.todaysPracticeCount}問`, rightX, y + 70);
+      // 統計項目
+      this.ctx.font = '13px "UDデジタル教科書体", sans-serif';
+      let statY = y + 75;
       
-      // 連続正答数
-      this.ctx.fillText(`連続正答: ${this.practiceStats.sessionStreak}問`, rightX, y + 85);
+      this.ctx.fillText(`練習回数: ${this.practiceStats.todaysPracticeCount}問`, rightX, statY);
+      statY += 18;
       
-      // セッション正答率
+      this.ctx.fillText(`連続正答: ${this.practiceStats.sessionStreak}問`, rightX, statY);
+      statY += 18;
+      
       const sessionTotal = this.practiceStats.totalPracticed;
       const sessionCorrect = this.practiceStats.correctCount;
       const sessionAccuracy = sessionTotal > 0 ? Math.round((sessionCorrect / sessionTotal) * 100) : 0;
-      this.ctx.fillText(`セッション正答率: ${sessionAccuracy}%`, rightX, y + 100);
+      this.ctx.fillText(`セッション正答率: ${sessionAccuracy}%`, rightX, statY);
+      statY += 18;
 
-      // 学習時間
       const sessionTime = Math.floor((Date.now() - this.practiceStats.startTime) / 1000 / 60);
-      this.ctx.fillText(`学習時間: ${sessionTime}分`, rightX, y + 115);
+      this.ctx.fillText(`学習時間: ${sessionTime}分`, rightX, statY);
 
       // 下部：クイック統計
-      const bottomY = y + h - 25;
-      this.ctx.font = '11px "UDデジタル教科書体", sans-serif';
+      const bottomY = y + h - 30;
+      this.ctx.font = '12px "UDデジタル教科書体", sans-serif';
       this.ctx.fillStyle = '#bdc3c7';
       
       const quickStats = [
         `残り未マスター: ${this.unmasteredKanji.length}件`,
-        `今回正解: ${sessionCorrect}/${sessionTotal}問`,
-        sessionTotal > 0 ? `平均応答時間: ${Math.round(sessionTime * 60 / sessionTotal)}秒` : '応答時間: -'
+        `今回: ${sessionCorrect}/${sessionTotal}問正解`,
+        sessionTotal > 0 ? `平均応答時間: ${Math.round(sessionTime * 60 / sessionTotal)}秒` : '応答時間: 計測中'
       ].join(' | ');
       
       this.ctx.textAlign = 'center';
@@ -973,7 +1117,7 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 🎯 練習モードバッジ
+   * 🎯 練習モードバッジ（拡大版）
    */
   _drawPracticeModeBadge() {
     if (!this.ctx) return;
@@ -986,12 +1130,12 @@ const practiceBattleScreenState = {
       this.ctx.fillRect(x, y, w, h);
       
       this.ctx.strokeStyle = 'rgba(56, 142, 60, 1)';
-      this.ctx.lineWidth = 2;
+      this.ctx.lineWidth = 3;
       this.ctx.strokeRect(x, y, w, h);
       
       // アイコンとテキスト
       this.ctx.fillStyle = 'white';
-      this.ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
+      this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
       this.ctx.fillText('📚 練習モード', x + w/2, y + h/2);
@@ -1002,19 +1146,19 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 📋 詳細統計パネル
+   * 📊 簡易統計バー（上部配置）
    */
-  _drawDetailedStatsPanel() {
+  _drawQuickStatsBar() {
     if (!this.ctx || this.practiceStats.totalPracticed === 0) return;
     
     try {
-      const { x, y, w, h } = this.panelConfig.stats;
+      const { x, y, w, h } = this.panelConfig.quickStats;
       
-      // パネル背景
-      this.ctx.fillStyle = 'rgba(30, 60, 114, 0.9)';
+      // バー背景
+      this.ctx.fillStyle = 'rgba(52, 73, 94, 0.9)';
       this.ctx.fillRect(x, y, w, h);
       
-      this.ctx.strokeStyle = '#2196f3';
+      this.ctx.strokeStyle = '#34495e';
       this.ctx.lineWidth = 2;
       this.ctx.strokeRect(x, y, w, h);
       
@@ -1023,15 +1167,15 @@ const practiceBattleScreenState = {
       const accuracy = Math.round((correctCount / totalPracticed) * 100);
       
       this.ctx.fillStyle = 'white';
-      this.ctx.font = 'bold 14px "UDデジタル教科書体", sans-serif';
-      this.ctx.textAlign = 'left';
+      this.ctx.font = 'bold 12px "UDデジタル教科書体", sans-serif';
+      this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
       
-      const statsText = `📈 セッション統計: ${totalPracticed}問練習 | 正答率${accuracy}% | 連続正答${sessionStreak}問 | ${correctCount}正解/${totalPracticed - correctCount}不正解`;
-      this.ctx.fillText(statsText, x + 15, y + h/2);
+      const statsText = `🎯 ${totalPracticed}問 | ✅${accuracy}% | 🔥${sessionStreak}連続`;
+      this.ctx.fillText(statsText, x + w/2, y + h/2);
       
     } catch (error) {
-      console.error('❌ 詳細統計パネル描画エラー:', error);
+      console.error('❌ 簡易統計バー描画エラー:', error);
     }
   },
 
@@ -1042,7 +1186,7 @@ const practiceBattleScreenState = {
     try {
       ctx.save();
       
-      let bgColor = 'rgba(0, 0, 0, 0.7)';
+      let bgColor = 'rgba(0, 0, 0, 0.75)';
       if (style === 'stone') {
         bgColor = 'rgba(50, 50, 60, 0.85)';
       }
@@ -1050,12 +1194,12 @@ const practiceBattleScreenState = {
       ctx.fillStyle = bgColor;
       ctx.fillRect(x, y, width, height);
       
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
       ctx.lineWidth = 2;
       ctx.strokeRect(x, y, width, height);
       
       if (style === 'stone') {
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
         ctx.lineWidth = 1;
         
         for (let i = 1; i < 3; i++) {
@@ -1079,7 +1223,7 @@ const practiceBattleScreenState = {
   _drawMasterBadge(ctx, x, y) {
     try {
       ctx.save();
-      ctx.font = 'bold 9px "UDデジタル教科書体",sans-serif';
+      ctx.font = 'bold 10px "UDデジタル教科書体",sans-serif';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'top';
       ctx.fillStyle = '#3498db';
@@ -1087,10 +1231,10 @@ const practiceBattleScreenState = {
       ctx.lineWidth = 1;
 
       const label = 'MASTER';
-      const padX = 4, padY = 2;
+      const padX = 5, padY = 3;
       const w = ctx.measureText(label).width + padX * 2;
-      const h = 14;
-      const rx = 3;
+      const h = 16;
+      const rx = 4;
       const left = x - w, top = y;
 
       ctx.beginPath();
@@ -1109,7 +1253,7 @@ const practiceBattleScreenState = {
       ctx.stroke();
 
       ctx.fillStyle = 'white';
-      ctx.fillText(label, x - padX, top + 2);
+      ctx.fillText(label, x - padX, top + 3);
       ctx.restore();
       
     } catch (error) {
@@ -1118,33 +1262,15 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 練習ログにメッセージを追加
-   */
-  _addToPracticeLog(message) {
-    try {
-      if (!Array.isArray(battleState.log)) battleState.log = [];
-      battleState.log.push(message);
-      
-      if (this.startTypewriterEffect) {
-        this.startTypewriterEffect(message);
-      }
-      
-    } catch (error) {
-      console.error('❌ ログ追加エラー:', error);
-    }
-  },
-
-  /**
    * 全漢字マスター完了メッセージ
    */
   _showAllMasteredMessage() {
     try {
-      this._addToPracticeLog('このステージの漢字は全てマスター済みです！');
-      this._addToPracticeLog('素晴らしい！完璧です！');
+      console.log('🎉 全ての漢字をマスターしました！');
       
       setTimeout(() => {
         this._completePractice();
-      }, 2000);
+      }, 1000);
       
     } catch (error) {
       console.error('❌ 全マスターメッセージエラー:', error);
@@ -1160,10 +1286,12 @@ const practiceBattleScreenState = {
       const accuracy = totalPracticed > 0 ? Math.round((correctCount / totalPracticed) * 100) : 0;
       const sessionTime = Math.floor((Date.now() - this.practiceStats.startTime) / 1000 / 60);
       
-      this._addToPracticeLog('練習完了！お疲れさまでした！');
-      this._addToPracticeLog(`統計: ${totalPracticed}問中 ${correctCount}問正解 (正答率${accuracy}%) 学習時間${sessionTime}分`);
-      
-      console.log('🎯 練習完了:', this.practiceStats);
+      console.log('🎯 練習完了:', {
+        totalPracticed,
+        correctCount, 
+        accuracy: `${accuracy}%`,
+        sessionTime: `${sessionTime}分`
+      });
       
       publish('playSE', 'stageClear');
       
@@ -1173,7 +1301,7 @@ const practiceBattleScreenState = {
         } else {
           publish('changeScreen', 'stageSelect');
         }
-      }, 2500);
+      }, 2000);
       
     } catch (error) {
       console.error('❌ 練習完了処理エラー:', error);
@@ -1220,7 +1348,6 @@ const practiceBattleScreenState = {
       
       if (!before && prog.mastered) {
         console.log(`🎉 漢字「${currentKanji.text}」をマスターしました！`);
-        this._addToPracticeLog(`「${currentKanji.text}」をマスターしました！`);
         
         if (this.masteryFlash) {
           this.masteryFlash = { 
