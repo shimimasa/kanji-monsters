@@ -5241,7 +5241,54 @@ function colorize(s) {
   return { text: s };
 }
 
-
+/**
+ * シールド専用の枠エフェクトを描画
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D コンテキスト
+ * @param {number} x - 枠のX座標
+ * @param {number} y - 枠のY座標
+ * @param {number} width - 枠の幅
+ * @param {number} height - 枠の高さ
+ * @param {Object} shieldStyle - シールドスタイル情報
+ * @param {Object} currentStyle - 現在のスタイル情報
+ */
+function drawShieldFrameEffects(ctx, x, y, width, height, shieldStyle, currentStyle) {
+  const time = Date.now() * 0.003;
+  const integrity = shieldStyle.hp / shieldStyle.maxHp;
+  
+  ctx.save();
+  
+  // シールド状態に応じたエフェクト
+  if (integrity <= 0.33) {
+    // 危険状態：枠周りに警告エフェクト
+    const dangerAlpha = (Math.sin(time * 6) + 1) * 0.3;
+    ctx.strokeStyle = `rgba(255, 50, 50, ${dangerAlpha})`;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 8]);
+    drawRoundedRect(ctx, x - 5, y - 5, width + 10, height + 10, 12, true);
+    ctx.setLineDash([]);
+  } else if (integrity <= 0.66) {
+    // 警戒状態：軽微な光る枠
+    const warnAlpha = (Math.sin(time * 3) + 1) * 0.2;
+    ctx.strokeStyle = `rgba(255, 165, 0, ${warnAlpha})`;
+    ctx.lineWidth = 1;
+    drawRoundedRect(ctx, x - 2, y - 2, width + 4, height + 4, 10, true);
+  }
+  
+  // シールドエネルギーの流れエフェクト
+  const flowOffset = (time * 50) % 20;
+  ctx.strokeStyle = currentStyle.accentColor;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.3;
+  
+  for (let i = 0; i < 4; i++) {
+    const offset = (flowOffset + i * 5) % 20;
+    ctx.setLineDash([4, 16]);
+    ctx.lineDashOffset = -offset;
+    drawRoundedRect(ctx, x + i, y + i, width - i * 2, height - i * 2, 8 - i, true);
+  }
+  
+  ctx.restore();
+}
 /**
  * モンスター出現枠を描画する関数
  */
