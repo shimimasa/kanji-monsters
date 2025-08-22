@@ -1,4 +1,3 @@
-// js/settingsScreen.js
 import { gameState } from '../core/gameState.js';
 import { drawButton, isMouseOverRect, drawThemeBackground, drawPanelBackground } from '../ui/uiRenderer.js';
 import { getCurrentUser } from '../services/firebase/firebaseController.js';
@@ -8,8 +7,6 @@ const settingsScreenState = {
   canvas: null,
   ctx: null,
   _clickHandler: null,
-  // Canvas関連のボタンプロパティを削除
-  // backButton, resetButton, _mousemoveHandler, mouseX, mouseY, hoveredButton は削除
 
   /** 画面表示時の初期化 */
   enter(arg) {
@@ -28,138 +25,323 @@ const settingsScreenState = {
     // 設定画面専用のコンテナを作成
     this.createSettingsContainer(uiRoot);
 
-    // Canvas関連のボタン定義は削除
-    // this.backButton と this.resetButton の定義を削除
-
-    // クリックイベント登録（Canvasボタン用は削除）
+    // クリックイベント登録
     this.registerHandlers();
   },
 
-        /** 設定画面専用のコンテナを作成 */
-        createSettingsContainer(uiRoot) {
-          // メインコンテナ
-          const settingsContainer = document.createElement('div');
-          settingsContainer.id = 'settingsContainer';
-          settingsContainer.className = 'settings-container';
-          
-          // DOM要素としてタイトルを生成
-          const settingsTitle = document.createElement('h2');
-          settingsTitle.textContent = '設定';
-          settingsTitle.className = 'settings-title';
-          settingsContainer.appendChild(settingsTitle);
-          
-          // オーディオ設定パネル
-          const audioPanel = this.createAudioPanel();
-          settingsContainer.appendChild(audioPanel);
+  /** 設定画面専用のコンテナを作成 */
+  createSettingsContainer(uiRoot) {
+    // メインコンテナ
+    const settingsContainer = document.createElement('div');
+    settingsContainer.id = 'settingsContainer';
+    settingsContainer.className = 'settings-container';
+    
+    // DOM要素としてタイトルを生成
+    const settingsTitle = document.createElement('h2');
+    settingsTitle.textContent = '設定';
+    settingsTitle.className = 'settings-title';
+    settingsContainer.appendChild(settingsTitle);
+    
+    // ゲームモード設定パネル
+    const gameModePanel = this.createGameModePanel();
+    settingsContainer.appendChild(gameModePanel);
+    
+    // オーディオ設定パネル
+    const audioPanel = this.createAudioPanel();
+    settingsContainer.appendChild(audioPanel);
 
-          // バトル設定パネル
-          const battlePanel = this.createBattlePanel();
-          settingsContainer.appendChild(battlePanel);
-          
-          // ボタンセクションを作成
-          const buttonSection = this.createButtonSection();
-          settingsContainer.appendChild(buttonSection);
-          
-          uiRoot.appendChild(settingsContainer);
-        },
-  
-    /** ボタンセクションを作成 */
-    createButtonSection() {
-      const buttonSection = document.createElement('div');
-      buttonSection.className = 'settings-button-section';
-      
-      // データリセットボタン
-      const resetButton = document.createElement('button');
-      resetButton.className = 'settings-button danger';
-      resetButton.textContent = 'データリセット（はじめから）';
-      resetButton.addEventListener('click', () => {
-        publish('playSE', 'decide');
-        this.resetData();
-      });
-      
-      // メインメニューへ戻るボタン
-      const backButton = document.createElement('button');
-      backButton.className = 'settings-button primary';
-      backButton.textContent = 'メインメニューへもどる';
-      backButton.addEventListener('click', () => {
-        publish('playSE', 'decide');
-        publish('changeScreen', 'title');
-      });
-      
-      buttonSection.appendChild(resetButton);
-      buttonSection.appendChild(backButton);
-      
-      return buttonSection;
-    },
+    // バトル設定パネル
+    const battlePanel = this.createBattlePanel();
+    settingsContainer.appendChild(battlePanel);
+    
+    // ボタンセクションを作成
+    const buttonSection = this.createButtonSection();
+    settingsContainer.appendChild(buttonSection);
+    
+    uiRoot.appendChild(settingsContainer);
+  },
 
-  /** オーディオ設定パネルを作成 */
-  createAudioPanel() {
+  /** ゲームモード設定パネルを作成 */
+  createGameModePanel() {
     const panel = document.createElement('div');
     panel.className = 'settings-panel';
     
     const title = document.createElement('h3');
     title.className = 'panel-title';
-    title.textContent = 'オーディオ設定';
+    title.textContent = 'ゲームモード設定';
     panel.appendChild(title);
     
-    // BGM音量スライダー
-    const bgmGroup = document.createElement('div');
-    bgmGroup.className = 'setting-group';
+    // ゲームモード選択
+    const modeGroup = document.createElement('div');
+    modeGroup.className = 'setting-group';
     
-    const bgmLabel = document.createElement('label');
-    bgmLabel.className = 'setting-label';
-    bgmLabel.textContent = 'BGM音量';
+    const modeLabel = document.createElement('div');
+    modeLabel.className = 'setting-label-with-tooltip';
     
-    const bgmSlider = document.createElement('input');
-    bgmSlider.type = 'range';
-    bgmSlider.id = 'bgmVolumeSlider';
-    bgmSlider.className = 'volume-slider';
-    bgmSlider.min = '0';
-    bgmSlider.max = '1';
-    bgmSlider.step = '0.01';
-    bgmSlider.value = '0.7';
+    const modeLabelText = document.createElement('span');
+    modeLabelText.className = 'setting-label';
+    modeLabelText.textContent = 'ゲームモード';
     
-    const bgmValue = document.createElement('span');
-    bgmValue.className = 'volume-value';
-    bgmValue.textContent = '70%';
+    const modeTooltipTrigger = document.createElement('span');
+    modeTooltipTrigger.className = 'tooltip-trigger';
+    modeTooltipTrigger.textContent = '？';
     
-    bgmGroup.appendChild(bgmLabel);
-    bgmGroup.appendChild(bgmSlider);
-    bgmGroup.appendChild(bgmValue);
-    panel.appendChild(bgmGroup);
+    modeLabel.appendChild(modeLabelText);
+    modeLabel.appendChild(modeTooltipTrigger);
     
-    // SE音量スライダー
-    const seGroup = document.createElement('div');
-    seGroup.className = 'setting-group';
+    // ラジオボタン群のコンテナ
+    const modeRadioContainer = document.createElement('div');
+    modeRadioContainer.className = 'radio-container';
     
-    const seLabel = document.createElement('label');
-    seLabel.className = 'setting-label';
-    seLabel.textContent = 'SE音量';
+    // じっくりモード
+    const jikkuriLabel = document.createElement('label');
+    jikkuriLabel.className = 'radio-label';
+    jikkuriLabel.innerHTML = `
+      <input type="radio" name="gameMode" value="jikkuri" id="jikkuriMode">
+      <span class="radio-custom"></span>
+      じっくりモード
+    `;
     
-    const seSlider = document.createElement('input');
-    seSlider.type = 'range';
-    seSlider.id = 'seVolumeSlider';
-    seSlider.className = 'volume-slider';
-    seSlider.min = '0';
-    seSlider.max = '1';
-    seSlider.step = '0.01';
-    seSlider.value = '0.7';
+    // チャレンジモード
+    const challengeLabel = document.createElement('label');
+    challengeLabel.className = 'radio-label';
+    challengeLabel.innerHTML = `
+      <input type="radio" name="gameMode" value="challenge" id="challengeMode">
+      <span class="radio-custom"></span>
+      チャレンジモード
+    `;
     
-    const seValue = document.createElement('span');
-    seValue.className = 'volume-value';
-    seValue.textContent = '70%';
+    modeRadioContainer.appendChild(jikkuriLabel);
+    modeRadioContainer.appendChild(challengeLabel);
     
-    seGroup.appendChild(seLabel);
-    seGroup.appendChild(seSlider);
-    seGroup.appendChild(seValue);
-    panel.appendChild(seGroup);
+    // モードの説明文
+    const modeDescription = document.createElement('div');
+    modeDescription.className = 'mode-description';
+    modeDescription.id = 'modeDescription';
     
-    // イベントリスナーを設定
-    this.setupAudioEvents(bgmSlider, bgmValue, seSlider, seValue);
+    modeGroup.appendChild(modeLabel);
+    modeGroup.appendChild(modeRadioContainer);
+    modeGroup.appendChild(modeDescription);
+    panel.appendChild(modeGroup);
+    
+    // ツールチップとイベントリスナーを設定
+    this._setupTooltipEvents(
+      modeTooltipTrigger,
+      'じっくりモード: 時間制限なし、ゆっくり考えながらプレイできます。\nチャレンジモード: 時間制限あり、スピードと正確性が求められます。'
+    );
+    this.setupGameModeEvents();
     
     return panel;
   },
 
+  /** ゲームモード設定のイベントリスナーを設定 */
+  setupGameModeEvents() {
+    // 初期値をローカルストレージから取得
+    const savedGameMode = localStorage.getItem('gameMode') || 'jikkuri';
+    
+    // 少し遅延してから初期値を設定
+    setTimeout(() => {
+      const jikkuriRadio = document.getElementById('jikkuriMode');
+      const challengeRadio = document.getElementById('challengeMode');
+      const modeDescription = document.getElementById('modeDescription');
+      
+      if (jikkuriRadio && challengeRadio && modeDescription) {
+        // 保存されたモードに応じてラジオボタンを設定
+        if (savedGameMode === 'jikkuri') {
+          jikkuriRadio.checked = true;
+        } else {
+          challengeRadio.checked = true;
+        }
+        
+        // 初期説明文を設定
+        this._updateModeDescription(savedGameMode, modeDescription);
+        
+        // イベントリスナーを設定
+        jikkuriRadio.addEventListener('change', () => {
+          if (jikkuriRadio.checked) {
+            this._saveModeAndUpdateDescription('jikkuri', modeDescription);
+          }
+        });
+        
+        challengeRadio.addEventListener('change', () => {
+          if (challengeRadio.checked) {
+            this._saveModeAndUpdateDescription('challenge', modeDescription);
+          }
+        });
+      }
+    }, 100);
+  },
+
+  /** ゲームモードを保存し、説明文を更新 */
+  _saveModeAndUpdateDescription(mode, descriptionElement) {
+    // ローカルストレージに保存
+    localStorage.setItem('gameMode', mode);
+    
+    // 説明文を更新
+    this._updateModeDescription(mode, descriptionElement);
+    
+    // フィードバックSE再生
+    publish('playSE', 'decide');
+    
+    console.log('ゲームモード設定完了:', mode);
+    
+    // 設定変更の視覚的フィードバック
+    descriptionElement.style.color = '#2ecc71';
+    descriptionElement.style.fontWeight = 'bold';
+    setTimeout(() => {
+      descriptionElement.style.color = '';
+      descriptionElement.style.fontWeight = '';
+    }, 1000);
+  },
+
+  /** モードの説明文を更新 */
+  _updateModeDescription(mode, descriptionElement) {
+    const descriptions = {
+      jikkuri: '🐌 じっくりモード：時間制限なしで、ゆっくり考えながら漢字の読みを学習できます。初心者の方やじっくり学びたい方におすすめです。',
+      challenge: '⚡ チャレンジモード：時間制限ありで、スピードと正確性が求められます。ゲーム感覚で楽しみたい方や、実力を試したい方におすすめです。'
+    };
+    
+    descriptionElement.textContent = descriptions[mode] || descriptions.jikkuri;
+  },
+
+    /** ゲームモード設定のイベントリスナーを設定 */
+    setupGameModeEvents() {
+      // 初期値をローカルストレージから取得
+      const savedGameMode = localStorage.getItem('gameMode') || 'jikkuri';
+      
+      // 少し遅延してから初期値を設定
+      setTimeout(() => {
+        const jikkuriRadio = document.getElementById('jikkuriMode');
+        const challengeRadio = document.getElementById('challengeMode');
+        const modeDescription = document.getElementById('modeDescription');
+        
+        if (jikkuriRadio && challengeRadio && modeDescription) {
+          // 保存されたモードに応じてラジオボタンを設定
+          if (savedGameMode === 'jikkuri') {
+            jikkuriRadio.checked = true;
+          } else {
+            challengeRadio.checked = true;
+          }
+          
+          // 初期説明文を設定
+          this._updateModeDescription(savedGameMode, modeDescription);
+          
+          // イベントリスナーを設定
+          jikkuriRadio.addEventListener('change', () => {
+            if (jikkuriRadio.checked) {
+              this._saveModeAndUpdateDescription('jikkuri', modeDescription);
+            }
+          });
+          
+          challengeRadio.addEventListener('change', () => {
+            if (challengeRadio.checked) {
+              this._saveModeAndUpdateDescription('challenge', modeDescription);
+            }
+          });
+        }
+      }, 100);
+    },
+  
+    /** ゲームモードを保存し、説明文を更新 */
+    _saveModeAndUpdateDescription(mode, descriptionElement) {
+      // ローカルストレージに保存
+      localStorage.setItem('gameMode', mode);
+      
+      // 説明文を更新
+      this._updateModeDescription(mode, descriptionElement);
+      
+      // フィードバックSE再生
+      publish('playSE', 'decide');
+      
+      console.log('ゲームモード設定完了:', mode);
+      
+      // 設定変更の視覚的フィードバック
+      descriptionElement.style.color = '#2ecc71';
+      descriptionElement.style.fontWeight = 'bold';
+      setTimeout(() => {
+        descriptionElement.style.color = '';
+        descriptionElement.style.fontWeight = '';
+      }, 1000);
+    },
+  
+    /** モードの説明文を更新 */
+    _updateModeDescription(mode, descriptionElement) {
+      const descriptions = {
+        jikkuri: '🐌 じっくりモード：時間制限なしで、ゆっくり考えながら漢字の読みを学習できます。初心者の方やじっくり学びたい方におすすめです。',
+        challenge: '⚡ チャレンジモード：時間制限ありで、スピードと正確性が求められます。ゲーム感覚で楽しみたい方や、実力を試したい方におすすめです。'
+      };
+      
+      descriptionElement.textContent = descriptions[mode] || descriptions.jikkuri;
+    },
+  
+    /** オーディオ設定パネルを作成 */
+    createAudioPanel() {
+      const panel = document.createElement('div');
+      panel.className = 'settings-panel';
+      
+      const title = document.createElement('h3');
+      title.className = 'panel-title';
+      title.textContent = 'オーディオ設定';
+      panel.appendChild(title);
+      
+      // BGM音量スライダー
+      const bgmGroup = document.createElement('div');
+      bgmGroup.className = 'setting-group';
+      
+      const bgmLabel = document.createElement('label');
+      bgmLabel.className = 'setting-label';
+      bgmLabel.textContent = 'BGM音量';
+      
+      const bgmSlider = document.createElement('input');
+      bgmSlider.type = 'range';
+      bgmSlider.id = 'bgmVolumeSlider';
+      bgmSlider.className = 'volume-slider';
+      bgmSlider.min = '0';
+      bgmSlider.max = '1';
+      bgmSlider.step = '0.01';
+      bgmSlider.value = '0.7';
+      
+      const bgmValue = document.createElement('span');
+      bgmValue.className = 'volume-value';
+      bgmValue.textContent = '70%';
+      
+      bgmGroup.appendChild(bgmLabel);
+      bgmGroup.appendChild(bgmSlider);
+      bgmGroup.appendChild(bgmValue);
+      panel.appendChild(bgmGroup);
+      
+      // SE音量スライダー
+      const seGroup = document.createElement('div');
+      seGroup.className = 'setting-group';
+      
+      const seLabel = document.createElement('label');
+      seLabel.className = 'setting-label';
+      seLabel.textContent = 'SE音量';
+      
+      const seSlider = document.createElement('input');
+      seSlider.type = 'range';
+      seSlider.id = 'seVolumeSlider';
+      seSlider.className = 'volume-slider';
+      seSlider.min = '0';
+      seSlider.max = '1';
+      seSlider.step = '0.01';
+      seSlider.value = '0.7';
+      
+      const seValue = document.createElement('span');
+      seValue.className = 'volume-value';
+      seValue.textContent = '70%';
+      
+      seGroup.appendChild(seLabel);
+      seGroup.appendChild(seSlider);
+      seGroup.appendChild(seValue);
+      panel.appendChild(seGroup);
+      
+      // イベントリスナーを設定
+      this.setupAudioEvents(bgmSlider, bgmValue, seSlider, seValue);
+      
+      return panel;
+    },
+  
     /** 表示・アクセシビリティ設定パネルを作成 */
     createDisplayPanel() {
       const panel = document.createElement('div');
@@ -277,7 +459,7 @@ const settingsScreenState = {
         tooltip.remove();
       });
     },
-
+  
     /** オーディオ設定のイベントリスナーを設定 */
     setupAudioEvents(bgmSlider, bgmValue, seSlider, seValue) {
       // BGM音量の初期値を取得
@@ -319,160 +501,158 @@ const settingsScreenState = {
         console.log('SE音量設定完了:', parseFloat(e.target.value));
       });
     },
-
-    // 2. バトル設定パネルを作成する新しいメソッド
-/** バトル設定パネルを作成 */
-createBattlePanel() {
-  const panel = document.createElement('div');
-  panel.className = 'settings-panel';
   
-  const title = document.createElement('h3');
-  title.className = 'panel-title';
-  title.textContent = 'バトル設定';
-  panel.appendChild(title);
-  
-  // 回復回数設定
-  const healGroup = document.createElement('div');
-  healGroup.className = 'setting-group';
-  
-  const healLabel = document.createElement('div');
-  healLabel.className = 'setting-label-with-tooltip';
-  
-  const healLabelText = document.createElement('span');
-  healLabelText.className = 'setting-label';
-  healLabelText.textContent = '回復回数の上限';
-  
-  const healTooltipTrigger = document.createElement('span');
-  healTooltipTrigger.className = 'tooltip-trigger';
-  healTooltipTrigger.textContent = '？';
-  
-  healLabel.appendChild(healLabelText);
-  healLabel.appendChild(healTooltipTrigger);
-  
-  // スライダーと値表示のコンテナ
-  const healControlContainer = document.createElement('div');
-  healControlContainer.className = 'slider-container';
-  
-  const healSlider = document.createElement('input');
-  healSlider.type = 'range';
-  healSlider.id = 'healCountSlider';
-  healSlider.className = 'heal-count-slider';
-  healSlider.min = '1';
-  healSlider.max = '5';
-  healSlider.step = '1';
-  healSlider.value = '3'; // デフォルト値
-  
-  const healValue = document.createElement('span');
-  healValue.className = 'heal-count-value';
-  healValue.textContent = '3回';
-  
-  healControlContainer.appendChild(healSlider);
-  healControlContainer.appendChild(healValue);
-  
-  healGroup.appendChild(healLabel);
-  healGroup.appendChild(healControlContainer);
-  panel.appendChild(healGroup);
-  
-  // ツールチップとイベントリスナーを設定
-  this._setupTooltipEvents(
-    healTooltipTrigger,
-    '各ステージで使用できる回復の回数上限を設定します。難易度を調整したい時にご利用ください。'
-  );
-  this.setupBattleEvents(healSlider, healValue);
-  
-  return panel;
-},
-
-// 3. バトル設定のイベントリスナーを設定する新しいメソッド
-/** バトル設定のイベントリスナーを設定 */
-setupBattleEvents(healSlider, healValue) {
-  // 初期値をローカルストレージから取得
-  const savedHealCount = localStorage.getItem('maxHealCount');
-  const initialHealCount = savedHealCount ? parseInt(savedHealCount, 10) : 3;
-  
-  // スライダーと表示を初期値に設定
-  healSlider.value = initialHealCount;
-  healValue.textContent = initialHealCount + '回';
-  
-  // リアルタイム更新（スライダー操作中）
-  healSlider.addEventListener('input', (e) => {
-    const count = parseInt(e.target.value, 10);
-    healValue.textContent = count + '回';
-  });
-  
-  // 設定変更完了時の処理
-  healSlider.addEventListener('change', (e) => {
-    const count = parseInt(e.target.value, 10);
-    
-    // ローカルストレージに保存
-    localStorage.setItem('maxHealCount', count.toString());
-    
-    // フィードバックSE再生
-    publish('playSE', 'decide');
-    
-    console.log('回復回数上限設定完了:', count);
-    
-    // 設定変更の視覚的フィードバック
-    healValue.style.color = '#2ecc71';
-    healValue.style.fontWeight = 'bold';
-    setTimeout(() => {
-      healValue.style.color = '';
-      healValue.style.fontWeight = '';
-    }, 500);
-  });
-},
-
-   /** アクセシビリティ設定のイベントリスナーを設定 */
-   setupAccessibilityEvents() {
-    const saveAccessibility = () => {
-      const cbMode = document.getElementById('cbMode');
-      const bigFont = document.getElementById('bigFont');
+    /** バトル設定パネルを作成 */
+    createBattlePanel() {
+      const panel = document.createElement('div');
+      panel.className = 'settings-panel';
       
-      if (cbMode) {
-        localStorage.setItem('cbMode', cbMode.checked ? '1' : '0');
+      const title = document.createElement('h3');
+      title.className = 'panel-title';
+      title.textContent = 'バトル設定';
+      panel.appendChild(title);
+      
+      // 回復回数設定
+      const healGroup = document.createElement('div');
+      healGroup.className = 'setting-group';
+      
+      const healLabel = document.createElement('div');
+      healLabel.className = 'setting-label-with-tooltip';
+      
+      const healLabelText = document.createElement('span');
+      healLabelText.className = 'setting-label';
+      healLabelText.textContent = '回復回数の上限';
+      
+      const healTooltipTrigger = document.createElement('span');
+      healTooltipTrigger.className = 'tooltip-trigger';
+      healTooltipTrigger.textContent = '？';
+      
+      healLabel.appendChild(healLabelText);
+      healLabel.appendChild(healTooltipTrigger);
+      
+      // スライダーと値表示のコンテナ
+      const healControlContainer = document.createElement('div');
+      healControlContainer.className = 'slider-container';
+      
+      const healSlider = document.createElement('input');
+      healSlider.type = 'range';
+      healSlider.id = 'healCountSlider';
+      healSlider.className = 'heal-count-slider';
+      healSlider.min = '1';
+      healSlider.max = '5';
+      healSlider.step = '1';
+      healSlider.value = '3'; // デフォルト値
+      
+      const healValue = document.createElement('span');
+      healValue.className = 'heal-count-value';
+      healValue.textContent = '3回';
+      
+      healControlContainer.appendChild(healSlider);
+      healControlContainer.appendChild(healValue);
+      
+      healGroup.appendChild(healLabel);
+      healGroup.appendChild(healControlContainer);
+      panel.appendChild(healGroup);
+      
+      // ツールチップとイベントリスナーを設定
+      this._setupTooltipEvents(
+        healTooltipTrigger,
+        '各ステージで使用できる回復の回数上限を設定します。難易度を調整したい時にご利用ください。'
+      );
+      this.setupBattleEvents(healSlider, healValue);
+      
+      return panel;
+    },
+  
+    /** バトル設定のイベントリスナーを設定 */
+    setupBattleEvents(healSlider, healValue) {
+      // 初期値をローカルストレージから取得
+      const savedHealCount = localStorage.getItem('maxHealCount');
+      const initialHealCount = savedHealCount ? parseInt(savedHealCount, 10) : 3;
+      
+      // スライダーと表示を初期値に設定
+      healSlider.value = initialHealCount;
+      healValue.textContent = initialHealCount + '回';
+      
+      // リアルタイム更新（スライダー操作中）
+      healSlider.addEventListener('input', (e) => {
+        const count = parseInt(e.target.value, 10);
+        healValue.textContent = count + '回';
+      });
+      
+      // 設定変更完了時の処理
+      healSlider.addEventListener('change', (e) => {
+        const count = parseInt(e.target.value, 10);
+        
+        // ローカルストレージに保存
+        localStorage.setItem('maxHealCount', count.toString());
+        
+        // フィードバックSE再生
+        publish('playSE', 'decide');
+        
+        console.log('回復回数上限設定完了:', count);
+        
+        // 設定変更の視覚的フィードバック
+        healValue.style.color = '#2ecc71';
+        healValue.style.fontWeight = 'bold';
+        setTimeout(() => {
+          healValue.style.color = '';
+          healValue.style.fontWeight = '';
+        }, 500);
+      });
+    },
+  
+    /** アクセシビリティ設定のイベントリスナーを設定 */
+    setupAccessibilityEvents() {
+      const saveAccessibility = () => {
+        const cbMode = document.getElementById('cbMode');
+        const bigFont = document.getElementById('bigFont');
+        
+        if (cbMode) {
+          localStorage.setItem('cbMode', cbMode.checked ? '1' : '0');
+        }
+        if (bigFont) {
+          localStorage.setItem('bigFont', bigFont.checked ? '1' : '0');
+        }
+        this.applyAccessibility();
+        
+        // アクセシビリティ設定変更時のフィードバック
+        publish('playSE', 'decide');
+      };
+  
+      // 少し遅延してから初期値を設定
+      setTimeout(() => {
+        const cbModeCheckbox = document.getElementById('cbMode');
+        const bigFontCheckbox = document.getElementById('bigFont');
+        
+        if (cbModeCheckbox) {
+          cbModeCheckbox.checked = localStorage.getItem('cbMode') === '1';
+          cbModeCheckbox.addEventListener('change', saveAccessibility);
+        }
+        
+        if (bigFontCheckbox) {
+          bigFontCheckbox.checked = localStorage.getItem('bigFont') === '1';
+          bigFontCheckbox.addEventListener('change', saveAccessibility);
+        }
+        
+        this.applyAccessibility();
+      }, 100);
+    },
+  
+    /** アクセシビリティ設定を適用 */
+    applyAccessibility() {
+      document.body.classList.toggle('cb-mode', localStorage.getItem('cbMode') === '1');
+      document.body.classList.toggle('big-font', localStorage.getItem('bigFont') === '1');
+    },
+  
+    /** DOM要素のクリーンアップ */
+    cleanupDOM() {
+      const existingContainer = document.getElementById('settingsContainer');
+      if (existingContainer) {
+        existingContainer.remove();
       }
-      if (bigFont) {
-        localStorage.setItem('bigFont', bigFont.checked ? '1' : '0');
-      }
-      this.applyAccessibility();
-      
-      // アクセシビリティ設定変更時のフィードバック
-      publish('playSE', 'decide');
-    };
-
-    // 少し遅延してから初期値を設定
-    setTimeout(() => {
-      const cbModeCheckbox = document.getElementById('cbMode');
-      const bigFontCheckbox = document.getElementById('bigFont');
-      
-      if (cbModeCheckbox) {
-        cbModeCheckbox.checked = localStorage.getItem('cbMode') === '1';
-        cbModeCheckbox.addEventListener('change', saveAccessibility);
-      }
-      
-      if (bigFontCheckbox) {
-        bigFontCheckbox.checked = localStorage.getItem('bigFont') === '1';
-        bigFontCheckbox.addEventListener('change', saveAccessibility);
-      }
-      
-      this.applyAccessibility();
-    }, 100);
-  },
-
-  /** アクセシビリティ設定を適用 */
-  applyAccessibility() {
-    document.body.classList.toggle('cb-mode', localStorage.getItem('cbMode') === '1');
-    document.body.classList.toggle('big-font', localStorage.getItem('bigFont') === '1');
-  },
-
-  /** DOM要素のクリーンアップ */
-  cleanupDOM() {
-    const existingContainer = document.getElementById('settingsContainer');
-    if (existingContainer) {
-      existingContainer.remove();
-    }
-  },
-
+    },
+  
     /** 毎フレーム描画 */
     update(dt) {
       const { ctx, canvas } = this;
@@ -514,292 +694,205 @@ setupBattleEvents(healSlider, healValue) {
       e.preventDefault();
     },
   
-    // 以下の不要なメソッドを削除:
-    // _updateButtonHoverStates, _drawEnhancedButton, _lightenColor は削除済み
+    /** データリセット処理 - 完全版 */
+    async resetData() {
+      const user = getCurrentUser();
+      
+      try {
+        // 第1段階: 具体的な確認ダイアログ
+        const firstConfirm = confirm(
+          '【最終確認】レベル、図鑑、ステージの進捗など、全てのセーブデータが完全に削除されます。\n' +
+          'この操作は取り消せません。よろしいですか？'
+        );
+        
+        if (!firstConfirm) {
+          console.log('データリセット操作がキャンセルされました（第1段階）');
+          return;
+        }
   
-    
-
-      /** 画面離脱時のクリーンアップ */
-  exit() {
-    this.unregisterHandlers();
-    this.cleanupDOM();
-    // アクティブなツールチップも削除
-    this._removeActiveTooltip();
-    
-    this.canvas = null;
-    this.ctx = null;
-    // Canvas関連のプロパティは削除済み
-  },
-
-  /** クリックイベント登録 */
-  registerHandlers() {
-    this._clickHandler = this.handleClick.bind(this);
-    this.canvas.addEventListener('click', this._clickHandler);
-    this.canvas.addEventListener('touchstart', this._clickHandler);
-    // マウス移動イベントは削除
-  },
-
-  /** クリックイベント解除 */
-  unregisterHandlers() {
-    if (this.canvas && this._clickHandler) {
-      this.canvas.removeEventListener('click', this._clickHandler);
-      this.canvas.removeEventListener('touchstart', this._clickHandler);
-    }
-    // マウス移動イベントの削除も削除
-  },
-
-  /** クリック処理 */
-  handleClick(e) {
-    // Canvas上のボタン処理は全て削除
-    // 必要に応じて、Canvas背景クリック時の処理のみ残す
-    e.preventDefault();
-  },
-
-  // マウス移動関連の関数は全て削除
-  // _updateButtonHoverStates, _drawEnhancedButton, _lightenColor, handleMouseMove は削除
-    /** ボタンセクションを作成 */
-    createButtonSection() {
-      const buttonSection = document.createElement('div');
-      buttonSection.className = 'settings-button-section';
-      
-      // データリセットボタン（ツールチップ付き）
-      const resetButtonContainer = document.createElement('div');
-      resetButtonContainer.style.position = 'relative';
-      resetButtonContainer.style.display = 'flex';
-      resetButtonContainer.style.alignItems = 'center';
-      resetButtonContainer.style.gap = '10px';
-      
-      const resetButton = document.createElement('button');
-      resetButton.className = 'settings-button danger';
-      resetButton.textContent = 'データリセット（はじめから）';
-      resetButton.addEventListener('click', () => {
-        publish('playSE', 'decide');
-        this.resetData();
-      });
-      
-      // ツールチップトリガー
-      const resetTooltipTrigger = document.createElement('span');
-      resetTooltipTrigger.className = 'tooltip-trigger';
-      resetTooltipTrigger.textContent = '？';
-      resetTooltipTrigger.style.flexShrink = '0';
-      
-      resetButtonContainer.appendChild(resetButton);
-      resetButtonContainer.appendChild(resetTooltipTrigger);
-      
-      // ツールチップイベントを設定
-      this._setupTooltipEvents(resetTooltipTrigger, '全てのセーブデータが削除され、元に戻せなくなります。レベル、図鑑、ステージ進捗、設定など、ゲームの全ての記録が完全に消去されます。');
-      
-      // メインメニューへ戻るボタン
-      const backButton = document.createElement('button');
-      backButton.className = 'settings-button primary';
-      backButton.textContent = 'メインメニューへもどる';
-      backButton.addEventListener('click', () => {
-        publish('playSE', 'decide');
-        publish('changeScreen', 'title');
-      });
-      
-      buttonSection.appendChild(resetButtonContainer);
-      buttonSection.appendChild(backButton);
-      
-      return buttonSection;
-    },
-  /** データリセット処理 - 完全版 */
-  async resetData() {
-    const user = getCurrentUser();
-    
-    try {
-      // 第1段階: 具体的な確認ダイアログ
-      const firstConfirm = confirm(
-        '【最終確認】レベル、図鑑、ステージの進捗など、全てのセーブデータが完全に削除されます。\n' +
-        'この操作は取り消せません。よろしいですか？'
-      );
-      
-      if (!firstConfirm) {
-        console.log('データリセット操作がキャンセルされました（第1段階）');
-        return;
-      }
-
-      // 第2段階: ダブルチェック - 確認ワードの入力
-      const confirmWord = prompt(
-        '最終確認として、以下の文字を正確に入力してください：\n\n' +
-        '「リセット」\n\n' +
-        '※ひらがな・カタカナは区別されます'
-      );
-      
-      if (confirmWord !== 'リセット') {
-        if (confirmWord === null) {
-          console.log('データリセット操作がキャンセルされました（第2段階）');
-        } else {
-          alert('入力された文字が正しくありません。データリセットを中止します。');
-          console.log('データリセット操作が中止されました（確認ワード不一致）');
-        }
-        return;
-      }
-
-      // 第3段階: 実際のデータ削除処理
-      console.log('データリセット処理を開始します...');
-      
-      // ローディング表示
-      const loadingElement = this._showLoadingMessage('データを削除中...');
-      
-      try {
-        // 1. LocalStorageの全関連データを削除
-        this._clearLocalStorageData();
+        // 第2段階: ダブルチェック - 確認ワードの入力
+        const confirmWord = prompt(
+          '最終確認として、以下の文字を正確に入力してください：\n\n' +
+          '「リセット」\n\n' +
+          '※ひらがな・カタカナは区別されます'
+        );
         
-        // 2. Firebase Firestoreのユーザーデータを削除
-        if (user?.uid) {
-          await this._clearFirebaseUserData(user.uid);
-        }
-        
-        // 3. アクセシビリティ設定も初期化
-        this._resetAccessibilitySettings();
-        
-        // 4. GameStateの初期化
-        this._resetGameState();
-        
-        // ローディング表示を非表示
-        this._hideLoadingMessage(loadingElement);
-        
-        console.log('データリセット処理が完了しました');
-        
-        // 成功メッセージ表示
-        alert('全てのデータが正常にリセットされました。\nタイトル画面に戻ります。');
-        
-        // 完全リセットのためリロード
-        window.location.reload();
-        
-      } catch (error) {
-        console.error('データリセット処理中にエラーが発生しました:', error);
-        this._hideLoadingMessage(loadingElement);
-        alert('データのリセット中にエラーが発生しました。\n一部のデータが削除されていない可能性があります。');
-      }
-      
-    } catch (error) {
-      console.error('データリセット処理でエラーが発生しました:', error);
-      alert('データのリセットに失敗しました。');
-    }
-  },
-
-  /** LocalStorageの全関連データを削除 */
-  _clearLocalStorageData() {
-    const keysToRemove = [];
-    
-    // ゲーム関連のキーを収集
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && (
-        key.startsWith('game_') ||
-        key.startsWith('kanji_') ||
-        key.startsWith('user_') ||
-        key.startsWith('progress_') ||
-        key.startsWith('level_') ||
-        key.startsWith('dex_') ||
-        key.startsWith('battle_') ||
-        key.startsWith('achievement_') ||
-        key.startsWith('clear_') ||           // ← 追加: ステージクリアフラグ
-        key === 'kanjiGameSave' ||            // ← 追加: メインセーブ
-        key === 'bgmVolume' ||
-        key === 'seVolume' ||
-        key === 'cbMode' ||
-        key === 'bigFont' ||
-        key === 'lastPlayedStage' ||
-        key === 'playerStats' ||
-        key === 'unlockedStages'
-      )) {
-        keysToRemove.push(key);
-      }
-    }
-    
-    // 収集したキーのデータを削除
-    keysToRemove.forEach(key => {
-      localStorage.removeItem(key);
-      console.log(`LocalStorage key removed: ${key}`);
-    });
-    
-    console.log(`LocalStorage cleaned: ${keysToRemove.length} keys removed`);
-  },
-
-  async _clearFirebaseUserData(uid) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        console.log(`Firebase user data deletion started for UID: ${uid}`);
-       const to = setTimeout(() => {
-         reject(new Error('Firebase data deletion timeout'));
-       }, 10000);
-       publish('deleteUserData', {
-          uid,
-          callback: async (result) => {
-            if (result && result.success) {
-              console.log('Firebase user data cleared successfully');
-             clearTimeout(to);
-            resolve();
-            } else {
-              console.error('Failed to clear Firebase user data:', result?.error || 'Unknown error');
-             clearTimeout(to);
-            reject(new Error(result?.error || 'Failed to delete user data'));
-            }
+        if (confirmWord !== 'リセット') {
+          if (confirmWord === null) {
+            console.log('データリセット操作がキャンセルされました（第2段階）');
+          } else {
+            alert('入力された文字が正しくありません。データリセットを中止します。');
+            console.log('データリセット操作が中止されました（確認ワード不一致）');
           }
-        });
+          return;
+        }
+  
+        // 第3段階: 実際のデータ削除処理
+        console.log('データリセット処理を開始します...');
+        
+        // ローディング表示
+        const loadingElement = this._showLoadingMessage('データを削除中...');
+        
+        try {
+          // 1. LocalStorageの全関連データを削除
+          this._clearLocalStorageData();
+          
+          // 2. Firebase Firestoreのユーザーデータを削除
+          if (user?.uid) {
+            await this._clearFirebaseUserData(user.uid);
+          }
+          
+          // 3. アクセシビリティ設定も初期化
+          this._resetAccessibilitySettings();
+          
+          // 4. GameStateの初期化
+          this._resetGameState();
+          
+          // ローディング表示を非表示
+          this._hideLoadingMessage(loadingElement);
+          
+          console.log('データリセット処理が完了しました');
+          
+          // 成功メッセージ表示
+          alert('全てのデータが正常にリセットされました。\nタイトル画面に戻ります。');
+          
+          // 完全リセットのためリロード
+          window.location.reload();
+          
+        } catch (error) {
+          console.error('データリセット処理中にエラーが発生しました:', error);
+          this._hideLoadingMessage(loadingElement);
+          alert('データのリセット中にエラーが発生しました。\n一部のデータが削除されていない可能性があります。');
+        }
+        
       } catch (error) {
-        console.error('Error in _clearFirebaseUserData:', error);
-        reject(error);
+        console.error('データリセット処理でエラーが発生しました:', error);
+        alert('データのリセットに失敗しました。');
       }
-    });
-  },
-
-  /** ゲームステートのリセット */
-  _resetGameState() {
-    // gameStateがあれば初期化
-    if (typeof gameState !== 'undefined' && gameState.reset) {
-      gameState.reset();
-      console.log('GameState has been reset');
+    },
+  
+    /** LocalStorageの全関連データを削除 */
+    _clearLocalStorageData() {
+      const keysToRemove = [];
+      
+      // ゲーム関連のキーを収集
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (
+          key.startsWith('game_') ||
+          key.startsWith('kanji_') ||
+          key.startsWith('user_') ||
+          key.startsWith('progress_') ||
+          key.startsWith('level_') ||
+          key.startsWith('dex_') ||
+          key.startsWith('battle_') ||
+          key.startsWith('achievement_') ||
+          key.startsWith('clear_') ||           // ← 追加: ステージクリアフラグ
+          key === 'kanjiGameSave' ||            // ← 追加: メインセーブ
+          key === 'gameMode' ||                 // ← 追加: ゲームモード
+          key === 'maxHealCount' ||             // ← 追加: 回復回数設定
+          key === 'bgmVolume' ||
+          key === 'seVolume' ||
+          key === 'cbMode' ||
+          key === 'bigFont' ||
+          key === 'lastPlayedStage' ||
+          key === 'playerStats' ||
+          key === 'unlockedStages'
+        )) {
+          keysToRemove.push(key);
+        }
+      }
+      
+      // 収集したキーのデータを削除
+      keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+        console.log(`LocalStorage key removed: ${key}`);
+      });
+      
+      console.log(`LocalStorage cleaned: ${keysToRemove.length} keys removed`);
+    },
+  
+    async _clearFirebaseUserData(uid) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          console.log(`Firebase user data deletion started for UID: ${uid}`);
+         const to = setTimeout(() => {
+           reject(new Error('Firebase data deletion timeout'));
+         }, 10000);
+         publish('deleteUserData', {
+            uid,
+            callback: async (result) => {
+              if (result && result.success) {
+                console.log('Firebase user data cleared successfully');
+               clearTimeout(to);
+              resolve();
+              } else {
+                console.error('Failed to clear Firebase user data:', result?.error || 'Unknown error');
+               clearTimeout(to);
+              reject(new Error(result?.error || 'Failed to delete user data'));
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error in _clearFirebaseUserData:', error);
+          reject(error);
+        }
+      });
+    },
+  
+    /** ゲームステートのリセット */
+    _resetGameState() {
+      // gameStateがあれば初期化
+      if (typeof gameState !== 'undefined' && gameState.reset) {
+        gameState.reset();
+        console.log('GameState has been reset');
+      }
+      
+      // その他のグローバル状態もリセット
+      publish('resetGameState');
+    },
+  
+    /** アクセシビリティ設定をリセット */
+    _resetAccessibilitySettings() {
+      document.body.classList.remove('cb-mode');
+      document.body.classList.remove('big-font');
+      console.log('アクセシビリティ設定がリセットされました');
+    },
+  
+    /** ローディングメッセージを表示 */
+    _showLoadingMessage(message) {
+      const loadingDiv = document.createElement('div');
+      loadingDiv.id = 'resetLoadingMessage';
+      loadingDiv.className = 'reset-loading-overlay';
+      
+      const messageContainer = document.createElement('div');
+      messageContainer.className = 'loading-message-container';
+      
+      const spinner = document.createElement('div');
+      spinner.className = 'loading-spinner';
+      
+      const messageText = document.createElement('div');
+      messageText.className = 'loading-text';
+      messageText.textContent = message;
+      
+      messageContainer.appendChild(spinner);
+      messageContainer.appendChild(messageText);
+      loadingDiv.appendChild(messageContainer);
+      
+      document.body.appendChild(loadingDiv);
+      return loadingDiv;
+    },
+  
+    /** ローディングメッセージを非表示 */
+    _hideLoadingMessage(loadingElement) {
+      if (loadingElement && loadingElement.parentNode) {
+        loadingElement.parentNode.removeChild(loadingElement);
+      }
+    },
+  
+    render() {
+      this.update(0);
     }
-    
-    // その他のグローバル状態もリセット
-    publish('resetGameState');
-  },
-
-  /** アクセシビリティ設定をリセット */
-  _resetAccessibilitySettings() {
-    document.body.classList.remove('cb-mode');
-    document.body.classList.remove('big-font');
-    console.log('アクセシビリティ設定がリセットされました');
-  },
-
-  /** ローディングメッセージを表示 */
-  _showLoadingMessage(message) {
-    const loadingDiv = document.createElement('div');
-    loadingDiv.id = 'resetLoadingMessage';
-    loadingDiv.className = 'reset-loading-overlay';
-    
-    const messageContainer = document.createElement('div');
-    messageContainer.className = 'loading-message-container';
-    
-    const spinner = document.createElement('div');
-    spinner.className = 'loading-spinner';
-    
-    const messageText = document.createElement('div');
-    messageText.className = 'loading-text';
-    messageText.textContent = message;
-    
-    messageContainer.appendChild(spinner);
-    messageContainer.appendChild(messageText);
-    loadingDiv.appendChild(messageContainer);
-    
-    document.body.appendChild(loadingDiv);
-    return loadingDiv;
-  },
-
-  /** ローディングメッセージを非表示 */
-  _hideLoadingMessage(loadingElement) {
-    if (loadingElement && loadingElement.parentNode) {
-      loadingElement.parentNode.removeChild(loadingElement);
-    }
-  },
-
-  render() {
-    this.update(0);
-  }
-};
-
-export default settingsScreenState;
+  };
+  
+  export default settingsScreenState;// js/settingsScreen.js

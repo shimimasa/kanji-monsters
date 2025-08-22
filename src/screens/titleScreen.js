@@ -25,25 +25,23 @@ const titleState = {
     const isReturnPlayer = gameState.playerName && gameState.playerName.trim() !== '';
     
     if (isReturnPlayer) {
-      // リピートプレイヤー用のボタン配置
-      this.jikkuriButton = { x: cx - 150, y: 320, width: 300, height: 50, text: 'つづきから（じっくり）' };
-      this.challengeButton = { x: cx - 150, y: 380, width: 300, height: 50, text: 'つづきから（チャレンジ）' };
-      this.settingsButton = { x: cx - 80, y: 450, width: 160, height: 50, text: 'せってい' };
+      // リピートプレイヤー用のボタン配置（モード統一）
+      this.playButton = { x: cx - 150, y: 350, width: 300, height: 50, text: 'つづきから' };
+      this.settingsButton = { x: cx - 80, y: 420, width: 160, height: 50, text: 'せってい' };
       
       // リセットボタンは誤タップ防止のため、小さく、離れた位置に配置
       this.resetButton = { 
         x: cx - 90, 
-        y: 520, 
+        y: 490, 
         width: 180, 
         height: 35, 
         text: 'はじめから' 
       };
     } else {
-      // 新規プレイヤー用のボタン配置（従来通り）
-      this.jikkuriButton = { x: cx - 150, y: 350, width: 300, height: 50, text: 'じっくりモードで はじめる' };
-      this.challengeButton = { x: cx - 150, y: 420, width: 300, height: 50, text: 'チャレンジモードで はじめる' };
+      // 新規プレイヤー用のボタン配置（モード統一）
+      this.playButton = { x: cx - 150, y: 380, width: 300, height: 50, text: 'はじめる' };
       this.resetButton = null; // リセットボタンは表示しない
-      this.settingsButton = { x: cx - 80, y: 490, width: 160, height: 50, text: 'せってい' };
+      this.settingsButton = { x: cx - 80, y: 450, width: 160, height: 50, text: 'せってい' };
     }
     
     this.registerHandlers();
@@ -70,6 +68,9 @@ const titleState = {
     if (isReturnPlayer) {
       this._drawWelcomeMessage(ctx, cw, ch);
     }
+
+    // 現在のゲームモード表示
+    this._drawCurrentGameMode(ctx, cw, ch);
 
     // ボタン描画
     this._drawFantasyButtons(ctx);
@@ -255,6 +256,48 @@ const titleState = {
     ctx.restore();
   },
 
+  /** 現在のゲームモードを表示 */
+  _drawCurrentGameMode(ctx, cw, ch) {
+    // ローカルストレージからゲームモードを取得
+    const gameMode = localStorage.getItem('gameMode') || 'jikkuri';
+    const modeText = gameMode === 'jikkuri' ? 'じっくりモード' : 'チャレンジモード';
+    
+    // モード表示の背景
+    const modeX = cw / 2 - 100;
+    const modeY = ch * 0.55;
+    const modeWidth = 200;
+    const modeHeight = 30;
+    
+    // 小さな巻物風背景
+    ctx.save();
+    const modeGradient = ctx.createLinearGradient(modeX, modeY, modeX, modeY + modeHeight);
+    modeGradient.addColorStop(0, 'rgba(245, 222, 179, 0.9)');
+    modeGradient.addColorStop(0.5, 'rgba(222, 184, 135, 0.9)');
+    modeGradient.addColorStop(1, 'rgba(210, 180, 140, 0.9)');
+    
+    ctx.fillStyle = modeGradient;
+    ctx.fillRect(modeX, modeY, modeWidth, modeHeight);
+    
+    // 枠線
+    ctx.strokeStyle = '#8B4513';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(modeX, modeY, modeWidth, modeHeight);
+    
+    // モードテキスト
+    ctx.fillStyle = '#2F1B14';
+    ctx.font = '14px "UDデジタル教科書体", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`現在: ${modeText}`, cw / 2, modeY + modeHeight / 2);
+    
+    // 設定変更の案内
+    ctx.font = '10px "UDデジタル教科書体", sans-serif';
+    ctx.fillStyle = '#8B7355';
+    ctx.fillText('※設定画面でモードを変更できます', cw / 2, modeY + modeHeight + 15);
+    
+    ctx.restore();
+  },
+
   /** 巻物を描画 */
   _drawScroll(ctx, x, y, width, height) {
     ctx.save();
@@ -284,8 +327,7 @@ const titleState = {
   /** ファンタジー風ボタンの描画 */
   _drawFantasyButtons(ctx) {
     // メインボタン
-    this._drawStyledButton(ctx, this.jikkuriButton, 'primary');
-    this._drawStyledButton(ctx, this.challengeButton, 'primary');
+    this._drawStyledButton(ctx, this.playButton, 'primary');
     this._drawStyledButton(ctx, this.settingsButton, 'secondary');
     
     // リセットボタン（危険な操作用）
@@ -405,7 +447,10 @@ const titleState = {
   },
 
   /** プレイヤー名確認と画面遷移の共通処理 */
-  _startGame(gameMode) {
+  _startGame() {
+    // ローカルストレージからゲームモードを取得（デフォルトはじっくり）
+    const gameMode = localStorage.getItem('gameMode') || 'jikkuri';
+    
     // プレイヤー名未設定なら名前入力画面へ遷移
     if (!gameState.playerName) {
       // ゲームモードを保存して名前入力画面へ
@@ -513,16 +558,9 @@ const titleState = {
     // === 座標変換ロジックここまで ===
 
     // ▼ 以下は元のクリック判定ロジック（x, y を使うようにする）
-    if (isMouseOverRect(x, y, this.jikkuriButton)) {
+    if (isMouseOverRect(x, y, this.playButton)) {
       publish('playSE', 'decide');
-      this._startGame('jikkuri');
-      return;
-    }
-
-    // チャレンジモードボタン
-    if (isMouseOverRect(x, y, this.challengeButton)) {
-      publish('playSE', 'decide');
-      this._startGame('challenge');
+      this._startGame();
       return;
     }
 
@@ -546,4 +584,3 @@ const titleState = {
 };
 
 export default titleState;
-
