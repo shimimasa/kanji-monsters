@@ -1094,14 +1094,22 @@ const imageY = frameArea.y + (frameArea.height - eh) / 2 + offsetY;
 this.ctx.translate(imageX + ew/2, imageY + eh/2);
 this.ctx.rotate(rotateAngle);
 
-// ★★★ シールド描画を敵画像の前に配置 ★★★
+// ★★★ シールド描画を敵画像の前に配置（修正版）★★★
 if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
   try {
     console.log('シールド描画開始:', enemy.shieldHp);
     
-    const shieldRadius = Math.max(ew, eh) * 0.6;
+    // **重要な修正**: モンスター枠のサイズを考慮してシールド半径を調整
+    const frameArea = drawMonsterFrame(this.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy);
+    
+    // シールド半径をモンスター枠の実際の表示エリアに基づいて計算
+    const shieldRadius = Math.min(frameArea.width, frameArea.height) * 0.45; // 0.6から0.45に調整してより適切なサイズに
     const maxShieldHp = enemy.originalShieldHp || 3;
     const currentShieldHp = enemy.shieldHp;
+    
+    // シールドの中心をモンスター枠の表示エリアの中心に設定
+    const shieldCenterX = 0; // 既に回転の中心点に変換済みのため、原点基準
+    const shieldCenterY = 0;
     
     const shieldIntegrity = currentShieldHp / maxShieldHp;
     const basePulse = Math.sin(Date.now() / 300) + 1;
@@ -1130,14 +1138,18 @@ if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
       shieldColor = { r: 100, g: 180, b: 255 };
     }
     
-    const shieldGrad = this.ctx.createRadialGradient(0, 0, shieldRadius * 0.7, 0, 0, shieldRadius);
+    // シールドのグラデーション（サイズ調整済み）
+    const shieldGrad = this.ctx.createRadialGradient(
+      shieldCenterX, shieldCenterY, shieldRadius * 0.7, 
+      shieldCenterX, shieldCenterY, shieldRadius
+    );
     shieldGrad.addColorStop(0, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, 0)`);
     shieldGrad.addColorStop(0.7, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, ${shieldOpacity * 0.5})`);
     shieldGrad.addColorStop(1, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, ${shieldOpacity})`);
     
     this.ctx.fillStyle = shieldGrad;
     this.ctx.beginPath();
-    this.ctx.arc(0, 0, shieldRadius, 0, Math.PI * 2);
+    this.ctx.arc(shieldCenterX, shieldCenterY, shieldRadius, 0, Math.PI * 2);
     this.ctx.fill();
     
     const outlineAlpha = Math.min(1, shieldOpacity + 0.2);
@@ -1150,25 +1162,27 @@ if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
     
     this.ctx.stroke();
     
+    // シールドのヒビ描画（半径をframeSizeに合わせて調整）
     try {
       if (typeof this.drawShieldCracks === 'function') {
-        this.drawShieldCracks(this.ctx, 0, 0, shieldRadius, crackLevel, currentShieldHp);
+        this.drawShieldCracks(this.ctx, shieldCenterX, shieldCenterY, shieldRadius, crackLevel, currentShieldHp);
       }
     } catch (error) {
       console.warn('シールドクラック描画エラー:', error);
     }
     
+    // 危険状態の警告エフェクト（半径調整済み）
     if (currentShieldHp === 1) {
       try {
         if (typeof this.drawShieldWarningEffect === 'function') {
-          this.drawShieldWarningEffect(this.ctx, 0, 0, shieldRadius);
+          this.drawShieldWarningEffect(this.ctx, shieldCenterX, shieldCenterY, shieldRadius);
         }
       } catch (error) {
         console.warn('シールド警告エフェクト描画エラー:', error);
       }
     }
     
-    console.log('シールド描画完了');
+    console.log('シールド描画完了 - 半径:', shieldRadius);
     
   } catch (error) {
     console.error('シールド描画中にエラーが発生しました:', error);
@@ -3995,10 +4009,14 @@ if (gameState.currentEnemy.isBoss) {
         battleScreenState.startShakeEffect(25, 8);
         battleScreenState.startFlashEffect('rgba(255, 255, 255, 0.6)', 30);
         
-        // 敵の位置を計算してシールド破壊エフェクトを開始
-        const enemyX = 500 + 240/2; // ex + ew/2
-        const enemyY = 120 + 120/2; // ey + eh/2（修正後の位置）
-        battleScreenState.startShieldBreakEffect(enemyX, enemyY, 150);
+        // **修正**: 敵の位置をモンスター枠の中心に正確に計算
+        // モンスター枠の座標系に合わせて中心点を計算
+        const frameAreaForEffect = drawMonsterFrame(battleScreenState.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy);
+        const enemyEffectX = frameAreaForEffect.x + frameAreaForEffect.width / 2;
+        const enemyEffectY = frameAreaForEffect.y + frameAreaForEffect.height / 2;
+        
+        // シールド破壊エフェクトを正確な位置で開始
+        battleScreenState.startShieldBreakEffect(enemyEffectX, enemyEffectY, Math.min(frameAreaForEffect.width, frameAreaForEffect.height) * 0.6);
       }
 
       // 行動パック表示（段階に応じてメッセージを変更）
