@@ -1,8 +1,42 @@
 // js/settingsScreen.js
-import { gameState } from '../core/gameState.js';
+import { gameState, saveGameData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect, drawThemeBackground, drawPanelBackground } from '../ui/uiRenderer.js';
 import { getCurrentUser } from '../services/firebase/firebaseController.js';
 import { publish } from '../core/eventBus.js';
+
+// レベルプリセット定義
+const LEVEL_PRESETS = {
+  'elementary1': { 
+    level: 1, 
+    label: '小学1年生レベル', 
+    exp: 0,
+    description: '基本的なひらがな・カタカナの漢字から学習'
+  },
+  'elementary4': { 
+    level: 11, 
+    label: '小学4年生レベル', 
+    exp: calculateExpForLevel(11),
+    description: '小学校中学年レベルの漢字から学習'
+  },
+  'junior1': { 
+    level: 24, 
+    label: '中学1年生レベル', 
+    exp: calculateExpForLevel(24),
+    description: '中学校レベルの漢字から学習'
+  }
+};
+
+// レベル計算関数（gameState.jsから移植）
+function calculateExpForLevel(level) {
+  if (!Number.isInteger(level) || level < 1) {
+    return 100;
+  }
+  if (level === 1) {
+    return 100;
+  }
+  const previousLevelExp = calculateExpForLevel(level - 1);
+  return Math.floor(previousLevelExp * 1.2) + 20;
+}
 
 const settingsScreenState = {
   canvas: null,
@@ -51,7 +85,7 @@ const settingsScreenState = {
     const audioPanel = this.createAudioPanel();
     settingsContainer.appendChild(audioPanel);
 
-    // バトル設定パネル
+    // バトル設定パネル（レベル変更機能を含む）
     const battlePanel = this.createBattlePanel();
     settingsContainer.appendChild(battlePanel);
     
@@ -315,7 +349,7 @@ const settingsScreenState = {
     });
   },
 
-  /** バトル設定パネルを作成 */
+  /** バトル設定パネルを作成（レベル変更機能付き） */
   createBattlePanel() {
     const panel = document.createElement('div');
     panel.className = 'settings-panel';
@@ -325,7 +359,11 @@ const settingsScreenState = {
     title.textContent = 'バトル設定';
     panel.appendChild(title);
     
-    // 回復回数設定
+    // レベル設定グループを追加
+    const levelGroup = this.createLevelSettingGroup();
+    panel.appendChild(levelGroup);
+    
+    // 既存の回復回数設定
     const healGroup = document.createElement('div');
     healGroup.className = 'setting-group';
     
@@ -375,6 +413,242 @@ const settingsScreenState = {
     this.setupBattleEvents(healSlider, healValue);
     
     return panel;
+  },
+
+  /** レベル設定グループを作成 */
+  createLevelSettingGroup() {
+    const levelGroup = document.createElement('div');
+    levelGroup.className = 'setting-group';
+    
+    const levelLabel = document.createElement('div');
+    levelLabel.className = 'setting-label-with-tooltip';
+    
+    const levelLabelText = document.createElement('span');
+    levelLabelText.className = 'setting-label';
+    levelLabelText.textContent = '学習レベル';
+    
+    const levelTooltipTrigger = document.createElement('span');
+    levelTooltipTrigger.className = 'tooltip-trigger';
+    levelTooltipTrigger.textContent = '？';
+    
+    levelLabel.appendChild(levelLabelText);
+    levelLabel.appendChild(levelTooltipTrigger);
+    
+    // 現在のレベル表示
+    const currentLevelDisplay = document.createElement('div');
+    currentLevelDisplay.className = 'current-level-display';
+    currentLevelDisplay.id = 'currentLevelDisplay';
+    
+    // ラジオボタン群のコンテナ
+    const levelRadioContainer = document.createElement('div');
+    levelRadioContainer.className = 'radio-container level-radio-container';
+    
+    // 各レベルプリセットのラジオボタンを作成
+    Object.entries(LEVEL_PRESETS).forEach(([key, preset]) => {
+      const levelOption = document.createElement('label');
+      levelOption.className = 'radio-label level-option';
+      levelOption.innerHTML = `
+        <input type="radio" name="playerLevel" value="${key}" id="level_${key}">
+        <span class="radio-custom"></span>
+        <div class="level-option-content">
+          <div class="level-option-title">${preset.label}</div>
+          <div class="level-option-description">${preset.description}</div>
+          <div class="level-option-stats">レベル ${preset.level}</div>
+        </div>
+      `;
+      levelRadioContainer.appendChild(levelOption);
+    });
+    
+    // 確認ボタン
+    const confirmButton = document.createElement('button');
+    confirmButton.className = 'level-change-button';
+    confirmButton.textContent = 'レベル変更を適用';
+    confirmButton.id = 'confirmLevelChange';
+    confirmButton.disabled = true;
+    
+    levelGroup.appendChild(levelLabel);
+    levelGroup.appendChild(currentLevelDisplay);
+    levelGroup.appendChild(levelRadioContainer);
+    levelGroup.appendChild(confirmButton);
+    
+    // ツールチップとイベントリスナーを設定
+    this._setupTooltipEvents(
+      levelTooltipTrigger,
+      'プレイヤーの学習レベルを変更できます。レベルを変更すると、経験値・HP・攻撃力が調整されます。'
+    );
+    this.setupLevelEvents();
+    
+    return levelGroup;
+  },
+
+  /** レベル設定のイベントリスナーを設定 */
+  setupLevelEvents() {
+    setTimeout(() => {
+      this.updateCurrentLevelDisplay();
+      
+      // ラジオボタンの変更イベント
+      const levelRadios = document.querySelectorAll('input[name="playerLevel"]');
+      const confirmButton = document.getElementById('confirmLevelChange');
+      
+      levelRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+          if (confirmButton) {
+            confirmButton.disabled = false;
+            confirmButton.classList.add('enabled');
+          }
+        });
+      });
+      
+      // 確認ボタンのクリックイベント
+      if (confirmButton) {
+        confirmButton.addEventListener('click', () => {
+          this.handleLevelChange();
+        });
+      }
+    }, 100);
+  },
+
+  /** 現在のレベル表示を更新 */
+  updateCurrentLevelDisplay() {
+    const display = document.getElementById('currentLevelDisplay');
+    if (!display) return;
+    
+    // gameStateから現在のレベルを取得
+    const currentLevel = gameState?.playerStats?.level || 1;
+    const currentExp = gameState?.playerStats?.exp || 0;
+    
+    // 現在のレベルに対応するプリセットを見つける
+    let currentPreset = null;
+    for (const [key, preset] of Object.entries(LEVEL_PRESETS)) {
+      if (preset.level === currentLevel) {
+        currentPreset = preset;
+        break;
+      }
+    }
+    
+    if (currentPreset) {
+      display.innerHTML = `
+        <div class="current-level-info">
+          <span class="current-level-label">現在のレベル:</span>
+          <span class="current-level-value">${currentPreset.label} (Lv.${currentLevel})</span>
+        </div>
+      `;
+    } else {
+      display.innerHTML = `
+        <div class="current-level-info">
+          <span class="current-level-label">現在のレベル:</span>
+          <span class="current-level-value">カスタムレベル (Lv.${currentLevel})</span>
+        </div>
+      `;
+    }
+  },
+
+  /** レベル変更処理 */
+  handleLevelChange() {
+    const selectedRadio = document.querySelector('input[name="playerLevel"]:checked');
+    if (!selectedRadio) {
+      alert('レベルを選択してください。');
+      return;
+    }
+    
+    const selectedPreset = LEVEL_PRESETS[selectedRadio.value];
+    if (!selectedPreset) {
+      console.error('選択されたプリセットが見つかりません:', selectedRadio.value);
+      return;
+    }
+    
+    // 確認ダイアログ
+    const confirmMessage = `${selectedPreset.label}（レベル${selectedPreset.level}）に変更しますか？\n\n` +
+      'レベル・経験値・HP・攻撃力が調整されます。';
+    
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+    
+    try {
+      // レベル変更を実行
+      this.applyLevelChange(selectedPreset);
+      
+      // 成功フィードバック
+      publish('playSE', 'levelUp');
+      alert(`${selectedPreset.label}に変更しました！`);
+      
+      // 表示を更新
+      this.updateCurrentLevelDisplay();
+      
+      // 確認ボタンを無効化
+      const confirmButton = document.getElementById('confirmLevelChange');
+      if (confirmButton) {
+        confirmButton.disabled = true;
+        confirmButton.classList.remove('enabled');
+      }
+      
+      // ラジオボタンをリセット
+      const levelRadios = document.querySelectorAll('input[name="playerLevel"]');
+      levelRadios.forEach(radio => {
+        radio.checked = false;
+      });
+      
+    } catch (error) {
+      console.error('レベル変更中にエラーが発生しました:', error);
+      alert('レベル変更に失敗しました。');
+    }
+  },
+
+  /** レベル変更を適用 */
+  applyLevelChange(preset) {
+    if (!gameState?.playerStats) {
+      throw new Error('gameState.playerStatsが見つかりません');
+    }
+    
+    const stats = gameState.playerStats;
+    const oldLevel = stats.level;
+    
+    // 新しいレベルを設定
+    stats.level = preset.level;
+    stats.exp = preset.exp;
+    
+    // レベルに応じてステータスを計算
+    // 基本値からレベル差分を計算
+    const levelDiff = preset.level - 1; // レベル1からの差分
+    
+    // HP計算: 基本100 + (レベル-1) × 10
+    stats.maxHp = 100 + (levelDiff * 10);
+    stats.hp = stats.maxHp; // 満タンで開始
+    
+    // 攻撃力計算: 基本10 + (レベル-1) × 2
+    stats.attack = 10 + (levelDiff * 2);
+    
+    // 次のレベルに必要な経験値を設定
+    if (preset.level < 100) { // 最大レベル制限
+      stats.nextLevelExp = calculateExpForLevel(preset.level + 1) - preset.exp;
+    } else {
+      stats.nextLevelExp = 999999; // 最大レベル到達時
+    }
+    
+    // 回復回数をリセット
+    stats.healCount = 3;
+    
+    // スキルポイントをレベルに応じて設定
+    stats.skillPoints = Math.max(0, preset.level - 1);
+    
+    console.log(`レベル変更完了: ${oldLevel} → ${preset.level}`);
+    console.log('新しいステータス:', {
+      level: stats.level,
+      hp: stats.hp,
+      maxHp: stats.maxHp,
+      attack: stats.attack,
+      exp: stats.exp,
+      nextLevelExp: stats.nextLevelExp,
+      skillPoints: stats.skillPoints
+    });
+    
+    // セーブデータを更新
+    try {
+      saveGameData();
+    } catch (error) {
+      console.warn('セーブデータの保存に失敗:', error);
+    }
   },
 
   /** バトル設定のイベントリスナーを設定 */

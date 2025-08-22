@@ -2882,3 +2882,174 @@ html,body{ font-size:var(--fs-base); }
     align-self: center;
   }
 }
+
+/* レベル変更機能のスタイリング */
+
+/* レベル設定グループ */
+.level-radio-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 15px 0;
+}
+
+/* レベルオプション */
+.level-option {
+  display: flex !important;
+  align-items: flex-start;
+  padding: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: auto;
+}
+
+.level-option:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.level-option input[type="radio"]:checked + .radio-custom + .level-option-content {
+  color: #3498db;
+}
+
+.level-option input[type="radio"]:checked ~ * {
+  color: #3498db;
+}
+
+/* レベルオプションの内容 */
+.level-option-content {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.level-option-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.level-option-description {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.level-option-stats {
+  font-size: 12px;
+  color: #f39c12;
+  font-weight: bold;
+}
+
+/* 現在のレベル表示 */
+.current-level-display {
+  margin: 12px 0 20px 0;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.2), rgba(46, 204, 113, 0.2));
+  border: 1px solid rgba(52, 152, 219, 0.4);
+  border-radius: 6px;
+}
+
+.current-level-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.current-level-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.current-level-value {
+  font-size: 14px;
+  font-weight: bold;
+  color: #3498db;
+}
+
+/* レベル変更確認ボタン */
+.level-change-button {
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: not-allowed;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+  opacity: 0.6;
+}
+
+.level-change-button.enabled {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  cursor: pointer;
+  opacity: 1;
+}
+
+.level-change-button.enabled:hover {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.level-change-button:disabled {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* カスタムラジオボタンのスタイル調整 */
+.level-option .radio-custom {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 600px) {
+  .level-option {
+    padding: 12px;
+  }
+  
+  .level-option-title {
+    font-size: 15px;
+  }
+  
+  .level-option-description {
+    font-size: 12px;
+  }
+  
+  .level-radio-container {
+    gap: 10px;
+  }
+  
+  .current-level-display {
+    padding: 10px 12px;
+  }
+  
+  .current-level-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* アニメーション効果 */
+@keyframes levelChangeSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.level-change-button.success {
+  animation: levelChangeSuccess 0.6s ease-in-out;
+}
