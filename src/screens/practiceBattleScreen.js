@@ -714,13 +714,6 @@ const practiceBattleScreenState = {
       this.drawStoneAttackEffect(adjustedX, adjustedY, kanjiBoxW, kanjiBoxH);
     }
 
-    // ⑤ アクションボタン描画
-    const actionBTN = {
-      attack: { x: 230, y: 380, w: 110, h: 50, label: "こうげき" },
-      heal:   { x: 350, y: 380, w: 110, h: 50, label: "かいふく" },
-      hint:   { x: 470, y: 380, w: 110, h: 50, label: "ヒント" },
-    };
-
     const mode = battleState.lastCommandMode || 'attack';
     
     Object.entries(actionBTN).forEach(([key, btn]) => {
