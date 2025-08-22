@@ -5246,7 +5246,6 @@ function colorize(s) {
  * モンスター出現枠を描画する関数
  */
 
-// 1. drawMonsterFrame関数を修正して、シールド状態を反映できるようにする
 function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'normal') {
   ctx.save();
   
@@ -5255,9 +5254,8 @@ function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'norma
   let shieldStyle = null;
   
   if (enemy) {
-
-    // ★★★ 修正：登場順による判定に変更 ★★★
-    frameStyle = getFrameStyleByOrder(gameState.currentEnemyIndex, enemy.isBoss);
+    // ★★★ 修正：battleScreenStateオブジェクトのメソッドを正しく呼び出し ★★★
+    frameStyle = battleScreenState.getFrameStyleByOrder(gameState.currentEnemyIndex, enemy.isBoss);
 
     if (enemy.isBoss) {
       frameStyle = 'boss';
@@ -5268,9 +5266,11 @@ function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'norma
           maxHp: enemy.originalShieldHp || 3
         };
       }
-    } else if (enemy.level >= 10) {
-      frameStyle = 'elite';
     }
+    // ★★★ 削除：不要になった else if 分岐を削除 ★★★
+    // else if (enemy.level >= 10) {
+    //   frameStyle = 'elite';
+    // }
   }
   
   // 枠の基本設定
