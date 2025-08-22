@@ -251,17 +251,7 @@ function __wss_renderSchoolHintOverlays(self, ctx) {
       r.tip = __wss_kankenTooltip(self.selectedGrade);
       rects.push(r);
     }
-    // ステージボタン右肩用
-    if (Array.isArray(self.stageButtons)) {
-      for (const b of self.stageButtons) {
-        const g = b?.stage?.grade;
-        if (g >= 7) {
-          const r = __wss_drawBadge(ctx, __wss_gradeToSchoolHint(g), b.x + b.width - 92, b.y + 6);
-          r.tip = __wss_kankenTooltip(g);
-          rects.push(r);
-        }
-      }
-    }
+  
     // ホバー判定とツールチップ
     if (rects.length > 0 && Number.isFinite(self.mouseX) && Number.isFinite(self.mouseY)) {
       for (const r of rects) {
