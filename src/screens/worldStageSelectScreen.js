@@ -307,7 +307,7 @@ const getUiRoot = () => {
   return uiRoot;
 };
 
-// ★★★ フッターボタンの設定を5ボタンに変更 ★★★
+// ★★★ フッターボタンの設定を5ボタンに修正 ★★★
 
 // フッターボタンを画面下部に水平一列に配置
 const BUTTON_CONFIG = {
@@ -322,7 +322,7 @@ const totalWidth = (BUTTON_CONFIG.width * 5) + (BUTTON_CONFIG.gap * 4);
 // 開始X座標を計算（中央揃え）
 const startX = (800 - totalWidth) / 2;
 
-// 各ボタンのx座標を計算（テキストを短縮）
+// 各ボタンのx座標を正しく計算（5ボタン配置）
 const backButton = { 
   x: startX, 
   y: BUTTON_CONFIG.y, 
@@ -332,7 +332,7 @@ const backButton = {
   icon: '⬅️'
 };
 
-// ★★★ 練習ボタンを追加 ★★★
+// ★★★ 練習ボタンを2番目に配置 ★★★
 const practiceButton = { 
   x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 1, 
   y: BUTTON_CONFIG.y, 
@@ -342,8 +342,9 @@ const practiceButton = {
   icon: '📝'
 };
 
+// 漢字図鑑ボタンを3番目に配置
 const dexButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 1, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -351,8 +352,9 @@ const dexButton = {
   icon: '📚'
 };
 
+// モンスターボタンを4番目に配置
 const monsterButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -360,9 +362,9 @@ const monsterButton = {
   icon: '👾'
 };
 
-// 追加: プロフィール/称号ボタン
+// プロフィール/称号ボタンを5番目に配置
 const profileButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 4, 
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
@@ -874,55 +876,54 @@ const worldStageSelectScreen = {
       // この後のフッター描画処理は引き続き実行する（returnしない）
     }
 
-    // 右側の大陸地図を描画
-    const mapX = cw / 2;
-    const mapY = 60;
-    const mapWidth = cw / 2;
-    const mapHeight = ch - 120;
-    
-    // 選択された漢検レベルに対応する画像を表示
-    let bgImage = null;
-    
-    // 文字列比較に修正
-    switch (String(this.selectedTabLevel)) {
-      case "4":
-        bgImage = images.stageSelect12;
-        break;
-      case "3":
-        bgImage = images.stageSelect13;
-        break;
-      case "準2":
-        bgImage = images.stageSelect14;
-        break;
-      case "2":
-        bgImage = images.stageSelect15;
-        break;
-      default:
-        bgImage = images.worldMap;
-    }
-    
-    // デバッグ情報を追加
-    console.log(`選択された背景画像: selectedTabLevel=${this.selectedTabLevel}, 画像=${bgImage ? '読み込み成功' : '未読み込み'}`);
-
-    if (bgImage) {
-      ctx.drawImage(bgImage, mapX, mapY, mapWidth, mapHeight);
-    } else {
-      // 地図画像がない場合は代替表示
-      this.drawFallbackContinentMap(mapX, mapY, mapWidth, mapHeight);
-    }
-
-    // 左側のステージリスト背景パネル（総復習モードでは描画しない）
-    const panelX = 10;
-    const panelY = 70; // 元の60から70に変更
-    const panelW = cw / 2 - 20;
-    const panelH = ch - 140; // フッターバー分の高さを調整
+    // 右側の大陸地図を描画（総復習モードではスキップ）
     if (!this.isReviewMode) {
+      const mapX = cw / 2;
+      const mapY = 60;
+      const mapWidth = cw / 2;
+      const mapHeight = ch - 120;
+      
+      // 選択された漢検レベルに対応する画像を表示
+      let bgImage = null;
+      
+      // 文字列比較に修正
+      switch (String(this.selectedTabLevel)) {
+        case "4":
+          bgImage = images.stageSelect12;
+          break;
+        case "3":
+          bgImage = images.stageSelect13;
+          break;
+        case "準2":
+          bgImage = images.stageSelect14;
+          break;
+        case "2":
+          bgImage = images.stageSelect15;
+          break;
+        default:
+          bgImage = images.worldMap;
+      }
+      
+      // デバッグ情報を追加
+      console.log(`選択された背景画像: selectedTabLevel=${this.selectedTabLevel}, 画像=${bgImage ? '読み込み成功' : '未読み込み'}`);
+
+      if (bgImage) {
+        ctx.drawImage(bgImage, mapX, mapY, mapWidth, mapHeight);
+      } else {
+        // 地図画像がない場合は代替表示
+        this.drawFallbackContinentMap(mapX, mapY, mapWidth, mapHeight);
+      }
+
+      // 左側のステージリスト背景パネル
+      const panelX = 10;
+      const panelY = 70; // 元の60から70に変更
+      const panelW = cw / 2 - 20;
+      const panelH = ch - 140; // フッターバー分の高さを調整
       this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
     }
 
     // 改善されたタブ描画 
-drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kanken');
-
+    drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kanken');
 
     // 大陸名とレベルの見出し（総復習モードでは表示しない）
     if (!this.isReviewMode) {
@@ -951,8 +952,8 @@ drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kank
 
       const textWidth = ctx.measureText(title).width;
       const textBgPadding = 10;
-      const textBgX = panelX + panelW / 2 - textWidth / 2 - textBgPadding;
-      const textBgY = panelY + 10;
+      const textBgX = 10 + (cw / 2 - 20) / 2 - textWidth / 2 - textBgPadding;
+      const textBgY = 80;
       const textBgWidth = textWidth + textBgPadding * 2;
       const textBgHeight = 36;
 
@@ -967,7 +968,7 @@ drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kank
       ctx.shadowBlur = 4;
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 2;
-      ctx.fillText(title, panelX + panelW / 2, panelY + 15);
+      ctx.fillText(title, 10 + (cw / 2 - 20) / 2, 85);
       ctx.shadowColor = 'transparent';
       ctx.shadowBlur = 0;
       ctx.shadowOffsetX = 0;
@@ -976,12 +977,9 @@ drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kank
 
     // ステージボタンの描画（総復習モードでは表示しない）
     if (!this.isReviewMode && this.stageButtons && this.stageButtons.length > 0) {
-      // const nextStage = this.getNextStage();
-      
       this.stageButtons.forEach(button => {
         const stage = button.stage;
         const isCleared = this.isStageCleared(stage.stageId);
-        // const isNext = nextStage && nextStage.stageId === stage.stageId;
         const isNext = false; // 自動点滅を無効化
         const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
 
@@ -1053,95 +1051,97 @@ drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kank
           }
         }
       });
-    } else {
+    } else if (!this.isReviewMode) {
       // ステージがない場合のメッセージ
+      const panelX = 10;
+      const panelW = cw / 2 - 20;
       ctx.fillStyle = '#ccc';
       ctx.font = '16px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('この大陸・級のステージはまだありません', panelX + panelW / 2, panelY + 100);
+      ctx.fillText('この大陸・級のステージはまだありません', panelX + panelW / 2, 200);
     }
 
-    // 各ステージのマーカーを動的に描画（ステータス別表示）
-    stages.forEach(stage => {
-      // ステージに位置情報がある場合のみ描画
-      if (stage.pos) {
-        const { x, y } = stage.pos;
-        const isCleared = this.isStageCleared(stage.stageId);
-        const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
-        // 次のステージの自動点滅を無効化
-        // const nextStage = this.getNextStage();
-        // const isNext = nextStage && nextStage.stageId === stage.stageId;
-        const isNext = false; // 自動点滅を無効化
-        const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
-        
-        let markerImage = images.markerPref;
-        let scale = 1;
-        let alpha = 1;
+    // 各ステージのマーカーを動的に描画（ステータス別表示）- 総復習モードでは表示しない
+    if (!this.isReviewMode) {
+      stages.forEach(stage => {
+        // ステージに位置情報がある場合のみ描画
+        if (stage.pos) {
+          const { x, y } = stage.pos;
+          const isCleared = this.isStageCleared(stage.stageId);
+          const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
+          const isNext = false; // 自動点滅を無効化
+          const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
+          
+          let markerImage = images.markerPref;
+          let scale = 1;
+          let alpha = 1;
 
-        // ステータス別の表示
-        if (isSelected) {
-          // 選択中のステージ: より強い点滅アニメーション
-          const pulse = Math.sin(this.animationTime * 0.01) * 0.5 + 0.5;
-          scale = 1 + pulse * 0.3;
-          alpha = 0.8 + pulse * 0.2;
-          ctx.save();
-          ctx.globalAlpha = alpha;
-          ctx.filter = 'hue-rotate(120deg) saturate(2) brightness(1.3)';
-        } else if (isCleared) {
-          // クリア済み: 金色のマーカー
-          markerImage = images.markerCleared || images.markerPref;
-          ctx.save();
-          ctx.globalAlpha = 1;
-          ctx.filter = 'hue-rotate(45deg) saturate(1.5) brightness(1.2)';
-        } else if (isNext) {
-          // 次に挑戦すべきステージ: 点滅アニメーション
-          const pulse = Math.sin(this.animationTime * 0.005) * 0.3 + 0.7;
-          scale = 1 + pulse * 0.2;
-          alpha = pulse;
-          ctx.save();
-          ctx.globalAlpha = alpha;
-        } else {
-          // 未挑戦: 通常表示
-          ctx.save();
-          ctx.globalAlpha = 0.7;
+          // ステータス別の表示
+          if (isSelected) {
+            // 選択中のステージ: より強い点滅アニメーション
+            const pulse = Math.sin(this.animationTime * 0.01) * 0.5 + 0.5;
+            scale = 1 + pulse * 0.3;
+            alpha = 0.8 + pulse * 0.2;
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.filter = 'hue-rotate(120deg) saturate(2) brightness(1.3)';
+          } else if (isCleared) {
+            // クリア済み: 金色のマーカー
+            markerImage = images.markerCleared || images.markerPref;
+            ctx.save();
+            ctx.globalAlpha = 1;
+            ctx.filter = 'hue-rotate(45deg) saturate(1.5) brightness(1.2)';
+          } else if (isNext) {
+            // 次に挑戦すべきステージ: 点滅アニメーション
+            const pulse = Math.sin(this.animationTime * 0.005) * 0.3 + 0.7;
+            scale = 1 + pulse * 0.2;
+            alpha = pulse;
+            ctx.save();
+            ctx.globalAlpha = alpha;
+          } else {
+            // 未挑戦: 通常表示
+            ctx.save();
+            ctx.globalAlpha = 0.7;
+          }
+
+          if (markerImage) {
+            const drawSize = MARKER_SIZE * scale;
+            const offsetX = (drawSize - MARKER_SIZE) / 2;
+            const offsetY = (drawSize - MARKER_SIZE) / 2;
+            ctx.drawImage(markerImage, x - offsetX, y - offsetY, drawSize, drawSize);
+          } else {
+            ctx.fillStyle = isCleared ? '#FFD700' : (isNext ? '#FF6B35' : '#f00');
+            const drawSize = MARKER_SIZE * scale;
+            const offsetX = (drawSize - MARKER_SIZE) / 2;
+            const offsetY = (drawSize - MARKER_SIZE) / 2;
+            ctx.fillRect(x - offsetX, y - offsetY, drawSize, drawSize);
+          }
+
+          // ホバー時は追加エフェクトと名前表示
+          if (isHovered) {
+            ctx.shadowColor = '#FFD700';
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(stage.name, x, y - 20);
+          }
+
+          ctx.restore();
         }
-
-        if (markerImage) {
-          const drawSize = MARKER_SIZE * scale;
-          const offsetX = (drawSize - MARKER_SIZE) / 2;
-          const offsetY = (drawSize - MARKER_SIZE) / 2;
-          ctx.drawImage(markerImage, x - offsetX, y - offsetY, drawSize, drawSize);
-        } else {
-          ctx.fillStyle = isCleared ? '#FFD700' : (isNext ? '#FF6B35' : '#f00');
-          const drawSize = MARKER_SIZE * scale;
-          const offsetX = (drawSize - MARKER_SIZE) / 2;
-          const offsetY = (drawSize - MARKER_SIZE) / 2;
-          ctx.fillRect(x - offsetX, y - offsetY, drawSize, drawSize);
-        }
-
-        // ホバー時は追加エフェクトと名前表示
-        if (isHovered) {
-          ctx.shadowColor = '#FFD700';
-          ctx.shadowBlur = 15;
-          ctx.fillStyle = '#fff';
-          ctx.font = '12px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(stage.name, x, y - 20);
-        }
-
-        ctx.restore();
-      }
-    });
+      });
+    }
 
     // フッターバーの描画
     this._drawFooterBar(ctx, cw, ch);
 
-        // ツールチップの描画（総復習モード以外）
-        if (gameState.currentGrade !== 0) {
-          this.drawTooltip(this.hoveredStage);
-        }
-        // ← 追加: 学年目安バッジと簡易ツールチップを最後に重ねる
-        __wss_renderSchoolHintOverlays(this, ctx);
+    // ツールチップの描画（総復習モード以外）
+    if (!this.isReviewMode) {
+      this.drawTooltip(this.hoveredStage);
+    }
+    
+    // 学年目安バッジと簡易ツールチップを最後に重ねる
+    __wss_renderSchoolHintOverlays(this, ctx);
   },
 
   /** クリックイベント処理 */
@@ -1297,7 +1297,7 @@ drawEnhancedTabs(ctx, tabs, this.selectedTabLevel, cw, this.animationTime, 'kank
     else if (this.isReviewMode) {
       // 現在の級に応じたステージを選択
       const gradeForReview = this.selectedGrade || 7;
-      const stagesForGrade = this.stages.filter(s => s.grade === gradeForReview);
+      const stagesForGrade = stageData.filter(s => s.grade === gradeForReview);
       
       if (stagesForGrade.length > 0) {
         const recommendedStage = stagesForGrade[0]; // 最初のステージを選択
