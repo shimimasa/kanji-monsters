@@ -1074,6 +1074,360 @@ if (battleState.enemyAction === 'defeat' && battleState.enemyActionTimer > 0) {
   }
 }
 
+/**
+ * モンスター出現枠を描画する関数
+ */
+
+// 1. drawMonsterFrame関数を修正して、シールド状態を反映できるようにする
+function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'normal') {
+  ctx.save();
+  
+  // 敵のタイプに応じて枠のスタイルを決定
+  let frameStyle = style;
+  let shieldStyle = null;
+  
+  if (enemy) {
+    if (enemy.isBoss) {
+      frameStyle = 'boss';
+      // ★★★ シールド状態の判定を追加 ★★★
+      if (enemy.shieldHp > 0) {
+        shieldStyle = {
+          hp: enemy.shieldHp,
+          maxHp: enemy.originalShieldHp || 3
+        };
+      }
+    } else if (enemy.level >= 10) {
+      frameStyle = 'elite';
+    }
+  }
+  
+  // 枠の基本設定
+  const cornerRadius = 8;
+  const frameThickness = 6;
+  const innerPadding = 8;
+  
+  // スタイル別の色設定
+  const styles = {
+    normal: {
+      outerColor: '#4a5568',
+      innerColor: '#2d3748',
+      glowColor: '#63b3ed',
+      bgColor: 'rgba(45, 55, 72, 0.8)',
+      accentColor: '#4299e1'
+    },
+    elite: {
+      outerColor: '#9f7aea',
+      innerColor: '#553c9a',
+      glowColor: '#d53f8c',
+      bgColor: 'rgba(85, 60, 154, 0.8)',
+      accentColor: '#b794f6'
+    },
+    boss: {
+      outerColor: '#e53e3e',
+      innerColor: '#c53030',
+      glowColor: '#fc8181',
+      bgColor: 'rgba(197, 48, 48, 0.8)',
+      accentColor: '#feb2b2'
+    }
+  };
+  
+  let currentStyle = styles[frameStyle];
+  
+  // ★★★ シールドがある場合、スタイルを上書き ★★★
+  if (shieldStyle) {
+    const shieldIntegrity = shieldStyle.hp / shieldStyle.maxHp;
+    const time = Date.now() * 0.003;
+    const pulse = (Math.sin(time * 2) + 1) * 0.5; // 0-1の範囲でパルス
+    
+    if (shieldIntegrity > 0.66) {
+      // 健全状態：青いシールド
+      currentStyle = {
+        outerColor: `rgba(100, 180, 255, ${0.8 + pulse * 0.2})`,
+        innerColor: `rgba(70, 130, 200, ${0.6 + pulse * 0.2})`,
+        glowColor: '#64b5f6',
+        bgColor: 'rgba(100, 180, 255, 0.1)',
+        accentColor: '#42a5f5'
+      };
+    } else if (shieldIntegrity > 0.33) {
+      // 警戒状態：青紫のシールド
+      currentStyle = {
+        outerColor: `rgba(150, 120, 255, ${0.8 + pulse * 0.2})`,
+        innerColor: `rgba(120, 90, 200, ${0.6 + pulse * 0.2})`,
+        glowColor: '#9c27b0',
+        bgColor: 'rgba(150, 120, 255, 0.1)',
+        accentColor: '#ba68c8'
+      };
+    } else {
+      // 危険状態：赤紫のシールド + 激しい点滅
+      const dangerPulse = (Math.sin(time * 4) + 1) * 0.5; // より激しい点滅
+      currentStyle = {
+        outerColor: `rgba(200, 100, 200, ${0.7 + dangerPulse * 0.3})`,
+        innerColor: `rgba(150, 70, 150, ${0.5 + dangerPulse * 0.3})`,
+        glowColor: '#f06292',
+        bgColor: 'rgba(200, 100, 200, 0.15)',
+        accentColor: '#ec407a'
+      };
+    }
+  }
+  
+  // 1. 外側の光るエフェクト（シールド状態に応じて調整）
+  if (frameStyle !== 'normal' || shieldStyle) {
+    const time = Date.now() * 0.003;
+    const glowIntensity = shieldStyle 
+      ? (Math.sin(time * 2) + 1) * 0.4 + 0.4  // シールド時はより強く光る
+      : (Math.sin(time) + 1) * 0.3 + 0.4;     // 通常時
+    
+    ctx.shadowColor = currentStyle.glowColor;
+    ctx.shadowBlur = shieldStyle ? 20 : 15; // シールド時はより大きな光
+    ctx.strokeStyle = currentStyle.glowColor;
+    ctx.globalAlpha = glowIntensity;
+    ctx.lineWidth = shieldStyle ? 4 : 3; // シールド時はより太い線
+    drawRoundedRect(ctx, x - 3, y - 3, width + 6, height + 6, cornerRadius + 3, true);
+    ctx.globalAlpha = 1;
+  }
+  
+  // 2. 背景（シールド状態に応じて調整）
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = currentStyle.bgColor;
+  drawRoundedRect(ctx, x, y, width, height, cornerRadius);
+  
+  // 3. 外枠（シールド状態に応じて太さ調整）
+  ctx.strokeStyle = currentStyle.outerColor;
+  ctx.lineWidth = shieldStyle ? frameThickness + 2 : frameThickness; // シールド時はより太く
+  drawRoundedRect(ctx, x, y, width, height, cornerRadius, true);
+  
+  // 4. 内側の装飾枠
+  const innerX = x + frameThickness;
+  const innerY = y + frameThickness;
+  const innerWidth = width - frameThickness * 2;
+  const innerHeight = height - frameThickness * 2;
+  
+  ctx.strokeStyle = currentStyle.innerColor;
+  ctx.lineWidth = 2;
+  drawRoundedRect(ctx, innerX, innerY, innerWidth, innerHeight, cornerRadius - 2, true);
+  
+  // 5. ★★★ シールド専用エフェクト ★★★
+  if (shieldStyle) {
+    drawShieldFrameEffects(ctx, x, y, width, height, shieldStyle, currentStyle);
+  }
+  
+  // 6. 角の装飾（ボス・エリート用）
+  if (frameStyle !== 'normal') {
+    drawCornerDecorations(ctx, x, y, width, height, currentStyle.accentColor, frameStyle);
+  }
+  
+  // 7. 中央の表示エリア（モンスター画像用）
+  const displayX = x + frameThickness + innerPadding;
+  const displayY = y + frameThickness + innerPadding;
+  const displayWidth = width - (frameThickness + innerPadding) * 2;
+  const displayHeight = height - (frameThickness + innerPadding) * 2;
+  
+  ctx.restore();
+  
+  // 表示エリアの座標を返す
+  return {
+    x: displayX,
+    y: displayY,
+    width: displayWidth,
+    height: displayHeight
+  };
+}
+
+// 2. ★★★ シールド専用の枠エフェクトを描画する新しい関数 ★★★
+function drawShieldFrameEffects(ctx, x, y, width, height, shieldStyle, style) {
+  const time = Date.now() * 0.001;
+  const cornerRadius = 8;
+  const shieldIntegrity = shieldStyle.hp / shieldStyle.maxHp;
+  
+  // シールドの状態に応じてエフェクトを描画
+  if (shieldIntegrity <= 0.33) {
+    // 危険状態：ヒビエフェクト
+    drawShieldCracksOnFrame(ctx, x, y, width, height, cornerRadius);
+  }
+  
+  if (shieldIntegrity <= 0.66) {
+    // 警戒状態以下：電気エフェクト
+    drawElectricEffectOnFrame(ctx, x, y, width, height, time);
+  }
+  
+  // 全状態：シールドパーティクル
+  drawShieldParticlesOnFrame(ctx, x, y, width, height, time, shieldIntegrity);
+  
+  // シールドHPインジケーター（枠の上部に小さく表示）
+  drawShieldHpIndicator(ctx, x, y, width, shieldStyle);
+}
+
+// 3. ★★★ 枠上のヒビエフェクト ★★★
+function drawShieldCracksOnFrame(ctx, x, y, width, height, cornerRadius) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  
+  // 枠の輪郭に沿ってヒビを描画
+  const numCracks = 6;
+  for (let i = 0; i < numCracks; i++) {
+    const t = i / numCracks;
+    const angle = t * Math.PI * 2;
+    
+    // 枠の輪郭上の点を計算
+    let frameX, frameY;
+    if (t < 0.25) {
+      // 上辺
+      frameX = x + (t * 4) * width;
+      frameY = y;
+    } else if (t < 0.5) {
+      // 右辺
+      frameX = x + width;
+      frameY = y + ((t - 0.25) * 4) * height;
+    } else if (t < 0.75) {
+      // 下辺
+      frameX = x + width - ((t - 0.5) * 4) * width;
+      frameY = y + height;
+    } else {
+      // 左辺
+      frameX = x;
+      frameY = y + height - ((t - 0.75) * 4) * height;
+    }
+    
+    // ヒビを内側に向かって描画
+    const crackLength = 15 + Math.random() * 10;
+    const innerX = frameX + Math.cos(angle + Math.PI) * crackLength;
+    const innerY = frameY + Math.sin(angle + Math.PI) * crackLength;
+    
+    ctx.beginPath();
+    ctx.moveTo(frameX, frameY);
+    ctx.lineTo(innerX, innerY);
+    ctx.stroke();
+  }
+  
+  ctx.restore();
+}
+
+// 4. ★★★ 枠上の電気エフェクト ★★★
+function drawElectricEffectOnFrame(ctx, x, y, width, height, time) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.lineWidth = 1;
+  ctx.lineCap = 'round';
+  
+  // 枠の周囲に電気が走るエフェクト
+  const segments = 20;
+  const perimeter = (width + height) * 2;
+  
+  for (let i = 0; i < 3; i++) {
+    const offset = (time * 2 + i * 0.5) % 1;
+    const startPos = offset * perimeter;
+    const endPos = startPos + 30;
+    
+    drawElectricArcAlongFrame(ctx, x, y, width, height, startPos, endPos);
+  }
+  
+  ctx.restore();
+}
+
+// 5. ★★★ 枠に沿って電気を描画 ★★★
+function drawElectricArcAlongFrame(ctx, x, y, width, height, startPos, endPos) {
+  const perimeter = (width + height) * 2;
+  const steps = 10;
+  
+  ctx.beginPath();
+  
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const pos = startPos + (endPos - startPos) * t;
+    const normalizedPos = (pos % perimeter) / perimeter;
+    
+    const framePoint = getFramePoint(x, y, width, height, normalizedPos);
+    const noise = (Math.random() - 0.5) * 8;
+    
+    if (i === 0) {
+      ctx.moveTo(framePoint.x + noise, framePoint.y + noise);
+    } else {
+      ctx.lineTo(framePoint.x + noise, framePoint.y + noise);
+    }
+  }
+  
+  ctx.stroke();
+}
+
+// 6. ★★★ 枠上の座標を取得するヘルパー ★★★
+function getFramePoint(x, y, width, height, t) {
+  const perimeter = (width + height) * 2;
+  const topEdge = width / perimeter;
+  const rightEdge = (width + height) / perimeter;
+  const bottomEdge = (width * 2 + height) / perimeter;
+  
+  if (t < topEdge) {
+    return { x: x + (t / topEdge) * width, y: y };
+  } else if (t < rightEdge) {
+    return { x: x + width, y: y + ((t - topEdge) / (height / perimeter)) * height };
+  } else if (t < bottomEdge) {
+    return { x: x + width - ((t - rightEdge) / topEdge) * width, y: y + height };
+  } else {
+    return { x: x, y: y + height - ((t - bottomEdge) / (height / perimeter)) * height };
+  }
+}
+
+// 7. ★★★ シールドパーティクル ★★★
+function drawShieldParticlesOnFrame(ctx, x, y, width, height, time, integrity) {
+  ctx.save();
+  
+  const numParticles = Math.floor(integrity * 12); // HPが高いほど多くのパーティクル
+  
+  for (let i = 0; i < numParticles; i++) {
+    const t = (time * 0.5 + i * 0.1) % 1;
+    const framePoint = getFramePoint(x, y, width, height, t);
+    
+    const alpha = 0.3 + Math.sin(time * 3 + i) * 0.2;
+    ctx.fillStyle = `rgba(100, 180, 255, ${alpha})`;
+    
+    const size = 2 + Math.sin(time * 2 + i) * 1;
+    ctx.fillRect(framePoint.x - size/2, framePoint.y - size/2, size, size);
+  }
+  
+  ctx.restore();
+}
+
+// 8. ★★★ シールドHPインジケーター ★★★
+function drawShieldHpIndicator(ctx, x, y, width, shieldStyle) {
+  const indicatorWidth = 60;
+  const indicatorHeight = 8;
+  const indicatorX = x + (width - indicatorWidth) / 2;
+  const indicatorY = y - 20;
+  
+  ctx.save();
+  
+  // 背景
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  ctx.fillRect(indicatorX, indicatorY, indicatorWidth, indicatorHeight);
+  
+  // シールドバー
+  const integrity = shieldStyle.hp / shieldStyle.maxHp;
+  let barColor;
+  if (integrity > 0.66) barColor = '#64b5f6';
+  else if (integrity > 0.33) barColor = '#ba68c8';
+  else barColor = '#f06292';
+  
+  ctx.fillStyle = barColor;
+  ctx.fillRect(indicatorX, indicatorY, indicatorWidth * integrity, indicatorHeight);
+  
+  // 枠線
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(indicatorX, indicatorY, indicatorWidth, indicatorHeight);
+  
+  // テキスト
+  ctx.fillStyle = 'white';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(`Shield ${shieldStyle.hp}`, indicatorX + indicatorWidth/2, indicatorY - 3);
+  
+  ctx.restore();
+}
+
+
 // 1. モンスター枠を描画
 const frameArea = drawMonsterFrame(this.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy);
 
@@ -1094,100 +1448,7 @@ const imageY = frameArea.y + (frameArea.height - eh) / 2 + offsetY;
 this.ctx.translate(imageX + ew/2, imageY + eh/2);
 this.ctx.rotate(rotateAngle);
 
-// ★★★ シールド描画を敵画像の前に配置（修正版）★★★
-if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
-  try {
-    console.log('シールド描画開始:', enemy.shieldHp);
-    
-    // **重要な修正**: モンスター枠のサイズを考慮してシールド半径を調整
-    const frameArea = drawMonsterFrame(this.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy);
-    
-    // シールド半径をモンスター枠の実際の表示エリアに基づいて計算
-    const shieldRadius = Math.min(frameArea.width, frameArea.height) * 0.45; // 0.6から0.45に調整してより適切なサイズに
-    const maxShieldHp = enemy.originalShieldHp || 3;
-    const currentShieldHp = enemy.shieldHp;
-    
-    // シールドの中心をモンスター枠の表示エリアの中心に設定
-    const shieldCenterX = 0; // 既に回転の中心点に変換済みのため、原点基準
-    const shieldCenterY = 0;
-    
-    const shieldIntegrity = currentShieldHp / maxShieldHp;
-    const basePulse = Math.sin(Date.now() / 300) + 1;
-    
-    let shieldOpacity, crackLevel;
-    
-    if (currentShieldHp === 3) {
-      shieldOpacity = 0.3 + basePulse * 0.1;
-      crackLevel = 0;
-    } else if (currentShieldHp === 2) {
-      shieldOpacity = 0.25 + basePulse * 0.08;
-      crackLevel = 1;
-    } else if (currentShieldHp === 1) {
-      shieldOpacity = 0.2 + basePulse * 0.12;
-      crackLevel = 2;
-    }
-    
-    let shieldColor;
-    try {
-      shieldColor = this.getShieldColor(currentShieldHp, maxShieldHp);
-      if (!shieldColor || typeof shieldColor.r === 'undefined') {
-        throw new Error('シールドカラーが正しく取得できません');
-      }
-    } catch (error) {
-      console.warn('シールドカラー取得エラー:', error);
-      shieldColor = { r: 100, g: 180, b: 255 };
-    }
-    
-    // シールドのグラデーション（サイズ調整済み）
-    const shieldGrad = this.ctx.createRadialGradient(
-      shieldCenterX, shieldCenterY, shieldRadius * 0.7, 
-      shieldCenterX, shieldCenterY, shieldRadius
-    );
-    shieldGrad.addColorStop(0, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, 0)`);
-    shieldGrad.addColorStop(0.7, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, ${shieldOpacity * 0.5})`);
-    shieldGrad.addColorStop(1, `rgba(${shieldColor.r}, ${shieldColor.g}, ${shieldColor.b}, ${shieldOpacity})`);
-    
-    this.ctx.fillStyle = shieldGrad;
-    this.ctx.beginPath();
-    this.ctx.arc(shieldCenterX, shieldCenterY, shieldRadius, 0, Math.PI * 2);
-    this.ctx.fill();
-    
-    const outlineAlpha = Math.min(1, shieldOpacity + 0.2);
-    this.ctx.strokeStyle = `rgba(${Math.min(255, shieldColor.r + 50)}, ${Math.min(255, shieldColor.g + 50)}, ${Math.min(255, shieldColor.b + 50)}, ${outlineAlpha})`;
-    this.ctx.lineWidth = 2;
-    
-    if (currentShieldHp < maxShieldHp) {
-      this.ctx.lineWidth = 2 + Math.sin(Date.now() / 100) * 0.5;
-    }
-    
-    this.ctx.stroke();
-    
-    // シールドのヒビ描画（半径をframeSizeに合わせて調整）
-    try {
-      if (typeof this.drawShieldCracks === 'function') {
-        this.drawShieldCracks(this.ctx, shieldCenterX, shieldCenterY, shieldRadius, crackLevel, currentShieldHp);
-      }
-    } catch (error) {
-      console.warn('シールドクラック描画エラー:', error);
-    }
-    
-    // 危険状態の警告エフェクト（半径調整済み）
-    if (currentShieldHp === 1) {
-      try {
-        if (typeof this.drawShieldWarningEffect === 'function') {
-          this.drawShieldWarningEffect(this.ctx, shieldCenterX, shieldCenterY, shieldRadius);
-        }
-      } catch (error) {
-        console.warn('シールド警告エフェクト描画エラー:', error);
-      }
-    }
-    
-    console.log('シールド描画完了 - 半径:', shieldRadius);
-    
-  } catch (error) {
-    console.error('シールド描画中にエラーが発生しました:', error);
-  }
-}
+
 
 if (enemy && enemy.img) {
   // 透過処理の問題を軽減するため、背景を少し暗くする
@@ -5187,113 +5448,6 @@ function colorize(s) {
   if (s.startsWith('★') || s.includes('ボーナス')) return { text: s, color: '#FFD700' };        // ゴールド
   if (s.includes('たおした')) return { text: s, color: '#F3E9D7' };
   return { text: s };
-}
-
-
-/**
- * モンスター出現枠を描画する関数
- */
-
-function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'normal') {
-  ctx.save();
-  
-  // 敵のタイプに応じて枠のスタイルを決定
-  let frameStyle = style;
-  if (enemy) {
-    if (enemy.isBoss) {
-      frameStyle = 'boss';
-    } else if (enemy.level >= 10) {
-      frameStyle = 'elite';
-    }
-  }
-  
-  // 枠の基本設定
-  const cornerRadius = 8;
-  const frameThickness = 6;
-  const innerPadding = 8;
-  
-  // スタイル別の色設定
-  const styles = {
-    normal: {
-      outerColor: '#4a5568',
-      innerColor: '#2d3748',
-      glowColor: '#63b3ed',
-      bgColor: 'rgba(45, 55, 72, 0.8)',
-      accentColor: '#4299e1'
-    },
-    elite: {
-      outerColor: '#9f7aea',
-      innerColor: '#553c9a',
-      glowColor: '#d53f8c',
-      bgColor: 'rgba(85, 60, 154, 0.8)',
-      accentColor: '#b794f6'
-    },
-    boss: {
-      outerColor: '#e53e3e',
-      innerColor: '#c53030',
-      glowColor: '#fc8181',
-      bgColor: 'rgba(197, 48, 48, 0.8)',
-      accentColor: '#feb2b2'
-    }
-  };
-  
-  const currentStyle = styles[frameStyle];
-  
-  // 1. 外側の光るエフェクト（ボス・エリート用）
-  if (frameStyle !== 'normal') {
-    const time = Date.now() * 0.003;
-    const glowIntensity = (Math.sin(time) + 1) * 0.3 + 0.4;
-    
-    ctx.shadowColor = currentStyle.glowColor;
-    ctx.shadowBlur = 15;
-    ctx.strokeStyle = currentStyle.glowColor;
-    ctx.globalAlpha = glowIntensity;
-    ctx.lineWidth = 3;
-    drawRoundedRect(ctx, x - 3, y - 3, width + 6, height + 6, cornerRadius + 3, true);
-    ctx.globalAlpha = 1;
-  }
-  
-  // 2. 背景（半透明）
-  ctx.shadowColor = 'transparent';
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = currentStyle.bgColor;
-  drawRoundedRect(ctx, x, y, width, height, cornerRadius);
-  
-  // 3. 外枠
-  ctx.strokeStyle = currentStyle.outerColor;
-  ctx.lineWidth = frameThickness;
-  drawRoundedRect(ctx, x, y, width, height, cornerRadius, true);
-  
-  // 4. 内側の装飾枠
-  const innerX = x + frameThickness;
-  const innerY = y + frameThickness;
-  const innerWidth = width - frameThickness * 2;
-  const innerHeight = height - frameThickness * 2;
-  
-  ctx.strokeStyle = currentStyle.innerColor;
-  ctx.lineWidth = 2;
-  drawRoundedRect(ctx, innerX, innerY, innerWidth, innerHeight, cornerRadius - 2, true);
-  
-  // 5. 角の装飾（ボス・エリート用）
-  if (frameStyle !== 'normal') {
-    drawCornerDecorations(ctx, x, y, width, height, currentStyle.accentColor, frameStyle);
-  }
-  
-  // 6. 中央の表示エリア（モンスター画像用）
-  const displayX = x + frameThickness + innerPadding;
-  const displayY = y + frameThickness + innerPadding;
-  const displayWidth = width - (frameThickness + innerPadding) * 2;
-  const displayHeight = height - (frameThickness + innerPadding) * 2;
-  
-  ctx.restore();
-  
-  // 表示エリアの座標を返す
-  return {
-    x: displayX,
-    y: displayY,
-    width: displayWidth,
-    height: displayHeight
-  };
 }
 
 /**
