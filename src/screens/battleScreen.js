@@ -5350,7 +5350,6 @@ function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'norma
   };
 }
 
-
 /**
  * 角の装飾を描画
  */
