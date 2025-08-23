@@ -2825,22 +2825,24 @@ this._touchStartHandler = e => {
   const rect = this.canvas.getBoundingClientRect();
   const scaleX = this.canvas.width / rect.width;
   const scaleY = this.canvas.height / rect.height;
-  const gx = (t.clientX - rect.left) * scaleX;
-  const gy = (t.clientY - rect.top) * scaleY;
+  
+  this._touchStartX = (t.clientX - rect.left) * scaleX;
+  this._touchStartY = (t.clientY - rect.top) * scaleY;
+  
   if (this.logScrollbar) {
     const sb = this.logScrollbar;
-    const inThumb = gx >= sb.thumbX && gx <= sb.thumbX + sb.thumbW && gy >= sb.thumbY && gy <= sb.thumbY + sb.thumbH;
-    const inTrack = gx >= sb.trackX && gx <= sb.trackX + sb.trackW && gy >= sb.trackY && gy <= sb.trackY + sb.trackH;
+    const inThumb = this._touchStartX >= sb.thumbX && this._touchStartX <= sb.thumbX + sb.thumbW && this._touchStartY >= sb.thumbY && this._touchStartY <= sb.thumbY + sb.thumbH;
+    const inTrack = this._touchStartX >= sb.trackX && this._touchStartX <= sb.trackX + sb.trackW && this._touchStartY >= sb.trackY && this._touchStartY <= sb.trackY + sb.trackH;
     if (inThumb) {
       this.draggingLogThumb = true;
-      this._dragStartY = gy;
+      this._dragStartY = this._touchStartY;
       this._dragStartOffset = this.logOffset || 0;
       this._logHintDismissed = true;
       e.preventDefault();
       return;
     }
       		if (inTrack && !inThumb) {
-      			const rel = Math.max(0, Math.min(1, (gy - sb.trackY - sb.thumbH / 2) / Math.max(1, sb.trackH - sb.thumbH)));
+      			const rel = Math.max(0, Math.min(1, (this._touchStartY - sb.trackY - sb.thumbH / 2) / Math.max(1, sb.trackH - sb.thumbH)));
       			const next = Math.round(rel * (sb.maxOffset || 0));
       			this.logOffset = next;
       			if (this.blockHistory && this.blockHistory.length > 0) this.currentBlockIndex = next;
@@ -2850,6 +2852,7 @@ this._touchStartHandler = e => {
            }
   }
 };
+
 this._touchMoveHandler = e => {
   if (!this.draggingLogThumb || !this.logScrollbar) return;
   const t = e.changedTouches[0];
@@ -2865,7 +2868,28 @@ this._touchMoveHandler = e => {
 	if (this.blockHistory && this.blockHistory.length > 0) this.currentBlockIndex = next;
   e.preventDefault();
 };
-this._touchEndHandler = () => {
+
+this._touchEndHandler = e => {
+  if (!e.changedTouches) return;
+  
+  const t = e.changedTouches[0];
+  const rect = this.canvas.getBoundingClientRect();
+  const scaleX = this.canvas.width / rect.width;
+  const scaleY = this.canvas.height / rect.height;
+  
+  const touchEndX = (t.clientX - rect.left) * scaleX;
+  const touchEndY = (t.clientY - rect.top) * scaleY;
+  
+  // タッチ開始と終了が近い場合のみクリックと判定
+  const moveDistance = Math.sqrt(
+    Math.pow(touchEndX - this._touchStartX, 2) + 
+    Math.pow(touchEndY - this._touchStartY, 2)
+  );
+  
+  if (moveDistance < 10) { // 10ピクセル以内の移動はクリックと判定
+    this.handleClick(e);
+  }
+  
   this.draggingLogThumb = false;
   this._dragStartY = null;
   this._dragStartOffset = null;
@@ -2909,13 +2933,9 @@ this.canvas.removeEventListener('touchend', this._touchEndHandler);
 
   /** クリック処理 */
   handleClick(e) {
-    // === ここからが新しい座標変換ロジック ===
-    e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
-
-    if (DEBUG) console.log('handleClick実行');
-
+    e.preventDefault();
+    
     let eventX, eventY;
-    // e.changedTouchesが存在すればタッチイベント、なければマウスイベントと判定
     if (e.changedTouches) {
       eventX = e.changedTouches[0].clientX;
       eventY = e.changedTouches[0].clientY;
@@ -2926,15 +2946,34 @@ this.canvas.removeEventListener('touchend', this._touchEndHandler);
 
     const rect = this.canvas.getBoundingClientRect();
     
-    // Canvasの実際の表示サイズと内部解像度の比率を計算
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
+    // より正確な座標変換
+    const canvasRatio = this.canvas.width / this.canvas.height;
+    const rectRatio = rect.width / rect.height;
     
-    // 実際のタッチ/クリック座標を、800x600のゲーム内座標に変換
-    const x = (eventX - rect.left) * scaleX;
-    const y = (eventY - rect.top) * scaleY;
+    let scaleX, scaleY, offsetX = 0, offsetY = 0;
     
-    if (DEBUG) console.log('クリック座標:', x, y);
+    if (rectRatio > canvasRatio) {
+      // 横長の表示領域の場合
+      scaleY = this.canvas.height / rect.height;
+      scaleX = scaleY;
+      offsetX = (rect.width - this.canvas.width / scaleY) / 2;
+    } else {
+      // 縦長の表示領域の場合
+      scaleX = this.canvas.width / rect.width;
+      scaleY = scaleX;
+      offsetY = (rect.height - this.canvas.height / scaleX) / 2;
+    }
+    
+    // 実際のタッチ/クリック座標をゲーム内座標に変換
+    const x = (eventX - rect.left - offsetX) * scaleX;
+    const y = (eventY - rect.top - offsetY) * scaleY;
+    
+    // 範囲チェックを追加
+    if (x < 0 || x > this.canvas.width || y < 0 || y > this.canvas.height) {
+      return false; // Canvas外のクリックは無視
+    }
+    
+    if (DEBUG) console.log('クリック座標:', x, y, 'スケール:', scaleX, scaleY);
     
     // BTNオブジェクトのプロパティを確認
     if (DEBUG) console.log('BTN.back:', BTN.back);

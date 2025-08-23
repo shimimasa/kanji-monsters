@@ -11,15 +11,14 @@ body {
 
 #gameCanvas {
     background-color: #000;
-     /* 画面の横幅、または縦幅のどちらか小さい方に合わせる */
-  width: 100vw;
-  height: 100vh;
-  
-  /* アスペクト比を維持して、オブジェクト全体がボックス内に収まるように調整 */
-  object-fit: contain;
-  
-  /* 背景や他の要素との重なり順を管理 */
-  z-index: 1;
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+    
+    /* 全画面表示時の座標計算を安定させる */
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
 }
 
 #uiOverlay {
