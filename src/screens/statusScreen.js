@@ -137,7 +137,7 @@ const statusScreenState = {
     this.canvas.addEventListener('click', this._clickHandler);
   },
 
-  /** クリックイベントリスナ解除 */
+  /** クリックイベントリスナ解除！*/
   unregisterHandlers() {
     if (this.canvas && this._clickHandler) {
       this.canvas.removeEventListener('click', this._clickHandler);
