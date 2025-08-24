@@ -1387,7 +1387,7 @@ const worldStageSelectScreen = {
     const isPracticeHovered = isMouseOverRect(this.mouseX, this.mouseY, practiceButton);
     const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
     const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
-    const isProfileHovered = isMouseOverRect(x, y, profileButton);
+    const isProfileHovered = isMouseOverRect(this.mouseX, this.mouseY, profileButton);
 
     // リッチボタンで描画
     this._drawRichFooterButton(ctx, backButton, '#808080', isBackHovered);
