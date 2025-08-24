@@ -6,6 +6,7 @@ import { stageData } from '../loaders/dataLoader.js';
 import ReviewQueue from '../models/reviewQueue.js';
 import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
 import { isBonusUnlocked } from '../core/bonusManager.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 // === 1. importの後に共通関数を追加 ===
 
@@ -581,13 +582,21 @@ const worldStageSelectScreen = {
 
   /** マウス移動ハンドラー */
   handleMouseMove(e) {
+    // 【修正前】以下をコメントアウト
+  /*
     const rect = this.canvas.getBoundingClientRect();
     const scaleX = this.canvas.width / rect.width;
     const scaleY = this.canvas.height / rect.height;
     
     this.mouseX = (e.clientX - rect.left) * scaleX;
-    this.mouseY = (e.clientY - rect.top) * scaleY;
+    this.mouseY = (e.clientY - rect.top) * scaleY; */
 
+  //【修正後】新しい座標変換を使用
+  const coords = getGameCoordinates(e, this.canvas);
+  if (!isValidCoordinates(coords)) return;
+  
+  this.mouseX = coords.x;
+  this.mouseY = coords.y;
     // ホバー中のステージを検出
     this.hoveredStage = null;
 
@@ -1145,6 +1154,8 @@ const worldStageSelectScreen = {
     // 座標変換ロジック
     e.preventDefault();
 
+    // 【修正前】以下をコメントアウト
+  /*
     let eventX, eventY;
     if (e.changedTouches) {
       eventX = e.changedTouches[0].clientX;
@@ -1159,6 +1170,15 @@ const worldStageSelectScreen = {
     const scaleY = this.canvas.height / rect.height;
     const screenX = (eventX - rect.left) * scaleX;
     const screenY = (eventY - rect.top) * scaleY;
+
+    */
+
+    // 【修正後】新しい座標変換を使用
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) return; // 黒帯領域のクリックは無視
+
+    const screenX = coords.x;
+    const screenY = coords.y;
 
     // 総復習モードのクリック（大ボタン）
     const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);

@@ -20,6 +20,7 @@ import { setupFSM } from './init/fsmsetup.js';
 import { checkAchievements } from './core/achievementManager.js';
 import { addKanji } from './models/kanjiDex.js';
 import practiceBattleScreen from './screens/practiceBattleScreen.js';
+import { initResponsiveCanvas, optimizeCanvasForFullscreen } from './utils/coordinateUtils.js';
 
 
 /* ----------------------------- 実績通知システム ----------------------------- */
@@ -27,10 +28,15 @@ const achievementNotificationQueue = [];
 
 /* ----------------------------- DOM / Canvas ----------------------------- */
 const canvas = document.getElementById('gameCanvas');
-canvas.width = 800;  // 追加: ゲーム内部の基準幅
-canvas.height = 600; // 追加: ゲーム内部の基準高さ
-const ctx    = canvas.getContext('2d');
+
+// レスポンシブ初期化
+const ctx = initResponsiveCanvas(canvas, 800, 600);
 setCanvas(canvas);
+
+// 全画面最適化（開発モードでは無効化可能）
+if (location.search.includes('fullscreen=true') || !location.hostname.includes('localhost')) {
+  optimizeCanvasForFullscreen(canvas);
+}
 // ★ ここで AudioManager を生成して export
 const audio = new AudioManager();
 

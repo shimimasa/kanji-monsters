@@ -2,6 +2,7 @@ import { publish } from '../core/eventBus.js';
 import { gameState } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { images } from '../loaders/assetsLoader.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 // 大陸マーカーの定義を修正（7行目付近）
 const continentMarkers = [

@@ -6,7 +6,7 @@ import { images } from '../loaders/assetsLoader.js';
 import reviewQueue from '../models/reviewQueue.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { calcBonusReward, isFirstClear, markBonusFirstClear, isBonusUnlocked } from '../core/bonusManager.js';
-
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 /** 角丸矩形を描画するヘルパー関数 */
 function drawRoundedRect(ctx, x, y, width, height, radius) {
@@ -505,12 +505,23 @@ const stageSelectScreenState = {
 
   /** マウス移動ハンドラー */
   handleMouseMove(e) {
+    // 【修正前】以下をコメントアウト
+  /*
     const rect = this.canvas.getBoundingClientRect();
     const scaleX = this.canvas.width / rect.width;
     const scaleY = this.canvas.height / rect.height;
     
     this.mouseX = (e.clientX - rect.left) * scaleX;
     this.mouseY = (e.clientY - rect.top) * scaleY;
+
+    */
+
+    // 【修正後】新しい座標変換を使用
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) return; // 黒帯領域のクリックは無視
+
+    this.mouseX = coords.x;
+    this.mouseY = coords.y;
 
     // ホバー中のステージを検出
     this.hoveredStage = null;
@@ -1244,6 +1255,8 @@ update(dt) {
     // === 座標変換ロジック ===
     e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
 
+    // 【修正前】以下をコメントアウト
+  /*
     let eventX, eventY;
     // e.changedTouchesが存在すればタッチイベント、なければマウスイベントと判定
     if (e.changedTouches) {
@@ -1263,6 +1276,15 @@ update(dt) {
     // 実際のタッチ/クリック座標を、800x600のゲーム内座標に変換
     const x = (eventX - rect.left) * scaleX;
     const y = (eventY - rect.top) * scaleY;
+
+    */
+
+    // 【修正後】新しい座標変換を使用
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) return; // 黒帯領域のクリックは無視
+    
+    const x = coords.x;
+    const y = coords.y;
 
     // タブクリック判定
     const tabCount = tabs.length;
