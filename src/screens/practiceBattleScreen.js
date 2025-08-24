@@ -4,6 +4,7 @@ import battleScreenState from './battleScreen.js';
 import { gameState, battleState } from '../core/gameState.js';
 import { getKanjiByStageId, isKanjiMastered } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 // 練習バトル画面状態
 const practiceBattleScreenState = {
@@ -538,47 +539,42 @@ const practiceBattleScreenState = {
    */
   handleClick(e) {
     console.log('🖱️ 練習モードクリック処理');
-
+  
     try {
-      e.preventDefault();
-
-      let eventX, eventY;
-      if (e.changedTouches) {
-        eventX = e.changedTouches[0].clientX;
-        eventY = e.changedTouches[0].clientY;
-      } else {
-        eventX = e.clientX;
-        eventY = e.clientY;
+      // 統一された座標変換を使用
+      const coords = getGameCoordinates(e, this.canvas);
+      if (!isValidCoordinates(coords)) {
+        return false; // 黒帯エリアのクリックは無視
       }
-
-      const rect = this.canvas.getBoundingClientRect();
-      const scaleX = this.canvas.width / rect.width;
-      const scaleY = this.canvas.height / rect.height;
-      const x = (eventX - rect.left) * scaleX;
-      const y = (eventY - rect.top) * scaleY;
-
+      
+      const x = coords.x;
+      const y = coords.y;
+      
+      // デバッグログ（開発中のみ）
+      console.log('練習バトル画面クリック座標:', x, y);
+  
       const BTN = {
         back:   { x: 20,  y: 20,  w: 100, h: 30 },
         stage:  { x: 140, y: 20,  w: 120, h: 30 },
       };
-
+  
       const isMouseOverRect = (mx, my, rect) => {
         return mx >= rect.x && mx <= rect.x + rect.w && 
                my >= rect.y && my <= rect.y + rect.h;
       };
-
+  
       if (isMouseOverRect(x, y, BTN.back)) {
         console.log('🏠 タイトルへ');
         publish('changeScreen', 'title');
         return true;
       }
-
+  
       if (isMouseOverRect(x, y, BTN.stage)) {
         console.log('🗺️ ステージ選択へ');
         publish('changeScreen', 'stageSelect');
         return true;
       }
-
+  
       return false;
       
     } catch (error) {

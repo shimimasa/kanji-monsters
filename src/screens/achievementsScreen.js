@@ -4,6 +4,7 @@
 import { publish } from '../core/eventBus.js';
 import { gameState, isAchievementUnlocked } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 const BTN = {
   back: { x: 20, y: 20, w: 100, h: 30, label: 'メニューへ' },
@@ -35,31 +36,37 @@ const achievementsScreen = {
     
     // イベント登録
     this._clickHandler = e => {
-      const r = this.canvas.getBoundingClientRect();
-      const x = e.clientX - r.left, y = e.clientY - r.top;
-      
-      // 戻るボタン
-      if (isMouseOverRect(x, y, BTN.back)) {
-        publish('playSE', 'decide');
-        publish('changeScreen', 'menu');
-        return;
-      }
-      
-      // 前のページボタン
-      if (isMouseOverRect(x, y, BTN.prevPage)) {
-        this.scroll = Math.max(0, this.scroll - this.itemsPerPage);
-        publish('playSE', 'decide');
-        return;
-      }
-      
-      // 次のページボタン
-      if (isMouseOverRect(x, y, BTN.nextPage)) {
-        const maxScroll = Math.max(0, this.achievements.length - this.itemsPerPage);
-        this.scroll = Math.min(maxScroll, this.scroll + this.itemsPerPage);
-        publish('playSE', 'decide');
-        return;
-      }
-    };
+      // 統一された座標変換を使用
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
+    }
+    
+    const x = coords.x;
+    const y = coords.y;
+    
+    // 戻るボタン
+    if (isMouseOverRect(x, y, BTN.back)) {
+      publish('playSE', 'decide');
+      publish('changeScreen', 'menu');
+      return;
+    }
+    
+    // 前のページボタン
+    if (isMouseOverRect(x, y, BTN.prevPage)) {
+      this.scroll = Math.max(0, this.scroll - this.itemsPerPage);
+      publish('playSE', 'decide');
+      return;
+    }
+    
+    // 次のページボタン
+    if (isMouseOverRect(x, y, BTN.nextPage)) {
+      const maxScroll = Math.max(0, this.achievements.length - this.itemsPerPage);
+      this.scroll = Math.min(maxScroll, this.scroll + this.itemsPerPage);
+      publish('playSE', 'decide');
+      return;
+    }
+  };
     this.canvas.addEventListener('click', this._clickHandler);
     
     this._keyHandler = e => {
