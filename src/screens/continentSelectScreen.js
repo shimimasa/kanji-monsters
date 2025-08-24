@@ -2,6 +2,7 @@ import { publish } from '../core/eventBus.js';
 import { gameState } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { images } from '../loaders/assetsLoader.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 // 大陸マーカーの定義を修正（7行目付近）
 const continentMarkers = [
@@ -578,18 +579,17 @@ const continentSelectState = {
 
   // handleClick と handleMouseMove の座標変換部分を修正
 handleClick(e) {
-  if (this.isZooming) return;
-  e.preventDefault();
-  
   const coords = getGameCoordinates(e, this.canvas);
-  if (!isValidCoordinates(coords)) return;
+  if (!isValidCoordinates(coords)) {
+    return false; // 黒帯エリアのクリックは無視
+  }
   
-  const screenX = coords.x;
-  const screenY = coords.y;
+  const x = coords.x;
+  const y = coords.y;
   
   // カメラ変換を逆算してワールド座標を取得
-  const worldX = (screenX - this.camera.x) / this.camera.scale;
-  const worldY = (screenY - this.camera.y) / this.camera.scale;
+  const worldX = (x - this.camera.x) / this.camera.scale;
+  const worldY = (y - this.camera.y) / this.camera.scale;
 
     // 大陸マーカーのクリック処理
     for (const marker of continentMarkers) {
@@ -602,7 +602,7 @@ handleClick(e) {
     }
 
     // 戻るボタンのクリック処理（カメラ変換の影響を受けない）
-    if (isMouseOverRect(screenX, screenY, backButton)) {
+    if (isMouseOverRect(x, y, backButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'courseSelect');
       return;

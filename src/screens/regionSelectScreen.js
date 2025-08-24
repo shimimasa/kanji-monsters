@@ -721,15 +721,17 @@ const regionSelectState = {
   handleMouseMove(e) {
     if (this.isZooming) return; // ズーム中はマウス処理を無効化
     
-    const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    const screenX = (e.clientX - rect.left) * scaleX;
-    const screenY = (e.clientY - rect.top) * scaleY;
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
+    }
+    
+    const x = coords.x;
+    const y = coords.y;
     
     // カメラ変換を逆算してワールド座標を取得
-    const worldX = (screenX - this.camera.x) / this.camera.scale;
-    const worldY = (screenY - this.camera.y) / this.camera.scale;
+    const worldX = (x - this.camera.x) / this.camera.scale;
+    const worldY = (y - this.camera.y) / this.camera.scale;
 
     // 地図の実座標（フォールバックあり）
     const map = this.mapRect ?? {
@@ -805,7 +807,7 @@ const regionSelectState = {
     }
 
     // 戻るボタンのクリック処理（カメラ変換の影響を受けない）
-    if (isMouseOverRect(screenX, screenY, backButton)) {
+    if (isMouseOverRect(x, y, backButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'title');
       return;
