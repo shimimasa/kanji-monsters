@@ -6,6 +6,7 @@ import { publish } from '../core/eventBus.js';
 import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
 import { checkAchievements } from '../core/achievementManager.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 // battleStateに残り時間プロパティを追加
 battleState.timeRemaining = 60;
@@ -2931,104 +2932,72 @@ this.canvas.removeEventListener('touchend', this._touchEndHandler);
     this.canvas.removeEventListener('mouseleave', this._mouseupHandler);
   },
 
-  /** クリック処理 */
-  handleClick(e) {
-    e.preventDefault();
-    
-    let eventX, eventY;
-    if (e.changedTouches) {
-      eventX = e.changedTouches[0].clientX;
-      eventY = e.changedTouches[0].clientY;
-    } else {
-      eventX = e.clientX;
-      eventY = e.clientY;
-    }
-
-    const rect = this.canvas.getBoundingClientRect();
-    
-    // より正確な座標変換
-    const canvasRatio = this.canvas.width / this.canvas.height;
-    const rectRatio = rect.width / rect.height;
-    
-    let scaleX, scaleY, offsetX = 0, offsetY = 0;
-    
-    if (rectRatio > canvasRatio) {
-      // 横長の表示領域の場合
-      scaleY = this.canvas.height / rect.height;
-      scaleX = scaleY;
-      offsetX = (rect.width - this.canvas.width / scaleY) / 2;
-    } else {
-      // 縦長の表示領域の場合
-      scaleX = this.canvas.width / rect.width;
-      scaleY = scaleX;
-      offsetY = (rect.height - this.canvas.height / scaleX) / 2;
-    }
-    
-    // 実際のタッチ/クリック座標をゲーム内座標に変換
-    const x = (eventX - rect.left - offsetX) * scaleX;
-    const y = (eventY - rect.top - offsetY) * scaleY;
-    
-    // 範囲チェックを追加
-    if (x < 0 || x > this.canvas.width || y < 0 || y > this.canvas.height) {
-      return false; // Canvas外のクリックは無視
-    }
-    
-    if (DEBUG) console.log('クリック座標:', x, y, 'スケール:', scaleX, scaleY);
-    
-    // BTNオブジェクトのプロパティを確認
-    if (DEBUG) console.log('BTN.back:', BTN.back);
-    if (DEBUG) console.log('BTN.stage:', BTN.stage);
-    if (DEBUG) console.log('BTN.attack:', BTN.attack);
-    
-    // ボタンの当たり判定を詳細にデバッグ
-    if (DEBUG) Object.entries(BTN).forEach(([key, btn]) => {
-      const isHit = isMouseOverRect(x, y, btn);
-      console.log(`ボタン[${key}] 座標(${btn.x},${btn.y},${btn.w},${btn.h}) ヒット:${isHit}`);
-    });
-    
-    // 「タイトルへ」ボタン押下時
-    if (isMouseOverRect(x, y, BTN.back)) {
-      console.log('「タイトルへ」ボタンがクリックされました');
-      publish('changeScreen', 'title');
-      return true;
-    }
-    
-    // 「ステージ選択」ボタン押下時
-    if (isMouseOverRect(x, y, BTN.stage)) {
-      console.log('「ステージ選択」ボタンがクリックされました');
-      publish('changeScreen', 'stageSelect');
-      return true;
-    }
-    
-    // 「こうげき」ボタン押下時
-    if (isMouseOverRect(x, y, BTN.attack)) {
-      console.log('「こうげき」ボタンがクリックされました');
-      // 最後に使用したコマンドを「攻撃」に設定
-      battleState.lastCommandMode = 'attack';
-      onAttack();
-      return true;
-    }
-    
-    // 「かいふく」ボタン押下時
-    if (isMouseOverRect(x, y, BTN.heal)) {
-      console.log('「かいふく」ボタンがクリックされました');
-      // 最後に使用したコマンドを「回復」に設定
-      battleState.lastCommandMode = 'heal';
-      onHeal();
-      return true;
-    }
-    
-    // 「ヒント」ボタン押下時
-    if (isMouseOverRect(x, y, BTN.hint)) {
-      console.log('「ヒント」ボタンがクリックされました');
-      // 最後に使用したコマンドを「ヒント」に設定
-      battleState.lastCommandMode = 'hint';
-      onHint();
-      return true;
-    }
-    
-    return false; // イベント未処理を示す
-  },
+ // 2. handleClickメソッドを以下のように修正
+handleClick(e) {
+  e.preventDefault();
+  
+  // 統一された座標変換を使用
+  const coords = getGameCoordinates(e, this.canvas);
+  if (!isValidCoordinates(coords)) {
+    return false; // 黒帯エリアのクリックは無視
+  }
+  
+  const x = coords.x;
+  const y = coords.y;
+  
+  if (DEBUG) console.log('クリック座標:', x, y);
+  
+  // BTNオブジェクトのプロパティを確認（デバッグ用）
+  if (DEBUG) console.log('BTN.back:', BTN.back);
+  if (DEBUG) console.log('BTN.stage:', BTN.stage);
+  if (DEBUG) console.log('BTN.attack:', BTN.attack);
+  
+  // ボタンの当たり判定を詳細にデバッグ
+  if (DEBUG) Object.entries(BTN).forEach(([key, btn]) => {
+    const isHit = isMouseOverRect(x, y, btn);
+    console.log(`ボタン[${key}] 座標(${btn.x},${btn.y},${btn.w},${btn.h}) ヒット:${isHit}`);
+  });
+  
+  // 「タイトルへ」ボタン押下時
+  if (isMouseOverRect(x, y, BTN.back)) {
+    console.log('「タイトルへ」ボタンがクリックされました');
+    publish('changeScreen', 'title');
+    return true;
+  }
+  
+  // 「ステージ選択」ボタン押下時
+  if (isMouseOverRect(x, y, BTN.stage)) {
+    console.log('「ステージ選択」ボタンがクリックされました');
+    publish('changeScreen', 'stageSelect');
+    return true;
+  }
+  
+  // 「こうげき」ボタン押下時
+  if (isMouseOverRect(x, y, BTN.attack)) {
+    console.log('「こうげき」ボタンがクリックされました');
+    battleState.lastCommandMode = 'attack';
+    onAttack();
+    return true;
+  }
+  
+  // 「かいふく」ボタン押下時
+  if (isMouseOverRect(x, y, BTN.heal)) {
+    console.log('「かいふく」ボタンがクリックされました');
+    battleState.lastCommandMode = 'heal';
+    onHeal();
+    return true;
+  }
+  
+  // 「ヒント」ボタン押下時
+  if (isMouseOverRect(x, y, BTN.hint)) {
+    console.log('「ヒント」ボタンがクリックされました');
+    battleState.lastCommandMode = 'hint';
+    onHint();
+    return true;
+  }
+  
+  return false; // イベント未処理を示す
+},
 
   // ※ 必要に応じて spawnEnemy, onAttack, onHeal, onHint, enemyTurn なども
   //   このオブジェクト内にメソッドとして整理してください。

@@ -4,6 +4,7 @@ import { gameState } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { images } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 // 地方マーカーの定義（mapRect基準の割合）
 const regionMarkers = [
@@ -720,11 +721,12 @@ const regionSelectState = {
   handleMouseMove(e) {
     if (this.isZooming) return; // ズーム中はマウス処理を無効化
     
-    const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    const screenX = (e.clientX - rect.left) * scaleX;
-    const screenY = (e.clientY - rect.top) * scaleY;
+    // 【修正後】新しい座標変換を使用
+  const coords = getGameCoordinates(e, this.canvas);
+  if (!isValidCoordinates(coords)) return;
+  
+  const screenX = coords.x;
+  const screenY = coords.y;
     
     // カメラ変換を逆算してワールド座標を取得
     const worldX = (screenX - this.camera.x) / this.camera.scale;
@@ -775,20 +777,12 @@ const regionSelectState = {
     // 座標変換ロジック
     e.preventDefault();
 
-    let eventX, eventY;
-    if (e.changedTouches) {
-      eventX = e.changedTouches[0].clientX;
-      eventY = e.changedTouches[0].clientY;
-    } else {
-      eventX = e.clientX;
-      eventY = e.clientY;
-    }
-
-    const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    const screenX = (eventX - rect.left) * scaleX;
-    const screenY = (eventY - rect.top) * scaleY;
+    // 【修正後】新しい座標変換を使用
+  const coords = getGameCoordinates(e, this.canvas);
+  if (!isValidCoordinates(coords)) return; // 黒帯領域のクリックは無視
+  
+  const screenX = coords.x;
+  const screenY = coords.y;
     
     // カメラ変換を逆算してワールド座標を取得
     const worldX = (screenX - this.camera.x) / this.camera.scale;
