@@ -827,12 +827,27 @@ const settingsScreenState = {
     }
   },
 
-  /** クリック処理 */
-  handleClick(e) {
-    // Canvas上のボタン処理は全て削除済み
-    // 必要に応じて、Canvas背景クリック時の処理のみ残す
-    e.preventDefault();
-  },
+ /** クリック処理 */
+handleClick(e) {
+  // 統一された座標変換を使用
+  const coords = getGameCoordinates(e, this.canvas);
+  if (!isValidCoordinates(coords)) {
+    return false; // 黒帯エリアのクリックは無視
+  }
+  
+  const x = coords.x;
+  const y = coords.y;
+  
+  // デバッグログ（開発中のみ）
+  console.log('設定画面クリック座標:', x, y);
+  
+  // Canvas上のボタン処理は全てDOM要素に移行済みのため、
+  // 必要に応じて、Canvas背景クリック時の処理のみ残す
+  e.preventDefault();
+  
+  // 何も処理しない（すべてDOM要素で処理）
+  return false;
+},
 
   /** データリセット処理 - 完全版 */
   async resetData() {

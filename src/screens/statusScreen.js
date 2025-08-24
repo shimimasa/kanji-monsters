@@ -3,6 +3,7 @@ import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { checkAchievements } from '../core/achievementManager.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 const statusScreenState = {
   canvas: null,
@@ -144,32 +145,43 @@ const statusScreenState = {
   },
 
   /** クリック処理 */
-  handleClick(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const player = gameState.playerStats;
+handleClick(e) {
+  // 統一された座標変換を使用
+  const coords = getGameCoordinates(e, this.canvas);
+  if (!isValidCoordinates(coords)) {
+    return false; // 黒帯エリアのクリックは無視
+  }
+  
+  const x = coords.x;
+  const y = coords.y;
+  
+  // デバッグログ（開発中のみ）
+  console.log('ステータス画面クリック座標:', x, y);
+  
+  const player = gameState.playerStats;
 
-    // HP アップグレードボタン
-    if (isMouseOverRect(x, y, this.hpUpgradeButton) && player.skillPoints >= this.hpUpgradeButton.cost) {
-      this.upgradeStatus(this.hpUpgradeButton);
-      publish('playSE', 'correct'); // 成功音
-      return;
-    }
+  // HP アップグレードボタン
+  if (isMouseOverRect(x, y, this.hpUpgradeButton) && player.skillPoints >= this.hpUpgradeButton.cost) {
+    this.upgradeStatus(this.hpUpgradeButton);
+    publish('playSE', 'correct'); // 成功音
+    return true;
+  }
 
-    // 攻撃力アップグレードボタン
-    if (isMouseOverRect(x, y, this.attackUpgradeButton) && player.skillPoints >= this.attackUpgradeButton.cost) {
-      this.upgradeStatus(this.attackUpgradeButton);
-      publish('playSE', 'correct'); // 成功音
-      return;
-    }
+  // 攻撃力アップグレードボタン
+  if (isMouseOverRect(x, y, this.attackUpgradeButton) && player.skillPoints >= this.attackUpgradeButton.cost) {
+    this.upgradeStatus(this.attackUpgradeButton);
+    publish('playSE', 'correct'); // 成功音
+    return true;
+  }
 
-    // 戻るボタン
-    if (isMouseOverRect(x, y, this.backButton)) {
-      publish('changeScreen', 'menu');
-      return;
-    }
-  },
+  // 戻るボタン
+  if (isMouseOverRect(x, y, this.backButton)) {
+    publish('changeScreen', 'menu');
+    return true;
+  }
+  
+  return false;
+},
 
   /** ステータスアップグレード処理 */
   upgradeStatus(button) {
