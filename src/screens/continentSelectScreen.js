@@ -535,18 +535,17 @@ const continentSelectState = {
   },
 
   handleMouseMove(e) {
-    if (this.isZooming) return; // ズーム中はマウス処理を無効化
+    if (this.isZooming) return;
     
-    const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    const screenX = (e.clientX - rect.left) * scaleX;
-    const screenY = (e.clientY - rect.top) * scaleY;
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) return;
+    
+    const screenX = coords.x;
+    const screenY = coords.y;
     
     // カメラ変換を逆算してワールド座標を取得
     const worldX = (screenX - this.camera.x) / this.camera.scale;
     const worldY = (screenY - this.camera.y) / this.camera.scale;
-
     // マーカーとの当たり判定
     const previousHovered = this.hoveredMarker;
     this.hoveredMarker = null;
@@ -577,30 +576,20 @@ const continentSelectState = {
     this.canvas.style.cursor = 'default';
   },
 
-  handleClick(e) {
-    if (this.isZooming) return; // ズーム中はクリックを無効化
-    
-    // 座標変換ロジック
-    e.preventDefault();
-
-    let eventX, eventY;
-    if (e.changedTouches) {
-      eventX = e.changedTouches[0].clientX;
-      eventY = e.changedTouches[0].clientY;
-    } else {
-      eventX = e.clientX;
-      eventY = e.clientY;
-    }
-
-    const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    const screenX = (eventX - rect.left) * scaleX;
-    const screenY = (eventY - rect.top) * scaleY;
-    
-    // カメラ変換を逆算してワールド座標を取得
-    const worldX = (screenX - this.camera.x) / this.camera.scale;
-    const worldY = (screenY - this.camera.y) / this.camera.scale;
+  // handleClick と handleMouseMove の座標変換部分を修正
+handleClick(e) {
+  if (this.isZooming) return;
+  e.preventDefault();
+  
+  const coords = getGameCoordinates(e, this.canvas);
+  if (!isValidCoordinates(coords)) return;
+  
+  const screenX = coords.x;
+  const screenY = coords.y;
+  
+  // カメラ変換を逆算してワールド座標を取得
+  const worldX = (screenX - this.camera.x) / this.camera.scale;
+  const worldY = (screenY - this.camera.y) / this.camera.scale;
 
     // 大陸マーカーのクリック処理
     for (const marker of continentMarkers) {

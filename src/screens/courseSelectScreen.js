@@ -1,6 +1,7 @@
 import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { drawButton, isMouseOverRect, drawText } from '../ui/uiRenderer.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 const courseSelectScreen = {
   /** 画面表示時の初期化 */
@@ -146,25 +147,12 @@ const courseSelectScreen = {
   handleClick(e) {
     e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
 
-    let eventX, eventY;
-    // e.changedTouchesが存在すればタッチイベント、なければマウスイベントと判定
-    if (e.changedTouches) {
-      eventX = e.changedTouches[0].clientX;
-      eventY = e.changedTouches[0].clientY;
-    } else {
-      eventX = e.clientX;
-      eventY = e.clientY;
-    }
-
-    const rect = this.canvas.getBoundingClientRect();
-    
-    // Canvasの実際の表示サイズと内部解像度の比率を計算
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    
-    // 実際のタッチ/クリック座標を、ゲーム内座標に変換
-    const x = (eventX - rect.left) * scaleX;
-    const y = (eventY - rect.top) * scaleY;
+    // 新しい座標変換
+  const coords = getGameCoordinates(e, this.canvas);
+  if (!isValidCoordinates(coords)) return; // 黒帯領域のクリックは無視
+  
+  const x = coords.x;
+  const y = coords.y;
 
     // 日本編（小学生）エリアがクリックされた場合
     if (isMouseOverRect(x, y, this.japanButton)) {
