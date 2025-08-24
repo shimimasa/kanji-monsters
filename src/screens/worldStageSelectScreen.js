@@ -1155,7 +1155,7 @@ const worldStageSelectScreen = {
     const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
     if (isReview) {
       const btn = this.reviewChallengeButton;
-      if (isMouseOverRect(screenX, screenY, btn)) {
+      if (isMouseOverRect(x, y, btn)) {
         publish('playSE', 'decide');
         if (ReviewQueue.size() > 0) {
           publish('changeScreen', 'reviewStage');
@@ -1176,8 +1176,8 @@ const worldStageSelectScreen = {
     const tabW = this.canvas.width / tabCount;
     const tabH = 60;
     
-    if (screenY <= tabH) {
-      const tabIndex = Math.floor(screenX / tabW);
+    if (y <= tabH) {
+      const tabIndex = Math.floor(x / tabW);
       if (tabIndex >= 0 && tabIndex < tabs.length) {
         const tab = tabs[tabIndex];
         this.selectedTabLevel = tab.kanken_level;
@@ -1191,7 +1191,7 @@ const worldStageSelectScreen = {
     // ステージボタンのクリック判定（総復習モードでは無効）
     if (!isReview) {
       for (const button of this.stageButtons) {
-        if (isMouseOverRect(screenX, screenY, button)) {
+        if (isMouseOverRect(x, y, button)) {
           publish('playSE', 'decide');
           if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
             gameState.currentStageId = button.id;
@@ -1210,8 +1210,8 @@ const worldStageSelectScreen = {
       for (const stage of this.stages) {
         if (stage.pos) {
           const { x, y } = stage.pos;
-          if (screenX >= x - MARKER_SIZE/2 && screenX <= x + MARKER_SIZE/2 && 
-              screenY >= y - MARKER_SIZE/2 && screenY <= y + MARKER_SIZE/2) {
+          if (x >= x - MARKER_SIZE/2 && x <= x + MARKER_SIZE/2 && 
+              y >= y - MARKER_SIZE/2 && y <= y + MARKER_SIZE/2) {
             publish('playSE', 'decide');
             if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
               gameState.currentStageId = stage.stageId;
@@ -1227,35 +1227,35 @@ const worldStageSelectScreen = {
     }
 
     // 戻るボタンのクリック処理
-    if (isMouseOverRect(screenX, screenY, backButton)) {
+    if (isMouseOverRect(x, y, backButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'continentSelect');
       return;
     }
 
     // ★★★ 練習ボタンのクリック処理を追加 ★★★
-    if (isMouseOverRect(screenX, screenY, practiceButton)) {
+    if (isMouseOverRect(x, y, practiceButton)) {
       publish('playSE', 'decide');
       this._startPracticeMode();
       return;
     }
 
     // 漢字図鑑ボタン
-    if (isMouseOverRect(screenX, screenY, dexButton)) {
+    if (isMouseOverRect(x, y, dexButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'kanjiDex');
       return;
     }
 
     // モンスターデックスボタン
-    if (isMouseOverRect(screenX, screenY, monsterButton)) {
+    if (isMouseOverRect(x, y, monsterButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'proverbMonsterDex');
       return;
     }
 
     // プロフィール/称号ボタン
-    if (isMouseOverRect(screenX, screenY, profileButton)) {
+      if (isMouseOverRect(x, y, profileButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'profile');
       return;
@@ -1383,11 +1383,11 @@ const worldStageSelectScreen = {
     ctx.fillRect(footerBarX, footerBarY, footerBarWidth, gradientHeight);
 
     // ★★★ ホバー判定に練習ボタンを追加 ★★★
-    const isBackHovered = isMouseOverRect(this.mouseX, this.mouseY, backButton);
-    const isPracticeHovered = isMouseOverRect(this.mouseX, this.mouseY, practiceButton);
-    const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
-    const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
-    const isProfileHovered = isMouseOverRect(this.mouseX, this.mouseY, profileButton);
+    const isBackHovered = isMouseOverRect(x, y, backButton);
+    const isPracticeHovered = isMouseOverRect(x, y, practiceButton);
+    const isDexHovered = isMouseOverRect(x, y, dexButton);
+    const isMonsterHovered = isMouseOverRect(x, y, monsterButton);
+    const isProfileHovered = isMouseOverRect(x, y, profileButton);
 
     // リッチボタンで描画
     this._drawRichFooterButton(ctx, backButton, '#808080', isBackHovered);

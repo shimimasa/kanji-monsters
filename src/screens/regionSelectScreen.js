@@ -675,11 +675,11 @@ const regionSelectState = {
     // 比率 → ワールド座標 → スクリーン座標（カメラ適用）
     const worldX = map.x + marker.px * map.width;
     const worldY = map.y + marker.py * map.height;
-    const screenX = worldX * this.camera.scale + this.camera.x;
-    const screenY = worldY * this.camera.scale + this.camera.y;
+    const x = worldX * this.camera.scale + this.camera.x;
+    const y = worldY * this.camera.scale + this.camera.y;
 
-    const tooltipX = screenX + 40;
-    const tooltipY = screenY - 50;
+    const tooltipX = x + 40;
+    const tooltipY = y - 50;
     const tooltipWidth = 200;
     const tooltipHeight = 90;
 
@@ -784,8 +784,8 @@ const regionSelectState = {
     const y = coords.y;
 
     // カメラ変換を逆算してワールド座標を取得
-    const worldX = (screenX - this.camera.x) / this.camera.scale;
-    const worldY = (screenY - this.camera.y) / this.camera.scale;
+    const worldX = (x - this.camera.x) / this.camera.scale;
+    const worldY = (y - this.camera.y) / this.camera.scale;
 
     // 地図の実座標（フォールバックあり）
     const map = this.mapRect ?? {

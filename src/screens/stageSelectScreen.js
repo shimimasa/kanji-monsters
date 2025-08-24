@@ -1324,8 +1324,8 @@ update(dt) {
         for (const stage of this.stages) {
           if (stage.pos) {
             const { x, y } = stage.pos;
-            if (screenX >= x - MARKER_SIZE/2 && screenX <= x + MARKER_SIZE/2 && 
-                screenY >= y - MARKER_SIZE/2 && screenY <= y + MARKER_SIZE/2) {
+            if (x >= x - MARKER_SIZE/2 && x <= x + MARKER_SIZE/2 && 
+                y >= y - MARKER_SIZE/2 && y <= y + MARKER_SIZE/2) {
               publish('playSE', 'decide');
               if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
                 const targetId = stage.stageId;

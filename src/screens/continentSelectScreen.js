@@ -475,11 +475,11 @@ const continentSelectState = {
    */
   drawMarkerTooltip(marker) {
     // カメラ変換を考慮した画面座標を計算
-    const screenX = marker.x * this.camera.scale + this.camera.x;
-    const screenY = marker.y * this.camera.scale + this.camera.y;
+    const x = marker.x * this.camera.scale + this.camera.x;
+    const y = marker.y * this.camera.scale + this.camera.y;
 
-    const tooltipX = screenX + 40;
-    const tooltipY = screenY - 50;
+    const tooltipX = x + 40;
+    const tooltipY = y - 50;
     const tooltipWidth = 200;
     const tooltipHeight = 90;
 
@@ -541,12 +541,12 @@ const continentSelectState = {
     const coords = getGameCoordinates(e, this.canvas);
     if (!isValidCoordinates(coords)) return;
     
-    const screenX = coords.x;
-    const screenY = coords.y;
+    const x = coords.x;
+    const y = coords.y;
     
     // カメラ変換を逆算してワールド座標を取得
-    const worldX = (screenX - this.camera.x) / this.camera.scale;
-    const worldY = (screenY - this.camera.y) / this.camera.scale;
+    const worldX = (x - this.camera.x) / this.camera.scale;
+    const worldY = (y - this.camera.y) / this.camera.scale;
     // マーカーとの当たり判定
     const previousHovered = this.hoveredMarker;
     this.hoveredMarker = null;
