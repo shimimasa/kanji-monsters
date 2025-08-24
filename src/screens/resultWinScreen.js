@@ -6,6 +6,7 @@ import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState, battleState, recordStageCleared } from '../core/gameState.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { calcBonusReward, isFirstClear, markBonusFirstClear } from '../core/bonusManager.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 const nextStageButton = {
   x: 300,
@@ -624,27 +625,14 @@ drawBonusResultPanel(ctx, x, y, width, height) {
 
   /** クリック処理 */
   handleClick(e) {
-    if (!this.canvas) return;
-    
-    e.preventDefault();
-
-    let eventX, eventY;
-    if (e.changedTouches) {
-      eventX = e.changedTouches[0].clientX;
-      eventY = e.changedTouches[0].clientY;
-    } else {
-      eventX = e.clientX;
-      eventY = e.clientY;
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
     }
+    
+    const x = coords.x;
+    const y = coords.y;
 
-    const rect = this.canvas.getBoundingClientRect();
-    if (!rect) return; // getBoundingClientRectがnullの場合は処理しない
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    
-    const x = (eventX - rect.left) * scaleX;
-    const y = (eventY - rect.top) * scaleY;
-    
     if (isMouseOverRect(x, y, nextStageButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'stageSelect');

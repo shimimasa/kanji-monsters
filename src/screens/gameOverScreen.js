@@ -6,6 +6,7 @@ import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState } from '../core/gameState.js';
 import { calcFailXP } from '../core/bonusManager.js';
 import { addPlayerExp } from '../core/gameState.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 const retryButton = {
   x: 250,
@@ -471,27 +472,17 @@ const gameOverState = {
     this.mouseY = (e.clientY - rect.top) * scaleY;
   },
   
-  /** クリック処理 */
+
+
   handleClick(e) {
-    if (!this.canvas) return;
-    
-    e.preventDefault();
-
-    let eventX, eventY;
-    if (e.changedTouches) {
-      eventX = e.changedTouches[0].clientX;
-      eventY = e.changedTouches[0].clientY;
-    } else {
-      eventX = e.clientX;
-      eventY = e.clientY;
+    // 統一された座標変換を使用
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
     }
-
-    const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
     
-    const x = (eventX - rect.left) * scaleX;
-    const y = (eventY - rect.top) * scaleY;
+    const x = coords.x;
+    const y = coords.y;
     
     // リトライボタン
     if (isMouseOverRect(x, y, retryButton)) {

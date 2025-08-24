@@ -3,6 +3,7 @@ import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { checkAchievements } from '../core/achievementManager.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 const statusScreenState = {
   canvas: null,
@@ -145,9 +146,14 @@ const statusScreenState = {
 
   /** クリック処理 */
   handleClick(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
+    }
+    
+    const x = coords.x;
+    const y = coords.y;
+
     const player = gameState.playerStats;
 
     // HP アップグレードボタン

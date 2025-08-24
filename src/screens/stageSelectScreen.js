@@ -6,7 +6,7 @@ import { images } from '../loaders/assetsLoader.js';
 import reviewQueue from '../models/reviewQueue.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { calcBonusReward, isFirstClear, markBonusFirstClear, isBonusUnlocked } from '../core/bonusManager.js';
-
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 /** 角丸矩形を描画するヘルパー関数 */
 function drawRoundedRect(ctx, x, y, width, height, radius) {
@@ -1241,28 +1241,14 @@ update(dt) {
 
   /** クリック処理 */
   handleClick(e) {
-    // === 座標変換ロジック ===
-    e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
-
-    let eventX, eventY;
-    // e.changedTouchesが存在すればタッチイベント、なければマウスイベントと判定
-    if (e.changedTouches) {
-      eventX = e.changedTouches[0].clientX;
-      eventY = e.changedTouches[0].clientY;
-    } else {
-      eventX = e.clientX;
-      eventY = e.clientY;
+    // 統一された座標変換を使用
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
     }
-
-    const rect = this.canvas.getBoundingClientRect();
     
-    // Canvasの実際の表示サイズと内部解像度の比率を計算
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    
-    // 実際のタッチ/クリック座標を、800x600のゲーム内座標に変換
-    const x = (eventX - rect.left) * scaleX;
-    const y = (eventY - rect.top) * scaleY;
+    const x = coords.x;
+    const y = coords.y;
 
     // タブクリック判定
     const tabCount = tabs.length;

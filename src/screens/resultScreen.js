@@ -2,6 +2,7 @@
 import { publish } from '../core/eventBus.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState } from '../core/gameState.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 const resultScreenState = {
   canvas: null,
@@ -96,9 +97,13 @@ const resultScreenState = {
   },
 
   handleClick(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
+    }
+    
+    const x = coords.x;
+    const y = coords.y;
 
     if (isMouseOverRect(x, y, this.retryButton)) {
       // 直前のモードでステージ選択画面からやり直す

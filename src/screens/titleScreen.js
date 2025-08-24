@@ -3,6 +3,7 @@ import { images } from '../loaders/assetsLoader.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState, updatePlayerName, clearSaveData } from '../core/gameState.js';
 import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 const titleState = {
   /** 画面表示時の初期化 */
@@ -531,32 +532,16 @@ const titleState = {
     }
   },
 
-  /** クリック処理 */
   handleClick(e) {
-    // === ここからが新しい座標変換ロジック ===
-    e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
-
-    let eventX, eventY;
-    // e.changedTouchesが存在すればタッチイベント、なければマウスイベントと判定
-    if (e.changedTouches) {
-      eventX = e.changedTouches[0].clientX;
-      eventY = e.changedTouches[0].clientY;
-    } else {
-      eventX = e.clientX;
-      eventY = e.clientY;
+    // 統一された座標変換を使用
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
     }
-
-    const rect = this.canvas.getBoundingClientRect();
     
-    // Canvasの実際の表示サイズと内部解像度の比率を計算
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
+    const x = coords.x;
+    const y = coords.y;
     
-    // 実際のタッチ/クリック座標を、800x600のゲーム内座標に変換
-    const x = (eventX - rect.left) * scaleX;
-    const y = (eventY - rect.top) * scaleY;
-    // === 座標変換ロジックここまで ===
-
     // ▼ 以下は元のクリック判定ロジック（x, y を使うようにする）
     if (isMouseOverRect(x, y, this.playButton)) {
       publish('playSE', 'decide');

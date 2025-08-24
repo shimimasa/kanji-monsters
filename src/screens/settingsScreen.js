@@ -828,11 +828,11 @@ const settingsScreenState = {
   },
 
   /** クリック処理 */
-  handleClick(e) {
-    // Canvas上のボタン処理は全て削除済み
-    // 必要に応じて、Canvas背景クリック時の処理のみ残す
-    e.preventDefault();
-  },
+    handleClick(e) {
+      // Canvas上のボタン処理は全て削除済み
+      // 必要に応じて、Canvas背景クリック時の処理のみ残す
+      e.preventDefault();
+    },
 
   /** データリセット処理 - 完全版 */
   async resetData() {

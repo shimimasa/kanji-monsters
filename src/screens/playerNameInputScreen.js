@@ -4,6 +4,7 @@ import { images } from '../loaders/assetsLoader.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState, updatePlayerName } from '../core/gameState.js';
 import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 const playerNameInputState = {
   /** 画面表示時の初期化 */
@@ -106,22 +107,14 @@ const playerNameInputState = {
 
   /** クリック処理 */
   handleClick(e) {
-    e.preventDefault();
-
-    let eventX, eventY;
-    if (e.changedTouches) {
-      eventX = e.changedTouches[0].clientX;
-      eventY = e.changedTouches[0].clientY;
-    } else {
-      eventX = e.clientX;
-      eventY = e.clientY;
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
     }
+    
+    const x = coords.x;
+    const y = coords.y;
 
-    const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    const x = (eventX - rect.left) * scaleX;
-    const y = (eventY - rect.top) * scaleY;
 
     if (isMouseOverRect(x, y, this.confirmButton)) {
       publish('playSE', 'decide');

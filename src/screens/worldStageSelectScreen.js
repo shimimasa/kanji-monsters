@@ -6,6 +6,7 @@ import { stageData } from '../loaders/dataLoader.js';
 import ReviewQueue from '../models/reviewQueue.js';
 import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
 import { isBonusUnlocked } from '../core/bonusManager.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 // === 1. importの後に共通関数を追加 ===
 
@@ -1142,23 +1143,13 @@ const worldStageSelectScreen = {
 
     if (this.isZooming) return; // ズーム中はクリックを無効化
     
-    // 座標変換ロジック
-    e.preventDefault();
-
-    let eventX, eventY;
-    if (e.changedTouches) {
-      eventX = e.changedTouches[0].clientX;
-      eventY = e.changedTouches[0].clientY;
-    } else {
-      eventX = e.clientX;
-      eventY = e.clientY;
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
     }
-
-    const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
-    const screenX = (eventX - rect.left) * scaleX;
-    const screenY = (eventY - rect.top) * scaleY;
+    
+    const x = coords.x;
+    const y = coords.y;
 
     // 総復習モードのクリック（大ボタン）
     const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);

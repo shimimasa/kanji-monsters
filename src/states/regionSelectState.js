@@ -1,6 +1,7 @@
 import { gameState } from '../core/gameState.js';
 import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 // 全国8地方の定義（コードは画像キーに合わせる）
 const regions = [
@@ -99,10 +100,14 @@ const regionSelectState = {
    * クリック処理：カードが押されたら地方をセットして次画面へ
    * @param {MouseEvent} e
    */
-  handleClick(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    handleClick(e) {
+    const coords = getGameCoordinates(e, this.canvas);
+    if (!isValidCoordinates(coords)) {
+      return false; // 黒帯エリアのクリックは無視
+    }
+    
+    const x = coords.x;
+    const y = coords.y; 
     for (const r of this.cardRects) {
       if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
         gameState.currentRegion = r.code;
