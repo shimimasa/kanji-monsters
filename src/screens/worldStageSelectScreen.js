@@ -1209,9 +1209,9 @@ const worldStageSelectScreen = {
     if (!isReview) {
       for (const stage of this.stages) {
         if (stage.pos) {
-          const { x, y } = stage.pos;
-          if (x >= x - MARKER_SIZE/2 && x <= x + MARKER_SIZE/2 && 
-              y >= y - MARKER_SIZE/2 && y <= y + MARKER_SIZE/2) {
+          const { x: markerX, y: markerY } = stage.pos;
+          if (x >= markerX - MARKER_SIZE/2 && x <= markerX + MARKER_SIZE/2 &&
+              y >= markerY - MARKER_SIZE/2 && y <= markerY + MARKER_SIZE/2) {
             publish('playSE', 'decide');
             if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
               gameState.currentStageId = stage.stageId;
@@ -1383,10 +1383,10 @@ const worldStageSelectScreen = {
     ctx.fillRect(footerBarX, footerBarY, footerBarWidth, gradientHeight);
 
     // ★★★ ホバー判定に練習ボタンを追加 ★★★
-    const isBackHovered = isMouseOverRect(x, y, backButton);
-    const isPracticeHovered = isMouseOverRect(x, y, practiceButton);
-    const isDexHovered = isMouseOverRect(x, y, dexButton);
-    const isMonsterHovered = isMouseOverRect(x, y, monsterButton);
+    const isBackHovered = isMouseOverRect(this.mouseX, this.mouseY, backButton);
+    const isPracticeHovered = isMouseOverRect(this.mouseX, this.mouseY, practiceButton);
+    const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
+    const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
     const isProfileHovered = isMouseOverRect(x, y, profileButton);
 
     // リッチボタンで描画
