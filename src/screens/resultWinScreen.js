@@ -635,7 +635,8 @@ drawBonusResultPanel(ctx, x, y, width, height) {
 
     if (isMouseOverRect(x, y, nextStageButton)) {
       publish('playSE', 'decide');
-      publish('changeScreen', 'stageSelect');
+      const targetScreen = gameState.previousScreen || 'stageSelect';
+      publish('changeScreen', targetScreen);
     }
   }
 };

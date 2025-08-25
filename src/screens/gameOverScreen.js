@@ -24,6 +24,14 @@ const titleButton = {
   text: 'タイトルへ'
 };
 
+const stageSelectButton = {
+  x: 330,  // 中央に配置
+  y: 420,
+  width: 140,
+  height: 50,
+  text: 'ステージ選択へ'
+};
+
 const gameOverState = {
   canvas: null,
   ctx: null,
@@ -89,9 +97,11 @@ const gameOverState = {
     
     // 4. 重厚なボタン群
     const isRetryHovered = isMouseOverRect(this.mouseX, this.mouseY, retryButton);
+    const isStageSelectHovered = isMouseOverRect(this.mouseX, this.mouseY, stageSelectButton);
     const isTitleHovered = isMouseOverRect(this.mouseX, this.mouseY, titleButton);
     
     this.drawSomberButton(ctx, retryButton, isRetryHovered, 'retry');
+    this.drawSomberButton(ctx, stageSelectButton, isStageSelectHovered, 'stageSelect');
     this.drawSomberButton(ctx, titleButton, isTitleHovered, 'title');
     
     // 5. 絶望的な雰囲気の装飾要素
@@ -337,8 +347,18 @@ const gameOverState = {
         buttonGradient.addColorStop(0.5, '#191970'); // ミッドナイトブルー
         buttonGradient.addColorStop(1, '#0F0F23'); // より暗い青
       }
-    } else {
-      // タイトルボタン（暗い赤系）
+    } else if (type === 'stageSelect') {
+      // ステージ選択ボタン（暗い青系）
+      if (isHovered) {
+        buttonGradient.addColorStop(0, '#4682B4'); // スチールブルー
+        buttonGradient.addColorStop(0.5, '#2F4F4F'); // ダークスレートグレー
+        buttonGradient.addColorStop(1, '#191970'); // ミッドナイトブルー
+      } else {
+        buttonGradient.addColorStop(0, '#2F4F4F'); // ダークスレートグレー
+        buttonGradient.addColorStop(0.5, '#191970'); // ミッドナイトブルー
+        buttonGradient.addColorStop(1, '#0F0F23'); // より暗い青
+      }
+    } else { // タイトルボタン（暗い赤系）
       if (isHovered) {
         buttonGradient.addColorStop(0, '#A0522D'); // シエナ
         buttonGradient.addColorStop(0.5, '#8B4513'); // サドルブラウン
@@ -496,6 +516,13 @@ const gameOverState = {
       publish('playSE', 'decide');
       // タイトル画面へ戻る
       publish('changeScreen', 'title');
+    }
+
+    // ステージ選択へボタン
+    if (isMouseOverRect(x, y, stageSelectButton)) {
+      publish('playSE', 'decide');
+      const targetScreen = gameState.previousScreen || 'stageSelect';
+      publish('changeScreen', targetScreen);
     }
   },
   
