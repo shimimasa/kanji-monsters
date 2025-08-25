@@ -22,8 +22,10 @@ const monsterCaptureScreen = {
 
     const stageId = gameState.currentStageId;
     const clearCount = this._getStageClearCount(stageId);
-    // 4→3→2→1（3回以上クリアで1）
-    this.captureLimit = Math.max(1, 4 - Math.min(clearCount, 3));
+    const isBonus = /^bonus_g/i.test(String(stageId || ''));
+
+    // 捕獲可能数: 通常 4→3→2→1、ボーナスは常時1
+    this.captureLimit = isBonus ? 1 : Math.max(1, 4 - Math.min(clearCount, 3));
 
     // 候補生成
     const dex = loadDex();
@@ -31,39 +33,38 @@ const monsterCaptureScreen = {
       ? defeatedMonsters.map(m => m.id).filter(Boolean)
       : [];
 
-    // 小学1-6年のIDのみ（世界編・ことわざ除外）
-    const all = getAllMonsterIds().filter(id => {
-      const m = getMonsterById(id);
-      const idStr = String(id);
-      const isWorld = (m && m.grade >= 7) || idStr.startsWith('PRV-');
-      return m && !isWorld;
-    });
-
-    // 候補: まずは今回倒したもの（未捕獲優先）を追加
-    const pool = [];
-    for (const id of defeatedIds) {
-      if (getMonsterById(id)) pool.push(id);
-    }
-
-    // 足りない分は未捕獲からランダム補充
-    const remain = 10 - pool.length;
-    if (remain > 0) {
-      const unCaptured = all.filter(id => !dex.has(id) && !pool.includes(id));
+    if (!isBonus) {
+      // 通常: このステージのモンスターのみ
+      let stageIds = defeatedIds.length > 0
+        ? defeatedIds.slice()
+        : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
+      stageIds = Array.from(new Set(stageIds));
+      if (stageIds.length > 10) {
+        shuffle(stageIds);
+        stageIds = stageIds.slice(0, 10);
+      }
+      this.candidates = stageIds;
+    } else {
+      // ボーナス: 他ステージからランダム（未捕獲優先）、ただし捕獲数は常時1
+      const all = getAllMonsterIds().filter(id => {
+        const m = getMonsterById(id);
+        const idStr = String(id);
+        const isWorld = (m && m.grade >= 7) || idStr.startsWith('PRV-');
+        return m && !isWorld;
+      });
+      const unCaptured = all.filter(id => !dex.has(id));
       shuffle(unCaptured);
-      pool.push(...unCaptured.slice(0, remain));
+      const pool = unCaptured.slice(0, 10);
+      if (pool.length < 10) {
+        const filler = all.filter(id => !pool.includes(id));
+        shuffle(filler);
+        pool.push(...filler.slice(0, 10 - pool.length));
+      }
+      this.candidates = pool.slice(0, 10);
     }
-
-    // それでも足りなければ、重複なしで補完
-    if (pool.length < 10) {
-      const filler = all.filter(id => !pool.includes(id));
-      shuffle(filler);
-      pool.push(...filler.slice(0, 10 - pool.length));
-    }
-
-    // 最終10件へ
-    this.candidates = pool.slice(0, 10);
 
     this._createDOM();
+
   },
 
   _createDOM() {
@@ -196,6 +197,13 @@ const monsterCaptureScreen = {
     return parseInt(localStorage.getItem(key) || '0');
   },
 
+  _incrementStageClearCount(stageId) {
+    if (!stageId) return;
+    const key = `stage_clear_${stageId}`;
+    const current = parseInt(localStorage.getItem(key) || '0');
+    localStorage.setItem(key, String(current + 1));
+  },
+
   _goResultWin() {
     const resultData = {
       stageId: gameState.currentStageId,
@@ -204,6 +212,8 @@ const monsterCaptureScreen = {
       time: gameState.timeRemaining ?? 0,
       playerHp: gameState.playerStats.hp
     };
+    // クリア回数を増加（次回以降 捕獲可能数が 4→3→2→1 と段階低下）
+    this._incrementStageClearCount(gameState?.currentStageId);
     publish('changeScreen', 'resultWin', resultData);
   },
 
