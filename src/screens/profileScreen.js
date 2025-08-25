@@ -75,12 +75,22 @@ const profileScreen = {
     
         const toKanjiDexBtn = document.createElement('button');
         toKanjiDexBtn.textContent = '漢字図鑑';
-        Object.assign(toKanjiDexBtn.style, backBtn.style);
+        toKanjiDexBtn.style.background = 'linear-gradient(135deg, #6c757d, #5a6268)';
+        toKanjiDexBtn.style.color = 'white';
+        toKanjiDexBtn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        toKanjiDexBtn.style.borderRadius = '8px';
+        toKanjiDexBtn.style.padding = '8px 12px';
+        toKanjiDexBtn.style.cursor = 'pointer';
         toKanjiDexBtn.onclick = () => publish('changeScreen', 'kanjiDex');
     
         const toMonsterDexBtn = document.createElement('button');
         toMonsterDexBtn.textContent = 'モンスター図鑑';
-        Object.assign(toMonsterDexBtn.style, backBtn.style);
+        toMonsterDexBtn.style.background = 'linear-gradient(135deg, #6c757d, #5a6268)';
+        toMonsterDexBtn.style.color = 'white';
+        toMonsterDexBtn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        toMonsterDexBtn.style.borderRadius = '8px';
+        toMonsterDexBtn.style.padding = '8px 12px';
+        toMonsterDexBtn.style.cursor = 'pointer';
         toMonsterDexBtn.onclick = () => publish('changeScreen', 'monsterDex');
     
         header.append(backBtn, title, toKanjiDexBtn, toMonsterDexBtn);
