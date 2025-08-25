@@ -1057,7 +1057,7 @@ const worldStageSelectScreen = {
       stages.forEach(stage => {
         // ステージに位置情報がある場合のみ描画
         if (stage.pos) {
-          const { x, y } = stage.pos;
+          const { x: markerX, y: markerY } = stage.pos;
           const isCleared = this.isStageCleared(stage.stageId);
           const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
           const isNext = false; // 自動点滅を無効化

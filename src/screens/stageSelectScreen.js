@@ -1323,9 +1323,9 @@ update(dt) {
       if (gameState.currentGrade !== 0) {
         for (const stage of this.stages) {
           if (stage.pos) {
-            const { x, y } = stage.pos;
-            if (x >= x - MARKER_SIZE/2 && x <= x + MARKER_SIZE/2 && 
-                y >= y - MARKER_SIZE/2 && y <= y + MARKER_SIZE/2) {
+            const { x: markerX, y: markerY } = stage.pos;
+            if (x >= markerX - MARKER_SIZE/2 && x <= markerX + MARKER_SIZE/2 && 
+                y >= markerY - MARKER_SIZE/2 && y <= markerY + MARKER_SIZE/2) {
               publish('playSE', 'decide');
               if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
                 const targetId = stage.stageId;
