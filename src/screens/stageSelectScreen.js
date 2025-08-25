@@ -1360,28 +1360,28 @@ update(dt) {
     }
 
     // ★★★ 練習ボタンのクリック処理を追加 ★★★
-    if (isMouseOverRect(x, y, practiceButton)) {
+    if (isMouseOverRect(this.mouseX, this.mouseY, practiceButton)) {
       publish('playSE', 'decide');
       this._startPracticeMode();
       return;
     }
 
     // 漢字図鑑ボタン
-    if (isMouseOverRect(x, y, dexButton)) {
+    if (isMouseOverRect(this.mouseX, this.mouseY, dexButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'kanjiDex');
       return;
     }
 
     // モンスターデックスボタン
-    if (isMouseOverRect(x, y, monsterButton)) {
+    if (isMouseOverRect(this.mouseX, this.mouseY, monsterButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'monsterDex');
       return;
     }
 
     // プロフィール/称号ボタン
-    if (isMouseOverRect(x, y, profileButton)) {
+    if (isMouseOverRect(this.mouseX, this.mouseY, profileButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'profile');
       return;
