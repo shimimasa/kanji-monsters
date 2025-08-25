@@ -1243,6 +1243,7 @@ const worldStageSelectScreen = {
     // 漢字図鑑ボタン
     if (isMouseOverRect(x, y, dexButton)) {
       publish('playSE', 'decide');
+      gameState.previousScreen = 'worldStageSelect';
       publish('changeScreen', 'kanjiDex');
       return;
     }
@@ -1250,6 +1251,7 @@ const worldStageSelectScreen = {
     // モンスターデックスボタン
     if (isMouseOverRect(x, y, monsterButton)) {
       publish('playSE', 'decide');
+      gameState.previousScreen = 'worldStageSelect';
       publish('changeScreen', 'proverbMonsterDex');
       return;
     }
@@ -1257,6 +1259,7 @@ const worldStageSelectScreen = {
     // プロフィール/称号ボタン
     if (isMouseOverRect(x, y, profileButton)) {
       publish('playSE', 'decide');
+      gameState.previousScreen = 'worldStageSelect';
       publish('changeScreen', 'profile');
       return;
     }

@@ -26,6 +26,7 @@ export const gameState = {
     currentStageId: null,
     // ★★★ 練習モードを追加 ★★★
     gameMode: 'challenge', // 'jikkuri', 'challenge', 'practice'
+    previousScreen: null, // 遷移元の画面を保存
   
     /* プレイヤー ----------------------------------------------------------- */
     playerName: '',

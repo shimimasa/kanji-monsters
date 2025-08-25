@@ -53,7 +53,11 @@ const profileScreen = {
 
     const backBtn = document.createElement('button');
     backBtn.textContent = '← もどる';
-    backBtn.onclick = () => publish('changeScreen', 'stageSelect');
+    backBtn.onclick = () => {
+      publish('playSE', 'decide');
+      const targetScreen = gameState.previousScreen || 'stageSelect';
+      publish('changeScreen', targetScreen);
+    };
 
     const toKanjiDexBtn = document.createElement('button');
     toKanjiDexBtn.textContent = '漢字図鑑';
