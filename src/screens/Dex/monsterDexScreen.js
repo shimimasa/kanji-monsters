@@ -2,6 +2,7 @@
 import { loadDex, loadSeenMonsters, markAsSeen, isNewMonster } from '../../models/monsterDex.js';
 import { getMonsterById, getAllMonsterIds } from '../../loaders/dataLoader.js';
 import { publish } from '../../core/eventBus.js';
+import { gameState } from '../../core/gameState.js';
 
 // --- グローバルスコープにあったヘルパー関数を、このファイル内に移動 ---
 
