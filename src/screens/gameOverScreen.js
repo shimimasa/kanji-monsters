@@ -9,27 +9,27 @@ import { addPlayerExp } from '../core/gameState.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
 const retryButton = {
-  x: 250,
+  x: 200,  // 左側
   y: 420,
   width: 140,
   height: 50,
   text: 'リトライ'
 };
 
-const titleButton = {
-  x: 410,
-  y: 420,
-  width: 140,
-  height: 50,
-  text: 'タイトルへ'
-};
-
 const stageSelectButton = {
-  x: 330,  // 中央に配置
+  x: 340,  // 中央
   y: 420,
   width: 140,
   height: 50,
   text: 'ステージ選択へ'
+};
+
+const titleButton = {
+  x: 480,  // 右側
+  y: 420,
+  width: 140,
+  height: 50,
+  text: 'タイトルへ'
 };
 
 const gameOverState = {
@@ -348,15 +348,15 @@ const gameOverState = {
         buttonGradient.addColorStop(1, '#0F0F23'); // より暗い青
       }
     } else if (type === 'stageSelect') {
-      // ステージ選択ボタン（暗い青系）
+      // ステージ選択ボタン（緑系）
       if (isHovered) {
-        buttonGradient.addColorStop(0, '#4682B4'); // スチールブルー
-        buttonGradient.addColorStop(0.5, '#2F4F4F'); // ダークスレートグレー
-        buttonGradient.addColorStop(1, '#191970'); // ミッドナイトブルー
+        buttonGradient.addColorStop(0, '#32CD32'); // ライムグリーン
+        buttonGradient.addColorStop(0.5, '#228B22'); // フォレストグリーン
+        buttonGradient.addColorStop(1, '#006400'); // ダークグリーン
       } else {
-        buttonGradient.addColorStop(0, '#2F4F4F'); // ダークスレートグレー
-        buttonGradient.addColorStop(0.5, '#191970'); // ミッドナイトブルー
-        buttonGradient.addColorStop(1, '#0F0F23'); // より暗い青
+        buttonGradient.addColorStop(0, '#228B22'); // フォレストグリーン
+        buttonGradient.addColorStop(0.5, '#006400'); // ダークグリーン
+        buttonGradient.addColorStop(1, '#004000'); // より暗いグリーン
       }
     } else { // タイトルボタン（暗い赤系）
       if (isHovered) {
@@ -521,7 +521,9 @@ const gameOverState = {
     // ステージ選択へボタン
     if (isMouseOverRect(x, y, stageSelectButton)) {
       publish('playSE', 'decide');
-      const targetScreen = gameState.previousScreen || 'stageSelect';
+      // previousScreenに基づいて適切な画面に戻る
+      const targetScreen = gameState.previousScreen === 'worldStageSelect' ? 
+        'worldStageSelect' : 'stageSelect';
       publish('changeScreen', targetScreen);
     }
   },
