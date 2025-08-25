@@ -363,54 +363,59 @@ const settingsScreenState = {
     const levelGroup = this.createLevelSettingGroup();
     panel.appendChild(levelGroup);
     
-    // 既存の回復回数設定
-    const healGroup = document.createElement('div');
-    healGroup.className = 'setting-group';
-    
-    const healLabel = document.createElement('div');
-    healLabel.className = 'setting-label-with-tooltip';
-    
-    const healLabelText = document.createElement('span');
-    healLabelText.className = 'setting-label';
-    healLabelText.textContent = '回復回数の上限';
-    
-    const healTooltipTrigger = document.createElement('span');
-    healTooltipTrigger.className = 'tooltip-trigger';
-    healTooltipTrigger.textContent = '？';
-    
-    healLabel.appendChild(healLabelText);
-    healLabel.appendChild(healTooltipTrigger);
-    
-    // スライダーと値表示のコンテナ
-    const healControlContainer = document.createElement('div');
-    healControlContainer.className = 'slider-container';
-    
-    const healSlider = document.createElement('input');
-    healSlider.type = 'range';
-    healSlider.id = 'healCountSlider';
-    healSlider.className = 'heal-count-slider';
-    healSlider.min = '1';
-    healSlider.max = '5';
-    healSlider.step = '1';
-    healSlider.value = '3'; // デフォルト値
-    
-    const healValue = document.createElement('span');
-    healValue.className = 'heal-count-value';
-    healValue.textContent = '3回';
-    
-    healControlContainer.appendChild(healSlider);
-    healControlContainer.appendChild(healValue);
-    
-    healGroup.appendChild(healLabel);
-    healGroup.appendChild(healControlContainer);
-    panel.appendChild(healGroup);
-    
+    // 回復仕様設定
+    const healModeGroup = document.createElement('div');
+    healModeGroup.className = 'setting-group';
+
+    const healModeLabel = document.createElement('div');
+    healModeLabel.className = 'setting-label-with-tooltip';
+
+    const healModeLabelText = document.createElement('span');
+    healModeLabelText.className = 'setting-label';
+    healModeLabelText.textContent = '回復後の敵行動';
+
+    const healModeTooltipTrigger = document.createElement('span');
+    healModeTooltipTrigger.className = 'tooltip-trigger';
+    healModeTooltipTrigger.textContent = '？';
+
+    healModeLabel.appendChild(healModeLabelText);
+    healModeLabel.appendChild(healModeTooltipTrigger);
+
+    // ラジオボタン群のコンテナ
+    const healModeRadioContainer = document.createElement('div');
+    healModeRadioContainer.className = 'radio-container';
+
+    // 攻撃なしモード
+    const noAttackLabel = document.createElement('label');
+    noAttackLabel.className = 'radio-label';
+    noAttackLabel.innerHTML = `
+      <input type="radio" name="healMode" value="noAttack" id="noAttackMode">
+      <span class="radio-custom"></span>
+      攻撃なし（安全）
+    `;
+
+    // 攻撃ありモード
+    const withAttackLabel = document.createElement('label');
+    withAttackLabel.className = 'radio-label';
+    withAttackLabel.innerHTML = `
+      <input type="radio" name="healMode" value="withAttack" id="withAttackMode">
+      <span class="radio-custom"></span>
+      攻撃あり（チャレンジ）
+    `;
+
+    healModeRadioContainer.appendChild(noAttackLabel);
+    healModeRadioContainer.appendChild(withAttackLabel);
+
+    healModeGroup.appendChild(healModeLabel);
+    healModeGroup.appendChild(healModeRadioContainer);
+    panel.appendChild(healModeGroup);
+
     // ツールチップとイベントリスナーを設定
     this._setupTooltipEvents(
-      healTooltipTrigger,
-      '各ステージで使用できる回復の回数上限を設定します。難易度を調整したい時にご利用ください。'
+      healModeTooltipTrigger,
+      '回復成功後に敵の攻撃があるかどうかを設定します。「攻撃なし」は初心者向け、「攻撃あり」は戦略性が高まります。'
     );
-    this.setupBattleEvents(healSlider, healValue);
+    this.setupHealModeEvents();
     
     return panel;
   },
@@ -648,6 +653,61 @@ const settingsScreenState = {
       saveGameData();
     } catch (error) {
       console.warn('セーブデータの保存に失敗:', error);
+    }
+  },
+
+  /** 回復仕様設定のイベントリスナーを設定 */
+  setupHealModeEvents() {
+    setTimeout(() => {
+      // 初期値をローカルストレージから取得
+      const savedHealMode = localStorage.getItem('healMode') || 'noAttack';
+      
+      // ラジオボタンを設定
+      const noAttackRadio = document.getElementById('noAttackMode');
+      const withAttackRadio = document.getElementById('withAttackMode');
+      
+      if (noAttackRadio && withAttackRadio) {
+        if (savedHealMode === 'noAttack') {
+          noAttackRadio.checked = true;
+        } else {
+          withAttackRadio.checked = true;
+        }
+        
+        // イベントリスナーを設定
+        noAttackRadio.addEventListener('change', () => {
+          if (noAttackRadio.checked) {
+            this._saveHealModeAndUpdate('noAttack');
+          }
+        });
+        
+        withAttackRadio.addEventListener('change', () => {
+          if (withAttackRadio.checked) {
+            this._saveHealModeAndUpdate('withAttack');
+          }
+        });
+      }
+    }, 100);
+  },
+
+  /** 回復仕様を保存し、説明文を更新 */
+  _saveHealModeAndUpdate(mode) {
+    // ローカルストレージに保存
+    localStorage.setItem('healMode', mode);
+    
+    // フィードバックSE再生
+    publish('playSE', 'decide');
+    
+    console.log('回復仕様設定完了:', mode);
+    
+    // 設定変更の視覚的フィードバック
+    const modeDescription = document.getElementById('modeDescription');
+    if (modeDescription) {
+      modeDescription.style.color = '#2ecc71';
+      modeDescription.style.fontWeight = 'bold';
+      setTimeout(() => {
+        modeDescription.style.color = '';
+        modeDescription.style.fontWeight = '';
+      }, 1000);
     }
   },
 

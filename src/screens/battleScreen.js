@@ -4566,10 +4566,24 @@ gameState.playerStats.healsSuccessful++;
   inputEl.value = '';
 
 
-      // プレイヤー行動→敵ターン開始待ち: 1.3s
-      setManagedTimeout(() => {
-        enemyTurn();
-        // 敵ターン終了→次の問題表示: 1.7s
+      // 設定に応じて敵ターンを実行
+      const healMode = localStorage.getItem('healMode') || 'noAttack'; // デフォルトは攻撃なし
+      if (healMode === 'withAttack') {
+        // プレイヤー行動→敵ターン開始待ち: 1.3s
+        setManagedTimeout(() => {
+          enemyTurn();
+          // 敵ターン終了→次の問題表示: 1.7s
+          setManagedTimeout(() => {
+            pickNextKanji();
+            // 入力再開までの待機: 0.65s
+            setManagedTimeout(() => {
+              battleState.turn = 'player';
+              battleState.inputEnabled = true;
+            }, 650);
+          }, 1700);
+        }, 1300);
+      } else {
+        // 攻撃なしモード: 直接次の問題へ
         setManagedTimeout(() => {
           pickNextKanji();
           // 入力再開までの待機: 0.65s
@@ -4577,8 +4591,8 @@ gameState.playerStats.healsSuccessful++;
             battleState.turn = 'player';
             battleState.inputEnabled = true;
           }, 650);
-        }, 1700);
-      }, 1300);
+        }, 1300);
+      }
 }
   
 
