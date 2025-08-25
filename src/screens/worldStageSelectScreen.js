@@ -1099,13 +1099,13 @@ const worldStageSelectScreen = {
             const drawSize = MARKER_SIZE * scale;
             const offsetX = (drawSize - MARKER_SIZE) / 2;
             const offsetY = (drawSize - MARKER_SIZE) / 2;
-            ctx.drawImage(markerImage, x - offsetX, y - offsetY, drawSize, drawSize);
+            ctx.drawImage(markerImage, markerX - offsetX, markerY - offsetY, drawSize, drawSize);
           } else {
             ctx.fillStyle = isCleared ? '#FFD700' : (isNext ? '#FF6B35' : '#f00');
             const drawSize = MARKER_SIZE * scale;
             const offsetX = (drawSize - MARKER_SIZE) / 2;
             const offsetY = (drawSize - MARKER_SIZE) / 2;
-            ctx.fillRect(x - offsetX, y - offsetY, drawSize, drawSize);
+            ctx.fillRect(markerX - offsetX, markerY - offsetY, drawSize, drawSize);
           }
 
           // ホバー時は追加エフェクトと名前表示
@@ -1115,7 +1115,7 @@ const worldStageSelectScreen = {
             ctx.fillStyle = '#fff';
             ctx.font = '12px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(stage.name, x, y - 20);
+            ctx.fillText(stage.name, markerX, markerY - 20);
           }
 
           ctx.restore();
