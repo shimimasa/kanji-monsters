@@ -1234,33 +1234,33 @@ const worldStageSelectScreen = {
     }
 
     // ★★★ 練習ボタンのクリック処理を追加 ★★★
-    if (isMouseOverRect(this.mouseX, this.mouseY, practiceButton)) {
+    if (isMouseOverRect(x, y, practiceButton)) {
       publish('playSE', 'decide');
       this._startPracticeMode();
       return;
     }
 
     // 漢字図鑑ボタン
-    if (isMouseOverRect(this.mouseX, this.mouseY, dexButton)) {
+    if (isMouseOverRect(x, y, dexButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'kanjiDex');
       return;
     }
 
     // モンスターデックスボタン
-    if (isMouseOverRect(this.mouseX, this.mouseY, monsterButton)) {
+    if (isMouseOverRect(x, y, monsterButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'proverbMonsterDex');
       return;
     }
 
     // プロフィール/称号ボタン
-    if (isMouseOverRect(this.mouseX, this.mouseY, profileButton)) {
+    if (isMouseOverRect(x, y, profileButton)) {
       publish('playSE', 'decide');
       publish('changeScreen', 'profile');
       return;
     }
-  },
+  },  
 
   // ★★★ 練習モード開始処理を追加 ★★★
   /**
