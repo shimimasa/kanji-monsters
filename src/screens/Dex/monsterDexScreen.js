@@ -39,12 +39,14 @@ const observer = new IntersectionObserver((entries) => {
 
 // モンスターカードを生成する関数
 function createCard(monster) {
-    const card = document.createElement('div');
-    card.classList.add('monster-card');
+  const card = document.createElement('div');
+  card.classList.add('monster-card');
   
-    if (!monster.collected) {
-      card.classList.add('locked');
-    }
+  // 捕獲済みかどうかで判定
+  if (!monster.collected) {
+    // シルエットではなく、非表示または「？」表示
+    return null;  // または未取得用のカードを返す
+  }
 
     // カードクリック時のモーダル表示処理
     card.addEventListener('click', () => {
@@ -292,6 +294,9 @@ const monsterDexState = {
       // 図鑑番号順（デフォルト）
       filtered.sort((a, b) => a.localeCompare(b));
     }
+
+    // 捕獲済みのみ表示
+    filtered = filtered.filter(id => this.dexSet.has(id));
 
     this.filteredMonsterIds = filtered;
     this.totalPages = Math.ceil(this.filteredMonsterIds.length / this.itemsPerPage);
@@ -624,54 +629,50 @@ const monsterDexState = {
       margin: '0 16px'
     });
 
-    // 現在のページのモンスターカードを生成
-    const startIndex = this.currentPage * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    const pageIds = this.filteredMonsterIds.slice(startIndex, endIndex);
-
-    pageIds.forEach(id => {
-      const monsterData = getMonsterById(id);
-      if (monsterData) {
-        monsterData.collected = this.dexSet.has(id);
-        const card = createCard(monsterData);
-        
-        // カードのスタイルを統一（KanjiDexと同様）
-        Object.assign(card.style, {
-          background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.8), rgba(160, 82, 45, 0.6))',
-          border: '2px solid #8B4513',
-          borderRadius: '12px',
-          padding: '12px',
-          textAlign: 'center',
-          cursor: monsterData.collected ? 'pointer' : 'default',
-          transition: 'all 0.3s ease',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-          color: '#fff'
+        // 現在のページのモンスターカードを生成
+        const startIndex = this.currentPage * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        const pageIds = this.filteredMonsterIds.slice(startIndex, endIndex);
+    
+        pageIds.forEach(id => {
+          const monsterData = getMonsterById(id);
+          if (monsterData) {
+            monsterData.collected = this.dexSet.has(id);
+            const card = createCard(monsterData);
+            if (!card) return; // 未捕獲は非表示（シルエット廃止）
+    
+            // カードのスタイルを統一（KanjiDexと同様）
+            Object.assign(card.style, {
+              background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.8), rgba(160, 82, 45, 0.6))',
+              border: '2px solid #8B4513',
+              borderRadius: '12px',
+              padding: '12px',
+              textAlign: 'center',
+              cursor: monsterData.collected ? 'pointer' : 'default',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+              color: '#fff'
+            });
+    
+            if (monsterData.collected) {
+              card.addEventListener('mouseenter', () => {
+                Object.assign(card.style, {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
+                });
+              });
+              
+              card.addEventListener('mouseleave', () => {
+                Object.assign(card.style, {
+                  transform: 'translateY(0)',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+                });
+              });
+            }
+            
+            cardGrid.appendChild(card);
+          }
         });
-
-        if (monsterData.collected) {
-          card.addEventListener('mouseenter', () => {
-            Object.assign(card.style, {
-              transform: 'translateY(-4px)',
-              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
-            });
-          });
-          
-          card.addEventListener('mouseleave', () => {
-            Object.assign(card.style, {
-              transform: 'translateY(0)',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
-            });
-          });
-        } else {
-          Object.assign(card.style, {
-            opacity: '0.6',
-            filter: 'grayscale(100%)'
-          });
-        }
-        
-        cardGrid.appendChild(card);
-      }
-    });
 
     // コンテナに全て追加
     this.container.appendChild(statsDiv);

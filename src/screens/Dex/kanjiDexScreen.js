@@ -7,6 +7,7 @@ import { getKanjiById, kanjiData, getKanjiByGrade } from '../../loaders/dataLoad
 import { gameState } from '../../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../../ui/uiRenderer.js';
 
+
 const BTN = {
   back: { x: 20, y: 20, w: 100, h: 30, label: 'ステージ選択へ' },
   prevPage: { x: 580, y: 500, w: 100, h: 40, label: '前のページ' },

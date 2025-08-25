@@ -4178,9 +4178,6 @@ if (gameState.currentEnemy.isBoss) {
         gameState.playerStats.bossesDefeated++;
       }
       
-      // モンスターデックスに登録
-      addMonster(gameState.currentEnemy.id);
-      
       // 敵撃破の統計データを更新
       recordEnemyDefeated();
       
@@ -4268,7 +4265,20 @@ if (gameState.currentEnemy.isBoss) {
                          gameState.hintLevel = 0;
 
                       });
-                     } else {
+                     } else {// 最後の敵を倒した場合の処理を修正
+                      if (gameState.currentEnemyIndex >= gameState.enemies.length - 1) {
+                        waitForDefeatAnimationThen(() => {
+                          // 倒したモンスターのリストを作成
+                          const defeatedMonsters = gameState.enemies.map(e => ({
+                            id: e.id,
+                            name: e.name,
+                            img: e.img
+                          }));
+                          
+                          // 捕獲画面へ遷移（resultWinではなく）
+                          publish('changeScreen', 'monsterCapture', defeatedMonsters);
+                        });
+                      }
                        // 最後の敵を倒した場合：ステージクリアを保留状態にする
                       waitForDefeatAnimationThen(() => {
                         const inputEl = battleScreenState.inputEl;
@@ -4384,6 +4394,7 @@ if (gameState.currentEnemy.isBoss) {
   // 入力欄をクリア
   inputEl.value = '';
 }
+
 
 // Levenshtein距離（文字列の類似度）を計算する関数
 function levenshteinDistance(a, b) {
