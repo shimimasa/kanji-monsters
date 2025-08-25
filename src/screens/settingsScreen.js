@@ -19,9 +19,9 @@ const LEVEL_PRESETS = {
     description: '小学校中学年レベルの漢字から学習'
   },
   'junior1': { 
-    level: 24, 
+    level: 30, 
     label: '中学1年生レベル', 
-    exp: calculateExpForLevel(24),
+    exp: calculateExpForLevel(30),
     description: '中学校レベルの漢字から学習'
   }
 };
