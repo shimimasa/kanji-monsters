@@ -880,6 +880,9 @@ updateShieldBreakEffect() {
 
       this.victoryCallback = onVictory;
 
+      // クリア保留フラグを毎回リセット（再入場で勝利画面に飛ばないように）
+      this.stageClearPending = false;
+
       // 各リストを初期化
       gameState.correctKanjiList = [];
       gameState.wrongKanjiList = [];
@@ -2743,25 +2746,28 @@ drawEnemyStatusPanel(ctx) {
   );
   },
 
-  /** 画面離脱時のクリーンアップ */
-  exit() {
-    // 入力欄を非表示＆キーイベント解除
-    if (this.inputEl) {
-      this.inputEl.style.display = 'none';
-      this.inputEl.removeEventListener('keydown', this._keydownHandler);
-    }
-    // クリックイベントリスナ解除
-    if (this._clickHandler) {
-      this.unregisterHandlers();
-    }
-    // タイマーの停止
-    if (this.timerId) {
-      clearInterval(this.timerId);
-      this.timerId = null;
-    }
-    // canvas/ctx/inputEl をクリア
-    this.canvas = this.ctx = this.inputEl = null;
-  },
+    /** 画面離脱時のクリーンアップ */
+    exit() {
+      // 入力欄を非表示＆キーイベント解除
+      if (this.inputEl) {
+        this.inputEl.style.display = 'none';
+        this.inputEl.removeEventListener('keydown', this._keydownHandler);
+      }
+      // クリックイベントリスナ解除
+      if (this._clickHandler) {
+        this.unregisterHandlers();
+      }
+      // タイマーの停止
+      if (this.timerId) {
+        clearInterval(this.timerId);
+        this.timerId = null;
+      }
+      // クリア保留フラグもリセット
+      this.stageClearPending = false;
+  
+      // canvas/ctx/inputEl をクリア
+      this.canvas = this.ctx = this.inputEl = null;
+    },
 
   /** クリックなどのイベントを登録 */
   registerHandlers() {
@@ -4269,7 +4275,7 @@ if (gameState.currentEnemy.isBoss) {
                          gameState.hintLevel = 0;
 
                       });
-                     } else {// 最後の敵を倒した場合の処理を修正
+                    } else {// 最後の敵を倒した場合の処理を修正
                       if (gameState.currentEnemyIndex >= gameState.enemies.length - 1) {
                         waitForDefeatAnimationThen(() => {
                           // 倒したモンスターのリストを作成
@@ -4278,11 +4284,15 @@ if (gameState.currentEnemy.isBoss) {
                             name: e.name,
                             img: e.img
                           }));
-                          
-                          // 捕獲画面へ遷移（resultWinではなく）
+                          // 入力欄をクリア（念のため）
+                          const inputEl = battleScreenState.inputEl;
+                          if (inputEl) inputEl.value = '';
+
+                          // 捕獲画面へ遷移（勝利画面は捕獲から遷移する）
                           publish('changeScreen', 'monsterCapture', defeatedMonsters);
                         });
                       }
+                    
                        // 最後の敵を倒した場合：ステージクリアを保留状態にする
                       waitForDefeatAnimationThen(() => {
                         const inputEl = battleScreenState.inputEl;
