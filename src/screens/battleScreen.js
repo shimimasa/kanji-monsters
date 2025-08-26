@@ -4093,6 +4093,13 @@ if (gameState.currentEnemy.isBoss) {
         
         // シールド破壊エフェクトを正確な位置で開始
         battleScreenState.startShieldBreakEffect(enemyEffectX, enemyEffectY, Math.min(frameAreaForEffect.width, frameAreaForEffect.height) * 0.6);
+        
+        // **追加**: シールド破壊後に漢字を切り替える
+        setManagedTimeout(() => {
+          pickNextKanji();
+          battleState.turn = 'player';
+          battleState.inputEnabled = true;
+        }, 2500); // エフェクト後に漢字切り替え
       }
 
       // 行動パック表示（段階に応じてメッセージを変更）
@@ -4117,22 +4124,25 @@ if (gameState.currentEnemy.isBoss) {
       // シールドを削った場合は敵にダメージを与えない
       dmg = 0;
 
-      // シールド破壊後も入力を継続できるように処理を修正
-      battleState.lastCommandMode = 'attack';
-      battleState.turn = 'enemy';
-      battleState.inputEnabled = false;
-      
-      // タイミングを調整（シールド破壊エフェクトを見せるため）
-      const waitTime = currentShieldHp === 0 ? 2000 : 1300; // 破壊時は2秒待機
-      
-      setManagedTimeout(() => {
-        enemyTurn();
-        setManagedTimeout(() => {
-          pickNextKanji();
-          battleState.turn = 'player';
-          battleState.inputEnabled = true;
-        }, 1700);
-      }, waitTime);
+            // シールド破壊後も入力を継続できるように処理を修正
+            battleState.lastCommandMode = 'attack';
+            battleState.turn = 'enemy';
+            battleState.inputEnabled = false;
+            
+            // タイミングを調整（シールド破壊エフェクトを見せるため）
+            const waitTime = currentShieldHp === 0 ? 2000 : 1300; // 破壊時は2秒待機
+            
+            setManagedTimeout(() => {
+              enemyTurn();
+              setManagedTimeout(() => {
+                // シールドが破壊されていない場合のみ次の漢字に進む
+                if (currentShieldHp > 0) {
+                  pickNextKanji();
+                }
+                battleState.turn = 'player';
+                battleState.inputEnabled = true;
+              }, 1700);
+            }, waitTime);
       
       // 入力欄をクリア
       inputEl.value = '';
