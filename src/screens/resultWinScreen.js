@@ -37,6 +37,18 @@ const resultWinState = {
       playerHp: gameState.playerStats.hp || 0
     };
 
+    // ★ 追加: ここでステージクリアを確実に反映
+    const stageId = this.resultData.stageId || gameState.currentStageId;
+    if (stageId) {
+      try {
+        localStorage.setItem(`clear_${stageId}`, '1');
+        if (!gameState.stageProgress) gameState.stageProgress = {};
+        gameState.stageProgress[stageId] = { cleared: true };
+      } catch (e) {
+        console.warn('ステージクリア反映に失敗:', e);
+      }
+    }
+
     // 実績チェックを最初に実行
     try {
       await checkAchievements();
