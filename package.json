@@ -1,7 +1,7 @@
 {
   "name": "japanese-literature-game",
   "version": "1.0.0",
-  "description": "漢字読みバトルRPG",
+  "description": "ヨミタビ",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

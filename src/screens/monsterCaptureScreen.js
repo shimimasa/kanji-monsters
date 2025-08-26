@@ -28,7 +28,7 @@ const monsterCaptureScreen = {
     this.captureLimit = isBonus ? 1 : Math.max(1, 4 - Math.min(clearCount, 3));
 
     // 候補生成
-    const dex = loadDex();
+    this.dex = loadDex(); // ← 修正: インスタンスに保持
     const defeatedIds = Array.isArray(defeatedMonsters)
       ? defeatedMonsters.map(m => m.id).filter(Boolean)
       : [];
@@ -45,14 +45,14 @@ const monsterCaptureScreen = {
       }
       this.candidates = stageIds;
     } else {
-      // ボーナス: 他ステージからランダム（未捕獲優先）、ただし捕獲数は常時1
+                  // ボーナス: 他ステージからランダム（未捕獲優先）、ただし捕獲数は常時1
       const all = getAllMonsterIds().filter(id => {
         const m = getMonsterById(id);
         const idStr = String(id);
         const isWorld = (m && m.grade >= 7) || idStr.startsWith('PRV-');
         return m && !isWorld;
       });
-      const unCaptured = all.filter(id => !dex.has(id));
+      const unCaptured = all.filter(id => !this.dex.has(id)); // ← 修正: this.dex
       shuffle(unCaptured);
       const pool = unCaptured.slice(0, 10);
       if (pool.length < 10) {
@@ -108,7 +108,7 @@ const monsterCaptureScreen = {
       const m = getMonsterById(id);
       if (!m) continue;
 
-      const already = dex.has(id); // ← 追加：捕獲済み判定
+      const already = this.dex && this.dex.has(id); // ← 修正: this.dex
 
       const card = document.createElement('div');
       Object.assign(card.style, {
