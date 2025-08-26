@@ -108,15 +108,18 @@ const monsterCaptureScreen = {
       const m = getMonsterById(id);
       if (!m) continue;
 
+      const already = dex.has(id); // ← 追加：捕獲済み判定
+
       const card = document.createElement('div');
       Object.assign(card.style, {
         background: 'linear-gradient(135deg, rgba(139,69,19,0.85), rgba(160,82,45,0.7))',
         border: '2px solid #8B4513',
         borderRadius: '12px',
         padding: '10px',
-        cursor: 'pointer',
+        cursor: already ? 'not-allowed' : 'pointer', // ← 追加：捕獲済みは選択不可
         userSelect: 'none',
-        transition: 'all .2s'
+        transition: 'all .2s',
+        opacity: already ? '0.55' : '1' // ← 追加：捕獲済みは半透明
       });
 
       const thumb = document.createElement('img');
@@ -131,18 +134,25 @@ const monsterCaptureScreen = {
 
       const badge = document.createElement('div');
       const updateBadge = () => {
-        badge.textContent = this.selected.has(id) ? '選択中' : '';
+        // ← 変更：捕獲済みは常時「捕獲済み」表示、選択中表示は未捕獲のみ
+        const selected = this.selected.has(id);
+        badge.textContent = already ? '捕獲済み' : (selected ? '選択中' : '');
         Object.assign(badge.style, {
           marginTop: '4px',
           textAlign: 'center',
-          color: this.selected.has(id) ? '#00ffb3' : 'transparent',
+          color: already ? '#ffd700' : (selected ? '#00ffb3' : 'transparent'),
           fontWeight: '700'
         });
-        card.style.outline = this.selected.has(id) ? '3px solid #00ffb3' : 'none';
+        card.style.outline = selected ? '3px solid #00ffb3' : 'none';
       };
       updateBadge();
 
       card.addEventListener('click', () => {
+        // ← 追加：捕獲済みは選択不可
+        if (already) {
+          try { publish('playSE', 'wrong'); } catch {}
+          return;
+        }
         if (this.selected.has(id)) {
           this.selected.delete(id);
         } else {
