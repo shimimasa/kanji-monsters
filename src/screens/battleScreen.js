@@ -1357,8 +1357,12 @@ this.ctx.restore();
 
       // 読み進捗の取得（存在しない場合も考慮）
       const prog = (gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id]) || null;
-      const progKun = prog ? prog.kunyomi : null;
-      const progOn  = prog ? prog.onyomi  : null;
+      const progKun = prog && prog.kunyomi
+        ? (prog.kunyomi instanceof Set ? prog.kunyomi : new Set(prog.kunyomi))
+        : null;
+      const progOn  = prog && prog.onyomi
+        ? (prog.onyomi instanceof Set ? prog.onyomi : new Set(prog.onyomi))
+        : null;
 
       // 折り返しヘルパー（ラベル幅を考慮、トークン単位）
       const drawWrappedTokens = (label, tokens, y, masteredSet) => {
@@ -5138,14 +5142,21 @@ function calculateHealAmount(playerLevel) {
 
 // 読み進捗のエントリを確保
 function ensureProgressEntry(kanjiId) {
-  ensureProgressRoot(); // 追加
-  const prog = gameState.kanjiReadProgress[kanjiId];
+  ensureProgressRoot();
+  let prog = gameState.kanjiReadProgress[kanjiId];
   if (!prog) {
     gameState.kanjiReadProgress[kanjiId] = {
       onyomi: new Set(),
       kunyomi: new Set(),
       mastered: false,
     };
+  } else {
+    if (!(prog.onyomi instanceof Set)) {
+      prog.onyomi = new Set(prog.onyomi || []);
+    }
+    if (!(prog.kunyomi instanceof Set)) {
+      prog.kunyomi = new Set(prog.kunyomi || []);
+    }
   }
   return gameState.kanjiReadProgress[kanjiId];
 }
@@ -5153,12 +5164,16 @@ function ensureProgressEntry(kanjiId) {
 // 現在の問題の読み進捗を更新し、マスター済みか判定
 function updateKanjiMasteryAfterCorrect(currentKanji, answer) {
   if (!currentKanji || !currentKanji.id) return;
-  ensureProgressRoot(); // 追加
+  ensureProgressRoot();
   const id = currentKanji.id;
   const prog = ensureProgressEntry(id);
 
   const isKun = (currentKanji.kunyomi || []).includes(answer);
   const isOn  = (currentKanji.onyomi || []).includes(answer);
+
+  if (!(prog.kunyomi instanceof Set)) prog.kunyomi = new Set(prog.kunyomi || []);
+  if (!(prog.onyomi instanceof Set))  prog.onyomi  = new Set(prog.onyomi  || []);
+
   if (isKun) prog.kunyomi.add(answer);
   if (isOn)  prog.onyomi.add(answer);
 
@@ -5167,14 +5182,10 @@ function updateKanjiMasteryAfterCorrect(currentKanji, answer) {
   const allOnOk  = (currentKanji.onyomi || []).every(r => prog.onyomi.has(r));
   prog.mastered = allKunOk && allOnOk;
 
-  // 追加: 初めてマスターになった瞬間にフラグ
   if (!before && prog.mastered) {
     battleScreenState.masteryFlash = { active: true, timer: 30, kanjiId: currentKanji.id };
     addToLog('ぜんぶよめた！マスターかんじになった！');
-    battleScreenState.showLogBlock([
-      'ぜんぶよめた！',
-      'マスターかんじになった！'
-    ]);
+    battleScreenState.showLogBlock(['ぜんぶよめた！', 'マスターかんじになった！']);
   }
 }
 
