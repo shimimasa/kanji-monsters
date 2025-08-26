@@ -88,8 +88,8 @@ const resultWinState = {
 
     this.bonusSummary = null;
 
-    const stageId = gameState.currentStageId || '';
-    const m = /^bonus_g(\d+)$/i.exec(stageId);
+    const bonusCheckId = stageId || gameState.currentStageId || '';
+    const m = /^bonus_g(\d+)$/i.exec(bonusCheckId);
     if (m) {
       const grade = parseInt(m[1], 10);
       const fights = gameState.enemies?.length || 0;
