@@ -1264,8 +1264,8 @@ if (enemy && enemy.img) {
 }
 this.ctx.restore();
 
-// ▼ 敵の下に「のこりバッジ + 段階つきセグメントバー（道マップ付き）」を描画
-this.drawStageProgress(this.ctx, frameArea);
+// ▼ 敵の下に「のこりバッジ」だけを描画（枠に重ならないよう下へ配置）
+this.drawStageRemaining(this.ctx, frameArea);
 
     
 
@@ -2865,7 +2865,6 @@ drawEnemyStatusPanel(ctx) {
     this.drawTextWithOutline(label, cx, cy, 'white', 'black', 'bold 16px "UDデジタル教科書体", sans-serif', 'center', 'middle', 2);
     ctx.restore();
   },
-
   drawFootprints(ctx, x1, x2, y) {
     if (x2 <= x1) return;
     ctx.save();
@@ -2886,6 +2885,22 @@ drawEnemyStatusPanel(ctx) {
       i++;
     }
     ctx.restore();
+  },
+
+  // ▼ 残数のみ表示（セグメント/足あとは表示しない）
+  drawStageRemaining(ctx, frameArea) {
+    if (!gameState.enemies || !gameState.enemies.length) return;
+
+    const total  = gameState.enemies.length;
+    const remain = Math.max(0, total - (gameState.currentEnemyIndex || 0)); // 現在を含めた残数
+
+    // 敵枠の真下に余白を設けて配置（枠と重ならない）
+    const marginBelowFrame = 10;   // 枠からの下マージン
+    const badgeHalfH       = 13;   // drawRemainingBadgeの高さ26pxの半分
+    const cx = frameArea.x + Math.floor(frameArea.width / 2);
+    const cy = frameArea.y + frameArea.height + marginBelowFrame + badgeHalfH;
+
+    this.drawRemainingBadge(ctx, cx, cy, remain);
   },
     /** 画面離脱時のクリーンアップ */
     exit() {
