@@ -1262,10 +1262,10 @@ if (enemy && enemy.img) {
   this.ctx.textAlign = 'center';
   this.ctx.fillText(enemy ? enemy.name : 'モンスター', 0, 0);
 }
-
 this.ctx.restore();
 
-    
+// ▼ 敵の下に「のこりバッジ + 段階つきセグメントバー（道マップ付き）」を描画
+this.drawStageProgress(this.ctx, frameArea);
 
     
 
@@ -2730,7 +2730,7 @@ drawEnemyStatusPanel(ctx) {
     'left', 'top', 3
   );
 
-  // 4. HPバーを下段に配置
+    // 4. HPバーを下段に配置
   // HPバー背景
   ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
   ctx.fillRect(contentX, barY, contentW, barH);
@@ -2746,6 +2746,147 @@ drawEnemyStatusPanel(ctx) {
   );
   },
 
+  // ========== ステージ進捗UI（のこりバッジ + 段階バー + 道マップ） ==========
+  progressUI: {
+    gap: 6,
+    segH: 16,
+    padY: 8,
+    colors: {
+      normal: '#3498db',
+      elite:  '#9b59b6',
+      boss:   '#e74c3c',
+      empty:  'rgba(255,255,255,0.15)',
+      done:   'rgba(255,255,255,0.65)',
+      current:'#f1c40f'
+    }
+  },
+
+  drawStageProgress(ctx, frameArea) {
+    if (!gameState.enemies || !gameState.enemies.length) return;
+
+    const total = gameState.enemies.length;
+    const idx   = Math.max(0, Math.min(total - 1, gameState.currentEnemyIndex || 0));
+    const remain = Math.max(0, total - (gameState.currentEnemyIndex || 0)); // 現在を含めた残数
+
+    // 配置（敵フレームの真下中央）
+    const barW = Math.min(frameArea.width, 260);
+    const barX = frameArea.x + Math.floor((frameArea.width - barW) / 2);
+    const barY = frameArea.y + frameArea.height + this.progressUI.padY;
+    const gap  = this.progressUI.gap;
+    const segH = this.progressUI.segH;
+    const segW = Math.max(10, Math.floor((barW - gap * (total - 1)) / total));
+    const colors = this.progressUI.colors;
+
+    // のこりバッジ
+    this.drawRemainingBadge(ctx, barX + Math.floor(barW / 2), barY - 20, remain);
+
+    // セグメント（段階色）
+    for (let i = 0; i < total; i++) {
+      const sx = barX + i * (segW + gap);
+      const sy = barY;
+      const enemy = gameState.enemies[i];
+      const styleKey = this.getFrameStyleByOrder(i, !!(enemy && enemy.isBoss)); // 'normal'|'elite'|'boss'
+
+      let fill = colors.empty;
+      if (i < (gameState.currentEnemyIndex || 0)) fill = colors.done;
+      else if (i === (gameState.currentEnemyIndex || 0)) fill = colors.current;
+      else fill = colors[styleKey] || colors.normal;
+
+      // 背面（薄い枠）
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(sx, sy + 2, segW, segH);
+
+      // 本体
+      ctx.fillStyle = fill;
+      ctx.fillRect(sx, sy, segW, segH);
+
+      // 枠
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(sx, sy, segW, segH);
+
+      // ボス印（王冠）
+      if (enemy && enemy.isBoss) {
+        ctx.save();
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('👑', sx + Math.floor(segW / 2), sy - 2);
+        ctx.restore();
+      }
+    }
+
+    // 道マップ（足あと）
+    const pathStart = barX + 2;
+    const curCenter = barX + idx * (segW + gap) + Math.floor(segW / 2);
+    const pathEnd   = Math.min(curCenter, barX + barW - 2);
+    this.drawFootprints(ctx, pathStart, pathEnd, barY + segH + 8);
+
+    // ゴール（お城）
+    ctx.save();
+    ctx.font = '18px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🏰', barX + barW + 8, barY + Math.floor(segH / 2));
+    ctx.restore();
+  },
+
+  drawRemainingBadge(ctx, cx, cy, remain) {
+    const label = `あと ${remain} たい！`;
+    ctx.save();
+    ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
+    const tw = Math.ceil(ctx.measureText(label).width);
+    const w = tw + 24;
+    const h = 26;
+    const x = cx - Math.floor(w / 2);
+    const y = cy - Math.floor(h / 2);
+    const r = Math.floor(h / 2);
+
+    // ピル背景
+    const g = ctx.createLinearGradient(x, y, x, y + h);
+    g.addColorStop(0, '#f39c12');
+    g.addColorStop(1, '#d35400');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    ctx.fill();
+
+    // 縁
+    ctx.strokeStyle = '#8e4400';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 文字
+    this.drawTextWithOutline(label, cx, cy, 'white', 'black', 'bold 16px "UDデジタル教科書体", sans-serif', 'center', 'middle', 2);
+    ctx.restore();
+  },
+
+  drawFootprints(ctx, x1, x2, y) {
+    if (x2 <= x1) return;
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    const step = 16;
+    let i = 0;
+    for (let x = x1; x <= x2; x += step) {
+      const offset = (i % 2 === 0) ? -4 : 4;
+      const rot = (i % 2 === 0) ? -0.6 : 0.6;
+      // かかと
+      ctx.beginPath();
+      ctx.ellipse(x, y + offset, 3, 5, rot, 0, Math.PI * 2);
+      ctx.fill();
+      // つま先
+      ctx.beginPath();
+      ctx.ellipse(x + 5, y + offset - 2, 2, 3, rot, 0, Math.PI * 2);
+      ctx.fill();
+      i++;
+    }
+    ctx.restore();
+  },
     /** 画面離脱時のクリーンアップ */
     exit() {
       // 入力欄を非表示＆キーイベント解除
