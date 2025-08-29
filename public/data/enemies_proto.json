@@ -1,7 +1,7 @@
 [
   {
     "id": "HKD-E01",
-    "name": "夕張メロン",
+    "name": "ジャガイモスライム",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -10,11 +10,16 @@
     "image": "HKD-E01.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "畑",
+    "desc": "丸いジャガイモの体を持つ小さなスライム。芽がツノのように伸び、土の中を転がって移動する。",
+    "trivia": "「馬鈴薯（ばれいしょ）」という漢字もある。でんぷんは理科でも大事な栄養素。",
+    "catchphrase": "「ころころ転がる土の精霊！」"
   },
   {
     "id": "HKD-E02",
-    "name": "ジンギスカン",
+    "name": "トウモロコシインプ",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -23,11 +28,16 @@
     "image": "HKD-E02.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "とうもろこし畑",
+    "desc": "黄金色の粒をマントのようにまとった小悪魔。粒を飛ばして攻撃する。",
+    "trivia": "「玉蜀黍（とうもろこし）」という難しい漢字がある。光合成で大きく育つ。",
+    "catchphrase": "「きらきら粒を投げる畑のいたずらっ子！」"
   },
   {
     "id": "HKD-E03",
-    "name": "毛ガニ",
+    "name": "ミルクフェアリー",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -36,11 +46,16 @@
     "image": "HKD-E03.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "牧場",
+    "desc": "牛乳のしずくから生まれた半透明の妖精。不思議な光を放つ。",
+    "trivia": "牛乳は「乳（ちち）」の字を使う。カルシウムは理科でも大事。",
+    "catchphrase": "「白いしずくの神秘の妖精！」"
   },
   {
     "id": "HKD-E04",
-    "name": "ラベンダー",
+    "name": "カニクラブ",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -49,11 +64,16 @@
     "image": "HKD-E04.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "オホーツクの海辺",
+    "desc": "赤い殻を持つカニ戦士。ハサミをふりあげて威嚇する。",
+    "trivia": "「蟹（かに）」という漢字もある。カニは理科でも学ぶ。",
+    "catchphrase": "「チョキチョキ守る浜辺の戦士！」"
   },
   {
     "id": "HKD-E05",
-    "name": "まりも",
+    "name": "チーズスピリット",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -62,11 +82,16 @@
     "image": "HKD-E05.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "酪農地帯",
+    "desc": "とろけるチーズの精霊。糸を引く姿が少し不気味。",
+    "trivia": "チーズは発酵食品。微生物の働きが理科につながる。",
+    "catchphrase": "「のび～る不思議な乳の精！」"
   },
   {
     "id": "HKD-E06",
-    "name": "トウモロコシ",
+    "name": "サケウォリアー",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -75,11 +100,16 @@
     "image": "HKD-E06.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "川の上流",
+    "desc": "鮭が二足歩行になった戦士。背びれを立てて勇敢に戦う。",
+    "trivia": "「鮭（さけ）」は秋の魚。産卵のために川をのぼる。",
+    "catchphrase": "「勇気を背負う赤い川戦士！」"
   },
   {
     "id": "HKD-E07",
-    "name": "バター",
+    "name": "ホタテガーディアン",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -88,11 +118,16 @@
     "image": "HKD-E07.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "陸奥湾",
+    "desc": "巨大なホタテ貝を盾に持つ守護者。殻の中に光る目がある。",
+    "trivia": "「帆立貝（ほたてがい）」は貝殻が帆の形に見えるから。二枚貝は理科で学ぶ。",
+    "catchphrase": "「海の盾を守る静かな番人！」"
   },
   {
     "id": "HKD-E08",
-    "name": "スープカレー",
+    "name": "ラーメンゴーレム",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -101,11 +136,16 @@
     "image": "HKD-E08.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "札幌の街",
+    "desc": "丼から生まれた熱々のゴーレム。麺や具材が体を覆う。",
+    "trivia": "「拉麺（ラーメン）」の字は中国から。「ラーメン（らーめん）」は「麺（めん）」と「湯（ゆ）」の合成語。",
+    "catchphrase": "「あつあつ湯気のどんぶり戦士！」"
   },
   {
     "id": "HKD-E09",
-    "name": "ハスカップ",
+    "name": "アイヌフクロウ",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -114,11 +154,16 @@
     "image": "HKD-E09.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "文化",
+    "habitat": "阿寒湖",
+    "desc": "シマフクロウがアイヌ文様をまとった神秘の怪鳥。翼を広げると夜空に光の模様を描き、霊力で敵を退ける。",
+    "trivia": "シマフクロウはアイヌ文化で「コタンコロカムイ（村を守る神）」と呼ばれ、神聖視されてきた存在。",
+    "catchphrase": "「夜空に舞う、文様の守護神！」"
   },
   {
     "id": "HKD-E10",
-    "name": "ししゃも",
+    "name": "北の守護獣ヒグマロード",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 23,
@@ -128,7 +173,12 @@
     "isBoss": true,
     "shieldHp": 3,
     "exp": 20,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説",
+    "habitat": "北海道全域",
+    "desc": "伝説のヒグマ。黒い毛並みに雪模様、吹雪のオーラをまとう。",
+    "trivia": "冬眠や生態は理科でも学ぶ。北海道を象徴する動物。",
+    "catchphrase": "「吹雪を従える北の覇者！」"
   },
   {
     "id": "AOM-E01",
@@ -143,7 +193,12 @@
     "image": "AOM-E01.webp",
     "isBoss": false,
     "exp": 14,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "meat",
+    "habitat": "北海道",
+    "desc": "北海道の特産品。冬には吹雪を従える北の覇者！",
+    "trivia": "北海道の特産品。冬には吹雪を従える北の覇者！",
+    "catchphrase": "吹雪を従える北の覇者！"
   },
   {
     "id": "AOM-E02",
