@@ -1055,6 +1055,12 @@ getMaxHealCountFromSettings() {
     return regionBgmKey;
   },
 
+  getEnemyAttackMode() {
+    try { return localStorage.getItem('enemyAttackMode') || 'always'; } catch { return 'always'; }
+  },
+  shouldEnemyAttackAfterCorrect() {
+    return this.getEnemyAttackMode() !== 'onMistakeOnly';
+  },
   /** 1フレームごとの描画更新 */
   update(dt) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -1133,6 +1139,9 @@ if (battleState.enemyAction === 'defeat' && battleState.enemyActionTimer > 0) {
 
 // 1. モンスター枠を描画
 const frameArea = drawMonsterFrame(this.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy);
+
+// 直近の表示領域を保存（他処理で参照するため）
+this._lastMonsterFrameArea = frameArea;
 
 // 2. 枠内でモンスター画像を描画
 this.ctx.save();
@@ -4240,14 +4249,13 @@ if (gameState.currentEnemy.isBoss) {
         // シールド破壊の派手なエフェクト
         battleScreenState.startShakeEffect(25, 8);
         battleScreenState.startFlashEffect('rgba(255, 255, 255, 0.6)', 30);
-        
-        // **修正**: 敵の位置をモンスター枠の中心に正確に計算
-        // モンスター枠の座標系に合わせて中心点を計算
-        const frameAreaForEffect = drawMonsterFrame(battleScreenState.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy);
-        const enemyEffectX = frameAreaForEffect.x + frameAreaForEffect.width / 2;
-        const enemyEffectY = frameAreaForEffect.y + frameAreaForEffect.height / 2;
-        
-        // シールド破壊エフェクトを正確な位置で開始
+
+      // **修正**: 直近のモンスター枠から中心座標と半径を取得（ex/ey/ew/eh に依存しない）
+const fa = battleScreenState._lastMonsterFrameArea;
+const enemyEffectX = fa ? fa.x + fa.width / 2 : ((battleScreenState.canvas?.width || 800) / 2);
+const enemyEffectY = fa ? fa.y + fa.height / 2 : ((battleScreenState.canvas?.height || 600) / 2);
+const radius = fa ? Math.min(fa.width, fa.height) * 0.6 : 120;
+       // シールド破壊エフェクトを正確な位置で開始
         battleScreenState.startShieldBreakEffect(enemyEffectX, enemyEffectY, Math.min(frameAreaForEffect.width, frameAreaForEffect.height) * 0.6);
         
         // **追加**: シールド破壊後に漢字を切り替える
@@ -4289,15 +4297,22 @@ if (gameState.currentEnemy.isBoss) {
             const waitTime = currentShieldHp === 0 ? 2000 : 1300; // 破壊時は2秒待機
             
             setManagedTimeout(() => {
-              enemyTurn();
-              setManagedTimeout(() => {
-                // シールドが破壊されていない場合のみ次の漢字に進む
+              if (battleScreenState.shouldEnemyAttackAfterCorrect()) {
+                enemyTurn();
+                setManagedTimeout(() => {
+                  if (currentShieldHp > 0) {
+                    pickNextKanji();
+                  }
+                  battleState.turn = 'player';
+                  battleState.inputEnabled = true;
+                }, 1700);
+              } else {
                 if (currentShieldHp > 0) {
                   pickNextKanji();
                 }
                 battleState.turn = 'player';
                 battleState.inputEnabled = true;
-              }, 1700);
+              }
             }, waitTime);
       
       // 入力欄をクリア
@@ -4474,13 +4489,18 @@ if (gameState.currentEnemy.isBoss) {
       battleState.inputEnabled = false;
       
       setManagedTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
-        enemyTurn();
-        // 敵ターン終了→次の問題表示: 1.7s
-        setManagedTimeout(() => {
+        if (battleScreenState.shouldEnemyAttackAfterCorrect()) {
+          enemyTurn();
+          setManagedTimeout(() => {
+            pickNextKanji();
+            battleState.turn = 'player';
+            battleState.inputEnabled = true;
+          }, 1700);
+        } else {
           pickNextKanji();
           battleState.turn = 'player';
           battleState.inputEnabled = true;
-        }, 1700);
+        }
       }, 1300);
     }
     

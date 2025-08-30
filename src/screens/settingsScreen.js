@@ -370,7 +370,6 @@ const settingsScreenState = {
     return panel;
   },
 
-  /** バトル設定パネルを作成（回復関連設定のみ） */
   createBattlePanel() {
     const panel = document.createElement('div');
     panel.className = 'settings-panel';
@@ -387,6 +386,10 @@ const settingsScreenState = {
     // 回復仕様設定（既存）
     const healModeGroup = this.createHealModeGroup();
     panel.appendChild(healModeGroup);
+
+    // 敵の行動タイミング（新規）
+    const enemyAttackModeGroup = this.createEnemyAttackModeGroup();
+    panel.appendChild(enemyAttackModeGroup);
     
     return panel;
   },
@@ -501,6 +504,85 @@ const settingsScreenState = {
     
     return healModeGroup;
   },
+
+  createEnemyAttackModeGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = '敵の行動タイミング';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const radioContainer = document.createElement('div');
+    radioContainer.className = 'radio-container';
+
+    const alwaysLabel = document.createElement('label');
+    alwaysLabel.className = 'radio-label';
+    alwaysLabel.innerHTML = `
+      <input type="radio" name="enemyAttackMode" value="always" id="enemyAttack_always">
+      <span class="radio-custom"></span>
+      通常（毎ターン攻撃）
+    `;
+
+    const mistakeOnlyLabel = document.createElement('label');
+    mistakeOnlyLabel.className = 'radio-label';
+    mistakeOnlyLabel.innerHTML = `
+      <input type="radio" name="enemyAttackMode" value="onMistakeOnly" id="enemyAttack_onMistakeOnly">
+      <span class="radio-custom"></span>
+      ミス時のみ攻撃
+    `;
+
+    radioContainer.appendChild(alwaysLabel);
+    radioContainer.appendChild(mistakeOnlyLabel);
+
+    group.appendChild(label);
+    group.appendChild(radioContainer);
+
+    this._setupTooltipEvents(
+      tip,
+      '敵の攻撃タイミングを切り替えます。\n「通常」は毎ターン攻撃、「ミス時のみ」は不正解の時だけ敵が攻撃します。'
+    );
+    this.setupEnemyAttackModeEvents();
+
+    return group;
+  },
+
+  setupEnemyAttackModeEvents() {
+    setTimeout(() => {
+      const saved = localStorage.getItem('enemyAttackMode') || 'always';
+      const always = document.getElementById('enemyAttack_always');
+      const mistakeOnly = document.getElementById('enemyAttack_onMistakeOnly');
+      if (always && mistakeOnly) {
+        if (saved === 'onMistakeOnly') mistakeOnly.checked = true;
+        else always.checked = true;
+
+        always.addEventListener('change', () => {
+          if (always.checked) this._saveEnemyAttackMode('always');
+        });
+        mistakeOnly.addEventListener('change', () => {
+          if (mistakeOnly.checked) this._saveEnemyAttackMode('onMistakeOnly');
+        });
+      }
+    }, 100);
+  },
+
+  _saveEnemyAttackMode(mode) {
+    try { localStorage.setItem('enemyAttackMode', mode); } catch {}
+    publish('playSE', 'decide');
+    console.log('敵の行動タイミング設定:', mode);
+  },
+
+
 
   /** レベル設定グループを作成 */
   createLevelSettingGroup() {
