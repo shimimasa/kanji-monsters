@@ -185,7 +185,7 @@ const monsterCaptureScreen = {
     };
 
     const confirmBtn = document.createElement('button');
-    confirmBtn.textContent = '捕獲を確定';
+    confirmBtn.textContent = 'ヨミトモを確定';
     Object.assign(confirmBtn.style, buttonStyle('green'));
     confirmBtn.onclick = () => {
       publish('playSE', 'decide');
