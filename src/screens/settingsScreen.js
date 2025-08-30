@@ -96,8 +96,46 @@ const settingsScreenState = {
     // ボタンセクションを作成
     const buttonSection = this.createButtonSection();
     settingsContainer.appendChild(buttonSection);
+
+    // 右上にセーブボタン（常時）
+    const saveBar = document.createElement('div');
+    Object.assign(saveBar.style, {
+      position: 'sticky', top: '8px', display: 'flex', justifyContent: 'flex-end',
+      padding: '8px 0', margin: '0 16px'
+    });
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = '💾 セーブ';
+    Object.assign(saveBtn.style, {
+      background: 'linear-gradient(135deg, #28a745, #20c997)', color: '#fff',
+      border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer'
+    });
+    saveBtn.onclick = () => {
+      try {
+        saveGameData();
+        publish('playSE', 'decide');
+        this._showSaveToast('セーブしました');
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    saveBar.appendChild(saveBtn);
+    settingsContainer.prepend(saveBar);
     
     uiRoot.appendChild(settingsContainer);
+  },
+
+  _showSaveToast(message) {
+    const toast = document.createElement('div');
+    Object.assign(toast.style, {
+      position: 'fixed', right: '16px', bottom: '16px', zIndex: 100001,
+      background: 'rgba(0,0,0,0.85)', color: '#fff', padding: '10px 14px', borderRadius: '8px',
+      border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+    });
+    toast.textContent = message || '保存しました';
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      if (toast && toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 1200);
   },
 
   /** ゲームモード設定パネルを作成 */

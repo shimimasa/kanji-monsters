@@ -28,13 +28,14 @@ export function loadProfileSummary() {
   const totalCorrect = ps.totalCorrect ?? 0;
   const weaknessHits = ps.weaknessHits ?? 0;
   const healsSuccessful = ps.healsSuccessful ?? 0;
+  const playtimeSeconds = ps.playtimeSeconds ?? 0;
 
   const kanjiDex = loadKanjiDex();
   const monsterDex = loadMonsterDex();
 
   return {
     player: { name, level, exp, next },
-    stats: { enemiesDefeated, bossesDefeated, totalCorrect, weaknessHits, healsSuccessful },
+    stats: { enemiesDefeated, bossesDefeated, totalCorrect, weaknessHits, healsSuccessful, playtimeSeconds },
     collection: {
       kanjiCount: kanjiDex.size,
       masteredCount: getMasteredKanjiCount(),
