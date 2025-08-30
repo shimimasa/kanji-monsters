@@ -48,6 +48,7 @@ export class AudioManager {
         title:   '/assets/audio/bgm_title.mp3',
         battle:  '/assets/audio/bgm_battle.mp3',
         victory: '/assets/audio/bgm_victory.mp3',
+        yomitomo: '/assets/audio/bgm_yomitomo.mp3',
 
         // 地域別BGMを追加
         hokkaido: '/assets/audio/北海道.mp3',

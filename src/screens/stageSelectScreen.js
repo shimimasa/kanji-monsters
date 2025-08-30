@@ -256,7 +256,7 @@ const monsterButton = {
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
-  text: 'モンスター',
+  text: '全国ゴトモン',
   icon: '👾'
 };
 

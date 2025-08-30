@@ -48,19 +48,19 @@ function createCard(monster) {
     return null;  // または未取得用のカードを返す
   }
 
-    // カードクリック時のモーダル表示処理
-    card.addEventListener('click', () => {
-      if (monster.collected) {
-        showMonsterModal(monster);
-        // モンスターを「確認済み」として記録
-        markAsSeen(monster.id);
-        // NEWバッジを削除
-        const newBadge = card.querySelector('.new-badge');
-        if (newBadge) {
-          newBadge.remove();
-        }
-      }
-    });
+      // カードクリック時のモーダル表示処理
+  card.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (monster.collected) {
+      showMonsterModal(monster);
+      // モンスターを「確認済み」として記録
+      markAsSeen(monster.id);
+      // NEWバッジを削除
+      const newBadge = card.querySelector('.new-badge');
+      if (newBadge) newBadge.remove();
+    }
+  });
 
     const img = document.createElement('img');
     const folder = gradeFolderMap[monster.grade] || gradeFolderMap[1];
@@ -96,14 +96,15 @@ function createCard(monster) {
 function showMonsterModal(monster) {
   const modal = document.createElement('div');
   modal.classList.add('monster-modal');
-  
-  const modalContent = document.createElement('div');
-  modalContent.classList.add('modal-content');
-  
-  // 閉じるボタン
-  const closeBtn = document.createElement('button');
-  closeBtn.classList.add('modal-close');
-  closeBtn.textContent = '×';
+  Object.assign(modal.style, {
+    position: 'fixed',
+    left: '0',
+    top: '0',
+    width: '100vw',
+    height: '100vh',
+    zIndex: '100001',
+    pointerEvents: 'auto'
+  });
 
   // 追加: Escで閉じる（登録/解除を忘れない）
   const onEsc = (e) => {

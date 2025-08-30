@@ -65,6 +65,8 @@ const monsterCaptureScreen = {
 
     this._createDOM();
 
+    publish('playBGM', 'yomitomo');
+
   },
 
   _createDOM() {
@@ -94,7 +96,7 @@ const monsterCaptureScreen = {
     });
 
     const header = document.createElement('div');
-    header.textContent = `捕獲フェーズ：最大 ${this.captureLimit} 体選べます（全10候補）`;
+    header.textContent = `ヨミトモにしよう！：最大 ${this.captureLimit} 体選べます（全10候補）`;
     Object.assign(header.style, { fontSize: '20px', fontWeight: '700', marginBottom: '12px' });
 
     const grid = document.createElement('div');
