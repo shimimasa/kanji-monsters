@@ -46,6 +46,9 @@ const titleState = {
     }
     
     this.registerHandlers();
+
+    // 画面右上にセーブボタン
+    this._injectSaveButton();
   },
 
   /** 毎フレーム呼び出し（描画） */
@@ -423,7 +426,7 @@ const titleState = {
     ctx.font = '12px "UDデジタル教科書体", sans-serif';
     ctx.fillStyle = '#8B7355';
     ctx.textAlign = 'center';
-    ctx.fillText('© あなたの名前 2025', cw / 2, ch - 30);
+    ctx.fillText('© 清水 2025', cw / 2, ch - 30);
     ctx.restore();
   },
 
@@ -445,6 +448,46 @@ const titleState = {
   unregisterHandlers() {
     this.canvas.removeEventListener('click', this._clickHandler);
     this.canvas.removeEventListener('touchstart', this._clickHandler);
+  },
+
+  _injectSaveButton() {
+    // 既存があれば削除
+    const id = 'titleSaveButton';
+    const old = document.getElementById(id);
+    if (old) old.remove();
+    const btn = document.createElement('button');
+    btn.id = id;
+    Object.assign(btn.style, {
+      position: 'fixed', right: '16px', top: '16px', zIndex: 100000,
+      background: 'linear-gradient(135deg, #28a745, #20c997)', color: '#fff',
+      border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer'
+    });
+    btn.textContent = '💾 セーブ';
+    btn.onclick = () => {
+      try {
+        // 動的importでgameStateのsaveを呼ぶ
+        import('../core/gameState.js').then(mod => {
+          mod.saveGameData();
+          publish('playSE', 'decide');
+          this._showSaveToast('セーブしました');
+        }).catch(console.error);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    document.body.appendChild(btn);
+  },
+
+  _showSaveToast(message) {
+    const toast = document.createElement('div');
+    Object.assign(toast.style, {
+      position: 'fixed', right: '16px', bottom: '16px', zIndex: 100001,
+      background: 'rgba(0,0,0,0.85)', color: '#fff', padding: '10px 14px', borderRadius: '8px',
+      border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+    });
+    toast.textContent = message || '保存しました';
+    document.body.appendChild(toast);
+    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 1200);
   },
 
   /** プレイヤー名確認と画面遷移の共通処理 */

@@ -136,9 +136,9 @@ const monsterCaptureScreen = {
 
       const badge = document.createElement('div');
       const updateBadge = () => {
-        // ← 変更：捕獲済みは常時「捕獲済み」表示、選択中表示は未捕獲のみ
+        // ← 変更：捕獲済みは常時「ヨミトモ」表示、選択中表示は未捕獲のみ
         const selected = this.selected.has(id);
-        badge.textContent = already ? '捕獲済み' : (selected ? '選択中' : '');
+        badge.textContent = already ? 'ヨミトモ！' : (selected ? '選択中' : '');
         Object.assign(badge.style, {
           marginTop: '4px',
           textAlign: 'center',
@@ -185,7 +185,7 @@ const monsterCaptureScreen = {
     };
 
     const confirmBtn = document.createElement('button');
-    confirmBtn.textContent = '捕獲を確定';
+    confirmBtn.textContent = 'ヨミトモを確定';
     Object.assign(confirmBtn.style, buttonStyle('green'));
     confirmBtn.onclick = () => {
       publish('playSE', 'decide');

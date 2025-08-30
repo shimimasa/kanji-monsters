@@ -118,11 +118,17 @@ const profileScreen = {
     infoCard.style.border = '1px solid #8B4513';
     infoCard.style.padding = '12px';
     infoCard.style.borderRadius = '10px';
+    const playtime = summary.stats.playtimeSeconds || 0;
+    const hh = Math.floor(playtime / 3600);
+    const mm = Math.floor((playtime % 3600) / 60);
+    const ss = Math.floor(playtime % 60);
+    const playtimeStr = `${hh}時間 ${mm}分 ${ss}秒`;
     infoCard.innerHTML = `
       <div><strong>プレイヤー:</strong> ${summary.player.name}</div>
       <div><strong>レベル:</strong> ${summary.player.level}（EXP: ${summary.player.exp}/${summary.player.next}）</div>
       <div><strong>勝利数:</strong> ${summary.stats.enemiesDefeated} / <strong>ボス撃破:</strong> ${summary.stats.bossesDefeated}</div>
       <div><strong>総正解:</strong> ${summary.stats.totalCorrect} / <strong>弱点ヒット:</strong> ${summary.stats.weaknessHits} / <strong>回復成功:</strong> ${summary.stats.healsSuccessful}</div>
+      <div><strong>総プレイ時間:</strong> ${playtimeStr}</div>
     `;
 
     const barsCard = document.createElement('div');

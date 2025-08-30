@@ -103,10 +103,21 @@ function showMonsterModal(monster) {
     width: '100vw',
     height: '100vh',
     zIndex: '100001',
-    pointerEvents: 'auto'
+    pointerEvents: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   });
 
-  // 追加: Escで閉じる（登録/解除を忘れない）
+  const modalContent = document.createElement('div');
+  modalContent.classList.add('modal-content');
+
+  // 閉じるボタン（← これが欠けていた）
+  const closeBtn = document.createElement('button');
+  closeBtn.classList.add('modal-close');
+  closeBtn.textContent = '×';
+
+  // Escで閉じる
   const onEsc = (e) => {
     if (e.key === 'Escape') {
       modal.remove();
@@ -121,15 +132,15 @@ function showMonsterModal(monster) {
     window.removeEventListener('keydown', onEsc);
     publish('playSE', 'cancel');
   };
-  
+
   // モンスター画像
   const img = document.createElement('img');
   const folder = gradeFolderMap[monster.grade] || gradeFolderMap[1];
   img.src = `/assets/images/monsters/thumb/${folder}/${monster.id}.webp`;
   img.alt = monster.name;
   img.classList.add('modal-monster-image');
-  
-  // モンスター情報
+
+  // 情報
   const info = document.createElement('div');
   info.classList.add('monster-info');
   info.innerHTML = `
@@ -141,13 +152,13 @@ function showMonsterModal(monster) {
     <p><strong>豆知識:</strong> ${monster.trivia || '—'}</p>
     <p><strong>決め台詞:</strong> ${monster.catchphrase || '—'}</p>
   `;
-  
+
   modalContent.appendChild(closeBtn);
   modalContent.appendChild(img);
   modalContent.appendChild(info);
   modal.appendChild(modalContent);
-  
-  // モーダル外クリックで閉じる
+
+  // オーバーレイクリックで閉じる
   modal.onclick = (e) => {
     if (e.target === modal) {
       modal.remove();
@@ -155,7 +166,7 @@ function showMonsterModal(monster) {
       publish('playSE', 'cancel');
     }
   };
-  
+
   document.body.appendChild(modal);
   publish('playSE', 'decide');
 }
