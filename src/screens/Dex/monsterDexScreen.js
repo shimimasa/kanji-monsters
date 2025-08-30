@@ -133,11 +133,12 @@ function showMonsterModal(monster) {
   info.classList.add('monster-info');
   info.innerHTML = `
     <h2>${monster.name}</h2>
-    <p><strong>学年:</strong> ${monster.grade}年生</p>
-    <p><strong>地方:</strong> ${regionMap[monster.grade] || '不明'}</p>
-    <p><strong>生息地:</strong> ${monster.prefecture || regionMap[monster.grade] || '不明'}</p>
-    <p><strong>読み:</strong> ${monster.reading || '不明'}</p>
-    <p><strong>意味:</strong> ${monster.meaning || '詳細情報なし'}</p>
+    <p><strong>都道府県:</strong> ${monster.prefecture || '不明'}</p>
+    <p><strong>カテゴリ:</strong> ${monster.category || '不明'}</p>
+    <p><strong>生息地:</strong> ${monster.habitat || '不明'}</p>
+    <p><strong>説明:</strong> ${monster.desc || '—'}</p>
+    <p><strong>豆知識:</strong> ${monster.trivia || '—'}</p>
+    <p><strong>決め台詞:</strong> ${monster.catchphrase || '—'}</p>
   `;
   
   modalContent.appendChild(closeBtn);
