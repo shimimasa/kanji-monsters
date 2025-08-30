@@ -1,6 +1,7 @@
 [
   {
     "id": "HKD-E01",
+    "stageId": "hokkaido_area1",
     "name": "ジャガイモスライム",
     "prefecture": "北海道",
     "level": 1,
@@ -19,6 +20,7 @@
   },
   {
     "id": "HKD-E02",
+    "stageId": "hokkaido_area1",
     "name": "トウモロコシインプ",
     "prefecture": "北海道",
     "level": 1,
@@ -37,6 +39,7 @@
   },
   {
     "id": "HKD-E03",
+    "stageId": "hokkaido_area1",
     "name": "ミルクフェアリー",
     "prefecture": "北海道",
     "level": 1,
@@ -55,6 +58,7 @@
   },
   {
     "id": "HKD-E04",
+    "stageId": "hokkaido_area1",
     "name": "カニクラブ",
     "prefecture": "北海道",
     "level": 1,
@@ -73,6 +77,7 @@
   },
   {
     "id": "HKD-E05",
+    "stageId": "hokkaido_area1",
     "name": "チーズスピリット",
     "prefecture": "北海道",
     "level": 1,
@@ -91,6 +96,7 @@
   },
   {
     "id": "HKD-E06",
+    "stageId": "hokkaido_area1",
     "name": "サケウォリアー",
     "prefecture": "北海道",
     "level": 1,
@@ -109,6 +115,7 @@
   },
   {
     "id": "HKD-E07",
+    "stageId": "hokkaido_area1",
     "name": "ホタテガーディアン",
     "prefecture": "北海道",
     "level": 1,
@@ -127,6 +134,7 @@
   },
   {
     "id": "HKD-E08",
+    "stageId": "hokkaido_area1",
     "name": "ラーメンゴーレム",
     "prefecture": "北海道",
     "level": 1,
@@ -145,6 +153,7 @@
   },
   {
     "id": "HKD-E09",
+    "stageId": "hokkaido_area1",
     "name": "アイヌフクロウ",
     "prefecture": "北海道",
     "level": 1,
@@ -163,6 +172,7 @@
   },
   {
     "id": "HKD-E10",
+    "stageId": "hokkaido_area1",
     "name": "北の守護獣ヒグマロード",
     "prefecture": "北海道",
     "level": 1,

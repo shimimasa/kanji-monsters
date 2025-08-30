@@ -423,7 +423,7 @@ const titleState = {
     ctx.font = '12px "UDデジタル教科書体", sans-serif';
     ctx.fillStyle = '#8B7355';
     ctx.textAlign = 'center';
-    ctx.fillText('© あなたの名前 2025', cw / 2, ch - 30);
+    ctx.fillText('© 清水 2025', cw / 2, ch - 30);
     ctx.restore();
   },
 
