@@ -28,6 +28,7 @@ import proverbMonsterDexState from '../screens/Dex/proverbMonsterDexScreen.js';
 // 追加
 import profileScreen       from '../screens/profileScreen.js';
 import gradeQuizScreen     from '../screens/gradeQuizScreen.js';
+import monsterCaptureScreen from '../screens/monsterCaptureScreen.js';
 // ★★★ 練習バトル画面を追加 ★★★
 import practiceBattleScreen from '../screens/practiceBattleScreen.js';
 
@@ -60,6 +61,7 @@ export async function setupFSM() {
     gradeQuiz:        gradeQuizScreen,
     // 追加
     profile:          profileScreen,
+    monsterCapture:   monsterCaptureScreen,
     // ★★★ 練習バトル画面を追加 ★★★
     practiceBattle:   practiceBattleScreen,
     // 共通バトル画面を追加
@@ -82,6 +84,7 @@ export async function setupFSM() {
                         'worldStageSelect', 'continentSelect', 'courseSelect',
                         // 追加
                         'profile',
+                        'monsterCapture',
                         // ★★★ 練習バトル画面を安全リストに追加 ★★★
                         'practiceBattle'];
     

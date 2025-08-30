@@ -1,7 +1,7 @@
 [
   {
     "id": "HKD-E01",
-    "name": "夕張メロン",
+    "name": "ジャガイモスライム",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -10,11 +10,16 @@
     "image": "HKD-E01.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "畑",
+    "desc": "丸いジャガイモの体を持つ小さなスライム。芽がツノのように伸び、土の中を転がって移動する。",
+    "trivia": "「馬鈴薯（ばれいしょ）」という漢字もある。でんぷんは理科でも大事な栄養素。",
+    "catchphrase": "「ころころ転がる土の精霊！」"
   },
   {
     "id": "HKD-E02",
-    "name": "ジンギスカン",
+    "name": "トウモロコシインプ",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -23,11 +28,16 @@
     "image": "HKD-E02.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "とうもろこし畑",
+    "desc": "黄金色の粒をマントのようにまとった小悪魔。粒を飛ばして攻撃する。",
+    "trivia": "「玉蜀黍（とうもろこし）」という難しい漢字がある。光合成で大きく育つ。",
+    "catchphrase": "「きらきら粒を投げる畑のいたずらっ子！」"
   },
   {
     "id": "HKD-E03",
-    "name": "毛ガニ",
+    "name": "ミルクフェアリー",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -36,11 +46,16 @@
     "image": "HKD-E03.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "牧場",
+    "desc": "牛乳のしずくから生まれた半透明の妖精。不思議な光を放つ。",
+    "trivia": "牛乳は「乳（ちち）」の字を使う。カルシウムは理科でも大事。",
+    "catchphrase": "「白いしずくの神秘の妖精！」"
   },
   {
     "id": "HKD-E04",
-    "name": "ラベンダー",
+    "name": "カニクラブ",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -49,11 +64,16 @@
     "image": "HKD-E04.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "オホーツクの海辺",
+    "desc": "赤い殻を持つカニ戦士。ハサミをふりあげて威嚇する。",
+    "trivia": "「蟹（かに）」という漢字もある。カニは理科でも学ぶ。",
+    "catchphrase": "「チョキチョキ守る浜辺の戦士！」"
   },
   {
     "id": "HKD-E05",
-    "name": "まりも",
+    "name": "チーズスピリット",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -62,11 +82,16 @@
     "image": "HKD-E05.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "酪農地帯",
+    "desc": "とろけるチーズの精霊。糸を引く姿が少し不気味。",
+    "trivia": "チーズは発酵食品。微生物の働きが理科につながる。",
+    "catchphrase": "「のび～る不思議な乳の精！」"
   },
   {
     "id": "HKD-E06",
-    "name": "トウモロコシ",
+    "name": "サケウォリアー",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -75,11 +100,16 @@
     "image": "HKD-E06.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "川の上流",
+    "desc": "鮭が二足歩行になった戦士。背びれを立てて勇敢に戦う。",
+    "trivia": "「鮭（さけ）」は秋の魚。産卵のために川をのぼる。",
+    "catchphrase": "「勇気を背負う赤い川戦士！」"
   },
   {
     "id": "HKD-E07",
-    "name": "バター",
+    "name": "ホタテガーディアン",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -88,11 +118,16 @@
     "image": "HKD-E07.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "陸奥湾",
+    "desc": "巨大なホタテ貝を盾に持つ守護者。殻の中に光る目がある。",
+    "trivia": "「帆立貝（ほたてがい）」は貝殻が帆の形に見えるから。二枚貝は理科で学ぶ。",
+    "catchphrase": "「海の盾を守る静かな番人！」"
   },
   {
     "id": "HKD-E08",
-    "name": "スープカレー",
+    "name": "ラーメンゴーレム",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -101,11 +136,16 @@
     "image": "HKD-E08.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "札幌の街",
+    "desc": "丼から生まれた熱々のゴーレム。麺や具材が体を覆う。",
+    "trivia": "「拉麺（ラーメン）」の字は中国から。「ラーメン（らーめん）」は「麺（めん）」と「湯（ゆ）」の合成語。",
+    "catchphrase": "「あつあつ湯気のどんぶり戦士！」"
   },
   {
     "id": "HKD-E09",
-    "name": "ハスカップ",
+    "name": "アイヌフクロウ",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 15,
@@ -114,11 +154,16 @@
     "image": "HKD-E09.webp",
     "isBoss": false,
     "exp": 10,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "文化",
+    "habitat": "阿寒湖",
+    "desc": "シマフクロウがアイヌ文様をまとった神秘の怪鳥。翼を広げると夜空に光の模様を描き、霊力で敵を退ける。",
+    "trivia": "シマフクロウはアイヌ文化で「コタンコロカムイ（村を守る神）」と呼ばれ、神聖視されてきた存在。",
+    "catchphrase": "「夜空に舞う、文様の守護神！」"
   },
   {
     "id": "HKD-E10",
-    "name": "ししゃも",
+    "name": "北の守護獣ヒグマロード",
     "prefecture": "北海道",
     "level": 1,
     "maxHp": 23,
@@ -128,12 +173,17 @@
     "isBoss": true,
     "shieldHp": 3,
     "exp": 20,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説",
+    "habitat": "北海道全域",
+    "desc": "伝説のヒグマ。黒い毛並みに雪模様、吹雪のオーラをまとう。",
+    "trivia": "冬眠や生態は理科でも学ぶ。北海道を象徴する動物。",
+    "catchphrase": "「吹雪を従える北の覇者！」"
   },
   {
     "id": "AOM-E01",
     "stageId": "tohoku_area1",
-    "name": "りんご",
+    "name": "リンゴチャイルド",
     "prefecture": "青森",
     "grade": 2,
     "level": 2,
@@ -143,12 +193,17 @@
     "image": "AOM-E01.webp",
     "isBoss": false,
     "exp": 14,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "リンゴ畑",
+    "desc": "赤いリンゴの子ども精霊。葉っぱの帽子をかぶり、果汁の光で遊ぶ。",
+    "trivia": "「林檎（りんご）」の漢字は難しい部首を含む。青森は日本一のりんご生産地。",
+    "catchphrase": "「果汁きらめく畑のいたずらっ子！」"
   },
   {
     "id": "AOM-E02",
     "stageId": "tohoku_area1",
-    "name": "大間のマグロ",
+    "name": "ホタテシェルウォーカー",
     "prefecture": "青森",
     "grade": 2,
     "level": 2,
@@ -158,12 +213,17 @@
     "image": "AOM-E02.webp",
     "isBoss": false,
     "exp": 14,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "陸奥湾",
+    "desc": "殻を背負って歩く怪物。影の奥で赤い目が光る。",
+    "trivia": "「帆立貝（ほたてがい）」は帆のような形から来た名前。二枚貝の仕組みは理科で学ぶ。",
+    "catchphrase": "「貝殻の盾を背負う沈黙の戦士！」"
   },
   {
     "id": "AOM-E03",
     "stageId": "tohoku_area1",
-    "name": "にんにく",
+    "name": "ハナドール",
     "prefecture": "青森",
     "grade": 2,
     "level": 2,
@@ -173,12 +233,17 @@
     "image": "AOM-E03.webp",
     "isBoss": false,
     "exp": 14,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "リンゴの花畑",
+    "desc": "白い花びらをまとう精霊人形。甘い香りで癒やす。",
+    "trivia": "花が咲いて受粉→実になるのは理科で重要。",
+    "catchphrase": "「花びらひらひら春の舞姫！」"
   },
   {
     "id": "AOM-E04",
     "stageId": "tohoku_area1",
-    "name": "ねぶた山車",
+    "name": "ツガルスノービースト",
     "prefecture": "青森",
     "grade": 2,
     "level": 2,
@@ -188,12 +253,17 @@
     "image": "AOM-E04.webp",
     "isBoss": false,
     "exp": 14,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "津軽の雪原",
+    "desc": "冷気をまとった黒い小獣。雪嵐の中で赤い瞳が光る。",
+    "trivia": "青森は豪雪地帯。雪の結晶は六角形になる。",
+    "catchphrase": "「吹雪を従える北の覇者！」"
   },
   {
     "id": "AOM-E05",
     "stageId": "tohoku_area1",
-    "name": "津軽塗",
+    "name": "ユキクリスタル",
     "prefecture": "青森",
     "grade": 2,
     "level": 2,
@@ -203,12 +273,17 @@
     "image": "AOM-E05.webp",
     "isBoss": false,
     "exp": 14,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "冬の青森一帯",
+    "desc": "雪の結晶が集まった透明な水晶。光を反射して輝く。",
+    "trivia": "「雪」は「雨＋彗」の組み合わせ。結晶の形は理科で観察できる。",
+    "catchphrase": "「雪の結晶が集まった透明な水晶！」"
   },
   {
     "id": "AOM-E06",
     "stageId": "tohoku_area1",
-    "name": "貝焼き味噌",
+    "name": "ネブタダンサー",
     "prefecture": "青森",
     "grade": 2,
     "level": 2,
@@ -218,12 +293,17 @@
     "image": "AOM-E06.webp",
     "isBoss": false,
     "exp": 14,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "文化",
+    "habitat": "ねぶた祭会場",
+    "desc": "提灯がモンスター化。光を放ちながらリズミカルに跳ねる。",
+    "trivia": "ねぶた祭の掛け声は「ラッセラー！」。漢字「祭」は神事から来た。",
+    "catchphrase": "「灯りと声で舞うお祭りスピリット！」"
   },
   {
     "id": "AOM-E07",
     "stageId": "tohoku_area1",
-    "name": "しじみ",
+    "name": "シャミセンシャーマン",
     "prefecture": "青森",
     "grade": 2,
     "level": 2,
@@ -233,12 +313,17 @@
     "image": "AOM-E07.webp",
     "isBoss": false,
     "exp": 14,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "芸能",
+    "habitat": "津軽地方",
+    "desc": "津軽三味線を体に宿す精霊。音色で相手を惑わせる。",
+    "trivia": "津軽三味線は青森の伝統楽器。音色は理科で学ぶ。",
+    "catchphrase": "「津軽三味線の音色で相手を惑わせる！」"
   },
   {
     "id": "AOM-E08",
     "stageId": "tohoku_area1",
-    "name": "ヒバ",
+    "name": "ヒバトーテム",
     "prefecture": "青森",
     "grade": 2,
     "level": 2,
@@ -248,12 +333,17 @@
     "image": "AOM-E08.webp",
     "isBoss": false,
     "exp": 14,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "青森ヒバの森",
+    "desc": "木彫りの小さな守護者。葉っぱの冠をかぶり、やさしく微笑む。",
+    "trivia": "青森ヒバは抗菌作用のある針葉樹。木材加工は社会科でも出てくる。",
+    "catchphrase": "「森を清める木の守護精！」"
   },
   {
     "id": "AOM-E09",
     "stageId": "tohoku_area1",
-    "name": "せんべい汁",
+    "name": "ジョウモンドール",
     "prefecture": "青森",
     "grade": 2,
     "level": 2,
@@ -263,12 +353,17 @@
     "image": "AOM-E09.webp",
     "isBoss": false,
     "exp": 14,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史文化",
+    "habitat": "三内丸山遺跡",
+    "desc": "縄文土偶が動き出した姿。瞳は空洞で不気味な雰囲気。",
+    "trivia": "縄文土偶は豊穣や祈りの象徴。縄文文化は社会科で学ぶ。",
+    "catchphrase": "「古代の祈りを背負う遺跡の歩行者！」"
   },
   {
     "id": "AOM-E10",
     "stageId": "tohoku_area1",
-    "name": "馬肉",
+    "name": "恐山ファントムドラゴン",
     "prefecture": "青森",
     "grade": 2,
     "level": 2,
@@ -279,12 +374,17 @@
     "isBoss": true,
     "shieldHp": 3,
     "exp": 28,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝説",
+    "habitat": "恐山",
+    "desc": "黒煙と雪嵐をまとった龍。霊的なオーラを放つ。",
+    "trivia": "恐山は火山活動でできた山。霊場として信仰の対象にもなった。",
+    "catchphrase": "「霊山に眠る黒き龍王！」"
   },
   {
     "id": "IWT-E01",
     "stageId": "tohoku_area2",
-    "name": "わんこそば",
+    "name": "わんこもちチャイルド",
     "prefecture": "岩手",
     "grade": 2,
     "level": 3,
@@ -294,12 +394,17 @@
     "image": "IWT-E01.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "盛岡の食文化エリア",
+    "desc": "小さな餅の精霊。ぴょんぴょん跳ねながら、ころころと転がって人々を楽しませる。",
+    "trivia": "わんこそば文化とともに、米を蒸してつくる餅は加熱反応（理科）の代表例。",
+    "catchphrase": "「ころころ元気！もちもちスマイル！」"
   },
   {
     "id": "IWT-E02",
     "stageId": "tohoku_area2",
-    "name": "南部鉄器",
+    "name": "カッパリバー",
     "prefecture": "岩手",
     "grade": 2,
     "level": 3,
@@ -309,12 +414,17 @@
     "image": "IWT-E02.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝承",
+    "habitat": "北上川・河川沿い",
+    "desc": "皿を頭に持つ水辺の怪物。水中に潜んで赤い目を光らせ、静かに獲物を狙う。",
+    "trivia": "河童伝承は全国に広がる民話。生態的には水辺の生物（理科）の知識と結びつく。",
+    "catchphrase": "「水面に潜む、赤きまなざし！」"
   },
   {
     "id": "IWT-E03",
     "stageId": "tohoku_area2",
-    "name": "まえざわぎゅう",
+    "name": "南部せんべいフェアリー",
     "prefecture": "岩手",
     "grade": 2,
     "level": 3,
@@ -324,12 +434,17 @@
     "image": "IWT-E03.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "南部地方",
+    "desc": "南部せんべいを盾に持つ小さな妖精。香ばしい匂いをまとって舞い踊る。",
+    "trivia": "南部せんべいは小麦粉を焼成して作られる。これは理科で学ぶ加熱反応。",
+    "catchphrase": "「パリッと守る！香ばしき盾！」"
   },
   {
     "id": "IWT-E04",
     "stageId": "tohoku_area2",
-    "name": "龍泉洞のみず",
+    "name": "岩手ウマビースト",
     "prefecture": "岩手",
     "grade": 2,
     "level": 3,
@@ -339,12 +454,17 @@
     "image": "IWT-E04.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "動物文化",
+    "habitat": "岩手の雪原",
+    "desc": "南部馬を思わせる小獣。雪原を駆け抜け、赤い目が闇に光る。",
+    "trivia": "南部馬は寒冷地に適応した日本在来馬。哺乳類の体の特徴も学べる。",
+    "catchphrase": "「雪原を駆け抜ける、赤きまなざし！」"
   },
   {
     "id": "IWT-E05",
     "stageId": "tohoku_area2",
-    "name": "盛岡冷麵",
+    "name": "りんどうスピリット",
     "prefecture": "岩手",
     "grade": 2,
     "level": 3,
@@ -354,12 +474,17 @@
     "image": "IWT-E05.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "植物",
+    "habitat": "岩手の山地",
+    "desc": "青紫の花をまとう小さな精霊。風に揺れて人々を癒やす。",
+    "trivia": "りんどうは岩手県の県花。植物の受粉の仕組みを理解するきっかけにもなる。",
+    "catchphrase": "「風に揺れる青の癒し！」"
   },
   {
     "id": "IWT-E06",
     "stageId": "tohoku_area2",
-    "name": "南部せんべい",
+    "name": "チャグチャグホース",
     "prefecture": "岩手",
     "grade": 2,
     "level": 3,
@@ -369,12 +494,17 @@
     "image": "IWT-E06.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "祭り",
+    "habitat": "滝沢市・盛岡近郊",
+    "desc": "鈴をつけた馬の精霊。祭りの音色に合わせて軽やかに跳ねる。",
+    "trivia": "チャグチャグ馬コ祭りは岩手の伝統行事で、農耕馬を敬う文化。",
+    "catchphrase": "「鈴の音ひびく、祭りの精霊！」"
   },
   {
     "id": "IWT-E07",
     "stageId": "tohoku_area2",
-    "name": "岩手短角牛",
+    "name": "南部鉄ファントム",
     "prefecture": "岩手",
     "grade": 2,
     "level": 3,
@@ -384,12 +514,17 @@
     "image": "IWT-E07.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸文化",
+    "habitat": "盛岡の工房周辺",
+    "desc": "南部鉄器が怪物化。硬質な鎧のような体に赤い目が光り、不気味に動き出す。",
+    "trivia": "鉄器は金属の加工によって作られる。理科では鉄の性質や分類を学ぶ。",
+    "catchphrase": "「重厚なる鉄の影！」"
   },
   {
     "id": "IWT-E08",
     "stageId": "tohoku_area2",
-    "name": "ひっつみ",
+    "name": "わら細工トーテム",
     "prefecture": "岩手",
     "grade": 2,
     "level": 3,
@@ -399,12 +534,17 @@
     "image": "IWT-E08.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "農村文化",
+    "habitat": "農村・田んぼ周辺",
+    "desc": "稲わらで作られた守り人形が精霊化。素朴な笑顔で農村を守る。",
+    "trivia": "稲わらは植物繊維として利用され、縄や人形に加工されてきた。",
+    "catchphrase": "「素朴な笑顔の農村の守り神！」"
   },
   {
     "id": "IWT-E09",
     "stageId": "tohoku_area2",
-    "name": "山ぶどう",
+    "name": "座敷わらしシャドー",
     "prefecture": "岩手",
     "grade": 2,
     "level": 3,
@@ -414,12 +554,17 @@
     "image": "IWT-E09.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝承",
+    "habitat": "古民家",
+    "desc": "古い家に現れる子どもの精霊。赤い目を光らせ、影の中で遊ぶ。",
+    "trivia": "座敷わらしは岩手を代表する民俗伝承で、幸福をもたらす存在とも言われる。",
+    "catchphrase": "「赤い瞳で見守る、家の精霊！」"
   },
   {
     "id": "IWT-E10",
     "stageId": "tohoku_area2",
-    "name": "あわび",
+    "name": "早池峰ドラゴンロード",
     "prefecture": "岩手",
     "grade": 2,
     "level": 3,
@@ -430,12 +575,17 @@
     "isBoss": true,
     "shieldHp": 3,
     "exp": 38,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "早池峰山",
+    "desc": "早池峰山の力を宿した竜。岩のような体に山の霊気をまとい、静かに山中を徘徊する。",
+    "trivia": "早池峰山は山岳信仰の対象であり、岩石の性質（理科）と結びつけて学べる。",
+    "catchphrase": "「山の霊気をまとう、岩の守護竜！」"
   },
   {
     "id": "AKT-E01",
     "stageId": "tohoku_area3",
-    "name": "きりたんぽ",
+    "name": "きりたんぽチャイルド",
     "prefecture": "秋田",
     "grade": 2,
     "level": 3,
@@ -445,12 +595,17 @@
     "image": "AKT-E01.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "秋田の郷土料理の里",
+    "desc": "きりたんぽ串が精霊化。香ばしい香りをまとってぴょんぴょん跳ねる。",
+    "trivia": "餅（もち）は米を加工した食文化の象徴。",
+    "catchphrase": "「香ばしく跳ねる米の精！」"
   },
   {
     "id": "AKT-E02",
     "stageId": "tohoku_area3",
-    "name": "なまはげ",
+    "name": "ハタハタゴーストフィッシュ",
     "prefecture": "秋田",
     "grade": 2,
     "level": 3,
@@ -460,12 +615,17 @@
     "image": "AKT-E02.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "日本海沿岸",
+    "desc": "発光する魚の怪物。体は半透明で赤い目が光る。",
+    "trivia": "ハタハタは秋田の冬の魚。発光は生物学のテーマ。",
+    "catchphrase": "「光る海の亡霊フィッシュ！」"
   },
   {
     "id": "AKT-E03",
     "stageId": "tohoku_area3",
-    "name": "ハタハタ",
+    "name": "比内チキンフェアリー",
     "prefecture": "秋田",
     "grade": 2,
     "level": 3,
@@ -475,12 +635,17 @@
     "image": "AKT-E03.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "農村地帯",
+    "desc": "比内地鶏の小さな妖精。羽ばたいて跳ね回る。",
+    "trivia": "比内地鶏は高級品種。鶏は「家禽」と呼ばれる。",
+    "catchphrase": "「元気に羽ばたく地鶏の妖精！」"
   },
   {
     "id": "AKT-E04",
     "stageId": "tohoku_area3",
-    "name": "比内地鶏",
+    "name": "なまはげパピービースト",
     "prefecture": "秋田",
     "grade": 2,
     "level": 3,
@@ -490,12 +655,17 @@
     "image": "AKT-E04.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "民俗",
+    "habitat": "男鹿半島",
+    "desc": "子犬が鬼の面をかぶった姿。牙をのぞかせ雪原を駆ける。",
+    "trivia": "なまはげは民俗行事。「鬼」の字は国語でも大事。",
+    "catchphrase": "「小さな牙を持つ雪原の番犬！」"
   },
   {
     "id": "AKT-E05",
     "stageId": "tohoku_area3",
-    "name": "ババヘラアイス",
+    "name": "秋田スイカスピリット",
     "prefecture": "秋田",
     "grade": 2,
     "level": 3,
@@ -505,12 +675,17 @@
     "image": "AKT-E05.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "農園",
+    "desc": "スイカの果実精霊。丸い体に緑の縞模様。",
+    "trivia": "果実の成長は理科のテーマ。秋田の夏の名産。",
+    "catchphrase": "「さわやかに弾ける夏の精！」"
   },
   {
     "id": "AKT-E06",
     "stageId": "tohoku_area3",
-    "name": "じゅんさい",
+    "name": "なまはげガーディアン",
     "prefecture": "秋田",
     "grade": 2,
     "level": 3,
@@ -520,12 +695,17 @@
     "image": "AKT-E06.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "民俗",
+    "habitat": "祭りの夜",
+    "desc": "鬼の面をかぶった姿。霊気をまとい、迫力ある姿。",
+    "trivia": "なまはげ行事は国の重要無形民俗文化財。",
+    "catchphrase": "「お祭りの夜に出現する鬼の精霊！」"
   },
   {
     "id": "AKT-E07",
     "stageId": "tohoku_area3",
-    "name": "稲庭うどん",
+    "name": "犬っこスノーゴーレム",
     "prefecture": "秋田",
     "grade": 2,
     "level": 3,
@@ -535,12 +715,17 @@
     "image": "AKT-E07.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "文化",
+    "habitat": "犬っこ祭り",
+    "desc": "雪の犬像が精霊化。にこやかな表情で守護する。",
+    "trivia": "犬っこ祭りは秋田の伝統行事。雪の結晶は理科で学ぶ六角形。",
+    "catchphrase": "「やさしく見守る雪のわんこ！」"
   },
   {
     "id": "AKT-E08",
     "stageId": "tohoku_area3",
-    "name": "ハタハタ寿司",
+    "name": "秋田杉トーテム",
     "prefecture": "秋田",
     "grade": 2,
     "level": 3,
@@ -550,12 +735,17 @@
     "image": "AKT-E08.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "秋田杉の森",
+    "desc": "巨大な木像が動き出す。木目が光り、霊気を放つ。",
+    "trivia": "秋田杉は日本三大美林の一つ。針葉樹の構造を理科で学べる。",
+    "catchphrase": "「森を守る光る木像！」"
   },
   {
     "id": "AKT-E09",
     "stageId": "tohoku_area3",
-    "name": "秋田犬",
+    "name": "曲げわっぱファントム",
     "prefecture": "秋田",
     "grade": 2,
     "level": 3,
@@ -565,13 +755,18 @@
     "image": "AKT-E09.webp",
     "isBoss": false,
     "exp": 19,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸",
+    "habitat": "大館",
+    "desc": "木製の曲げわっぱから黒い影が漏れる。中に赤い光が揺らめく。",
+    "trivia": "曲げわっぱは秋田の伝統工芸。木材加工は社会と理科の両面で学べる。",
+    "catchphrase": "「器の奥から影がにじむ！」"
   },
   {
     "id": "AKT-E10",
     "stageId": "tohoku_area3",
-    "name": "比内地鶏の卵",
-    "prefecture": "秋田",
+    "name": "鳥海マグマドラゴン",
+    "prefecture": "秋田", 
     "grade": 2,
     "level": 3,
     "maxHp": 75,
@@ -581,12 +776,17 @@
     "isBoss": true,
     "shieldHp": 3,
     "exp": 38,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝説",
+    "habitat": "鳥海山",
+    "desc": "火山の力を宿す龍。体は岩石ででき、隙間からマグマが光る。",
+    "trivia": "鳥海山は火山。理科で学ぶ火山の活動を示す。",
+    "catchphrase": "「マグマを背負う炎の守護竜！」"
   },
   {
     "id": "MYG-E01",
     "stageId": "tohoku_area4",
-    "name": "仙台牛",
+    "name": "ずんだスピリット",
     "prefecture": "宮城",
     "grade": 2,
     "level": 4,
@@ -596,12 +796,17 @@
     "image": "MYG-E01.webp",
     "isBoss": false,
     "exp": 25,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "仙台平野",
+    "desc": "枝豆をすりつぶした姿の小精霊。緑色の丸い体で、にこにこと笑いながら跳ね回る。ずんだ餅の香りを漂わせ、人々に元気を与える。",
+    "trivia": "ずんだ餅は仙台の名産。枝豆は「豆」と呼ばれる。",
+    "catchphrase": "「豆をすりつぶした、ずんだスピリット！」"
   },
   {
     "id": "MYG-E02",
     "stageId": "tohoku_area4",
-    "name": "笹かまぼこ",
+    "name": "サメソウルフィン",
     "prefecture": "宮城",
     "grade": 2,
     "level": 4,
@@ -611,12 +816,17 @@
     "image": "MYG-E02.webp",
     "isBoss": false,
     "exp": 25,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海洋生物",
+    "habitat": "三陸沖",
+    "desc": "サメの魂が背びれだけ浮かんで現れる怪異。赤い目が光り海を切り裂く。",
+    "trivia": "三陸沖はフカヒレの産地としても知られている。",
+    "catchphrase": "「背びれひとつで海を支配する影！」" 
   },
   {
     "id": "MYG-E03",
     "stageId": "tohoku_area4",
-    "name": "牛タン",
+    "name": "仙台ギュードール",
     "prefecture": "宮城",
     "grade": 2,
     "level": 4,
@@ -626,12 +836,17 @@
     "image": "MYG-E03.webp",
     "isBoss": false,
     "exp": 25,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "仙台平野",
+    "desc": "仙台牛をモチーフにした精霊人形。額に星形の模様が輝き、穏やかに草原を歩く。",
+    "trivia": "仙台牛は日本三大和牛に並ぶ高級ブランド。",
+    "catchphrase": "「やわらか笑顔！星模様の牛精霊！」"
   },
   {
     "id": "MYG-E04",
     "stageId": "tohoku_area4",
-    "name": "ずんだ餅",
+    "name": "ホヤノイド",
     "prefecture": "宮城",
     "grade": 2,
     "level": 4,
@@ -641,12 +856,17 @@
     "image": "MYG-E04.webp",
     "isBoss": false,
     "exp": 25,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "海洋生物",
+    "habitat": "三陸沖",
+    "desc": "ホヤが二足歩行化したモンスター。オレンジ色の体から泡を吹き、不気味に歩く。",
+    "trivia": "ホヤは「海のパイナップル」と呼ばれる珍味。",
+    "catchphrase": "「潮の香りをまとい歩く、海の奇妙な影！」"
   },
   {
     "id": "MYG-E05",
     "stageId": "tohoku_area4",
-    "name": "伊達政宗",
+    "name": "笹かまバード",
     "prefecture": "宮城",
     "grade": 2,
     "level": 4,
@@ -656,12 +876,17 @@
     "image": "MYG-E05.webp",
     "isBoss": false,
     "exp": 25,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "仙台港・市場周辺",
+    "desc": "笹かまぼこに羽が生えた小鳥。香ばしい香りを漂わせながら飛び回る。",
+    "trivia": "笹かまぼこは仙台の名産。小鳥は「バード」と呼ばれる。",
+    "catchphrase": "「ふんわり香ばしい！空飛ぶごちそうバード！」"
   },
   {
     "id": "MYG-E06",
     "stageId": "tohoku_area4",
-    "name": "はらこ飯",
+    "name": "七夕スターリウム",
     "prefecture": "宮城",
     "grade": 2,
     "level": 4,
@@ -671,12 +896,17 @@
     "image": "MYG-E06.webp",
     "isBoss": false,
     "exp": 25,
-    "weakness": "kunyomi"
+    "weakness": "onyomi",
+    "category": "祭り",
+    "habitat": "仙台七夕まつり",
+    "desc": "七夕飾りが星の精霊化。短冊をまとい星屑を振りまく。",
+    "trivia": "仙台七夕は日本三大七夕の一つ。",
+    "catchphrase": "「七夕の星屑をまとう、七夕の精霊！」"
   },
   {
     "id": "MYG-E07",
     "stageId": "tohoku_area4",
-    "name": "三陸ワカメ",
+    "name": "伊達アーマーロード",
     "prefecture": "宮城",
     "grade": 2,
     "level": 4,
@@ -686,12 +916,17 @@
     "image": "MYG-E07.webp",
     "isBoss": false,
     "exp": 25,
-    "weakness": "onyomi"
+    "weakness": "kunyomi",
+    "category": "歴史",
+    "habitat": "仙台城跡",
+    "desc": "伊達政宗の兜を模した黒甲冑の騎士。赤い瞳を光らせる。",
+    "trivia": "伊達政宗の三日月前立て兜は仙台の象徴。",
+    "catchphrase": "「三日月の刃、伊達の魂を受け継ぐ者！」"
   },
   {
     "id": "MYG-E08",
     "stageId": "tohoku_area4",
-    "name": "ホヤ",
+    "name": "こけしポルター",
     "prefecture": "宮城",
     "grade": 2,
     "level": 4,
@@ -701,12 +936,17 @@
     "image": "MYG-E08.webp",
     "isBoss": false,
     "exp": 25,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸文化",
+    "habitat": "鳴子温泉",
+    "desc": "鳴子こけしが精霊化。赤い模様を揺らして踊るように動く。",
+    "trivia": "鳴子温泉郷は日本有数のこけし産地。",
+    "catchphrase": "「こけしの精霊が踊る！」"
   },
   {
     "id": "MYG-E09",
     "stageId": "tohoku_area4",
-    "name": "竹炭",
+    "name": "能面シャドウリーパー",
     "prefecture": "宮城",
     "grade": 2,
     "level": 4,
@@ -716,27 +956,37 @@
     "image": "MYG-E09.webp",
     "isBoss": false,
     "exp": 25,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝統芸能",
+    "habitat": "能舞台跡",
+    "desc": "能面が闇に浮かんで舞う怪異。瞳が赤く光り影が揺れる。",
+    "trivia": "能はユネスコ無形文化遺産にも登録されている。",
+    "catchphrase": "「静けさの中に潜む恐怖！」"
   },
   {
     "id": "MYG-E10",
     "stageId": "tohoku_area4",
-    "name": "仙台味噌",
+    "name": "松島シーサーペント",
     "prefecture": "宮城",
     "grade": 2,
-    "level": 4,
-    "maxHp": 98,
-    "atk": 15,
+    "level": 5,
+    "maxHp": 100,
+    "atk": 20,
     "thumb": "MYG-E10_thumb",
     "image": "MYG-E10.webp",
     "isBoss": true,
     "exp": 50,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝説",
+    "habitat": "松島湾",
+    "desc": "海の中に浮かぶ巨大なサーペント。赤い鱗が光り、波を切り裂く。",
+    "trivia": "松島は日本三景の一つ。",
+    "catchphrase": "「松と海を背負う守護竜！」"
   },
   {
     "id": "YMG-E01",
     "stageId": "tohoku_area5",
-    "name": "さくらんぼ",
+    "name": "さくらんぼツインズ",
     "prefecture": "山形",
     "grade": 2,
     "level": 5,
@@ -746,12 +996,17 @@
     "image": "YMG-E01.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "さくらんぼ畑",
+    "desc": "双子のさくらんぼ精霊。手をつなぎぴょんぴょん跳ねる。",
+    "trivia": "山形はさくらんぼ生産量日本一。双子は「ツインズ」と呼ばれる。",
+    "catchphrase": "「ふたつでひとつ！元気の果実！」"
   },
   {
     "id": "YMG-E02",
     "stageId": "tohoku_area5",
-    "name": "米沢牛",
+    "name": "だだちゃビーンシャドー",
     "prefecture": "山形",
     "grade": 2,
     "level": 5,
@@ -761,12 +1016,17 @@
     "image": "YMG-E02.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "農業",
+    "habitat": "庄内平野",
+    "desc": "だだちゃ豆が影の精霊に。赤い光が漂い不気味。",
+    "trivia": "だだちゃ豆は庄内地方の伝統枝豆。",
+    "catchphrase": "「畑の影から忍び寄る豆の精！」"
   },
   {
     "id": "YMG-E03",
     "stageId": "tohoku_area5",
-    "name": "玉こんにゃく",
+    "name": "ラ・フランスフェアリー",
     "prefecture": "山形",
     "grade": 2,
     "level": 5,
@@ -776,12 +1036,17 @@
     "image": "YMG-E03.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "果樹園",
+    "desc": "洋梨の精霊。黄緑の体に羽を持ち、甘い香りを漂わせる",
+    "trivia": "山形はラ・フランスの生産量も全国トップ。",
+    "catchphrase": "「ふんわり香る癒やしの妖精！」"
   },
   {
     "id": "YMG-E04",
     "stageId": "tohoku_area5",
-    "name": "ラ・フランス",
+    "name": "サクランボウルダー",
     "prefecture": "山形",
     "grade": 2,
     "level": 5,
@@ -791,12 +1056,17 @@
     "image": "YMG-E04.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "山地",
+    "desc": "固い果実の岩玉モンスター。転がって攻撃する。",
+    "trivia": "果実の種子は非常に硬い保護構造を持つ。",
+    "catchphrase": "「転がる赤い破壊球！」"
   },
   {
     "id": "YMG-E05",
     "stageId": "tohoku_area5",
-    "name": "将棋の駒",
+    "name": "芋煮チャイルド",
     "prefecture": "山形",
     "grade": 2,
     "level": 5,
@@ -806,12 +1076,17 @@
     "image": "YMG-E05.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "川原の芋煮会",
+    "desc": "芋煮鍋から生まれた精霊。湯気でふわふわ漂う。",
+    "trivia": "山形の秋は芋煮会が定番行事。",
+    "catchphrase": "「ふわっと湯気からこんにちは！」"
   },
   {
     "id": "YMG-E06",
     "stageId": "tohoku_area5",
-    "name": "だし",
+    "name": "花笠ダンサーズ",
     "prefecture": "山形",
     "grade": 2,
     "level": 5,
@@ -821,12 +1096,17 @@
     "image": "YMG-E06.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "祭り",
+    "habitat": "花笠祭り",
+    "desc": "花笠を回転させながら舞う精霊。笑顔が可愛い。",
+    "trivia": "山形花笠まつりは東北四大祭りの一つ。",
+    "catchphrase": "「踊れ、回れ！花笠の華精！」"
   },
   {
     "id": "YMG-E07",
     "stageId": "tohoku_area5",
-    "name": "米沢ラーメン",
+    "name": "紅花シャーマン",
     "prefecture": "山形",
     "grade": 2,
     "level": 5,
@@ -836,12 +1116,17 @@
     "image": "YMG-E07.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝統工芸",
+    "habitat": "紅花畑",
+    "desc": "紅花の染料をまとった術師。赤い花びらを散らす。",
+    "trivia": "紅花染めは山形の伝統工芸。",
+    "catchphrase": "「赤き花弁、呪術のごとく舞う！」"
   },
   {
     "id": "YMG-E08",
     "stageId": "tohoku_area5",
-    "name": "紅花",
+    "name": "将棋ピースゴーレム",
     "prefecture": "山形",
     "grade": 2,
     "level": 5,
@@ -851,12 +1136,17 @@
     "image": "YMG-E08.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸文化",
+    "habitat": "天童市",
+    "desc": "将棋駒が組み合わさった小ゴーレム。跳ねて戦う。",
+    "trivia": "天童は将棋駒の生産量日本一。",
+    "catchphrase": "「跳ねて進め！かわいい将棋魂！」"
   },
   {
     "id": "YMG-E09",
     "stageId": "tohoku_area5",
-    "name": "冷やしラーメン",
+    "name": "西蔵王ヤマガミ",
     "prefecture": "山形",
     "grade": 2,
     "level": 5,
@@ -866,12 +1156,17 @@
     "image": "YMG-E09.webp",
     "isBoss": true,
     "exp": 31,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "蔵王連峰",
+    "desc": "雪と岩の霊。冷気をまとう巨人。",
+    "trivia": "蔵王連峰は火山活動により多彩な景観を形成。",
+    "catchphrase": "「雪と岩の静かなる巨影！」"
   },
   {
     "id": "YMG-E10",
     "stageId": "tohoku_area5",
-    "name": "月山筍",
+    "name": "蔵王オニアイスドラゴン",
     "prefecture": "山形",
     "grade": 2,
     "level": 5,
@@ -881,12 +1176,17 @@
     "image": "YMG-E10.webp",
     "isBoss": true,
     "exp": 62,
-    "weakness": "kunyomi"
-  },
+    "weakness": "kunyomi",
+    "category": "伝説",
+    "habitat": "蔵王の樹氷地帯",
+    "desc": "氷の棘に覆われた竜。吹雪を操る。",
+    "trivia": "蔵王の樹氷は世界的にも有名な気象現象。",
+      "catchphrase": "「吹雪を操る、氷の竜！」"
+    },
   {
     "id": "HKS-E01",
     "stageId": "tohoku_area6",
-    "name": "あかつき桃",
+    "name": "あかべこチャイルド",
     "prefecture": "福島",
     "grade": 2,
     "level": 5,
@@ -896,12 +1196,17 @@
     "image": "HKS-E01.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "郷土玩具",
+    "habitat": "会津地方",
+    "desc": "赤べこが小さな精霊化。首を揺らして歩く。",
+    "trivia": "赤べこは疫病除けの縁起物。",
+    "catchphrase": "「ゆらゆら歩く、元気の赤い牛！」"
   },
   {
     "id": "HKS-E02",
     "stageId": "tohoku_area6",
-    "name": "喜多方ラーメン",
+    "name": "喜多方ラーメンゴースト",
     "prefecture": "福島",
     "grade": 2,
     "level": 5,
@@ -911,12 +1216,17 @@
     "image": "HKS-E02.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "喜多方市",
+    "desc": "ラーメンの湯気が怪異化。麺が影のように蠢く。",
+    "trivia": "喜多方ラーメンは日本三大ラーメンの一つ。",
+    "catchphrase": "「ゆらめく湯気に潜む影！」"
   },
   {
     "id": "HKS-E03",
     "stageId": "tohoku_area6",
-    "name": "会津漆器",
+    "name": "ももフェアリー",
     "prefecture": "福島",
     "grade": 2,
     "level": 5,
@@ -926,12 +1236,17 @@
     "image": "HKS-E03.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "福島盆地",
+    "desc": "桃の果実が精霊化。ピンクの光をまとい浮遊する。",
+    "trivia": "福島は「くだもの王国」と呼ばれるほど果物栽培が盛ん。",
+    "catchphrase": "「甘い香りで癒やしを届ける！」"
   },
   {
     "id": "HKS-E04",
     "stageId": "tohoku_area6",
-    "name": "いかにんじん",
+    "name": "わかさぎシャドーフィッシュ",
     "prefecture": "福島",
     "grade": 2,
     "level": 5,
@@ -941,12 +1256,17 @@
     "image": "HKS-E04.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "猪苗代湖",
+    "desc": "透き通る体に赤い目を持つ小魚モンスター。群れると不気味な光を放つ。",
+    "trivia": "猪苗代湖は日本第四位の広さを誇る湖",
+    "catchphrase": "「湖底を漂う影の群れ！」"
   },
   {
     "id": "HKS-E05",
     "stageId": "tohoku_area6",
-    "name": "ネギそば",
+    "name": "会津米スピリット",
     "prefecture": "福島",
     "grade": 2,
     "level": 5,
@@ -956,12 +1276,17 @@
     "image": "HKS-E05.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "農業",
+    "habitat": "会津平野",
+    "desc": "米粒型の精霊。稲穂の帽子をかぶり、跳ねて歩く。",
+    "trivia": "会津米は寒暖差を活かした良質なコシヒカリ。",
+    "catchphrase": "「ぷちっと跳ねる、豊かさの精！」"
   },
   {
     "id": "HKS-E06",
     "stageId": "tohoku_area6",
-    "name": "ままどおる",
+    "name": "大内宿ソードランナー",
     "prefecture": "福島",
     "grade": 2,
     "level": 5,
@@ -971,12 +1296,17 @@
     "image": "HKS-E06.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史景観",
+    "habitat": "大内宿",
+    "desc": "茅葺き屋根を背負った小戦士。雪道を軽やかに走る。",
+    "trivia": "大内宿は江戸時代の宿場町の景観を残す重要文化財。",
+    "catchphrase": "「茅葺きハウスを背負う走り屋！」"
   },
   {
     "id": "HKS-E07",
     "stageId": "tohoku_area6",
-    "name": "柏餅",
+    "name": "三春ザクラゴーレム",
     "prefecture": "福島",
     "grade": 2,
     "level": 5,
@@ -986,12 +1316,17 @@
     "image": "HKS-E07.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "三春町",
+    "desc": "滝桜が巨人化した精霊。花びらを散らしながら歩く。",
+    "trivia": "三春滝桜は樹齢1000年以上の巨木。",
+    "catchphrase": "「千年の桜が動き出す！」"
   },
   {
     "id": "HKS-E08",
     "stageId": "tohoku_area6",
-    "name": "円盤餃子",
+    "name": "起き上がり小法師ポルター",
     "prefecture": "福島",
     "grade": 2,
     "level": 5,
@@ -1001,12 +1336,17 @@
     "image": "HKS-E08.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "郷土玩具",
+    "habitat": "会津地方",
+    "desc": "転んでも立ち上がる小法師の精霊。笑顔で転がる。",
+    "trivia": "「七転八起」の縁起物。",
+    "catchphrase": "「ころころ転んで、また起き上がる！」"
   },
   {
     "id": "HKS-E09",
     "stageId": "tohoku_area6",
-    "name": "鯉料理",
+    "name": "白虎隊ファントム",
     "prefecture": "福島",
     "grade": 2,
     "level": 5,
@@ -1016,12 +1356,17 @@
     "image": "HKS-E09.webp",
     "isBoss": false,
     "exp": 31,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史",
+    "habitat": "飯盛山",
+    "desc": "白虎隊の霊が兵士モンスターに。青白いオーラを放つ。",
+    "trivia": "白虎隊は戊辰戦争で戦った少年兵士たち。",
+    "catchphrase": "「青白い炎に燃える武士の影！」"
   },
   {
     "id": "HKS-E10",
     "stageId": "tohoku_area6",
-    "name": "山春駒",
+    "name": "磐梯マグマドラゴン",
     "prefecture": "福島",
     "grade": 2,
     "level": 5,
@@ -1031,12 +1376,17 @@
     "image": "HKS-E10.webp",
     "isBoss": true,
     "exp": 62,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然・火山系",
+    "habitat": "磐梯山",
+    "desc": "火山の力を宿した岩竜。体の割れ目からマグマが光る。",
+    "trivia": "1888年の磐梯山噴火は大規模な山体崩壊を引き起こした。",
+    "catchphrase": "「赤き大地の怒りをまとう竜！」"
   },
   {
     "id": "TCG-E01",
     "stageId": "kanto_area1",
-    "name": "とちおとめ",
+    "name": "とちおとめフェアリー",
     "prefecture": "栃木",
     "grade": 3,
     "level": 6,
@@ -1046,12 +1396,17 @@
     "image": "TCG-E01.webp",
     "isBoss": false,
     "exp": 40,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "果実系",
+    "habitat": "栃木県・いちご畑",
+    "desc": "真っ赤ないちごの妖精。甘い香りを漂わせ、羽を広げて舞う。",
+    "trivia": "栃木県は「とちおとめ」を中心に、いちごの生産量日本一を誇る。",
+    "catchphrase": "「甘さひろがる、赤い羽の精！」"
   },
   {
     "id": "TCG-E02",
     "stageId": "kanto_area1",
-    "name": "宇都宮餃子",
+    "name": "しもつかれシャドー",
     "prefecture": "栃木",
     "grade": 3,
     "level": 6,
@@ -1061,12 +1416,17 @@
     "image": "TCG-E02.webp",
     "isBoss": false,
     "exp": 40,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "郷土料理系",
+    "habitat": "栃木県・冬の食卓",
+    "desc": "大根や鮭の切れ端が影となり漂う怪異。静かに忍び寄る。",
+    "trivia": "しもつかれは栃木の伝統的な冬の料理で、節分後に食べられる。",
+    "catchphrase": "「影と化した郷土の味わい！」"
   },
   {
     "id": "TCG-E03",
     "stageId": "kanto_area1",
-    "name": "眠り猫",
+    "name": "日光杉スピリット",
     "prefecture": "栃木",
     "grade": 3,
     "level": 6,
@@ -1076,12 +1436,17 @@
     "image": "TCG-E03.webp",
     "isBoss": false,
     "exp": 40,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "栃木県・日光杉並木",
+    "desc": "小さな体に杉の葉をマントのようにまとい、森を駆け回る。",
+    "trivia": "日光杉並木は特別史跡・天然記念物に指定されている。",
+    "catchphrase": "「森を駆ける、緑の守り子！」"
   },
   {
     "id": "TCG-E04",
     "stageId": "kanto_area1",
-    "name": "湯葉",
+    "name": "鮎ストリームゴースト",
     "prefecture": "栃木",
     "grade": 3,
     "level": 6,
@@ -1091,12 +1456,17 @@
     "image": "TCG-E04.webp",
     "isBoss": false,
     "exp": 40,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "魚類系",
+    "habitat": "栃木県・那珂川",
+    "desc": "銀色の鮎が霊体化し、川を泳ぐ。青白い光を放つ姿は神秘的。",
+    "trivia": "那珂川は鮎釣りで有名で、毎年解禁時期には多くの釣り人が集う。",
+    "catchphrase": "「川を泳ぐ、銀の影！」"
   },
   {
     "id": "TCG-E05",
     "stageId": "kanto_area1",
-    "name": "かんびょう",
+    "name": "かんぴょうチャイルド",
     "prefecture": "栃木",
     "grade": 3,
     "level": 6,
@@ -1106,12 +1476,17 @@
     "image": "TCG-E05.webp",
     "isBoss": false,
     "exp": 40,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化系",
+    "habitat": "栃木県・かんぴょう畑",
+    "desc": "体にかんぴょうを巻きつけて転がり遊ぶ小精霊。",
+    "trivia": "栃木県はかんぴょう生産量日本一。巻き寿司にも欠かせない。",
+    "catchphrase": "「くるくる転がる、白き元気玉！」"
   },
   {
     "id": "TCG-E06",
     "stageId": "kanto_area1",
-    "name": "レモン牛乳",
+    "name": "日光猿ポルター",
     "prefecture": "栃木",
     "grade": 2,
     "level": 6,
@@ -1121,12 +1496,17 @@
     "image": "TCG-E06.webp",
     "isBoss": false,
     "exp": 40,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史系",
+    "habitat": "栃木県・日光東照宮",
+    "desc": "見ざる・言わざる・聞かざるの三匹が跳ね回る小猿精霊。",
+    "trivia": "日光東照宮の三猿は「人の生き方の教え」を示す彫刻。",
+    "catchphrase": "「三匹そろって元気に跳ねる！」"
   },
   {
     "id": "TCG-E07",
     "stageId": "kanto_area1",
-    "name": "佐野ラーメン",
+    "name": "鹿沼彫刻シェード",
     "prefecture": "栃木",
     "grade": 3,
     "level": 6,
@@ -1136,12 +1516,17 @@
     "image": "TCG-E07.webp",
     "isBoss": false,
     "exp": 40,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸系",
+    "habitat": "鹿沼市・彫刻屋台祭り",
+    "desc": "木彫りの装飾が動き出し、影をまとって迫る。",
+    "trivia": "鹿沼の彫刻屋台は豪華で緻密な工芸品として有名。",
+    "catchphrase": "「木彫りが闇に踊り出す！」"
   },
   {
     "id": "TCG-E08",
     "stageId": "kanto_area1",
-    "name": "しもつかれ",
+    "name": "益子焼ゴーレム",
     "prefecture": "栃木",
     "grade": 3,
     "level": 6,
@@ -1151,12 +1536,17 @@
     "image": "TCG-E08.webp",
     "isBoss": false,
     "exp": 40,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸系",
+    "habitat": "益子町",
+    "desc": "益子焼の器が組み合わさって動くゴーレム。優しい笑顔を浮かべる。",
+    "trivia": "益子焼は日本を代表する陶芸で、シンプルかつ素朴な風合いが特徴。",
+    "catchphrase": "「器の心が歩き出す！」"
   },
   {
     "id": "TCG-E09",
     "stageId": "kanto_area1",
-    "name": "にら",
+    "name": "日光能面ファントム",
     "prefecture": "栃木",
     "grade": 2,
     "level": 6,
@@ -1166,12 +1556,17 @@
     "image": "TCG-E09.webp",
     "isBoss": false,
     "exp": 40,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝統芸能系",
+    "habitat": "日光・能舞台",
+    "desc": "能面が浮かび舞い踊る不気味な幻影。",
+    "trivia": "能は日本を代表する伝統芸能で、日光の舞台でも演じられる。",
+    "catchphrase": "「仮面が踊る、影の舞！」"
   },
   {
     "id": "TCG-E10",
     "stageId": "kanto_area1",
-    "name": "益子焼",
+    "name": "日光男体ドラゴンロード",
     "prefecture": "栃木",
     "grade": 3,
     "level": 6,
@@ -1181,12 +1576,17 @@
     "image": "TCG-E10.webp",
     "isBoss": true,
     "exp": 80,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然・伝説系",
+    "habitat": "日光男体山",
+    "desc": "火山の力を宿した守護竜。背中には雪をいただいている。",
+    "trivia": "男体山は信仰の山で、火山としても知られる。",
+    "catchphrase": "「山を背負いし火炎の竜！」"
   },
   {
     "id": "GNM-E01",
     "stageId": "kanto_area2",
-    "name": "下仁田ネギ",
+    "name": "こんにゃくスライム",
     "prefecture": "群馬",
     "grade": 3,
     "level": 7,
@@ -1196,12 +1596,17 @@
     "image": "GNM-E01.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化系",
+    "habitat": "群馬県・こんにゃく畑",
+    "desc": "ぷるぷる揺れる小さなモンスター。灰色半透明の体でころんと跳ねる。",
+    "trivia": "群馬県はこんにゃく生産量日本一。日本の9割以上を占める。",
+    "catchphrase": "「ぷるぷる跳ねる畑の妖精！」"
   },
   {
     "id": "GNM-E02",
     "stageId": "kanto_area2",
-    "name": "焼きまんじゅう",
+    "name": "おっきりこみシャドー",
     "prefecture": "群馬",
     "grade": 3,
     "level": 7,
@@ -1211,12 +1616,17 @@
     "image": "GNM-E02.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "郷土料理系",
+    "habitat": "群馬県・上州地方",
+    "desc": "幅広の麺が宙を漂い、汁の霧をまとう怪異。空気に絡みつく。",
+    "trivia": "おっきりこみは幅広麺を野菜と煮込む郷土料理。冬の定番。",
+    "catchphrase": "「霧とともに忍び寄る麺の影！」"
   },
   {
     "id": "GNM-E03",
     "stageId": "kanto_area2",
-    "name": "草津温泉",
+    "name": "キャベツピクシー",
     "prefecture": "群馬",
     "grade": 3,
     "level": 7,
@@ -1226,12 +1636,17 @@
     "image": "GNM-E03.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "農産・野菜系",
+    "habitat": "群馬県・嬬恋村",
+    "desc": "キャベツの葉をマントにした妖精。畑を元気に飛び回る。",
+    "trivia": "嬬恋村は「キャベツの村」と呼ばれ、日本一の生産地。",
+    "catchphrase": "「丸い葉っぱの元気っ子！」"
   },
   {
     "id": "GNM-E04",
     "stageId": "kanto_area2",
-    "name": "コンニャク",
+    "name": "赤城山ワインバット",
     "prefecture": "群馬",
     "grade": 3,
     "level": 7,
@@ -1241,12 +1656,17 @@
     "image": "GNM-E04.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "果実文化・酒造系",
+    "habitat": "赤城山のぶどう畑",
+    "desc": "紫の翼に赤い瞳を持つコウモリ精霊。葡萄酒の香りを漂わせる。",
+    "trivia": "群馬県はワイン造りも盛んで、赤城山は代表的な産地の一つ。",
+    "catchphrase": "「葡萄の香とともに忍び寄る影！」"
   },
   {
     "id": "GNM-E05",
     "stageId": "kanto_area2",
-    "name": "上毛三山",
+    "name": "ネギホーリー",
     "prefecture": "群馬",
     "grade": 3,
     "level": 7,
@@ -1256,12 +1676,17 @@
     "image": "GNM-E05.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化系",
+    "habitat": "群馬県・下仁田町",
+    "desc": "下仁田ネギを杖のように構えた小僧モンスター。笑顔で人々を守る。",
+    "trivia": "下仁田ネギは「殿様ネギ」とも呼ばれ、鍋料理に最適。",
+    "catchphrase": "「ネギの香りがする！」"
   },
   {
     "id": "GNM-E06",
     "stageId": "kanto_area2",
-    "name": "ゼリーふらい",
+    "name": "達磨チャイルド",
     "prefecture": "群馬",
     "grade": 3,
     "level": 7,
@@ -1271,12 +1696,17 @@
     "image": "GNM-E06.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸文化系",
+    "habitat": "群馬県・高崎市",
+    "desc": "赤い丸い体の小精霊。転んでもすぐ立ち上がり、にこにこ笑う。",
+    "trivia": "高崎だるまは全国シェア8割を誇る縁起物。",
+    "catchphrase": "「七転び八起き、笑顔の守り子！」"
   },
   {
     "id": "GNM-E07",
     "stageId": "kanto_area2",
-    "name": "尾瀬の水",
+    "name": "富岡シルクファントム",
     "prefecture": "群馬",
     "grade": 3,
     "level": 7,
@@ -1286,12 +1716,17 @@
     "image": "GNM-E07.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "産業遺産系",
+    "habitat": "富岡製糸場",
+    "desc": "白い糸をまとう幽霊のような存在。繭の仮面をつけ、静かに漂う。",
+    "trivia": "富岡製糸場は世界遺産に登録された日本の近代産業遺産。",
+    "catchphrase": "「白糸の仮面、沈黙の幽影！」"
   },
   {
     "id": "GNM-E08",
     "stageId": "kanto_area2",
-    "name": "空っ風",
+    "name": "草津温泉スプライト",
     "prefecture": "群馬",
     "grade": 3,
     "level": 7,
@@ -1301,12 +1736,17 @@
     "image": "GNM-E08.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "観光・温泉系",
+    "habitat": "草津温泉・湯畑",
+    "desc": "湯けむりに包まれた小さなモンスター。頭に木桶をかぶり湯畑の光を背負う。",
+    "trivia": "草津温泉は日本三名泉の一つ。湯畑は観光名所。",
+    "catchphrase": "「湯けむりの中で笑顔を届ける！」"
   },
   {
     "id": "GNM-E09",
     "stageId": "kanto_area2",
-    "name": "こんにゃくゼリー",
+    "name": "八木節オーガ",
     "prefecture": "群馬",
     "grade": 3,
     "level": 7,
@@ -1316,12 +1756,17 @@
     "image": "GNM-E09.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "民謡・祭り系",
+    "habitat": "群馬県・上州地方",
+    "desc": "和太鼓を背負った鬼精霊。荒々しく夜祭を舞い踊る。",
+    "trivia": "八木節は群馬の代表的な民謡で、国指定重要無形文化財。",
+    "catchphrase": "「夜祭を焦がす荒ぶる太鼓鬼！」"
   },
   {
     "id": "GNM-E10",
     "stageId": "kanto_area2",
-    "name": "上毛かるた",
+    "name": "榛名サンダーホース",
     "prefecture": "群馬",
     "grade": 3,
     "level": 7,
@@ -1331,12 +1776,17 @@
     "image": "GNM-E10.webp",
     "isBoss": true,
     "exp": 100,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝説系",
+    "habitat": "榛名山・火口湖",
+    "desc": "雷をまとった黒馬の守護獣。背には火口湖を抱える。",
+    "trivia": "榛名山は火山であり、山頂には榛名湖が広がる。",
+    "catchphrase": "「雷をまとう、黒馬の守護神！」"
   },
   {
     "id": "IBK-E01",
     "stageId": "kanto_area3",
-    "name": "なっとう",
+    "name": "レンコンマンドラ",
     "prefecture": "茨城",
     "grade": 3,
     "level": 7,
@@ -1346,12 +1796,17 @@
     "image": "IBK-E01.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "農産系",
+    "habitat": "霞ヶ浦・蓮根畑",
+    "desc": "レンコンの体から芽を出した小妖怪。ぴょこんと飛び出しては笑う。",
+    "trivia": "茨城県はレンコンの生産量日本一。霞ヶ浦周辺で多く栽培される。",
+    "catchphrase": "「シャキッと元気！穴だらけの妖精！」"
   },
   {
     "id": "IBK-E02",
     "stageId": "kanto_area3",
-    "name": "アンデスメロン",
+    "name": "アンコウルアー",
     "prefecture": "茨城",
     "grade": 3,
     "level": 7,
@@ -1361,12 +1816,17 @@
     "image": "IBK-E02.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "海産系",
+    "habitat": "大洗沖",
+    "desc": "大きな口を開け、光る突起で獲物を誘う怪魚モンスター。",
+    "trivia": "茨城県の冬の味覚「アンコウ鍋」に使われる鮟鱇は有名。",
+    "catchphrase": "「闇を照らす、深海の罠！」"
   },
   {
     "id": "IBK-E03",
     "stageId": "kanto_area3",
-    "name": "あんこう",
+    "name": "ネモフィラブルーム",
     "prefecture": "茨城",
     "grade": 3,
     "level": 7,
@@ -1376,12 +1836,17 @@
     "image": "IBK-E03.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然系",
+    "habitat": "ひたち海浜公園",
+    "desc": "青い花びらをまとった小花の妖精。風に揺れてふわりと舞う。",
+    "trivia": "春の「みはらしの丘」は一面がネモフィラブルーに染まる。",
+    "catchphrase": "「空より青い、丘のささやき！」"
   },
   {
     "id": "IBK-E04",
     "stageId": "kanto_area3",
-    "name": "干し芋",
+    "name": "メロンカラペイス",
     "prefecture": "茨城",
     "grade": 3,
     "level": 7,
@@ -1391,12 +1856,17 @@
     "image": "IBK-E04.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "果実系",
+    "habitat": "鉾田市・メロン畑",
+    "desc": "硬いメロンの殻を甲羅にした甲殻獣。裂け目から緑の光を放つ。",
+    "trivia": "鉾田市はメロンの生産量が日本トップクラス。",
+    "catchphrase": "「緑の宝玉、殻に潜む獣！」"
   },
   {
     "id": "IBK-E05",
     "stageId": "kanto_area3",
-    "name": "印籠",
+    "name": "ほしいもコロコロ",
     "prefecture": "茨城",
     "grade": 3,
     "level": 7,
@@ -1406,12 +1876,17 @@
     "image": "IBK-E05.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "農産系",
+    "habitat": "ひたちなか市",
+    "desc": "ころころ転がる干し芋の精。甘い香りで人を癒やす。",
+    "trivia": "ひたちなか市は干し芋生産量日本一。冬の特産品として有名。",
+    "catchphrase": "「甘さころころ、元気を運ぶ！」"
   },
   {
     "id": "IBK-E06",
     "stageId": "kanto_area3",
-    "name": "あんこう鍋",
+    "name": "偕楽園ウメベル",
     "prefecture": "茨城",
     "grade": 3,
     "level": 7,
@@ -1421,12 +1896,17 @@
     "image": "IBK-E06.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "水戸市・偕楽園",
+    "desc": "梅の花を飾った小さなベル状の妖精。音色と香りを届ける。",
+    "trivia": "偕楽園は梅の名所として日本三名園のひとつ。",
+    "catchphrase": "「春告げる、花と香りの使者！」"
   },
   {
     "id": "IBK-E07",
     "stageId": "kanto_area3",
-    "name": "しらす干し",
+    "name": "笠間炎窯シャーマン",
     "prefecture": "茨城",
     "grade": 3,
     "level": 7,
@@ -1436,12 +1916,17 @@
     "image": "IBK-E07.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸系",
+    "habitat": "笠間市",
+    "desc": "炎をまとう陶器のシャーマン。壺や皿を武器のように操る。",
+    "trivia": "笠間焼は日本最古級の陶芸として知られる。",
+    "catchphrase": "「炎と土が呼び覚ます呪術師！」"
   },
   {
     "id": "IBK-E08",
     "stageId": "kanto_area3",
-    "name": "レンコン",
+    "name": "つくばラボランナー",
     "prefecture": "茨城",
     "grade": 3,
     "level": 7,
@@ -1451,12 +1936,17 @@
     "image": "IBK-E08.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "科学系",
+    "habitat": "つくば市・研究学園都市",
+    "desc": "試験管やビーカーを背負い、元気に走る小型モンスター。",
+    "trivia": "つくば市は「日本の科学都市」と呼ばれ、研究機関が集中している。",
+    "catchphrase": "「走れ！未来を運ぶ研究者！」"
   },
   {
     "id": "IBK-E09",
     "stageId": "kanto_area3",
-    "name": "水戸梅",
+    "name": "石岡幌獅子リーヴァー",
     "prefecture": "茨城",
     "grade": 3,
     "level": 7,
@@ -1466,12 +1956,17 @@
     "image": "IBK-E09.webp",
     "isBoss": false,
     "exp": 50,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "祭り系",
+    "habitat": "石岡市・幌獅子祭り",
+    "desc": "大きな獅子頭が怪異化し、荒々しく暴れ回る。",
+    "trivia": "石岡のお祭りは関東三大祭りの一つに数えられる。",
+    "catchphrase": "「夜を裂く、咆哮の獅子頭！」"
   },
   {
     "id": "IBK-E10",
     "stageId": "kanto_area3",
-    "name": "ローズポーク",
+    "name": "要石ナマズバインダー",
     "prefecture": "茨城",
     "grade": 3,
     "level": 7,
@@ -1481,12 +1976,17 @@
     "image": "IBK-E10.webp",
     "isBoss": true,
     "exp": 100,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説系",
+    "habitat": "鹿島神宮",
+    "desc": "巨大ナマズを鎖で縛る石の守護者。地を揺らす力を封じている。",
+    "trivia": "要石は地震を起こす鯰を押さえつけると伝えられる霊石。",
+    "catchphrase": "「地を鎮める、封印の石守！」"
   },
   {
     "id": "SIT-E01",
     "stageId": "kanto_area4",
-    "name": "草加せんべい",
+    "name": "草加せんべいチャイルド",
     "prefecture": "埼玉",
     "grade": 3,
     "level": 8,
@@ -1496,12 +1996,17 @@
     "image": "SIT-E01.webp",
     "isBoss": false,
     "exp": 61,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化系",
+    "habitat": "草加市",
+    "desc": "大きな丸せんべいを盾のように抱えた小精霊。香ばしい香りを漂わせる。",
+    "trivia": "草加せんべいは江戸時代から続く名物で、醤油の香ばしさが特徴。",
+    "catchphrase": "「パリッと香ばしい、お菓子の守り子！」"
   },
   {
     "id": "SIT-E02",
     "stageId": "kanto_area4",
-    "name": "狭山茶",
+    "name": "鰻影ウナバイト",
     "prefecture": "埼玉",
     "grade": 3,
     "level": 8,
@@ -1511,12 +2016,17 @@
     "image": "SIT-E02.webp",
     "isBoss": false,
     "exp": 61,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化・河川系",
+    "habitat": "川越市・荒川流域",
+    "desc": "長い影のような鰻がうねり泳ぎ、人々を惑わす。目は赤く光る。",
+    "trivia": "川越や浦和は鰻料理の名所で、江戸から伝わる伝統食。",
+    "catchphrase": "「黒き影は水面を這う！」"
   },
   {
     "id": "SIT-E03",
     "stageId": "kanto_area4",
-    "name": "ねぎみそだれ",
+    "name": "狭山茶ピクシー",
     "prefecture": "埼玉",
     "grade": 3,
     "level": 8,
@@ -1526,12 +2036,17 @@
     "image": "SIT-E03.webp",
     "isBoss": false,
     "exp": 61,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "農産系",
+    "habitat": "所沢市・狭山市",
+    "desc": "緑茶の葉を髪にした小さな妖精。茶碗に座って微笑む。",
+    "trivia": "狭山茶は日本三大名茶の一つ。",
+    "catchphrase": "「お茶の香り、お茶の味！」"
   },
   {
     "id": "SIT-E04",
     "stageId": "kanto_area4",
-    "name": "十万石まんじゅう",
+    "name": "サイタマライオンファング",
     "prefecture": "埼玉",
     "grade": 3,
     "level": 8,
@@ -1541,12 +2056,17 @@
     "image": "SIT-E04.webp",
     "isBoss": false,
     "exp": 61,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "動物系",
+    "habitat": "浦和市・埼玉スタジアム",
+    "desc": "黒いたてがみを炎のように揺らめかせるライオン型の守護獣。",
+    "trivia": "ライオンは浦和レッズのシンボルであり、県の象徴的モチーフにもなっている。",
+    "catchphrase": "「咆哮轟く、埼玉の獅子！」"
   },
   {
     "id": "SIT-E05",
     "stageId": "kanto_area4",
-    "name": "鉄道博物館",
+    "name": "長瀞ラインスプライト",
     "prefecture": "埼玉",
     "grade": 3,
     "level": 8,
@@ -1556,12 +2076,17 @@
     "image": "SIT-E05.webp",
     "isBoss": false,
     "exp": 61,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "長瀞渓谷",
+    "desc": "小舟のオールを持った水の精霊。清流をすべるように踊る。",
+    "trivia": "長瀞は川下りと奇岩で有名な観光名所。",
+    "catchphrase": "「清流とともに駆ける、小舟の妖精！」"
   },
   {
     "id": "SIT-E06",
     "stageId": "kanto_area4",
-    "name": "ゼリーふらい",
+    "name": "川越蔵クラフト",
     "prefecture": "埼玉",
     "grade": 3,
     "level": 8,
@@ -1571,12 +2096,17 @@
     "image": "SIT-E06.webp",
     "isBoss": false,
     "exp": 61,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "建築・歴史文化系",
+    "habitat": "川越市・蔵造りの町並み",
+    "desc": "黒漆喰の壁を背負った小さな蔵の子。大きな扉を守る。",
+    "trivia": "川越の蔵造りは江戸の情緒を残す町並みとして有名。",
+    "catchphrase": "「扉を守る、小さな蔵の番人！」"
   },
   {
     "id": "SIT-E07",
     "stageId": "kanto_area4",
-    "name": "五家宝",
+    "name": "秩父夜祭シャドーダンサー",
     "prefecture": "埼玉",
     "grade": 3,
     "level": 8,
@@ -1586,12 +2116,17 @@
     "image": "SIT-E07.webp",
     "isBoss": false,
     "exp": 61,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "祭り系",
+    "habitat": "秩父市・秩父夜祭",
+    "desc": "提灯の灯りに照らされ踊る影の舞手。赤い仮面が揺れる。",
+    "trivia": "秩父夜祭はユネスコ無形文化遺産に登録された豪華絢爛な祭礼。",
+    "catchphrase": "「夜を焦がす、仮面の影舞！」"
   },
   {
     "id": "SIT-E08",
     "stageId": "kanto_area4",
-    "name": "深谷ねぎ",
+    "name": "岩槻雛ゴーレム",
     "prefecture": "埼玉",
     "grade": 3,
     "level": 8,
@@ -1601,12 +2136,17 @@
     "image": "SIT-E08.webp",
     "isBoss": false,
     "exp": 61,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸系",
+    "habitat": "さいたま市岩槻区",
+    "desc": "雛人形のパーツが組み合わさり動くゴーレム。優しい笑顔を浮かべる。",
+    "trivia": "岩槻は雛人形の産地として「人形の町」と呼ばれる。",
+    "catchphrase": "「人形が笑う、岩槻の守護神！」"
   },
   {
     "id": "SIT-E09",
     "stageId": "kanto_area4",
-    "name": "狭山茶饅頭",
+    "name": "鉄道マスクファントム",
     "prefecture": "埼玉",
     "grade": 3,
     "level": 8,
@@ -1616,12 +2156,17 @@
     "image": "SIT-E09.webp",
     "isBoss": false,
     "exp": 61,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "交通・鉄道文化系",
+    "habitat": "大宮・鉄道博物館",
+    "desc": "鉄仮面をまとった亡霊機関士。赤い光を放つ目で前を睨む。",
+    "trivia": "鉄道博物館は鉄道ファンの聖地として知られる。",
+    "catchphrase": "「赤光の眼、轟く鉄路の亡霊！」"
   },
   {
     "id": "SIT-E10",
     "stageId": "kanto_area4",
-    "name": "川越いも",
+    "name": "武蔵武神マロウド",
     "prefecture": "埼玉",
     "grade": 3,
     "level": 8,
@@ -1631,12 +2176,17 @@
     "image": "SIT-E10.webp",
     "isBoss": true,
     "exp": 122,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝説系",
+    "habitat": "大宮・氷川神社",
+    "desc": "巨大な薙刀を持つ武神の化身。冷気を漂わせる。",
+    "trivia": "武蔵一宮・氷川神社は埼玉の総鎮守。",
+    "catchphrase": "「冷気を操る、武神の化身！」"
   },
   {
     "id": "TB-E01",
     "stageId": "kanto_area5",
-    "name": "ピーナッツ",
+    "name": "ピーナッツゴブリン",
     "prefecture": "千葉",
     "grade": 3,
     "level": 9,
@@ -1646,12 +2196,17 @@
     "image": "TB-E01.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化系",
+    "habitat": "八街市・落花生畑",
+    "desc": "殻の兜をかぶった小鬼。炒り落花生を投げて遊ぶ。",
+    "trivia": "八街市は落花生の国内シェア約8割を誇る。",
+    "catchphrase": "「ポリポリ騒ぐ畑の守り鬼！」"
   },
   {
     "id": "TB-E02",
     "stageId": "kanto_area5",
-    "name": "落花生みそ",
+    "name": "イワシスウォーム",
     "prefecture": "千葉",
     "grade": 3,
     "level": 9,
@@ -1661,12 +2216,17 @@
     "image": "TB-E02.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "漁業系",
+    "habitat": "銚子漁港",
+    "desc": "無数のイワシが群体生物のように融合し、巨大な魚影を作る。",
+    "trivia": "銚子港は日本有数の水揚げを誇る漁港。",
+    "catchphrase": "「群れ成す影、海を呑み込む！」"
   },
   {
     "id": "TB-E03",
     "stageId": "kanto_area5",
-    "name": "ぬれ煎餅",
+    "name": "船橋梨ベアー",
     "prefecture": "千葉",
     "grade": 3,
     "level": 9,
@@ -1676,12 +2236,17 @@
     "image": "TB-E03.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "果実系",
+    "habitat": "船橋市・梨園",
+    "desc": "梨を背負った小熊モンスター。果汁を吹きかけて元気をふりまく。",
+    "trivia": "船橋の梨は全国的に有名で、ゆるキャラ「ふなっしー」も誕生。",
+    "catchphrase": "「ジューシー全開！元気の子熊！」"
   },
   {
     "id": "TB-E04",
     "stageId": "kanto_area5",
-    "name": "房総びわ",
+    "name": "九十九リシェルクラブ",
     "prefecture": "千葉",
     "grade": 3,
     "level": 9,
@@ -1691,12 +2256,17 @@
     "image": "TB-E04.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "海産系",
+    "habitat": "九十九里浜",
+    "desc": "鋭い爪を持つ巨大ハマグリの甲殻獣。殻の内側は真珠色に輝く。",
+    "trivia": "九十九里浜はハマグリやイワシ漁で知られる。",
+    "catchphrase": "「殻を開けば、光と恐怖！」"
   },
   {
     "id": "TB-E05",
     "stageId": "kanto_area5",
-    "name": "なめろう",
+    "name": "銚子ポートゴーレム",
     "prefecture": "千葉",
     "grade": 3,
     "level": 9,
@@ -1706,12 +2276,17 @@
     "image": "TB-E05.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "建造物系",
+    "habitat": "銚子港の防波堤",
+    "desc": "灯台やテトラポッドの破片が組み合わさったゴーレム。港を守る番人。",
+    "trivia": "犬吠埼灯台は銚子のシンボル的建造物。",
+    "catchphrase": "「港を護る、石の巨人！」"
   },
   {
     "id": "TB-E06",
     "stageId": "kanto_area5",
-    "name": "びわゼリー",
+    "name": "成田祈祷カラス",
     "prefecture": "千葉",
     "grade": 3,
     "level": 9,
@@ -1721,12 +2296,17 @@
     "image": "TB-E06.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "宗教系",
+    "habitat": "成田山新勝寺",
+    "desc": "護摩の炎を羽に宿した黒烏。お札をくわえて飛ぶ。",
+    "trivia": "成田山は初詣参拝者数全国トップ級。",
+    "catchphrase": "「祈りを届ける炎の使者！」"
   },
   {
     "id": "TB-E07",
     "stageId": "kanto_area5",
-    "name": "太巻き寿司",
+    "name": "佐原山車ウォーロード",
     "prefecture": "千葉",
     "grade": 3,
     "level": 9,
@@ -1736,12 +2316,17 @@
     "image": "TB-E07.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "祭り系",
+    "habitat": "佐原大祭",
+    "desc": "山車人形が戦甲冑を纏い動き出した姿。木の肌が軋み、目が光る。",
+    "trivia": "佐原大祭はユネスコ無形文化遺産にも登録。",
+    "catchphrase": "「木像が目覚め、町を進軍！」"
   },
   {
     "id": "TB-E08",
     "stageId": "kanto_area5",
-    "name": "房州ひじき",
+    "name": "鴨川シャチライダー",
     "prefecture": "千葉",
     "grade": 3,
     "level": 9,
@@ -1751,12 +2336,17 @@
     "image": "TB-E08.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海獣系",
+    "habitat": "鴨川シーワールド",
+    "desc": "潮を吹きながら遊ぶシャチのモンスター。大きな瞳で元気いっぱい。",
+    "trivia": "鴨川シーワールドはシャチショーで全国的に有名。",
+    "catchphrase": "「潮を駆ける、海の覇者！」"
   },
   {
     "id": "TB-E09",
     "stageId": "kanto_area5",
-    "name": "梨",
+    "name": "幕張メカフェンサー",
     "prefecture": "千葉",
     "grade": 3,
     "level": 9,
@@ -1766,12 +2356,17 @@
     "image": "TB-E09.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "機械・都市文化系",
+    "habitat": "幕張メッセ",
+    "desc": "展示ブースが変形したロボット戦士。鋭いアンテナを槍にする。",
+    "trivia": "幕張メッセは国際展示場として世界的に有名。",
+    "catchphrase": "「光の展示場が戦場に！」"
   },
   {
     "id": "TB-E10",
     "stageId": "kanto_area5",
-    "name": "しょうゆ",
+    "name": "龍宮クジラロード",
     "prefecture": "千葉",
     "grade": 3,
     "level": 9,
@@ -1781,12 +2376,17 @@
     "image": "TB-E10.webp",
     "isBoss": true,
     "exp": 152,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説系",
+    "habitat": "房総沖",
+    "desc": "巨大な鯨が龍宮城を背に背負った守護幻獣。海を揺らす覇者。",
+    "trivia": "房総沖は古来より鯨伝説が多く、漁文化と結びつく。",
+    "catchphrase": "「海を揺らす、龍宮の覇者！」"
   },
   {
     "id": "TKY-E01",
     "stageId": "kanto_area6",
-    "name": "もんじゃ焼き",
+    "name": "江戸寿司インプ",
     "prefecture": "東京",
     "grade": 3,
     "level": 9,
@@ -1796,12 +2396,17 @@
     "image": "TKY-E01.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化系",
+    "habitat": "築地市場・豊洲市場",
+    "desc": "寿司桶を背負った小鬼。マグロや玉子の寿司をお手玉のように投げて遊ぶ。",
+    "trivia": "東京の築地・豊洲市場は世界最大級の魚市場で、江戸前寿司文化の中心地。",
+    "catchphrase": "「回せ回せ！寿司のいたずら小鬼！」"
   },
   {
     "id": "TKY-E02",
     "stageId": "kanto_area6",
-    "name": "雷おこし",
+    "name": "多摩河骨魚",
     "prefecture": "東京",
     "grade": 3,
     "level": 9,
@@ -1811,12 +2416,17 @@
     "image": "TKY-E02.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "河川・アンデッド系",
+    "habitat": "多摩川",
+    "desc": "魚の骨が集合して動く怪魚。青白い光を放ちながら川底を這う。",
+    "trivia": "多摩川は古くから人々の生活を支えた川で、自然と都市が交わる場所。",
+    "catchphrase": "「骨の群れ、濁流をさまよう！」"
   },
   {
     "id": "TKY-E03",
     "stageId": "kanto_area6",
-    "name": "江戸切子",
+    "name": "原宿パンケーキホムンクルス",
     "prefecture": "東京",
     "grade": 3,
     "level": 9,
@@ -1826,12 +2436,17 @@
     "image": "TKY-E03.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化・スイーツ系",
+    "habitat": "原宿・表参道",
+    "desc": "ふわふわのパンケーキから生まれた小さな人造生物。ホイップを帽子に笑顔で跳ねる。",
+    "trivia": "原宿は「パンケーキの街」としても知られ、若者文化と結びついている。",
+    "catchphrase": "「ふわふわ甘い、人造の妖精！」"
   },
   {
     "id": "TKY-E04",
     "stageId": "kanto_area6",
-    "name": "つくだ煮",
+    "name": "江戸火消しオーガ",
     "prefecture": "東京",
     "grade": 3,
     "level": 9,
@@ -1841,12 +2456,17 @@
     "image": "TKY-E04.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史系",
+    "habitat": "深川・両国",
+    "desc": "纏を振る火消しの鬼。煤にまみれ、燃え残り火をまとっている。",
+    "trivia": "江戸の火消しは「め組」に代表され、町火消しとして市民を守った。",
+    "catchphrase": "「火と灰の中から蘇る、炎の鬼！」"
   },
   {
     "id": "TKY-E05",
     "stageId": "kanto_area6",
-    "name": "東京タワー",
+    "name": "上野パンダチャイルド",
     "prefecture": "東京",
     "grade": 3,
     "level": 9,
@@ -1856,12 +2476,17 @@
     "image": "TKY-E05.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "動物系",
+    "habitat": "上野動物園",
+    "desc": "竹を抱えた子パンダのモンスター。ころころ転がって遊ぶ。",
+    "trivia": "上野動物園は東京都内で最も古い動物園。",
+    "catchphrase": "「竹を抱えて、パンダの子！」"
   },
   {
     "id": "TKY-E06",
     "stageId": "kanto_area6",
-    "name": "東京ばな奈",
+    "name": "浅草雷鼓コボルト",
     "prefecture": "東京",
     "grade": 3,
     "level": 9,
@@ -1871,12 +2496,17 @@
     "image": "TKY-E06.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "祭り系",
+    "habitat": "浅草寺・雷門",
+    "desc": "犬顔の獣人で、太鼓を背負い稲妻を叩き出す。元気いっぱいに跳ね回る。",
+    "trivia": "浅草寺の雷門は東京を代表する観光名所で、雷神像が祀られている。",
+    "catchphrase": "「ワンと一鳴き、雷の太鼓！」"
   },
   {
     "id": "TKY-E07",
     "stageId": "kanto_area6",
-    "name": "雷門提灯",
+    "name": "隅田川花火スペクター",
     "prefecture": "東京",
     "grade": 3,
     "level": 9,
@@ -1886,12 +2516,17 @@
     "image": "TKY-E07.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "祭礼・花火系",
+    "habitat": "隅田川花火大会",
+    "desc": "散った火花が集まり幽鬼の姿をとる。赤や青の光を漂わせる。",
+    "trivia": "隅田川花火大会は東京都内で最も有名な花火大会。",
+    "catchphrase": "「散る火花が集まり、幽鬼の姿をとる！」"
   },
   {
     "id": "TKY-E08",
     "stageId": "kanto_area6",
-    "name": "人形焼",
+    "name": "東京タワーゴーレム",
     "prefecture": "東京",
     "grade": 3,
     "level": 9,
@@ -1901,12 +2536,17 @@
     "image": "TKY-E08.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "建築系",
+    "habitat": "港区・東京タワー",
+    "desc": "赤白の鉄骨でできたゴーレム。頭のアンテナを掲げ街を見守る。",
+    "trivia": "東京タワーは昭和33年に完成した東京の象徴的建造物。",
+    "catchphrase": "「赤白の巨人、街を見守る！」"
   },
   {
     "id": "TKY-E09",
     "stageId": "kanto_area6",
-    "name": "深川めし",
+    "name": "歌舞伎影武者レイス",
     "prefecture": "東京",
     "grade": 3,
     "level": 9,
@@ -1916,12 +2556,17 @@
     "image": "TKY-E09.webp",
     "isBoss": false,
     "exp": 76,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "芸能・文化系",
+    "habitat": "銀座・歌舞伎座",
+    "desc": "隈取の仮面をかぶった霊武者。舞台裏で刀を抜き、影の剣士となる。",
+    "trivia": "歌舞伎は江戸時代から続く日本の伝統芸能で、世界無形文化遺産。",
+    "catchphrase": "「舞台裏から忍ぶ、影の剣士！」"
   },
   {
     "id": "TKY-E10",
     "stageId": "kanto_area6",
-    "name": "佃島の干物",
+    "name": "江戸城シルドラゴン",
     "prefecture": "東京",
     "grade": 3,
     "level": 9,
@@ -1931,12 +2576,17 @@
     "image": "TKY-E10.webp",
     "isBoss": true,
     "exp": 152,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説系",
+    "habitat": "皇居・江戸城跡",
+    "desc": "江戸城の石垣から蘇った銀の竜。背に瓦をまとい、城を守護する。",
+    "trivia": "江戸城は徳川幕府の拠点であり、現在は皇居として残る。",
+    "catchphrase": "「城を背負い、江戸を統べる竜！」"
   },
   {
     "id": "KNG-E01",
     "stageId": "kanto_area7",
-    "name": "湘南しらす",
+    "name": "湘南シラススウォーム",
     "prefecture": "神奈川",
     "grade": 3,
     "level": 10,
@@ -1946,12 +2596,17 @@
     "image": "KNG-E01.webp",
     "isBoss": false,
     "exp": 93,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海産系",
+    "habitat": "湘南・江の島",
+    "desc": "無数のしらすが群れを作り、一つの丸っこいモンスターのように動く。光を放ちながら波打ち際を泳ぎ、きらめく群体となる。",
+    "trivia": "湘南はしらす漁の名所で、新鮮なしらす丼は観光客に大人気。",
+    "catchphrase": "「白き群れ、波とともにきらめく！」"
   },
   {
     "id": "KNG-E02",
     "stageId": "kanto_area7",
-    "name": "シウマイ",
+    "name": "横浜焼売オートマトン",
     "prefecture": "神奈川",
     "grade": 3,
     "level": 10,
@@ -1961,12 +2616,17 @@
     "image": "KNG-E02.webp",
     "isBoss": false,
     "exp": 93,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化系",
+    "habitat": "横浜中華街",
+    "desc": "蒸籠から現れた機械仕掛けの焼売兵。頭頂から蒸気を吹き出し、無機質な赤い目を光らせながら歩く。",
+    "trivia": "横浜中華街はアジア最大級のチャイナタウンで、点心は観光の目玉。",
+    "catchphrase": "「湯気の機械兵、街を行進！」"
   },
   {
     "id": "KNG-E03",
     "stageId": "kanto_area7",
-    "name": "中華街",
+    "name": "小田原板カマアーマー",
     "prefecture": "神奈川",
     "grade": 3,
     "level": 10,
@@ -1976,12 +2636,17 @@
     "image": "KNG-E03.webp",
     "isBoss": false,
     "exp": 93,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化系",
+    "habitat": "小田原市",
+    "desc": "かまぼこ板を盾のように構えた小獣型モンスター。弾力ある体で攻撃を弾き返し、守りに優れる。",
+    "trivia": "小田原かまぼこは江戸時代から続く伝統的な加工食品。",
+    "catchphrase": "「ぷりぷり跳ねる、板盾の守り子！」"
   },
   {
     "id": "KNG-E04",
     "stageId": "kanto_area7",
-    "name": "江ノ電",
+    "name": "三浦マグロジョーズ",
     "prefecture": "神奈川",
     "grade": 3,
     "level": 10,
@@ -1991,12 +2656,17 @@
     "image": "KNG-E04.webp",
     "isBoss": false,
     "exp": 93,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海産系",
+    "habitat": "三浦半島・三崎港",
+    "desc": "巨大なマグロの姿をした獣。鋭いヒレで獲物を切り裂き、冷徹な捕食者として恐れられる。",
+    "trivia": "三崎港はマグロ漁で有名で、日本有数の水揚げ量を誇る。",
+    "catchphrase": "「赤き海の刃、冷徹なる捕食者！」"
   },
   {
     "id": "KNG-E05",
     "stageId": "kanto_area7",
-    "name": "箱根温泉卵",
+    "name": "鎌倉大仏ゴーレム",
     "prefecture": "神奈川",
     "grade": 3,
     "level": 10,
@@ -2006,12 +2676,17 @@
     "image": "KNG-E05.webp",
     "isBoss": false,
     "exp": 93,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "観光系",
+    "habitat": "鎌倉・高徳院",
+    "desc": "鎌倉大仏の石や銅板が組み合わさってできた小型ゴーレム。穏やかな微笑みで人々を癒す。",
+    "trivia": "鎌倉大仏は高さ約11mの国宝で、鎌倉を代表する観光地。",
+    "catchphrase": "「石と銅の守護者、微笑む仏！」"
   },
   {
     "id": "KNG-E06",
     "stageId": "kanto_area7",
-    "name": "横須賀カレー",
+    "name": "箱根温泉オニユニット",
     "prefecture": "神奈川",
     "grade": 3,
     "level": 10,
@@ -2021,12 +2696,17 @@
     "image": "KNG-E06.webp",
     "isBoss": false,
     "exp": 93,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "温泉系",
+    "habitat": "箱根温泉",
+    "desc": "温泉の蒸気に包まされた鬼。赤い目を光らせ、湯けむりの中から姿を現す。",
+    "trivia": "箱根は日本屈指の温泉地で、多くの旅館や温泉街がある。",
+    "catchphrase": "「湯けむりとともに現れる炎鬼！」"
   },
   {
     "id": "KNG-E07",
     "stageId": "kanto_area7",
-    "name": "鎌倉野菜",
+    "name": "横須賀カレー",
     "prefecture": "神奈川",
     "grade": 3,
     "level": 10,
@@ -2036,12 +2716,17 @@
     "image": "KNG-E07.webp",
     "isBoss": false,
     "exp": 93,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化系",
+    "habitat": "横須賀市",
+    "desc": "カレー皿を背負った猫モンスター。しっぽを振りながら歩き、スパイスの香りで仲間を呼ぶ。",
+    "trivia": "横須賀は「海軍カレー」の街として全国的に有名。",
+    "catchphrase": "「スパイス香る、港のにゃんこ！」"
   },
   {
     "id": "KNG-E08",
     "stageId": "kanto_area7",
-    "name": "湘南ゴールド",
+    "name": "川崎工場ナイトスペクター",
     "prefecture": "神奈川",
     "grade": 3,
     "level": 10,
@@ -2051,12 +2736,17 @@
     "image": "KNG-E08.webp",
     "isBoss": false,
     "exp": 93,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工業系",
+    "habitat": "川崎市・工場夜景地帯",
+    "desc": "煙突の煙と光が融合して生まれた幽鬼。半透明の体に光が揺らめき、夜空を漂う。",
+    "trivia": "川崎の工場地帯は夜景観光スポットとして人気を博している。",
+    "catchphrase": "「煙と光が踊る、夜の亡霊！」"
   },
   {
     "id": "KNG-E09",
     "stageId": "kanto_area7",
-    "name": "葉山牛",
+    "name": "江の島ドラゴンタートル",
     "prefecture": "神奈川",
     "grade": 3,
     "level": 10,
@@ -2066,12 +2756,17 @@
     "image": "KNG-E09.webp",
     "isBoss": false,
     "exp": 93,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説系",
+    "habitat": "江の島",
+    "desc": "甲羅に龍の文様を持つ海亀モンスター。海の守り子として穏やかに泳ぐ。",
+    "trivia": "江の島には龍神伝説が伝わり、信仰の対象とされている。",
+    "catchphrase": "「龍の甲羅を背負う、海の守り子！」"
   },
   {
     "id": "KNG-E10",
     "stageId": "kanto_area7",
-    "name": "海軍コロッケ",
+    "name": "丹沢サンダーライガー",
     "prefecture": "神奈川",
     "grade": 3,
     "level": 10,
@@ -2081,12 +2776,17 @@
     "image": "KNG-E10.webp",
     "isBoss": true,
     "exp": 186,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説系",
+    "habitat": "丹沢山地",
+    "desc": "雷をまとった巨大な獅子の幻獣。山岳を駡きまぎ、嵐の中に現れる。",
+    "trivia": "丹沢山地は雷や嵐の伝承が多く残る自然豊かな山域。",
+    "catchphrase": "「雷鳴とともに吠える、丹沢の王！」"
   },
   {
     "id": "NGT-E01",
     "stageId": "chubu_area1",
-    "name": "コシヒカリ",
+    "name": "コシヒカリスプライト",
     "prefecture": "新潟",
     "grade": 4,
     "level": 11,
@@ -2096,12 +2796,17 @@
     "image": "NGT-E01.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化系",
+    "habitat": "魚沼地域",
+    "desc": "稲穂を背負った小さな米の精霊。白い米粒を体にあしらい、丸っこい姿で微笑む。黄金の稲が背から揺れる。",
+    "trivia": "新潟県は日本一の米どころで、「魚沼産コシヒカリ」は特に高級ブランド米。",
+    "catchphrase": "「黄金の稲から生まれた、笑顔の米精！」"
   },
   {
     "id": "NGT-E02",
     "stageId": "chubu_area1",
-    "name": "笹団子",
+    "name": "佐渡寒ブリリッパー",
     "prefecture": "新潟",
     "grade": 4,
     "level": 11,
@@ -2111,12 +2816,17 @@
     "image": "NGT-E02.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "海産系",
+    "habitat": "佐渡沖",
+    "desc": "白き羽が巻き上がる白鯛。寒く凍りついた海に棲む優雅な白鯛モンスター。冬を似て美しい姿を展開。",
+    "trivia": "寒冷の海で冬の寒波を乗り越えて耐えられる美しい白鯛モンスター。",
+    "catchphrase": "「雪を乗り越えた、優雅な剣舞！」"
   },
   {
     "id": "NGT-E03",
     "stageId": "chubu_area1",
-    "name": "日本酒",
+    "name": "笹団子チャイルド",
     "prefecture": "新潟",
     "grade": 4,
     "level": 11,
@@ -2126,12 +2836,17 @@
     "image": "NGT-E03.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化系",
+    "habitat": "新潟市周辺",
+    "desc": "笹の葉にくるまれた団子の子どもモンスター。ころころ転がり、にこにこ笑顔を見せる。",
+    "trivia": "笹団子は新潟を代表する郷土菓子で、保存性も高い。",
+    "catchphrase": "「くるくる転がる、甘味の子守り！」"
   },
   {
     "id": "NGT-E04",
     "stageId": "chubu_area1",
-    "name": "のっぺい汁",
+    "name": "日本酒バインドゴースト",
     "prefecture": "新潟",
     "grade": 4,
     "level": 11,
@@ -2141,12 +2856,17 @@
     "image": "NGT-E04.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "酒文化系",
+    "habitat": "長岡や新潟の酒蔵",
+    "desc": "酒樽の蒸気から生まれた酔いどれの霊。白いもやに包まれ、赤い光の目で漂う。",
+    "trivia": "新潟は酒蔵数日本一を誇り、淡麗辛口の酒が有名。",
+    "catchphrase": "「酒気をまとい、酔夢に誘う影！」"
   },
   {
     "id": "NGT-E05",
     "stageId": "chubu_area1",
-    "name": "南蛮エビ",
+    "name": "錦鯉セラフ",
     "prefecture": "新潟",
     "grade": 4,
     "level": 11,
@@ -2156,12 +2876,17 @@
     "image": "NGT-E05.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然系",
+    "habitat": "小千谷市",
+    "desc": "錦鯉の鱗模様をまとった水の天使。小さな水の翼を広げ、優雅に舞い泳ぐ。",
+    "trivia": "小千谷市は錦鯉発祥の地で、世界的に観賞魚として親しまれている。",
+    "catchphrase": "「彩りの翼、泳ぐように舞う！」"
   },
   {
     "id": "NGT-E06",
     "stageId": "chubu_area1",
-    "name": "へぎそば",
+    "name": "燕三条スチールゴーレム",
     "prefecture": "新潟",
     "grade": 4,
     "level": 11,
@@ -2171,12 +2896,17 @@
     "image": "NGT-E06.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸系",
+    "habitat": "燕三条地域",
+    "desc": "金槌や刃物の破片から組み上がった鋼鉄のゴーレム。鈍い銀色の体が無骨に輝く。",
+    "trivia": "燕三条は世界的な金属加工の町として知られる。",
+    "catchphrase": "「鉄槌響く、鋼の巨兵！」"
   },
   {
     "id": "NGT-E07",
     "stageId": "chubu_area1",
-    "name": "鮭",
+    "name": "十日町きものフェアリー",
     "prefecture": "新潟",
     "grade": 4,
     "level": 11,
@@ -2186,12 +2916,17 @@
     "image": "NGT-E07.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸系",
+    "habitat": "十日町市",
+    "desc": "色鮮やかな絹の着物をまとう小さな妖精。ひらひらと舞い踊り、優雅に笑う。",
+    "trivia": "十日町は伝統的な絹織物の産地で「きものの町」として有名。",
+    "catchphrase": "「絹の風をまとう、舞の乙女！」"
   },
   {
     "id": "NGT-E08",
     "stageId": "chubu_area1",
-    "name": "バスセンターのカレー",
+    "name": "長岡花火ファントマトン",
     "prefecture": "新潟",
     "grade": 4,
     "level": 11,
@@ -2201,12 +2936,17 @@
     "image": "NGT-E08.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "祭り系",
+    "habitat": "長岡市",
+    "desc": "花火の筒や火薬で組まれた自動人形。胸から火花を散らし、夜空のように赤青に光る。",
+    "trivia": "長岡花火大会は日本三大花火の一つで、戦後復興の象徴。",
+    "catchphrase": "「火花を操り、夜空を統べる人形兵！」"
   },
   {
     "id": "NGT-E09",
     "stageId": "chubu_area1",
-    "name": "三角だるま",
+    "name": "相川金山ドワーフ",
     "prefecture": "新潟",
     "grade": 4,
     "level": 11,
@@ -2216,12 +2956,17 @@
     "image": "NGT-E09.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "鉱山系",
+    "habitat": "佐渡金山",
+    "desc": "小さな体で金鉱石を抱えるドワーフ。ランプを頭に灯し、坑道を守る。",
+    "trivia": "佐渡金山は江戸時代、日本最大級の金産出量を誇った。",
+    "catchphrase": "「金を抱えて輝く、坑道の番人！」"
   },
   {
     "id": "NGT-E10",
     "stageId": "chubu_area1",
-    "name": "雪下にんじん",
+    "name": "越後雪鬼イエティ",
     "prefecture": "新潟",
     "grade": 4,
     "level": 11,
@@ -2231,12 +2976,17 @@
     "image": "NGT-E10.webp",
     "isBoss": true,
     "exp": 226,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説系",
+    "habitat": "越後山脈",
+    "desc": "雪に覆われた巨大な鬼獣。氷の爪を振りかざし、吹雪とともに現れる。",
+    "trivia": "新潟県は日本有数の豪雪地帯で、雪にまつわる伝承が多い。",
+    "catchphrase": "「白銀を裂く、越後の雪鬼！」"
   },
   {
     "id": "TYM-E01",
     "stageId": "chubu_area2",
-    "name": "ホタルイカ",
+    "name": "富山ホタルイカランタン",
     "prefecture": "富山",
     "grade": 4,
     "level": 11,
@@ -2246,12 +2996,17 @@
     "image": "TYM-E01.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海産系",
+    "habitat": "富山湾",
+    "desc": "青白い光を放つ小さなホタルイカのモンスター。丸っこく、夜の海でランタンのように漂う。",
+    "trivia": "富山湾は「天然のいけす」と呼ばれ、ホタルイカの発光は春の風物詩。",
+    "catchphrase": "「青き光で、海を照らす小灯り！」"
   },
   {
     "id": "TYM-E02",
     "stageId": "chubu_area2",
-    "name": "ます寿司",
+    "name": "白エビゴースト",
     "prefecture": "富山",
     "grade": 4,
     "level": 11,
@@ -2261,12 +3016,17 @@
     "image": "TYM-E02.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海産系",
+    "habitat": "富山湾",
+    "desc": "透き通った体を持つ白エビの霊。淡い青白い光をまといながら水中を漂う。",
+    "trivia": "白エビは「富山湾の宝石」と呼ばれ、甘みのある高級食材。",
+    "catchphrase": "「透明なる影、深海をさまよう！」"
   },
   {
     "id": "TYM-E03",
     "stageId": "chubu_area2",
-    "name": "立山連峰",
+    "name": "ます寿司ローラー",
     "prefecture": "富山",
     "grade": 4,
     "level": 11,
@@ -2276,12 +3036,17 @@
     "image": "TYM-E03.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化系",
+    "habitat": "富山市",
+    "desc": "笹の葉に包まれた円盤状の寿司がモンスター化。コロコロ転がりながら移動し、笹の香りを振りまく。",
+    "trivia": "富山名物「ます寿司」は押し寿司の代表格で、駅弁としても人気。",
+    "catchphrase": "「転がる笹香、押し寿司パワー！」"
   },
   {
     "id": "TYM-E04",
     "stageId": "chubu_area2",
-    "name": "薬売り",
+    "name": "黒部ダムリヴァイアサン",
     "prefecture": "富山",
     "grade": 4,
     "level": 11,
@@ -2291,12 +3056,17 @@
     "image": "TYM-E04.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "黒部ダム",
+    "desc": "ダムの水圧から生まれた水竜。轟音を響かせて山々を震わせる。",
+    "trivia": "黒部ダムは日本最大級のアーチ式ダムで、観光名所としても有名。",
+    "catchphrase": "「黒き水流、山を揺らす咆哮！」"
   },
   {
     "id": "TYM-E05",
     "stageId": "chubu_area2",
-    "name": "昆布締め",
+    "name": "立山ユキウサギ",
     "prefecture": "富山",
     "grade": 4,
     "level": 11,
@@ -2306,12 +3076,17 @@
     "image": "TYM-E05.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "立山連峰",
+    "desc": "真っ白な雪の中で跳ねる小さな雪ウサギ。耳が雪の結晶の形をしている。",
+    "trivia": "立山連峰は日本屈指の豪雪地帯で、ライチョウやユキウサギが象徴的存在。",
+    "catchphrase": "「雪原を駆ける、白き跳ね星！」"
   },
   {
     "id": "TYM-E06",
     "stageId": "chubu_area2",
-    "name": "ブリ",
+    "name": "高岡銅器ゴーレム",
     "prefecture": "富山",
     "grade": 4,
     "level": 11,
@@ -2321,12 +3096,17 @@
     "image": "TYM-E06.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸系",
+    "habitat": "高岡市",
+    "desc": "銅像や仏具の破片から組み上がった巨人。緑青の体で重々しく動く。",
+    "trivia": "高岡は400年以上の歴史を持つ銅器産地で、日本三大大仏の一つ「高岡大仏」も造られた。",
+    "catchphrase": "「銅の魂が宿る、鋼鉄の守護者！」"
   },
   {
     "id": "TYM-E07",
     "stageId": "chubu_area2",
-    "name": "鱒の寿司",
+    "name": "越中八尾オワラダンサー",
     "prefecture": "富山",
     "grade": 4,
     "level": 11,
@@ -2336,12 +3116,17 @@
     "image": "TYM-E07.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "祭り系",
+    "habitat": "八尾町",
+    "desc": "編笠をかぶった小さな踊り子モンスター。鈴を鳴らしながら優雅に舞う。",
+    "trivia": "越中八尾「おわら風の盆」は日本を代表する伝統舞踊祭。",
+    "catchphrase": "「風に揺れる、舞の囁き！」"
   },
   {
     "id": "TYM-E08",
     "stageId": "chubu_area2",
-    "name": "富山ブラックラーメン",
+    "name": "五箇山合掌ファントム",
     "prefecture": "富山",
     "grade": 4,
     "level": 11,
@@ -2351,12 +3136,17 @@
     "image": "TYM-E08.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "建築・伝統系",
+    "habitat": "五箇山合掌造り集落",
+    "desc": "茅葺き屋根が人型となった霊体。夜になると屋根が揺れ、不気味な影を落とす。",
+    "trivia": "五箇山は世界遺産の合掌造り集落で、雪国の知恵が詰まった住居。",
+    "catchphrase": "「屋根が揺らめき、影が歩き出す！」"
   },
   {
     "id": "TYM-E09",
     "stageId": "chubu_area2",
-    "name": "白エビ",
+    "name": "富山薬売りインプ",
     "prefecture": "富山",
     "grade": 4,
     "level": 11,
@@ -2366,12 +3156,17 @@
     "image": "TYM-E09.webp",
     "isBoss": false,
     "exp": 113,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝統・商文化系",
+    "habitat": "富山市周辺",
+    "desc": "薬箱を背負った小さな商人インプ。笑顔で丸薬を差し出す。",
+    "trivia": "富山の薬売りは「置き薬商法」で全国を巡った伝統文化。",
+    "catchphrase": "「元気を届ける、小さな薬売り！」"
   },
   {
     "id": "TYM-E10",
     "stageId": "chubu_area2",
-    "name": "立山杉",
+    "name": "立山雷鳥ガーディアン",
     "prefecture": "富山",
     "grade": 4,
     "level": 11,
@@ -2381,12 +3176,17 @@
     "image": "TYM-E10.webp",
     "isBoss": true,
     "exp": 226,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然・伝説系",
+    "habitat": "立山連峰",
+    "desc": "雷と雪をまとった巨大な雷鳥の守護獣。山の神の化身とされる。",
+    "trivia": "雷鳥は「神の鳥」と呼ばれ、立山信仰の象徴。",
+    "catchphrase": "「雪嶺に轟く、雷鳴の翼！」"
   },
   {
     "id": "ISK-E01",
     "stageId": "chubu_area3",
-    "name": "加賀野菜",
+    "name": "加賀野菜ピクシー",
     "prefecture": "石川",
     "grade": 4,
     "level": 12,
@@ -2396,12 +3196,17 @@
     "image": "ISK-E01.webp",
     "isBoss": false,
     "exp": 138,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化系",
+    "habitat": "金沢市",
+    "desc": "加賀野菜（五郎島金時や金時草など）を頭や体にまとった小さな妖精。元気いっぱいに畑を駆け回る。",
+    "trivia": "加賀野菜は金沢市特産のブランド野菜で約15品目が認定されている。",
+    "catchphrase": "「彩り豊かな畑の守り子！」"
   },
   {
     "id": "ISK-E02",
     "stageId": "chubu_area3",
-    "name": "金箔",
+    "name": "香箱ガニクラーケン",
     "prefecture": "石川",
     "grade": 4,
     "level": 12,
@@ -2411,12 +3216,17 @@
     "image": "ISK-E02.webp",
     "isBoss": false,
     "exp": 138,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海産・甲殻類系",
+    "habitat": "金沢港",
+    "desc": "香箱ガニが巨大化した甲殻獣。鋭い鉗爪と黒い泡を武器に、海を徘徊する。",
+    "trivia": "香箱ガニはズワイガニの雌で、冬の金沢の味覚を代表する。",
+    "catchphrase": "「冬の海を支配する赤き鉗爪！」"
   },
   {
     "id": "ISK-E03",
     "stageId": "chubu_area3",
-    "name": "和菓子",
+    "name": "能登塩クリスタルビースト",
     "prefecture": "石川",
     "grade": 4,
     "level": 12,
@@ -2426,12 +3236,17 @@
     "image": "ISK-E03.webp",
     "isBoss": false,
     "exp": 138,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化・自然系",
+    "habitat": "能登半島",
+    "desc": "塩の結晶が集まって生まれた小さな獣型モンスター。背中の結晶はきらめき続ける。",
+    "trivia": "能登の「揚げ浜式製塩」は日本最古の製塩法のひとつ。",
+    "catchphrase": "「輝く結晶、浜辺の小獣！」"
   },
   {
     "id": "ISK-E04",
     "stageId": "chubu_area3",
-    "name": "輪島塗",
+    "name": "輪島朝市シャドー",
     "prefecture": "石川",
     "grade": 4,
     "level": 12,
@@ -2441,12 +3256,17 @@
     "image": "ISK-E04.webp",
     "isBoss": false,
     "exp": 138,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "文化系",
+    "habitat": "輪島市",
+    "desc": "朝市の喧噪に取り残された影が集合して生まれた霊体。魚籠や干物の模様が揺らめく。",
+    "trivia": "輪島の朝市は1000年以上続く伝統市で、日本三大朝市のひとつ。",
+    "catchphrase": "「ざわめき残す、影の市！」"
   },
   {
     "id": "ISK-E05",
     "stageId": "chubu_area3",
-    "name": "能登の牡蠣",
+    "name": "白山ミズヘビ",
     "prefecture": "石川",
     "grade": 4,
     "level": 12,
@@ -2456,12 +3276,17 @@
     "image": "ISK-E05.webp",
     "isBoss": false,
     "exp": 138,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "白山の清流",
+    "desc": "水紋模様を背に持つ小さな水蛇。丸っこい体で愛嬌を振りまきながら泳ぐ。",
+    "trivia": "白山は日本三霊山のひとつで、豊富な雪解け水が清流を育む。",
+    "catchphrase": "「清流を駆ける、水紋の蛇！」"
   },
   {
     "id": "ISK-E06",
     "stageId": "chubu_area3",
-    "name": "治部煮",
+    "name": "九谷焼ゴーレム",
     "prefecture": "石川",
     "grade": 4,
     "level": 12,
@@ -2471,12 +3296,17 @@
     "image": "ISK-E06.webp",
     "isBoss": false,
     "exp": 138,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸系",
+    "habitat": "加賀市",
+    "desc": "九谷焼の陶片でできた巨人。極彩色の模様が浮かび上がり、光を反射して輝く。",
+    "trivia": "九谷焼は400年の歴史を持つ石川県の伝統陶磁器。",
+    "catchphrase": "「彩色の破片、動き出す器！」"
   },
   {
     "id": "ISK-E07",
     "stageId": "chubu_area3",
-    "name": "甘エビ",
+    "name": "七尾ひょっとこゴブリン",
     "prefecture": "石川",
     "grade": 4,
     "level": 12,
@@ -2486,12 +3316,17 @@
     "image": "ISK-E07.webp",
     "isBoss": false,
     "exp": 138,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "祭り系",
+    "habitat": "七尾市",
+    "desc": "小さなゴブリンがひょっとことばかりしている。お祭りのおどりに参加している。",
+    "trivia": "七尾市は日本三大祭りのひとつ「七尾ひょっとこ祭」がある。",
+    "catchphrase": "「奇妙な踊り、笑いを誘う祭りの道化！」"
   },
   {
     "id": "ISK-E08",
     "stageId": "chubu_area3",
-    "name": "のどくろ",
+    "name": "輪島塗アーマードゴーレム",
     "prefecture": "石川",
     "grade": 4,
     "level": 12,
@@ -2501,12 +3336,17 @@
     "image": "ISK-E08.webp",
     "isBoss": false,
     "exp": 138,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸系",
+    "habitat": "輪島市",
+    "desc": "輪島塗の漆黒の鎧をまとったゴーレム。赤と金の模様が体を走り、荘厳な雰囲気を放つ。",
+    "trivia": "輪島塗は堅牢さと美しさを兼ね備えた漆器で、日本を代表する工芸品。",
+    "catchphrase": "「漆黒の輝き、永遠の守護者！」"
   },
   {
     "id": "ISK-E09",
     "stageId": "chubu_area3",
-    "name": "金沢カレー",
+    "name": "金沢鼓オーガ",
     "prefecture": "石川",
     "grade": 4,
     "level": 12,
@@ -2516,12 +3356,17 @@
     "image": "ISK-E09.webp",
     "isBoss": false,
     "exp": 138,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "祭り系",
+    "habitat": "金沢市",
+    "desc": "太鼓を背負った小鬼のモンスター。楽しげに太鼓を叩き、祭りの熱気を盛り上げる。",
+    "trivia": "加賀百万石祭りでは鼓や太鼓が街を彩り、盛大に催される。",
+    "catchphrase": "「百万石の響き、祭りの鼓動！」"
   },
   {
     "id": "ISK-E10",
     "stageId": "chubu_area3",
-    "name": "能登塩",
+    "name": "白山シラヤマドラゴン",
     "prefecture": "石川",
     "grade": 4,
     "level": 12,
@@ -2531,12 +3376,17 @@
     "image": "ISK-E10.webp",
     "isBoss": true,
     "exp": 276,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "白山",
+    "desc": "雪と雷をまとった白銀の龍。冷気を吐き、山の守護神として威厳を放つ。",
+    "trivia": "白山信仰では霊峰を守護する神獣とされる。",
+    "catchphrase": "「雪と雷鳴に轟く、白山の龍！」"
   },
   {
     "id": "HKI-E01",
     "stageId": "chubu_area4",
-    "name": "ソースカツ丼",
+    "name": "越前ガニクラブリン",
     "prefecture": "福井",
     "grade": 4,
     "level": 13,
@@ -2546,12 +3396,17 @@
     "image": "HKI-E01.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化系",
+    "habitat": "越前町",
+    "desc": "黄色いタグをつけた小さなカニのモンスター。ハサーミでピースサインを作って遊ぶ。",
+    "trivia": "越前ガニは日本海の冬を代表する高級ブランドガニ。",
+    "catchphrase": "「タグ付きブランド、元気なハサミ！」"
   },
   {
     "id": "HKI-E02",
     "stageId": "chubu_area4",
-    "name": "水ようかん",
+    "name": "若狭フグシャドー",
     "prefecture": "福井",
     "grade": 4,
     "level": 13,
@@ -2561,12 +3416,17 @@
     "image": "HKI-E02.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "海産・食文化系",
+    "habitat": "若狭湾",
+    "desc": "膨れた体のフグが影のように漂う。毒を含んだ泡を吹き出す姿が不気味。",
+    "trivia": "若狭湾はフグ料理が名物で、観光客にも人気。",
+    "catchphrase": "「影に潜む、毒の泡！」"
   },
   {
     "id": "HKI-E03",
     "stageId": "chubu_area4",
-    "name": "越前焼",
+    "name": "ソースカツゴーレム",
     "prefecture": "福井",
     "grade": 4,
     "level": 13,
@@ -2576,12 +3436,17 @@
     "image": "HKI-E03.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "ご当地グルメ系",
+    "habitat": "福井市",
+    "desc": "丼の器やカツが積み重なって動き出した小型ゴーレム。香ばしい香りを漂わせる。",
+    "trivia": "福井のソースカツ丼は卵でとじない独自のスタイルで知られる。",
+    "catchphrase": "「サクサク衣の、元気ゴーレム！」"
   },
   {
     "id": "HKI-E04",
     "stageId": "chubu_area4",
-    "name": "若狭ぐじ",
+    "name": "東尋坊クラーケン",
     "prefecture": "福井",
     "grade": 4,
     "level": 13,
@@ -2591,12 +3456,17 @@
     "image": "HKI-E04.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "東尋坊",
+    "desc": "断崖の下に潜むタコ型モンスター。体に岩の模様を刻み、荒波に合わせて動く。",
+    "trivia": "東尋坊は柱状節理の断崖絶壁で、日本海随一の景勝地。",
+    "catchphrase": "「断崖に潜む、海の魔物！」"
   },
   {
     "id": "HKI-E05",
     "stageId": "chubu_area4",
-    "name": "へしこ",
+    "name": "メガネドラゴネット",
     "prefecture": "福井",
     "grade": 4,
     "level": 13,
@@ -2606,12 +3476,17 @@
     "image": "HKI-E05.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "産業系",
+    "habitat": "鯖江市",
+    "desc": "大きな眼鏡をかけた小さな竜。レンズから未来を見通す光を放つ。",
+    "trivia": "鯖江は世界的な眼鏡フレームの産地。",
+    "catchphrase": "「未来を見通す、ガラスの瞳！」"
   },
   {
     "id": "HKI-E06",
     "stageId": "chubu_area4",
-    "name": "越前ガニ",
+    "name": "越前和紙ペーパーウィスプ",
     "prefecture": "福井",
     "grade": 4,
     "level": 13,
@@ -2621,12 +3496,17 @@
     "image": "HKI-E06.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸系",
+    "habitat": "越前市",
+    "desc": "和紙の切れ端が集まり霊体のように漂う。風に舞い、古文の文字が淡く光る。",
+    "trivia": "越前和紙は1500年以上の歴史を持つ伝統工芸品。",
+    "catchphrase": "「紙片が集い、古の声を囁く！」"
   },
   {
     "id": "HKI-E07",
     "stageId": "chubu_area4",
-    "name": "越前そば",
+    "name": "勝山恐竜チャイルド",
     "prefecture": "福井",
     "grade": 4,
     "level": 13,
@@ -2636,12 +3516,17 @@
     "image": "HKI-E07.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "恐竜系",
+    "habitat": "勝山市",
+    "desc": "小さな恐竜型モンスター。背中に化石模様を持ち、元気いっぱいに駆け回る。",
+    "trivia": "勝山の恐竜博物館は国内最大級の恐竜展示を誇る。",
+    "catchphrase": "「太古のロマン、ちびっこ恐竜！」"
   },
   {
     "id": "HKI-E08",
     "stageId": "chubu_area4",
-    "name": "恐竜",
+    "name": "一乗谷サムライレイス",
     "prefecture": "福井",
     "grade": 4,
     "level": 13,
@@ -2651,12 +3536,17 @@
     "image": "HKI-E08.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史系",
+    "habitat": "一乗谷朝倉氏遺跡",
+    "desc": "鎧をまとった武者の霊が、亡国の記憶と共に出現。冷たい風をまとっている。",
+    "trivia": "一乗谷朝倉氏遺跡は戦国大名の居城跡で「北陸の小京都」と呼ばれる。",
+    "catchphrase": "「廃城に響く、武者の嘆き！」"
   },
   {
     "id": "HKI-E09",
     "stageId": "chubu_area4",
-    "name": "羽二十餅",
+    "name": "三国祭ライオネット",
     "prefecture": "福井",
     "grade": 4,
     "level": 13,
@@ -2666,12 +3556,17 @@
     "image": "HKI-E09.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "祭り系",
+    "habitat": "坂井市",
+    "desc": "山車から飛び出した子獅子のモンスター。太鼓に合わせて跳ね回る。",
+    "trivia": "三国祭は北陸三大祭りのひとつで、豪華な山車が有名。",
+    "catchphrase": "「祭りのリズムに舞う、子獅子の勇気！」"
   },
   {
     "id": "HKI-E10",
     "stageId": "chubu_area4",
-    "name": "若狭塗",
+    "name": "河野クラゲエンペラー",
     "prefecture": "福井",
     "grade": 4,
     "level": 13,
@@ -2681,12 +3576,17 @@
     "image": "HKI-E10.webp",
     "isBoss": true,
     "exp": 334,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "海洋伝承系",
+    "habitat": "若狭湾・河野海岸",
+    "desc": "夜光クラゲが集合して王の姿をとった幻獣。青白い光を放ち、潮を自在に操る。",
+    "trivia": "若狭湾は透明度の高い海と豊富な海洋生物で知られる。",
+    "catchphrase": "「光の触手が、海を支配する！」"
   },
   {
     "id": "NGN-E01",
     "stageId": "chubu_area5",
-    "name": "野沢菜",
+    "name": "信州リンゴインプ",
     "prefecture": "長野",
     "grade": 4,
     "level": 13,
@@ -2696,12 +3596,17 @@
     "image": "NGN-E01.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "果物系",
+    "habitat": "長野市・リンゴ園",
+    "desc": "リンゴをかじった跡のような耳を持つ小鬼。両手にリンゴを抱え、跳ね回るように動く。",
+    "trivia": "信州は日本有数のリンゴの産地で、「ふじ」など多くの品種が育てられている。",
+    "catchphrase": "「赤く実った果実を守る、小さな悪戯っ子！」"
   },
   {
     "id": "NGN-E02",
     "stageId": "chubu_area5",
-    "name": "おやき",
+    "name": "野沢菜シャドークローク",
     "prefecture": "長野",
     "grade": 4,
     "level": 13,
@@ -2711,12 +3616,17 @@
     "image": "NGN-E02.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "野菜系",
+    "habitat": "野沢温泉村",
+    "desc": "野沢菜の葉をマントのように羽織った影のモンスター。赤い目を光らせ、ひそかに忍び寄る。",
+    "trivia": "野沢菜漬けは江戸時代から続く長野の伝統保存食。",
+    "catchphrase": "「漬物の香りとともに忍び寄る影！」"
   },
   {
     "id": "NGN-E03",
     "stageId": "chubu_area5",
-    "name": "信州そば",
+    "name": "そばっ子コロボックル",
     "prefecture": "長野",
     "grade": 4,
     "level": 13,
@@ -2726,12 +3636,17 @@
     "image": "NGN-E03.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化系",
+    "habitat": "戸隠そば街道",
+    "desc": "そば殻の帽子をかぶった小人モンスター。そば打ちを真似して遊ぶ姿が愛らしい。",
+    "trivia": "戸隠そばは日本三大そばのひとつで、修験道文化とも関わりが深い。",
+    "catchphrase": "「ちょこんと座って、そばをこねるよ！」"
   },
   {
     "id": "NGN-E04",
     "stageId": "chubu_area5",
-    "name": "ながのりんご",
+    "name": "御柱ジャガーノート",
     "prefecture": "長野",
     "grade": 4,
     "level": 13,
@@ -2741,12 +3656,17 @@
     "image": "NGN-E04.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "祭り系",
+    "habitat": "諏訪大社",
+    "desc": "御柱が鎧と車輪をまとう突進兵器のような巨木モンスター。轟音を響かせながら突進する。",
+    "trivia": "諏訪大社の「御柱祭」は7年に一度行われる豪壮な祭事。",
+    "catchphrase": "「神柱が轟き、荒ぶる巨神兵！」"
   },
   {
     "id": "NGN-E05",
     "stageId": "chubu_area5",
-    "name": "木曾漆器",
+    "name": "松本城クロウガーディアン",
     "prefecture": "長野",
     "grade": 4,
     "level": 13,
@@ -2756,12 +3676,17 @@
     "image": "NGN-E05.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史系",
+    "habitat": "松本市",
+    "desc": "黒羽を広げた小さな鳥モンスター。烏城を象徴し、城を護る守護者。",
+    "trivia": "松本城は「烏城」と呼ばれる国宝の城郭。",
+    "catchphrase": "「黒羽を広げ、城を護る翼！」"
   },
   {
     "id": "NGN-E06",
     "stageId": "chubu_area5",
-    "name": "おやき（高菜）",
+    "name": "善光寺ゴーストモンク",
     "prefecture": "長野",
     "grade": 4,
     "level": 13,
@@ -2771,12 +3696,17 @@
     "image": "NGN-E06.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "仏教系",
+    "habitat": "長野市・善光寺",
+    "desc": "僧衣をまとった幽霊のようなモンスター。法要の音を奏で、亡霊の世界へ誘う。",
+    "trivia": "善光寺は「一生に一度は善光寺詣り」と言われる名刹。",
+    "catchphrase": "「南無の声とともに現れる、霊僧！」"
   },
   {
     "id": "NGN-E07",
     "stageId": "chubu_area5",
-    "name": "わさび漬け",
+    "name": "木曾漆器アーマービートル",
     "prefecture": "長野",
     "grade": 4,
     "level": 13,
@@ -2786,12 +3716,17 @@
     "image": "NGN-E07.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸系",
+    "habitat": "木曾町",
+    "desc": "漆塗りの装甲を背負ったカブトムシ型モンスター。光沢のある殻が仲間を守る。",
+    "trivia": "木曽漆器は国の伝統工芸に指定される漆文化。",
+    "catchphrase": "「艶めく甲冑、漆黒の騎士虫！」"
   },
   {
     "id": "NGN-E08",
     "stageId": "chubu_area5",
-    "name": "りんごチップス",
+    "name": "上田真田ウォリアー",
     "prefecture": "長野",
     "grade": 4,
     "level": 13,
@@ -2801,12 +3736,17 @@
     "image": "NGN-E08.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史系",
+    "habitat": "上田城跡",
+    "desc": "六文銭の旗を背負った赤備えの武者モンスター。鋼の鎧をまとい、刀を構える。",
+    "trivia": "真田氏は智略で知られた戦国武将で、六文銭は家紋として有名。",
+    "catchphrase": "「六文銭を背負い、戦場を駆ける！」"
   },
   {
     "id": "NGN-E09",
     "stageId": "chubu_area5",
-    "name": "山賊焼き",
+    "name": "戸隠ヤマトタケルウルフ",
     "prefecture": "長野",
     "grade": 4,
     "level": 13,
@@ -2816,12 +3756,17 @@
     "image": "NGN-E09.webp",
     "isBoss": false,
     "exp": 167,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "神話系",
+    "habitat": "戸隠山",
+    "desc": "狼の姿をした武人モンスター。甲冑をまとい大剣を構える。目は青白く光り、威厳を漂わせる。",
+    "trivia": "戸隠は日本神話や修験道にまつわる伝説が多い聖地。",
+    "catchphrase": "「神話の剣を振るう、狼武者！」"
   },
   {
     "id": "NGN-E10",
     "stageId": "chubu_area5",
-    "name": "信州みそ",
+    "name": "諏訪ミシャグジサーペント",
     "prefecture": "長野",
     "grade": 4,
     "level": 13,
@@ -2831,12 +3776,17 @@
     "image": "NGN-E10.webp",
     "isBoss": true,
     "exp": 334,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "神話系",
+    "habitat": "諏訪湖周辺",
+    "desc": "古代の蛇神が顕現した巨大な大蛇。鱗に呪紋が浮かび、湖面をうねる。",
+    "trivia": "ミシャグジ神は古代諏訪信仰に登場する蛇神。",
+    "catchphrase": "「古の呪神、湖を巡る巨蛇！」"
   },
   {
     "id": "GF-E01",
     "stageId": "chubu_area6",
-    "name": "飛騨牛",
+    "name": "鮎ストリーマー",
     "prefecture": "岐阜",
     "grade": 4,
     "level": 14,
@@ -2846,12 +3796,17 @@
     "image": "GF-E01.webp",
     "isBoss": false,
     "exp": 203,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "長良川",
+    "desc": "銀色の体に青緑の背を持つ鮎のモンスター。清流を泳ぎながら、きらめく尾びれを広げる。",
+    "trivia": "長良川の鮎は「清流の女王」と呼ばれ、漁法「鵜飼」でも有名。",
+    "catchphrase": "「清流を駆ける、きらめきの使者！」"
   },
   {
     "id": "GF-E02",
     "stageId": "chubu_area6",
-    "name": "さるぼぼ",
+    "name": "栗きんとんスライム",
     "prefecture": "岐阜",
     "grade": 4,
     "level": 14,
@@ -2861,12 +3816,17 @@
     "image": "GF-E02.webp",
     "isBoss": false,
     "exp": 203,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化系",
+    "habitat": "中津川市",
+    "desc": "ころんとした黄色いスライム。栗きんとんの甘い香りを漂わせ、にこにこと跳ね回る。",
+    "trivia": "中津川の栗きんとんは全国的に有名な和菓子。",
+    "catchphrase": "「ころんと甘い、山の恵み！」"
   },
   {
     "id": "GF-E03",
     "stageId": "chubu_area6",
-    "name": "鮎",
+    "name": "飛騨牛ミノタウロス",
     "prefecture": "岐阜",
     "grade": 4,
     "level": 14,
@@ -2876,12 +3836,17 @@
     "image": "GF-E02.webp",
     "isBoss": false,
     "exp": 203,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "畜産・食文化系",
+    "habitat": "飛騨高山",
+    "desc": "黒光りする筋肉質な体を持つ牛頭の巨人。赤く光る瞳と鋭い角で睨みつける。",
+    "trivia": "飛騨牛は日本三大和牛の一つとして知られる。",
+    "catchphrase": "「黒角に宿る、旨みと力！」"
   },
   {
     "id": "GF-E04",
     "stageId": "chubu_area6",
-    "name": "高山ラーメン",
+    "name": "朴葉味噌ホムンクルス",
     "prefecture": "岐阜",
     "grade": 4,
     "level": 14,
@@ -2891,12 +3856,17 @@
     "image": "GF-E04.webp",
     "isBoss": false,
     "exp": 203,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化系",
+    "habitat": "飛騨地方",
+    "desc": "炭火で焼かれた朴葉味噌が人型になったモンスター。体から香ばしい煙を漂わせる。",
+    "trivia": "朴葉の上で味噌を焼く「朴葉味噌」は飛騨の代表料理。",
+    "catchphrase": "「香ばしき煙、炭火から生まれし影！」"
   },
   {
     "id": "GF-E05",
     "stageId": "chubu_area6",
-    "name": "白川郷",
+    "name": "美濃和紙ペーパーウィスプ",
     "prefecture": "岐阜",
     "grade": 4,
     "level": 14,
@@ -2906,12 +3876,17 @@
     "image": "GF-E05.webp",
     "isBoss": false,
     "exp": 203,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸系",
+    "habitat": "美濃市",
+    "desc": "和紙を羽のように広げる小さな妖精。淡い光を放ちながらふわふわ舞う。",
+    "trivia": "美濃和紙はユネスコ無形文化遺産に登録。",
+    "catchphrase": "「光をまとう、紙の妖精！」"
   },
   {
     "id": "GF-E06",
     "stageId": "chubu_area6",
-    "name": "栗きんとん",
+    "name": "関刃鬼",
     "prefecture": "岐阜",
     "grade": 4,
     "level": 14,
@@ -2921,12 +3896,17 @@
     "image": "GF-E06.webp",
     "isBoss": false,
     "exp": 203,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸系",
+    "habitat": "関市",
+    "desc": "刀を構える鬼のモンスター。刀身には刃が無数にあり、光を放つ。",
+    "trivia": "関市は刀の産地で、「刀の郷」とも呼ばれる。",
+    "catchphrase": "「鋼の刃、鬼の魂！」"
   },
   {
     "id": "GF-E07",
     "stageId": "chubu_area6",
-    "name": "朴葉味噌",
+    "name": "白川郷合掌ゴーレム",
     "prefecture": "岐阜",
     "grade": 4,
     "level": 14,
@@ -2936,12 +3916,17 @@
     "image": "GF-E07.webp",
     "isBoss": false,
     "exp": 203,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "建築系",
+    "habitat": "白川郷",
+    "desc": "合掌造りの建物をまとった巨大なゴーレム。合掌の手を結び、静かに立ち止まる。",
+    "trivia": "白川郷は世界遺産に登録された合掌造り集落。",
+    "catchphrase": "「茅葺き屋根の、ほのぼの番人！」"
   },
   {
     "id": "GF-E08",
     "stageId": "chubu_area6",
-    "name": "鶏ちゃん",
+    "name": "鵜飼リバーバード",
     "prefecture": "岐阜",
     "grade": 4,
     "level": 14,
@@ -2951,12 +3936,17 @@
     "image": "GF-E08.webp",
     "isBoss": false,
     "exp": 203,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "鳥系",
+    "habitat": "長良川",
+    "desc": "鵜を模したモンスター。首に小さな縄をつけ、嘴には魚をくわえる。",
+    "trivia": "岐阜の長良川鵜飼は1300年以上の歴史を持つ伝統漁法。",
+    "catchphrase": "「清流に舞う、漁の使者！」"
   },
   {
     "id": "GF-E09",
     "stageId": "chubu_area6",
-    "name": "高山スイーツ",
+    "name": "岐阜城シャドーサムライ",
     "prefecture": "岐阜",
     "grade": 4,
     "level": 14,
@@ -2966,12 +3956,17 @@
     "image": "GF-E09.webp",
     "isBoss": false,
     "exp": 203,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史系",
+    "habitat": "岐阜城",
+    "desc": "黒い影のような甲冑武者。赤く光る目を持ち、城を背に戦う。",
+    "trivia": "岐阜城は織田信長ゆかりの城として有名。",
+    "catchphrase": "「影の甲冑、岐阜を守る剣士！」"
   },
   {
     "id": "GF-E10",
     "stageId": "chubu_area6",
-    "name": "下呂温泉まんじゅう",
+    "name": "白山ドラゴンガーディアン",
     "prefecture": "岐阜",
     "grade": 4,
     "level": 14,
@@ -2981,12 +3976,17 @@
     "image": "GF-E10.webp",
     "isBoss": true,
     "exp": 406,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "白山",
+    "desc": "白銀の鱗に雪をまとった龍。青白い目が輝き、冷気をまとう守護獣。",
+    "trivia": "白山は霊峰として古くから信仰の対象とされた。",
+    "catchphrase": "「雪嶺に舞う、氷の守護竜！」"
   },
   {
     "id": "YMN-E01",
     "stageId": "chubu_area7",
-    "name": "ぶどう",
+    "name": "甲州ブドウピクシー",
     "prefecture": "山梨",
     "grade": 4,
     "level": 15,
@@ -2996,12 +3996,17 @@
     "image": "YMN-E01.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化系",
+    "habitat": "甲府盆地・葡萄畑",
+    "desc": "ブドウの房を背負った小さな妖精。果実の香りを漂わせ、きらめく尾びれを広げる。",
+    "trivia": "甲州ブドウは日本最古のブドウ品種のひとつで、ワイン用としても有名。",
+    "catchphrase": "「甘い香りに誘う、葡萄の妖精！」"
   },
   {
     "id": "YMN-E02",
     "stageId": "chubu_area7",
-    "name": "ほうとう",
+    "name": "信玄桃スピリット",
     "prefecture": "山梨",
     "grade": 4,
     "level": 15,
@@ -3011,12 +4016,17 @@
     "image": "YMN-E02.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化系",
+    "habitat": "笛吹市・桃畑",
+    "desc": "桃の形をした霊体モンスター。滴る果汁の音と共に現れる。",
+    "trivia": "山梨県は日本一の桃の生産地で、夏には果樹園観光も盛ん。",
+    "catchphrase": "「滴る雫に潜む、甘美な霊！」"
   },
   {
     "id": "YMN-E03",
     "stageId": "chubu_area7",
-    "name": "信玄餅",
+    "name": "富士桜ウサギ",
     "prefecture": "山梨",
     "grade": 4,
     "level": 15,
@@ -3026,12 +4036,17 @@
     "image": "YMN-E03.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然系",
+    "habitat": "富士吉田市",
+    "desc": "桜の花びら耳を持つ小ウサギモンスター。春風に舞いながら跳ねる。",
+    "trivia": "富士山麓は桜の名所が点在し、富士と花の競演が楽しめる。",
+    "catchphrase": "「花と舞う、春色の跳ね星！」"
   },
   {
     "id": "YMN-E04",
     "stageId": "chubu_area7",
-    "name": "富士山",
+    "name": "ワインバットシャドー",
     "prefecture": "山梨",
     "grade": 4,
     "level": 15,
@@ -3041,12 +4056,17 @@
     "image": "YMN-E04.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "酒文化系",
+    "habitat": "勝沼ワイナリー",
+    "desc": "葡萄酒の香りを漂わせるコウモリモンスター。赤い瞳で夜空を飛ぶ。",
+    "trivia": "勝沼は日本ワイン発祥の地とされ、ワイナリーが多数存在する。",
+    "catchphrase": "「葡萄酒の夜に舞う、赤眼の翼！」"
   },
   {
     "id": "YMN-E05",
     "stageId": "chubu_area7",
-    "name": "宝石",
+    "name": "ほうとうキャタピラー",
     "prefecture": "山梨",
     "grade": 4,
     "level": 15,
@@ -3056,12 +4076,17 @@
     "image": "YMN-E05.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "郷土料理系",
+    "habitat": "甲府市",
+    "desc": "幅広麺を体に巻きつけた幼虫モンスター。ころころ転がりながら遊ぶ。",
+    "trivia": "ほうとうは山梨の代表的な郷土料理で、戦国武将・武田信玄も食したと伝わる。",
+    "catchphrase": "「もちもちボディの、麺むしっ子！」"
   },
   {
     "id": "YMN-E06",
     "stageId": "chubu_area7",
-    "name": "ワイン",
+    "name": "甲州印伝アーマードビースト",
     "prefecture": "山梨",
     "grade": 4,
     "level": 15,
@@ -3071,12 +4096,17 @@
     "image": "YMN-E06.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸系",
+    "habitat": "甲府市",
+    "desc": "甲州印伝の革が鎧のように張り付いた獣型モンスター。赤黒の漆模様が浮かび、硬質な装甲を誇る。",
+    "trivia": "甲州印伝は鹿革に漆で模様を描く伝統工芸で、武具や装飾品に用いられてきた。",
+    "catchphrase": "「漆模様を纏う、革の戦獣！」"
   },
   {
     "id": "YMN-E07",
     "stageId": "chubu_area7",
-    "name": "ほうとう南瓜",
+    "name": "吉田火祭サラマンダー",
     "prefecture": "山梨",
     "grade": 4,
     "level": 15,
@@ -3086,12 +4116,17 @@
     "image": "YMN-E07.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "祭り系",
+    "habitat": "富士吉田市",
+    "desc": "松明の火から生まれた小さな火蜥蜴モンスター。火の粉を散らしながら跳ね回る。",
+      "trivia": "吉田の火祭は「日本三奇祭」のひとつで、国の重要無形民俗文化財に指定。",
+      "catchphrase": "「炎の跳ね星、夏の祭り！」"
   },
   {
     "id": "YMN-E08",
     "stageId": "chubu_area7",
-    "name": "あけの金時",
+    "name": "身延紙ファントム",
     "prefecture": "山梨",
     "grade": 4,
     "level": 15,
@@ -3101,12 +4136,17 @@
     "image": "YMN-E08.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸系",
+    "habitat": "身延町",
+    "desc": "古文の文字が浮かぶ和紙が人影を形作り、ゆらゆら揺れる霊体。",
+    "trivia": "身延山周辺では和紙作りが盛んで、仏教文化とも深く結びついている。",
+    "catchphrase": "「墨の跡が語る、紙の亡霊！」"
   },
   {
     "id": "YMN-E09",
     "stageId": "chubu_area7",
-    "name": "信玄桃",
+    "name": "武田シシガミ",
     "prefecture": "山梨",
     "grade": 4,
     "level": 15,
@@ -3116,12 +4156,17 @@
     "image": "YMN-E09.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史系",
+    "habitat": "甲府市・武田神社",
+    "desc": "黄金のたてがみを持つ獅子の守護獣。戦勝を祈る武田信玄の加護を受ける。",
+    "trivia": "武田神社は武田信玄を祀る神社で、武勇と知略の象徴とされる。",
+    "catchphrase": "「甲斐の国を護る、黄金の獅子！」"
   },
   {
     "id": "YMN-E10",
     "stageId": "chubu_area7",
-    "name": "ぶどうジュース",
+    "name": "富士氷雪フェニックス",
     "prefecture": "山梨",
     "grade": 4,
     "level": 15,
@@ -3131,12 +4176,17 @@
     "image": "YMN-E10.webp",
     "isBoss": true,
     "exp": 490,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然系",
+    "habitat": "富士山北麓",
+    "desc": "白銀の羽をまとったフェニックス。冷気を纏い、空を飛び、地を震わせる。",
+    "trivia": "富士山は日本の聖山で、神々の棲む聖域。",
+    "catchphrase": "「冷気を纏う、富士の火鳥！」"
   },
   {
     "id": "SZO-E01",
     "stageId": "chubu_area8",
-    "name": "お茶",
+    "name": "富士茶フェアリー",
     "prefecture": "静岡",
     "grade": 4,
     "level": 15,
@@ -3146,12 +4196,17 @@
     "image": "SZO-E01.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "農産系",
+    "habitat": "静岡市周辺の茶畑",
+    "desc": "茶葉を羽のように広げて舞う妖精。爽やかな香りをまとい、訪れる人を癒す。",
+    "trivia": "静岡県は日本一の茶産地として知られる。",
+    "catchphrase": "「茶畑に舞う、癒しの緑の羽！」"
   },
   {
     "id": "SZO-E02",
     "stageId": "chubu_area8",
-    "name": "うなぎパイ",
+    "name": "桜えびシャドーフィッシュ",
     "prefecture": "静岡",
     "grade": 4,
     "level": 15,
@@ -3161,12 +4216,17 @@
     "image": "SZO-E02.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海産系",
+    "habitat": "駿河湾",
+    "desc": "群れをなす桜えびが影のように漂い、不気味に光る群体モンスター。",
+    "trivia": "駿河湾の桜えびは全国的にも貴重な水産資源。",
+    "catchphrase": "「紅き群れ、海を染める影！」"
   },
   {
     "id": "SZO-E03",
     "stageId": "chubu_area8",
-    "name": "富士宮やきそば",
+    "name": "みかんバルーン",
     "prefecture": "静岡",
     "grade": 4,
     "level": 15,
@@ -3176,12 +4236,17 @@
     "image": "SZO-E03.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "農産系",
+    "habitat": "三ケ日・浜松地域",
+    "desc": "丸いみかんが風船のように膨らみ、ふわふわ漂うモンスター。甘酸っぱい香りを漂わせる。",
+    "trivia": "静岡県は日本一のみかんの生産地で、夏には果樹園観光も盛ん。",
+    "catchphrase": "「空に浮かぶ、オレンジの恵み！」"
   },
   {
     "id": "SZO-E04",
     "stageId": "chubu_area8",
-    "name": "しらす",
+    "name": "伊豆ジオリザード",
     "prefecture": "静岡",
     "grade": 4,
     "level": 15,
@@ -3191,12 +4256,17 @@
     "image": "SZO-E04.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然系",
+    "habitat": "伊豆半島ジオパーク",
+    "desc": "溶岩の鱗をまとったトカゲ型モンスター。背中から火山の熱気を放つ。",
+    "trivia": "伊豆半島は世界ジオパークにも認定される火山地形の宝庫。",
+    "catchphrase": "「火山の記憶を背負う、黒き鱗！」"
   },
   {
     "id": "SZO-E05",
     "stageId": "chubu_area8",
-    "name": "わさび",
+    "name": "安倍川もちスライム",
     "prefecture": "静岡",
     "grade": 4,
     "level": 15,
@@ -3206,12 +4276,17 @@
     "image": "SZO-E05.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "郷土菓子系",
+    "habitat": "静岡市・安倍川",
+    "desc": "もちのように柔らかい体を持つスライム。表面にはきな粉がかかっている。",
+    "trivia": "安倍川もちの歴史は江戸時代から続く。",
+    "catchphrase": "「ぷるぷる揺れる、甘き精霊！」"
   },
   {
     "id": "SZO-E06",
     "stageId": "chubu_area8",
-    "name": "桜えび",
+    "name": "浜名湖ウナギサーペント",
     "prefecture": "静岡",
     "grade": 4,
     "level": 15,
@@ -3221,12 +4296,17 @@
     "image": "SZO-E06.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "湖・水産系",
+    "habitat": "浜名湖",
+    "desc": "長大な体をくねらせるウナギの守護獣。背に稲妻の模様が走る。",
+    "trivia": "浜名湖は日本最大の淡水湖で、水産資源が豊富。",
+    "catchphrase": "「水の王者、浜名湖の守護者！」"
   },
   {
     "id": "SZO-E07",
     "stageId": "chubu_area8",
-    "name": "黒はんぺん",
+    "name": "わさびトゲハリネズミ",
     "prefecture": "静岡",
     "grade": 4,
     "level": 15,
@@ -3236,12 +4316,17 @@
     "image": "SZO-E07.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "農産系",
+    "habitat": "伊豆のわさび田",
+    "desc": "背中にわさび根のようなトゲを持つハリネズミ型モンスター。鼻をひくひくさせる。",
+    "trivia": "伊豆のわさびは清流で育ち、全国的に有名。",
+    "catchphrase": "「ツンと香る、小さな守り手！」"
   },
   {
     "id": "SZO-E08",
     "stageId": "chubu_area8",
-    "name": "静岡おでん",
+    "name": "三保羽衣シルフ",
     "prefecture": "静岡",
     "grade": 4,
     "level": 15,
@@ -3251,12 +4336,17 @@
     "image": "SZO-E08.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝承系",
+    "habitat": "三保の松原",
+    "desc": "羽衣をまとい空を舞う妖精。淡い光を放ち、風とともに現れる。",
+    "trivia": "羽衣伝説の舞台として有名。",
+    "catchphrase": "「風に揺らめく、天女の舞！」"
   },
   {
     "id": "SZO-E09",
     "stageId": "chubu_area8",
-    "name": "わさび漬け",
+    "name": "駿府城サムライゴースト",
     "prefecture": "静岡",
     "grade": 4,
     "level": 15,
@@ -3266,12 +4356,17 @@
     "image": "SZO-E09.webp",
     "isBoss": false,
     "exp": 245,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史系",
+    "habitat": "静岡市・駿府城跡",
+    "desc": "甲冑をまとう武士の霊。刀を手に城を見守る。",
+    "trivia": "駿府城は徳川家康ゆかりの城。",
+    "catchphrase": "「城を護る、青白き鎧武者！」"
   },
   {
     "id": "SZO-E10",
     "stageId": "chubu_area8",
-    "name": "クラウンメロン",
+    "name": "富士樹海エント",
     "prefecture": "静岡",
     "grade": 4,
     "level": 15,
@@ -3281,12 +4376,17 @@
     "image": "SZO-E10.webp",
     "isBoss": true,
     "exp": 490,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然系",
+    "habitat": "青木ヶ原樹海",
+    "desc": "木々が合体して生まれた巨木モンスター。苔むした体から光が漏れる。",
+    "trivia": "青木ヶ原樹海は富士山の噴火で形成された原生林。",
+    "catchphrase": "「深き森に潜む、歩む大樹！」"
   },
   {
     "id": "AIC-E01",
     "stageId": "chubu_area9",
-    "name": "味噌カツ",
+    "name": "名古屋コーチンチック",
     "prefecture": "愛知",
     "grade": 4,
     "level": 16,
@@ -3296,12 +4396,17 @@
     "image": "AIC-E01.webp",
     "isBoss": false,
     "exp": 296,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "郷土料理系",
+    "habitat": "名古屋市",
+    "desc": "ふわふわの羽毛をまとった小鳥モンスター。卵を抱えてぴょこぴょこ歩く。",
+    "trivia": "名古屋コーチンは日本三大地鶏のひとつ。",
+    "catchphrase": "「元気いっぱい、卵を守る小さな勇者！」"
   },
   {
     "id": "AIC-E02",
     "stageId": "chubu_area9",
-    "name": "きしめん",
+    "name": "ひつまぶしドラゴネット",
     "prefecture": "愛知",
     "grade": 4,
     "level": 16,
@@ -3311,12 +4416,17 @@
     "image": "AIC-E02.webp",
     "isBoss": false,
     "exp": 296,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "郷土料理系",
+    "habitat": "名古屋市・ひつまぶし店周辺",
+    "desc": "うなぎの香ばしさを背負った小竜。口から炭火のような火を吐く。",
+    "trivia": "ひつまぶしは名古屋名物のうなぎ料理で、三通りの食べ方を楽しめる。",
+    "catchphrase": "「香ばしき火竜、食の守護者！」"
   },
   {
     "id": "AIC-E03",
     "stageId": "chubu_area9",
-    "name": "手羽先",
+    "name": "金鯱スピリット",
     "prefecture": "愛知",
     "grade": 4,
     "level": 16,
@@ -3326,12 +4436,17 @@
     "image": "AIC-E03.webp",
     "isBoss": false,
     "exp": 296,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "郷土料理系",
+    "habitat": "名古屋市・金鯱店周辺",
+    "desc": "屋根に輝く金の鯱が小さな精霊として動き出した姿。光を反射してきらめく。",
+    "trivia": "名古屋城の金鯱は城の象徴で、火除けのお守りともされた。",
+    "catchphrase": "「輝ける鱗、城を護る黄金の魚！」"
   },
   {
     "id": "AIC-E04",
     "stageId": "chubu_area9",
-    "name": "えびふりゃあ",
+    "name": "きしめんスライム",
     "prefecture": "愛知",
     "grade": 4,
     "level": 16,
@@ -3341,12 +4456,17 @@
     "image": "AIC-E04.webp",
     "isBoss": false,
     "exp": 296,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "郷土料理系",
+    "habitat": "名古屋市",
+    "desc": "幅広の麺がゼリー状になって動くスライム。つゆの香りをまとっている。",
+    "trivia": "きしめんは平たい麺で、名古屋のソウルフード。",
+    "catchphrase": "「つるつる跳ねる、麺の小精霊！」"
   },
   {
     "id": "AIC-E05",
     "stageId": "chubu_area9",
-    "name": "金シャチ",
+    "name": "有松絞りホムンクルス",
     "prefecture": "愛知",
     "grade": 4,
     "level": 16,
@@ -3356,12 +4476,17 @@
     "image": "AIC-E05.webp",
     "isBoss": false,
     "exp": 296,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝統文化系",
+    "habitat": "有松町",
+    "desc": "絞り布をまとった小さな人造モンスター。模様が動くように揺らめく。",
+    "trivia": "有松絞りは江戸時代から続く伝統染色技法。",
+    "catchphrase": "「布の命が宿る、小さな染色魔法！」"
   },
   {
     "id": "AIC-E06",
     "stageId": "chubu_area9",
-    "name": "天むす",
+    "name": "犬山城ゴーストサムライ",
     "prefecture": "愛知",
     "grade": 4,
     "level": 16,
@@ -3371,12 +4496,17 @@
     "image": "AIC-E06.webp",
     "isBoss": false,
     "exp": 296,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史系",
+    "habitat": "犬山城",
+    "desc": "甲冑をまとう武士の霊。刀を手に城を見守る。",
+    "trivia": "犬山城は日本最古の木造天守を持つ国宝の城。",
+    "catchphrase": "「城を護る、幽玄の侍！」"
   },
   {
     "id": "AIC-E07",
     "stageId": "chubu_area9",
-    "name": "守口漬け",
+    "name": "名古屋太閤だんじりオーガ",
     "prefecture": "愛知",
     "grade": 4,
     "level": 16,
@@ -3386,12 +4516,17 @@
     "image": "AIC-E07.webp",
     "isBoss": false,
     "exp": 296,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "郷土料理系",
+    "habitat": "名古屋祭り周辺",
+    "desc": "だんじり屋台が鬼と化したモンスター。力強く街を練り歩く。",
+    "trivia": "名古屋まつりは織田信長や豊臣秀吉などの武将行列で有名。",
+    "catchphrase": "「轟く太鼓と共に進む、鬼の行列！」"
   },
   {
     "id": "AIC-E08",
     "stageId": "chubu_area9",
-    "name": "あんかけスパ",
+    "name": "常滑焼クレイゴーレム",
     "prefecture": "愛知",
     "grade": 4,
     "level": 16,
@@ -3401,12 +4536,17 @@
     "image": "AIC-E08.webp",
     "isBoss": false,
     "exp": 296,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "郷土料理系",
+    "habitat": "常滑市",
+    "desc": "常滑焼の急須や土管の破片でできた土の巨人。ひび割れから光を放つ。",
+    "trivia": "常滑焼は日本六古窯のひとつで、急須が特に有名。",
+    "catchphrase": "「土と炎が生んだ、陶器の守護者！」"
   },
   {
     "id": "AIC-E09",
     "stageId": "chubu_area9",
-    "name": "どて煮",
+    "name": "熱田炎神フェニックス",
     "prefecture": "愛知",
     "grade": 4,
     "level": 16,
@@ -3416,12 +4556,17 @@
     "image": "AIC-E09.webp",
     "isBoss": false,
     "exp": 296,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "郷土料理系",
+    "habitat": "名古屋市・熱田神宮",
+    "desc": "炎をまとった不死鳥。神域を飛び回り、参拝者を見守る。",
+    "trivia": "熱田神宮は三種の神器の一つ「草薙剣」を祀る名社。",
+    "catchphrase": "「炎の翼、神域を照らす守護鳥！」"
   },
   {
     "id": "AIC-E10",
     "stageId": "chubu_area9",
-    "name": "鬼まんじゅう",
+    "name": "織田信長シャドー",
     "prefecture": "愛知",
     "grade": 4,
     "level": 16,
@@ -3431,12 +4576,17 @@
     "image": "AIC-E10.webp",
     "isBoss": true,
     "exp": 592,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史系",
+    "habitat": "清須城跡・安土ゆかりの地",
+    "desc": "甲冑をまとった信長の影。赤黒いオーラを放ち、不気味に睨みつける。",
+    "trivia": "織田信長は戦国時代を代表する武将で「尾張のうつけ」と呼ばれた青年期から天下布武を掲げた。",
+    "catchphrase": "「天下布武の影が今、甦る！」"
   },
   {
     "id": "SG-E01",
     "stageId": "kinki_area1",
-    "name": "鱒寿司",
+    "name": "近江米ピクシー",
     "prefecture": "滋賀",
     "grade": 5,
     "level": 17,
@@ -3446,12 +4596,17 @@
     "image": "SG-E01.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "琵琶湖周辺の田んぼ",
+    "desc": "稲穂を冠にした小さな妖精。ふわりと漂い、田園を見守る。",
+    "trivia": "滋賀は近江米の産地で、歴史あるブランド米として有名。",
+    "catchphrase": "「黄金の穂先、風と踊る小さな守り神！」"
   },
   {
     "id": "SG-E02",
     "stageId": "kinki_area1",
-    "name": "近江牛",
+    "name": "鮒寿司シャドーフィッシュ",
     "prefecture": "滋賀",
     "grade": 5,
     "level": 17,
@@ -3461,12 +4616,17 @@
     "image": "SG-E02.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "郷土料理系",
+    "habitat": "琵琶湖",
+    "desc": "発酵の気配をまとう黒い影魚。酸味のオーラを放ち、漂う。",
+    "trivia": "鮒寿司は日本最古の発酵寿司の一つで、滋賀の名物料理。",
+    "catchphrase": "「酸味の影、湖底より忍び寄る！」"
   },
   {
     "id": "SG-E03",
     "stageId": "kinki_area1",
-    "name": "信楽たぬき",
+    "name": "信楽タヌキウォリアー",
     "prefecture": "滋賀",
     "grade": 5,
     "level": 17,
@@ -3476,12 +4636,17 @@
     "image": "SG-E03.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸",
+    "habitat": "信楽町",
+    "desc": "笠と徳利を背負ったタヌキ戦士。笑顔で村を守る。",
+    "trivia": "信楽焼のタヌキ像は商売繁盛の縁起物として知られる。",
+    "catchphrase": "「にっこり笑顔で、福を招く戦士！」"
   },
   {
     "id": "SG-E04",
     "stageId": "kinki_area1",
-    "name": "ナマズ",
+    "name": "近江牛ミノタウロス",
     "prefecture": "滋賀",
     "grade": 5,
     "level": 17,
@@ -3491,12 +4656,17 @@
     "image": "SG-E04.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "畜産文化",
+    "habitat": "近江八幡市",
+    "desc": "黒毛の牛頭を持つ戦士。重厚な体格で地面を踏み鳴らす。",
+    "trivia": "近江牛は日本三大和牛の一つで、全国に知られる高級ブランド。",
+    "catchphrase": "「黒き巨躯、雷鳴のように迫る！」"
   },
   {
     "id": "SG-E05",
     "stageId": "kinki_area1",
-    "name": "でっち羊羹",
+    "name": "長浜曳山ドールゴーレム",
     "prefecture": "滋賀",
     "grade": 5,
     "level": 17,
@@ -3506,12 +4676,17 @@
     "image": "SG-E05.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "人形系",
+    "habitat": "長浜曳山祭",
+    "desc": "曳山の人形が動き出したゴーレム。木の香りを漂わせる。",
+    "trivia": "曳山祭の舞台人形は精巧で「動く美術品」と呼ばれる。",
+    "catchphrase": "「木の舞台から飛び出す、人形守護者！」"
   },
   {
     "id": "SG-E06",
     "stageId": "kinki_area1",
-    "name": "赤こんにゃく",
+    "name": "湖東忍者カラス",
     "prefecture": "滋賀",
     "grade": 5,
     "level": 17,
@@ -3521,12 +4696,17 @@
     "image": "SG-E06.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史系",
+    "habitat": "甲賀市",
+    "desc": "黒羽をまとった忍びカラス。素早い動きで敵を翻弄する。",
+    "trivia": "滋賀県甲賀は伊賀と並ぶ忍者の里。",
+    "catchphrase": "「黒羽の影、風と消える忍び鳥！」"
   },
   {
     "id": "SG-E07",
     "stageId": "kinki_area1",
-    "name": "近江ちゃんぽん",
+    "name": "安土武将ゴースト",
     "prefecture": "滋賀",
     "grade": 5,
     "level": 17,
@@ -3536,12 +4716,17 @@
     "image": "SG-E07.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史系",
+    "habitat": "安土城跡",
+    "desc": "戦国武将の霊が甲冑をまとって現れる。燃え尽きた城の幻影を背負う。",
+    "trivia": "安土城は織田信長が築いた壮麗な城として有名。",
+    "catchphrase": "「炎の城から蘇る、戦国の亡霊！」"
   },
   {
     "id": "SG-E08",
     "stageId": "kinki_area1",
-    "name": "鮎ずし",
+    "name": "近江麻シルフ",
     "prefecture": "滋賀",
     "grade": 5,
     "level": 17,
@@ -3551,12 +4736,17 @@
     "image": "SG-E08.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸",
+    "habitat": "近江上布の産地",
+    "desc": "麻布を羽衣のようにまとった小さな精霊。優雅に舞う。",
+    "trivia": "近江上布は夏に涼しい高級麻織物で、重要無形文化財。",
+    "catchphrase": "「布が紡ぐ、風の精！」"
   },
   {
     "id": "SG-E09",
     "stageId": "kinki_area1",
-    "name": "日野菜",
+    "name": "比叡山僧兵ファントム",
     "prefecture": "滋賀",
     "grade": 5,
     "level": 17,
@@ -3566,12 +4756,17 @@
     "image": "SG-E09.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史系",
+    "habitat": "比叡山延暦寺",
+    "desc": "僧兵の霊が鎧武者となって現れる。法螺貝の音が響く。",
+    "trivia": "中世の比叡山は僧兵が活躍したことで知られる。",
+    "catchphrase": "「修羅と化した、法の守り手！」"
   },
   {
     "id": "SG-E10",
     "stageId": "kinki_area1",
-    "name": "鮒ずしの頭",
+    "name": "琵琶湖ビワッシー",
     "prefecture": "滋賀",
     "grade": 5,
     "level": 17,
@@ -3581,12 +4776,17 @@
     "image": "SG-E10.webp",
     "isBoss": true,
     "exp": 714,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝説系",
+    "habitat": "琵琶湖",
+    "desc": "琵琶湖に棲むとされる未確認生物。長い首と黒い背びれを持ち、霧の中に現れる。",
+    "trivia": "琵琶湖には「湖の怪物が出る」という伝説があり、「ビワッシー」と呼ばれる。",
+    "catchphrase": "「湖面に現る、黒き影の幻獣！」"
   },
   {
     "id": "ME-E01",
     "stageId": "kinki_area2",
-    "name": "松阪牛",
+    "name": "赤福もちスライム",
     "prefecture": "三重",
     "grade": 5,
     "level": 17,
@@ -3596,12 +4796,17 @@
     "image": "ME-E01.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "伊勢・おかげ横丁",
+    "desc": "やわらかいもちに小豆あんを背負ったぷるぷるスライム。甘い香りを漂わせる。",
+    "trivia": "赤福餅は伊勢名物として全国に知られ、300年以上の歴史を持つ和菓子。",
+    "catchphrase": "「甘さと柔らかさ、伊勢のぷるぷる精霊！」"
   },
   {
     "id": "ME-E02",
     "stageId": "kinki_area2",
-    "name": "伊勢海老",
+    "name": "真珠シェルピクシー",
     "prefecture": "三重",
     "grade": 5,
     "level": 17,
@@ -3611,12 +4816,17 @@
     "image": "ME-E02.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸",
+    "habitat": "志摩・英虞湾",
+    "desc": "貝殻から生まれた小さな精霊。光り輝く真珠を抱えて舞う。",
+    "trivia": "三重の英虞湾は真珠養殖の発祥地。ミキモト真珠島が有名。",
+    "catchphrase": "「海に光る、真珠の妖精！」"
   },
   {
     "id": "ME-E03",
     "stageId": "kinki_area2",
-    "name": "赤福",
+    "name": "伊勢えびウォリアー",
     "prefecture": "三重",
     "grade": 5,
     "level": 17,
@@ -3626,12 +4836,17 @@
     "image": "ME-E03.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "海産物",
+    "habitat": "志摩半島の漁村",
+    "desc": "赤い甲冑をまとった小さな伊勢えび戦士。ハサミで元気に跳ねる。",
+    "trivia": "伊勢えびは三重を代表する高級食材で、縁起物としても人気。",
+    "catchphrase": "「海の幸、赤き跳ね武者！」"
   },
   {
     "id": "ME-E04",
     "stageId": "kinki_area2",
-    "name": "真珠",
+    "name": "松阪ビーフブル",
     "prefecture": "三重",
     "grade": 5,
     "level": 17,
@@ -3641,12 +4856,17 @@
     "image": "ME-E04.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "松阪市の牧場",
+    "desc": "丸々と太った黒毛和牛の精霊。力強いがどこか愛嬌がある。",
+    "trivia": "松阪牛は日本三大和牛のひとつで、世界的に高級ブランド牛として知られる。",
+    "catchphrase": "「肉の王者、やさしい巨牛！」"
   },
   {
     "id": "ME-E05",
     "stageId": "kinki_area2",
-    "name": "熊野古道",
+    "name": "熊野古道ウッドスプライト",
     "prefecture": "三重",
     "grade": 5,
     "level": 17,
@@ -3656,12 +4876,17 @@
     "image": "ME-E05.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝統",
+    "habitat": "熊野古道",
+    "desc": "苔むした木から生まれた精霊。巡礼者の足跡を静かに見守る。",
+    "trivia": "熊野古道は世界遺産に登録され、古代から続く信仰の道。",
+    "catchphrase": "「千年の道を守る、森の精霊！」"
   },
   {
     "id": "ME-E06",
     "stageId": "kinki_area2",
-    "name": "へんば餅",
+    "name": "鳥羽カモメスカウト",
     "prefecture": "三重",
     "grade": 5,
     "level": 17,
@@ -3671,12 +4896,17 @@
     "image": "ME-E06.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海鳥",
+    "habitat": "鳥羽湾",
+    "desc": "白いカモメの姿をしたスカウト鳥。海上を飛び回り仲間を呼ぶ。",
+    "trivia": "鳥羽は海の幸と水族館で有名な港町。カモメはシンボル的存在。",
+    "catchphrase": "「海風に乗る、白き伝令！」"
   },
   {
     "id": "ME-E07",
     "stageId": "kinki_area2",
-    "name": "伊勢うどん",
+    "name": "海女パールセイレーン",
     "prefecture": "三重",
     "grade": 5,
     "level": 17,
@@ -3686,12 +4916,17 @@
     "image": "ME-E07.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説・海文化",
+    "habitat": "志摩・英虞湾",
+    "desc": "海女の霊が真珠を抱えて現れる。波間から現れる姿は美しいが、冷たい声で呼び寄せる。",
+    "trivia": "海女は海の幸を採る女性。三重県の志摩・英虞湾は有名な海女の町。",
+    "catchphrase": "「真珠の歌声、海底からの誘い！」"
   },
   {
     "id": "ME-E08",
     "stageId": "kinki_area2",
-    "name": "てこね寿司",
+    "name": "忍者影武者ゴースト",
     "prefecture": "三重",
     "grade": 5,
     "level": 17,
@@ -3701,12 +4936,17 @@
     "image": "ME-E08.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史・伝説",
+    "habitat": "伊賀上野城下",
+    "desc": "忍者の怨霊が影武者となり現れる。闇夜に紛れて消える幻影。",
+    "trivia": "三重県伊賀は忍者の里として知られ、伊賀流忍者博物館が観光名所。",
+    "catchphrase": "「影より出でて、影に消える！」"
   },
   {
     "id": "ME-E09",
     "stageId": "kinki_area2",
-    "name": "志摩のアワビ",
+    "name": "鬼ヶ城ロックオーガ",
     "prefecture": "三重",
     "grade": 5,
     "level": 17,
@@ -3716,12 +4956,17 @@
     "image": "ME-E09.webp",
     "isBoss": false,
     "exp": 357,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "熊野市・鬼ヶ城",
+    "desc": "荒波に削られた岩壁から生まれた鬼。海風を浴びて轟音を上げる。",
+    "trivia": "鬼ヶ城は熊野灘に面する奇岩群で、鬼が住んでいた伝説が残る。",
+    "catchphrase": "「岩と波が生んだ、怒涛の岩鬼！」"
   },
   {
     "id": "ME-E10",
     "stageId": "kinki_area2",
-    "name": "あおさのり",
+    "name": "伊勢神宮アマテラスドラゴン",
     "prefecture": "三重",
     "grade": 5,
     "level": 17,
@@ -3731,12 +4976,17 @@
     "image": "ME-E10.webp",
     "isBoss": true,
     "exp": 714,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "神話",
+    "habitat": "伊勢神宮・内宮",
+    "desc": "天照大神の光を宿す白龍。伊勢の森を翔け、眩い光で闇を払う。",
+    "trivia": "伊勢神宮は天照大神を祀る日本最高の聖地であり、「日の神」の象徴。",
+    "catchphrase": "「光の化身、天照の白龍！」"
   },
   {
     "id": "KYT-E01",
     "stageId": "kinki_area3",
-    "name": "八つ橋",
+    "name": "八坂舞妓ピクシー",
     "prefecture": "京都",
     "grade": 5,
     "level": 18,
@@ -3746,12 +4996,17 @@
     "image": "KYT-E01.webp",
     "isBoss": false,
     "exp": 431,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝統文化",
+    "habitat": "祇園・八坂神社周辺",
+    "desc": "舞妓姿の小さな精霊。鈴の音を響かせ、華やかに舞う。",
+    "trivia": "祇園の舞妓は京都を代表する伝統文化の象徴。華やかな衣装と舞が観光客を魅了する。",
+    "catchphrase": "「花の都に舞い散る、小さな妖精！」"
   },
   {
     "id": "KYT-E02",
     "stageId": "kinki_area3",
-    "name": "京野菜",
+    "name": "清水寺ゴーレム",
     "prefecture": "京都",
     "grade": 5,
     "level": 18,
@@ -3761,12 +5016,17 @@
     "image": "KYT-E02.webp",
     "isBoss": false,
     "exp": 431,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史・建築",
+    "habitat": "清水寺",
+    "desc": "清水寺の舞台の木組みが組み上がって動き出した守護者。足場が軋む音が鳴り響く。",
+    "trivia": "清水寺は世界遺産で、日本の仏教建築の代表。",
+    "catchphrase": "「千年の木組み、今ここに立つ！」"
   },
   {
     "id": "KYT-E03",
     "stageId": "kinki_area3",
-    "name": "宇治抹茶",
+    "name": "宇治茶カッパ",
     "prefecture": "京都",
     "grade": 5,
     "level": 18,
@@ -3776,12 +5036,17 @@
     "image": "KYT-E03.webp",
     "isBoss": false,
     "exp": 431,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "宇治川",
+    "desc": "茶葉の皿を頭に乗せた河童。香ばしい香りを漂わせる。",
+    "trivia": "宇治は日本有数の茶の産地で、平等院の庭園とも深く関わりがある。",
+    "catchphrase": "「香り立つ茶葉、水辺の守り！」"
   },
   {
     "id": "KYT-E04",
     "stageId": "kinki_area3",
-    "name": "舞妓",
+    "name": "金閣シルバーファントム",
     "prefecture": "京都",
     "grade": 5,
     "level": 18,
@@ -3791,12 +5056,17 @@
     "image": "KYT-E04.webp",
     "isBoss": false,
     "exp": 431,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "建築・幻影",
+    "habitat": "金閣寺",
+    "desc": "金箔が剥がれ落ちた幻影の建物霊。月夜に現れて冷たく輝く。",
+    "trivia": "金閣寺は焼失と再建を繰り返し、その歴史が「幻影」のイメージを強めている。",
+    "catchphrase": "「黄金の影、夜空に揺らめく幻影！」"
   },
   {
     "id": "KYT-E05",
     "stageId": "kinki_area3",
-    "name": "清水焼",
+    "name": "嵐山サルウォリアー",
     "prefecture": "京都",
     "grade": 5,
     "level": 18,
@@ -3806,12 +5076,17 @@
     "image": "KYT-E05.webp",
     "isBoss": false,
     "exp": 431,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然・動物",
+    "habitat": "嵐山・猿山",
+    "desc": "竹の杖を持った小猿戦士。仲間を率いて跳ね回る。",
+    "trivia": "嵐山モンキーパークには多くの野生ニホンザルが生息しており、観光名所となっている。",
+    "catchphrase": "「竹林駆ける、小さな勇者！」"
   },
   {
     "id": "KYT-E06",
     "stageId": "kinki_area3",
-    "name": "生八つ橋",
+    "name": "京野菜オーガ",
     "prefecture": "京都",
     "grade": 5,
     "level": 18,
@@ -3821,12 +5096,17 @@
     "image": "KYT-E06.webp",
     "isBoss": false,
     "exp": 431,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "京都市近郊の畑",
+    "desc": "賀茂ナスや九条ネギを体に生やした鬼。畑を徘徊する。",
+    "trivia": "賀茂ナスや九条ネギなどの京野菜は、古くから京都の食文化を支えてきた特産品。",
+    "catchphrase": "「畑に実る、緑の鬼神！」"
   },
   {
     "id": "KYT-E07",
     "stageId": "kinki_area3",
-    "name": "千枚漬け",
+    "name": "平等院フェニックス",
     "prefecture": "京都",
     "grade": 5,
     "level": 18,
@@ -3836,12 +5116,17 @@
     "image": "KYT-E07.webp",
     "isBoss": false,
     "exp": 431,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説",
+    "habitat": "宇治・平等院鳳凰堂",
+    "desc": "鳳凰堂の屋根から飛び立った不死鳥。炎をまとい夜空を翔ける。",
+    "trivia": "平等院鳳凰堂は世界遺産であり、屋根の鳳凰は一万円札の図柄にも使われている。",
+    "catchphrase": "「千年の炎、不死の翼！」"
   },
   {
     "id": "KYT-E08",
     "stageId": "kinki_area3",
-    "name": "湯葉",
+    "name": "京人形ドールマリオネット",
     "prefecture": "京都",
     "grade": 5,
     "level": 18,
@@ -3851,12 +5136,17 @@
     "image": "KYT-E08.webp",
     "isBoss": false,
     "exp": 431,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "工芸",
+    "habitat": "京都市・人形工房",
+    "desc": "京人形が糸に操られるように舞う小さな人形モンスター。",
+    "trivia": "京人形は節句や人形劇に用いられ、精緻な技術と美しい装飾で知られる。",
+    "catchphrase": "「糸に導かれ、優雅に舞う！」"
   },
   {
     "id": "KYT-E09",
     "stageId": "kinki_area3",
-    "name": "丹波栗",
+    "name": "鴨川リバーサーペント",
     "prefecture": "京都",
     "grade": 5,
     "level": 18,
@@ -3866,12 +5156,17 @@
     "image": "KYT-E09.webp",
     "isBoss": false,
     "exp": 431,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "鴨川",
+    "desc": "川底に潜む蛇のような幻獣。夜になると水面に黒い影を走らせる。",
+    "trivia": "鴨川は京都の中心を流れ、夜の水面に映る影や灯火が幻想的な景観を生む。",
+    "catchphrase": "「流れに潜む、黒き影蛇！」"
   },
   {
     "id": "KYT-E10",
     "stageId": "kinki_area3",
-    "name": "賀茂ナス",
+    "name": "大文字炎鬼",
     "prefecture": "京都",
     "grade": 5,
     "level": 18,
@@ -3881,12 +5176,17 @@
     "image": "KYT-E10.webp",
     "isBoss": true,
     "exp": 862,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "祭り・伝説",
+    "habitat": "五山送り火",
+    "desc": "送り火の炎から現れる炎鬼。夜空に「大」の字を背負って舞う。",
+    "trivia": "五山送り火は京都の夏の伝統行事で、精霊を送るための炎の祭典。",
+    "catchphrase": "「炎の文字、闇を焦がす鬼火！」"
   },
   {
     "id": "NR-E01",
     "stageId": "kinki_area4",
-    "name": "柿の葉寿司",
+    "name": "柿の葉すしスライム",
     "prefecture": "奈良",
     "grade": 5,
     "level": 19,
@@ -3896,12 +5196,17 @@
     "image": "NR-E01.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "奈良市周辺",
+    "desc": "柿の葉で包まれた寿司がぷるぷる動くスライムモンスター。",
+    "trivia": "柿の葉すしは奈良の名物で、保存食として古くから親しまれてきた。",
+    "catchphrase": "「葉っぱに包まれた、美味しいぷるぷる！」"
   },
   {
     "id": "NR-E02",
     "stageId": "kinki_area4",
-    "name": "奈良漬",
+    "name": "奈良漬けゴブリン",
     "prefecture": "奈良",
     "grade": 5,
     "level": 19,
@@ -3911,12 +5216,17 @@
     "image": "NR-E02.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "奈良町",
+    "desc": "酒粕の樽からひょっこり顔を出す小さなゴブリン。顔はほんのり赤く、酒粕の香りをまとっている。",
+    "trivia": "奈良漬けは酒粕に漬け込む保存食で、古都の代表的な土産物。",
+    "catchphrase": "「樽の中から、ふらりと登場！」"
   },
   {
     "id": "NR-E03",
     "stageId": "kinki_area4",
-    "name": "鹿せんべい",
+    "name": "大仏ベビィ",
     "prefecture": "奈良",
     "grade": 5,
     "level": 19,
@@ -3926,12 +5236,17 @@
     "image": "NR-E03.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史",
+    "habitat": "奈良市・東大寺",
+    "desc": "東大寺の大仏をミニチュア化した子ども姿のモンスター。優しい表情で手を合わせる。",
+    "trivia": "奈良の大仏は世界最大級の青銅仏で、国宝として知られる。",
+    "catchphrase": "「ちいさな姿でも、心は大きく！」"
   },
   {
     "id": "NR-E04",
     "stageId": "kinki_area4",
-    "name": "大仏",
+    "name": "大仏プリンプディ",
     "prefecture": "奈良",
     "grade": 5,
     "level": 19,
@@ -3941,12 +5256,17 @@
     "image": "NR-E04.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "奈良市・菓子店",
+    "desc": "大仏の顔が描かれたカッププリンから生まれたぷるぷる精霊。スプーンを武器のように持ち、ころころ跳ねる。",
+    "trivia": "大仏プリンは奈良の観光スイーツとして有名で、大きなサイズが特徴。",
+    "catchphrase": "「ぷるんと笑顔、奈良の甘味精霊！」"
   },
   {
     "id": "NR-E05",
     "stageId": "kinki_area4",
-    "name": "三輪そうめん",
+    "name": "飛鳥石舞い",
     "prefecture": "奈良",
     "grade": 5,
     "level": 19,
@@ -3956,12 +5276,17 @@
     "image": "NR-E05.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史",
+    "habitat": "奈良市・飛鳥遺跡",
+    "desc": "亀石や猿石が動き出した小さな石像モンスター。ころころ転がって遊ぶ。",
+    "trivia": "飛鳥には不思議な石造物が点在し、古代の謎を秘めている。",
+    "catchphrase": "「古代の謎を運ぶ、コロコロ石精！」"
   },
   {
     "id": "NR-E06",
     "stageId": "kinki_area4",
-    "name": "飛鳥鍋",
+    "name": "三輪そうめんナイト",
     "prefecture": "奈良",
     "grade": 5,
     "level": 19,
@@ -3971,12 +5296,17 @@
     "image": "NR-E06.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "奈良市・三輪",
+    "desc": "白いそうめんをまとった小さな騎士。細長い剣を振り回す。",
+    "trivia": "三輪そうめんは日本最古のそうめんとされ、細さとコシが自慢。",
+    "catchphrase": "「細き糸に宿る、食の騎士！」"
   },
   {
     "id": "NR-E07",
     "stageId": "kinki_area4",
-    "name": "柿ジャム",
+    "name": "蔵王権現スピリット",
     "prefecture": "奈良",
     "grade": 5,
     "level": 19,
@@ -3986,12 +5316,17 @@
     "image": "NR-E07.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "宗教",
+    "habitat": "奈良市・金峯山寺",
+    "desc": "怒りの形相をした権現の霊が青い炎をまとって現れる。",
+    "trivia": "金峯山寺の蔵王権現像は修験道の本尊で、力強い姿が信仰の対象。",
+    "catchphrase": "「青き炎に宿る、修験の守護神！」"
   },
   {
     "id": "NR-E08",
     "stageId": "kinki_area4",
-    "name": "三和素麵",
+    "name": "天川天女ファントム",
     "prefecture": "奈良",
     "grade": 5,
     "level": 19,
@@ -4001,12 +5336,17 @@
     "image": "NR-E08.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "宗教",
+    "habitat": "奈良市・天川村",
+    "desc": "天川の天女伝説から生まれた幻影。白い羽衣を翻し、月夜に舞う。",
+    "trivia": "天川村は古来より天女伝説が伝わる霊場。",
+    "catchphrase": "「月に舞い降りる、白羽の幻影！」"
   },
   {
     "id": "NR-E09",
     "stageId": "kinki_area4",
-    "name": "奈良漬チーズ",
+    "name": "長谷寺鬼面僧",
     "prefecture": "奈良",
     "grade": 5,
     "level": 19,
@@ -4016,12 +5356,17 @@
     "image": "NR-E09.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史",
+    "habitat": "奈良市・長谷寺",
+    "desc": "鬼面をかぶった僧兵の霊が夜に現れ、法螺貝の音を響かせる。",
+    "trivia": "長谷寺は真言宗の大本山で、修験道とのつながりも深い。",
+    "catchphrase": "「法螺の音と共に現る、鬼面の僧兵！」"
   },
   {
     "id": "NR-E10",
     "stageId": "kinki_area4",
-    "name": "吉野葛",
+    "name": "鹿王タイタニス",
     "prefecture": "奈良",
     "grade": 5,
     "level": 19,
@@ -4031,12 +5376,17 @@
     "image": "NR-E10.webp",
     "isBoss": true,
     "exp": 1038,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説",
+    "habitat": "奈良市・奈良公園",
+    "desc": "奈良の神鹿が巨大化した王の姿。黄金の角から光を放ち、群れを率いて現れる。",
+    "trivia": "奈良の鹿は古代より春日大社の神の使いとされ、奈良の象徴として尊ばれている。",
+    "catchphrase": "「黄金の角に宿る、神鹿の王！」"
   },
   {
     "id": "OSK-E01",
     "stageId": "kinki_area5",
-    "name": "たこ焼き",
+    "name": "たこ焼きスライム",
     "prefecture": "大阪",
     "grade": 5,
     "level": 19,
@@ -4046,12 +5396,17 @@
     "image": "OSK-E01.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "大阪市・道頓堀",
+    "desc": "丸いたこ焼きの体を持つぷるぷるスライム。ソースと青のりがかかり、湯気を立てている。",
+    "trivia": "たこ焼きは大阪を代表するソウルフード。",
+    "catchphrase": "「熱々ソースで、とろける一撃！」"
   },
   {
     "id": "OSK-E02",
     "stageId": "kinki_area5",
-    "name": "串カツ",
+    "name": "お好み焼きパンダ",
     "prefecture": "大阪",
     "grade": 5,
     "level": 19,
@@ -4061,12 +5416,17 @@
     "image": "OSK-E02.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "大阪市・新世界",
+    "desc": "お好み焼きを背負ったパンダ型モンスター。ソースをかけながら踊る。",
+    "trivia": "大阪のお好み焼きは「粉もん文化」の象徴。",
+    "catchphrase": "「ひっくり返して、ソースの舞！」"
   },
   {
     "id": "OSK-E03",
     "stageId": "kinki_area5",
-    "name": "豚まん",
+    "name": "串カツピクシー",
     "prefecture": "大阪",
     "grade": 5,
     "level": 19,
@@ -4076,12 +5436,17 @@
     "image": "OSK-E03.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "大阪市・新世界・ジャンジャン横丁",
+    "desc": "衣をまとった妖精のような姿。串カツを振り回して軽やかに飛ぶ。",
+    "trivia": "大阪の粉もん文化の一角を担うのが串カツ。",
+    "catchphrase": "「カリカリ衣で、空を舞う！」"
   },
   {
     "id": "OSK-E04",
     "stageId": "kinki_area5",
-    "name": "お好み焼き",
+    "name": "通天閣ロボ",
     "prefecture": "大阪",
     "grade": 5,
     "level": 19,
@@ -4091,12 +5456,17 @@
     "image": "OSK-E04.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "観光",
+    "habitat": "大阪市・新世界",
+    "desc": "通天閣がロボットに変形したモンスター。ライトアップで七色に光る。",
+    "trivia": "通天閣は大阪のシンボルタワーとして親しまれている。",
+    "catchphrase": "「大阪の空を照らす、光の巨塔！」"
   },
   {
     "id": "OSK-E05",
     "stageId": "kinki_area5",
-    "name": "通天閣",
+    "name": "グリコランナー",
     "prefecture": "大阪",
     "grade": 5,
     "level": 19,
@@ -4106,12 +5476,17 @@
     "image": "OSK-E05.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "観光",
+    "habitat": "大阪市・道頓堀",
+    "desc": "グリコサインから飛び出したランナー型モンスター。ゴールポーズで元気を与える。",
+    "trivia": "道頓堀のグリコ看板は大阪を代表する観光スポット。",
+    "catchphrase": "「走って笑顔、大阪パワー全開！」"
   },
   {
     "id": "OSK-E06",
     "stageId": "kinki_area5",
-    "name": "イカ焼き",
+    "name": "笑い神ピエロ",
     "prefecture": "大阪",
     "grade": 5,
     "level": 19,
@@ -4121,12 +5496,17 @@
     "image": "OSK-E06.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "文化・芸能",
+    "habitat": "大阪市・なんば・劇場街",
+    "desc": "カラフルな衣装を着たピエロ型モンスター。笑いの波動で周囲を明るくする。",
+    "trivia": "大阪は「笑いの都」と呼ばれ、漫才・落語の発祥地でもある。",
+    "catchphrase": "「笑いの渦で、敵も味方も大爆笑！」"
   },
   {
     "id": "OSK-E07",
     "stageId": "kinki_area5",
-    "name": "くいだおれ人形",
+    "name": "岸和田だんじりファイター",
     "prefecture": "大阪",
     "grade": 5,
     "level": 19,
@@ -4136,12 +5516,17 @@
     "image": "OSK-E07.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "祭り",
+    "habitat": "大阪市・岸和田市",
+    "desc": "だんじりの木彫りから生まれた戦士モンスター。轟音と共に突進する。",
+    "trivia": "岸和田だんじり祭は豪快な曳行で知られる伝統行事。",
+    "catchphrase": "「轟く車輪、魂の突撃！」"
   },
   {
     "id": "OSK-E08",
     "stageId": "kinki_area5",
-    "name": "岩おこし",
+    "name": "安倍晴明シャドウ",
     "prefecture": "大阪",
     "grade": 5,
     "level": 19,
@@ -4151,12 +5536,17 @@
     "image": "OSK-E08.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "宗教",
+    "habitat": "大阪市・阿倍野区",
+    "desc": "陰陽師・安倍晴明の影から生まれた幻影モンスター。呪符を操り、妖気を放つ。",
+    "trivia": "安倍晴明は平安時代の陰陽師で、大阪・阿倍野に生誕地伝承がある。",
+    "catchphrase": "「闇に符を刻む、呪術の影！」"
   },
   {
     "id": "OSK-E09",
     "stageId": "kinki_area5",
-    "name": "紅しょうが天",
+    "name": "道頓堀カニキング",
     "prefecture": "大阪",
     "grade": 5,
     "level": 19,
@@ -4166,12 +5556,17 @@
     "image": "OSK-E09.webp",
     "isBoss": false,
     "exp": 519,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "観光",
+    "habitat": "大阪市・道頓堀",
+    "desc": "動くカニ看板から生まれた巨大カニモンスター。目が赤く光り、鋭いハサミで挟み込む。",
+    "trivia": "道頓堀のカニ看板は大阪観光のシンボルで、動く仕掛けが名物。",
+    "catchphrase": "「ハサミ煌めく、道頓堀の帝王！」"
   },
   {
     "id": "OSK-E10",
     "stageId": "kinki_area5",
-    "name": "カレーうどん",
+    "name": "大阪城ジャイアント",
     "prefecture": "大阪",
     "grade": 5,
     "level": 19,
@@ -4181,12 +5576,17 @@
     "image": "OSK-E10.webp",
     "isBoss": true,
     "exp": 1038,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史",
+    "habitat": "大阪市・大阪城",
+    "desc": "大阪城そのものが巨人化したモンスター。城壁を纏い、大地を揺るがす。",
+    "trivia": "大阪城は豊臣秀吉の象徴であり、幾度も戦火を越えて再建された。",
+    "catchphrase": "「城壁動き出す、天下布武の巨神！」"
   },
   {
     "id": "WKY-E01",
     "stageId": "kinki_area6",
-    "name": "南高梅",
+    "name": "梅干しチャイルド",
     "prefecture": "和歌山",
     "grade": 5,
     "level": 20,
@@ -4196,12 +5596,17 @@
     "image": "WKY-E01.webp",
     "isBoss": false,
     "exp": 625,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "紀州・梅林",
+    "desc": "小さな子どもの姿に梅干しの帽子をかぶった精霊モンスター。にこやかに走り回る。",
+    "trivia": "和歌山は梅干しの一大産地で、特に「南高梅」が有名。",
+    "catchphrase": "「すっぱさ全開、元気いっぱい！」"
   },
   {
     "id": "WKY-E02",
     "stageId": "kinki_area6",
-    "name": "みかん",
+    "name": "みかんフェアリー",
     "prefecture": "和歌山",
     "grade": 5,
     "level": 20,
@@ -4211,12 +5616,17 @@
     "image": "WKY-E02.webp",
     "isBoss": false,
     "exp": 625,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "有田みかん畑",
+    "desc": "オレンジ色の羽を持つ果実の妖精。甘い香りを漂わせながら舞う。",
+    "trivia": "有田みかんは400年以上の歴史を持つブランドみかん。",
+    "catchphrase": "「甘さひろがる、太陽の妖精！」"
   },
   {
     "id": "WKY-E03",
     "stageId": "kinki_area6",
-    "name": "金山寺味噌",
+    "name": "パンダチャイルド",
     "prefecture": "和歌山",
     "grade": 5,
     "level": 20,
@@ -4226,12 +5636,17 @@
     "image": "WKY-E03.webp",
     "isBoss": false,
     "exp": 625,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "動物",
+    "habitat": "白浜アドベンチャーワールド",
+    "desc": "小さなパンダの姿をした愛らしいモンスター。ころころ転がって遊ぶ。",
+    "trivia": "和歌山・白浜はジャイアントパンダの飼育で有名。",
+    "catchphrase": "「ころころ笑顔、平和のしるし！」"
   },
   {
     "id": "WKY-E04",
     "stageId": "kinki_area6",
-    "name": "まぐろ",
+    "name": "しらすキャット",
     "prefecture": "和歌山",
     "grade": 5,
     "level": 20,
@@ -4241,12 +5656,17 @@
     "image": "WKY-E04.webp",
     "isBoss": false,
     "exp": 625,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化・海産物",
+    "habitat": "和歌浦の漁港",
+    "desc": "しらすをまとった子猫のモンスター。背中の小魚がぴちぴち跳ねる。",
+    "trivia": "和歌山のしらすは新鮮で有名、丼として人気。",
+    "catchphrase": "「海の恵みを、背負ってにゃん！」"
   },
   {
     "id": "WKY-E05",
     "stageId": "kinki_area6",
-    "name": "熊野古道",
+    "name": "熊野詣りスプライト",
     "prefecture": "和歌山",
     "grade": 5,
     "level": 20,
@@ -4256,12 +5676,17 @@
     "image": "WKY-E05.webp",
     "isBoss": false,
     "exp": 625,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史・伝統",
+    "habitat": "熊野古道",
+    "desc": "巡礼者の笠をかぶった小さな精霊。杖を持って静かに歩く。",
+    "trivia": "熊野古道は世界遺産に登録された巡礼の道。",
+    "catchphrase": "「千年の道を、今日も歩む！」"
   },
   {
     "id": "WKY-E06",
     "stageId": "kinki_area6",
-    "name": "うめぼし",
+    "name": "鯨フレンドリー",
     "prefecture": "和歌山",
     "grade": 5,
     "level": 20,
@@ -4271,12 +5696,17 @@
     "image": "WKY-E06.webp",
     "isBoss": false,
     "exp": 625,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "動物",
+    "habitat": "太地町",
+    "desc": "小さな鯨の姿をしたモンスター。尾びれで水しぶきを上げる。",
+    "trivia": "太地町は古来より捕鯨の町として知られる。",
+    "catchphrase": "「しぶきをあげて、海を駆ける！」"
   },
   {
     "id": "WKY-E07",
     "stageId": "kinki_area6",
-    "name": "和歌山ラーメン",
+    "name": "高野山僧兵ファントム",
     "prefecture": "和歌山",
     "grade": 5,
     "level": 20,
@@ -4286,12 +5716,17 @@
     "image": "WKY-E07.webp",
     "isBoss": false,
     "exp": 625,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "宗教",
+    "habitat": "高野山",
+    "desc": "僧兵の霊が甲冑姿で現れる。数珠を武器に戦う。",
+    "trivia": "高野山は空海が開いた真言密教の聖地。",
+    "catchphrase": "「法と武を兼ねる、山岳の守護者！」"
   },
   {
     "id": "WKY-E08",
     "stageId": "kinki_area6",
-    "name": "しらす丼",
+    "name": "那智滝ウォータースピリット",
     "prefecture": "和歌山",
     "grade": 5,
     "level": 20,
@@ -4301,12 +5736,17 @@
     "image": "WKY-E08.webp",
     "isBoss": false,
     "exp": 625,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "那智の滝",
+    "desc": "滝壺から現れる水の精霊。青白い体が揺らめく。",
+    "trivia": "那智の滝は日本一の落差を誇り、古来より信仰の対象。",
+    "catchphrase": "「轟音と共に現る、聖なる滝精！」"
   },
   {
     "id": "WKY-E09",
     "stageId": "kinki_area6",
-    "name": "みかんジュース",
+    "name": "熊野権現ビースト",
     "prefecture": "和歌山",
     "grade": 5,
     "level": 20,
@@ -4316,12 +5756,17 @@
     "image": "WKY-E09.webp",
     "isBoss": false,
     "exp": 625,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "宗教",
+    "habitat": "熊野三山",
+    "desc": "熊野の神使である三本足の烏「八咫烏」が獣化したモンスター。",
+    "trivia": "八咫烏は日本神話の導きの鳥で、熊野の象徴。",
+    "catchphrase": "「三本の翼で導く、神の使い！」"
   },
   {
     "id": "WKY-E10",
     "stageId": "kinki_area6",
-    "name": "めはり寿司",
+    "name": "熊野大社ガーディアン",
     "prefecture": "和歌山",
     "grade": 5,
     "level": 20,
@@ -4331,12 +5776,17 @@
     "image": "WKY-E10.webp",
     "isBoss": true,
     "exp": 1250,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説",
+    "habitat": "熊野本宮大社",
+    "desc": "社殿そのものが巨人化したモンスター。神々しい光を背に現れる。",
+    "trivia": "熊野本宮大社は熊野信仰の中心地。",
+    "catchphrase": "「聖域を護る、永遠の大守護神！」"
   },
   {
     "id": "HYG-E01",
     "stageId": "kinki_area7",
-    "name": "神戸牛",
+    "name": "神戸ビーフブル",
     "prefecture": "兵庫",
     "grade": 5,
     "level": 21,
@@ -4346,12 +5796,17 @@
     "image": "HYG-E01.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "神戸市",
+    "desc": "黒毛和牛をモチーフにした牛型モンスター。丸々とした体で愛嬌があり、力強い。",
+    "trivia": "神戸ビーフは世界的に有名なブランド牛肉。",
+    "catchphrase": "「旨みぎっしり、港町の誇り！」"
   },
   {
     "id": "HYG-E02",
     "stageId": "kinki_area7",
-    "name": "明石焼き",
+    "name": "淡路玉ねぎフェアリー",
     "prefecture": "兵庫",
     "grade": 5,
     "level": 21,
@@ -4361,12 +5816,17 @@
     "image": "HYG-E02.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "淡路島",
+    "desc": "玉ねぎの帽子をかぶった妖精モンスター。涙の魔法を使う。",
+    "trivia": "淡路島は日本有数の玉ねぎ産地。",
+    "catchphrase": "「甘さと涙で、みんなを包む！」"
   },
   {
     "id": "HYG-E03",
     "stageId": "kinki_area7",
-    "name": "淡路玉ねぎ",
+    "name": "明石タコスライム",
     "prefecture": "兵庫",
     "grade": 5,
     "level": 21,
@@ -4376,12 +5836,17 @@
     "image": "HYG-E03.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化・海産物",
+    "habitat": "明石海峡",
+    "desc": "タコの形をしたぷるぷるスライムモンスター。墨を吹いて遊ぶ。",
+    "trivia": "明石のタコはブランド海産物で、たこ焼きの材料にもなる。",
+    "catchphrase": "「足もと軽やか、海の人気者！」"
   },
   {
     "id": "HYG-E04",
     "stageId": "kinki_area7",
-    "name": "洋菓子",
+    "name": "姫路忍者キャット",
     "prefecture": "兵庫",
     "grade": 5,
     "level": 21,
@@ -4391,12 +5856,17 @@
     "image": "HYG-E04.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "忍者",
+    "habitat": "姫路城下町",
+    "desc": "忍者装束をまとった黒猫モンスター。素早く走り、手裏剣を投げる。",
+    "trivia": "姫路城周辺は戦国時代の要衝で、忍者の伝承も残る。",
+    "catchphrase": "「闇を駆け抜ける、小さな影武者！」"
   },
   {
     "id": "HYG-E05",
     "stageId": "kinki_area7",
-    "name": "姫路城",
+    "name": "六甲やまびこスプライト",
     "prefecture": "兵庫",
     "grade": 5,
     "level": 21,
@@ -4406,12 +5876,17 @@
     "image": "HYG-E05.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然・精霊",
+    "habitat": "六甲山",
+    "desc": "山のやまびこから生まれた精霊モンスター。声を真似して遊ぶ。",
+    "trivia": "六甲山は神戸を代表する観光スポット。",
+    "catchphrase": "「こだまが響く、山のいたずらっ子！」"
   },
   {
     "id": "HYG-E06",
     "stageId": "kinki_area7",
-    "name": "淡路ビーフ",
+    "name": "但馬コウノトリチャイルド",
     "prefecture": "兵庫",
     "grade": 5,
     "level": 21,
@@ -4421,12 +5896,17 @@
     "image": "HYG-E06.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "動物",
+    "habitat": "豊岡市",
+    "desc": "小さなコウノトリの子供型モンスター。幸運を運ぶといわれる。",
+    "trivia": "豊岡はコウノトリの人工繁殖・保護で有名。",
+    "catchphrase": "「空から運ぶ、しあわせの翼！」"
   },
   {
     "id": "HYG-E07",
     "stageId": "kinki_area7",
-    "name": "炭酸せんべい",
+    "name": "有馬温泉スピリット",
     "prefecture": "兵庫",
     "grade": 5,
     "level": 21,
@@ -4436,12 +5916,17 @@
     "image": "HYG-E07.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "有馬温泉",
+    "desc": "金泉と銀泉の湯気から現れる精霊モンスター。体は赤と白の蒸気に包まれている。",
+    "trivia": "有馬温泉は日本三古湯のひとつ。",
+    "catchphrase": "「湯煙に宿る、古都の精霊！」"
   },
   {
     "id": "HYG-E08",
     "stageId": "kinki_area7",
-    "name": "出石そば",
+    "name": "赤穂浪士ゴースト",
     "prefecture": "兵庫",
     "grade": 5,
     "level": 21,
@@ -4451,12 +5936,17 @@
     "image": "HYG-E08.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "武士",
+    "habitat": "赤穂市",
+    "desc": "忠臣蔵の赤穂浪士の霊が甲冑姿で現れる。刀を掲げて戦う。",
+    "trivia": "赤穂浪士は仇討ちで知られ、日本史上の忠義の象徴。",
+    "catchphrase": "「忠義を胸に、今も戦う幻影！」"
   },
   {
     "id": "HYG-E09",
     "stageId": "kinki_area7",
-    "name": "たつの醤油",
+    "name": "姫路白鷺フェニックス",
     "prefecture": "兵庫",
     "grade": 5,
     "level": 21,
@@ -4466,12 +5956,17 @@
     "image": "HYG-E09.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝統芸能",
+    "habitat": "淡路島",
+    "desc": "淡路人形浄瑠璃から生まれた糸で操られる幻影モンスター。夜になると動き出す。",
+    "trivia": "淡路人形浄瑠璃は国指定重要無形民俗文化財。",
+    "catchphrase": "「糸に操らられ、闇に舞う！」"
   },
   {
     "id": "HYG-E10",
     "stageId": "kinki_area7",
-    "name": "はばのり",
+    "name": "姫路城天守閣フェニックス",
     "prefecture": "兵庫",
     "grade": 5,
     "level": 21,
@@ -4481,12 +5976,17 @@
     "image": "HYG-E10.webp",
     "isBoss": true,
     "exp": 1504,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝説",
+    "habitat": "姫路城天守閣",
+    "desc": "姫路城から飛び立つ巨大な白い不死鳥モンスター。羽ばたきで光を放つ。",
+    "trivia": "姫路城は白鷺のように美しいことから「白鷺城」と呼ばれる。",
+    "catchphrase": "「純白の炎、蘇る城鳥！」"
   },
   {
     "id": "TTR-E01",
     "stageId": "chugoku_area1",
-    "name": "らっきょう",
+    "name": "砂丘トカゲチャイルド",
     "prefecture": "鳥取",
     "grade": 6,
     "level": 21,
@@ -4496,12 +5996,17 @@
     "image": "TTR-E01.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "動物",
+    "habitat": "鳥取砂丘",
+    "desc": "砂の色をした小さなトカゲのモンスター。砂の中に潜ってひょっこり顔を出す。",
+    "trivia": "砂丘の生態系にはハ虫類が多く見られ、観察会も行われている。",
+    "catchphrase": "「砂の忍者、ちょこまか走る！」"
   },
   {
     "id": "TTR-E02",
     "stageId": "chugoku_area1",
-    "name": "鳥取梨",
+    "name": "二十世紀ナシフェアリー",
     "prefecture": "鳥取",
     "grade": 6,
     "level": 21,
@@ -4511,12 +6016,17 @@
     "image": "TTR-E02.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "鳥取の梨園",
+    "desc": "丸い梨の体をした果実の妖精モンスター。瑞々しい香りを漂わせる。",
+    "trivia": "鳥取は二十世紀梨の生産地として全国的に有名。",
+    "catchphrase": "「甘酸っぱさは、魔法のしずく！」"
   },
   {
     "id": "TTR-E03",
     "stageId": "chugoku_area1",
-    "name": "松葉ガニ",
+    "name": "松葉ガニスライム",
     "prefecture": "鳥取",
     "grade": 6,
     "level": 21,
@@ -4526,12 +6036,17 @@
     "image": "TTR-E03.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化・海産物",
+    "habitat": "境港",
+    "desc": "カニの殻が混じったぷるぷるスライムモンスター。はさみでちょっかいを出す。",
+    "trivia": "松葉ガニは鳥取を代表する冬の味覚。",
+    "catchphrase": "「はさみピチピチ、砂浜のいたずらっ子！」"
   },
   {
     "id": "TTR-E04",
     "stageId": "chugoku_area1",
-    "name": "すなば珈琲",
+    "name": "大山ミルクベア",
     "prefecture": "鳥取",
     "grade": 6,
     "level": 21,
@@ -4541,12 +6056,17 @@
     "image": "TTR-E04.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "動物",
+    "habitat": "大山",
+    "desc": "牛乳を背負った小熊モンスター。雪山を元気に駆ける。",
+    "trivia": "大山は酪農が盛んで、牛乳・乳製品が特産。",
+    "catchphrase": "「雪とミルクの元気印！」"
   },
   {
     "id": "TTR-E05",
     "stageId": "chugoku_area1",
-    "name": "白うさぎ",
+    "name": "鳥取すなばコーヒースピリット",
     "prefecture": "鳥取",
     "grade": 6,
     "level": 21,
@@ -4556,12 +6076,17 @@
     "image": "TTR-E05.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "観光",
+    "habitat": "鳥取砂丘",
+    "desc": "珈琲カップから生まれた小さな精霊モンスター。香ばしい香りを漂わせる。",
+    "trivia": "スターバックスが進出する前、「スタバはないけど日本一のすなばはある」と話題になったご当地カフェ文化。",
+    "catchphrase": "「香ばしさひろがる、すなの香精！」"
   },
   {
     "id": "TTR-E06",
     "stageId": "chugoku_area1",
-    "name": "砂丘らっきょう",
+    "name": "白兎チャイルド",
     "prefecture": "鳥取",
     "grade": 6,
     "level": 21,
@@ -4571,12 +6096,17 @@
     "image": "TTR-E06.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "神話・動物",
+    "habitat": "白兎海岸",
+    "desc": "白兎神話の小さな兎モンスター。波打ち際を飛び跳ねる。",
+    "trivia": "古事記に登場する「因幡の白兎」で有名。",
+    "catchphrase": "「神話の浜辺を駆ける、白き精霊！」"
   },
   {
     "id": "TTR-E07",
     "stageId": "chugoku_area1",
-    "name": "あごちくわ",
+    "name": "砂丘サンドゴーレム",
     "prefecture": "鳥取",
     "grade": 6,
     "level": 21,
@@ -4586,12 +6116,17 @@
     "image": "TTR-E07.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "鳥取砂丘",
+    "desc": "砂が人型に固まった守護者モンスター。風に乗って姿を変える。",
+    "trivia": "砂丘では砂像フェスティバルが開催される。",
+    "catchphrase": "「風と砂が生んだ、無敵の巨像！」"
   },
   {
     "id": "TTR-E08",
     "stageId": "chugoku_area1",
-    "name": "いかの塩辛",
+    "name": "境港妖怪ウォーカー",
     "prefecture": "鳥取",
     "grade": 6,
     "level": 21,
@@ -4601,12 +6136,17 @@
     "image": "TTR-E08.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "妖怪",
+    "habitat": "境港",
+    "desc": "妖怪の姿をした徘徊モンスター。夜になると街を歩き回る。",
+    "trivia": "境港は漫画家・水木しげるの出身地で、妖怪の町として有名。",
+    "catchphrase": "「夜に現れる、妖怪の使者！」"
   },
   {
     "id": "TTR-E09",
     "stageId": "chugoku_area1",
-    "name": "ばばちゃん",
+    "name": "大山修験ファントム",
     "prefecture": "鳥取",
     "grade": 6,
     "level": 21,
@@ -4616,12 +6156,17 @@
     "image": "TTR-E09.webp",
     "isBoss": false,
     "exp": 752,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "宗教",
+    "habitat": "大山",
+    "desc": "大山修験の霊が青白い炎をまとって現れる。法力で悪を祓う。",
+    "trivia": "大山は古代より山岳信仰の霊場として知られる。",
+    "catchphrase": "「霊峰に宿る、修験の幻影！」"
   },
   {
     "id": "TTR-E10",
     "stageId": "chugoku_area1",
-    "name": "牛骨ラーメン",
+    "name": "砂丘キングキャメル",
     "prefecture": "鳥取",
     "grade": 6,
     "level": 21,
@@ -4631,12 +6176,17 @@
     "image": "TTR-E10.webp",
     "isBoss": true,
     "exp": 1504,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝説",
+    "habitat": "鳥取砂丘",
+    "desc": "巨大化したラクダの王。背中のコブが砂山のように盛り上がる。",
+    "trivia": "ラクダは鳥取砂丘の観光シンボル。",
+    "catchphrase": "「砂を統べる、巨大なる砂丘王！」"
   },
   {
     "id": "OKY-E01",
     "stageId": "chugoku_area2",
-    "name": "白桃",
+    "name": "桃太郎チャイルド",
     "prefecture": "岡山",
     "grade": 6,
     "level": 22,
@@ -4646,12 +6196,17 @@
     "image": "OKY-E01.webp",
     "isBoss": false,
     "exp": 904,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "童話",
+    "habitat": "岡山",
+    "desc": "桃から生まれた小さな子どもモンスター。元気いっぱいで仲間を呼ぶ。",
+    "trivia": "岡山の桃太郎伝説は、古事記や温羅退治の伝承に基づく。",
+    "catchphrase": "「桃から飛び出す、元気なヒーロー！」"
   },
   {
     "id": "OKY-E02",
     "stageId": "chugoku_area2",
-    "name": "きびだんご",
+    "name": "吉備団子フェアリー",
     "prefecture": "岡山",
     "grade": 6,
     "level": 22,
@@ -4661,12 +6216,17 @@
     "image": "OKY-E02.webp",
     "isBoss": false,
     "exp": 904,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "岡山",
+    "desc": "吉備団子を抱えた小さな妖精モンスター。甘い香りを漂わせる。",
+    "trivia": "吉備団子は岡山名物で、桃太郎が鬼退治の際に仲間へ配ったと言われる。",
+    "catchphrase": "「ひとつ食べれば、仲間がふえる！」"
   },
   {
     "id": "OKY-E03",
     "stageId": "chugoku_area2",
-    "name": "マスカット",
+    "name": "倉敷デニムピクシー",
     "prefecture": "岡山",
     "grade": 6,
     "level": 22,
@@ -4676,12 +6236,17 @@
     "image": "OKY-E03.webp",
     "isBoss": false,
     "exp": 904,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝統工芸",
+    "habitat": "倉敷市美観地区",
+    "desc": "デニム生地を羽織った小さな妖精モンスター。鮮やかな藍色が特徴。",
+    "trivia": "倉敷は国産ジーンズ発祥の地であり、デニムストリートが観光名所。",
+    "catchphrase": "「青の羽ばたき、街を彩る！」"
   },
   {
     "id": "OKY-E04",
     "stageId": "chugoku_area2",
-    "name": "備前焼",
+    "name": "備前焼ゴーレム",
     "prefecture": "岡山",
     "grade": 6,
     "level": 22,
@@ -4691,12 +6256,17 @@
     "image": "OKY-E04.webp",
     "isBoss": false,
     "exp": 904,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "工芸",
+    "habitat": "備前市",
+    "desc": "備前焼の土器が動き出した小さなゴーレム。ひび割れ模様が光る。",
+    "trivia": "備前焼は日本六古窯の一つで、釉薬を使わず焼き締めで仕上げるのが特徴。",
+    "catchphrase": "「土の力で街を守る！」"
   },
   {
     "id": "OKY-E05",
     "stageId": "chugoku_area2",
-    "name": "デニム",
+    "name": "蒜山ジャージーベア",
     "prefecture": "岡山",
     "grade": 6,
     "level": 22,
@@ -4706,12 +6276,17 @@
     "image": "OKY-E05.webp",
     "isBoss": false,
     "exp": 904,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "動物",
+    "habitat": "蒜山高原",
+    "desc": "ジャージー牛をモチーフにした小熊型モンスター。ミルクの香りが漂う。",
+    "trivia": "蒜山高原はジャージー牛の飼育で有名で、乳製品の産地としても知られる。",
+    "catchphrase": "「ミルクと笑顔を届ける、小さな力持ち！」"
   },
   {
     "id": "OKY-E06",
     "stageId": "chugoku_area2",
-    "name": "ままかり",
+    "name": "瀬戸内タコスライム",
     "prefecture": "岡山",
     "grade": 6,
     "level": 22,
@@ -4721,12 +6296,17 @@
     "image": "OKY-E06.webp",
     "isBoss": false,
     "exp": 904,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海産物",
+    "habitat": "瀬戸内海",
+    "desc": "タコをモチーフにしたぷるぷるスライムモンスター。墨を吐いて遊ぶ。",
+    "trivia": "岡山の瀬戸内海はタコの名産地で、倉敷や玉野の郷土料理に欠かせない。",
+    "catchphrase": "「海の人気者、ぴょこぴょこタコスライム！」"
   },
   {
     "id": "OKY-E07",
     "stageId": "chugoku_area2",
-    "name": "祭りずし",
+    "name": "吉備津彦ノーブルナイト",
     "prefecture": "岡山",
     "grade": 6,
     "level": 22,
@@ -4736,12 +6316,17 @@
     "image": "OKY-E07.webp",
     "isBoss": false,
     "exp": 904,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史",
+    "habitat": "吉備津神社",
+    "desc": "吉備津彦命をモチーフにした騎士モンスター。矢を手に勇ましく戦う。",
+    "trivia": "吉備津彦命は温羅を討伐したとされる伝承の英雄で、吉備津神社に祀られている。",
+    "catchphrase": "「矢に宿るは、神の力！」"
   },
   {
     "id": "OKY-E08",
     "stageId": "chugoku_area2",
-    "name": "シャインマスカット",
+    "name": "温羅オーガ",
     "prefecture": "岡山",
     "grade": 6,
     "level": 22,
@@ -4751,12 +6336,17 @@
     "image": "OKY-E08.webp",
     "isBoss": false,
     "exp": 904,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "鬼",
+    "habitat": "鬼ノ城跡",
+    "desc": "桃太郎に退治された温羅の鬼がモンスター化。恐ろしい角と牙を持つ。",
+    "trivia": "温羅伝説は岡山の鬼退治物語の原点で、吉備津神社の鳴釜神事に伝わる。",
+    "catchphrase": "「伝説に残る、敗者の逆襲！」"
   },
   {
     "id": "OKY-E09",
     "stageId": "chugoku_area2",
-    "name": "鰆",
+    "name": "備中国分寺スピリット",
     "prefecture": "岡山",
     "grade": 6,
     "level": 22,
@@ -4766,12 +6356,17 @@
     "image": "OKY-E09.webp",
     "isBoss": false,
     "exp": 904,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "宗教",
+    "habitat": "総社市・国分寺五重塔",
+    "desc": "五重塔を守る霊体モンスター。光を放ちながら夜空に浮かぶ。",
+    "trivia": "備中国分寺は奈良時代に聖武天皇が建立を命じた国分寺の一つ。",
+    "catchphrase": "「塔に宿る、永遠の守護霊！」"
   },
   {
     "id": "OKY-E10",
     "stageId": "chugoku_area2",
-    "name": "黄ニラ",
+    "name": "桃源大鬼",
     "prefecture": "岡山",
     "grade": 6,
     "level": 22,
@@ -4781,12 +6376,17 @@
     "image": "OKY-E10.webp",
     "isBoss": true,
     "exp": 1808,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "伝説",
+    "habitat": "吉備路・鬼ノ城跡",
+    "desc": "桃太郎に退治された温羅の怨念が巨大な鬼となって蘇ったモンスター。角が桃色に輝き、城壁を背負い圧倒的な存在感を持つ。",
+    "trivia": "鬼ノ城は白村江の戦い後に築かれた山城とも言われ、桃太郎伝説と結びつく。",
+    "catchphrase": "「桃源を揺るがす、怨念の大鬼王！」"
   },
   {
     "id": "SMN-E01",
     "stageId": "chugoku_area3",
-    "name": "出雲そば",
+    "name": "出雲そばフェアリー",
     "prefecture": "島根",
     "grade": 6,
     "level": 23,
@@ -4796,12 +6396,17 @@
     "image": "SMN-E01.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "食文化",
+    "habitat": "出雲市・そば処",
+    "desc": "黒っぽいそばの髪を持った小さな妖精モンスター。羽を広げて元気に飛び回る。",
+    "trivia": "出雲そばは日本三大そばの一つで、割子そばが名物。",
+    "catchphrase": "「そばの香りと一緒に舞う、小さな精霊！」"
   },
   {
     "id": "SMN-E02",
     "stageId": "chugoku_area3",
-    "name": "のどくろ",
+    "name": "宍道湖シジミスライム",
     "prefecture": "島根",
     "grade": 6,
     "level": 23,
@@ -4811,12 +6416,17 @@
     "image": "SMN-E02.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "海産物",
+    "habitat": "宍道湖",
+    "desc": "シジミの殻を背負ったぷるぷるスライム。水辺をぴょこぴょこ跳ね回る。",
+    "trivia": "宍道湖はシジミ漁で有名で、日本一の漁獲量を誇る。",
+    "catchphrase": "「ちっちゃな殻に、栄養たっぷり！」"
   },
   {
     "id": "SMN-E03",
     "stageId": "chugoku_area3",
-    "name": "石見銀山",
+    "name": "石見銀山モグラチャイルド",
     "prefecture": "島根",
     "grade": 6,
     "level": 23,
@@ -4826,12 +6436,17 @@
     "image": "SMN-E03.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "石見銀山",
+    "desc": "銀鉱石を背負った小さなモグラのモンスター。土を掘り進んで顔を出す。",
+    "trivia": "石見銀山は世界遺産に登録された日本最大の銀山跡。",
+    "catchphrase": "「土の中からキラリ！銀の子守モグラ！」"
   },
   {
     "id": "SMN-E04",
     "stageId": "chugoku_area3",
-    "name": "勾玉",
+    "name": "出雲大社ウサギピクシー",
     "prefecture": "島根",
     "grade": 6,
     "level": 23,
@@ -4841,12 +6456,17 @@
     "image": "SMN-E04.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "神話",
+    "habitat": "出雲大社",
+    "desc": "白兎神話の小さな兎モンスター。鈴を振りながら飛び跳ねる。",
+    "trivia": "「因幡の白兎」は大国主命と関わる有名な神話。",
+    "catchphrase": "「神話の浜辺から跳ねる、小さな精霊！」"
   },
   {
     "id": "SMN-E05",
     "stageId": "chugoku_area3",
-    "name": "八岐大蛇",
+    "name": "津和野アヤメスプライト",
     "prefecture": "島根",
     "grade": 6,
     "level": 23,
@@ -4856,12 +6476,17 @@
     "image": "SMN-E05.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "自然",
+    "habitat": "津和野町",
+    "desc": "アヤメの花を身にまとった小さな精霊モンスター。花びらの羽でふわふわ漂う。",
+    "trivia": "津和野は「山陰の小京都」と呼ばれ、アヤメの名所としても知られる。",
+    "catchphrase": "「花の都に舞う、可憐な風の精！」"
   },
   {
     "id": "SMN-E06",
     "stageId": "chugoku_area3",
-    "name": "しじみ",
+    "name": "隠岐ウミドリチャイルド",
     "prefecture": "島根",
     "grade": 6,
     "level": 23,
@@ -4871,12 +6496,17 @@
     "image": "SMN-E06.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "隠岐諸島",
+    "desc": "青い羽を広げた小さな海鳥モンスター。爽快に空を飛び回る。",
+    "trivia": "隠岐諸島は国指定のジオパークで、豊かな海鳥の生息地。",
+    "catchphrase": "「潮風に乗って飛び回る、海鳥の精！」"
   },
   {
     "id": "SMN-E07",
     "stageId": "chugoku_area3",
-    "name": "うずめ飯",
+    "name": "八岐大蛇ファング",
     "prefecture": "島根",
     "grade": 6,
     "level": 23,
@@ -4886,12 +6516,17 @@
     "image": "SMN-E07.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "神話",
+    "habitat": "斐伊川流域",
+    "desc": "八つの頭を持つ大蛇モンスター。赤い目を光らせ、不気味にうねる。",
+    "trivia": "「ヤマタノオロチ」は出雲神話に登場する伝説の大蛇",
+    "catchphrase": "「八つの咆哮、荒ぶる大蛇の化身！」"
   },
   {
     "id": "SMN-E08",
     "stageId": "chugoku_area3",
-    "name": "赤てん",
+    "name": "石見神楽ウォリアー",
     "prefecture": "島根",
     "grade": 6,
     "level": 23,
@@ -4901,12 +6536,17 @@
     "image": "SMN-E08.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "伝統文化",
+    "habitat": "石見地方",
+    "desc": "鬼面をかぶった武者モンスター。舞いながら戦い、迫力を放つ。",
+    "trivia": "石見神楽は勇壮な舞と豪華な衣装で知られる島根の伝統芸能。",
+    "catchphrase": "「鬼面に宿る、舞いの戦士！」"
   },
   {
     "id": "SMN-E09",
     "stageId": "chugoku_area3",
-    "name": "寒シマメ",
+    "name": "出雲雷神ファントム",
     "prefecture": "島根",
     "grade": 6,
     "level": 23,
@@ -4916,12 +6556,17 @@
     "image": "SMN-E09.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "神話",
+    "habitat": "出雲平野上空",
+    "desc": "太鼓を背負った雷の霊体モンスター。雷光をまとい、空を駛る。",
+    "trivia": "古代の出雲は雷神信仰が盛んで、豊作を祈る儀礼に結びついた。",
+    "catchphrase": "「雷鳴轟く、空の守護霊！」"
   },
   {
     "id": "SMN-E10",
     "stageId": "chugoku_area3",
-    "name": "宍道湖の白魚",
+    "name": "出雲大蛇ドラゴンロード",
     "prefecture": "島根",
     "grade": 6,
     "level": 23,
@@ -4931,12 +6576,17 @@
     "image": "SMN-E10.webp",
     "isBoss": true,
     "exp": 2174,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "神話",
+    "habitat": "出雲国の山河一帯",
+    "desc": "八岐大蛇が龍と化した究極のボスモンスター。鱗が光り輝き、雷雲を呼び出す。",
+    "trivia": "ヤマタノオロチ伝説は日本神話の中でも特に壮大で、出雲地方を象徴する物語。",
+    "catchphrase": "「雷雲を従えし、終末の大蛇龍！」"
   },
   {
     "id": "HRS-E01",
     "stageId": "chugoku_area4",
-    "name": "牡蠣",
+    "name": "広島焼きキャッピー",
     "prefecture": "広島",
     "grade": 6,
     "level": 23,
@@ -4946,12 +6596,17 @@
     "image": "HRS-E01.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "広島市",
+    "desc": "広島風焼きキャップモンスター。キャップの形をしたモンスター。ソースの香りを漂わせる。",
+    "trivia": "広島風お好み焼きは、麺や野菜を重ねて焼く独特のスタイルで全国的に有名。",
+    "catchphrase": "「ソース香る、元気いっぱいの焼き精！」"
   },
   {
     "id": "HRS-E02",
     "stageId": "chugoku_area4",
-    "name": "もみじ饅頭",
+    "name": "もみじまんじゅうフェアリー",
     "prefecture": "広島",
     "grade": 6,
     "level": 23,
@@ -4961,12 +6616,17 @@
     "image": "HRS-E02.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "宮島",
+    "desc": "もみじまんじゅうを抱えた小さな妖精モンスター。甘い香りを漂わせ、参拝客を癒やす存在。",
+    "trivia": "もみじまんじゅうは明治時代に宮島で誕生した銘菓で、お土産として親しまれている。",
+    "catchphrase": "「紅葉の形に、甘い魔法！」"
   },
   {
     "id": "HRS-E03",
     "stageId": "chugoku_area4",
-    "name": "尾道ラーメン",
+    "name": "宮島シカチャイルド",
     "prefecture": "広島",
     "grade": 6,
     "level": 23,
@@ -4976,12 +6636,17 @@
     "image": "HRS-E03.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "動物",
+    "habitat": "宮島（厳島神社周辺）",
+    "desc": "小さな鹿の姿をしたモンスター。参道をぴょこぴょこと歩き、人々の笑顔を集める。",
+    "trivia": "宮島のシカは古くから神の使いとされ、厳島神社の神聖な雰囲気を象徴している。",
+    "catchphrase": "「神の島で跳ねる、小さな鹿精！」"
   },
   {
     "id": "HRS-E04",
     "stageId": "chugoku_area4",
-    "name": "レモン",
+    "name": "尾道ネコスピリット",
     "prefecture": "広島",
     "grade": 6,
     "level": 23,
@@ -4991,12 +6656,17 @@
     "image": "HRS-E04.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "動物",
+    "habitat": "尾道の坂道",
+    "desc": "尾道の路地に暮らす猫がモンスター化。のんびり気まぐれな姿で旅人を導く。",
+    "trivia": "尾道は「猫の細道」と呼ばれる小道があり、多くの猫好き観光客を惹きつけている。",
+    "catchphrase": "「坂道をのんびり歩く、しっぽの精！」"
   },
   {
     "id": "HRS-E05",
     "stageId": "chugoku_area4",
-    "name": "原爆ドーム",
+    "name": "鞆の浦シーランタン",
     "prefecture": "広島",
     "grade": 6,
     "level": 23,
@@ -5006,12 +6676,17 @@
     "image": "HRS-E05.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "海精霊",
+    "habitat": "福山市・鞆の浦",
+    "desc": "鞆の浦の常夜灯をモチーフにした小さな海の精霊モンスター。石灯籠の体が海風に揺れて灯りを放つ。",
+    "trivia": "鞆の浦は瀬戸内の古い港町で、江戸時代の常夜灯が今も残り、潮待ちの港として栄えた。",
+    "catchphrase": "「海を照らす、小さな灯りの守り手！」"
   },
   {
     "id": "HRS-E06",
     "stageId": "chugoku_area4",
-    "name": "広島菜漬け",
+    "name": "呉カレーミリタリードッグ",
     "prefecture": "広島",
     "grade": 6,
     "level": 23,
@@ -5021,12 +6696,17 @@
     "image": "HRS-E06.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "呉市",
+    "desc": "カレーを背負った軍犬風モンスター。勇ましくも愛らしい姿で、艦隊を支える。",
+    "trivia": "呉市では海上自衛隊のカレーが名物で、毎週金曜日に食べられる伝統がある。",
+    "catchphrase": "「スパイシーな香りとともに進軍！」"
   },
   {
     "id": "HRS-E07",
     "stageId": "chugoku_area4",
-    "name": "お好み村",
+    "name": "原爆ドームガーディアン",
     "prefecture": "広島",
     "grade": 6,
     "level": 23,
@@ -5036,12 +6716,17 @@
     "image": "HRS-E07.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "建造物",
+    "habitat": "広島市平和記念公園",
+    "desc": "原爆ドームを背負った守護霊モンスター。荘厳で不気味な存在感を放ち、平和の記憶を守り続ける。",
+    "trivia": "原爆ドームは1996年に世界文化遺産に登録され、戦争の悲惨さと平和の大切さを伝えている。",
+    "catchphrase": "「永遠に語り継ぐ、平和の守護者！」"
   },
   {
     "id": "HRS-E08",
     "stageId": "chugoku_area4",
-    "name": "つけ麵",
+    "name": "宮島大鳥居ファントム",
     "prefecture": "広島",
     "grade": 6,
     "level": 23,
@@ -5051,12 +6736,17 @@
     "image": "HRS-E08.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "建造物",
+    "habitat": "厳島神社",
+    "desc": "大鳥居を背負った不気味なモンスター。赤い光を放ち、海上に荘厳な影を落とす。",
+    "trivia": "厳島神社の大鳥居は潮の満ち引きによって海に浮かぶように見える景観で有名。",
+    "catchphrase": "「海に浮かぶ、霊なる大門！」"
   },
   {
     "id": "HRS-E09",
     "stageId": "chugoku_area4",
-    "name": "因島のはっさく",
+    "name": "毛利武者スピリット",
     "prefecture": "広島",
     "grade": 6,
     "level": 23,
@@ -5066,12 +6756,17 @@
     "image": "HRS-E09.webp",
     "isBoss": false,
     "exp": 1087,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "武者",
+    "habitat": "広島城",
+    "desc": "毛利元就の霊を思わせる武者モンスター。鋭い眼光で睨みを利かし、城を守護する。",
+    "trivia": "毛利元就は戦国時代の名将で、「三本の矢」の教えで一族の結束を固めた人物として知られる。",
+    "catchphrase": "「智将の霊魂、城を守る！」"
   },
   {
     "id": "HRS-E10",
     "stageId": "chugoku_area4",
-    "name": "レモンケーキ",
+    "name": "厳島鳳凰ロード",
     "prefecture": "広島",
     "grade": 6,
     "level": 23,
@@ -5081,12 +6776,17 @@
     "image": "HRS-E10.webp",
     "isBoss": true,
     "exp": 2174,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "幻獣",
+    "habitat": "厳島神社",
+    "desc": "大鳥居から飛び立つ神聖な鳳凰モンスター。炎の羽を広げ、荘厳な姿で空を舞う。",
+    "trivia": "鳳凰は古来より吉兆を示す聖なる鳥とされ、平和や繁栄の象徴として描かれてきた。",
+    "catchphrase": "「炎と光に包まれた、神の鳳凰！」"
   },
   {
     "id": "YMGC-E01",
     "stageId": "chugoku_area5",
-    "name": "ふぐ",
+    "name": "ふぐフロートン",
     "prefecture": "山口",
     "grade": 6,
     "level": 24,
@@ -5096,12 +6796,17 @@
     "image": "YMGC-E01.png",
     "isBoss": false,
     "exp": 1306,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "下関・唐戸市場",
+    "desc": "ふぐがぷかぷか浮いて進むモンスター。丸く膨らんだ体が愛らしい。",
+    "trivia": "下関は日本一のふぐの水揚げ地で、「ふく」と呼ばれ縁起物とされる。",
+    "catchphrase": "「ふくらんで笑う、海の福精！」"
   },
   {
     "id": "YMGC-E02",
     "stageId": "chugoku_area5",
-    "name": "瓦そば",
+    "name": "瓦そばサーペント",
     "prefecture": "山口",
     "grade": 6,
     "level": 24,
@@ -5111,12 +6816,17 @@
     "image": "YMGC-E02.png",
     "isBoss": false,
     "exp": 1306,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "川棚温泉",
+    "desc": "熱い瓦の上に蛇のようにうねる緑の麺を背負ったモンスター。香ばしい香りを放つ。",
+    "trivia": "瓦そばは熱した瓦に茶そばをのせて焼く山口独自の料理。",
+    "catchphrase": "「香ばしく踊る、瓦の蛇精！」"
   },
   {
     "id": "YMGC-E03",
     "stageId": "chugoku_area5",
-    "name": "錦帯橋",
+    "name": "外郎スイートゴースト",
     "prefecture": "山口",
     "grade": 6,
     "level": 24,
@@ -5126,12 +6836,17 @@
     "image": "YMGC-E03.png",
     "isBoss": false,
     "exp": 1306,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "食文化",
+    "habitat": "山口市",
+    "desc": "ぷるぷるした外郎（ういろう）がモンスター化。もちもちした体で弾む。",
+    "trivia": "山口の外郎はワラビ粉を使った独自製法で、名古屋や小田原のものと異なる。",
+    "catchphrase": "「ぷるぷる跳ねる、甘味の精！」"
   },
   {
     "id": "YMGC-E04",
     "stageId": "chugoku_area5",
-    "name": "夏みかん",
+    "name": "秋吉台ロックビースト",
     "prefecture": "山口",
     "grade": 6,
     "level": 24,
@@ -5141,12 +6856,17 @@
     "image": "YMGC-E04.png",
     "isBoss": false,
     "exp": 1306,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "自然",
+    "habitat": "秋吉台",
+    "desc": "石灰岩の台地が怪物化。白い岩肌が鎧のように輝く。",
+    "trivia": "秋吉台は日本最大のカルスト台地で、特異な景観を誇る。",
+    "catchphrase": "「大地を駆ける、石灰の巨獣！」"
   },
   {
     "id": "YMGC-E05",
     "stageId": "chugoku_area5",
-    "name": "れんこん",
+    "name": "錦帯橋リバーガード",
     "prefecture": "山口",
     "grade": 6,
     "level": 24,
@@ -5156,12 +6876,17 @@
     "image": "YMGC-E05.png",
     "isBoss": false,
     "exp": 1306,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "建造物",
+    "habitat": "岩国市",
+    "desc": "錦帯橋の五連アーチが背中に宿る水守モンスター。川の精霊を従える。",
+    "trivia": "錦帯橋は1673年に建造された木造橋で、日本三名橋のひとつ。",
+    "catchphrase": "「五連の弧を背負う、川の守り手！」"
   },
   {
     "id": "YMGC-E06",
     "stageId": "chugoku_area5",
-    "name": "ワカメ",
+    "name": "萩みかんチャイルド",
     "prefecture": "山口",
     "grade": 6,
     "level": 24,
@@ -5171,12 +6896,17 @@
     "image": "YMGC-E06.png",
     "isBoss": false,
     "exp": 1306,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "果実",
+    "habitat": "萩市",
+    "desc": "小さな萩みかんを抱えた妖精モンスター。酸っぱさと甘さで元気を振りまく。",
+    "trivia": "萩のみかんは温暖な気候で栽培され、冬の味覚として有名。",
+    "catchphrase": "「甘酸っぱく弾ける、萩の小精！」"
   },
   {
     "id": "YMGC-E07",
     "stageId": "chugoku_area5",
-    "name": "とらふぐ皮",
+    "name": "瑠璃光寺タワースピリット",
     "prefecture": "山口",
     "grade": 6,
     "level": 24,
@@ -5186,12 +6916,17 @@
     "image": "YMGC-E07.png",
     "isBoss": false,
     "exp": 1306,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "宗教",
+    "habitat": "山口市",
+    "desc": "瑠璃光寺の五重塔が霊体化したモンスター。静かな光を放ち夜を照らす。",
+    "trivia": "瑠璃光寺五重塔は室町時代の国宝建築で、西日本を代表する美しい塔。",
+    "catchphrase": "「瑠璃色に輝く、五重の霊塔！」"
   },
   {
     "id": "YMGC-E08",
     "stageId": "chugoku_area5",
-    "name": "ういろう",
+    "name": "松陰シェイド",
     "prefecture": "山口",
     "grade": 6,
     "level": 24,
@@ -5201,12 +6936,17 @@
     "image": "YMGC-E08.png",
     "isBoss": false,
     "exp": 1306,
-    "weakness": "onyomi"
+    "weakness": "onyomi",
+    "category": "歴史・人物",
+    "habitat": "松下村塾",
+    "desc": "吉田松陰の魂が影武者のように現れたモンスター。鋭い視線で未来を見据える。",
+    "trivia": "松下村塾は幕末の志士を多く育て、日本の近代化に大きく貢献した。",
+    "catchphrase": "「未来を照らす、長州の影魂！」"
   },
   {
     "id": "YMGC-E09",
     "stageId": "chugoku_area5",
-    "name": "夏みかんゼリー",
+    "name": "高杉ストームライダー",
     "prefecture": "山口",
     "grade": 6,
     "level": 24,
@@ -5216,12 +6956,17 @@
     "image": "YMGC-E09.png",
     "isBoss": false,
     "exp": 1306,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "歴史・人物",
+    "habitat": "山口市",
+    "desc": "高杉晋作の魂を宿した武者モンスター。烈風とともに現れ、剣を振るう。",
+    "trivia": "高杉晋作は奇兵隊を組織し、幕末の動乱で長州藩を導いた人物。",
+    "catchphrase": "「風を起こす、維新の嵐武者！」"
   },
   {
     "id": "YMGC-E10",
     "stageId": "chugoku_area5",
-    "name": "クジラ",
+    "name": "海響クラーケンロード",
     "prefecture": "山口",
     "grade": 6,
     "level": 24,
@@ -5232,7 +6977,12 @@
     "isBoss": true,
     "shieldHp": 3,
     "exp": 2612,
-    "weakness": "kunyomi"
+    "weakness": "kunyomi",
+    "category": "幻獣",
+    "habitat": "下関・関門海峡",
+    "desc": "関門海峡に潜む巨大クラーケンの王。触手で海を揺らし、航路を支配する。",
+    "trivia": "関門海峡は潮流が速く、古来より海難事故が多く伝説の怪物譚が残されている。",
+    "catchphrase": "「海を揺るがす、深淵の大王！」"
   },
   {
     "id": "PRV-E001",

@@ -39,26 +39,28 @@ const observer = new IntersectionObserver((entries) => {
 
 // モンスターカードを生成する関数
 function createCard(monster) {
-    const card = document.createElement('div');
-    card.classList.add('monster-card');
+  const card = document.createElement('div');
+  card.classList.add('monster-card');
   
-    if (!monster.collected) {
-      card.classList.add('locked');
-    }
+  // 捕獲済みかどうかで判定
+  if (!monster.collected) {
+    // シルエットではなく、非表示または「？」表示
+    return null;  // または未取得用のカードを返す
+  }
 
-    // カードクリック時のモーダル表示処理
-    card.addEventListener('click', () => {
-      if (monster.collected) {
-        showMonsterModal(monster);
-        // モンスターを「確認済み」として記録
-        markAsSeen(monster.id);
-        // NEWバッジを削除
-        const newBadge = card.querySelector('.new-badge');
-        if (newBadge) {
-          newBadge.remove();
-        }
-      }
-    });
+      // カードクリック時のモーダル表示処理
+  card.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (monster.collected) {
+      showMonsterModal(monster);
+      // モンスターを「確認済み」として記録
+      markAsSeen(monster.id);
+      // NEWバッジを削除
+      const newBadge = card.querySelector('.new-badge');
+      if (newBadge) newBadge.remove();
+    }
+  });
 
     const img = document.createElement('img');
     const folder = gradeFolderMap[monster.grade] || gradeFolderMap[1];
@@ -94,14 +96,15 @@ function createCard(monster) {
 function showMonsterModal(monster) {
   const modal = document.createElement('div');
   modal.classList.add('monster-modal');
-  
-  const modalContent = document.createElement('div');
-  modalContent.classList.add('modal-content');
-  
-  // 閉じるボタン
-  const closeBtn = document.createElement('button');
-  closeBtn.classList.add('modal-close');
-  closeBtn.textContent = '×';
+  Object.assign(modal.style, {
+    position: 'fixed',
+    left: '0',
+    top: '0',
+    width: '100vw',
+    height: '100vh',
+    zIndex: '100001',
+    pointerEvents: 'auto'
+  });
 
   // 追加: Escで閉じる（登録/解除を忘れない）
   const onEsc = (e) => {
@@ -131,11 +134,12 @@ function showMonsterModal(monster) {
   info.classList.add('monster-info');
   info.innerHTML = `
     <h2>${monster.name}</h2>
-    <p><strong>学年:</strong> ${monster.grade}年生</p>
-    <p><strong>地方:</strong> ${regionMap[monster.grade] || '不明'}</p>
-    <p><strong>生息地:</strong> ${monster.prefecture || regionMap[monster.grade] || '不明'}</p>
-    <p><strong>読み:</strong> ${monster.reading || '不明'}</p>
-    <p><strong>意味:</strong> ${monster.meaning || '詳細情報なし'}</p>
+    <p><strong>都道府県:</strong> ${monster.prefecture || '不明'}</p>
+    <p><strong>カテゴリ:</strong> ${monster.category || '不明'}</p>
+    <p><strong>生息地:</strong> ${monster.habitat || '不明'}</p>
+    <p><strong>説明:</strong> ${monster.desc || '—'}</p>
+    <p><strong>豆知識:</strong> ${monster.trivia || '—'}</p>
+    <p><strong>決め台詞:</strong> ${monster.catchphrase || '—'}</p>
   `;
   
   modalContent.appendChild(closeBtn);
@@ -292,6 +296,9 @@ const monsterDexState = {
       // 図鑑番号順（デフォルト）
       filtered.sort((a, b) => a.localeCompare(b));
     }
+
+    // 捕獲済みのみ表示
+    filtered = filtered.filter(id => this.dexSet.has(id));
 
     this.filteredMonsterIds = filtered;
     this.totalPages = Math.ceil(this.filteredMonsterIds.length / this.itemsPerPage);
@@ -624,54 +631,50 @@ const monsterDexState = {
       margin: '0 16px'
     });
 
-    // 現在のページのモンスターカードを生成
-    const startIndex = this.currentPage * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    const pageIds = this.filteredMonsterIds.slice(startIndex, endIndex);
-
-    pageIds.forEach(id => {
-      const monsterData = getMonsterById(id);
-      if (monsterData) {
-        monsterData.collected = this.dexSet.has(id);
-        const card = createCard(monsterData);
-        
-        // カードのスタイルを統一（KanjiDexと同様）
-        Object.assign(card.style, {
-          background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.8), rgba(160, 82, 45, 0.6))',
-          border: '2px solid #8B4513',
-          borderRadius: '12px',
-          padding: '12px',
-          textAlign: 'center',
-          cursor: monsterData.collected ? 'pointer' : 'default',
-          transition: 'all 0.3s ease',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-          color: '#fff'
+        // 現在のページのモンスターカードを生成
+        const startIndex = this.currentPage * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        const pageIds = this.filteredMonsterIds.slice(startIndex, endIndex);
+    
+        pageIds.forEach(id => {
+          const monsterData = getMonsterById(id);
+          if (monsterData) {
+            monsterData.collected = this.dexSet.has(id);
+            const card = createCard(monsterData);
+            if (!card) return; // 未捕獲は非表示（シルエット廃止）
+    
+            // カードのスタイルを統一（KanjiDexと同様）
+            Object.assign(card.style, {
+              background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.8), rgba(160, 82, 45, 0.6))',
+              border: '2px solid #8B4513',
+              borderRadius: '12px',
+              padding: '12px',
+              textAlign: 'center',
+              cursor: monsterData.collected ? 'pointer' : 'default',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+              color: '#fff'
+            });
+    
+            if (monsterData.collected) {
+              card.addEventListener('mouseenter', () => {
+                Object.assign(card.style, {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
+                });
+              });
+              
+              card.addEventListener('mouseleave', () => {
+                Object.assign(card.style, {
+                  transform: 'translateY(0)',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+                });
+              });
+            }
+            
+            cardGrid.appendChild(card);
+          }
         });
-
-        if (monsterData.collected) {
-          card.addEventListener('mouseenter', () => {
-            Object.assign(card.style, {
-              transform: 'translateY(-4px)',
-              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
-            });
-          });
-          
-          card.addEventListener('mouseleave', () => {
-            Object.assign(card.style, {
-              transform: 'translateY(0)',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
-            });
-          });
-        } else {
-          Object.assign(card.style, {
-            opacity: '0.6',
-            filter: 'grayscale(100%)'
-          });
-        }
-        
-        cardGrid.appendChild(card);
-      }
-    });
 
     // コンテナに全て追加
     this.container.appendChild(statsDiv);

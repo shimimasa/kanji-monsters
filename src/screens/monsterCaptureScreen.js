@@ -1,0 +1,270 @@
+// src/screens/monsterCaptureScreen.js
+import { publish } from '../core/eventBus.js';
+import { gameState } from '../core/gameState.js';
+import { addMonster, loadDex } from '../models/monsterDex.js';
+import { getAllMonsterIds, getMonsterById } from '../loaders/dataLoader.js';
+
+const monsterCaptureScreen = {
+  canvas: null,
+  container: null,
+  candidates: [],        // 表示候補（最大10）
+  captureLimit: 1,       // 捕獲可能数（4→3→2→1）
+  selected: new Set(),   // 選択済み
+
+  enter(defeatedMonsters) {
+    this.canvas = document.getElementById('gameCanvas');
+    if (this.canvas) {
+      this._prevCanvasVisibility = this.canvas.style.visibility;
+      this._prevCanvasPointer = this.canvas.style.pointerEvents;
+      this.canvas.style.visibility = 'hidden';
+      this.canvas.style.pointerEvents = 'none';
+    }
+
+    const stageId = gameState.currentStageId;
+    const clearCount = this._getStageClearCount(stageId);
+    const isBonus = /^bonus_g/i.test(String(stageId || ''));
+
+    // 捕獲可能数: 通常 4→3→2→1、ボーナスは常時1
+    this.captureLimit = isBonus ? 1 : Math.max(1, 4 - Math.min(clearCount, 3));
+
+    // 候補生成
+    this.dex = loadDex(); // ← 修正: インスタンスに保持
+    const defeatedIds = Array.isArray(defeatedMonsters)
+      ? defeatedMonsters.map(m => m.id).filter(Boolean)
+      : [];
+
+    if (!isBonus) {
+      // 通常: このステージのモンスターのみ
+      let stageIds = defeatedIds.length > 0
+        ? defeatedIds.slice()
+        : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
+      stageIds = Array.from(new Set(stageIds));
+      if (stageIds.length > 10) {
+        shuffle(stageIds);
+        stageIds = stageIds.slice(0, 10);
+      }
+      this.candidates = stageIds;
+    } else {
+                  // ボーナス: 他ステージからランダム（未捕獲優先）、ただし捕獲数は常時1
+      const all = getAllMonsterIds().filter(id => {
+        const m = getMonsterById(id);
+        const idStr = String(id);
+        const isWorld = (m && m.grade >= 7) || idStr.startsWith('PRV-');
+        return m && !isWorld;
+      });
+      const unCaptured = all.filter(id => !this.dex.has(id)); // ← 修正: this.dex
+      shuffle(unCaptured);
+      const pool = unCaptured.slice(0, 10);
+      if (pool.length < 10) {
+        const filler = all.filter(id => !pool.includes(id));
+        shuffle(filler);
+        pool.push(...filler.slice(0, 10 - pool.length));
+      }
+      this.candidates = pool.slice(0, 10);
+    }
+
+    this._createDOM();
+
+    publish('playBGM', 'yomitomo');
+
+  },
+
+  _createDOM() {
+    if (this.container) this.container.remove();
+
+    this.container = document.createElement('div');
+    Object.assign(this.container.style, {
+      position: 'fixed',
+      left: '0', top: '0',
+      width: '100vw', height: '100vh',
+      zIndex: '100001',
+      background: 'rgba(0,0,0,0.6)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    });
+
+    const panel = document.createElement('div');
+    Object.assign(panel.style, {
+      width: '90vw', maxWidth: '1000px',
+      background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.85), rgba(59, 130, 246, 0.6))',
+      border: '2px solid rgba(59,130,246,0.5)',
+      borderRadius: '16px',
+      boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+      padding: '16px',
+      color: '#fff'
+    });
+
+    const header = document.createElement('div');
+    header.textContent = `ヨミトモにしよう！：最大 ${this.captureLimit} 体選べます（全10候補）`;
+    Object.assign(header.style, { fontSize: '20px', fontWeight: '700', marginBottom: '12px' });
+
+    const grid = document.createElement('div');
+    Object.assign(grid.style, {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+      gap: '12px'
+    });
+
+    for (const id of this.candidates) {
+      const m = getMonsterById(id);
+      if (!m) continue;
+
+      const already = this.dex && this.dex.has(id); // ← 修正: this.dex
+
+      const card = document.createElement('div');
+      Object.assign(card.style, {
+        background: 'linear-gradient(135deg, rgba(139,69,19,0.85), rgba(160,82,45,0.7))',
+        border: '2px solid #8B4513',
+        borderRadius: '12px',
+        padding: '10px',
+        cursor: already ? 'not-allowed' : 'pointer', // ← 追加：捕獲済みは選択不可
+        userSelect: 'none',
+        transition: 'all .2s',
+        opacity: already ? '0.55' : '1' // ← 追加：捕獲済みは半透明
+      });
+
+      const thumb = document.createElement('img');
+      const folderMap = {1:'grade1-hokkaido',2:'grade2-touhoku',3:'grade3-kantou',4:'grade4-chuubu',5:'grade5-kinki',6:'grade6-chuugoku'};
+      const folder = folderMap[m.grade] || folderMap[1];
+      thumb.src = `/assets/images/monsters/thumb/${folder}/${m.id}.webp`;
+      Object.assign(thumb.style, { width: '100%', borderRadius: '8px' });
+
+      const name = document.createElement('div');
+      name.textContent = m.name;
+      Object.assign(name.style, { fontWeight: '700', marginTop: '6px', textAlign: 'center' });
+
+      const badge = document.createElement('div');
+      const updateBadge = () => {
+        // ← 変更：捕獲済みは常時「捕獲済み」表示、選択中表示は未捕獲のみ
+        const selected = this.selected.has(id);
+        badge.textContent = already ? '捕獲済み' : (selected ? '選択中' : '');
+        Object.assign(badge.style, {
+          marginTop: '4px',
+          textAlign: 'center',
+          color: already ? '#ffd700' : (selected ? '#00ffb3' : 'transparent'),
+          fontWeight: '700'
+        });
+        card.style.outline = selected ? '3px solid #00ffb3' : 'none';
+      };
+      updateBadge();
+
+      card.addEventListener('click', () => {
+        // ← 追加：捕獲済みは選択不可
+        if (already) {
+          try { publish('playSE', 'wrong'); } catch {}
+          return;
+        }
+        if (this.selected.has(id)) {
+          this.selected.delete(id);
+        } else {
+          if (this.selected.size >= this.captureLimit) return;
+          this.selected.add(id);
+        }
+        updateBadge();
+        publish('playSE', 'decide');
+      });
+
+      card.appendChild(thumb);
+      card.appendChild(name);
+      card.appendChild(badge);
+      grid.appendChild(card);
+    }
+
+    const footer = document.createElement('div');
+    Object.assign(footer.style, {
+      display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '12px'
+    });
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'スキップ';
+    Object.assign(cancelBtn.style, buttonStyle('gray'));
+    cancelBtn.onclick = () => {
+      publish('playSE', 'cancel');
+      this._goResultWin();
+    };
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.textContent = '捕獲を確定';
+    Object.assign(confirmBtn.style, buttonStyle('green'));
+    confirmBtn.onclick = () => {
+      publish('playSE', 'decide');
+      for (const id of this.selected) addMonster(id);
+      this._goResultWin();
+    };
+
+    footer.appendChild(cancelBtn);
+    footer.appendChild(confirmBtn);
+
+    panel.appendChild(header);
+    panel.appendChild(grid);
+    panel.appendChild(footer);
+    this.container.appendChild(panel);
+    document.body.appendChild(this.container);
+  },
+
+  _getStageClearCount(stageId) {
+    if (!stageId) return 0;
+    const key = `stage_clear_${stageId}`;
+    return parseInt(localStorage.getItem(key) || '0');
+  },
+
+  _incrementStageClearCount(stageId) {
+    if (!stageId) return;
+    const key = `stage_clear_${stageId}`;
+    const current = parseInt(localStorage.getItem(key) || '0');
+    localStorage.setItem(key, String(current + 1));
+  },
+
+  _goResultWin() {
+    const resultData = {
+      stageId: gameState.currentStageId,
+      correct: gameState.correctKanjiList,
+      wrong: gameState.wrongKanjiList,
+      time: gameState.timeRemaining ?? 0,
+      playerHp: gameState.playerStats.hp
+    };
+    // クリア回数を増加（次回以降 捕獲可能数が 4→3→2→1 と段階低下）
+    this._incrementStageClearCount(gameState?.currentStageId);
+    publish('changeScreen', 'resultWin', resultData);
+  },
+
+  exit() {
+    if (this.container) this.container.remove();
+    if (this.canvas) {
+      this.canvas.style.visibility = this._prevCanvasVisibility ?? '';
+      this.canvas.style.pointerEvents = this._prevCanvasPointer ?? '';
+    }
+    this.container = null;
+    this.canvas = null;
+    this.candidates = [];
+    this.selected.clear();
+  },
+
+  update() {},
+  render() {}
+};
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function buttonStyle(kind) {
+  const base = {
+    padding: '10px 16px',
+    borderRadius: '8px',
+    border: '1px solid rgba(255,255,255,0.2)',
+    color: '#fff',
+    cursor: 'pointer'
+  };
+  if (kind === 'green') {
+    return Object.assign(base, { background: 'linear-gradient(135deg, #28a745, #20c997)' });
+  }
+  return Object.assign(base, { background: 'linear-gradient(135deg, #6c757d, #5a6268)' });
+}
+
+export default monsterCaptureScreen;

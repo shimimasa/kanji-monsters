@@ -880,6 +880,9 @@ updateShieldBreakEffect() {
 
       this.victoryCallback = onVictory;
 
+      // クリア保留フラグを毎回リセット（再入場で勝利画面に飛ばないように）
+      this.stageClearPending = false;
+
       // 各リストを初期化
       gameState.correctKanjiList = [];
       gameState.wrongKanjiList = [];
@@ -1259,10 +1262,10 @@ if (enemy && enemy.img) {
   this.ctx.textAlign = 'center';
   this.ctx.fillText(enemy ? enemy.name : 'モンスター', 0, 0);
 }
-
 this.ctx.restore();
 
-    
+// ▼ 敵の下に「のこりバッジ」だけを描画（枠に重ならないよう下へ配置）
+this.drawStageRemaining(this.ctx, frameArea);
 
     
 
@@ -1357,8 +1360,12 @@ this.ctx.restore();
 
       // 読み進捗の取得（存在しない場合も考慮）
       const prog = (gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id]) || null;
-      const progKun = prog ? prog.kunyomi : null;
-      const progOn  = prog ? prog.onyomi  : null;
+      const progKun = prog && prog.kunyomi
+        ? (prog.kunyomi instanceof Set ? prog.kunyomi : new Set(prog.kunyomi))
+        : null;
+      const progOn  = prog && prog.onyomi
+        ? (prog.onyomi instanceof Set ? prog.onyomi : new Set(prog.onyomi))
+        : null;
 
       // 折り返しヘルパー（ラベル幅を考慮、トークン単位）
       const drawWrappedTokens = (label, tokens, y, masteredSet) => {
@@ -2723,7 +2730,7 @@ drawEnemyStatusPanel(ctx) {
     'left', 'top', 3
   );
 
-  // 4. HPバーを下段に配置
+    // 4. HPバーを下段に配置
   // HPバー背景
   ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
   ctx.fillRect(contentX, barY, contentW, barH);
@@ -2739,25 +2746,184 @@ drawEnemyStatusPanel(ctx) {
   );
   },
 
-  /** 画面離脱時のクリーンアップ */
-  exit() {
-    // 入力欄を非表示＆キーイベント解除
-    if (this.inputEl) {
-      this.inputEl.style.display = 'none';
-      this.inputEl.removeEventListener('keydown', this._keydownHandler);
+  // ========== ステージ進捗UI（のこりバッジ + 段階バー + 道マップ） ==========
+  progressUI: {
+    gap: 6,
+    segH: 16,
+    padY: 8,
+    colors: {
+      normal: '#3498db',
+      elite:  '#9b59b6',
+      boss:   '#e74c3c',
+      empty:  'rgba(255,255,255,0.15)',
+      done:   'rgba(255,255,255,0.65)',
+      current:'#f1c40f'
     }
-    // クリックイベントリスナ解除
-    if (this._clickHandler) {
-      this.unregisterHandlers();
-    }
-    // タイマーの停止
-    if (this.timerId) {
-      clearInterval(this.timerId);
-      this.timerId = null;
-    }
-    // canvas/ctx/inputEl をクリア
-    this.canvas = this.ctx = this.inputEl = null;
   },
+
+  drawStageProgress(ctx, frameArea) {
+    if (!gameState.enemies || !gameState.enemies.length) return;
+
+    const total = gameState.enemies.length;
+    const idx   = Math.max(0, Math.min(total - 1, gameState.currentEnemyIndex || 0));
+    const remain = Math.max(0, total - (gameState.currentEnemyIndex || 0)); // 現在を含めた残数
+
+    // 配置（敵フレームの真下中央）
+    const barW = Math.min(frameArea.width, 260);
+    const barX = frameArea.x + Math.floor((frameArea.width - barW) / 2);
+    const barY = frameArea.y + frameArea.height + this.progressUI.padY;
+    const gap  = this.progressUI.gap;
+    const segH = this.progressUI.segH;
+    const segW = Math.max(10, Math.floor((barW - gap * (total - 1)) / total));
+    const colors = this.progressUI.colors;
+
+    // のこりバッジ
+    this.drawRemainingBadge(ctx, barX + Math.floor(barW / 2), barY - 20, remain);
+
+    // セグメント（段階色）
+    for (let i = 0; i < total; i++) {
+      const sx = barX + i * (segW + gap);
+      const sy = barY;
+      const enemy = gameState.enemies[i];
+      const styleKey = this.getFrameStyleByOrder(i, !!(enemy && enemy.isBoss)); // 'normal'|'elite'|'boss'
+
+      let fill = colors.empty;
+      if (i < (gameState.currentEnemyIndex || 0)) fill = colors.done;
+      else if (i === (gameState.currentEnemyIndex || 0)) fill = colors.current;
+      else fill = colors[styleKey] || colors.normal;
+
+      // 背面（薄い枠）
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(sx, sy + 2, segW, segH);
+
+      // 本体
+      ctx.fillStyle = fill;
+      ctx.fillRect(sx, sy, segW, segH);
+
+      // 枠
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(sx, sy, segW, segH);
+
+      // ボス印（王冠）
+      if (enemy && enemy.isBoss) {
+        ctx.save();
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('👑', sx + Math.floor(segW / 2), sy - 2);
+        ctx.restore();
+      }
+    }
+
+    // 道マップ（足あと）
+    const pathStart = barX + 2;
+    const curCenter = barX + idx * (segW + gap) + Math.floor(segW / 2);
+    const pathEnd   = Math.min(curCenter, barX + barW - 2);
+    this.drawFootprints(ctx, pathStart, pathEnd, barY + segH + 8);
+
+    // ゴール（お城）
+    ctx.save();
+    ctx.font = '18px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🏰', barX + barW + 8, barY + Math.floor(segH / 2));
+    ctx.restore();
+  },
+
+  drawRemainingBadge(ctx, cx, cy, remain) {
+    const label = `あと ${remain} たい！`;
+    ctx.save();
+    ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
+    const tw = Math.ceil(ctx.measureText(label).width);
+    const w = tw + 24;
+    const h = 26;
+    const x = cx - Math.floor(w / 2);
+    const y = cy - Math.floor(h / 2);
+    const r = Math.floor(h / 2);
+
+    // ピル背景
+    const g = ctx.createLinearGradient(x, y, x, y + h);
+    g.addColorStop(0, '#f39c12');
+    g.addColorStop(1, '#d35400');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    ctx.fill();
+
+    // 縁
+    ctx.strokeStyle = '#8e4400';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 文字
+    this.drawTextWithOutline(label, cx, cy, 'white', 'black', 'bold 16px "UDデジタル教科書体", sans-serif', 'center', 'middle', 2);
+    ctx.restore();
+  },
+  drawFootprints(ctx, x1, x2, y) {
+    if (x2 <= x1) return;
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    const step = 16;
+    let i = 0;
+    for (let x = x1; x <= x2; x += step) {
+      const offset = (i % 2 === 0) ? -4 : 4;
+      const rot = (i % 2 === 0) ? -0.6 : 0.6;
+      // かかと
+      ctx.beginPath();
+      ctx.ellipse(x, y + offset, 3, 5, rot, 0, Math.PI * 2);
+      ctx.fill();
+      // つま先
+      ctx.beginPath();
+      ctx.ellipse(x + 5, y + offset - 2, 2, 3, rot, 0, Math.PI * 2);
+      ctx.fill();
+      i++;
+    }
+    ctx.restore();
+  },
+
+  // ▼ 残数のみ表示（セグメント/足あとは表示しない）
+  drawStageRemaining(ctx, frameArea) {
+    if (!gameState.enemies || !gameState.enemies.length) return;
+
+    const total  = gameState.enemies.length;
+    const remain = Math.max(0, total - (gameState.currentEnemyIndex || 0)); // 現在を含めた残数
+
+    // 敵枠の真下に余白を設けて配置（枠と重ならない）
+    const marginBelowFrame = 10;   // 枠からの下マージン
+    const badgeHalfH       = 13;   // drawRemainingBadgeの高さ26pxの半分
+    const cx = frameArea.x + Math.floor(frameArea.width / 2);
+    const cy = frameArea.y + frameArea.height + marginBelowFrame + badgeHalfH;
+
+    this.drawRemainingBadge(ctx, cx, cy, remain);
+  },
+    /** 画面離脱時のクリーンアップ */
+    exit() {
+      // 入力欄を非表示＆キーイベント解除
+      if (this.inputEl) {
+        this.inputEl.style.display = 'none';
+        this.inputEl.removeEventListener('keydown', this._keydownHandler);
+      }
+      // クリックイベントリスナ解除
+      if (this._clickHandler) {
+        this.unregisterHandlers();
+      }
+      // タイマーの停止
+      if (this.timerId) {
+        clearInterval(this.timerId);
+        this.timerId = null;
+      }
+      // クリア保留フラグもリセット
+      this.stageClearPending = false;
+  
+      // canvas/ctx/inputEl をクリア
+      this.canvas = this.ctx = this.inputEl = null;
+    },
 
   /** クリックなどのイベントを登録 */
   registerHandlers() {
@@ -4083,6 +4249,13 @@ if (gameState.currentEnemy.isBoss) {
         
         // シールド破壊エフェクトを正確な位置で開始
         battleScreenState.startShieldBreakEffect(enemyEffectX, enemyEffectY, Math.min(frameAreaForEffect.width, frameAreaForEffect.height) * 0.6);
+        
+        // **追加**: シールド破壊後に漢字を切り替える
+        setManagedTimeout(() => {
+          pickNextKanji();
+          battleState.turn = 'player';
+          battleState.inputEnabled = true;
+        }, 2500); // エフェクト後に漢字切り替え
       }
 
       // 行動パック表示（段階に応じてメッセージを変更）
@@ -4107,22 +4280,25 @@ if (gameState.currentEnemy.isBoss) {
       // シールドを削った場合は敵にダメージを与えない
       dmg = 0;
 
-      // シールド破壊後も入力を継続できるように処理を修正
-      battleState.lastCommandMode = 'attack';
-      battleState.turn = 'enemy';
-      battleState.inputEnabled = false;
-      
-      // タイミングを調整（シールド破壊エフェクトを見せるため）
-      const waitTime = currentShieldHp === 0 ? 2000 : 1300; // 破壊時は2秒待機
-      
-      setManagedTimeout(() => {
-        enemyTurn();
-        setManagedTimeout(() => {
-          pickNextKanji();
-          battleState.turn = 'player';
-          battleState.inputEnabled = true;
-        }, 1700);
-      }, waitTime);
+            // シールド破壊後も入力を継続できるように処理を修正
+            battleState.lastCommandMode = 'attack';
+            battleState.turn = 'enemy';
+            battleState.inputEnabled = false;
+            
+            // タイミングを調整（シールド破壊エフェクトを見せるため）
+            const waitTime = currentShieldHp === 0 ? 2000 : 1300; // 破壊時は2秒待機
+            
+            setManagedTimeout(() => {
+              enemyTurn();
+              setManagedTimeout(() => {
+                // シールドが破壊されていない場合のみ次の漢字に進む
+                if (currentShieldHp > 0) {
+                  pickNextKanji();
+                }
+                battleState.turn = 'player';
+                battleState.inputEnabled = true;
+              }, 1700);
+            }, waitTime);
       
       // 入力欄をクリア
       inputEl.value = '';
@@ -4177,9 +4353,6 @@ if (gameState.currentEnemy.isBoss) {
       if (gameState.currentEnemy.isBoss) {
         gameState.playerStats.bossesDefeated++;
       }
-      
-      // モンスターデックスに登録
-      addMonster(gameState.currentEnemy.id);
       
       // 敵撃破の統計データを更新
       recordEnemyDefeated();
@@ -4268,7 +4441,24 @@ if (gameState.currentEnemy.isBoss) {
                          gameState.hintLevel = 0;
 
                       });
-                     } else {
+                    } else {// 最後の敵を倒した場合の処理を修正
+                      if (gameState.currentEnemyIndex >= gameState.enemies.length - 1) {
+                        waitForDefeatAnimationThen(() => {
+                          // 倒したモンスターのリストを作成
+                          const defeatedMonsters = gameState.enemies.map(e => ({
+                            id: e.id,
+                            name: e.name,
+                            img: e.img
+                          }));
+                          // 入力欄をクリア（念のため）
+                          const inputEl = battleScreenState.inputEl;
+                          if (inputEl) inputEl.value = '';
+
+                          // 捕獲画面へ遷移（勝利画面は捕獲から遷移する）
+                          publish('changeScreen', 'monsterCapture', defeatedMonsters);
+                        });
+                      }
+                    
                        // 最後の敵を倒した場合：ステージクリアを保留状態にする
                       waitForDefeatAnimationThen(() => {
                         const inputEl = battleScreenState.inputEl;
@@ -4384,6 +4574,7 @@ if (gameState.currentEnemy.isBoss) {
   // 入力欄をクリア
   inputEl.value = '';
 }
+
 
 // Levenshtein距離（文字列の類似度）を計算する関数
 function levenshteinDistance(a, b) {
@@ -5127,14 +5318,21 @@ function calculateHealAmount(playerLevel) {
 
 // 読み進捗のエントリを確保
 function ensureProgressEntry(kanjiId) {
-  ensureProgressRoot(); // 追加
-  const prog = gameState.kanjiReadProgress[kanjiId];
+  ensureProgressRoot();
+  let prog = gameState.kanjiReadProgress[kanjiId];
   if (!prog) {
     gameState.kanjiReadProgress[kanjiId] = {
       onyomi: new Set(),
       kunyomi: new Set(),
       mastered: false,
     };
+  } else {
+    if (!(prog.onyomi instanceof Set)) {
+      prog.onyomi = new Set(prog.onyomi || []);
+    }
+    if (!(prog.kunyomi instanceof Set)) {
+      prog.kunyomi = new Set(prog.kunyomi || []);
+    }
   }
   return gameState.kanjiReadProgress[kanjiId];
 }
@@ -5142,12 +5340,16 @@ function ensureProgressEntry(kanjiId) {
 // 現在の問題の読み進捗を更新し、マスター済みか判定
 function updateKanjiMasteryAfterCorrect(currentKanji, answer) {
   if (!currentKanji || !currentKanji.id) return;
-  ensureProgressRoot(); // 追加
+  ensureProgressRoot();
   const id = currentKanji.id;
   const prog = ensureProgressEntry(id);
 
   const isKun = (currentKanji.kunyomi || []).includes(answer);
   const isOn  = (currentKanji.onyomi || []).includes(answer);
+
+  if (!(prog.kunyomi instanceof Set)) prog.kunyomi = new Set(prog.kunyomi || []);
+  if (!(prog.onyomi instanceof Set))  prog.onyomi  = new Set(prog.onyomi  || []);
+
   if (isKun) prog.kunyomi.add(answer);
   if (isOn)  prog.onyomi.add(answer);
 
@@ -5156,14 +5358,10 @@ function updateKanjiMasteryAfterCorrect(currentKanji, answer) {
   const allOnOk  = (currentKanji.onyomi || []).every(r => prog.onyomi.has(r));
   prog.mastered = allKunOk && allOnOk;
 
-  // 追加: 初めてマスターになった瞬間にフラグ
   if (!before && prog.mastered) {
     battleScreenState.masteryFlash = { active: true, timer: 30, kanjiId: currentKanji.id };
     addToLog('ぜんぶよめた！マスターかんじになった！');
-    battleScreenState.showLogBlock([
-      'ぜんぶよめた！',
-      'マスターかんじになった！'
-    ]);
+    battleScreenState.showLogBlock(['ぜんぶよめた！', 'マスターかんじになった！']);
   }
 }
 

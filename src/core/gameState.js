@@ -205,6 +205,16 @@ export const gameState = {
     };
   }
 
+function getStageClearCount(stageId) {
+  const key = `stage_clear_${stageId}`;
+  return parseInt(localStorage.getItem(key) || '0');
+}
+
+function incrementStageClearCount(stageId) {
+  const key = `stage_clear_${stageId}`;
+  const current = getStageClearCount(stageId);
+  localStorage.setItem(key, String(current + 1));
+}
   /**
    * ゲームデータをlocalStorageに保存する
    */
