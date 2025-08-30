@@ -4245,25 +4245,24 @@ if (gameState.currentEnemy.isBoss) {
       } else if (currentShieldHp === 0) {
         publish('playSE', 'shield3');
         battleState.log.push('ボスの防御が完全に崩れた！');
-        
-        // シールド破壊の派手なエフェクト
+        // シールド破壊エフェクト（強度）
         battleScreenState.startShakeEffect(25, 8);
         battleScreenState.startFlashEffect('rgba(255, 255, 255, 0.6)', 30);
 
       // **修正**: 直近のモンスター枠から中心座標と半径を取得（ex/ey/ew/eh に依存しない）
-const fa = battleScreenState._lastMonsterFrameArea;
+      const fa = battleScreenState._lastMonsterFrameArea;
 const enemyEffectX = fa ? fa.x + fa.width / 2 : ((battleScreenState.canvas?.width || 800) / 2);
 const enemyEffectY = fa ? fa.y + fa.height / 2 : ((battleScreenState.canvas?.height || 600) / 2);
 const radius = fa ? Math.min(fa.width, fa.height) * 0.6 : 120;
-       // シールド破壊エフェクトを正確な位置で開始
-        battleScreenState.startShieldBreakEffect(enemyEffectX, enemyEffectY, Math.min(frameAreaForEffect.width, frameAreaForEffect.height) * 0.6);
-        
-        // **追加**: シールド破壊後に漢字を切り替える
-        setManagedTimeout(() => {
-          pickNextKanji();
-          battleState.turn = 'player';
-          battleState.inputEnabled = true;
-        }, 2500); // エフェクト後に漢字切り替え
+// シールド破壊エフェクトを正確な位置で開始
+battleScreenState.startShieldBreakEffect(enemyEffectX, enemyEffectY, radius);
+
+// **追加**: シールド破壊後に漢字を切り替える
+setManagedTimeout(() => {
+  pickNextKanji();
+  battleState.turn = 'player';
+  battleState.inputEnabled = true;
+}, 2500);
       }
 
       // 行動パック表示（段階に応じてメッセージを変更）
