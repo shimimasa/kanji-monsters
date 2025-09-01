@@ -1196,8 +1196,8 @@
     "kunyomi": [
       "しか"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。",
+    "meaning": "大声で相手の非をとがめること。",
+  "exampleSentence": "先生に大声で叱（しか）られた。",
     "continent": "アフリカ",
     "originalGrade": 10
   },
@@ -1642,8 +1642,8 @@
     "kunyomi": [
       "や"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。",
+    "meaning": "からだの肉がおちる。土地が肥えていないこと。",
+  "exampleSentence": "土地が痩（や）せて作物が育たない。",
     "continent": "アフリカ",
     "originalGrade": 10
   },
@@ -2167,8 +2167,8 @@
     "kunyomi": [
       "は"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "おおいをとりのぞく。むきとる。",
+  "exampleSentence": "りんごの皮をナイフで剥（む）く。"
   },
   {
     "id": "g10-141",
