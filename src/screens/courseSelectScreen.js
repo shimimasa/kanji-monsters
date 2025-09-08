@@ -63,13 +63,13 @@ const courseSelectScreen = {
     ctx.font = 'bold 32px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText('学習コース選択', cw / 2, 50);
+    ctx.fillText('冒険先を選択', cw / 2, 50);
     
     // 左側エリア（日本編）
     this._drawCourseArea(
       ctx,
       this.japanButton,
-      '小学生の漢字（日本編）',
+      '日本地図（小学生の漢字）',
       images.japanMap
     );
     
@@ -77,7 +77,7 @@ const courseSelectScreen = {
     this._drawCourseArea(
       ctx,
       this.worldButton,
-      '中学生の漢字（世界編）',
+      '世界地図（中学生の漢字）',
       images.worldMap
     );
         // ヒントテキスト

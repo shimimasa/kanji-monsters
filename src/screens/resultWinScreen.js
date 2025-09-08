@@ -263,7 +263,7 @@ const resultWinState = {
     // サブタイトル
     ctx.font = '24px "UDデジタル教科書体", sans-serif';
     ctx.fillStyle = '#8B4513';
-    ctx.fillText('おめでとうございます！', centerX, centerY + 50);
+    ctx.fillText('おめでとう！', centerX, centerY + 50);
     
     ctx.restore();
   },

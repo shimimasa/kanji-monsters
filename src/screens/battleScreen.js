@@ -14,7 +14,7 @@ battleState.timeRemaining = 60;
 
 const ENEMY_FRAME_CONFIG = {
   normal: { min: 1, max: 5 },    // 1-5体目
-  elite: { min: 6, max: 9 },     // 6-9体目
+  elite: { min: 7, max: 9 },     // 7-9体目
   boss: { min: 10, max: Infinity } // 10体目以降
 };
 
