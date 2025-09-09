@@ -34,6 +34,12 @@ setCanvas(canvas);
 // ★ ここで AudioManager を生成して export
 const audio = new AudioManager();
 
+// ── 追加：イベントBusの購読 ──
+// 'playSE' → audio.playSE(name)
+// 'playBGM' → audio.playBGM(name, loop = true)
+subscribe('playSE', name => audio.playSE(name));
+subscribe('playBGM', (name, loop = true) => audio.playBGM(name, loop));
+
 // -- service worker 登録は一旦コメントアウト（sw.js が存在しないため 404 となる） --
 // if ('serviceWorker' in navigator){
 //   window.addEventListener('load', () =>
@@ -50,7 +56,7 @@ const audio = new AudioManager();
 document.body.addEventListener(
   'pointerdown',
   () => {
-    publish('playBGM', 'title');   // タイトル曲をループ再生（EventBus 経由）
+    audio.playBGM('title');   // タイトル曲をループ再生（EventBus 経由）
   },
   { once: true }
 );
@@ -210,11 +216,7 @@ function drawAchievementNotifications(ctx) {
   requestAnimationFrame(loop);
 })();
 
-// ── 追加：イベントBusの購読 ──
-// 'playSE' → audio.playSE(name)
-// 'playBGM' → audio.playBGM(name, loop = true)
-subscribe('playSE', name => audio.playSE(name));
-subscribe('playBGM', (name, loop = true) => audio.playBGM(name, loop));
+
 
 // ── 追加：音量設定／取得をEventBus経由に ──
 subscribe('setBGMVolume', v => audio.setBGMVolume(v));
