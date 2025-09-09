@@ -120,10 +120,16 @@ export class AudioManager {
       const src = this.resolveBgmSrc(key);
       if (!src) return console.warn(`BGM "${key}" は定義されていません`);
 
-      // 同じ曲ならスキップ（同キーかつ同srcなら何もしない）
-      if (this.#currentBGM?.dataset?.key === key && this.#currentBGM?.src?.includes(src)) return;
+      // 同じキーかつ同じソースなら、停止状態なら再開。それ以外はスキップ
+      if (this.#currentBGM?.dataset?.key === key && this.#currentBGM?.src?.includes(src)) {
+        if (this.#currentBGM.paused) {
+          this.#currentBGM.loop = loop;
+          this.#currentBGM.volume = this.#masterVolume * this.#bgmVolume;
+          this.#currentBGM.play().catch(console.error);
+        }
+        return;
+      }
 
-      // 今流れている曲を即停止（新BGM停止の妨げにならないよう直接停止）
       if (this.#currentBGM) {
         this.#currentBGM.pause();
         this.#currentBGM.currentTime = 0;
@@ -144,10 +150,16 @@ export class AudioManager {
      * @param {number} duration フェード秒数 (0–5くらい推奨)
      */
     async fadeToBGM(key, duration = 1) {
-      if (this.#currentBGM?.dataset?.key === key) return; // 同じなら不要
-  
-      await this.stopBGM(duration);       // フェードアウト
-      this.playBGM(key);                  // 新しい曲を再生
+      // 同じキーでも一時停止中なら再開
+      if (this.#currentBGM?.dataset?.key === key) {
+        if (this.#currentBGM.paused) {
+          this.#currentBGM.volume = this.#masterVolume * this.#bgmVolume;
+          this.#currentBGM.play().catch(console.error);
+        }
+        return;
+      }
+      await this.stopBGM(duration);
+      this.playBGM(key);
       await this.#fadeIn(this.#currentBGM, duration);
     }
   
