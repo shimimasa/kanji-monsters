@@ -50,13 +50,7 @@ const UI_IMAGE_PATHS = {
   regionMarker:  '/assets/images/region_marker.png',
   // タイトル画面用の背景画像を追加
   titleBackground: '/assets/images/title_background.png',
-  // 地方境界線ハイライト画像を追加
-  region1Boundary: '/assets/images/regions/hokkaido_boundary.png',
-  region2Boundary: '/assets/images/regions/tohoku_boundary.png',
-  region3Boundary: '/assets/images/regions/kanto_boundary.png',
-  region4Boundary: '/assets/images/regions/chubu_boundary.png',
-  region5Boundary: '/assets/images/regions/kinki_boundary.png',
-  region6Boundary: '/assets/images/regions/chugoku_boundary.png',
+
   
   // 世界ステージ選択用の画像を追加
   stageSelect12: '/assets/images/stage.select/stage.select12.png', // 4級

@@ -9,7 +9,7 @@ const sharp = require('sharp');
 tinify.key = process.env.TINYPNG_API_KEY || "CvXw9ZsCJcs66Ns04VySFH5qfWk20hG4";
 
 // 入力ディレクトリ（引数で上書き可）
-const INPUT_DIR = path.resolve(process.argv[2] || path.resolve(__dirname, '../public/assets/アジア'));
+const INPUT_DIR = path.resolve(process.argv[2] || path.resolve(__dirname, '../public/assets/asia'));
 
 // 中間出力（TinyPNG圧縮後）と最終出力
 const COMP_DIR  = path.resolve(__dirname, 'compressed/asia');
