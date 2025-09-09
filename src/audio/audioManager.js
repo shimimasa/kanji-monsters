@@ -120,7 +120,7 @@ export class AudioManager {
       const src = this.resolveBgmSrc(key);
       if (!src) return console.warn(`BGM "${key}" は定義されていません`);
 
-      // 同じキーかつ同じソースなら、停止状態なら再開。それ以外はスキップ
+      // 同じキーかつ同ソース: 停止中なら再開。それ以外は何もしない
       if (this.#currentBGM?.dataset?.key === key && this.#currentBGM?.src?.includes(src)) {
         if (this.#currentBGM.paused) {
           this.#currentBGM.loop = loop;
@@ -183,12 +183,12 @@ export class AudioManager {
      * @param {'appear'|'attack'|'damage'|'heal'|'defeat'|'correct'|'wrong'} key
      */
     playSE(key) {
-           const src = this.resolveSeSrc(key);
-           if (!src) return console.warn(`SE "${key}" は定義されていません`);
-           const se = new Audio(encodeURI(src));
-            se.volume = this.#masterVolume * this.#seVolume;
-            se.play().catch(console.error);
-          }
+      const src = this.resolveSeSrc(key);
+      if (!src) return console.warn(`SE "${key}" は定義されていません`);
+      const se = new Audio(encodeURI(src));
+      se.volume = this.#masterVolume * this.#seVolume;
+      se.play().catch(console.error);
+    }
   
     /*───────────────────────
       共通ユーティリティ
@@ -244,50 +244,49 @@ export class AudioManager {
                   const base = mapped.replace(/\.(ogg|mp3|m4a)$/i, '');
                   return this.#resolveDynamicSrc(base);
                 }
-                // area系: xxx_areaN_(a|b) はそのまま解決
                 if (/_area\d+_(a|b)$/i.test(key)) {
                   return this.#resolveDynamicSrc(`/assets/audio/${key}`);
                 }
-                // area系: xxx_areaN は a/b をランダム選択
                 if (/_area\d+$/i.test(key)) {
                   const pick = Math.random() < 0.5 ? 'a' : 'b';
                   return this.#resolveDynamicSrc(`/assets/audio/${key}_${pick}`);
                 }
-                // その他はキー名そのまま
                 return this.#resolveDynamicSrc(`/assets/audio/${key}`);
               }
 
-              // SE用の実ソースURLを解決（マップ→拡張子自動選択 or 動的）
-              resolveSeSrc(key) {
-                const map = (AudioManager.FILES && AudioManager.FILES.se) || {};
-                const mapped = map[key];
-                if (mapped) {
-                  const base = mapped.replace(/\.(ogg|mp3|m4a)$/i, '');
-                  return this.#resolveDynamicSrc(base);
-                }
-                return this.#resolveDynamicSrc(`/assets/audio/${key}`);
-              }
+             // SE: マップ→拡張子自動選択 or 動的キー
+             resolveSeSrc(key) {
+               const map = (AudioManager.FILES && AudioManager.FILES.se) || {};
+               const mapped = map[key];
+               if (mapped) {
+                 const base = mapped.replace(/\.(ogg|mp3|m4a)$/i, '');
+                 return this.#resolveDynamicSrc(base);
+               }
+               return this.#resolveDynamicSrc(`/assets/audio/${key}`);
+             }
 
-              // 内部：拡張子自動選択（優先: ogg → mp3 → m4a）
-              #resolveDynamicSrc(basePathNoExt) {
-                try {
-                  const a = document.createElement('audio');
-                  const order = [
-                    { ext: 'ogg', mime: 'audio/ogg; codecs="vorbis"' },
-                    { ext: 'mp3', mime: 'audio/mpeg' },
-                    { ext: 'm4a', mime: 'audio/mp4; codecs="mp4a.40.2"' }
-                  ];
-                  for (const cand of order) {
-                    const support = a.canPlayType(cand.mime);
-                    if (support === 'probably' || support === 'maybe') {
-                      return `${basePathNoExt}.${cand.ext}`;
-                    }
-                  }
-                } catch {}
-                return `${basePathNoExt}.mp3`;
-              }    /**
-     * BGM音量を設定 (0–1)
-     */
+             #resolveDynamicSrc(basePathNoExt) {
+               try {
+                 const a = document.createElement('audio');
+                 const order = [
+                   { ext: 'ogg', mime: 'audio/ogg; codecs="vorbis"' },
+                   { ext: 'mp3', mime: 'audio/mpeg' },
+                   { ext: 'm4a', mime: 'audio/mp4; codecs="mp4a.40.2"' }
+                 ];
+                 for (const cand of order) {
+                   const support = a.canPlayType(cand.mime);
+                   if (support === 'probably' || support === 'maybe') {
+                     return `${basePathNoExt}.${cand.ext}`;
+                   }
+                 }
+               } catch {}
+               return `${basePathNoExt}.mp3`;
+             }
+
+     /*───────────────────────
+      BGM音量を設定 (0–1)
+    ───────────────────────*/
+     
     setBGMVolume(value) {
       this.#bgmVolume = Math.max(0, Math.min(1, value));
       if (this.#currentBGM) {
