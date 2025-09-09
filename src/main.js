@@ -12,7 +12,6 @@ import {
   loadPlayerData
 } from './services/firebase/firebaseController.js';
 import { AudioManager } from './audio/audioManager.js';
-import { subscribe, publish } from './core/eventBus.js';
 import reviewQueue from './models/reviewQueue.js';
 import DataSync from './services/firebase/dataSync.js';
 import { FSM } from './core/stateMachine.js';
