@@ -136,7 +136,7 @@ export class AudioManager {
         this.#currentBGM = null;
       }
 
-      const bgm = new Audio(src);
+      const bgm = new Audio(encodeURI(src));
       bgm.dataset.key = key;
       bgm.loop = loop;
       bgm.volume = this.#masterVolume * this.#bgmVolume;
@@ -183,13 +183,12 @@ export class AudioManager {
      * @param {'appear'|'attack'|'damage'|'heal'|'defeat'|'correct'|'wrong'} key
      */
     playSE(key) {
-      const src = AudioManager.FILES.se[key];
-      if (!src) return console.warn(`SE "${key}" は定義されていません`);
-  
-      const se = new Audio(src);
-      se.volume = this.#masterVolume * this.#seVolume;
-      se.play().catch(console.error);
-    }
+           const src = this.resolveSeSrc(key);
+           if (!src) return console.warn(`SE "${key}" は定義されていません`);
+           const se = new Audio(encodeURI(src));
+            se.volume = this.#masterVolume * this.#seVolume;
+            se.play().catch(console.error);
+          }
   
     /*───────────────────────
       共通ユーティリティ
@@ -257,7 +256,18 @@ export class AudioManager {
                 // その他はキー名そのまま
                 return this.#resolveDynamicSrc(`/assets/audio/${key}`);
               }
-      
+
+              // SE用の実ソースURLを解決（マップ→拡張子自動選択 or 動的）
+              resolveSeSrc(key) {
+                const map = (AudioManager.FILES && AudioManager.FILES.se) || {};
+                const mapped = map[key];
+                if (mapped) {
+                  const base = mapped.replace(/\.(ogg|mp3|m4a)$/i, '');
+                  return this.#resolveDynamicSrc(base);
+                }
+                return this.#resolveDynamicSrc(`/assets/audio/${key}`);
+              }
+
               // 内部：拡張子自動選択（優先: ogg → mp3 → m4a）
               #resolveDynamicSrc(basePathNoExt) {
                 try {
@@ -275,9 +285,7 @@ export class AudioManager {
                   }
                 } catch {}
                 return `${basePathNoExt}.mp3`;
-              }
-
-    /**
+              }    /**
      * BGM音量を設定 (0–1)
      */
     setBGMVolume(value) {

@@ -9,7 +9,7 @@ const titleState = {
   /** 画面表示時の初期化 */
   enter(canvas) {
     // BGM再生
-    publish('playBGM', 'title');
+    // publish('playBGM', 'title');
     
     // canvas が未渡しの場合は DOM から取得
     this.canvas = canvas || document.getElementById('gameCanvas');
