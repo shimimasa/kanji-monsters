@@ -147,7 +147,7 @@ export async function loadBgImage(stageId) {
     // パスの配列を作成
     const pathsToTry = [
       // 1. ステージIDに完全一致する背景画像
-      `/assets/images/backgrounds/${stageId}.png?v=${timestamp}`,
+      `/assets/images/backgrounds/${stageId}.webp?v=${timestamp}`,
   
       // 2. 学年別の背景画像（フォールバック）
       `/assets/images/stage.select/stage.select${getGradeFromStageId(stageId)}.png?v=${timestamp}`

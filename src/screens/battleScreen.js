@@ -1024,10 +1024,15 @@ getMaxHealCountFromSettings() {
    */
   getBGMKeyForStage(stageId) {
     // ボス戦の場合
-    if (stageId.includes('boss')) {
+    if (stageId && stageId.includes('boss')) {
       return 'boss';
     }
-    // それ以外はステージIDをそのままBGMキーとして使う
+    // エリア付きステージは a / b をランダム
+    if (/_area\d+$/i.test(stageId)) {
+      const ab = Math.random() < 0.5 ? 'a' : 'b';
+      return `${stageId}_${ab}`;
+    }
+    // その他はステージIDをそのまま使用
     return stageId;
   },
 
