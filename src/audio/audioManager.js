@@ -51,7 +51,7 @@ export class AudioManager {
         gameover: '/assets/audio/bgm_gameover.mp3',
         yomitomo: '/assets/audio/bgm_yomitomo.mp3',
 
-        // 地域別BGMを追加
+        // ステージ別BGMを追加
         hokkaido: '/assets/audio/北海道.mp3',
         hokkaido_a: '/assets/audio/北海道.mp3',
         hokkaido_b: '/assets/audio/北海道.mp3',
@@ -83,6 +83,10 @@ export class AudioManager {
         africa_a: '/assets/audio/アフリカ大陸A.mp3',
         africa_b: '/assets/audio/アフリカ大陸B.mp3',
     
+        Africa: '/assets/audio/アフリカ大陸A.mp3',
+
+
+
         boss: '/assets/audio/boss.mp3'
       },
       se: {
@@ -221,32 +225,45 @@ export class AudioManager {
           });
         }
     
-        // 動的キー用：BGMの実ソースURLを解決（ステージID→拡張子自動選択）
-        resolveBgmSrc(key) {
-          const mapped = AudioManager.FILES && AudioManager.FILES.bgm && AudioManager.FILES.bgm[key];
-          if (mapped) return mapped;
-          const base = `/assets/audio/${key}`;
-          return this.#resolveDynamicSrc(base);
-        }
-    
-        // 内部：拡張子自動選択（優先: ogg → mp3 → m4a）
-        #resolveDynamicSrc(basePathNoExt) {
-          try {
-            const a = document.createElement('audio');
-            const order = [
-              { ext: 'ogg', mime: 'audio/ogg; codecs="vorbis"' },
-              { ext: 'mp3', mime: 'audio/mpeg' },
-              { ext: 'm4a', mime: 'audio/mp4; codecs="mp4a.40.2"' }
-            ];
-            for (const cand of order) {
-              const support = a.canPlayType(cand.mime);
-              if (support === 'probably' || support === 'maybe') {
-                return `${basePathNoExt}.${cand.ext}`;
+               // 動的キー用：BGMの実ソースURLを解決（ステージID→拡張子自動選択）
+               resolveBgmSrc(key) {
+                const map = (AudioManager.FILES && AudioManager.FILES.bgm) || {};
+                const mapped = map[key];
+                if (mapped) {
+                  const base = mapped.replace(/\.(ogg|mp3|m4a)$/i, '');
+                  return this.#resolveDynamicSrc(base);
+                }
+                // area系: xxx_areaN_(a|b) はそのまま解決
+                if (/_area\d+_(a|b)$/i.test(key)) {
+                  return this.#resolveDynamicSrc(`/assets/audio/${key}`);
+                }
+                // area系: xxx_areaN は a/b をランダム選択
+                if (/_area\d+$/i.test(key)) {
+                  const pick = Math.random() < 0.5 ? 'a' : 'b';
+                  return this.#resolveDynamicSrc(`/assets/audio/${key}_${pick}`);
+                }
+                // その他はキー名そのまま
+                return this.#resolveDynamicSrc(`/assets/audio/${key}`);
               }
-            }
-          } catch {}
-          return `${basePathNoExt}.mp3`;
-        }
+      
+              // 内部：拡張子自動選択（優先: ogg → mp3 → m4a）
+              #resolveDynamicSrc(basePathNoExt) {
+                try {
+                  const a = document.createElement('audio');
+                  const order = [
+                    { ext: 'ogg', mime: 'audio/ogg; codecs="vorbis"' },
+                    { ext: 'mp3', mime: 'audio/mpeg' },
+                    { ext: 'm4a', mime: 'audio/mp4; codecs="mp4a.40.2"' }
+                  ];
+                  for (const cand of order) {
+                    const support = a.canPlayType(cand.mime);
+                    if (support === 'probably' || support === 'maybe') {
+                      return `${basePathNoExt}.${cand.ext}`;
+                    }
+                  }
+                } catch {}
+                return `${basePathNoExt}.mp3`;
+              }
 
     /**
      * BGM音量を設定 (0–1)
