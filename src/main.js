@@ -56,7 +56,7 @@ subscribe('playBGM', (name, loop = true) => audio.playBGM(name, loop));
 document.body.addEventListener(
   'pointerdown',
   () => {
-    audio.playBGM('title');   // タイトル曲をループ再生（EventBus 経由）
+    publish('playBGM','title');   // タイトル曲をループ再生（EventBus 経由）
   },
   { once: true }
 );
