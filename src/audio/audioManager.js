@@ -113,19 +113,19 @@ export class AudioManager {
      * @param {boolean} [loop=true]
      */
     playBGM(key, loop = true) {
-      const src = AudioManager.FILES.bgm[key];
+      const src = this.resolveBgmSrc(key);
       if (!src) return console.warn(`BGM "${key}" は定義されていません`);
-  
-      // 同じ曲ならスキップ
-      if (this.#currentBGM?.dataset?.key === key) return;
-  
+
+      // 同じ曲ならスキップ（同キーかつ同srcなら何もしない）
+      if (this.#currentBGM?.dataset?.key === key && this.#currentBGM?.src?.includes(src)) return;
+
       // 今流れている曲を即停止（新BGM停止の妨げにならないよう直接停止）
       if (this.#currentBGM) {
         this.#currentBGM.pause();
         this.#currentBGM.currentTime = 0;
         this.#currentBGM = null;
       }
-  
+
       const bgm = new Audio(src);
       bgm.dataset.key = key;
       bgm.loop = loop;
@@ -204,22 +204,49 @@ export class AudioManager {
       });
     }
   
-    // 内部：フェードイン
-    #fadeIn(audio, duration) {
-      return new Promise(res => {
-        if (duration <= 0) return res();
-        let t = 0;
-        audio.volume = 0;
-        const targetVolume = this.#masterVolume * this.#bgmVolume;
-        const step = () => {
-          t += 0.016;
-          audio.volume = Math.min(targetVolume, (t / duration) * targetVolume);
-          if (t >= duration) return res();
-          requestAnimationFrame(step);
-        };
-        step();
-      });
-    }
+        // 内部：フェードイン
+        #fadeIn(audio, duration) {
+          return new Promise(res => {
+            if (duration <= 0) return res();
+            let t = 0;
+            audio.volume = 0;
+            const targetVolume = this.#masterVolume * this.#bgmVolume;
+            const step = () => {
+              t += 0.016;
+              audio.volume = Math.min(targetVolume, (t / duration) * targetVolume);
+              if (t >= duration) return res();
+              requestAnimationFrame(step);
+            };
+            step();
+          });
+        }
+    
+        // 動的キー用：BGMの実ソースURLを解決（ステージID→拡張子自動選択）
+        resolveBgmSrc(key) {
+          const mapped = AudioManager.FILES && AudioManager.FILES.bgm && AudioManager.FILES.bgm[key];
+          if (mapped) return mapped;
+          const base = `/assets/audio/${key}`;
+          return this.#resolveDynamicSrc(base);
+        }
+    
+        // 内部：拡張子自動選択（優先: ogg → mp3 → m4a）
+        #resolveDynamicSrc(basePathNoExt) {
+          try {
+            const a = document.createElement('audio');
+            const order = [
+              { ext: 'ogg', mime: 'audio/ogg; codecs="vorbis"' },
+              { ext: 'mp3', mime: 'audio/mpeg' },
+              { ext: 'm4a', mime: 'audio/mp4; codecs="mp4a.40.2"' }
+            ];
+            for (const cand of order) {
+              const support = a.canPlayType(cand.mime);
+              if (support === 'probably' || support === 'maybe') {
+                return `${basePathNoExt}.${cand.ext}`;
+              }
+            }
+          } catch {}
+          return `${basePathNoExt}.mp3`;
+        }
 
     /**
      * BGM音量を設定 (0–1)

@@ -144,20 +144,14 @@ export async function loadBgImage(stageId) {
     regionName = stageId.split('_')[0];
   }
   
-  // パスの配列を作成
-  const pathsToTry = [
-    // 1. 通常の背景画像パス（完全一致）
-    `/assets/images/backgrounds/${stageId}.png?v=${timestamp}`,
-    
-    // 2. 地域ベースの背景画像パス（エリア番号に基づく）
-    `/assets/images/backgrounds/${regionName}_area${areaNumber}.png?v=${timestamp}`,
-    
-    // 3. 地域のデフォルト背景画像（area1）をフォールバックとして試す
-    `/assets/images/backgrounds/${regionName}_area1.png?v=${timestamp}`,
-    
-    // 4. 学年別の背景画像を試す（最終フォールバック）
-    `/assets/images/stage.select/stage.select${getGradeFromStageId(stageId)}.png?v=${timestamp}`
-  ];
+    // パスの配列を作成
+    const pathsToTry = [
+      // 1. ステージIDに完全一致する背景画像
+      `/assets/images/backgrounds/${stageId}.png?v=${timestamp}`,
+  
+      // 2. 学年別の背景画像（フォールバック）
+      `/assets/images/stage.select/stage.select${getGradeFromStageId(stageId)}.png?v=${timestamp}`
+    ];
   
   // 各パスを順番に試す
   for (const path of pathsToTry) {
