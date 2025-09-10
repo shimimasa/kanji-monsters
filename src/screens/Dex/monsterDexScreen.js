@@ -6,7 +6,7 @@ import { gameState } from '../../core/gameState.js';
 
 // --- グローバルスコープにあったヘルパー関数を、このファイル内に移動 ---
 
-// 学年別フォルダマッピング
+// 学年別フォルダマッピング（世界 7-10 を追加）
 const gradeFolderMap = {
   1: 'grade1-hokkaido',
   2: 'grade2-touhoku',
@@ -14,16 +14,27 @@ const gradeFolderMap = {
   4: 'grade4-chuubu',
   5: 'grade5-kinki',
   6: 'grade6-chuugoku',
+  7: 'grade7-asia',
+  8: 'grade8-europe',
+  9: 'grade9-america',
+  10: 'grade10-africa',
 };
 
-// 地方マッピング（学年から地方名への変換）
-const regionMap = {
+// 地方/地域マッピング
+const japanRegionMap = {
   1: '北海道',
   2: '東北',
   3: '関東',
   4: '中部',
   5: '近畿',
-  6: '中国'
+  6: '中国',
+};
+
+const worldRegionMap = {
+  7: 'アジア',
+  8: 'ヨーロッパ',
+  9: 'アメリカ大陸',
+  10: 'アフリカ大陸'
 };
 
 // IntersectionObserver を用いたサムネイル遅延読み込み
@@ -42,13 +53,12 @@ function createCard(monster) {
   const card = document.createElement('div');
   card.classList.add('monster-card');
   
-  // 捕獲済みかどうかで判定
+  // 捕獲済みかどうかで判定（未捕獲は非表示）
   if (!monster.collected) {
-    // シルエットではなく、非表示または「？」表示
-    return null;  // または未取得用のカードを返す
+    return null;
   }
 
-      // カードクリック時のモーダル表示処理
+  // カードクリック時のモーダル表示処理
   card.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -62,34 +72,35 @@ function createCard(monster) {
     }
   });
 
-    const img = document.createElement('img');
-    const folder = gradeFolderMap[monster.grade] || gradeFolderMap[1];
-    const thumbPath = `/assets/images/monsters/thumb/${folder}/${monster.id}.webp`;
-    img.dataset.thumb = thumbPath;
-    img.alt = monster.name;
-    card.appendChild(img);
+  const img = document.createElement('img');
+  const folder = gradeFolderMap[monster.grade] || gradeFolderMap[1];
+  const thumbPath = `/assets/images/monsters/thumb/${folder}/${monster.id}.webp`;
+  img.dataset.thumb = thumbPath;
+  img.alt = monster.name;
+  card.appendChild(img);
 
-    const nameEl = document.createElement('p');
-    nameEl.textContent = monster.collected ? monster.name : '？？？';
-    nameEl.classList.add('monster-name');
-    card.appendChild(nameEl);
+  const nameEl = document.createElement('p');
+  nameEl.textContent = monster.collected ? monster.name : '？？？';
+  nameEl.classList.add('monster-name');
+  card.appendChild(nameEl);
 
-    // 生息地（都道府県）の表示を追加
-    const prefectureEl = document.createElement('p');
-    prefectureEl.textContent = monster.collected ? (monster.prefecture || regionMap[monster.grade] || '不明') : '？？？';
-    prefectureEl.classList.add('monster-prefecture');
-    card.appendChild(prefectureEl);
+  // 生息地（都道府県/大陸地域）の表示
+  const prefectureEl = document.createElement('p');
+  const regionFallback = monster.grade <= 6 ? japanRegionMap[monster.grade] : worldRegionMap[monster.grade];
+  prefectureEl.textContent = monster.collected ? (monster.prefecture || regionFallback || '不明') : '？？？';
+  prefectureEl.classList.add('monster-prefecture');
+  card.appendChild(prefectureEl);
 
-    // NEWバッジの追加
-    if (isNewMonster(monster.id)) {
-      const newBadge = document.createElement('div');
-      newBadge.classList.add('new-badge');
-      newBadge.textContent = 'NEW!';
-      card.appendChild(newBadge);
-    }
-  
-    observer.observe(card); // 遅延読み込みの対象として監視
-    return card;
+  // NEWバッジの追加
+  if (isNewMonster(monster.id)) {
+    const newBadge = document.createElement('div');
+    newBadge.classList.add('new-badge');
+    newBadge.textContent = 'NEW!';
+    card.appendChild(newBadge);
+  }
+
+  observer.observe(card); // 遅延読み込みの対象として監視
+  return card;
 }
 
 // モンスター詳細モーダルを表示する関数
@@ -112,7 +123,7 @@ function showMonsterModal(monster) {
   const modalContent = document.createElement('div');
   modalContent.classList.add('modal-content');
 
-  // 閉じるボタン（← これが欠けていた）
+  // 閉じるボタン
   const closeBtn = document.createElement('button');
   closeBtn.classList.add('modal-close');
   closeBtn.textContent = '×';
@@ -133,10 +144,10 @@ function showMonsterModal(monster) {
     publish('playSE', 'cancel');
   };
 
-  // モンスター画像
+  // モンスター画像（フル画像を表示）
   const img = document.createElement('img');
   const folder = gradeFolderMap[monster.grade] || gradeFolderMap[1];
-  img.src = `/assets/images/monsters/thumb/${folder}/${monster.id}.webp`;
+  img.src = `/assets/images/monsters/full/${folder}/${monster.id}.webp`;
   img.alt = monster.name;
   img.classList.add('modal-monster-image');
 
@@ -145,7 +156,7 @@ function showMonsterModal(monster) {
   info.classList.add('monster-info');
   info.innerHTML = `
     <h2>${monster.name}</h2>
-    <p><strong>都道府県:</strong> ${monster.prefecture || '不明'}</p>
+    <p><strong>地域:</strong> ${monster.prefecture || (monster.grade <= 6 ? japanRegionMap[monster.grade] : worldRegionMap[monster.grade]) || '不明'}</p>
     <p><strong>カテゴリ:</strong> ${monster.category || '不明'}</p>
     <p><strong>生息地:</strong> ${monster.habitat || '不明'}</p>
     <p><strong>説明:</strong> ${monster.desc || '—'}</p>
@@ -184,8 +195,9 @@ const monsterDexState = {
   totalPages: 0,
 
   // フィルタリング・ソート用の状態
-  currentRegionFilter: 'all', // 'all', 1, 2, 3, 4, 5, 6
+  currentRegionFilter: 'all', // 'all', 1..6 or 7..10
   currentSortOrder: 'id', // 'id' (図鑑番号順), 'name' (五十音順)
+  currentMode: 'japan', // 'japan' | 'world'
 
   // DOM管理用プロパティ
   container: null,
@@ -204,15 +216,20 @@ const monsterDexState = {
     // データの読み込み
     this.dexSet = loadDex();
     this.seenSet = loadSeenMonsters();
-    // 小学生6学年のみ（世界編・ことわざは除外）
+
+    // すべての（ことわざ以外の）モンスターIDを保持（日本1-6＋世界7-10）
     this.allMonsterIds = getAllMonsterIds().filter(id => {
-      const m = getMonsterById(id);
       const idStr = String(id);
-      const isWorld = (m && m.grade >= 7) || idStr.startsWith('PRV-');
-      return m && !isWorld;
+      if (idStr.startsWith('PRV-')) return false; // ことわざ除外
+      const m = getMonsterById(id);
+      return !!m;
     });
 
-    // 初期状態では全てのモンスターを表示
+    // 初期状態では日本モード
+    this.currentMode = 'japan';
+    this.currentRegionFilter = 'all';
+
+    // 初期状態で全ての対象モンスターを表示
     this.applyFiltersAndSort();
     this.currentPage = 0;
 
@@ -260,35 +277,44 @@ const monsterDexState = {
     document.body.appendChild(this.container);
   },
 
-  /** 地方ごとのコンプリート状況を計算 */
+  /** 現在モードに応じた学年リストを返す */
+  _getAllowedGrades() {
+    return this.currentMode === 'japan' ? [1,2,3,4,5,6] : [7,8,9,10];
+  },
+
+  /** 地域ごとのコンプリート状況を計算（現在モードのみ） */
   calculateRegionCompletion() {
     const regionCompletion = {};
-    
-    // 各地方（学年）ごとにモンスターを分類
-    for (let grade = 1; grade <= 6; grade++) {
+    const allowed = this._getAllowedGrades();
+
+    for (const grade of allowed) {
       const regionMonsters = this.allMonsterIds.filter(id => {
         const monster = getMonsterById(id);
         return monster && monster.grade === grade;
       });
-      
       const collectedInRegion = regionMonsters.filter(id => this.dexSet.has(id));
-      
       regionCompletion[grade] = {
         total: regionMonsters.length,
         collected: collectedInRegion.length,
         isComplete: regionMonsters.length > 0 && collectedInRegion.length === regionMonsters.length
       };
     }
-    
     return regionCompletion;
   },
 
   /** フィルタリングとソートを適用 */
   applyFiltersAndSort() {
-    // 地方フィルタリング
-    let filtered = this.allMonsterIds;
+    const allowed = this._getAllowedGrades();
+
+    // 対象モードのみに限定
+    let filtered = this.allMonsterIds.filter(id => {
+      const m = getMonsterById(id);
+      return m && allowed.includes(m.grade);
+    });
+
+    // 地域フィルタリング
     if (this.currentRegionFilter !== 'all') {
-      filtered = this.allMonsterIds.filter(id => {
+      filtered = filtered.filter(id => {
         const monster = getMonsterById(id);
         return monster && monster.grade === this.currentRegionFilter;
       });
@@ -305,7 +331,7 @@ const monsterDexState = {
       });
     } else {
       // 図鑑番号順（デフォルト）
-      filtered.sort((a, b) => a.localeCompare(b));
+      filtered.sort((a, b) => String(a).localeCompare(String(b)));
     }
 
     // 捕獲済みのみ表示
@@ -322,8 +348,9 @@ const monsterDexState = {
     // 既存の要素を全てクリア
     this.container.innerHTML = '';
 
-    // 地方コンプリート状況を計算
+    // 地域コンプリート状況を計算
     const regionCompletion = this.calculateRegionCompletion();
+    const allowed = this._getAllowedGrades();
 
     // === 統計エリア（KanjiDexと同じネイビーブルー系） ===
     const statsDiv = document.createElement('div');
@@ -338,8 +365,13 @@ const monsterDexState = {
       boxShadow: '0 2px 8px rgba(30, 58, 138, 0.2)'
     });
     
-    const totalCollected = this.dexSet.size;
-    const totalMonsters = this.allMonsterIds.length;
+    // 現在モードの総数と収集数
+    const idsInMode = this.allMonsterIds.filter(id => {
+      const m = getMonsterById(id);
+      return m && allowed.includes(m.grade);
+    });
+    const totalMonsters = idsInMode.length;
+    const totalCollected = idsInMode.filter(id => this.dexSet.has(id)).length;
     const collectionRate = totalMonsters > 0 ? Math.round((totalCollected / totalMonsters) * 100) : 0;
     
     const statsText = document.createElement('div');
@@ -443,10 +475,42 @@ const monsterDexState = {
     });
     leftControls.appendChild(backButton);
 
-    // 地方セレクト
+    // 種別セレクト（日本/世界）
+    const modeLabel = document.createElement('span');
+    modeLabel.textContent = '種別：';
+    Object.assign(modeLabel.style, { color: '#ffffff', fontWeight: '500', marginRight: '8px' });
+
+    const modeSelect = document.createElement('select');
+    Object.assign(modeSelect.style, {
+      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05))',
+      color: 'white',
+      border: '1px solid rgba(255, 255, 255, 0.3)',
+      borderRadius: '6px',
+      padding: '6px 12px',
+      fontSize: '14px',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease'
+    });
+    modeSelect.innerHTML = `
+      <option value="japan">日本ゴトモン</option>
+      <option value="world">世界ゴトモン</option>
+    `;
+    modeSelect.value = this.currentMode;
+    modeSelect.addEventListener('change', (e) => {
+      this.currentMode = e.target.value;
+      this.currentRegionFilter = 'all';
+      this.applyFiltersAndSort();
+      this.currentPage = 0;
+      this.renderPage();
+      publish('playSE', 'decide');
+    });
+    leftControls.appendChild(modeLabel);
+    leftControls.appendChild(modeSelect);
+
+    // 地域セレクト
     const regionLabel = document.createElement('span');
     regionLabel.className = 'monster-region-label';
-    regionLabel.textContent = '地方：';
+    regionLabel.textContent = '地域：';
     Object.assign(regionLabel.style, {
       color: '#ffffff',
       fontWeight: '500',
@@ -467,9 +531,11 @@ const monsterDexState = {
     });
 
     let optionsHTML = '<option value="all">すべて</option>';
-    for (let grade = 1; grade <= 6; grade++) {
-      const regionName = regionMap[grade];
-      const completion = regionCompletion[grade];
+    const regionNames = this.currentMode === 'japan' ? japanRegionMap : worldRegionMap;
+    const grades = this._getAllowedGrades();
+    for (const grade of grades) {
+      const regionName = regionNames[grade];
+      const completion = regionCompletion[grade] || { isComplete: false };
       const crownIcon = completion.isComplete ? ' 👑' : '';
       optionsHTML += `<option value="${grade}" style="background: rgba(30, 58, 138, 0.9); color: white;">${regionName}${crownIcon}</option>`;
     }
@@ -642,50 +708,50 @@ const monsterDexState = {
       margin: '0 16px'
     });
 
-        // 現在のページのモンスターカードを生成
-        const startIndex = this.currentPage * this.itemsPerPage;
-        const endIndex = startIndex + this.itemsPerPage;
-        const pageIds = this.filteredMonsterIds.slice(startIndex, endIndex);
-    
-        pageIds.forEach(id => {
-          const monsterData = getMonsterById(id);
-          if (monsterData) {
-            monsterData.collected = this.dexSet.has(id);
-            const card = createCard(monsterData);
-            if (!card) return; // 未捕獲は非表示（シルエット廃止）
-    
-            // カードのスタイルを統一（KanjiDexと同様）
-            Object.assign(card.style, {
-              background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.8), rgba(160, 82, 45, 0.6))',
-              border: '2px solid #8B4513',
-              borderRadius: '12px',
-              padding: '12px',
-              textAlign: 'center',
-              cursor: monsterData.collected ? 'pointer' : 'default',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-              color: '#fff'
-            });
-    
-            if (monsterData.collected) {
-              card.addEventListener('mouseenter', () => {
-                Object.assign(card.style, {
-                  transform: 'translateY(-4px)',
-                  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
-                });
-              });
-              
-              card.addEventListener('mouseleave', () => {
-                Object.assign(card.style, {
-                  transform: 'translateY(0)',
-                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
-                });
-              });
-            }
-            
-            cardGrid.appendChild(card);
-          }
+    // 現在のページのモンスターカードを生成
+    const startIndex = this.currentPage * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    const pageIds = this.filteredMonsterIds.slice(startIndex, endIndex);
+
+    pageIds.forEach(id => {
+      const monsterData = getMonsterById(id);
+      if (monsterData) {
+        monsterData.collected = this.dexSet.has(id);
+        const card = createCard(monsterData);
+        if (!card) return; // 未捕獲は非表示
+
+        // カードのスタイルを統一（KanjiDexと同様）
+        Object.assign(card.style, {
+          background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.8), rgba(160, 82, 45, 0.6))',
+          border: '2px solid #8B4513',
+          borderRadius: '12px',
+          padding: '12px',
+          textAlign: 'center',
+          cursor: monsterData.collected ? 'pointer' : 'default',
+          transition: 'all 0.3s ease',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+          color: '#fff'
         });
+
+        if (monsterData.collected) {
+          card.addEventListener('mouseenter', () => {
+            Object.assign(card.style, {
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)'
+            });
+          });
+          
+          card.addEventListener('mouseleave', () => {
+            Object.assign(card.style, {
+              transform: 'translateY(0)',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+            });
+          });
+        }
+        
+        cardGrid.appendChild(card);
+      }
+    });
 
     // コンテナに全て追加
     this.container.appendChild(statsDiv);

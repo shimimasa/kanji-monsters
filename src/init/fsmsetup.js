@@ -24,7 +24,7 @@ import stageLoadingState   from '../screens/stageLoadingScreen.js';
 import courseSelectScreen from '../screens/courseSelectScreen.js';
 import continentSelectScreen from '../screens/continentSelectScreen.js';
 import worldStageSelectScreen from '../screens/worldStageSelectScreen.js';
-import proverbMonsterDexState from '../screens/Dex/proverbMonsterDexScreen.js';
+// import proverbMonsterDexState from '../screens/Dex/proverbMonsterDexScreen.js'; // ← 削除
 // 追加
 import profileScreen       from '../screens/profileScreen.js';
 import gradeQuizScreen     from '../screens/gradeQuizScreen.js';
@@ -57,7 +57,7 @@ export async function setupFSM() {
     courseSelect:     courseSelectScreen,
     continentSelect:  continentSelectScreen,
     worldStageSelect: worldStageSelectScreen,
-    proverbMonsterDex: proverbMonsterDexState,
+    // proverbMonsterDex: proverbMonsterDexState, // ← 削除
     gradeQuiz:        gradeQuizScreen,
     // 追加
     profile:          profileScreen,
@@ -67,6 +67,7 @@ export async function setupFSM() {
     // 共通バトル画面を追加
     battle:           battleFactory('default'),
   };
+  // ...
   // ステージごとのバトルステートを一括登録
   stageData.forEach(s => {
     states[s.stageId] = battleFactory(s.stageId);

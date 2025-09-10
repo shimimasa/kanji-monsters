@@ -1248,13 +1248,13 @@ const worldStageSelectScreen = {
       return;
     }
 
-    // モンスターデックスボタン
-    if (isMouseOverRect(x, y, monsterButton)) {
-      publish('playSE', 'decide');
-      gameState.previousScreen = 'worldStageSelect';
-      publish('changeScreen', 'proverbMonsterDex');
-      return;
-    }
+        // モンスターデックスボタン
+        if (isMouseOverRect(x, y, monsterButton)) {
+          publish('playSE', 'decide');
+          gameState.previousScreen = 'worldStageSelect';
+          publish('changeScreen', 'monsterDex'); // ← 統合版へ
+          return;
+        }
 
     // プロフィール/称号ボタン
     if (isMouseOverRect(x, y, profileButton)) {
