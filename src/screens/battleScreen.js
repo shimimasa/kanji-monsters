@@ -5156,20 +5156,18 @@ function calculateExpForLevel(level) {
   return Math.floor(previousLevelExp * 1.2) + 20;
 }
 
-// addPlayerExp関数の拡張または経験値更新時の処理を修正
-// onAttackやその他経験値が増加する箇所で呼び出す
 function updatePlayerExp(expGained) {
   // 既存の経験値加算処理
   const levelUpResult = addPlayerExp(expGained);
-  
-  // 経験値バーアニメーションの設定
+
+  // 経験値バーアニメーションの設定（レベル開始EXP基準）
   const player = gameState.playerStats;
-  const currentLevelExp = calculateExpForLevel(player.level);
-  const expForBar = player.exp - currentLevelExp;
-  
+  const levelStartExp = getLevelStartExp(player.level);
+  const expForBar = Math.max(0, player.exp - levelStartExp);
+
   battleScreenState.playerExpTarget = expForBar;
   battleScreenState.playerExpAnimating = true;
-  
+
   return levelUpResult;
 }
 
@@ -5201,18 +5199,9 @@ function onAttackHandler() {
 
 
 function getLevelStartExp(level) {
-
-
-  const player = gameState.playerStats;
-  const levelStartExp = getLevelStartExp(player.level);
-  const expForBar = Math.max(0, player.exp - levelStartExp);
-
-  battleScreenState.playerExpTarget = expForBar;
-  battleScreenState.playerExpAnimating = true;
-  // 入力値の検証
+  // レベル開始時点の累積EXPを返す（Lv1は0）
   if (!Number.isInteger(level) || level <= 1) return 0;
   return calculateExpForLevel(level - 1);
-
 }
 
 
