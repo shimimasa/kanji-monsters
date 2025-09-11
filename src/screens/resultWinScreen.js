@@ -572,7 +572,7 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     const maxDisplay = Math.min(gameState.wrongKanjiList.length, 4); // 最大4個まで表示
     for (let i = 0; i < maxDisplay; i++) {
       const kanji = gameState.wrongKanjiList[i];
-      const text = `${kanji.text || kanji}（${kanji.meaning || ''}）`;
+      const text = `${kanji.text || kanji}`;
       ctx.fillText(text, x + 15, y + 50 + i * 20);
     }
     
