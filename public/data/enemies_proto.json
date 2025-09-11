@@ -6996,7 +6996,7 @@
   },
   {
     "id": "CHU-E001",
-      "stageId": "Asie_area1",
+      "stageId": "Asia_area1",
       "name": "ギョウザインプ",
       "prefecture": "中国",
     "grade": 7,
@@ -7016,7 +7016,7 @@
   },
   {
     "id": "CHU-E002",
-    "stageId": "Asie_area1",
+    "stageId": "Asia_area1",
     "name": "パンダウォリアー",
     "prefecture": "中国",
     "grade": 7,
@@ -7036,7 +7036,7 @@
   },
   {
     "id": "CHU-E003",
-    "stageId": "Asie_area1",
+    "stageId": "Asia_area1",
     "name": "チャティーフェアリー",
     "prefecture": "中国",
     "grade": 7,
@@ -7056,7 +7056,7 @@
   },
   {
     "id": "CHU-E004",
-    "stageId": "Asie_area1",
+    "stageId": "Asia_area1",
     "name": "ロータスゴースト",
     "prefecture": "中国",
     "grade": 7,
@@ -7076,7 +7076,7 @@
   },
   {
     "id": "CHU-E005",
-    "stageId": "Asie_area1",
+    "stageId": "Asia_area1",
     "name": "シルクロードビートル",
     "prefecture": "中国",
     "grade": 7,
@@ -7096,7 +7096,7 @@
   },
   {
     "id": "CHU-E006",
-    "stageId": "Asie_area1",
+    "stageId": "Asia_area1",
     "name": "ファンマスクピエロ",
     "prefecture": "中国",
     "grade": 7,
@@ -7116,7 +7116,7 @@
   },
   {
     "id": "CHU-E007",
-    "stageId": "Asie_area1",
+    "stageId": "Asia_area1",
     "name": "兵馬俑ガーディアン",
     "prefecture": "中国",
     "grade": 7,
@@ -7136,7 +7136,7 @@
   },
   {
     "id": "CHU-E008",
-    "stageId": "Asie_area1",
+    "stageId": "Asia_area1",
     "name": "火鍋ゴーレム",
     "prefecture": "中国",
     "grade": 7,
@@ -7156,7 +7156,7 @@
   },
   {
     "id": "CHU-E009",
-    "stageId": "Asie_area1",
+    "stageId": "Asia_area1",
     "name": "ドラゴンダンサー",
     "prefecture": "中国",
     "grade": 7,
@@ -7176,7 +7176,7 @@
   },
   {
     "id": "CHU-E010",
-    "stageId": "Asie_area1",
+    "stageId": "Asia_area1",
     "name": "長城コロッサス",
     "prefecture": "中国",
     "grade": 7,
@@ -7197,7 +7197,7 @@
   },
   {
     "id": "IND-E001",
-      "stageId": "Asie_area2",
+        "stageId": "Asia_area2",
           "name": "ナンゴブリン",
           "prefecture": "インド",
     "grade": 7,
@@ -7217,7 +7217,7 @@
   },
   {
     "id": "IND-E002",
-          "stageId": "Asie_area2",
+          "stageId": "Asia_area2",
           "name": "マンゴーフェアリー",
           "prefecture": "インド",
     "grade": 7,
@@ -7237,7 +7237,7 @@
   },
   {
     "id": "IND-E003",
-          "stageId": "Asie_area2",
+          "stageId": "Asia_area2",
           "name": "インディアエレファント",
           "prefecture": "インド",
     "grade": 7,
@@ -7257,7 +7257,7 @@
   },
   {
     "id": "IND-E004",
-    "stageId": "Asie_area2",
+    "stageId": "Asia_area2",
     "name": "ベンガルトラビースト",
     "prefecture": "インド",
     "grade": 7,
@@ -7277,7 +7277,7 @@
   },
   {
     "id": "IND-E005",
-    "stageId": "Asie_area2",
+    "stageId": "Asia_area2",
     "name": "スパイスフェアリー",
     "prefecture": "インド",
     "grade": 7,
@@ -7297,7 +7297,7 @@
   },
   {
     "id": "IND-E006",
-    "stageId": "Asie_area2",
+    "stageId": "Asia_area2",
     "name": "マットスピリット",
     "prefecture": "インド",
     "grade": 7,
@@ -7317,7 +7317,7 @@
   },
   {
     "id": "IND-E007",
-    "stageId": "Asie_area2",
+    "stageId": "Asia_area2",
     "name": "ボリウッドダンサー",
     "prefecture": "インド",
     "grade": 7,
@@ -7337,7 +7337,7 @@
   },
   {
     "id": "IND-E008",
-    "stageId": "Asie_area2",
+    "stageId": "Asia_area2",
     "name": "ナーガガーディアン",
     "prefecture": "インド",
     "grade": 7,
@@ -7357,7 +7357,7 @@
   },
   {
     "id": "IND-E009",
-    "stageId": "Asie_area2",
+    "stageId": "Asia_area2",
     "name": "ガルーダウォリアー",
     "prefecture": "インド",
     "grade": 7,
@@ -7377,7 +7377,7 @@
   },
   {
     "id": "IND-E010",
-    "stageId": "Asie_area2",
+    "stageId": "Asia_area2",
     "name": "ガンジスリヴァイアサン",
     "prefecture": "インド",
     "grade": 7,
@@ -7398,7 +7398,7 @@
   },
   {
     "id": "INDN-E001",
-          "stageId": "Asie_area3",
+          "stageId": "Asia_area3",
           "name": "テンペゴブリン",
           "prefecture": "インドネシア",
     "grade": 7,
@@ -7418,7 +7418,7 @@
   },
   {
     "id": "INDN-E002",
-              "stageId": "Asie_area3",
+              "stageId": "Asia_area3",
               "name": "ココナッツスピリット",
               "prefecture": "インドネシア",
     "grade": 7,
@@ -7438,7 +7438,7 @@
   },
   {
     "id": "INDN-E003",
-    "stageId": "Asie_area3",
+    "stageId": "Asia_area3",
     "name": "オランウータンビースト",
     "prefecture": "インドネシア",
     "grade": 7,
@@ -7458,7 +7458,7 @@
   },
   {
     "id": "INDN-E004",
-    "stageId": "Asie_area3",
+    "stageId": "Asia_area3",
     "name": "コモドドラゴン",
     "prefecture": "インドネシア",
     "grade": 7,
@@ -7478,7 +7478,7 @@
   },
   {
     "id": "INDN-E005",
-              "stageId": "Asie_area3",
+              "stageId": "Asia_area3",
               "name": "ラフレシアスピリット",
               "prefecture": "インドネシア",
     "grade": 7,
@@ -7498,7 +7498,7 @@
   },
   {
     "id": "INDN-E006",
-              "stageId": "Asie_area3",
+              "stageId": "Asia_area3",
               "name": "ガムランインストゥルメンタル",
               "prefecture": "インドネシア",
     "grade": 7,
@@ -7518,7 +7518,7 @@
   },
   {
     "id": "INDN-E007",
-    "stageId": "Asie_area3",
+    "stageId": "Asia_area3",
     "name": "ワヤンシャドウ",
     "prefecture": "インドネシア",
     "grade": 7,
@@ -7538,7 +7538,7 @@
   },
   {
     "id": "INDN-E008",
-    "stageId": "Asie_area3",
+    "stageId": "Asia_area3",
     "name": "バリダンスゴースト",
     "prefecture": "東南アジア海洋部",
     "grade": 7,
@@ -7558,7 +7558,7 @@
   },
   {
     "id": "INDN-E009",
-    "stageId": "Asie_area3",
+    "stageId": "Asia_area3",
     "name": "ガルーダウォリアー",
     "prefecture": "東南アジア海洋部",
     "grade": 7,
@@ -7578,7 +7578,7 @@
   },
   {
     "id": "INDN-E010",
-              "stageId": "Asie_area3",
+              "stageId": "Asia_area3",
               "name": "バリテンプルガーディアン",
               "prefecture": "インドネシア",
     "grade": 7,
@@ -7599,7 +7599,7 @@
   },
   {
     "id": "PKS-E001",
-             "stageId": "Asie_area4",
+             "stageId": "Asia_area4",
                   "name": "ビリヤニビースト",
                   "prefecture": "パキスタン",
     "grade": 7,
@@ -7619,7 +7619,7 @@
   },
   {
     "id": "PKS-E002",
-                  "stageId": "Asie_area4",
+                  "stageId": "Asia_area4",
                   "name": "チャパティシェード",
                   "prefecture": "パキスタン",
     "grade": 7,
@@ -7639,7 +7639,7 @@
   },
   {
     "id": "PKS-E003",
-                  "stageId": "Asie_area4",
+                  "stageId": "Asia_area4",
                   "name": "マルコールホーン",
                   "prefecture": "パキスタン",
     "grade": 7,
@@ -7659,7 +7659,7 @@
   },
   {
     "id": "PKS-E004",
-    "stageId": "Asie_area4",
+    "stageId": "Asia_area4",
     "name": "インダスリバースピリット",
     "prefecture": "パキスタン",
     "grade": 7,
@@ -7679,7 +7679,7 @@
   },
   {
     "id": "PKS-E005",
-    "stageId": "Asie_area4",
+    "stageId": "Asia_area4",
     "name": "トラックアートゴーレム",
     "prefecture": "パキスタン",
     "grade": 7,
@@ -7699,7 +7699,7 @@
   },
   {
     "id": "PKS-E006",
-    "stageId": "Asie_area4",
+    "stageId": "Asia_area4",
     "name": "ラッシースライム",
     "prefecture": "パキスタン",
     "grade": 7,
@@ -7719,7 +7719,7 @@
   },
   {
     "id": "PKS-E007",
-                  "stageId": "Asie_area4",
+                  "stageId": "Asia_area4",
                   "name": "ジンファイアロード",
                   "prefecture": "パキスタン",
     "grade": 7,
@@ -7739,7 +7739,7 @@
   },
   {
     "id": "PKS-E008",
-                  "stageId": "Asie_area4",
+                  "stageId": "Asia_area4",
                   "name": "スーフィードランサー",
                   "prefecture": "パキスタン",
     "grade": 7,
@@ -7759,7 +7759,7 @@
   },
   {
     "id": "PKS-E009",
-    "stageId": "Asie_area4",
+    "stageId": "Asia_area4",
     "name": "モヘンジョダロセンチネル",
     "prefecture": "パキスタン",
     "grade": 7,
@@ -7779,7 +7779,7 @@
   },
   {
     "id": "PKS-E010",
-    "stageId": "Asie_area4",
+    "stageId": "Asia_area4",
     "name": "カラコルムコロッサス",
     "prefecture": "パキスタン",
     "grade": 7,
@@ -7800,7 +7800,7 @@
   },
   {
     "id": "KOR-E001",
-    "stageId": "Asie_area5",
+    "stageId": "Asia_area5",
     "name": "キムチスライム",
     "prefecture": "韓国",
     "grade": 7,
@@ -7820,7 +7820,7 @@
   },
   {
     "id": "KOR-E002",
-    "stageId": "Asie_area5",
+    "stageId": "Asia_area5",
     "name": "トッポッキファイター",
     "prefecture": "韓国",
     "grade": 7,
@@ -7840,7 +7840,7 @@
   },
   {
     "id": "KOR-E003",
-                    "stageId": "Asie_area5",
+                    "stageId": "Asia_area5",
                     "name": "タンチョウバード",
                     "prefecture": "韓国",
     "grade": 7,
@@ -7860,7 +7860,7 @@
   },
   {
     "id": "KOR-E004",
-                    "stageId": "Asie_area5",
+                    "stageId": "Asia_area5",
                     "name": "コリアンタイガー",
                     "prefecture": "韓国",
     "grade": 7,
@@ -7880,7 +7880,7 @@
   },
   {
     "id": "KOR-E005",
-                    "stageId": "Asie_area5",
+                    "stageId": "Asia_area5",
                     "name": "韓紙ペーパーシェード",
                     "prefecture": "韓国",
     "grade": 7,
@@ -7900,7 +7900,7 @@
   },
   {
     "id": "KOR-E006",
-                    "stageId": "Asie_area5",
+                    "stageId": "Asia_area5",
                     "name": "サムギョプサルスピリット",
                     "prefecture": "韓国",
     "grade": 7,
@@ -7920,7 +7920,7 @@
   },
   {
     "id": "KOR-E007",
-                    "stageId": "Asie_area5",
+                    "stageId": "Asia_area5",
                     "name": "テコンドーゴーレム",
                     "prefecture": "韓国",
     "grade": 7,
@@ -7940,7 +7940,7 @@
   },
   {
     "id": "KOR-E008",
-    "stageId": "Asie_area5",
+    "stageId": "Asia_area5",
     "name": "タルチュムゴースト",
     "prefecture": "韓国",
     "grade": 7,
@@ -7960,7 +7960,7 @@
   },
   {
     "id": "KOR-E009",
-                    "stageId": "Asie_area5",
+                    "stageId": "Asia_area5",
                     "name": "クミホ",
                     "prefecture": "韓国",
     "grade": 7,
@@ -7980,7 +7980,7 @@
   },
   {
     "id": "KOR-E010",
-                    "stageId": "Asie_area5",
+                    "stageId": "Asia_area5",
                     "name": "白頭山ドラゴン",
                     "prefecture": "韓国",
     "grade": 7,
@@ -8001,7 +8001,7 @@
   },
   {
     "id": "THA-E001",
-                      "stageId": "Asie_area6",
+                      "stageId": "Asia_area6",
                       "name": "トムヤムスライム",
                       "prefecture": "タイ",
     "grade": 7,
@@ -8021,7 +8021,7 @@
   },
   {
     "id": "THA-E002",
-                      "stageId": "Asie_area6",
+                      "stageId": "Asia_area6",
                       "name": "パッタイスピリット",
                       "prefecture": "タイ",
     "grade": 7,
@@ -8041,7 +8041,7 @@
   },
   {
     "id": "THA-E003",
-                      "stageId": "Asie_area6",
+                      "stageId": "Asia_area6",
                       "name": "マンゴーゴーレム",
                       "prefecture": "タイ",
     "grade": 7,
@@ -8061,7 +8061,7 @@
   },
   {
     "id": "THA-E004",
-    "stageId": "Asie_area6",
+    "stageId": "Asia_area6",
     "name": "タイエレファントビースト",
     "prefecture": "タイ",
     "grade": 7,
@@ -8081,7 +8081,7 @@
   },
   {
     "id": "THA-E005",
-                      "stageId": "Asie_area6",
+                      "stageId": "Asia_area6",
                       "name": "コブラサーペント",
                       "prefecture": "タイ",
     "grade": 7,
@@ -8101,7 +8101,7 @@
   },
   {
     "id": "THA-E006",
-                      "stageId": "Asie_area6",
+                      "stageId": "Asia_area6",
                       "name": "ロータスシェード",
                       "prefecture": "タイ",
     "grade": 7,
@@ -8121,7 +8121,7 @@
   },
   {
     "id": "THA-E007",
-                      "stageId": "Asie_area6",
+                      "stageId": "Asia_area6",
                       "name": "ムエタイウォリアー",
                       "prefecture": "タイ",
     "grade": 7,
@@ -8141,7 +8141,7 @@
   },
   {
     "id": "THA-E008",
-                      "stageId": "Asie_area6",
+                      "stageId": "Asia_area6",
                       "name": "アユタヤゴーレム",
                       "prefecture": "タイ",
     "grade": 7,
@@ -8161,7 +8161,7 @@
   },
   {
     "id": "THA-E009",
-                      "stageId": "Asie_area6",
+                      "stageId": "Asia_area6",
                       "name": "ナーガ・ミラージュ",
                       "prefecture": "タイ",
     "grade": 7,
@@ -8181,7 +8181,7 @@
   },
   {
     "id": "THA-E010",
-                      "stageId": "Asie_area6",
+                      "stageId": "Asia_area6",
                       "name": "ハヌマーンロード",
                       "prefecture": "タイ",
     "grade": 7,
@@ -8202,7 +8202,7 @@
   },
   {
     "id": "VNM-E001",
-                      "stageId": "Asie_area7",
+                      "stageId": "Asia_area7",
                       "name": "フォースライム",
                       "prefecture": "ベトナム",
     "grade": 7,
@@ -8222,7 +8222,7 @@
   },
   {
     "id": "VNM-E002",
-    "stageId": "Asie_area7",
+    "stageId": "Asia_area7",
     "name": "バインミーゴーレム",
     "prefecture": "ベトナム",
     "grade": 7,
@@ -8242,7 +8242,7 @@
   },
   {
     "id": "VNM-E003",
-    "stageId": "Asie_area7",
+    "stageId": "Asia_area7",
     "name": "ネムローラー",
     "prefecture": "ベトナム",
     "grade": 7,
@@ -8262,7 +8262,7 @@
   },
   {
     "id": "VNM-E004",
-                      "stageId": "Asie_area7",
+                      "stageId": "Asia_area7",
                       "name": "バッファロービースト",
                       "prefecture": "ベトナム",
     "grade": 7,
@@ -8282,7 +8282,7 @@
   },
   {
     "id": "VNM-E005",
-    "stageId": "Asie_area7",
+    "stageId": "Asia_area7",
     "name": "竹スピリット",
     "prefecture": "ベトナム",
     "grade": 7,
@@ -8302,7 +8302,7 @@
   },
   {
     "id": "VNM-E006",
-                      "stageId": "Asie_area7",
+                      "stageId": "Asia_area7",
                       "name": "蓮フラワーシャード",
                       "prefecture": "ベトナム",
     "grade": 7,
@@ -8322,7 +8322,7 @@
   },
   {
     "id": "VNM-E007",
-                      "stageId": "Asie_area7",
+                      "stageId": "Asia_area7",
                       "name": "ノンラーシェード",
                       "prefecture": "ベトナム",
     "grade": 7,
@@ -8342,7 +8342,7 @@
   },
   {
     "id": "VNM-E008",
-                      "stageId": "Asie_area7",
+                      "stageId": "Asia_area7",
                       "name": "フエガード",
                       "prefecture": "ベトナム",
     "grade": 7,
@@ -8362,7 +8362,7 @@
   },
   {
     "id": "VNM-E009",
-                      "stageId": "Asie_area7",
+                      "stageId": "Asia_area7",
                       "name": "ホアンキエムタートル",
                       "prefecture": "ベトナム",
     "grade": 7,
@@ -8382,7 +8382,7 @@
   },
   {
     "id": "VNM-E010",
-                      "stageId": "Asie_area7",
+                      "stageId": "Asia_area7",
                       "name": "ドラムタイタン",
                       "prefecture": "ベトナム",
     "grade": 7,
@@ -8403,7 +8403,7 @@
   },
   {
     "id": "PHI-E001",
-                      "stageId": "Asie_area8",
+                      "stageId": "Asia_area8",
                       "name": "アドボスライム",
                       "prefecture": "フィリピン",
     "grade": 7,
@@ -8423,7 +8423,7 @@
   },
   {
     "id": "PHI-E002",
-    "stageId": "Asie_area8",
+    "stageId": "Asia_area8",
     "name": "ハロハロゴースト",
     "prefecture": "フィリピン",
     "grade": 7,
@@ -8443,7 +8443,7 @@
   },
   {
     "id": "PHI-E003",
-    "stageId": "Asie_area8",
+    "stageId": "Asia_area8",
     "name": "バナナリーフインプ",
     "prefecture": "フィリピン",
     "grade": 7,
@@ -8463,7 +8463,7 @@
   },
   {
     "id": "PHI-E004",
-    "stageId": "Asie_area8",
+    "stageId": "Asia_area8",
     "name": "ココナッツスピリット",
     "prefecture": "フィリピン",
     "grade": 7,
@@ -8483,7 +8483,7 @@
   },
   {
     "id": "PHI-E005",
-    "stageId": "Asie_area8",
+    "stageId": "Asia_area8",
     "name": "タホフェアリー",
     "prefecture": "フィリピン",
     "grade": 7,
@@ -8503,7 +8503,7 @@
   },
   {
     "id": "PHI-E006",
-    "stageId": "Asie_area8",
+    "stageId": "Asia_area8",
     "name": "カラバオビースト",
     "prefecture": "フィリピン",
     "grade": 7,
@@ -8523,7 +8523,7 @@
   },
   {
     "id": "PHI-E007",
-                      "stageId": "Asie_area8",
+                      "stageId": "Asia_area8",
                       "name": "ジープニゴーレム",
                       "prefecture": "フィリピン",
     "grade": 7,
@@ -8543,7 +8543,7 @@
   },
   {
     "id": "PHI-E008",
-    "stageId": "Asie_area8",
+    "stageId": "Asia_area8",
     "name": "シヌログダンサー",
     "prefecture": "フィリピン",
     "grade": 7,
@@ -8563,7 +8563,7 @@
   },
   {
     "id": "PHI-E009",
-                      "stageId": "Asie_area8",
+                      "stageId": "Asia_area8",
                       "name": "バロンクラッド",
                       "prefecture": "フィリピン",
     "grade": 7,
@@ -8583,7 +8583,7 @@
   },
   {
     "id": "PHI-E010",
-    "stageId": "Asie_area8",
+    "stageId": "Asia_area8",
     "name": "マヨンヴォルケーノロード",
     "prefecture": "フィリピン",
     "grade": 7,
@@ -8604,7 +8604,7 @@
   },
   {
     "id": "MMR-E001",
-                        "stageId": "Asie_area9",
+                        "stageId": "Asia_area9",
                         "name": "モヒンスープスライム",
                         "prefecture": "ミャンマー",
     "grade": 7,
@@ -8624,7 +8624,7 @@
   },
   {
     "id": "MMR-E002",
-                        "stageId": "Asie_area9",
+                        "stageId": "Asia_area9",
                         "name": "ラペフェアリー",
                         "prefecture": "ミャンマー",
     "grade": 7,
@@ -8644,7 +8644,7 @@
   },
   {
     "id": "MMR-E003",
-    "stageId": "Asie_area9",
+    "stageId": "Asia_area9",
     "name": "ココナッツバード",
     "prefecture": "モンゴル草原",
     "grade": 7,
@@ -8664,7 +8664,7 @@
   },
   {
     "id": "MMR-E004",
-                        "stageId": "Asie_area9",
+                        "stageId": "Asia_area9",
                         "name": "インレーオッタースピリット",
                         "prefecture": "ミャンマー",
     "grade": 7,
@@ -8684,7 +8684,7 @@
   },
   {
     "id": "MMR-E005",
-    "stageId": "Asie_area9",
+    "stageId": "Asia_area9",
     "name": "パゴダチャイルド",
     "prefecture": "モンゴル草原",
     "grade": 7,
@@ -8704,7 +8704,7 @@
   },
   {
     "id": "MMR-E006",
-                        "stageId": "Asie_area9",
+                        "stageId": "Asia_area9",
                         "name": "ルビードラゴン",
                         "prefecture": "ミャンマー",
     "grade": 7,
@@ -8724,7 +8724,7 @@
   },
   {
     "id": "MMR-E007",
-                        "stageId": "Asie_area9",
+                        "stageId": "Asia_area9",
                         "name": "カラウェイバード",
                         "prefecture": "ミャンマー",
     "grade": 7,
@@ -8744,7 +8744,7 @@
   },
   {
     "id": "MMR-E008",
-    "stageId": "Asie_area9",
+    "stageId": "Asia_area9",
     "name": "チャウッピンダンサー",
     "prefecture": "ミャンマー",
     "grade": 7,
@@ -8764,7 +8764,7 @@
   },
   {
     "id": "MMR-E009",
-                        "stageId": "Asie_area9",
+                        "stageId": "Asia_area9",
                         "name": "エーヤワディースピリット",
                         "prefecture": "ミャンマー",
     "grade": 7,
@@ -8784,7 +8784,7 @@
   },
   {
     "id": "MMR-E010",
-                        "stageId": "Asie_area9",
+                        "stageId": "Asia_area9",
                         "name": "バガンロード",
                         "prefecture": "ミャンマー",
     "grade": 7,
@@ -8804,7 +8804,7 @@
   },
   {
     "id": "MNG-E001",
-                        "stageId": "Asie_area10", 
+                        "stageId": "Asia_area10", 
                         "name": "ミルクティスライム",
                         "prefecture": "モンゴル",
     "grade": 7,
@@ -8824,7 +8824,7 @@
   },
   {
     "id": "MNG-E002",
-    "stageId": "Asie_area10", 
+    "stageId": "Asia_area10", 
                         "name": "ボーズフェアリー",
                         "prefecture": "モンゴル",
     "grade": 7,
@@ -8844,7 +8844,7 @@
   },
   {
     "id": "MNG-E003",
-                        "stageId": "Asie_area10", 
+                        "stageId": "Asia_area10", 
                         "name": "ゲルチャイルド",
                         "prefecture": "モンゴル",
     "grade": 7,
@@ -8864,7 +8864,7 @@
   },
   {
     "id": "MNG-E004",
-    "stageId": "Asie_area10",
+    "stageId": "Asia_area10",
     "name": "ヤクスピリット",
                         "prefecture": "モンゴル",
     "grade": 7,
@@ -8884,7 +8884,7 @@
   },
   {
     "id": "MNG-E005",
-                        "stageId": "Asie_area10", 
+                        "stageId": "Asia_area10", 
                         "name": "草原ウサギ",
                         "prefecture": "モンゴル",
     "grade": 7,
@@ -8904,7 +8904,7 @@
   },
   {
     "id": "MNG-E006",
-                        "stageId": "Asie_area10", 
+                        "stageId": "Asia_area10", 
                         "name": "モリンカンライダー",
                         "prefecture": "モンゴル",
     "grade": 7,
@@ -8924,7 +8924,7 @@
   },
   {
     "id": "MNG-E007",
-    "stageId": "Asie_area10",
+    "stageId": "Asia_area10",
     "name": "ファルコンウォリアー",
     "prefecture": "モンゴル",
     "grade": 7,
@@ -8944,7 +8944,7 @@
   },
   {
     "id": "MNG-E008",
-                        "stageId": "Asie_area10", 
+                        "stageId": "Asia_area10", 
                         "name": "ステップゴーレム",
                         "prefecture": "モンゴル",
     "grade": 7,
@@ -8964,7 +8964,7 @@
   },
   {
     "id": "MNG-E009",
-                        "stageId": "Asie_area10", 
+                        "stageId": "Asia_area10", 
                         "name": "テンゲリドラゴン",
                         "prefecture": "モンゴル",
     "grade": 7,
@@ -8984,7 +8984,7 @@
   },
   {
     "id": "MNG-E010",
-                        "stageId": "Asie_area10", 
+                        "stageId": "Asia_area10", 
                         "name": "チンギスロード",
                         "prefecture": "モンゴル",
     "grade": 7,

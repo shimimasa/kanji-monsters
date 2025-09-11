@@ -16,9 +16,9 @@ export class AudioManager {
     /** @type {number} 0.0–1.0 のマスターボリューム */
     #masterVolume = 1;
     /** @type {number} 0.0–1.0 のBGM個別音量 */
-    #bgmVolume = 0.7; // デフォルト値を0.7に設定
+    #bgmVolume = 0.2; // デフォルト値を0.7に設定
     /** @type {number} 0.0–1.0 のSE個別音量 */
-    #seVolume  = 0.7; // デフォルト値を0.7に設定
+    #seVolume  = 0.2; // デフォルト値を0.7に設定
 
     constructor() {
       // 初期化時にローカルストレージから音量設定を読み込む

@@ -540,7 +540,7 @@ export function drawStoneButton(ctx, button, isHovered, isPressed) {
 // ステージIDから学年を取得するヘルパー関数
 function getGradeFromStageId(stageId) {
   // 中学生ステージの場合
-  if (stageId.startsWith('Asie_')) return 12; // 4級
+  if (stageId.startsWith('Asia_')) return 12; // 4級
   if (stageId.startsWith('Europe_')) return 13; // 3級
   if (stageId.startsWith('America_')) return 14; // 準2級
   if (stageId.startsWith('Africa_')) return 15; // 2級

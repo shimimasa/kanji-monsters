@@ -298,7 +298,7 @@ export function getKanjiByStageId(stageId) {
   }
   
   // 中学生ステージの場合、学年に基づいて漢字プールを取得
-  if (normalizedId.startsWith('asie_')) {
+  if (normalizedId.startsWith('asia_')) {
     console.log('4級（grade 7）の漢字プールを使用します');
     return getKanjiByGrade(7);
   } else if (normalizedId.startsWith('europe_')) {
@@ -338,7 +338,7 @@ function getGradeFromStageId(stageId) {
   if (stageId.startsWith('chubu_')) return 4;
   if (stageId.startsWith('kinki_')) return 5;
   if (stageId.startsWith('chugoku_')) return 6;
-  if (stageId.startsWith('asie_')) return 7;
+  if (stageId.startsWith('asia_')) return 7;
   if (stageId.startsWith('europe_')) return 8;
   if (stageId.startsWith('america_')) return 9;
   if (stageId.startsWith('africa_')) return 10;
