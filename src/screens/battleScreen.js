@@ -976,8 +976,8 @@ updateShieldBreakEffect() {
 
       // 経験値表示の初期化（修正版）
       const player = gameState.playerStats;
-      const currentLevelExp = calculateExpForLevel(player.level);
-      const expInCurrentLevel = Math.max(0, player.exp - currentLevelExp);
+      const levelStartExp = getLevelStartExp(player.level);
+      const expInCurrentLevel = Math.max(0, player.exp - levelStartExp);
       this.playerExpDisplay = expInCurrentLevel;
       this.playerExpTarget = expInCurrentLevel;
       this.playerExpAnimating = false;
@@ -2630,16 +2630,14 @@ if (hh.visible) {
     const expBarH = 12;
   
     const player = gameState.playerStats;
-    const baseExp = calculateExpForLevel(player.level);
-    const nextBaseExp = calculateExpForLevel(player.level + 1);
+    const baseExp = getLevelStartExp(player.level);
+    const nextBaseExp = calculateExpForLevel(player.level); // そのレベル終了時
     const maxExpThisLevel = Math.max(1, nextBaseExp - baseExp);
-  
+
     // 表示用の現在EXP（このレベル内）
     const currentExpInLevel = Math.max(0, Math.min(maxExpThisLevel, this.playerExpDisplay || 0));
-  
-    // パーチメントに合う暖色の細いゲージ（枠・目盛りつき）
+
     drawExpBar(ctx, contentX, expBarY, contentW, expBarH, currentExpInLevel, maxExpThisLevel);
-  
     // 攻撃力表示（EXPバーのさらに下）
     const statsY = expBarY + expBarH + 12;
     this.drawTextWithOutline(
@@ -5094,8 +5092,8 @@ function drawExpBar(ctx, x, y, width, height, currentExp, maxExp) {
     ctx.fillStyle = gradient;
     ctx.fillRect(x, y, width * expRatio, height);
     
-    // アニメーション中は光るエフェクトを追加
-    if (battleScreenState.playerExpAnimating) {
+        // アニメーション中は光るエフェクトを追加
+      if (battleScreenState.playerExpAnimating && currentExp > 0) {
       // バーの先端に光るハイライト
       const glowWidth = 5;
       const glowX = x + (width * expRatio) - glowWidth;
@@ -5200,6 +5198,24 @@ function onAttackHandler() {
   }
   
 }
+
+
+function getLevelStartExp(level) {
+
+
+  const player = gameState.playerStats;
+  const levelStartExp = getLevelStartExp(player.level);
+  const expForBar = Math.max(0, player.exp - levelStartExp);
+
+  battleScreenState.playerExpTarget = expForBar;
+  battleScreenState.playerExpAnimating = true;
+  // 入力値の検証
+  if (!Number.isInteger(level) || level <= 1) return 0;
+  return calculateExpForLevel(level - 1);
+
+}
+
+
 
 function onHealHandler() {
     // 下部ヘルプ: かいふく
