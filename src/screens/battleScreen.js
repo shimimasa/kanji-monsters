@@ -4337,44 +4337,23 @@ setManagedTimeout(() => {
       const expGained = inBonus ? 0 : (gameState.currentEnemy.exp || 30);
 
       if (expGained > 0) {
-        // パーティクル → メッセージ（現状ロジック）
-        // 敵の位置（中心点）を計算
-        const enemyX = 480 + 240/2; // ex + ew/2
-        const enemyY = 80 + 120/2;  // ey + eh/2
-        
-        // プレイヤー経験値バーの位置を計算
-        // プレイヤーステータスパネルの経験値バーの位置を取得
-        const panelX = 20;
-        const panelY = battleScreenState.canvas.height - 120;
-        const expBarY = panelY + 25 + 35; // 経験値バーのY座標
-        const expBarX = panelX + 140; // 経験値バーの中央あたり
-        
-        // パーティクルエフェクトを開始
-        battleScreenState.startExpParticleEffect(
-          enemyX, enemyY, // 敵の位置（発生源）
-          expBarX, expBarY, // 経験値バーの位置（目標）
-          expGained // 獲得経験値
-        );
-        
-        // 経験値獲得メッセージを表示
-        battleState.log.push(`${expGained}の経験値を獲得した！`);
-        
-        setTimeout(() => {
-          // 経験値を加算して、レベルアップ判定＋EXPバー更新
-          const levelUpResult = updatePlayerExp(expGained);
 
-          if (levelUpResult.leveledUp) {
-            publish('playSE', 'levelUp');
-            battleState.log.push(`レベルが ${levelUpResult.newLevel} にあがった！`);
-            addToLog(`攻撃力が上がった！ HP最大値が増えた！`);
-            battleScreenState.showLogBlock([
-              `レベルが ${levelUpResult.newLevel} にあがった！`,
-              '攻撃力が上がった！ HP最大値が増えた！'
-            ]);
-            battleScreenState.startLevelUpEffect(120);
-          }
-        }, 1000);
-      }
+            // 経験値獲得メッセージを表示
+            battleState.log.push(`${expGained}の経験値を獲得した！`);
+        
+            // パーティクル無しで即EXPへ反映（バーが右へ伸びる）
+            const levelUpResult = updatePlayerExp(expGained);
+            if (levelUpResult.leveledUp) {
+              publish('playSE', 'levelUp');
+              battleState.log.push(`レベルが ${levelUpResult.newLevel} にあがった！`);
+              addToLog(`攻撃力が上がった！ HP最大値が増えた！`);
+              battleScreenState.showLogBlock([
+                `レベルが ${levelUpResult.newLevel} にあがった！`,
+                '攻撃力が上がった！ HP最大値が増えた！'
+              ]);
+              battleScreenState.startLevelUpEffect(120);
+            }
+           }
       
              // 敵が残っていれば次の敵をスポーン、最後の敵ならステージクリア待機
              if (gameState.currentEnemyIndex < gameState.enemies.length - 1) {
