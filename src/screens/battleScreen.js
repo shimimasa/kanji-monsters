@@ -974,13 +974,10 @@ updateShieldBreakEffect() {
       this.comboAnimation.scale = 1.0;
       this.comboAnimation.comboCount = 0;
 
-      // 経験値表示の初期化（修正版）
       const player = gameState.playerStats;
-      const levelStartExp = getLevelStartExp(player.level);
-      const expInCurrentLevel = Math.max(0, player.exp - levelStartExp);
-      this.playerExpDisplay = expInCurrentLevel;
-      this.playerExpTarget = expInCurrentLevel;
-      this.playerExpAnimating = false;
+            this.playerExpDisplay = player.exp;
+            this.playerExpTarget = player.exp;
+            this.playerExpAnimating = false;
 
       // ヒント初期化
       gameState.hintLevel = 0;
@@ -2630,14 +2627,14 @@ if (hh.visible) {
     const expBarH = 12;
   
     const player = gameState.playerStats;
-    const baseExp = getLevelStartExp(player.level);
-    const nextBaseExp = calculateExpForLevel(player.level); // そのレベル終了時
-    const maxExpThisLevel = Math.max(1, nextBaseExp - baseExp);
 
-    // 表示用の現在EXP（このレベル内）
-    const currentExpInLevel = Math.max(0, Math.min(maxExpThisLevel, this.playerExpDisplay || 0));
-
-    drawExpBar(ctx, contentX, expBarY, contentW, expBarH, currentExpInLevel, maxExpThisLevel);
+       const maxExpThisLevel = Math.max(1, player.nextLevelExp);
+       const currentExpInLevel = Math.max(
+         0,
+         Math.min(maxExpThisLevel, this.playerExpDisplay ?? player.exp)
+       );
+     
+        drawExpBar(ctx, contentX, expBarY, contentW, expBarH, currentExpInLevel, maxExpThisLevel);
     // 攻撃力表示（EXPバーのさらに下）
     const statsY = expBarY + expBarH + 12;
     this.drawTextWithOutline(
@@ -3093,19 +3090,21 @@ handleClick(e) {
     console.log(`ボタン[${key}] 座標(${btn.x},${btn.y},${btn.w},${btn.h}) ヒット:${isHit}`);
   });
   
-  // 「タイトルへ」ボタン押下時
-  if (isMouseOverRect(x, y, BTN.back)) {
-    console.log('「タイトルへ」ボタンがクリックされました');
-    publish('changeScreen', 'title');
-    return true;
-  }
+    // 「タイトルへ」ボタン押下時
+    if (isMouseOverRect(x, y, BTN.back)) {
+      console.log('「タイトルへ」ボタンがクリックされました');
+    publish('playBGM', 'title'); // 先にメニューBGMへ切替
+      publish('changeScreen', 'title');
+      return true;
+    }
   
-  // 「ステージ選択」ボタン押下時
-  if (isMouseOverRect(x, y, BTN.stage)) {
-    console.log('「ステージ選択」ボタンがクリックされました');
-    publish('changeScreen', 'stageSelect');
-    return true;
-  }
+    // 「ステージ選択」ボタン押下時
+    if (isMouseOverRect(x, y, BTN.stage)) {
+      console.log('「ステージ選択」ボタンがクリックされました');
+     publish('playBGM', 'title'); // メニュー共通BGMへ
+      publish('changeScreen', 'stageSelect');
+      return true;
+    }
   
   // 「こうげき」ボタン押下時
   if (isMouseOverRect(x, y, BTN.attack)) {
@@ -5160,12 +5159,10 @@ function updatePlayerExp(expGained) {
   // 既存の経験値加算処理
   const levelUpResult = addPlayerExp(expGained);
 
-  // 経験値バーアニメーションの設定（レベル開始EXP基準）
+  // 経験値バーアニメーションの設定（レベル内EXPをそのまま使用）
   const player = gameState.playerStats;
-  const levelStartExp = getLevelStartExp(player.level);
-  const expForBar = Math.max(0, player.exp - levelStartExp);
 
-  battleScreenState.playerExpTarget = expForBar;
+  battleScreenState.playerExpTarget = Math.max(0, player.exp);
   battleScreenState.playerExpAnimating = true;
 
   return levelUpResult;
