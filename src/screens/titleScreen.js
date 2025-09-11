@@ -73,8 +73,6 @@ const titleState = {
       this._drawWelcomeMessage(ctx, cw, ch);
     }
 
-    // 現在のゲームモード表示
-    this._drawCurrentGameMode(ctx, cw, ch);
 
     // ボタン描画
     this._drawFantasyButtons(ctx);
