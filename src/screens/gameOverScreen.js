@@ -69,11 +69,9 @@ const gameOverState = {
     if (m) {
       const grade = parseInt(m[1], 10);
       const clearedFights = Math.max(0, gameState.currentEnemyIndex); // 倒した数
-      const failXP = calcFailXP(grade, clearedFights);
-      if (failXP > 0) {
-        addPlayerExp(failXP);
-        console.log(`[学年ボーナス] 途中敗退報酬 +${failXP}XP（${clearedFights}体）`);
-      }
+      // 途中敗退報酬によるEXP付与は廃止（モンスター撃破時のみ付与）
+      // const failXP = calcFailXP(grade, clearedFights);
+      // if (failXP > 0) { addPlayerExp(failXP); }
     }
   },
   

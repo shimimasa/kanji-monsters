@@ -101,14 +101,10 @@ const resultWinState = {
 
       const result = calcBonusReward({ grade, fights, cleared, accuracyPct, remHpPct, firstClear });
 
-      // 一括で経験値付与
-      const { addPlayerExp } = await import('../core/gameState.js');
-      addPlayerExp(result.xp);
-
-      // 初回フラグ保存
+      // ステージクリア時のEXP付与は行わない（表示のみ）
       if (firstClear) markBonusFirstClear(grade);
 
-      this.bonusSummary = { grade, fights, accuracyPct, remHpPct, ...result };
+      this.bonusSummary = { grade, fights, accuracyPct, remHpPct, ...result, xp: 0 };
     }
     
     // イベントハンドラ登録
@@ -440,12 +436,11 @@ drawBonusResultPanel(ctx, x, y, width, height) {
   ctx.fillStyle = '#ffffff';
   ctx.fillText('学年ボーナス結果', x + width/2, y + 65);
 
-  // 本文
   const lines = [
     `連戦数: ${s.fights}`,
     `正答率: ${s.accuracyPct}% / 残HP: ${s.remHpPct}%`,
     `ランク: ${s.rank}（倍率 x${s.multiplier}）`,
-    `獲得EXP: ${s.xp}（内訳: base ${s.baseXP} / 初回 ${s.firstClearBonus}）`,
+    `ステージクリア時のEXP付与: なし`
   ];
   const tp = s.titleProgress;
   if (tp?.gained) {
