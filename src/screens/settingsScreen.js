@@ -531,7 +531,7 @@ const settingsScreenState = {
     alwaysLabel.innerHTML = `
       <input type="radio" name="enemyAttackMode" value="always" id="enemyAttack_always">
       <span class="radio-custom"></span>
-      通常（毎ターン攻撃）
+      ふつう（毎ターン攻撃）
     `;
 
     const mistakeOnlyLabel = document.createElement('label');
@@ -539,7 +539,7 @@ const settingsScreenState = {
     mistakeOnlyLabel.innerHTML = `
       <input type="radio" name="enemyAttackMode" value="onMistakeOnly" id="enemyAttack_onMistakeOnly">
       <span class="radio-custom"></span>
-      ミス時のみ攻撃
+      かんたん（ミス時のみ攻撃）
     `;
 
     radioContainer.appendChild(alwaysLabel);

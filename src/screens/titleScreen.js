@@ -260,47 +260,6 @@ const titleState = {
     ctx.restore();
   },
 
-  /** 現在のゲームモードを表示 */
-  _drawCurrentGameMode(ctx, cw, ch) {
-    // ローカルストレージからゲームモードを取得
-    const gameMode = localStorage.getItem('gameMode') || 'jikkuri';
-    const modeText = gameMode === 'jikkuri' ? 'じっくりモード' : 'チャレンジモード';
-    
-    // モード表示の背景
-    const modeX = cw / 2 - 100;
-    const modeY = ch * 0.55;
-    const modeWidth = 200;
-    const modeHeight = 30;
-    
-    // 小さな巻物風背景
-    ctx.save();
-    const modeGradient = ctx.createLinearGradient(modeX, modeY, modeX, modeY + modeHeight);
-    modeGradient.addColorStop(0, 'rgba(245, 222, 179, 0.9)');
-    modeGradient.addColorStop(0.5, 'rgba(222, 184, 135, 0.9)');
-    modeGradient.addColorStop(1, 'rgba(210, 180, 140, 0.9)');
-    
-    ctx.fillStyle = modeGradient;
-    ctx.fillRect(modeX, modeY, modeWidth, modeHeight);
-    
-    // 枠線
-    ctx.strokeStyle = '#8B4513';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(modeX, modeY, modeWidth, modeHeight);
-    
-    // モードテキスト
-    ctx.fillStyle = '#2F1B14';
-    ctx.font = '14px "UDデジタル教科書体", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`現在: ${modeText}`, cw / 2, modeY + modeHeight / 2);
-    
-    // 設定変更の案内
-    ctx.font = '10px "UDデジタル教科書体", sans-serif';
-    ctx.fillStyle = '#8B7355';
-    ctx.fillText('※設定画面でモードを変更できます', cw / 2, modeY + modeHeight + 15);
-    
-    ctx.restore();
-  },
 
   /** 巻物を描画 */
   _drawScroll(ctx, x, y, width, height) {
