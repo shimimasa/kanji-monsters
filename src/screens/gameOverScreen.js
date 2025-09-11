@@ -502,28 +502,34 @@ const gameOverState = {
     const x = coords.x;
     const y = coords.y;
     
-    // リトライボタン
-    if (isMouseOverRect(x, y, retryButton)) {
-      publish('playSE', 'decide');
-      // 同じステージを再挑戦
-      publish('changeScreen', gameState.currentStageId);
-    }
+        // リトライボタン
+        if (isMouseOverRect(x, y, retryButton)) {
+          publish('playSE', 'decide');
+          // 次のバトル画面がBGMを再生するので一旦停止（軽くフェード）
+          publish('stopBGM', 0.2);
+          // 同じステージを再挑戦
+          publish('changeScreen', gameState.currentStageId);
+        }
+        
+        // タイトルへボタン
+        if (isMouseOverRect(x, y, titleButton)) {
+          publish('playSE', 'decide');
+          // 画面遷移前にメニューBGMへ切替
+          publish('playBGM', 'title');
+          // タイトル画面へ戻る
+          publish('changeScreen', 'title');
+        }
     
-    // タイトルへボタン
-    if (isMouseOverRect(x, y, titleButton)) {
-      publish('playSE', 'decide');
-      // タイトル画面へ戻る
-      publish('changeScreen', 'title');
-    }
-
-    // ステージ選択へボタン
-    if (isMouseOverRect(x, y, stageSelectButton)) {
-      publish('playSE', 'decide');
-      // previousScreenに基づいて適切な画面に戻る
-      const targetScreen = gameState.previousScreen === 'worldStageSelect' ? 
-        'worldStageSelect' : 'stageSelect';
-      publish('changeScreen', targetScreen);
-    }
+        // ステージ選択へボタン
+        if (isMouseOverRect(x, y, stageSelectButton)) {
+          publish('playSE', 'decide');
+          // 画面遷移前にメニューBGMへ切替
+          publish('playBGM', 'title');
+          // previousScreenに基づいて適切な画面に戻る
+          const targetScreen = gameState.previousScreen === 'worldStageSelect' ? 
+            'worldStageSelect' : 'stageSelect';
+          publish('changeScreen', targetScreen);
+        }
   },
   
   render() {
