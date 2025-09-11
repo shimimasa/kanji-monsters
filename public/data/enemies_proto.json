@@ -6995,7 +6995,7 @@
     "catchphrase": "「海を揺るがす、深淵の大王！」"
   },
   {
-    "id": "CHU-E001",
+    "id": "CHN-E001",
       "stageId": "Asia_area1",
       "name": "ギョウザインプ",
       "prefecture": "中国",
@@ -7003,8 +7003,8 @@
     "level": 21,
     "maxHp": 355,
     "atk": 52,
-    "thumb": "CHU-E001.thumb",
-    "image": "CHU-E001.webp",
+    "thumb": "CHN-E001.thumb",
+    "image": "CHN-E001.webp",
     "isBoss": false,
     "exp": 807,
     "weakness": "onyomi",
@@ -7015,7 +7015,7 @@
     "catchphrase": "あつあつ皮の中に、秘密のパワー！"
   },
   {
-    "id": "CHU-E002",
+    "id": "CHN-E002",
     "stageId": "Asia_area1",
     "name": "パンダウォリアー",
     "prefecture": "中国",
@@ -7023,8 +7023,8 @@
     "level": 22,
     "maxHp": 360,
     "atk": 54,
-    "thumb": "CHU-E002.thumb",
-    "image": "CHU-E002.webp",
+    "thumb": "CHN-E002.thumb",
+    "image": "CHN-E002.webp",
     "isBoss": false,
     "exp": 840,
     "weakness": "kunyomi",
@@ -7035,7 +7035,7 @@
     "catchphrase": "のんびり強く、竹を武器に！"
   },
   {
-    "id": "CHU-E003",
+    "id": "CHN-E003",
     "stageId": "Asia_area1",
     "name": "チャティーフェアリー",
     "prefecture": "中国",
@@ -7043,8 +7043,8 @@
     "level": 23,
     "maxHp": 365,
     "atk": 56,
-    "thumb": "CHU-E003.thumb",
-    "image": "CHU-E003.webp",
+    "thumb": "CHN-E003.thumb",
+    "image": "CHN-E003.webp",
     "isBoss": false,
     "exp": 872,
     "weakness": "onyomi",
@@ -7055,7 +7055,7 @@
     "catchphrase": "香り立つ一服で心も癒やす！"
   },
   {
-    "id": "CHU-E004",
+    "id": "CHN-E004",
     "stageId": "Asia_area1",
     "name": "ロータスゴースト",
     "prefecture": "中国",
@@ -7063,8 +7063,8 @@
     "level": 24,
     "maxHp": 370,
     "atk": 58,
-    "thumb": "CHU-E004.thumb",
-    "image": "CHU-E004.webp",
+    "thumb": "CHN-E004.thumb",
+    "image": "CHN-E004.webp",
     "isBoss": false,
     "exp": 905,
     "weakness": "onyomi",
@@ -7075,7 +7075,7 @@
     "catchphrase": "水面に咲く、神秘の花霊！"
   },
   {
-    "id": "CHU-E005",
+    "id": "CHN-E005",
     "stageId": "Asia_area1",
     "name": "シルクロードビートル",
     "prefecture": "中国",
@@ -7083,8 +7083,8 @@
     "level": 20,
     "maxHp": 375,
     "atk": 60,
-    "thumb": "CHU-E005.thumb",
-    "image": "CHU-E005.webp",
+    "thumb": "CHN-E005.thumb",
+    "image": "CHN-E005.webp",
     "isBoss": false,
     "exp": 787,
     "weakness": "kunyomi",
@@ -7095,7 +7095,7 @@
     "catchphrase": "砂を越え、交易を守る甲虫！"
   },
   {
-    "id": "CHU-E006",
+    "id": "CHN-E006",
     "stageId": "Asia_area1",
     "name": "ファンマスクピエロ",
     "prefecture": "中国",
@@ -7103,8 +7103,8 @@
     "level": 21,
     "maxHp": 380,
     "atk": 62,
-    "thumb": "CHU-E006.thumb",
-    "image": "CHU-E006.webp",
+    "thumb": "CHN-E006.thumb",
+    "image": "CHN-E006.webp",
     "isBoss": false,
     "exp": 820,
     "weakness": "onyomi",
@@ -7115,7 +7115,7 @@
     "catchphrase": "仮面の色で心を揺さぶる！"
   },
   {
-    "id": "CHU-E007",
+    "id": "CHN-E007",
     "stageId": "Asia_area1",
     "name": "兵馬俑ガーディアン",
     "prefecture": "中国",
@@ -7123,8 +7123,8 @@
     "level": 22,
     "maxHp": 385,
     "atk": 64,
-    "thumb": "CHU-E007.thumb",
-    "image": "CHU-E007.webp",
+    "thumb": "CHN-E007.thumb",
+    "image": "CHN-E007.webp",
     "isBoss": false,
     "exp": 852,
     "weakness": "onyomi",
@@ -7135,7 +7135,7 @@
     "catchphrase": "古代の力を感じる、兵馬俑のエール！"
   },
   {
-    "id": "CHU-E008",
+    "id": "CHN-E008",
     "stageId": "Asia_area1",
     "name": "火鍋ゴーレム",
     "prefecture": "中国",
@@ -7143,8 +7143,8 @@
     "level": 23,
     "maxHp": 390,
     "atk": 50,
-    "thumb": "CHU-E008.thumb",
-    "image": "CHU-E008.webp",
+    "thumb": "CHN-E008.thumb",
+    "image": "CHN-E008.webp",
     "isBoss": false,
     "exp": 885,
     "weakness": "kunyomi",
@@ -7155,7 +7155,7 @@
     "catchphrase": "煮えたぎる辛さで熱烈歓迎！"
   },
   {
-    "id": "CHU-E009",
+    "id": "CHN-E009",
     "stageId": "Asia_area1",
     "name": "ドラゴンダンサー",
     "prefecture": "中国",
@@ -7163,8 +7163,8 @@
     "level": 24,
     "maxHp": 395,
     "atk": 52,
-    "thumb": "CHU-E009_thumb",
-    "image": "CHU-E009.webp",
+    "thumb": "CHN-E009.thumb",
+    "image": "CHN-E009.webp",
     "isBoss": false,
     "exp": 917,
     "weakness": "onyomi",
@@ -7175,7 +7175,7 @@
     "catchphrase": "舞え、祝福の龍！"
   },
   {
-    "id": "CHU-E010",
+    "id": "CHN-E010",
     "stageId": "Asia_area1",
     "name": "長城コロッサス",
     "prefecture": "中国",
@@ -7183,8 +7183,8 @@
     "level": 20,
     "maxHp": 350,
     "atk": 54,
-    "thumb": "CHU-E010.thumb",
-    "image": "CHU-E010.webp",
+    "thumb": "CHN-E010.thumb",
+    "image": "CHN-E010.webp",
     "isBoss": true,
     "shieldHp": 3,
     "exp": 775,
@@ -7799,7 +7799,7 @@
     "catchphrase": "山は目覚め、天空は揺れる！"
   },
   {
-    "id": "KOR-E001",
+    "id": "KNK-E001",
     "stageId": "Asia_area5",
     "name": "キムチスライム",
     "prefecture": "韓国",
@@ -7807,8 +7807,8 @@
     "level": 21,
     "maxHp": 355,
     "atk": 52,
-    "thumb": "KOR-E001.thumb",
-    "image": "KOR-E001.webp",
+    "thumb": "KNK-E001.thumb",
+    "image": "KNK-E001.webp",
     "isBoss": false,
     "exp": 807,
     "weakness": "onyomi",
@@ -7819,7 +7819,7 @@
                     "catchphrase": "発酵パワーで酸っぱく攻める！"
   },
   {
-    "id": "KOR-E002",
+    "id": "KNK-E002",
     "stageId": "Asia_area5",
     "name": "トッポッキファイター",
     "prefecture": "韓国",
@@ -7827,8 +7827,8 @@
     "level": 22,
     "maxHp": 360,
     "atk": 54,
-    "thumb": "KOR-E002.thumb",
-    "image": "KOR-E002.webp",
+    "thumb": "KNK-E002.thumb",
+    "image": "KNK-E002.webp",
     "isBoss": false,
     "exp": 840,
     "weakness": "kunyomi",
@@ -7839,7 +7839,7 @@
     "catchphrase": "モチっと辛口、一直線！"
   },
   {
-    "id": "KOR-E003",
+    "id": "KNK-E003",
                     "stageId": "Asia_area5",
                     "name": "タンチョウバード",
                     "prefecture": "韓国",
@@ -7847,8 +7847,8 @@
     "level": 23,
     "maxHp": 365,
     "atk": 56,
-    "thumb": "KOR-E003.thumb",
-    "image": "KOR-E003.webp",
+    "thumb": "KNK-E003.thumb",
+    "image": "KNK-E003.webp",
     "isBoss": false,
     "exp": 872,
     "weakness": "onyomi",
@@ -7859,7 +7859,7 @@
     "catchphrase": "舞い降りる吉兆の翼！"
   },
   {
-    "id": "KOR-E004",
+    "id": "KNK-E004",
                     "stageId": "Asia_area5",
                     "name": "コリアンタイガー",
                     "prefecture": "韓国",
@@ -7867,8 +7867,8 @@
     "level": 24,
     "maxHp": 370,
     "atk": 58,
-    "thumb": "KOR-E004.thumb",
-    "image": "KOR-E004.webp",
+    "thumb": "KNK-E004.thumb",
+    "image": "KNK-E004.webp",
     "isBoss": false,
     "exp": 905,
     "weakness": "onyomi",
@@ -7879,7 +7879,7 @@
     "catchphrase": "咆哮一閃、山の王！"
   },
   {
-    "id": "KOR-E005",
+      "id": "KNK-E005",
                     "stageId": "Asia_area5",
                     "name": "韓紙ペーパーシェード",
                     "prefecture": "韓国",
@@ -7887,8 +7887,8 @@
     "level": 20,
     "maxHp": 375,
     "atk": 60,
-    "thumb": "KOR-E005.thumb",
-    "image": "KOR-E005.webp",
+    "thumb": "KNK-E005.thumb",
+    "image": "KNK-E005.webp",
     "isBoss": false,
     "exp": 787,
     "weakness": "kunyomi",
@@ -7899,7 +7899,7 @@
     "catchphrase": "紙の力で未来を包む！"
   },
   {
-    "id": "KOR-E006",
+    "id": "KNK-E006",
                     "stageId": "Asia_area5",
                     "name": "サムギョプサルスピリット",
                     "prefecture": "韓国",
@@ -7907,8 +7907,8 @@
     "level": 21,
     "maxHp": 380,
     "atk": 62,
-    "thumb": "KOR-E006.thumb",
-    "image": "KOR-E006.webp",
+    "thumb": "KNK-E006.thumb",
+    "image": "KNK-E006.webp",
     "isBoss": false,
     "exp": 820,
     "weakness": "kunyomi",
@@ -7919,7 +7919,7 @@
     "catchphrase": "香ばしさで心を焼く！"
   },
   {
-    "id": "KOR-E007",
+    "id": "KNK-E007",
                     "stageId": "Asia_area5",
                     "name": "テコンドーゴーレム",
                     "prefecture": "韓国",
@@ -7927,8 +7927,8 @@
     "level": 22,
     "maxHp": 385,
     "atk": 64,
-    "thumb": "KOR-E007.thumb",
-    "image": "KOR-E007.webp",
+    "thumb": "KNK-E007.thumb",
+    "image": "KNK-E007.webp",
     "isBoss": false,
     "exp": 852,
     "weakness": "onyomi",
@@ -7939,7 +7939,7 @@
                     "catchphrase": "一撃必蹴、道場の守護者！"
   },
   {
-    "id": "KOR-E008",
+    "id": "KNK-E008",
     "stageId": "Asia_area5",
     "name": "タルチュムゴースト",
     "prefecture": "韓国",
@@ -7947,8 +7947,8 @@
     "level": 23,
     "maxHp": 390,
     "atk": 50,
-    "thumb": "KOR-E008.thumb",
-    "image": "KOR-E008.webp",
+    "thumb": "KNK-E008.thumb",
+    "image": "KNK-E008.webp",
     "isBoss": false,
     "exp": 885,
     "weakness": "kunyomi",
@@ -7959,7 +7959,7 @@
     "catchphrase": "笑いと怒り、舞で裁く！"
   },
   {
-    "id": "KOR-E009",
+    "id": "KNK-E009",
                     "stageId": "Asia_area5",
                     "name": "クミホ",
                     "prefecture": "韓国",
@@ -7967,8 +7967,8 @@
     "level": 24,
     "maxHp": 395,
     "atk": 52,
-    "thumb": "KOR-E009.thumb",
-    "image": "KOR-E009.webp",
+    "thumb": "KNK-E009.thumb",
+    "image": "KNK-E009.webp",
     "isBoss": false,
     "exp": 917,
     "weakness": "kunyomi",
@@ -7979,7 +7979,7 @@
     "catchphrase": "九つの尾で影を操る！"
   },
   {
-    "id": "KOR-E010",
+    "id": "KNK-E010",
                     "stageId": "Asia_area5",
                     "name": "白頭山ドラゴン",
                     "prefecture": "韓国",
@@ -7987,8 +7987,8 @@
     "level": 20,
     "maxHp": 350,
     "atk": 54,
-    "thumb": "KOR-E010.thumb",
-      "image": "KOR-E010.webp",
+      "thumb": "KNK-E010.thumb",
+      "image": "KNK-E010.webp",
     "isBoss": true,
     "shieldHp": 3,
     "exp": 775,
@@ -8000,7 +8000,7 @@
     "catchphrase": "山と湖が呼ぶ天地の龍！"
   },
   {
-    "id": "THA-E001",
+    "id": "TAI-E001",
                       "stageId": "Asia_area6",
                       "name": "トムヤムスライム",
                       "prefecture": "タイ",
@@ -8008,8 +8008,8 @@
     "level": 21,
     "maxHp": 355,
     "atk": 56,
-    "thumb": "THA-E001.thumb",
-    "image": "THA-E001.webp",
+    "thumb": "TAI-E001.thumb",
+    "image": "TAI-E001.webp",
     "isBoss": false,
     "exp": 807,
     "weakness": "onyomi",
@@ -8020,7 +8020,7 @@
     "catchphrase": "熱々スープで敵もとろける！"
   },
   {
-    "id": "THA-E002",
+    "id": "TAI-E002",
                       "stageId": "Asia_area6",
                       "name": "パッタイスピリット",
                       "prefecture": "タイ",
@@ -8028,8 +8028,8 @@
     "level": 22,
     "maxHp": 360,
     "atk": 58,
-    "thumb": "THA-E002.thumb",
-    "image": "THA-E002.webp",
+    "thumb": "TAI-E002.thumb",
+    "image": "TAI-E002.webp",
     "isBoss": false,
     "exp": 840,
     "weakness": "kunyomi",
@@ -8040,7 +8040,7 @@
     "catchphrase": "跳ねろ麺！香ばしい炎で決める！"
   },
   {
-    "id": "THA-E003",
+    "id": "TAI-E003",
                       "stageId": "Asia_area6",
                       "name": "マンゴーゴーレム",
                       "prefecture": "タイ",
@@ -8048,8 +8048,8 @@
     "level": 23,
     "maxHp": 365,
     "atk": 60,
-    "thumb": "THA-E003.thumb",
-    "image": "THA-E003.webp",
+    "thumb": "TAI-E003.thumb",
+    "image": "TAI-E003.webp",
     "isBoss": false,
     "exp": 872,
     "weakness": "kunyomi",
@@ -8060,7 +8060,7 @@
                       "catchphrase": "甘さで癒す、黄金の守護者！"
   },
   {
-    "id": "THA-E004",
+    "id": "TAI-E004",
     "stageId": "Asia_area6",
     "name": "タイエレファントビースト",
     "prefecture": "タイ",
@@ -8068,8 +8068,8 @@
     "level": 24,
     "maxHp": 370,
     "atk": 62,
-    "thumb": "THA-E004.thumb",
-    "image": "THA-E004.webp",
+    "thumb": "TAI-E004.thumb",
+    "image": "TAI-E004.webp",
     "isBoss": false,
     "exp": 905,
     "weakness": "onyomi",
@@ -8080,7 +8080,7 @@
     "catchphrase": "大地を震わす聖獣の咆哮！"
   },
   {
-    "id": "THA-E005",
+    "id": "TAI-E005",
                       "stageId": "Asia_area6",
                       "name": "コブラサーペント",
                       "prefecture": "タイ",
@@ -8088,8 +8088,8 @@
     "level": 20,
     "maxHp": 375,
     "atk": 64,
-    "thumb": "THA-E005.thumb",
-    "image": "THA-E005.webp",
+    "thumb": "TAI-E005.thumb",
+    "image": "TAI-E005.webp",
     "isBoss": false,
     "exp": 787,
     "weakness": "kunyomi",
@@ -8100,7 +8100,7 @@
     "catchphrase": "毒と影で相手を圧倒！"
   },
   {
-    "id": "THA-E006",
+    "id": "TAI-E006",
                       "stageId": "Asia_area6",
                       "name": "ロータスシェード",
                       "prefecture": "タイ",
@@ -8108,8 +8108,8 @@
     "level": 21,
     "maxHp": 380,
     "atk": 50,
-    "thumb": "THA-E006_thumb",
-    "image": "THA-E006.webp",
+    "thumb": "TAI-E006.thumb",
+    "image": "TAI-E006.webp",
     "isBoss": false,
     "exp": 820,
     "weakness": "kunyomi",
@@ -8120,7 +8120,7 @@
     "catchphrase": "光と影、蓮は道を照らす！"
   },
   {
-    "id": "THA-E007",
+    "id": "TAI-E007",
                       "stageId": "Asia_area6",
                       "name": "ムエタイウォリアー",
                       "prefecture": "タイ",
@@ -8128,8 +8128,8 @@
     "level": 22,
     "maxHp": 385,
     "atk": 52,
-    "thumb": "THA-E007_thumb",
-    "image": "THA-E007.webp",
+    "thumb": "TAI-E007.thumb",
+    "image": "TAI-E007.webp",
     "isBoss": false,
     "exp": 852,
     "weakness": "onyomi",
@@ -8140,7 +8140,7 @@
     "catchphrase": "一撃必殺、衝撃の蹴り！"
   },
   {
-    "id": "THA-E008",
+    "id": "TAI-E008",
                       "stageId": "Asia_area6",
                       "name": "アユタヤゴーレム",
                       "prefecture": "タイ",
@@ -8148,8 +8148,8 @@
     "level": 23,
     "maxHp": 390,
     "atk": 54,
-    "thumb": "THA-E008_thumb",
-    "image": "THA-E008.webp",
+    "thumb": "TAI-E008.thumb",
+    "image": "TAI-E008.webp",
     "isBoss": false,
     "exp": 885,
     "weakness": "kunyomi",
@@ -8160,7 +8160,7 @@
     "catchphrase": "古代の拳、今も響く！"
   },
   {
-    "id": "THA-E009",
+    "id": "TAI-E009",
                       "stageId": "Asia_area6",
                       "name": "ナーガ・ミラージュ",
                       "prefecture": "タイ",
@@ -8168,8 +8168,8 @@
     "level": 24,
     "maxHp": 395,
     "atk": 56,
-    "thumb": "THA-E009_thumb",
-    "image": "THA-E009.webp",
+    "thumb": "TAI-E009.thumb",
+    "image": "TAI-E009.webp",
     "isBoss": false,
     "exp": 917,
     "weakness": "meaning",
@@ -8180,7 +8180,7 @@
     "catchphrase": "水幻の影、千の蛇が舞う！"
   },
   {
-    "id": "THA-E010",
+    "id": "TAI-E010",
                       "stageId": "Asia_area6",
                       "name": "ハヌマーンロード",
                       "prefecture": "タイ",
@@ -8188,8 +8188,8 @@
     "level": 20,
     "maxHp": 350,
     "atk": 58,
-    "thumb": "THA-E010_thumb",
-    "image": "THA-E010.webp",
+    "thumb": "TAI-E010.thumb",
+    "image": "TAI-E010.webp",
     "isBoss": true,
     "shieldHp": 3,
     "exp": 775,
@@ -8201,7 +8201,7 @@
                       "catchphrase": "天空を駆ける白き将軍！"
   },
   {
-    "id": "VNM-E001",
+    "id": "BTN-E001",
                       "stageId": "Asia_area7",
                       "name": "フォースライム",
                       "prefecture": "ベトナム",
@@ -8209,8 +8209,8 @@
     "level": 21,
     "maxHp": 355,
     "atk": 60,
-    "thumb": "VNM-E001.thumb",
-    "image": "VNM-E001.webp",
+    "thumb": "BTN-E001.thumb",
+    "image": "BTN-E001.webp",
     "isBoss": false,
     "exp": 807,
     "weakness": "onyomi",
@@ -8221,7 +8221,7 @@
                       "catchphrase": "香草の香りで相手もとろける！"
   },
   {
-    "id": "VNM-E002",
+    "id": "BTN-E002",
     "stageId": "Asia_area7",
     "name": "バインミーゴーレム",
     "prefecture": "ベトナム",
@@ -8229,8 +8229,8 @@
     "level": 22,
     "maxHp": 360,
     "atk": 62,
-    "thumb": "VNM-E002.thumb",
-    "image": "VNM-E002.webp",
+    "thumb": "BTN-E002.thumb",
+    "image": "BTN-E002.webp",
     "isBoss": false,
     "exp": 840,
     "weakness": "kunyomi",
@@ -8241,7 +8241,7 @@
                       "catchphrase": "カリッと決める一撃サンド！"
   },
   {
-    "id": "VNM-E003",
+    "id": "BTN-E003",
     "stageId": "Asia_area7",
     "name": "ネムローラー",
     "prefecture": "ベトナム",
@@ -8249,8 +8249,8 @@
     "level": 23,
     "maxHp": 365,
     "atk": 64,
-    "thumb": "VNM-E003.thumb",
-    "image": "VNM-E003.webp",
+    "thumb": "BTN-E003.thumb",
+    "image": "BTN-E003.webp",
     "isBoss": false,
     "exp": 872,
     "weakness": "kunyomi",
@@ -8261,7 +8261,7 @@
     "catchphrase": "転がる香ばしさ、止まらない！"
   },
   {
-    "id": "VNM-E004",
+    "id": "BTN-E004",
                       "stageId": "Asia_area7",
                       "name": "バッファロービースト",
                       "prefecture": "ベトナム",
@@ -8269,8 +8269,8 @@
     "level": 24,
     "maxHp": 370,
     "atk": 50,
-    "thumb": "VNM-E004.thumb",
-    "image": "VNM-E004.webp",
+    "thumb": "BTN-E004.thumb",
+    "image": "BTN-E004.webp",
     "isBoss": false,
     "exp": 905,
     "weakness": "onyomi",
@@ -8281,7 +8281,7 @@
                       "catchphrase": "角で耕す、大地の守護獣！"
   },
   {
-    "id": "VNM-E005",
+    "id": "BTN-E005",
     "stageId": "Asia_area7",
     "name": "竹スピリット",
     "prefecture": "ベトナム",
@@ -8289,8 +8289,8 @@
     "level": 20,
     "maxHp": 375,
     "atk": 52,
-    "thumb": "VNM-E005.thumb",
-    "image": "VNM-E005.webp",
+    "thumb": "BTN-E005.thumb",
+    "image": "BTN-E005.webp",
     "isBoss": false,
     "exp": 787,
     "weakness": "kunyomi",
@@ -8301,7 +8301,7 @@
     "catchphrase": "しなやかなる竹の舞！"
   },
   {
-    "id": "VNM-E006",
+    "id": "BTN-E006",
                       "stageId": "Asia_area7",
                       "name": "蓮フラワーシャード",
                       "prefecture": "ベトナム",
@@ -8309,8 +8309,8 @@
     "level": 21,
     "maxHp": 380,
     "atk": 54,
-    "thumb": "VNM-E006.thumb",
-    "image": "VNM-E006.webp",
+    "thumb": "BTN-E006.thumb",
+    "image": "BTN-E006.webp",
     "isBoss": false,
     "exp": 820,
     "weakness": "meaning",
@@ -8321,7 +8321,7 @@
     "catchphrase": "蓮の光で清めの一撃！"
   },
   {
-    "id": "VNM-E007",
+    "id": "BTN-E007",
                       "stageId": "Asia_area7",
                       "name": "ノンラーシェード",
                       "prefecture": "ベトナム",
@@ -8329,8 +8329,8 @@
     "level": 22,
     "maxHp": 385,
     "atk": 56,
-    "thumb": "VNM-E007.thumb",
-    "image": "VNM-E007.webp",
+    "thumb": "BTN-E007.thumb",
+    "image": "BTN-E007.webp",
     "isBoss": false,
     "exp": 852,
     "weakness": "onyomi",
@@ -8341,7 +8341,7 @@
     "catchphrase": "風に舞う、影の笠！"
   },
   {
-    "id": "VNM-E008",
+    "id": "BTN-E008",
                       "stageId": "Asia_area7",
                       "name": "フエガード",
                       "prefecture": "ベトナム",
@@ -8349,8 +8349,8 @@
     "level": 23,
     "maxHp": 390,
     "atk": 58,
-    "thumb": "VNM-E008.thumb",
-    "image": "VNM-E008.webp",
+    "thumb": "BTN-E008.thumb",
+    "image": "BTN-E008.webp",
     "isBoss": false,
     "exp": 885,
     "weakness": "kunyomi",
@@ -8361,7 +8361,7 @@
     "catchphrase": "王都を守る不滅の守護！"
   },
   {
-    "id": "VNM-E009",
+    "id": "BTN-E009",
                       "stageId": "Asia_area7",
                       "name": "ホアンキエムタートル",
                       "prefecture": "ベトナム",
@@ -8369,8 +8369,8 @@
     "level": 24,
     "maxHp": 395,
     "atk": 60,
-    "thumb": "VNM-E009.thumb",
-    "image": "VNM-E009.webp",
+    "thumb": "BTN-E009.thumb",
+    "image": "BTN-E009.webp",
     "isBoss": false,
     "exp": 917,
     "weakness": "meaning",
@@ -8381,7 +8381,7 @@
     "catchphrase": "甲羅に宿る、伝説の力！"
   },
   {
-    "id": "VNM-E010",
+    "id": "BTN-E010",
                       "stageId": "Asia_area7",
                       "name": "ドラムタイタン",
                       "prefecture": "ベトナム",
@@ -8389,8 +8389,8 @@
     "level": 20,
     "maxHp": 350,
     "atk": 62,
-    "thumb": "VNM-E010.thumb",
-    "image": "VNM-E010.webp",
+    "thumb": "BTN-E010.thumb",
+    "image": "BTN-E010.webp",
     "isBoss": true,
     "shieldHp": 3,
     "exp": 775,
@@ -8402,7 +8402,7 @@
     "catchphrase": "大地を震わす、雷鳴の鼓動！"
   },
   {
-    "id": "PHI-E001",
+    "id": "FIP-E001",
                       "stageId": "Asia_area8",
                       "name": "アドボスライム",
                       "prefecture": "フィリピン",
@@ -8410,8 +8410,8 @@
     "level": 21,
     "maxHp": 355,
     "atk": 64,
-    "thumb": "PHI-E001.thumb",
-    "image": "PHI-E001.webp",
+    "thumb": "FIP-E001.thumb",
+    "image": "FIP-E001.webp",
     "isBoss": false,
     "exp": 807,
     "weakness": "onyomi",
@@ -8422,7 +8422,7 @@
                       "catchphrase": "こくうまボディでとろけ攻撃！"
   },
   {
-    "id": "PHI-E002",
+    "id": "FIP-E002",
     "stageId": "Asia_area8",
     "name": "ハロハロゴースト",
     "prefecture": "フィリピン",
@@ -8430,8 +8430,8 @@
     "level": 22,
     "maxHp": 360,
     "atk": 50,
-    "thumb": "PHI-E002.thumb",
-    "image": "PHI-E002.webp",
+    "thumb": "FIP-E002.thumb",
+    "image": "FIP-E002.webp",
     "isBoss": false,
     "exp": 840,
     "weakness": "kunyomi",
@@ -8442,7 +8442,7 @@
                       "catchphrase": "ひんやりカラフルゴースト！"
   },
   {
-    "id": "PHI-E003",
+    "id": "FIP-E003",
     "stageId": "Asia_area8",
     "name": "バナナリーフインプ",
     "prefecture": "フィリピン",
@@ -8450,8 +8450,8 @@
     "level": 23,
     "maxHp": 365,
     "atk": 52,
-    "thumb": "PHI-E003.thumb",
-    "image": "PHI-E003.webp",
+    "thumb": "FIP-E003.thumb",
+    "image": "FIP-E003.webp",
     "isBoss": false,
     "exp": 872,
     "weakness": "kunyomi",
@@ -8462,7 +8462,7 @@
                       "catchphrase": "ぴょんぴょん跳ねる葉っぱのいたずらっ子！"
   },
   {
-    "id": "PHI-E004",
+    "id": "FIP-E004",
     "stageId": "Asia_area8",
     "name": "ココナッツスピリット",
     "prefecture": "フィリピン",
@@ -8470,8 +8470,8 @@
     "level": 24,
     "maxHp": 370,
     "atk": 54,
-    "thumb": "PHI-E004.thumb",
-    "image": "PHI-E004.webp",
+    "thumb": "FIP-E004.thumb",
+    "image": "FIP-E004.webp",
     "isBoss": false,
     "exp": 905,
     "weakness": "onyomi",
@@ -8482,7 +8482,7 @@
                       "catchphrase": "コココっと殻でガード！"
   },
   {
-    "id": "PHI-E005",
+    "id": "FIP-E005",
     "stageId": "Asia_area8",
     "name": "タホフェアリー",
     "prefecture": "フィリピン",
@@ -8490,8 +8490,8 @@
     "level": 20,
     "maxHp": 375,
     "atk": 56,
-    "thumb": "PHI-E005.thumb",
-    "image": "PHI-E005.webp",
+    "thumb": "FIP-E005.thumb",
+    "image": "FIP-E005.webp",
     "isBoss": false,
     "exp": 787,
     "weakness": "kunyomi",
@@ -8502,7 +8502,7 @@
                       "catchphrase": "ふんわりあま〜い小さな癒し手！"
   },
   {
-    "id": "PHI-E006",
+    "id": "FIP-E006",
     "stageId": "Asia_area8",
     "name": "カラバオビースト",
     "prefecture": "フィリピン",
@@ -8510,8 +8510,8 @@
     "level": 21,
     "maxHp": 380,
     "atk": 58,
-    "thumb": "PHI-E006.thumb",
-    "image": "PHI-E006.webp",
+    "thumb": "FIP-E006.thumb",
+    "image": "FIP-E006.webp",
     "isBoss": false,
     "exp": 820,
     "weakness": "onyomi",
@@ -8522,7 +8522,7 @@
     "catchphrase": "角で大地を切り開く農耕の守護獣！"
   },
   {
-    "id": "PHI-E007",
+    "id": "FIP-E007",
                       "stageId": "Asia_area8",
                       "name": "ジープニゴーレム",
                       "prefecture": "フィリピン",
@@ -8530,8 +8530,8 @@
     "level": 22,
     "maxHp": 385,
     "atk": 60,
-    "thumb": "PHI-E007.thumb",
-    "image": "PHI-E007.webp",
+    "thumb": "FIP-E007.thumb",
+    "image": "FIP-E007.webp",
     "isBoss": false,
     "exp": 852,
     "weakness": "onyomi",
@@ -8542,7 +8542,7 @@
                       "catchphrase": "派手な装甲でド派手に突進！"
   },
   {
-    "id": "PHI-E008",
+    "id": "FIP-E008",
     "stageId": "Asia_area8",
     "name": "シヌログダンサー",
     "prefecture": "フィリピン",
@@ -8550,8 +8550,8 @@
     "level": 23,
     "maxHp": 390,
     "atk": 62,
-    "thumb": "PHI-E008.thumb",
-    "image": "PHI-E008.webp",
+    "thumb": "FIP-E008.thumb",
+    "image": "FIP-E008.webp",
     "isBoss": false,
     "exp": 885,
     "weakness": "kunyomi",
@@ -8562,7 +8562,7 @@
                       "catchphrase": "炎の舞で観客も敵も魅了する！"
   },
   {
-    "id": "PHI-E009",
+    "id": "FIP-E009",
                       "stageId": "Asia_area8",
                       "name": "バロンクラッド",
                       "prefecture": "フィリピン",
@@ -8570,8 +8570,8 @@
     "level": 24,
     "maxHp": 395,
     "atk": 64,
-    "thumb": "PHI-E009.thumb",
-    "image": "PHI-E009.webp",
+    "thumb": "FIP-E009.thumb",
+    "image": "FIP-E009.webp",
     "isBoss": false,
     "exp": 917,
     "weakness": "kunyomi",
@@ -8582,7 +8582,7 @@
                       "catchphrase": "優雅なる布が守護の鎧に！"
   },
   {
-    "id": "PHI-E010",
+    "id": "FIP-E010",
     "stageId": "Asia_area8",
     "name": "マヨンヴォルケーノロード",
     "prefecture": "フィリピン",
@@ -8590,8 +8590,8 @@
     "level": 20,
     "maxHp": 350,
     "atk": 50,
-    "thumb": "PHI-E010.thumb",
-    "image": "PHI-E010.webp",
+    "thumb": "FIP-E010.thumb",
+    "image": "FIP-E010.webp",
     "isBoss": true,
     "shieldHp": 3,
     "exp": 775,
@@ -8603,7 +8603,7 @@
                       "catchphrase": "炎と溶岩で大地を支配する火山の王！"
   },
   {
-    "id": "MMR-E001",
+    "id": "MYM-E001",
                         "stageId": "Asia_area9",
                         "name": "モヒンスープスライム",
                         "prefecture": "ミャンマー",
@@ -8611,8 +8611,8 @@
     "level": 21,
     "maxHp": 355,
     "atk": 52,
-    "thumb": "MMR-E001.thumb",
-    "image": "MMR-E001.webp",
+    "thumb": "MYM-E001.thumb",
+    "image": "MYM-E001.webp",
     "isBoss": false,
     "exp": 807,
     "weakness": "onyomi",
@@ -8623,7 +8623,7 @@
     "catchphrase": "ぷるぷる麺であったか攻撃！"
   },
   {
-    "id": "MMR-E002",
+    "id": "MYM-E002",
                         "stageId": "Asia_area9",
                         "name": "ラペフェアリー",
                         "prefecture": "ミャンマー",
@@ -8631,8 +8631,8 @@
     "level": 22,
     "maxHp": 360,
     "atk": 54,
-    "thumb": "MMR-E002.thumb",
-    "image": "MMR-E002.webp",
+    "thumb": "MYM-E002.thumb",
+    "image": "MYM-E002.webp",
     "isBoss": false,
     "exp": 840,
     "weakness": "kunyomi",
@@ -8643,7 +8643,7 @@
     "catchphrase": "お茶の香りでふんわりマジック！"
   },
   {
-    "id": "MMR-E003",
+    "id": "MYM-E003",
     "stageId": "Asia_area9",
     "name": "ココナッツバード",
     "prefecture": "モンゴル草原",
@@ -8651,8 +8651,8 @@
     "level": 23,
     "maxHp": 365,
     "atk": 56,
-    "thumb": "MMR-E003.thumb",
-    "image": "MMR-E003.webp",
+    "thumb": "MYM-E003.thumb",
+    "image": "MYM-E003.webp",
     "isBoss": false,
     "exp": 872,
     "weakness": "onyomi",
@@ -8663,7 +8663,7 @@
     "catchphrase": "ココっと飛んでパタパタ防御！"
   },
   {
-    "id": "MMR-E004",
+    "id": "MYM-E004",
                         "stageId": "Asia_area9",
                         "name": "インレーオッタースピリット",
                         "prefecture": "ミャンマー",
@@ -8671,8 +8671,8 @@
     "level": 24,
     "maxHp": 370,
     "atk": 58,
-    "thumb": "MMR-E004.thumb",
-    "image": "MMR-E004.webp",
+    "thumb": "MYM-E004.thumb",
+    "image": "MYM-E004.webp",
     "isBoss": false,
     "exp": 905,
     "weakness": "onyomi",
@@ -8683,7 +8683,7 @@
                         "catchphrase": "ちゃぷちゃぷ遊んで水の術！"
   },
   {
-    "id": "MMR-E005",
+    "id": "MYM-E005",
     "stageId": "Asia_area9",
     "name": "パゴダチャイルド",
     "prefecture": "モンゴル草原",
@@ -8691,8 +8691,8 @@
     "level": 20,
     "maxHp": 375,
     "atk": 60,
-    "thumb": "MMR-E005.thumb",
-    "image": "MMR-E005.webp",
+    "thumb": "MYM-E005.thumb",
+    "image": "MYM-E005.webp",
     "isBoss": false,
     "exp": 787,
     "weakness": "kunyomi",
@@ -8703,7 +8703,7 @@
     "catchphrase": "きらきらパゴダで守護の光！"
   },
   {
-    "id": "MMR-E006",
+    "id": "MYM-E006",
                         "stageId": "Asia_area9",
                         "name": "ルビードラゴン",
                         "prefecture": "ミャンマー",
@@ -8711,8 +8711,8 @@
     "level": 21,
     "maxHp": 380,
     "atk": 62,
-    "thumb": "MMR-E006.thumb",
-    "image": "MMR-E006.webp",
+    "thumb": "MYM-E006.thumb",
+    "image": "MYM-E006.webp",
     "isBoss": false,
     "exp": 820,
     "weakness": "meaning",
@@ -8723,7 +8723,7 @@
     "catchphrase": "紅蓮の輝きで灼熱ブレス！"
   },
   {
-    "id": "MMR-E007",
+    "id": "MYM-E007",
                         "stageId": "Asia_area9",
                         "name": "カラウェイバード",
                         "prefecture": "ミャンマー",
@@ -8731,8 +8731,8 @@
     "level": 22,
     "maxHp": 385,
     "atk": 64,
-    "thumb": "MMR-E007.thumb",
-    "image": "MMR-E007.webp",
+    "thumb": "MYM-E007.thumb",
+    "image": "MYM-E007.webp",
     "isBoss": false,
     "exp": 852,
     "weakness": "onyomi",
@@ -8743,7 +8743,7 @@
                         "catchphrase": "風を巻き起こす天空の守護者！"
   },
   {
-    "id": "MMR-E008",
+    "id": "MYM-E008",
     "stageId": "Asia_area9",
     "name": "チャウッピンダンサー",
     "prefecture": "ミャンマー",
@@ -8751,8 +8751,8 @@
     "level": 23,
     "maxHp": 390,
     "atk": 50,
-    "thumb": "MMR-E008.thumb",
-    "image": "MMR-E008.webp",
+    "thumb": "MYM-E008.thumb",
+    "image": "MYM-E008.webp",
     "isBoss": false,
     "exp": 885,
     "weakness": "kunyomi",
@@ -8763,7 +8763,7 @@
     "catchphrase": "舞い踊りながら鋭い一撃！"
   },
   {
-    "id": "MMR-E009",
+    "id": "MYM-E009",
                         "stageId": "Asia_area9",
                         "name": "エーヤワディースピリット",
                         "prefecture": "ミャンマー",
@@ -8771,8 +8771,8 @@
     "level": 24,
     "maxHp": 395,
     "atk": 52,
-    "thumb": "MMR-E009.thumb",
-    "image": "MMR-E009.webp",
+    "thumb": "MYM-E009.thumb",
+    "image": "MYM-E009.webp",
     "isBoss": false,
     "exp": 917,
     "weakness": "onyomi",
@@ -8783,7 +8783,7 @@
     "catchphrase": "大河の力で豪快突進！"
   },
   {
-    "id": "MMR-E010",
+    "id": "MYM-E010",
                         "stageId": "Asia_area9",
                         "name": "バガンロード",
                         "prefecture": "ミャンマー",
@@ -8791,8 +8791,8 @@
     "level": 20,
     "maxHp": 350,
     "atk": 54,
-    "thumb": "MMR-E010.thumb",
-    "image": "MMR-E010.webp",
+    "thumb": "MYM-E010.thumb",
+    "image": "MYM-E010.webp",
     "isBoss": true,
     "exp": 775,
     "weakness": "onyomi",
