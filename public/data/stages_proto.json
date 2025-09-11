@@ -2071,19 +2071,19 @@
       "x": 600,
       "y": 200
     },
-    "stageId": "Asie_area1",
+    "stageId": "Asia_area1",
     "name": "中国",
     "enemyIdList": [
-      "CHU-E001",
-      "CHU-E002",
-      "CHU-E003",
-      "CHU-E004",
-      "CHU-E005",
-      "CHU-E006",
-      "CHU-E007",
-      "CHU-E008",
-      "CHU-E009",
-      "CHU-E010"
+      "CHN-E001",
+      "CHN-E002",
+      "CHN-E003",
+      "CHN-E004",
+      "CHN-E005",
+      "CHN-E006",
+      "CHN-E007",
+      "CHN-E008",
+      "CHN-E009",
+      "CHN-E010"
     ],
     "kanjiPoolIdList": [
       "g7-001",
@@ -2128,7 +2128,7 @@
       "x": 450,
       "y": 300
     },
-    "stageId": "Asie_area2",
+    "stageId": "Asia_area2",
     "name": "インド",
     "enemyIdList": [
       "IND-E001",
@@ -2186,7 +2186,7 @@
       "x": 570,
       "y": 450
     },
-    "stageId": "Asie_area3",
+    "stageId": "Asia_area3",
     "name": "インドネシア",
     "enemyIdList": [
       "INDN-E001",
@@ -2244,7 +2244,7 @@
       "x": 420,
       "y": 250
     },
-    "stageId": "Asie_area4",
+    "stageId": "Asia_area4",
     "name": "パキスタン",
     "enemyIdList": [
       "PKS-E001",
@@ -2302,7 +2302,7 @@
       "x": 640,
       "y": 150
     },
-    "stageId": "Asie_area5",
+    "stageId": "Asia_area5",
     "name": "韓国",
     "enemyIdList": [
       "KNK-E001",
@@ -2360,7 +2360,7 @@
       "x": 560,
       "y": 370
     },
-    "stageId": "Asie_area6",
+    "stageId": "Asia_area6",
     "name": "タイ",
     "enemyIdList": [
       "TAI-E001",
@@ -2417,7 +2417,7 @@
       "x": 600,
       "y": 350
     },
-    "stageId": "Asie_area7",
+    "stageId": "Asia_area7",
     "name": "ベトナム",
     "enemyIdList": [
       "BTN-E001",
@@ -2474,7 +2474,7 @@
       "x": 650,
       "y": 350
     },
-    "stageId": "Asie_area8",
+    "stageId": "Asia_area8",
     "name": "フィリピン",
     "enemyIdList": [
       "FIP-E001",
@@ -2534,7 +2534,7 @@
       "x": 540,
       "y": 330
     },
-    "stageId": "Asie_area9",
+    "stageId": "Asia_area9",
     "name": "ミャンマー",
     "enemyIdList": [
       "MYM-E001",
@@ -2591,7 +2591,7 @@
       "x": 550,
       "y": 150
     },
-    "stageId": "Asie_area10",
+    "stageId": "Asia_area10",
     "name": "モンゴル",
     "enemyIdList": [
       "MNG-E001",
