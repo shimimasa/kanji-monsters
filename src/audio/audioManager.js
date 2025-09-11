@@ -16,9 +16,9 @@ export class AudioManager {
     /** @type {number} 0.0–1.0 のマスターボリューム */
     #masterVolume = 1;
     /** @type {number} 0.0–1.0 のBGM個別音量 */
-    #bgmVolume = 0.7; // デフォルト値を0.7に設定
+    #bgmVolume = 0.2; // デフォルト値を0.7に設定
     /** @type {number} 0.0–1.0 のSE個別音量 */
-    #seVolume  = 0.7; // デフォルト値を0.7に設定
+    #seVolume  = 0.2; // デフォルト値を0.7に設定
 
     constructor() {
       // 初期化時にローカルストレージから音量設定を読み込む
@@ -51,7 +51,7 @@ export class AudioManager {
         gameover: '/assets/audio/bgm_gameover.mp3',
         yomitomo: '/assets/audio/bgm_yomitomo.mp3',
 
-        // 地域別BGMを追加
+        // ステージ別BGMを追加
         hokkaido: '/assets/audio/北海道.mp3',
         hokkaido_a: '/assets/audio/北海道.mp3',
         hokkaido_b: '/assets/audio/北海道.mp3',
@@ -83,6 +83,10 @@ export class AudioManager {
         africa_a: '/assets/audio/アフリカ大陸A.mp3',
         africa_b: '/assets/audio/アフリカ大陸B.mp3',
     
+        Africa: '/assets/audio/アフリカ大陸A.mp3',
+
+
+
         boss: '/assets/audio/boss.mp3'
       },
       se: {
@@ -113,40 +117,50 @@ export class AudioManager {
      * @param {boolean} [loop=true]
      */
     playBGM(key, loop = true) {
-      const src = AudioManager.FILES.bgm[key];
-      if (!src) return console.warn(`BGM "${key}" は定義されていません`);
-  
-      // 同じ曲ならスキップ
-      if (this.#currentBGM?.dataset?.key === key) return;
-  
-      // 今流れている曲を即停止（新BGM停止の妨げにならないよう直接停止）
+      const base = this.resolveBgmBase(key); // 拡張子なしのベースURLを取得
+      if (!base) return console.warn(`BGM "${key}" は定義されていません`);
+
+      // 既存BGMと同じキーかつ再生中であればスキップ、停止中なら再開のみ
+      if (this.#currentBGM?.dataset?.key === key && this.#currentBGM.src && this.#currentBGM.src.includes(base)) {
+        if (this.#currentBGM.paused) {
+          this.#currentBGM.loop = loop;
+          this.#currentBGM.volume = this.#masterVolume * this.#bgmVolume;
+          this.#currentBGM.play().catch(err => { if (err?.name !== 'AbortError') console.error(err); });
+        }
+        return;
+      }
+
       if (this.#currentBGM) {
         this.#currentBGM.pause();
         this.#currentBGM.currentTime = 0;
         this.#currentBGM = null;
       }
-  
-      const bgm = new Audio(src);
+
+      // 実ファイルを順に試して再生
+      const order = ['ogg','mp3','m4a'];
+      const bgm = new Audio();
       bgm.dataset.key = key;
       bgm.loop = loop;
       bgm.volume = this.#masterVolume * this.#bgmVolume;
-      bgm.play().catch(console.error);
+
       this.#currentBGM = bgm;
+      this.#playWithExtFallback(bgm, base, order);
     }
-  
-    /**
-     * フェード付きで BGM を切り替える
-     * @param {'title'|'battle'|'victory'|'defeat'} key
-     * @param {number} duration フェード秒数 (0–5くらい推奨)
-     */
-    async fadeToBGM(key, duration = 1) {
-      if (this.#currentBGM?.dataset?.key === key) return; // 同じなら不要
-  
-      await this.stopBGM(duration);       // フェードアウト
-      this.playBGM(key);                  // 新しい曲を再生
-      await this.#fadeIn(this.#currentBGM, duration);
+
+    async #playWithExtFallback(audioEl, baseNoExt, order) {
+      for (const ext of order) {
+        const src = encodeURI(`${baseNoExt}.${ext}`);
+        try {
+          audioEl.src = src;
+          await audioEl.play();
+          return; // 再生開始に成功
+        } catch (err) {
+          if (err?.name === 'AbortError') return; // 他のBGM切替で中断された場合は終了
+          // 次の拡張子へ
+        }
+      }
+      console.warn('BGMの再生に失敗しました:', baseNoExt, order);
     }
-  
     /**
      * BGM 停止
      * @param {number} duration フェードアウト秒数。0 なら即停止
@@ -167,12 +181,12 @@ export class AudioManager {
      * @param {'appear'|'attack'|'damage'|'heal'|'defeat'|'correct'|'wrong'} key
      */
     playSE(key) {
-      const src = AudioManager.FILES.se[key];
-      if (!src) return console.warn(`SE "${key}" は定義されていません`);
-  
-      const se = new Audio(src);
+      const base = this.resolveSeBase(key);
+      if (!base) return console.warn(`SE "${key}" は定義されていません`);
+      const order = ['ogg','mp3','m4a'];
+      const se = new Audio();
       se.volume = this.#masterVolume * this.#seVolume;
-      se.play().catch(console.error);
+      this.#playWithExtFallback(se, base, order);
     }
   
     /*───────────────────────
@@ -204,26 +218,73 @@ export class AudioManager {
       });
     }
   
-    // 内部：フェードイン
-    #fadeIn(audio, duration) {
-      return new Promise(res => {
-        if (duration <= 0) return res();
-        let t = 0;
-        audio.volume = 0;
-        const targetVolume = this.#masterVolume * this.#bgmVolume;
-        const step = () => {
-          t += 0.016;
-          audio.volume = Math.min(targetVolume, (t / duration) * targetVolume);
-          if (t >= duration) return res();
-          requestAnimationFrame(step);
-        };
-        step();
-      });
-    }
+        // 内部：フェードイン
+        #fadeIn(audio, duration) {
+          return new Promise(res => {
+            if (duration <= 0) return res();
+            let t = 0;
+            audio.volume = 0;
+            const targetVolume = this.#masterVolume * this.#bgmVolume;
+            const step = () => {
+              t += 0.016;
+              audio.volume = Math.min(targetVolume, (t / duration) * targetVolume);
+              if (t >= duration) return res();
+              requestAnimationFrame(step);
+            };
+            step();
+          });
+        }
+    
+        resolveBgmBase(key) {
+          const map = (AudioManager.FILES && AudioManager.FILES.bgm) || {};
+          const mapped = map[key];
+          if (mapped) {
+            return mapped.replace(/\.(ogg|mp3|m4a)$/i, '');
+          }
+          // area系: xxx_areaN_(a|b) はそのまま
+          if (/_area\d+_(a|b)$/i.test(key)) {
+            return `/assets/audio/${key}`;
+          }
+          // area系: xxx_areaN は毎回 a/b ランダム
+          if (/_area\d+$/i.test(key)) {
+            const pick = Math.random() < 0.5 ? 'a' : 'b';
+            return `/assets/audio/${key}_${pick}`;
+          }
+          // その他はキー名そのまま（例: title → /assets/audio/bgm_title）
+          return `/assets/audio/${key}`;
+        }
 
-    /**
-     * BGM音量を設定 (0–1)
-     */
+        resolveSeBase(key) {
+          const map = (AudioManager.FILES && AudioManager.FILES.se) || {};
+          const mapped = map[key];
+          if (mapped) {
+            return mapped.replace(/\.(ogg|mp3|m4a)$/i, '');
+          }
+          return `/assets/audio/${key}`;
+        }  
+
+             #resolveDynamicSrc(basePathNoExt) {
+               try {
+                 const a = document.createElement('audio');
+                 const order = [
+                   { ext: 'ogg', mime: 'audio/ogg; codecs="vorbis"' },
+                   { ext: 'mp3', mime: 'audio/mpeg' },
+                   { ext: 'm4a', mime: 'audio/mp4; codecs="mp4a.40.2"' }
+                 ];
+                 for (const cand of order) {
+                   const support = a.canPlayType(cand.mime);
+                   if (support === 'probably' || support === 'maybe') {
+                     return `${basePathNoExt}.${cand.ext}`;
+                   }
+                 }
+               } catch {}
+               return `${basePathNoExt}.mp3`;
+             }
+
+     /*───────────────────────
+      BGM音量を設定 (0–1)
+    ───────────────────────*/
+     
     setBGMVolume(value) {
       this.#bgmVolume = Math.max(0, Math.min(1, value));
       if (this.#currentBGM) {

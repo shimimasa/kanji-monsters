@@ -322,7 +322,7 @@ const stageSelectScreenState = {
   /** 画面表示時の初期化 */
   enter(arg) {
     // BGM 再生 & canvas 取得
-    publish('playBGM', 'title');
+    // publish('playBGM', 'title');
     this.canvas = (arg && typeof arg.getContext === 'function')
       ? arg
       : document.getElementById('gameCanvas');

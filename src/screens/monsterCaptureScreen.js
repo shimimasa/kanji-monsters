@@ -2,6 +2,7 @@
 import { publish } from '../core/eventBus.js';
 import { gameState } from '../core/gameState.js';
 import { addMonster, loadDex } from '../models/monsterDex.js';
+
 import { getAllMonsterIds, getMonsterById } from '../loaders/dataLoader.js';
 
 const monsterCaptureScreen = {
@@ -125,9 +126,17 @@ const monsterCaptureScreen = {
       });
 
       const thumb = document.createElement('img');
-      const folderMap = {1:'grade1-hokkaido',2:'grade2-touhoku',3:'grade3-kantou',4:'grade4-chuubu',5:'grade5-kinki',6:'grade6-chuugoku'};
+      const folderMap = {
+        1:'grade1-hokkaido', 2:'grade2-touhoku', 3:'grade3-kantou',
+        4:'grade4-chuubu',   5:'grade5-kinki',   6:'grade6-chuugoku',
+        7:'grade7-asia',     8:'grade8-europe', 9:'grade9-america',
+        10:'grade10-africa'
+      };
+      const idStr = String(m.id);
       const folder = folderMap[m.grade] || folderMap[1];
-      thumb.src = `/assets/images/monsters/thumb/${folder}/${m.id}.webp`;
+      thumb.src = idStr.startsWith('PRV-')
+        ? `/assets/images/monsters/thumb/${m.id}.webp`
+        : `/assets/images/monsters/thumb/${folder}/${m.id}.webp`;
       Object.assign(thumb.style, { width: '100%', borderRadius: '8px' });
 
       const name = document.createElement('div');

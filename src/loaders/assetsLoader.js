@@ -50,13 +50,7 @@ const UI_IMAGE_PATHS = {
   regionMarker:  '/assets/images/region_marker.png',
   // タイトル画面用の背景画像を追加
   titleBackground: '/assets/images/title_background.png',
-  // 地方境界線ハイライト画像を追加
-  region1Boundary: '/assets/images/regions/hokkaido_boundary.png',
-  region2Boundary: '/assets/images/regions/tohoku_boundary.png',
-  region3Boundary: '/assets/images/regions/kanto_boundary.png',
-  region4Boundary: '/assets/images/regions/chubu_boundary.png',
-  region5Boundary: '/assets/images/regions/kinki_boundary.png',
-  region6Boundary: '/assets/images/regions/chugoku_boundary.png',
+
   
   // 世界ステージ選択用の画像を追加
   stageSelect12: '/assets/images/stage.select/stage.select12.png', // 4級
@@ -138,8 +132,8 @@ export async function loadBgImage(stageId) {
   }
   
   // 中学生ステージ（世界）の場合
-  if (stageId.startsWith('Asie_')) {
-    regionName = 'asia'; // または 'asie'（ファイル名に合わせる）
+  if (stageId.startsWith('Asia_')) {
+    regionName = 'asia'; // または 'asia'（ファイル名に合わせる）
   }
   else if (stageId.startsWith('Europe_')) regionName = 'europe';
   else if (stageId.startsWith('America_')) regionName = 'america';
@@ -150,20 +144,14 @@ export async function loadBgImage(stageId) {
     regionName = stageId.split('_')[0];
   }
   
-  // パスの配列を作成
-  const pathsToTry = [
-    // 1. 通常の背景画像パス（完全一致）
-    `/assets/images/backgrounds/${stageId}.png?v=${timestamp}`,
-    
-    // 2. 地域ベースの背景画像パス（エリア番号に基づく）
-    `/assets/images/backgrounds/${regionName}_area${areaNumber}.png?v=${timestamp}`,
-    
-    // 3. 地域のデフォルト背景画像（area1）をフォールバックとして試す
-    `/assets/images/backgrounds/${regionName}_area1.png?v=${timestamp}`,
-    
-    // 4. 学年別の背景画像を試す（最終フォールバック）
-    `/assets/images/stage.select/stage.select${getGradeFromStageId(stageId)}.png?v=${timestamp}`
-  ];
+    // パスの配列を作成
+    const pathsToTry = [
+      // 1. ステージIDに完全一致する背景画像
+      `/assets/images/backgrounds/${stageId}.webp?v=${timestamp}`,
+  
+      // 2. 学年別の背景画像（フォールバック）
+      `/assets/images/stage.select/stage.select${getGradeFromStageId(stageId)}.png?v=${timestamp}`
+    ];
   
   // 各パスを順番に試す
   for (const path of pathsToTry) {
@@ -210,10 +198,10 @@ export async function loadMonsterImage(enemy) {
     5: 'grade5-kinki',
     6: 'grade6-chuugoku',
     // 中学生ステージ用のマッピングを追加
-    7: 'proverbs',  // 4級
-    8: 'proverbs',  // 3級
-    9: 'proverbs',  // 準2級
-    10: 'proverbs', // 2級
+    7: 'grade7-asia',  // 4級
+    8: 'grade8-europe',  // 3級
+    9: 'grade9-america',  // 準2級
+    10: 'grade10-africa', // 2級
   };
   
   // 学年に基づいてフォルダを決定
@@ -229,12 +217,12 @@ export async function loadMonsterImage(enemy) {
   // 中学生ステージ（PRV-Exxx形式）の場合
   if (enemyId.startsWith('PRV-')) {
     pathsToTry.push(
-      // 1. WebP形式の画像（proverbs/full/フォルダ内）
-      `/assets/images/proverbs/full/${enemyId}.webp`,
+      // 1. WebP形式の画像（monsters/full/フォルダ内）
+      `/assets/images/monsters/full/${enemyId}.webp`,
       // 2. image-pipeline内のWebP画像
-      `/image-pipeline/output/proverbs/full/${enemyId}.webp`,
+      `/image-pipeline/output/monsters/full/${enemyId}.webp`,
       // 3. PNG形式の代替
-      `/image‐pipeline/proverb/proverb_${enemyId.replace('PRV-E', '')}.png`
+      `/image‐pipeline/monsters/monster_${enemyId.replace('PRV-E', '')}.png`
     );
   } else {
     // 小学生ステージ用の既存のパス
@@ -552,7 +540,7 @@ export function drawStoneButton(ctx, button, isHovered, isPressed) {
 // ステージIDから学年を取得するヘルパー関数
 function getGradeFromStageId(stageId) {
   // 中学生ステージの場合
-  if (stageId.startsWith('Asie_')) return 12; // 4級
+  if (stageId.startsWith('Asia_')) return 12; // 4級
   if (stageId.startsWith('Europe_')) return 13; // 3級
   if (stageId.startsWith('America_')) return 14; // 準2級
   if (stageId.startsWith('Africa_')) return 15; // 2級

@@ -12,7 +12,6 @@ import {
   loadPlayerData
 } from './services/firebase/firebaseController.js';
 import { AudioManager } from './audio/audioManager.js';
-import { subscribe, publish } from './core/eventBus.js';
 import reviewQueue from './models/reviewQueue.js';
 import DataSync from './services/firebase/dataSync.js';
 import { FSM } from './core/stateMachine.js';
@@ -34,14 +33,10 @@ setCanvas(canvas);
 // ★ ここで AudioManager を生成して export
 const audio = new AudioManager();
 
-// -- service worker 登録は一旦コメントアウト（sw.js が存在しないため 404 となる） --
-// if ('serviceWorker' in navigator){
-//   window.addEventListener('load', () =>
-//     navigator.serviceWorker
-//       .register('/sw.js')
-//       .catch(console.error)
-//   );
-// }
+// ── 先にイベント購読を登録（最重要） ──
+import { subscribe, publish } from './core/eventBus.js';
+subscribe('playSE',  name => audio.playSE(name));
+subscribe('playBGM', (name, loop = true) => audio.playBGM(name, loop));
 
 // ────────────────
 // モバイルブラウザの自動再生制限対策：
@@ -50,7 +45,7 @@ const audio = new AudioManager();
 document.body.addEventListener(
   'pointerdown',
   () => {
-    publish('playBGM', 'title');   // タイトル曲をループ再生（EventBus 経由）
+    publish('playBGM', 'title');   // ここは publish のままでOK（購読が先にある）
   },
   { once: true }
 );
@@ -210,11 +205,7 @@ function drawAchievementNotifications(ctx) {
   requestAnimationFrame(loop);
 })();
 
-// ── 追加：イベントBusの購読 ──
-// 'playSE' → audio.playSE(name)
-// 'playBGM' → audio.playBGM(name, loop = true)
-subscribe('playSE', name => audio.playSE(name));
-subscribe('playBGM', (name, loop = true) => audio.playBGM(name, loop));
+
 
 // ── 追加：音量設定／取得をEventBus経由に ──
 subscribe('setBGMVolume', v => audio.setBGMVolume(v));

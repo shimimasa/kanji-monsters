@@ -406,7 +406,7 @@ const worldStageSelectScreen = {
   /** 画面表示時の初期化 */
   enter(arg) {
     // BGM 再生
-    publish('playBGM', 'title');
+    // publish('playBGM', 'title');
     // 引数が Canvas の場合と props の場合の両方に対応
     const isCanvasArg = arg && typeof arg.getContext === 'function';
     this.canvas = isCanvasArg ? arg : document.getElementById('gameCanvas');
@@ -1248,13 +1248,13 @@ const worldStageSelectScreen = {
       return;
     }
 
-    // モンスターデックスボタン
-    if (isMouseOverRect(x, y, monsterButton)) {
-      publish('playSE', 'decide');
-      gameState.previousScreen = 'worldStageSelect';
-      publish('changeScreen', 'proverbMonsterDex');
-      return;
-    }
+        // モンスターデックスボタン
+        if (isMouseOverRect(x, y, monsterButton)) {
+          publish('playSE', 'decide');
+          gameState.previousScreen = 'worldStageSelect';
+          publish('changeScreen', 'monsterDex'); // ← 統合版へ
+          return;
+        }
 
     // プロフィール/称号ボタン
     if (isMouseOverRect(x, y, profileButton)) {

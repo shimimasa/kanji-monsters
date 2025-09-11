@@ -2131,8 +2131,15 @@
     "kunyomi": [
       "こ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "中にはいる。また、ものがたくさん集まること。",
+  "exampleSentence": "夕方の電車はとても込（こ）む。",
+    "continent": "アメリカ大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
 
   {
@@ -2232,8 +2239,8 @@
     "kunyomi": [
       "の"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。",
+    "meaning": "物の上にのせる。書物などにしるすこと。",
+  "exampleSentence": "新聞に自分の写真が載（の）る。",
     "continent": "アメリカ大陸",
     "originalGrade": 7,
     "correctCount": 0,
@@ -2273,8 +2280,15 @@
     "kunyomi": [
       "さ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "花のつぼみがひらくこと。",
+  "exampleSentence": "春になると桜の花が咲（さ）く。",
+  "continent": "アジア大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
 
   {
@@ -2313,8 +2327,15 @@
     "kunyomi": [
       "むね"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "中心となる大切なことがら。また、おいしいこと。",
+  "exampleSentence": "会議の要（よう）旨（し）をまとめる。",
+  "continent": "アジア大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-110",
@@ -2328,8 +2349,15 @@
     "kunyomi": [
       "うかが"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "「聞く」や「訪ねる」の、へりくだった言い方。",
+  "exampleSentence": "先生のご意見を伺（うかが）う。",
+  "continent": "アジア大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-111",
@@ -2343,8 +2371,15 @@
     "kunyomi": [
       "さ"
     ],
-    "meaning": "かずのはじめ・ひとつ",
-    "exampleSentence": "りんごが 一（ひと）つ ある。"
+    "meaning": "先のするどいもので、つきさすこと。とげ。",
+  "exampleSentence": "指にとげが刺（さ）さった。",
+  "continent": "アジア大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-112",
