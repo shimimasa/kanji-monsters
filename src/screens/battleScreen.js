@@ -276,10 +276,10 @@ getFrameStyleByOrder(enemyIndex, isBoss = false) {
   // 登場順による判定（1ベースに変換）
   const order = enemyIndex + 1;
   
-  if (order <= 5) {
-    return 'normal';    // 1-5体目：ノーマル
+  if (order <= 7) {
+    return 'normal';    // 1-7体目：ノーマル
   } else if (order <= 9) {
-    return 'elite';     // 6-9体目：エリート
+    return 'elite';     // 8-9体目：エリート
   } else {
     return 'boss';      // 10体目以降：ボス扱い
   }
@@ -1419,41 +1419,28 @@ this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY)
     }
     // ← ここまで追加
 
-    // ── 経験値アニメーション処理 ──
-    // isAnimatingExpがfalse、かつexpAnimQueueに要素がある場合に処理開始
-    if (!this.isAnimatingExp && this.expAnimQueue.length > 0) {
-      this.isAnimatingExp = true;
-      
-      // expAnimQueueから経験値を1つ取り出し
-      const expGained = this.expAnimQueue.shift();
-      
-      // addPlayerExp関数を呼び出してgameStateを更新し、戻り値を取得
-      const levelUpResult = addPlayerExp(expGained);
-      
-      // レベルアップした場合の演出処理
-      if (levelUpResult.leveledUp) {
-        // レベルアップSE再生
-        publish('playSE', 'levelUp');
-        
-        // レベルアップメッセージをセット
-        this.levelUpMessage = `レベルが ${levelUpResult.newLevel} にあがった！`;
-        
-        // レベルアップ強化エフェクトを開始
-        this.startLevelUpEffect(120); // 2秒間表示
-        
-        // レベルアップ時の実績チェック
-        checkAchievements().catch(error => {
-          console.error('実績チェック中にエラーが発生しました:', error);
-        });
-        
-        // HPバーアニメーション設定
-        battleState.playerHpTarget = gameState.playerStats.hp;
-        battleState.playerHpAnimating = true;
-      }
-      
-      // アニメーションが完了したらフラグをリセット
-      this.isAnimatingExp = false;
-    }
+        // ── 経験値アニメーション処理 ──
+        if (!this.isAnimatingExp && this.expAnimQueue.length > 0) {
+          this.isAnimatingExp = true;
+    
+          const expGained = this.expAnimQueue.shift();
+    
+          // EXPを加算しつつ、EXPバーの目標値も更新（アニメ有効化）
+          const levelUpResult = updatePlayerExp(expGained);
+    
+          if (levelUpResult.leveledUp) {
+            publish('playSE', 'levelUp');
+            this.levelUpMessage = `レベルが ${levelUpResult.newLevel} にあがった！`;
+            this.startLevelUpEffect(120);
+            checkAchievements().catch(error => {
+              console.error('実績チェック中にエラーが発生しました:', error);
+            });
+            battleState.playerHpTarget = gameState.playerStats.hp;
+            battleState.playerHpAnimating = true;
+          }
+    
+          this.isAnimatingExp = false;
+        }
 
     // ── HPアニメーション更新 ──
     if (battleState.playerHpAnimating) {
@@ -2591,78 +2578,88 @@ if (hh.visible) {
     return 'white'; // 白色（デフォルト）
   },
 
- // battleScreen.js内の既存のdrawPlayerStatusPanel関数を、以下のコードで完全に置き換えてください。
-
- drawPlayerStatusPanel(ctx) {
-  const panelW = 260;
-  const panelH = 130;
-  const panelX = 20;
-  const panelY = 600 - panelH - 20;
-
-  if (images.panelPlayer) {
-    ctx.drawImage(images.panelPlayer, panelX, panelY, panelW, panelH);
-  }
-
-  // --- ▼ここからレイアウトと配色を調整▼ ---
-  const horizontalPadding = 55;
-  const contentX = panelX + horizontalPadding;
-  const contentY = panelY + 22;
-  const contentW = panelW - (horizontalPadding * 2);
-
-  // プレイヤー名（インクのような濃い茶色に変更）
-  this.drawTextWithOutline(
-    gameState.playerName,
-    contentX, contentY,
-    '#5C4033', '#F5DEB3', 'bold 16px "UDデジタル教科書体", sans-serif',
-    'left', 'top', 2
-  );
-
-  // レベル表示（金色に黒い縁取りで視認性アップ）
-  this.drawTextWithOutline(
-    `Lv.${gameState.playerStats.level}`,
-    contentX + contentW, contentY,
-    '#DAA520', '#654321', 'bold 16px "UDデジタル教科書体", sans-serif',
-    'right', 'top', 2
-  );
-
-  // HP バー
-  const barY = contentY + 25;
-  const barH = 18;
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-  ctx.fillRect(contentX, barY, contentW, barH);
-
-  const hpRatio = gameState.playerStats.hp / gameState.playerStats.maxHp;
-  ctx.fillStyle = hpRatio > 0.5 ? '#2ecc71' : (hpRatio > 0.2 ? '#f39c12' : '#e74c3c');
-  ctx.fillRect(contentX, barY, contentW * hpRatio, barH);
-  // HPテキスト（黒い縁取りで視認性アップ）
-  this.drawTextWithOutline(
-    `${gameState.playerStats.hp} / ${gameState.playerStats.maxHp}`,
-    contentX + contentW / 2, barY + barH / 2,
-    'white', 'black', '12px "UDデジタル教科書体", sans-serif', 'center', 'middle', 2
-  );
-
-  // 攻撃力表示（濃い茶色に変更）
-  this.drawTextWithOutline(
-    `ATK: ${gameState.playerStats.attack}`,
-    contentX, barY + barH + 18,
-    '#5C4033', '#F5DEB3', '14px "UDデジタル教科書体", sans-serif',
-    'left', 'top', 2
-  );
-  // --- ▲ここまで▲ ---
-  // ▼▼▼ 修正：回復回数表示を動的に ▼▼▼
-  const healCount = gameState.playerStats.healCount || 0;
-  const maxHealCount = this.getMaxHealCountFromSettings();
-  this.drawTextWithOutline(
-    `回復: ${healCount}/${maxHealCount}回`,
-    contentX + contentW, barY + barH + 18,
-    healCount > 0 ? '#2ecc71' : '#e74c3c', // 残りがあれば緑、なければ赤
-    '#F5DEB3', '14px "UDデジタル教科書体", sans-serif',
-    'right', 'top', 2
-  );
-  // ▲▲▲ ここまで追加 ▲▲▲
-},
-
-// battleScreen.js内の既存のdrawEnemyStatusPanel関数を、以下のコードで完全に置き換えてください。
+  drawPlayerStatusPanel(ctx) {
+    const panelW = 260;
+    const panelH = 130;
+    const panelX = 20;
+    const panelY = 600 - panelH - 20;
+  
+    if (images.panelPlayer) {
+      ctx.drawImage(images.panelPlayer, panelX, panelY, panelW, panelH);
+    }
+  
+    // --- ▼ここからレイアウトと配色を調整▼ ---
+    const horizontalPadding = 55;
+    const contentX = panelX + horizontalPadding;
+    const contentY = panelY + 22;
+    const contentW = panelW - (horizontalPadding * 2);
+  
+    // プレイヤー名
+    this.drawTextWithOutline(
+      gameState.playerName,
+      contentX, contentY,
+      '#5C4033', '#F5DEB3', 'bold 16px "UDデジタル教科書体", sans-serif',
+      'left', 'top', 2
+    );
+  
+    // レベル表示
+    this.drawTextWithOutline(
+      `Lv.${gameState.playerStats.level}`,
+      contentX + contentW, contentY,
+      '#DAA520', '#654321', 'bold 16px "UDデジタル教科書体", sans-serif',
+      'right', 'top', 2
+    );
+  
+    // HP バー
+    const barY = contentY + 25;
+    const barH = 18;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.fillRect(contentX, barY, contentW, barH);
+  
+    const hpRatio = gameState.playerStats.hp / gameState.playerStats.maxHp;
+    ctx.fillStyle = hpRatio > 0.5 ? '#2ecc71' : (hpRatio > 0.2 ? '#f39c12' : '#e74c3c');
+    ctx.fillRect(contentX, barY, contentW * hpRatio, barH);
+    this.drawTextWithOutline(
+      `${gameState.playerStats.hp} / ${gameState.playerStats.maxHp}`,
+      contentX + contentW / 2, barY + barH / 2,
+      'white', 'black', '12px "UDデジタル教科書体", sans-serif', 'center', 'middle', 2
+    );
+  
+    // ▼ 追加: EXPバー（HPの下、ATK/回復の上） ▼
+    const expBarY = barY + barH + 6;
+    const expBarH = 12;
+  
+    const player = gameState.playerStats;
+    const baseExp = calculateExpForLevel(player.level);
+    const nextBaseExp = calculateExpForLevel(player.level + 1);
+    const maxExpThisLevel = Math.max(1, nextBaseExp - baseExp);
+  
+    // 表示用の現在EXP（このレベル内）
+    const currentExpInLevel = Math.max(0, Math.min(maxExpThisLevel, this.playerExpDisplay || 0));
+  
+    // パーチメントに合う暖色の細いゲージ（枠・目盛りつき）
+    drawExpBar(ctx, contentX, expBarY, contentW, expBarH, currentExpInLevel, maxExpThisLevel);
+  
+    // 攻撃力表示（EXPバーのさらに下）
+    const statsY = expBarY + expBarH + 12;
+    this.drawTextWithOutline(
+      `ATK: ${gameState.playerStats.attack}`,
+      contentX, statsY,
+      '#5C4033', '#F5DEB3', '14px "UDデジタル教科書体", sans-serif',
+      'left', 'top', 2
+    );
+  
+    // 回復回数（右寄せ、色は残回数で変化）
+    const healCount = gameState.playerStats.healCount || 0;
+    const maxHealCount = this.getMaxHealCountFromSettings();
+    this.drawTextWithOutline(
+      `回復: ${healCount}/${maxHealCount}回`,
+      contentX + contentW, statsY,
+      healCount > 0 ? '#2ecc71' : '#e74c3c',
+      '#F5DEB3', '14px "UDデジタル教科書体", sans-serif',
+      'right', 'top', 2
+    );
+  },
 
 drawEnemyStatusPanel(ctx) {
   const panelW = 280;
@@ -2689,28 +2686,6 @@ drawEnemyStatusPanel(ctx) {
   const barH = 22;
   // --- ▲ここまでY軸の配置を調整▲ ---
 
-  // 1. レベルを右上に配置
-  const levelText = `Lv.${gameState.currentEnemy.level || 1}`;
-  this.drawTextWithOutline(
-    levelText,
-    contentX + contentW, topRowY,
-    '#FFD700', '#000000', 'bold 18px "UDデジタル教科書体", sans-serif',
-    'right', 'top', 3
-  );
-
-  // 2. レベルの左隣に弱点アイコンを配置
-  if (gameState.currentEnemy.weakness) {
-    const levelMetrics = ctx.measureText(levelText);
-    const iconSize = 20;
-    const iconPadding = 8;
-    const iconX = contentX + contentW - levelMetrics.width - iconPadding - iconSize;
-    const iconY = topRowY;
-    const iconImg = gameState.currentEnemy.weakness === 'onyomi' ? images.iconOnyomi : images.iconKunyomi;
-
-    if (iconImg) {
-      ctx.drawImage(iconImg, iconX, iconY, iconSize, iconSize);
-    }
-  }
 
   // 3. 敵の名前を左上に配置
   this.drawTextWithOutline(
@@ -4384,27 +4359,21 @@ setManagedTimeout(() => {
         // 経験値獲得メッセージを表示
         battleState.log.push(`${expGained}の経験値を獲得した！`);
         
-        // 経験値パーティクルエフェクト後に経験値を実際に加算
         setTimeout(() => {
-          // 経験値を加算して、レベルアップ判定を行う
-          const levelUpResult = addPlayerExp(expGained);
-          
-          // レベルアップした場合の演出処理
+          // 経験値を加算して、レベルアップ判定＋EXPバー更新
+          const levelUpResult = updatePlayerExp(expGained);
+
           if (levelUpResult.leveledUp) {
-            // レベルアップSE再生
             publish('playSE', 'levelUp');
-            
-            // レベルアップメッセージをログに追加
             battleState.log.push(`レベルが ${levelUpResult.newLevel} にあがった！`);
             addToLog(`攻撃力が上がった！ HP最大値が増えた！`);
             battleScreenState.showLogBlock([
               `レベルが ${levelUpResult.newLevel} にあがった！`,
               '攻撃力が上がった！ HP最大値が増えた！'
             ]);
-            // レベルアップ強化エフェクトを開始
-            battleScreenState.startLevelUpEffect(120); // 2秒間表示
+            battleScreenState.startLevelUpEffect(120);
           }
-        }, 1000); // パーティクルエフェクトが見える程度の遅延
+        }, 1000);
       }
       
              // 敵が残っていれば次の敵をスポーン、最後の敵ならステージクリア待機
