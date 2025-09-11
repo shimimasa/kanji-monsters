@@ -13,7 +13,7 @@ import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils
 battleState.timeRemaining = 60;
 
 const ENEMY_FRAME_CONFIG = {
-  normal: { min: 1, max: 5 },    // 1-5体目
+  normal: { min: 1, max: 6 },    // 1-6体目
   elite: { min: 7, max: 9 },     // 7-9体目
   boss: { min: 10, max: Infinity } // 10体目以降
 };
@@ -21,8 +21,8 @@ const ENEMY_FRAME_CONFIG = {
 // プレイヤーに進行状況を示すUI追加も可能
 function getProgressInfo() {
   const order = gameState.currentEnemyIndex + 1;
-  if (order <= 5) return `ノーマル戦 ${order}/5`;
-  if (order <= 9) return `エリート戦 ${order - 5}/4`;
+  if (order <= 6) return `ノーマル戦 ${order}/6`;
+  if (order <= 9) return `エリート戦 ${order - 6}/3`;
   return `ボス戦`;
 }
 
