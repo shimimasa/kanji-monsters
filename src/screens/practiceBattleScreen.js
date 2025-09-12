@@ -10,7 +10,7 @@ const practiceBattleScreenState = {
   // 既存のbattleScreenStateの全機能を継承
   ...battleScreenState,
   
-  // 練習モード専用のプロパティ
+  // マスターモード専用のプロパティ
   practiceMode: true,
   onPracticeComplete: null,
   unmasteredKanji: [],
@@ -43,10 +43,10 @@ const practiceBattleScreenState = {
   // 📐 最適化されたレイアウト設定（ボタンエリア削除後）
   panelConfig: {
     // 前回の漢字パネル（読み表示付きで少し拡大）
-    previous: { x: 20, y: 70, w: 180, h: 200 },
+    previous: { x: 20, y: 70, w: 260, h: 200 },
         // 現在学習中漢字パネル（右上に移動）
-    current: { x: 520, y: 80, w: 260, h: 160 },
-    // 練習モードバッジ（下に移動）
+    current: { x: 520, y: 70, w: 260, h: 200 },
+    // マスターモードバッジ（下に移動）
     modeBadge: { x: 20, y: 450, w: 140, h: 35 },
     // 拡張マスター進捗パネル（よみ入力の下に配置）
     progress: { x: 230, y: 460, w: 350, h: 70 },
@@ -73,7 +73,7 @@ const practiceBattleScreenState = {
       this.practiceStats.todaysPracticeCount = this._getTodaysPracticeCount();
       this.recentHistory = []; // 履歴をクリア
       
-            // 練習モード専用のハンドラを先に設定
+            // マスターモード専用のハンドラを先に設定
       this._setupPracticeHandlers();
       
       // 通常のバトル画面初期化を実行
@@ -87,7 +87,7 @@ const practiceBattleScreenState = {
         }
       } catch {}
 
-      // 練習モード専用のキーハンドラを設定
+      // マスターモード専用のキーハンドラを設定
       this._setupPracticeKeyHandler();
       // 敵関連のみを無効化
       this._disableEnemyElements();
@@ -104,7 +104,7 @@ const practiceBattleScreenState = {
       // 最初の未マスター漢字を出題
       this._pickNextUnmasteredKanji();
       
-      console.log('📚 練習モードを開始しました');
+      console.log('📚 マスターモードを開始しました');
       
     } catch (error) {
       console.error('❌ 練習バトル画面の初期化に失敗:', error);
@@ -144,10 +144,10 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 練習モード専用のハンドラを設定
+   * マスターモード専用のハンドラを設定
    */
   _setupPracticeHandlers() {
-    console.log('🔧 練習モード用ハンドラを設定中...');
+    console.log('🔧 マスターモード用ハンドラを設定中...');
     
     try {
       this._originalHandleAttack = this.handleAttack;
@@ -155,21 +155,21 @@ const practiceBattleScreenState = {
       this._originalHandleHint = this.handleHint;
       
       this.handleAttack = () => {
-        console.log('🎯 練習モード handleAttack');
+        console.log('🎯 マスターモード handleAttack');
         this.handlePracticeAnswer();
       };
       
       this.handleHeal = () => {
-        console.log('💚 練習モード handleHeal - 同じ処理');
+        console.log('💚 マスターモード handleHeal - 同じ処理');
         this.handlePracticeAnswer();
       };
       
       this.handleHint = () => {
-        console.log('💡 練習モード handleHint');
+        console.log('💡 マスターモード handleHint');
         this.handlePracticeHint();
       };
       
-      console.log('✅ 練習モード用ハンドラ設定完了');
+      console.log('✅ マスターモード用ハンドラ設定完了');
       
     } catch (error) {
       console.error('❌ ハンドラ設定エラー:', error);
@@ -177,10 +177,10 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 練習モード専用のキーボードハンドラを設定
+   * マスターモード専用のキーボードハンドラを設定
    */
   _setupPracticeKeyHandler() {
-    console.log('🔧 練習モード専用キーハンドラを設定中...');
+    console.log('🔧 マスターモード専用キーハンドラを設定中...');
     
     try {
       if (!this.inputEl) {
@@ -317,10 +317,10 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 練習モード専用解答処理（統合）
+   * マスターモード専用解答処理（統合）
    */
   handlePracticeAnswer() {
-    console.log('🎯 練習モード解答処理開始');
+    console.log('🎯 マスターモード解答処理開始');
     
     try {
       if (battleState.turn !== 'player' || !battleState.inputEnabled) {
@@ -407,10 +407,10 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 練習モード専用ヒント処理
+   * マスターモード専用ヒント処理
    */
   handlePracticeHint() {
-    console.log('💡 練習モードヒント処理開始');
+    console.log('💡 マスターモードヒント処理開始');
     
     try {
       if (!gameState.currentKanji) return;
@@ -554,10 +554,10 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * マウスクリック処理（練習モード専用にオーバーライド）
+   * マウスクリック処理（マスターモード専用にオーバーライド）
    */
   handleClick(e) {
-    console.log('🖱️ 練習モードクリック処理');
+    console.log('🖱️ マスターモードクリック処理');
 
     try {
       e.preventDefault();
@@ -875,7 +875,7 @@ const practiceBattleScreenState = {
       this._drawPreviousKanjiPanelWithReadings();  // 前回漢字（読み付き）
       this._drawCurrentKanjiDetailPanel();         // 現在漢字詳細
       this._drawEnhancedProgressPanel();           // 進捗パネル（簡素）
-      this._drawPracticeModeBadge();               // 練習モードバッジ
+      this._drawPracticeModeBadge();               // マスターモードバッジ
       this._drawOperationGuide();                  // 操作ガイド（ボタンの代替）
       // this._drawLearningHistoryPanel();          // 学習履歴パネル（非表示）
       this._drawDetailedStats();                 // 詳細統計（必要に応じて）
@@ -913,19 +913,13 @@ const practiceBattleScreenState = {
       
       let infoY = y + 100;
       
-      // 画数と意味
+      // 画数
       this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}画`, x + 10, infoY);
       infoY += 16;
       
-      if (battleState.lastAnswered.meaning) {
-        const meaning = battleState.lastAnswered.meaning.length > 14 
-          ? battleState.lastAnswered.meaning.substring(0, 14) + '...'
-          : battleState.lastAnswered.meaning;
-        this.ctx.fillText(`意味: ${meaning}`, x + 10, infoY);
-        infoY += 16;
-      }
+      
 
-            // 正確な読み表示
+       // 正確な読み表示
       this.ctx.fillStyle = '#e8f5e8';
       this.ctx.fillText('正しい読み:', x + 10, infoY);
       infoY += 16;
@@ -1024,14 +1018,7 @@ const practiceBattleScreenState = {
       this.ctx.fillText(`画数: ${gameState.currentKanji.strokes}画`, x + 12, infoY);
       infoY += 16;
       
-      // 意味
-      if (gameState.currentKanji.meaning) {
-        const meaning = gameState.currentKanji.meaning.length > 16 
-          ? gameState.currentKanji.meaning.substring(0, 16) + '...'
-          : gameState.currentKanji.meaning;
-        this.ctx.fillText(`意味: ${meaning}`, x + 12, infoY);
-        infoY += 16;
-      }
+      
       
       // 部首
       if (gameState.currentKanji.radical) {
@@ -1143,7 +1130,7 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 🎯 練習モードバッジ
+   * 🎯 マスターモードバッジ
    */
   _drawPracticeModeBadge() {
     if (!this.ctx) return;
@@ -1162,10 +1149,10 @@ const practiceBattleScreenState = {
       this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
-      this.ctx.fillText('📚 練習モード', x + w/2, y + h/2);
+      this.ctx.fillText('📚 マスターモード', x + w/2, y + h/2);
       
     } catch (error) {
-      console.error('❌ 練習モードバッジ描画エラー:', error);
+      console.error('❌ マスターモードバッジ描画エラー:', error);
     }
   },
 

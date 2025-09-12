@@ -426,7 +426,7 @@ function findBonusBossForGrade(grade, allEnemies) {
   return null;
 }
 
-// ★★★ 練習モード用のマスター判定関数を追加 ★★★
+// ★★★ マスターモード用のマスター判定関数を追加 ★★★
 
 /**
  * 漢字がマスター済みかどうかを判定する

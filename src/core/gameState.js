@@ -24,7 +24,7 @@ export const gameState = {
     /* 画面遷移 ------------------------------------------------------------- */
             // 'title' | 'menu' | 'battle' | 'stageClear' ...
     currentStageId: null,
-    // ★★★ 練習モードを追加 ★★★
+    // ★★★ マスターモードを追加 ★★★
     gameMode: 'challenge', // 'jikkuri', 'challenge', 'practice'
     previousScreen: null, // 遷移元の画面を保存
   
@@ -64,7 +64,7 @@ export const gameState = {
     /* 実績システム --------------------------------------------------------- */
     unlockedAchievements: new Set(),  // 解除した実績のIDを保存
 
-    /* ★★★ 練習モード用の進捗管理 ★★★ */
+    /* ★★★ マスターモード用の進捗管理 ★★★ */
     practiceProgress: {
       // stageId: { allMastered: boolean, lastPracticed: timestamp }
     },
