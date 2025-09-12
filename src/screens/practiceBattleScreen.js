@@ -44,8 +44,8 @@ const practiceBattleScreenState = {
   panelConfig: {
     // 前回の漢字パネル（読み表示付きで少し拡大）
     previous: { x: 20, y: 70, w: 180, h: 200 },
-    // 現在学習中漢字パネル（少し拡大）
-    current: { x: 20, y: 280, w: 180, h: 160 },
+        // 現在学習中漢字パネル（右上に移動）
+    current: { x: 520, y: 80, w: 260, h: 160 },
     // 練習モードバッジ（下に移動）
     modeBadge: { x: 20, y: 450, w: 140, h: 35 },
     // 拡張マスター進捗パネル（よみ入力の下に配置）
@@ -266,8 +266,7 @@ const practiceBattleScreenState = {
    */
   _pickNextUnmasteredKanji() {
     try {
-      this._buildUnmasteredKanjiList();
-      
+      // ここで未マスターリストを再構築しない（進捗が0に戻るのを防止）
       if (this.unmasteredKanji.length === 0) {
         this._completePractice();
         return;
@@ -837,29 +836,30 @@ const practiceBattleScreenState = {
     
     try {
       this.ctx.save();
-      
-      const bgGradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-      bgGradient.addColorStop(0, '#1e3c72');
-      bgGradient.addColorStop(1, '#2a5298');
-      
-      // 敵エリア
-      if (this.stageBgImage) {
-        this.ctx.drawImage(this.stageBgImage, 480, 80, 280, 200, 480, 80, 280, 200);
-        this.ctx.drawImage(this.stageBgImage, 500, 10, 280, 120, 500, 10, 280, 120);
-      } else {
-        this.ctx.fillStyle = bgGradient;
-        this.ctx.fillRect(480, 80, 280, 200);
-        this.ctx.fillRect(500, 10, 280, 120);
-      }
-      
-      // プレイヤーエリア
-      if (this.stageBgImage) {
-        this.ctx.drawImage(this.stageBgImage, 20, 500, 280, 100, 20, 500, 280, 100);
-      } else {
-        this.ctx.fillStyle = bgGradient;
-        this.ctx.fillRect(20, 500, 280, 100);
-      }
-      
+
+      const fillArea = (x, y, w, h) => {
+        // 背景全体を一度描画済みなので、同じ比率で背景の該当箇所を切り出す
+        if (this.stageBgImage) {
+          const img = this.stageBgImage;
+          const sx = img.width  * (x / this.canvas.width);
+          const sy = img.height * (y / this.canvas.height);
+          const sw = img.width  * (w / this.canvas.width);
+          const sh = img.height * (h / this.canvas.height);
+          this.ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+        } else {
+          const bgGradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+          bgGradient.addColorStop(0, '#1e3c72');
+          bgGradient.addColorStop(1, '#2a5298');
+          this.ctx.fillStyle = bgGradient;
+          this.ctx.fillRect(x, y, w, h);
+        }
+      };
+
+      // 敵エリアとプレイヤーエリアを背景で“埋め戻し”して歪みを防ぐ
+      fillArea(480, 80, 280, 200);
+      fillArea(500, 10, 280, 120);
+      fillArea(20, 500, 280, 100);
+
       this.ctx.restore();
       
     } catch (error) {
@@ -878,8 +878,7 @@ const practiceBattleScreenState = {
       this._drawPracticeModeBadge();               // 練習モードバッジ
       this._drawOperationGuide();                  // 操作ガイド（ボタンの代替）
       // this._drawLearningHistoryPanel();          // 学習履歴パネル（非表示）
-      this._drawCircularProgress();                // 円形プログレス
-      // this._drawDetailedStats();                 // 詳細統計（必要に応じて）
+      this._drawDetailedStats();                 // 詳細統計（必要に応じて）
     } catch (error) {
       console.error('❌ 改善UI描画エラー:', error);
     }
@@ -1264,64 +1263,21 @@ const practiceBattleScreenState = {
     }
   },
 
-  /**
-   * ⭕ 円形プログレス
-   */
-  _drawCircularProgress() {
-    if (!this.ctx) return;
-    
-    try {
-      const { x, y, radius } = this.panelConfig.circularProgress;
-      
-      const stageKanji = getKanjiByStageId(gameState.currentStageId);
-      const totalKanji = stageKanji.length;
-      const masteredCount = totalKanji - this.unmasteredKanji.length;
-      const progressRatio = totalKanji > 0 ? masteredCount / totalKanji : 0;
-      
-      // 背景円
-      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-      this.ctx.lineWidth = 4;
-      this.ctx.beginPath();
-      this.ctx.arc(x, y, radius, 0, Math.PI * 2);
-      this.ctx.stroke();
-      
-      // 進捗円弧
-      if (progressRatio > 0) {
-        this.ctx.strokeStyle = '#4caf50';
-        this.ctx.lineWidth = 6;
-        this.ctx.lineCap = 'round';
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, radius, -Math.PI/2, -Math.PI/2 + progressRatio * Math.PI * 2);
-        this.ctx.stroke();
-      }
-      
-      // 中央のテキスト
-      this.ctx.fillStyle = 'white';
-      this.ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
-      this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'middle';
-      this.ctx.fillText(`${Math.round(progressRatio * 100)}%`, x, y - 5);
-      
-      this.ctx.font = '10px "UDデジタル教科書体", sans-serif';
-      this.ctx.fillText('マスター', x, y + 10);
-      
-    } catch (error) {
-      console.error('❌ 円形プログレス描画エラー:', error);
-    }
-  },
+  
 
   /**
    * 📊 詳細統計表示
    */
   _drawDetailedStats() {
-    if (!this.ctx || this.practiceStats.totalPracticed === 0) return;
+    // 常に表示（0件でも）
+    if (!this.ctx) return;
     
     try {
-      // 右上の小さなエリアに統計を表示
-      const x = 550;
-      const y = 350;
+      // 画面右下に配置（キャンバスサイズに追従）
       const w = 230;
-      const h = 80;
+      const h = 90;
+      const x = this.canvas.width - w - 20;
+      const y = this.canvas.height - h - 20;
       
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
       this.ctx.fillRect(x, y, w, h);
@@ -1339,20 +1295,17 @@ const practiceBattleScreenState = {
       let statY = y + 35;
       
       const { totalPracticed, correctCount, correctStreak, maxStreak } = this.practiceStats;
-      const accuracy = Math.round((correctCount / totalPracticed) * 100);
+      const accuracy = totalPracticed > 0 ? Math.round((correctCount / totalPracticed) * 100) : 0;
       
       this.ctx.fillText(`正答率: ${accuracy}% (${correctCount}/${totalPracticed})`, x + 10, statY);
       statY += 15;
-      
       this.ctx.fillText(`現在の連続: ${correctStreak}問`, x + 10, statY);
       statY += 15;
-      
       this.ctx.fillText(`最高連続: ${maxStreak}問`, x + 10, statY);
       
-      // 平均解答時間
       if (this.practiceStats.timePerQuestion.length > 0) {
         const avgTime = Math.round(
-          this.practiceStats.timePerQuestion.reduce((a, b) => a + b, 0) / 
+          this.practiceStats.timePerQuestion.reduce((a, b) => a + b, 0) /
           this.practiceStats.timePerQuestion.length / 1000
         );
         this.ctx.textAlign = 'right';
