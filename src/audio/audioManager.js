@@ -137,7 +137,7 @@ export class AudioManager {
       }
 
       // 実ファイルを順に試して再生
-      const order = ['ogg','mp3','m4a'];
+      const order = ['ogg','m4a','mp3'];
       const bgm = new Audio();
       bgm.dataset.key = key;
       bgm.loop = loop;
@@ -183,7 +183,7 @@ export class AudioManager {
     playSE(key) {
       const base = this.resolveSeBase(key);
       if (!base) return console.warn(`SE "${key}" は定義されていません`);
-      const order = ['ogg','mp3','m4a'];
+      const order = ['ogg','m4a','mp3'];
       const se = new Audio();
       se.volume = this.#masterVolume * this.#seVolume;
       this.#playWithExtFallback(se, base, order);

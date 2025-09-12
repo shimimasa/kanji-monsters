@@ -58,7 +58,7 @@ const resultWinState = {
 
     // クリア画面に入ったらクリアBGMを再生
     publish('playBGM', 'victory');
-    
+
     // ステージクリアの統計データを更新
     recordStageCleared();
     gameState.playerStats.stagesCleared++;
@@ -643,6 +643,8 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     if (isMouseOverRect(x, y, nextStageButton)) {
       publish('playSE', 'decide');
       const targetScreen = gameState.previousScreen || 'stageSelect';
+      // 画面遷移前にメニュー系BGMへ切替
+      publish('playBGM', 'title');
       publish('changeScreen', targetScreen);
     }
   }

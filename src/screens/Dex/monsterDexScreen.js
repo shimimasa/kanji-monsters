@@ -213,6 +213,9 @@ const monsterDexState = {
       this.canvas.style.pointerEvents = 'none';
     }
 
+    // 画面専用BGMを再生
+    publish('playBGM', 'bgm_monsterDex');
+
     // データの読み込み
     this.dexSet = loadDex();
     this.seenSet = loadSeenMonsters();
@@ -471,6 +474,7 @@ const monsterDexState = {
     backButton.addEventListener('click', () => {
       publish('playSE', 'decide');
       const targetScreen = gameState.previousScreen || 'stageSelect';
+      publish('stopBGM', 0.2);
       publish('changeScreen', targetScreen);
     });
     leftControls.appendChild(backButton);
