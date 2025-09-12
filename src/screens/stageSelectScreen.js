@@ -238,7 +238,7 @@ const practiceButton = {
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
-  text: '練習',
+  text: 'マスター',
   icon: '📝'
 };
 
@@ -1409,12 +1409,12 @@ update(dt) {
         gameState.gameMode = 'practice';
         publish('changeScreen', 'practiceBattle');
       } else {
-        alert('練習できるステージがありません。');
+        alert('マスターできるステージがありません。');
       }
     }
     // ステージが選択されていない場合
     else {
-      alert('練習したいステージを先に選択してください。');
+      alert('マスターしたいステージを先に選択してください。');
     }
   },
   

@@ -329,7 +329,7 @@ const practiceButton = {
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
-  text: '練習',
+  text: 'マスター',
   icon: '📝'
 };
 
