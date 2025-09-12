@@ -982,8 +982,8 @@ const practiceBattleScreenState = {
       }
 
       // MASTERバッジ
-      const prog = gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id];
-      if (prog && prog.mastered) {
+      const badgeProg = gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id];
+      if (badgeProg && badgeProg.mastered) {
         this._drawMasterBadge(this.ctx, x + w - 8, y + 8);
       }
       
