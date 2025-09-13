@@ -1056,26 +1056,20 @@ getMaxHealCountFromSettings() {
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    // ② 左上に「タイトルへ」「ステージ選択」ボタンを描画（リッチなデザイン）
-    [BTN.back, BTN.stage].forEach(b => {
-      const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
-      
-      // 単純な描画方法でテスト
-      this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
-      this.ctx.fillRect(b.x, b.y, b.w, b.h);
-      
-      // テキストを明示的に描画
-      this.ctx.fillStyle = 'white';
-      this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
-      this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'middle';
-      this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
-      
-      // 枠線を追加して視認性を高める
-      this.ctx.strokeStyle = 'white';
-      this.ctx.lineWidth = 2;
-      this.ctx.strokeRect(b.x, b.y, b.w, b.h);
-    });
+       // ② 左上に「ステージ選択」ボタンを描画（リッチなデザイン）
+       [BTN.stage].forEach(b => {
+        const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
+        this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
+        this.ctx.fillRect(b.x, b.y, b.w, b.h);
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2);
+        this.ctx.strokeStyle = 'white';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(b.x, b.y, b.w, b.h);
+      });
 
     /* 敵（新しいモンスター枠付き） */
 const enemy = gameState.currentEnemy;
@@ -3109,13 +3103,14 @@ if (e.type === 'touchstart') {
       return true;
     }
   
-    // 「ステージ選択」ボタン押下時
-    if (isMouseOverRect(x, y, BTN.stage)) {
-      console.log('「ステージ選択」ボタンがクリックされました');
-     publish('playBGM', 'title'); // メニュー共通BGMへ
-      publish('changeScreen', 'stageSelect');
-      return true;
-    }
+        // 「ステージ選択」ボタン押下時
+        if (isMouseOverRect(x, y, BTN.stage)) {
+          console.log('「ステージ選択」ボタンがクリックされました');
+          publish('playBGM', 'title'); // メニュー共通BGMへ
+          const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+          publish('changeScreen', targetScreen);
+          return true;
+        }
   
   // 「こうげき」ボタン押下時
   if (isMouseOverRect(x, y, BTN.attack)) {

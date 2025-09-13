@@ -582,7 +582,6 @@ const practiceBattleScreenState = {
       const y = (eventY - rect.top) * scaleY;
 
       const BTN = {
-        back:   { x: 20,  y: 20,  w: 100, h: 30 },
         stage:  { x: 140, y: 20,  w: 120, h: 30 },
       };
 
@@ -591,17 +590,11 @@ const practiceBattleScreenState = {
                my >= rect.y && my <= rect.y + rect.h;
       };
 
-      if (isMouseOverRect(x, y, BTN.back)) {
-        console.log('🏠 タイトルへ');
-        publish('playBGM', 'title');
-        publish('changeScreen', 'title');
-        return true;
-      }
-
       if (isMouseOverRect(x, y, BTN.stage)) {
         console.log('🗺️ ステージ選択へ');
         publish('playBGM', 'title');
-        publish('changeScreen', 'stageSelect');
+        const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+        publish('changeScreen', targetScreen);
         return true;
       }
 
@@ -656,29 +649,24 @@ const practiceBattleScreenState = {
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    // ② 上部ボタン描画
-    const BTN = {
-      back:   { x: 20,  y: 20,  w: 100, h: 30,  label: 'タイトルへ' },
-      stage:  { x: 140, y: 20,  w: 120, h: 30,  label: 'ステージ選択' },
-    };
-
-    [BTN.back, BTN.stage].forEach(b => {
-      const isHovered = this.mouseX && this.mouseY ? 
-        (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h) : false;
-      
-      this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
-      this.ctx.fillRect(b.x, b.y, b.w, b.h);
-      
-      this.ctx.fillStyle = 'white';
-      this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
-      this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'middle';
-      this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
-      
-      this.ctx.strokeStyle = 'white';
-      this.ctx.lineWidth = 2;
-      this.ctx.strokeRect(b.x, b.y, b.w, b.h);
-    });
+        // ② 上部ボタン描画（ステージ選択のみ）
+        const BTN = {
+          stage:  { x: 140, y: 20,  w: 120, h: 30,  label: 'ステージ選択' },
+        };
+        [BTN.stage].forEach(b => {
+          const isHovered = this.mouseX && this.mouseY ? 
+            (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h) : false;
+          this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
+          this.ctx.fillRect(b.x, b.y, b.w, b.h);
+          this.ctx.fillStyle = 'white';
+          this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
+          this.ctx.strokeStyle = 'white';
+          this.ctx.lineWidth = 2;
+          this.ctx.strokeRect(b.x, b.y, b.w, b.h);
+        });
 
     // ③ 漢字ボックス描画
     this._drawKanjiBoxWithEffects();
