@@ -453,9 +453,8 @@ const worldStageSelectScreen = {
     this._clickHandler = this.handleClick.bind(this);
     this._mousemoveHandler = this.handleMouseMove.bind(this);
     this.canvas.addEventListener('click', this._clickHandler);
-    this.canvas.addEventListener('touchstart', this._clickHandler);
+    this.canvas.addEventListener('touchstart', this._clickHandler, { passive: false });
     this.canvas.addEventListener('mousemove', this._mousemoveHandler);
-
     // ヘッダーUIは使用しない（stageSelect と同じフッター構成に統一）
   },
 
@@ -1137,6 +1136,14 @@ const worldStageSelectScreen = {
 
   /** クリックイベント処理 */
   handleClick(e) {
+    // モバイルの二重発火ガード（タップ直後のclickを無視）
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (e.type === 'touchstart') {
+      this._lastTouchTime = now;
+      if (e.cancelable) e.preventDefault();
+    } else if (e.type === 'click') {
+      if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
+    }
     if (this._inputLocked) return;
     this._inputLocked = true;
     setTimeout(() => { this._inputLocked = false; }, 250);

@@ -340,7 +340,7 @@ const stageSelectScreenState = {
     this._clickHandler = this.handleClick.bind(this);
     this._mousemoveHandler = this.handleMouseMove.bind(this);
     this.canvas.addEventListener('click', this._clickHandler);
-    this.canvas.addEventListener('touchstart', this._clickHandler);
+    this.canvas.addEventListener('touchstart', this._clickHandler, { passive: false });
     this.canvas.addEventListener('mousemove', this._mousemoveHandler);
 
     // 復習ボタン（ヘッダー側）は使用しないため非表示
@@ -1228,7 +1228,7 @@ update(dt) {
     this._clickHandler = this.handleClick.bind(this);
     this._mousemoveHandler = this.handleMouseMove.bind(this);
     this.canvas.addEventListener('click', this._clickHandler);
-    this.canvas.addEventListener('touchstart', this._clickHandler);
+    this.canvas.addEventListener('touchstart', this._clickHandler, { passive: false });
     this.canvas.addEventListener('mousemove', this._mousemoveHandler);
   },
 
@@ -1241,6 +1241,14 @@ update(dt) {
 
   /** クリック処理 */
   handleClick(e) {
+    // モバイルの二重発火ガード
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (e.type === 'touchstart') {
+      this._lastTouchTime = now;
+      if (e.cancelable) e.preventDefault();
+    } else if (e.type === 'click') {
+      if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
+    }
     // 統一された座標変換を使用
     const coords = getGameCoordinates(e, this.canvas);
     if (!isValidCoordinates(coords)) {
