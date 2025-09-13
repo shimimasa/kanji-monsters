@@ -593,12 +593,14 @@ const practiceBattleScreenState = {
 
       if (isMouseOverRect(x, y, BTN.back)) {
         console.log('🏠 タイトルへ');
+        publish('playBGM', 'title');
         publish('changeScreen', 'title');
         return true;
       }
 
       if (isMouseOverRect(x, y, BTN.stage)) {
         console.log('🗺️ ステージ選択へ');
+        publish('playBGM', 'title');
         publish('changeScreen', 'stageSelect');
         return true;
       }
@@ -1477,6 +1479,7 @@ const practiceBattleScreenState = {
         if (this.onPracticeComplete) {
           this.onPracticeComplete();
         } else {
+          publish('playBGM', 'title');
           publish('changeScreen', 'stageSelect');
         }
       }, 2000);

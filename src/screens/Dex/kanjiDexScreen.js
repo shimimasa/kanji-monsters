@@ -252,8 +252,10 @@ const kanjiDexScreen = {
   
     backButton.addEventListener('click', () => {
       publish('playSE', 'decide');
-      const targetScreen = gameState.previousScreen || 'stageSelect';
-      publish('stopBGM', 0.2);
+      publish('playBGM', 'title');
+      const targetScreen = (gameState.previousScreen === 'worldStageSelect')
+        ? 'worldStageSelect'
+        : 'stageSelect';
       publish('changeScreen', targetScreen);
     });
     leftControls.appendChild(backButton);
