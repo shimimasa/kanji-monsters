@@ -28,8 +28,6 @@ const UI_IMAGE_PATHS = {
   buttonStoneNormal: '/assets/images/ui/button_stone_normal.png',
   buttonStoneHover: '/assets/images/ui/button_stone_hover.png',
   buttonStonePressed: '/assets/images/ui/button_stone_pressed.png',
-  iconOnyomi: '/assets/images/ui/icon_onyomi.png',
-  iconKunyomi: '/assets/images/ui/icon_kunyomi.png',
   iconLogAttack: '/assets/images/ui/icon_log_attack.png',
   iconLogHeal: '/assets/images/ui/icon_log_heal.png',
   iconBookClosed: '/assets/images/ui/icon_book_closed.png',

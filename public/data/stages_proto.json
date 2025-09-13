@@ -4,7 +4,7 @@
     "region": "北海道",
     "pref": "北海道奥地",
     "pos": {
-      "x": 350,
+      "x": 550,
       "y": 250
     },
     "stageId": "hokkaido_area1",
@@ -70,22 +70,22 @@
     "region": "北海道",
     "pref": "北海道市街地",
     "pos": {
-      "x": 250,
-      "y": 400
+      "x": 450,
+      "y": 380
     },
     "stageId": "hokkaido_area2",
     "name": "北海道市街地",
     "enemyIdList": [
-      "HKD-E11",
-      "HKD-E12",
-      "HKD-E13",
-      "HKD-E14",
-      "HKD-E15",
-      "HKD-E16",
-      "HKD-E17",
-      "HKD-E18",
-      "HKD-E19",
-      "HKD-E20"
+      "HKD-E011",
+      "HKD-E012",
+      "HKD-E013",
+      "HKD-E014",
+      "HKD-E015",
+      "HKD-E016",
+      "HKD-E017",
+      "HKD-E018",
+      "HKD-E019",
+      "HKD-E020"
     ],
     "kanjiPoolIdList": [
       "g1-041",
