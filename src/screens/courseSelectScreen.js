@@ -37,8 +37,11 @@ const courseSelectScreen = {
           text: 'タイトルへ'
         };
     
-    // イベントハンドラを登録
-    this.registerHandlers();
+      // イベントハンドラを登録
+  this.registerHandlers();
+  // 画面遷移直後のタップを無視（クリックスルー防止）
+  this._inputBlockUntil = ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) + 350;
+
   },
 
   /** 毎フレーム呼び出し（描画） */
@@ -134,7 +137,7 @@ const courseSelectScreen = {
   registerHandlers() {
     this._clickHandler = this.handleClick.bind(this);
     this.canvas.addEventListener('click', this._clickHandler);
-    this.canvas.addEventListener('touchstart', this._clickHandler);
+    this.canvas.addEventListener('touchstart', this._clickHandler, { passive: false });
   },
 
   /** クリックイベント解除 */
@@ -152,6 +155,11 @@ const courseSelectScreen = {
       if (e.cancelable) e.preventDefault();
     } else if (e.type === 'click') {
       if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
+    }
+    // 画面遷移直後のクリック・タップは無視
+    if (this._inputBlockUntil && now < this._inputBlockUntil) {
+      if (e.cancelable) e.preventDefault();
+      return;
     }
     e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
 

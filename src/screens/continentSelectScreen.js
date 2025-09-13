@@ -579,6 +579,16 @@ const continentSelectState = {
 
   // handleClick と handleMouseMove の座標変換部分を修正
 handleClick(e) {
+  // モバイルの二重発火ガード
+  const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  if (e.type === 'touchstart') {
+    this._lastTouchTime = now;
+    if (e.cancelable) e.preventDefault();
+  } else if (e.type === 'click') {
+    if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
+  }
+e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
+  
   const coords = getGameCoordinates(e, this.canvas);
   if (!isValidCoordinates(coords)) {
     return false; // 黒帯エリアのクリックは無視

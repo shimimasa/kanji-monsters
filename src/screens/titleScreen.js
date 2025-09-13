@@ -398,7 +398,7 @@ const titleState = {
   registerHandlers() {
     this._clickHandler = this.handleClick.bind(this);
     this.canvas.addEventListener('click', this._clickHandler);
-    this.canvas.addEventListener('touchstart', this._clickHandler);
+    this.canvas.addEventListener('touchstart', this._clickHandler, { passive: false });
   },
 
   /** クリックイベント解除 */
@@ -533,12 +533,21 @@ const titleState = {
   },
 
   handleClick(e) {
+    // モバイルの二重発火ガード
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (e.type === 'touchstart') {
+      this._lastTouchTime = now;
+      if (e.cancelable) e.preventDefault();
+    } else if (e.type === 'click') {
+      if (this._lastTouchTime && (now - this._lastTouchTime) < 700) {
+        return;
+      }
+    }
     // 統一された座標変換を使用
     const coords = getGameCoordinates(e, this.canvas);
     if (!isValidCoordinates(coords)) {
       return false; // 黒帯エリアのクリックは無視
     }
-    
     const x = coords.x;
     const y = coords.y;
     
