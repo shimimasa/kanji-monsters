@@ -205,6 +205,26 @@ export const gameState = {
     };
   }
 
+  // Helper: serialize/deserialize kanjiReadProgress
+function serializeKanjiReadProgress(progress) {
+  const out = {};
+  for (const [id, prog] of Object.entries(progress || {})) {
+    const ony = prog?.onyomi instanceof Set ? Array.from(prog.onyomi) : Array.isArray(prog?.onyomi) ? prog.onyomi : [];
+    const kun = prog?.kunyomi instanceof Set ? Array.from(prog.kunyomi) : Array.isArray(prog?.kunyomi) ? prog.kunyomi : [];
+    out[id] = { onyomi: ony, kunyomi: kun, mastered: !!prog?.mastered };
+  }
+  return out;
+}
+function deserializeKanjiReadProgress(raw) {
+  const out = {};
+  for (const [id, prog] of Object.entries(raw || {})) {
+    const onyArr = Array.isArray(prog?.onyomi) ? prog.onyomi : [];
+    const kunArr = Array.isArray(prog?.kunyomi) ? prog.kunyomi : [];
+    out[id] = { onyomi: new Set(onyArr), kunyomi: new Set(kunArr), mastered: !!prog?.mastered };
+  }
+  return out;
+}
+
 function getStageClearCount(stageId) {
   const key = `stage_clear_${stageId}`;
   return parseInt(localStorage.getItem(key) || '0');
@@ -224,16 +244,12 @@ function incrementStageClearCount(stageId) {
         playerName: gameState.playerName,
         playerStats: gameState.playerStats,
         unlockedAchievements: Array.from(gameState.unlockedAchievements),
-        // ★★★ 練習進捗とマスター状況も保存 ★★★
+        // ★★★ ここを直列化したものに置換 ★★★
         practiceProgress: gameState.practiceProgress,
-        kanjiReadProgress: gameState.kanjiReadProgress
+        kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress)
       };
-      
       localStorage.setItem('kanjiGameSave', JSON.stringify(saveData));
       console.log('💾 ゲームデータを保存しました');
-      
-      // ▼▼▼ 追加：Firestoreにも保存 ▼▼▼
-      // Firebaseサービスが利用可能な場合はFirestoreにも保存
       import('../services/firebase/firebaseController.js').then(firebase => {
         firebase.savePlayerData({
           name: gameState.playerName,
@@ -248,8 +264,6 @@ function incrementStageClearCount(stageId) {
       }).catch(error => {
         console.warn('Firebase controller読み込み失敗:', error);
       });
-      // ▲▲▲ 追加終了 ▲▲▲
-      
     } catch (error) {
       console.error('❌ ゲームデータの保存に失敗しました:', error);
     }
@@ -265,33 +279,24 @@ function incrementStageClearCount(stageId) {
         console.log('💾 セーブデータが見つかりません。新規ゲームを開始します。');
         return false;
       }
-
       const saveData = JSON.parse(saveDataStr);
-      
-      // プレイヤー名を復元
+  
       if (saveData.playerName) {
         gameState.playerName = saveData.playerName;
       }
-
-      // プレイヤー統計を復元
       if (saveData.playerStats) {
         Object.assign(gameState.playerStats, saveData.playerStats);
       }
-
-      // 実績データを復元（ArrayからSetに変換）
       if (saveData.unlockedAchievements && Array.isArray(saveData.unlockedAchievements)) {
         gameState.unlockedAchievements = new Set(saveData.unlockedAchievements);
       }
-
-      // ★★★ 練習進捗とマスター状況を復元 ★★★
       if (saveData.practiceProgress) {
         gameState.practiceProgress = saveData.practiceProgress;
       }
-
       if (saveData.kanjiReadProgress) {
-        gameState.kanjiReadProgress = saveData.kanjiReadProgress;
+        gameState.kanjiReadProgress = deserializeKanjiReadProgress(saveData.kanjiReadProgress);
       }
-
+  
       console.log('💾 ゲームデータを読み込みました');
       console.log(`📊 レベル: ${gameState.playerStats.level}, 倒した敵: ${gameState.playerStats.enemiesDefeated}, クリアしたステージ: ${gameState.playerStats.stagesCleared}`);
       console.log(`🏆 解除済み実績数: ${gameState.unlockedAchievements.size}`);

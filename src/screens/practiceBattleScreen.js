@@ -47,7 +47,7 @@ const practiceBattleScreenState = {
         // 現在学習中漢字パネル（右上に移動）
     current: { x: 520, y: 70, w: 260, h: 200 },
     // マスターモードバッジ（上に移動）
-    modeBadge: { x: 360, y: 40, w: 160, h: 40 },
+    modeBadge: { x: 320, y: 40, w: 160, h: 40 },
     // 拡張マスター進捗パネル（よみ入力の下に配置）
     progress: { x: 100, y: 460, w: 350, h: 70 },
     // 学習履歴パネル（未使用・非表示）
@@ -924,29 +924,31 @@ const practiceBattleScreenState = {
       this.ctx.fillText('正しい読み:', x + 10, infoY);
       infoY += 16;
 
-      // 読みを色分けして描画（読了=鮮色、未読=グレー）
-      const prog = (gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id]) || { onyomi: new Set(), kunyomi: new Set() };
-
-      const drawColoredList = (label, arr, learnedSet, learnedColor, unlearnedColor) => {
-        if (!arr || arr.length === 0) return;
-        this.ctx.textAlign = 'left';
-        this.ctx.fillStyle = '#e0e0e0';
-        this.ctx.fillText(label, x + 10, infoY);
-        let tx = x + 35;
-        for (let i = 0; i < arr.length; i++) {
-          const r = arr[i];
-          const learned = learnedSet && learnedSet.has(r);
-          this.ctx.fillStyle = learned ? learnedColor : '#95a5a6';
-          const text = i < arr.length - 1 ? `${r}、` : r;
-          this.ctx.fillText(text, tx, infoY);
-          tx += this.ctx.measureText(text).width + 2;
-        }
-        infoY += 16;
-      };
-
-      drawColoredList('音:', (battleState.lastAnswered.onyomi || []), prog.onyomi, '#f1c40f', '#95a5a6');
-      drawColoredList('訓:', (battleState.lastAnswered.kunyomi || []), prog.kunyomi, '#2ecc71', '#95a5a6');
-
+            // 読みを色分けして描画（読了=鮮色、未読=グレー）
+            const rawProg = gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id];
+            const prog = rawProg || {};
+            const onySet = (prog.onyomi instanceof Set) ? prog.onyomi : new Set((prog.onyomi || []));
+            const kunSet = (prog.kunyomi instanceof Set) ? prog.kunyomi : new Set((prog.kunyomi || []));
+      
+            const drawColoredList = (label, arr, learnedSet, learnedColor, unlearnedColor) => {
+              if (!arr || arr.length === 0) return;
+              this.ctx.textAlign = 'left';
+              this.ctx.fillStyle = '#e0e0e0';
+              this.ctx.fillText(label, x + 10, infoY);
+              let tx = x + 35;
+              for (let i = 0; i < arr.length; i++) {
+                const r = arr[i];
+                const learned = learnedSet && learnedSet.has(r);
+                this.ctx.fillStyle = learned ? learnedColor : '#95a5a6';
+                const text = i < arr.length - 1 ? `${r}、` : r;
+                this.ctx.fillText(text, tx, infoY);
+                tx += this.ctx.measureText(text).width + 2;
+              }
+              infoY += 16;
+            };
+      
+            drawColoredList('音:', (battleState.lastAnswered.onyomi || []), onySet, '#f1c40f', '#95a5a6');
+            drawColoredList('訓:', (battleState.lastAnswered.kunyomi || []), kunSet, '#2ecc71', '#95a5a6');
       // あなたの答え表示
       if (battleState.lastAnswered.correctAnswer) {
         // 正解した場合
@@ -1026,38 +1028,70 @@ const practiceBattleScreenState = {
         infoY += 16;
       }
       
-      // JLPTレベル
-      if (gameState.currentKanji.jlpt) {
-        this.ctx.fillText(`JLPT: ${gameState.currentKanji.jlpt}`, x + 12, infoY);
-        infoY += 16;
-      }
-
-      // 学習進捗ゲージ
-      const prog = gameState.kanjiReadProgress && gameState.kanjiReadProgress[gameState.currentKanji.id];
-      if (prog) {
-        const gaugeY = y + h - 35;
-        const gaugeW = w - 24;
-        const gaugeH = 10;
-        
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-        this.ctx.fillRect(x + 12, gaugeY, gaugeW, gaugeH);
-        
-        const totalReadings = (gameState.currentKanji.onyomi || []).length + (gameState.currentKanji.kunyomi || []).length;
-        const masteredReadings = (prog.onyomi ? prog.onyomi.size : 0) + (prog.kunyomi ? prog.kunyomi.size : 0);
-        const progressRatio = totalReadings > 0 ? masteredReadings / totalReadings : 0;
-        
-        this.ctx.fillStyle = progressRatio >= 1 ? '#2ecc71' : '#3498db';
-        this.ctx.fillRect(x + 12, gaugeY, gaugeW * progressRatio, gaugeH);
-        
-        this.ctx.strokeStyle = 'white';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(x + 12, gaugeY, gaugeW, gaugeH);
-        
-        this.ctx.font = '10px "UDデジタル教科書体",sans-serif';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillStyle = 'white';
-        this.ctx.fillText(`習得: ${masteredReadings}/${totalReadings}`, x + w/2, gaugeY + 22);
-      }
+            // JLPTレベル
+            if (gameState.currentKanji.jlpt) {
+              this.ctx.fillText(`JLPT: ${gameState.currentKanji.jlpt}`, x + 12, infoY);
+              infoY += 16;
+            }
+      
+            // 読み（既習は表示、未習は○で隠す）
+            const rawProg = gameState.kanjiReadProgress && gameState.kanjiReadProgress[gameState.currentKanji.id];
+            const prog = rawProg || {};
+            const onySet = (prog.onyomi instanceof Set) ? prog.onyomi : new Set((prog.onyomi || []));
+            const kunSet = (prog.kunyomi instanceof Set) ? prog.kunyomi : new Set((prog.kunyomi || []));
+      
+            const mask = (s) => {
+              const len = (String(s || '')).length;
+              return len > 0 ? '○'.repeat(len) : '○';
+            };
+      
+            const drawMaskedList = (label, arr, learnedSet, color) => {
+              if (!arr || arr.length === 0) return;
+              this.ctx.textAlign = 'left';
+              this.ctx.fillStyle = '#e0e0e0';
+              this.ctx.fillText(label, x + 12, infoY);
+              let tx = x + 35;
+              this.ctx.fillStyle = 'white';
+              for (let i = 0; i < arr.length; i++) {
+                const r = arr[i];
+                const isKnown = learnedSet.has(r);
+                const text = isKnown ? r : mask(r);
+                this.ctx.fillStyle = isKnown ? color : '#bdc3c7';
+                const disp = i < arr.length - 1 ? `${text}、` : text;
+                this.ctx.fillText(disp, tx, infoY);
+                tx += this.ctx.measureText(disp).width + 2;
+              }
+              infoY += 16;
+            };
+      
+            drawMaskedList('音:', (gameState.currentKanji.onyomi || []), onySet, '#f1c40f');
+            drawMaskedList('訓:', (gameState.currentKanji.kunyomi || []), kunSet, '#2ecc71');
+      
+            // 学習進捗ゲージ
+            if (prog) {
+              const gaugeY = y + h - 35;
+              const gaugeW = w - 24;
+              const gaugeH = 10;
+      
+              this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+              this.ctx.fillRect(x + 12, gaugeY, gaugeW, gaugeH);
+      
+              const totalReadings = (gameState.currentKanji.onyomi || []).length + (gameState.currentKanji.kunyomi || []).length;
+              const masteredReadings = (onySet.size) + (kunSet.size);
+              const progressRatio = totalReadings > 0 ? masteredReadings / totalReadings : 0;
+      
+              this.ctx.fillStyle = progressRatio >= 1 ? '#2ecc71' : '#3498db';
+              this.ctx.fillRect(x + 12, gaugeY, gaugeW * progressRatio, gaugeH);
+      
+              this.ctx.strokeStyle = 'white';
+              this.ctx.lineWidth = 1;
+              this.ctx.strokeRect(x + 12, gaugeY, gaugeW, gaugeH);
+      
+              this.ctx.font = '10px \"UDデジタル教科書体\",sans-serif';
+              this.ctx.textAlign = 'center';
+              this.ctx.fillStyle = 'white';
+              this.ctx.fillText(`習得: ${masteredReadings}/${totalReadings}`, x + w/2, gaugeY + 22);
+            }
       
     } catch (error) {
       console.error('❌ 現在漢字パネル描画エラー:', error);
@@ -1403,6 +1437,27 @@ const practiceBattleScreenState = {
       const { totalPracticed, correctCount, maxStreak } = this.practiceStats;
       const accuracy = totalPracticed > 0 ? Math.round((correctCount / totalPracticed) * 100) : 0;
       const sessionTime = Math.floor((Date.now() - this.practiceStats.startTime) / 1000 / 60);
+      const prog = gameState.kanjiReadProgress[id];
+
+      // 既存データが配列等の場合に Set へ正規化
+      if (!(prog.onyomi instanceof Set)) {
+        prog.onyomi = new Set(prog.onyomi || []);
+      }
+      if (!(prog.kunyomi instanceof Set)) {
+        prog.kunyomi = new Set(prog.kunyomi || []);
+      }
+
+      const isKun = (currentKanji.kunyomi || []).includes(answer);
+      const isOn = (currentKanji.onyomi || []).includes(answer);
+      
+      if (isKun) {
+        prog.kunyomi.add(answer);
+        console.log(`📖 訓読み「${answer}」を習得しました`);
+      }
+      if (isOn) {
+        prog.onyomi.add(answer);
+        console.log(`📖 音読み「${answer}」を習得しました`);
+      }
       
       console.log('🎯 練習完了:', {
         totalPracticed,
