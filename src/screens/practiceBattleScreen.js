@@ -456,14 +456,18 @@ const practiceBattleScreenState = {
       // 成功パーティクルエフェクト開始
       this.startSuccessParticles();
       
-      // 石版攻撃エフェクト
-      if (this.startStoneAttackEffect && this.canvas) {
-        const kanjiX = this.canvas.width / 2;
-        const kanjiY = 200;
-        this.startStoneAttackEffect(kanjiX, kanjiY, 180, 160);
-      }
-      
-      publish('playSE', 'correct');
+            // 石版攻撃エフェクト
+            if (this.startStoneAttackEffect && this.canvas) {
+              const kanjiX = this.canvas.width / 2;
+              const kanjiY = 200;
+              this.startStoneAttackEffect(kanjiX, kanjiY, 180, 160);
+            }
+            
+            publish('playSE', 'correct');
+            // ← 追加: 正解時に図鑑へ登録（重複は内部で無視される）
+            publish('addToKanjiDex', gameState.currentKanji.id);
+            
+            
       
       const wasAlreadyMastered = this._isKanjiMastered(gameState.currentKanji.id);
       this._updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
@@ -1458,7 +1462,7 @@ const practiceBattleScreenState = {
         prog.onyomi.add(answer);
         console.log(`📖 音読み「${answer}」を習得しました`);
       }
-      
+
       console.log('🎯 練習完了:', {
         totalPracticed,
         correctCount, 

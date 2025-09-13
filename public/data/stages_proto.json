@@ -2,10 +2,10 @@
   {
     "grade": 1,
     "region": "北海道",
-    "pref": "北海道",
+    "pref": "北海道奥地",
     "pos": {
-      "x": 750,
-      "y": 200
+      "x": 350,
+      "y": 250
     },
     "stageId": "hokkaido_area1",
     "name": "北海道奥地",
@@ -70,8 +70,8 @@
     "region": "北海道",
     "pref": "北海道市街地",
     "pos": {
-      "x": 550,
-      "y": 300
+      "x": 250,
+      "y": 400
     },
     "stageId": "hokkaido_area2",
     "name": "北海道市街地",
