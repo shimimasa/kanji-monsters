@@ -891,7 +891,7 @@
         "sentence": "ひろばに 人（ひと）が たくさん あつまった。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-042",
@@ -912,7 +912,7 @@
         "sentence": "つめたい 水（みず）を のむと きもちがいい。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-043",
@@ -935,7 +935,7 @@
         "sentence": "こたえが 正（ただ）しいか どうか かくにんする。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-044",
@@ -962,7 +962,7 @@
         "sentence": "土（つち）から くさの めが 生（は）える。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-045",
@@ -984,7 +984,7 @@
         "sentence": "今日（きょう）の 空（そら）は とても 青（あお）い。"
       }
     ],
-    "stageId": "hokkaido_area1"
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-046",
@@ -1005,7 +1005,7 @@
         "sentence": "夕（ゆう）ごはんの じゅんびを する。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-047",
@@ -1027,7 +1027,8 @@
         "reading": "いし",
         "sentence": "かわらで まるい 石（いし）を みつけた。"
       }
-    ]
+    ],
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-048",
@@ -1049,7 +1050,7 @@
         "sentence": "しんごうが 赤（あか）に なったら とまる。"
       }
     ],
-    "stageId": "hokkaido_area1"
+    "stageId": ["hokkaido_area2"]   
   },
   {
     "id": "g1-049",
@@ -1070,7 +1071,7 @@
         "sentence": "千円（センエン）さつを もっている。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-050",
@@ -1090,7 +1091,8 @@
         "reading": "かわ",
         "sentence": "おおきな 川（かわ）で さかなが およいでいる。"
       }
-    ]
+    ],
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-051",
@@ -1111,7 +1113,7 @@
         "sentence": "わたしが 先（さき）に はしるよ。"
       }
     ],
-    "stageId": ["hokkaido_area1"]       
+    "stageId": ["hokkaido_area2"]       
   },
   {
     "id": "g1-052",
@@ -1133,7 +1135,7 @@
         "sentence": "あしたは いつもより 早（はや）く おきる。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-053",
@@ -1154,7 +1156,7 @@
         "sentence": "にわに たくさんの 草（くさ）が はえている。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-054",
@@ -1176,7 +1178,7 @@
         "sentence": "かけっこでは 足（あし）が はやいほうが かつ。"
       }
           ],
-    "stageId": ["hokkaido_area1"]
+        "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-055",
@@ -1197,7 +1199,7 @@
         "sentence": "おじいちゃんのいえは しずかな 村（むら）に ある。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-056",
@@ -1219,7 +1221,7 @@
         "sentence": "大（おお）きな こえで へんじを する。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-057",
@@ -1241,7 +1243,7 @@
         "sentence": "あの 男（おとこ）の 子（こ）は わたしの ともだちだ。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-058",
@@ -1262,7 +1264,7 @@
         "sentence": "パンダは 竹（たけ）の はっぱを たべる。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-059",
@@ -1284,7 +1286,7 @@
         "sentence": "は この 中（なか）に プレゼントが はいっている。"
       }
     ],
-    "stageId": "hokkaido_area1"
+    "stageId": "hokkaido_area2"
   },
   {
     "id": "g1-060",
@@ -1305,7 +1307,7 @@
         "sentence": "はっぱの うえに いろんな 虫（むし）が いた。"
       }
           ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-061",
@@ -1326,7 +1328,7 @@
         "sentence": "わたしが すんでいる 町（まち）を しょうかいします。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-062",
@@ -1348,7 +1350,7 @@
         "sentence": "今日（きょう）は 天（テン）気（キ）が とても いい。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-063",
@@ -1369,7 +1371,7 @@
         "sentence": "田（た）んぼに かかしが たっている。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-064",
@@ -1391,7 +1393,7 @@
         "sentence": "はたけの 土（つち）を たがやす。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-065",
@@ -1412,7 +1414,7 @@
         "sentence": "えんぴつを 二（ふた）ほん もっている。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-066",
@@ -1436,7 +1438,7 @@
         "sentence": "今日（きょう）は とてもあつい 日（ひ）だ。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+        "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-067",
@@ -1458,7 +1460,7 @@
         "sentence": "へやに 入（はい）るときは ドアを しめる。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-068",
@@ -1479,7 +1481,7 @@
         "sentence": "あたらしい 年（とし）が はじまって うれしい。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-069",
@@ -1502,7 +1504,7 @@
         "sentence": "しろい紙（かみ）に えを かく。"
       }
     ],
-    "stageId": ["hokkaido_area1"]   
+    "stageId": ["hokkaido_area2"]   
   },
   {
     "id": "g1-070",
@@ -1525,7 +1527,7 @@
         "sentence": "たこには 足（あし）が 八（やっ）つ ある。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-071",
@@ -1544,7 +1546,7 @@
         "sentence": "百円（ヒャクエン）だまを ちょきんばこに いれた。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-072",
@@ -1567,7 +1569,7 @@
         "sentence": "この 本（ホン）の 文（ブン）は わかりやすい。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-073",
@@ -1590,7 +1592,7 @@
         "sentence": "ひろばの 大（おお）きな 木（き）の したで やすむ。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-074",
@@ -1611,7 +1613,7 @@
         "sentence": "としょしつで すきな 本（ホン）を よんだ。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-075",
@@ -1633,7 +1635,7 @@
         "sentence": "じぶんの 名（な）まえを 大（おお）きく かきましょう。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-076",
@@ -1656,7 +1658,7 @@
         "sentence": "ねこは くらやみでも 目（め）が よくみえる。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-077",
@@ -1678,7 +1680,7 @@
         "sentence": "先生（センセイ）の まえに きちんと 立（た）つ。"
       }
             ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-078",
@@ -1700,7 +1702,7 @@
         "sentence": "みんなで 力（ちから）を あわせて がんばろう。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-079",
@@ -1721,7 +1723,7 @@
         "sentence": "小（ちい）さな 林（はやし）を ぬけると うみが みえた。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+      "stageId": ["hokkaido_area2"]
   },
   {
     "id": "g1-080",
@@ -1744,6 +1746,6 @@
         "sentence": "さいころを ふったら 六（むっ）つ の 目（め）が でた。"
       }
     ],
-    "stageId": ["hokkaido_area1"]
+    "stageId": ["hokkaido_area2"]
   }
 ]

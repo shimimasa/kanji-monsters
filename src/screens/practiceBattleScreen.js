@@ -651,7 +651,7 @@ const practiceBattleScreenState = {
 
         // ② 上部ボタン描画（ステージ選択のみ）
         const BTN = {
-          stage:  { x: 140, y: 20,  w: 120, h: 30,  label: 'ステージ選択' },
+          stage:  { x: 40, y: 20,  w: 220, h: 30,  label: 'ステージ選択（もどる）' },
         };
         [BTN.stage].forEach(b => {
           const isHovered = this.mouseX && this.mouseY ? 
@@ -1111,47 +1111,46 @@ const practiceBattleScreenState = {
       this.ctx.lineWidth = 3;
       this.ctx.strokeRect(x, y, w, h);
 
-      // タイトル
-      this.ctx.fillStyle = 'white';
-      this.ctx.textAlign = 'left';
-      this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
-      this.ctx.fillText('📊 マスター進捗', x + 18, y + 24);
-
-      // 進捗値（ターゲットを毎フレーム追従）
-      const stageKanji = getKanjiByStageId(gameState.currentStageId);
-      const totalKanji = Math.max(1, stageKanji.length);
-      const masteredCount = totalKanji - this.unmasteredKanji.length;
-      const targetRatio = masteredCount / totalKanji;
-      this.progressState.target = targetRatio;
-
-      // アニメーション（イージング）
-      this.progressState.current += (this.progressState.target - this.progressState.current) * 0.12;
-
-      // 左に数値、下にバー
-      this.ctx.font = 'bold 20px "UDデジタル教科書体", sans-serif';
-      this.ctx.fillStyle = '#4caf50';
-      this.ctx.fillText(`${masteredCount}`, x + 18, y + 48);
-      this.ctx.font = 'bold 14px "UDデジタル教科書体", sans-serif';
-      this.ctx.fillStyle = 'white';
-      this.ctx.fillText(`/ ${totalKanji} (${Math.round(this.progressState.current * 100)}%)`, x + 70, y + 48);
-
-      const barX = x + 18;
-      const barY = y + h - 24;
-      const barW = w - 36;
-      const barH = 12;
-
-      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-      this.ctx.fillRect(barX, barY, barW, barH);
-
-      const progressGradient = this.ctx.createLinearGradient(barX, barY, barX + barW, barY);
-      progressGradient.addColorStop(0, '#2ecc71');
-      progressGradient.addColorStop(1, '#27ae60');
-      this.ctx.fillStyle = progressGradient;
-      this.ctx.fillRect(barX, barY, barW * this.progressState.current, barH);
-
-      this.ctx.strokeStyle = 'white';
-      this.ctx.lineWidth = 1;
-      this.ctx.strokeRect(barX, barY, barW, barH);
+            // タイトル
+            this.ctx.fillStyle = 'white';
+            this.ctx.textAlign = 'left';
+            this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+            this.ctx.fillText('📊 マスター進捗', x + 18, y + 24);
+      
+            // 進捗値（ターゲットを毎フレーム追従）
+            const stageKanji = getKanjiByStageId(gameState.currentStageId);
+            const totalKanji = Math.max(1, stageKanji.length);
+            const masteredCount = totalKanji - this.unmasteredKanji.length;
+            const targetRatio = masteredCount / totalKanji;
+            this.progressState.target = targetRatio;
+      
+            // アニメーション（イージング）
+            this.progressState.current += (this.progressState.target - this.progressState.current) * 0.12;
+      
+            // 右上に数値（バーの上）
+            const progressLabel = `${masteredCount} / ${totalKanji} (${Math.round(this.progressState.current * 100)}%)`;
+            this.ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
+            this.ctx.textAlign = 'right';
+            this.ctx.fillStyle = 'white';
+            this.ctx.fillText(progressLabel, x + w - 18, y + 24);
+      
+            const barX = x + 18;
+            const barY = y + h - 24;
+            const barW = w - 36;
+            const barH = 12;
+      
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.fillRect(barX, barY, barW, barH);
+      
+            const progressGradient = this.ctx.createLinearGradient(barX, barY, barX + barW, barY);
+            progressGradient.addColorStop(0, '#2ecc71');
+            progressGradient.addColorStop(1, '#27ae60');
+            this.ctx.fillStyle = progressGradient;
+            this.ctx.fillRect(barX, barY, barW * this.progressState.current, barH);
+      
+            this.ctx.strokeStyle = 'white';
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeRect(barX, barY, barW, barH);
     } catch (error) {
       console.error('❌ 拡張進捗パネル描画エラー:', error);
     }
@@ -1526,7 +1525,7 @@ const practiceBattleScreenState = {
           };
         }
         
-        publish('playSE', 'levelUp');
+        publish('playSE', 'master');
       }
       
     } catch (error) {
