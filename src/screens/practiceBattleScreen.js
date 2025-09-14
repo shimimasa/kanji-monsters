@@ -256,12 +256,23 @@ const practiceBattleScreenState = {
       const el = this.inputEl;
       if (!el) return;
 
+      const scrollCanvasTopIntoView = () => {
+        try {
+          const r = this.canvas && this.canvas.getBoundingClientRect && this.canvas.getBoundingClientRect();
+          if (!r) return;
+          const base = (window.pageYOffset || document.documentElement.scrollTop || 0);
+          const y = Math.max(0, base + r.top - 12);
+          window.scrollTo(0, y);
+        } catch {}
+      };
+
       const applyByViewport = () => {
         const vv = window.visualViewport;
         if (!vv) return;
         const bottomInset = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop));
         this.keyboardState.bottomInset = bottomInset;
         this.keyboardState.open = bottomInset > 100;
+        if (this.keyboardState.open) scrollCanvasTopIntoView();
         // 位置再計算
         this._adjustInputPosition();
       };
@@ -272,14 +283,10 @@ const practiceBattleScreenState = {
       }
 
       this._focusHandler = () => {
-        // ページのスクロールを抑止
-        document.documentElement.style.overflow = 'hidden';
-        document.body.style.overflow = 'hidden';
         applyByViewport();
+        setTimeout(() => { if (this.keyboardState.open) scrollCanvasTopIntoView(); }, 50);
       };
       this._blurHandler = () => {
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
         this.keyboardState.open = false;
         this.keyboardState.bottomInset = 0;
         this._adjustInputPosition();
