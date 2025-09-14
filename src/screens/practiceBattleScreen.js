@@ -1604,10 +1604,10 @@ const practiceBattleScreenState = {
       const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 40;
 
       if (keyboardOpen) {
-        // キーボード直上に固定（視認性重視）
+        // キーボード直上に固定（余白を4pxに縮める）
         this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
         this.inputEl.style.top = 'auto';
-        this.inputEl.style.bottom = `${Math.round(bottomInset + 12)}px`;
+        this.inputEl.style.bottom = `${Math.round(bottomInset + 4)}px`;
         this.inputEl.style.transform = 'none';
       } else {
         // 従来のキャンバス中央付近に配置（PCと同等）
