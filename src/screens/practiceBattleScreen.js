@@ -1525,7 +1525,7 @@ const practiceBattleScreenState = {
           };
         }
         
-        publish('playSE', 'levelUp');
+        publish('playSE', 'master');
       }
       
     } catch (error) {
