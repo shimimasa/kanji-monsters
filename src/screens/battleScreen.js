@@ -1034,7 +1034,7 @@ getMaxHealCountFromSettings() {
   },
 
   getEnemyAttackMode() {
-    try { return localStorage.getItem('enemyAttackMode') || 'always'; } catch { return 'always'; }
+    try { return localStorage.getItem('enemyAttackMode') || 'onMistakeOnly'; } catch { return 'onMistakeOnly'; }
   },
   shouldEnemyAttackAfterCorrect() {
     return this.getEnemyAttackMode() !== 'onMistakeOnly';

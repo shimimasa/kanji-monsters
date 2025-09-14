@@ -559,7 +559,7 @@ const settingsScreenState = {
 
   setupEnemyAttackModeEvents() {
     setTimeout(() => {
-      const saved = localStorage.getItem('enemyAttackMode') || 'always';
+      const saved = localStorage.getItem('enemyAttackMode') || 'onMistakeOnly';
       const always = document.getElementById('enemyAttack_always');
       const mistakeOnly = document.getElementById('enemyAttack_onMistakeOnly');
       if (always && mistakeOnly) {
