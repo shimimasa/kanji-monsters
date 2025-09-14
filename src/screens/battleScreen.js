@@ -90,6 +90,7 @@ const battleScreenState = {
   logOffset: 0,
   timerId: null,
   _timeouts: [],
+  _focusScrollTimers: [], // フォーカス時の再補正タイマー
 
   // モバイルキーボード状態
   keyboardState: { open: false, bottomInset: 0 },
@@ -2279,24 +2280,62 @@ if (hh.visible) {
     }
 
   },
-
-  
 /**
- * モバイルのキーボード可視領域に追従＆スクロール抑止
+ * モバイルのキーボード可視領域に追従＆スクロール補正
  */
 _setupMobileViewportWorkarounds() {
   try {
     const el = this.inputEl;
     if (!el) return;
 
+    const setScrollPadding = (enable) => {
+      const html = document.documentElement;
+      const body = document.body;
+      if (enable) {
+        this._prevBodyStyles = this._prevBodyStyles || {
+          htmlOverflowY: html.style.overflowY,
+          bodyOverflowY: body.style.overflowY,
+          bodyPaddingBottom: body.style.paddingBottom,
+          htmlOverscroll: html.style.overscrollBehaviorY,
+          bodyOverscroll: body.style.overscrollBehaviorY
+        };
+        html.style.overflowY = 'auto';
+        body.style.overflowY = 'auto';
+        html.style.overscrollBehaviorY = 'contain';
+        body.style.overscrollBehaviorY = 'contain';
+        const vv = window.visualViewport;
+        const inset = vv ? Math.max(0, (window.innerHeight - vv.height - vv.offsetTop)) : 0;
+        const pad = Math.max(220, inset + 220); // 十分な余白を確保
+        body.style.paddingBottom = `${pad}px`;
+      } else {
+        const s = this._prevBodyStyles || {};
+        document.documentElement.style.overflowY = s.htmlOverflowY || '';
+        document.body.style.overflowY = s.bodyOverflowY || '';
+        document.documentElement.style.overscrollBehaviorY = s.htmlOverscroll || '';
+        document.body.style.overscrollBehaviorY = s.bodyOverscroll || '';
+        document.body.style.paddingBottom = s.bodyPaddingBottom || '';
+        this._prevBodyStyles = null;
+      }
+    };
+
     const scrollCanvasTopIntoView = () => {
       try {
         const r = this.canvas && this.canvas.getBoundingClientRect && this.canvas.getBoundingClientRect();
         if (!r) return;
         const base = (window.pageYOffset || document.documentElement.scrollTop || 0);
-        const y = Math.max(0, base + r.top - 12);
+        const y = Math.max(0, base + r.top - 12); // 上に少し余白
         window.scrollTo(0, y);
       } catch {}
+    };
+
+    const scheduleScrollCorrections = () => {
+      // Safariの自動パン対策：複数回再補正
+      const times = [0, 60, 120, 240, 360];
+      this._focusScrollTimers = this._focusScrollTimers || [];
+      times.forEach(t => {
+        const id = setTimeout(() => { if (this.keyboardState.open) scrollCanvasTopIntoView(); }, t);
+        this._focusScrollTimers.push(id);
+      });
     };
 
     const applyByViewport = () => {
@@ -2305,21 +2344,34 @@ _setupMobileViewportWorkarounds() {
       const bottomInset = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop));
       this.keyboardState.bottomInset = bottomInset;
       this.keyboardState.open = bottomInset > 100;
-      if (this.keyboardState.open) scrollCanvasTopIntoView();
+      if (this.keyboardState.open) {
+        setScrollPadding(true);
+        scrollCanvasTopIntoView();
+      }
     };
 
     this._vvResizeHandler = () => { applyByViewport(); };
+    this._vvScrollHandler = () => { if (this.keyboardState.open) scrollCanvasTopIntoView(); };
+
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', this._vvResizeHandler);
+      window.visualViewport.addEventListener('scroll', this._vvScrollHandler);
     }
+
     this._focusHandler = () => {
       applyByViewport();
-      setTimeout(() => { if (this.keyboardState.open) scrollCanvasTopIntoView(); }, 50);
+      scheduleScrollCorrections();
     };
     this._blurHandler = () => {
       this.keyboardState.open = false;
       this.keyboardState.bottomInset = 0;
+      setScrollPadding(false);
+      if (Array.isArray(this._focusScrollTimers)) {
+        this._focusScrollTimers.forEach(id => { try { clearTimeout(id); } catch {} });
+        this._focusScrollTimers = [];
+      }
     };
+
     el.addEventListener('focus', this._focusHandler);
     el.addEventListener('blur', this._blurHandler);
   } catch (e) {
@@ -2912,8 +2964,29 @@ drawEnemyStatusPanel(ctx) {
       if (this._vvResizeHandler && window.visualViewport) {
         window.visualViewport.removeEventListener('resize', this._vvResizeHandler);
       }
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
+      if (this._vvScrollHandler && window.visualViewport) {
+        window.visualViewport.removeEventListener('scroll', this._vvScrollHandler);
+      }
+      if (Array.isArray(this._focusScrollTimers)) {
+        this._focusScrollTimers.forEach(id => { try { clearTimeout(id); } catch {} });
+        this._focusScrollTimers = [];
+      }
+      // 付与したスタイルを元に戻す
+      if (this._prevBodyStyles) {
+        const s = this._prevBodyStyles;
+        document.documentElement.style.overflowY = s.htmlOverflowY || '';
+        document.body.style.overflowY = s.bodyOverflowY || '';
+        document.documentElement.style.overscrollBehaviorY = s.htmlOverscroll || '';
+        document.body.style.overscrollBehaviorY = s.bodyOverscroll || '';
+        document.body.style.paddingBottom = s.bodyPaddingBottom || '';
+        this._prevBodyStyles = null;
+      } else {
+        document.documentElement.style.overflowY = '';
+        document.body.style.overflowY = '';
+        document.documentElement.style.overscrollBehaviorY = '';
+        document.body.style.overscrollBehaviorY = '';
+        document.body.style.paddingBottom = '';
+      }
       // クリックイベントリスナ解除
       if (this._clickHandler) {
         this.unregisterHandlers();
