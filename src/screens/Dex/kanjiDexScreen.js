@@ -50,11 +50,14 @@ const kanjiDexScreen = {
     
     // canvas 引数が HTMLCanvasElement ならそれを使い、そうでなければ DOM から取得
     this.canvas = (arg && typeof arg.getContext === 'function')
-      ? arg
-      : document.getElementById('gameCanvas');
-    this.ctx    = this.canvas.getContext('2d');
+    ? arg
+    : document.getElementById('gameCanvas');
+  this.ctx    = this.canvas.getContext('2d');
 
-    // 背面のキャンバスを不可視化（前画面の斜線などが透けないように）
+  // 画面専用BGMを再生
+  publish('playBGM', 'bgm_kanjiDex');
+
+  // 背面のキャンバスを不可視化（前画面の斜線などが透けないように）
     this._canvasRef = this.canvas || null;
     if (this._canvasRef) {
       this._prevCanvasVisibility = this._canvasRef.style.visibility;
@@ -249,7 +252,10 @@ const kanjiDexScreen = {
   
     backButton.addEventListener('click', () => {
       publish('playSE', 'decide');
-      const targetScreen = gameState.previousScreen || 'stageSelect';
+      publish('playBGM', 'title');
+      const targetScreen = (gameState.previousScreen === 'worldStageSelect')
+        ? 'worldStageSelect'
+        : 'stageSelect';
       publish('changeScreen', targetScreen);
     });
     leftControls.appendChild(backButton);
@@ -1052,6 +1058,7 @@ const kanjiDexScreen = {
 
   /** exit：画面離脱時のクリーンアップ */
   exit() {
+    publish('stopBGM', 0.2);
     // DOM要素を削除
     if (this.container) {
       this.container.remove();

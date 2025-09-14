@@ -58,7 +58,7 @@ const resultWinState = {
 
     // クリア画面に入ったらクリアBGMを再生
     publish('playBGM', 'victory');
-    
+
     // ステージクリアの統計データを更新
     recordStageCleared();
     gameState.playerStats.stagesCleared++;
@@ -101,14 +101,10 @@ const resultWinState = {
 
       const result = calcBonusReward({ grade, fights, cleared, accuracyPct, remHpPct, firstClear });
 
-      // 一括で経験値付与
-      const { addPlayerExp } = await import('../core/gameState.js');
-      addPlayerExp(result.xp);
-
-      // 初回フラグ保存
+      // ステージクリア時のEXP付与は行わない（表示のみ）
       if (firstClear) markBonusFirstClear(grade);
 
-      this.bonusSummary = { grade, fights, accuracyPct, remHpPct, ...result };
+      this.bonusSummary = { grade, fights, accuracyPct, remHpPct, ...result, xp: 0 };
     }
     
     // イベントハンドラ登録
@@ -440,12 +436,11 @@ drawBonusResultPanel(ctx, x, y, width, height) {
   ctx.fillStyle = '#ffffff';
   ctx.fillText('学年ボーナス結果', x + width/2, y + 65);
 
-  // 本文
   const lines = [
     `連戦数: ${s.fights}`,
     `正答率: ${s.accuracyPct}% / 残HP: ${s.remHpPct}%`,
     `ランク: ${s.rank}（倍率 x${s.multiplier}）`,
-    `獲得EXP: ${s.xp}（内訳: base ${s.baseXP} / 初回 ${s.firstClearBonus}）`,
+    `ステージクリア時のEXP付与: なし`
   ];
   const tp = s.titleProgress;
   if (tp?.gained) {
@@ -637,6 +632,16 @@ drawBonusResultPanel(ctx, x, y, width, height) {
 
   /** クリック処理 */
   handleClick(e) {
+// モバイルの二重発火ガード
+const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+if (e.type === 'touchstart') {
+  this._lastTouchTime = now;
+  if (e.cancelable) e.preventDefault();
+} else if (e.type === 'click') {
+  if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
+}
+e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
+
     const coords = getGameCoordinates(e, this.canvas);
     if (!isValidCoordinates(coords)) {
       return false; // 黒帯エリアのクリックは無視
@@ -648,6 +653,8 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     if (isMouseOverRect(x, y, nextStageButton)) {
       publish('playSE', 'decide');
       const targetScreen = gameState.previousScreen || 'stageSelect';
+      // 画面遷移前にメニュー系BGMへ切替
+      publish('playBGM', 'title');
       publish('changeScreen', targetScreen);
     }
   }

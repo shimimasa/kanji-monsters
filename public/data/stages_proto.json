@@ -2,13 +2,13 @@
   {
     "grade": 1,
     "region": "北海道",
-    "pref": "北海道",
+    "pref": "北海道奥地",
     "pos": {
       "x": 550,
-      "y": 300
+      "y": 250
     },
     "stageId": "hokkaido_area1",
-    "name": "北海道",
+    "name": "北海道奥地",
     "enemyIdList": [
       "HKD-E01",
       "HKD-E02",
@@ -61,7 +61,33 @@
       "g1-037",
       "g1-038",
       "g1-039",
-      "g1-040",
+      "g1-040"
+    ],
+    "recommendedLevel": 1
+  },
+  {
+    "grade": 1,
+    "region": "北海道",
+    "pref": "北海道市街地",
+    "pos": {
+      "x": 450,
+      "y": 380
+    },
+    "stageId": "hokkaido_area2",
+    "name": "北海道市街地",
+    "enemyIdList": [
+      "HKD-E011",
+      "HKD-E012",
+      "HKD-E013",
+      "HKD-E014",
+      "HKD-E015",
+      "HKD-E016",
+      "HKD-E017",
+      "HKD-E018",
+      "HKD-E019",
+      "HKD-E020"
+    ],
+    "kanjiPoolIdList": [
       "g1-041",
       "g1-042",
       "g1-043",
@@ -103,7 +129,6 @@
       "g1-079",
       "g1-080"
     ],
-    "clearBonusExp": 30,
     "recommendedLevel": 1
   },
   {
@@ -160,7 +185,6 @@
       "g2-029",
       "g2-030"
     ],
-    "clearBonusExp": 30,
     "recommendedLevel": 2
   },
   {
@@ -217,7 +241,6 @@
       "g2-059",
       "g2-060"
     ],
-    "clearBonusExp": 30,
     "recommendedLevel": 3
   },
   {
@@ -274,7 +297,6 @@
       "g2-089",
       "g2-090"
     ],
-    "clearBonusExp": 30,
     "recommendedLevel": 3
   },
   {
@@ -326,7 +348,6 @@
       "g2-114",
       "g2-115"
     ],
-    "clearBonusExp": 30,
     "recommendedLevel": 4
   },
   {
@@ -378,7 +399,6 @@
       "g2-139",
       "g2-140"
     ],
-    "clearBonusExp": 30,
     "recommendedLevel": 5
   },
   {
@@ -423,7 +443,6 @@
       "g2-159",
       "g2-160"
     ],
-    "clearBonusExp": 30,
     "recommendedLevel": 5
   },
   {
@@ -485,7 +504,7 @@
       "g3-034",
       "g3-035"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 6
   },
   {
@@ -547,7 +566,6 @@
       "g3-069",
       "g3-070"
     ],
-    "clearBonusExp": 30,
     "recommendedLevel": 7
   },
   {
@@ -609,7 +627,7 @@
       "g3-104",
       "g3-105"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 7
   },
   {
@@ -666,7 +684,7 @@
       "g3-134",
       "g3-135"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 8
   },
   {
@@ -728,7 +746,7 @@
       "g3-169",
       "g3-170"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 9
   },
   {
@@ -785,7 +803,7 @@
       "g3-199",
       "g3-200"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 9
   },
   {
@@ -907,7 +925,7 @@
       "g3-199",
       "g3-200"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 10
   },
   {
@@ -954,7 +972,7 @@
       "g4-019",
       "g4-020"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 11
   },
   {
@@ -1001,7 +1019,7 @@
       "g4-039",
       "g4-040"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 11
   },
   {
@@ -1048,7 +1066,7 @@
       "g4-059",
       "g4-060"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 12
   },
   {
@@ -1095,7 +1113,7 @@
       "g4-079",
       "g4-080"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 13
   },
   {
@@ -1142,7 +1160,7 @@
       "g4-099",
       "g4-100"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 13
   },
   {
@@ -1189,7 +1207,7 @@
       "g4-119",
       "g4-120"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 14
   },
   {
@@ -1236,7 +1254,7 @@
       "g4-139",
       "g4-140"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 15
   },
   {
@@ -1288,7 +1306,7 @@
       "g4-164",
       "g4-165"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 15
   },
   {
@@ -1352,7 +1370,7 @@
       "g4-201",
       "g4-202"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 16
   },
   {
@@ -1404,7 +1422,7 @@
       "g5-024",
       "g5-025"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 17
   },
   {
@@ -1456,7 +1474,7 @@
       "g5-049",
       "g5-050"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 17
   },
   {
@@ -1508,7 +1526,7 @@
       "g5-074",
       "g5-075"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 18
   },
   {
@@ -1560,7 +1578,7 @@
       "g5-099",
       "g5-100"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 19
   },
   {
@@ -1612,7 +1630,7 @@
       "g5-124",
       "g5-125"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 19
   },
   {
@@ -1669,7 +1687,7 @@
       "g5-154",
       "g5-155"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 20
   },
   {
@@ -1735,7 +1753,7 @@
       "g5-193",
       "g5-194"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 21
   },
   {
@@ -1797,7 +1815,7 @@
       "g6-034",
       "g6-035"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 21
   },
   {
@@ -1864,7 +1882,7 @@
       "g6-074",
       "g6-075"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 22
   },
   {
@@ -1931,7 +1949,7 @@
       "g6-114",
       "g6-115"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 23
   },
   {
@@ -1998,7 +2016,7 @@
       "g6-154",
       "g6-155"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 23
   },
   {
@@ -2060,7 +2078,7 @@
       "g6-189",
       "g6-190"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   {
@@ -2117,7 +2135,7 @@
       "g7-029",
       "g7-030"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   {
@@ -2174,7 +2192,7 @@
       "g7-059",
       "g7-060"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   
@@ -2232,7 +2250,7 @@
       "g7-089",
       "g7-090"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 24
   },
   
@@ -2290,7 +2308,7 @@
       "g7-119",
       "g7-120"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
   
@@ -2348,7 +2366,7 @@
       "g7-149",
       "g7-150"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
   
@@ -2406,7 +2424,7 @@
       "g7-179",
       "g7-180"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
   {
@@ -2463,7 +2481,7 @@
       "g7-209",
       "g7-210"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
   {
@@ -2523,7 +2541,7 @@
       "g7-239",
       "g7-240"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 24
   },
   {
@@ -2580,7 +2598,7 @@
       "g7-269",
       "g7-270"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   {
@@ -2650,7 +2668,7 @@
       "g7-312",
       "g7-313"
         ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   {
@@ -2707,7 +2725,7 @@
       "g8-029",
       "g8-030"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   {
@@ -2764,7 +2782,7 @@
       "g8-059",
       "g8-060"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   
@@ -2822,7 +2840,7 @@
       "g8-089",
       "g8-090"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 24
   },
   {
@@ -2879,7 +2897,7 @@
       "g8-119",
       "g8-120"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   
@@ -2937,7 +2955,7 @@
       "g8-149",
       "g8-150"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   
@@ -2995,7 +3013,7 @@
       "g8-179",
       "g8-180"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   
@@ -3053,7 +3071,7 @@
       "g8-209",
       "g8-210"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   
@@ -3111,7 +3129,7 @@
       "g8-239",
       "g8-240"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 24
   },
   
@@ -3169,7 +3187,7 @@
       "g8-269",
       "g8-270"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
   {
@@ -3210,7 +3228,7 @@
       "g8-283",
       "g8-284"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
   
@@ -3268,7 +3286,7 @@
       "g9-029",
       "g9-030"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
   
@@ -3326,7 +3344,7 @@
       "g9-059",
       "g9-060"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
   {
@@ -3383,7 +3401,7 @@
       "g9-089",
       "g9-090"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 24
   },
   {
@@ -3440,7 +3458,7 @@
       "g9-119",
       "g9-120"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   {
@@ -3497,7 +3515,7 @@
       "g9-149",
       "g9-150"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   {
@@ -3554,7 +3572,7 @@
       "g9-179",
       "g9-180"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   {
@@ -3611,7 +3629,7 @@
       "g9-209",
       "g9-210"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   {
@@ -3666,7 +3684,7 @@
       "g9-239",
       "g9-240"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 24
   },
   {
@@ -3723,7 +3741,7 @@
       "g9-269",
       "g9-270"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   
@@ -3809,7 +3827,7 @@
       "g9-327",
       "g9-328"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   
@@ -3857,7 +3875,7 @@
       "g10-019",
       "g10-020"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
 
@@ -3905,7 +3923,7 @@
       "g10-039",
       "g10-040"
     ],
-    "clearBonusExp": 30,
+    
     "recommendedLevel": 24
   },
   {
@@ -3952,7 +3970,7 @@
       "g10-059",
       "g10-060"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 24
   },
   
@@ -4000,7 +4018,7 @@
       "g10-079",
       "g10-080"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
   
@@ -4048,7 +4066,7 @@
       "g10-099",
       "g10-100"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
 
@@ -4096,7 +4114,7 @@
       "g10-119",
       "g10-120"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
   
@@ -4144,7 +4162,7 @@
       "g10-139",
       "g10-140"
     ],
-    "clearBonusExp": 30,
+        
     "recommendedLevel": 24
   },
 
@@ -4193,7 +4211,7 @@
       "g10-159",
       "g10-160"
     ],
-    "clearBonusExp": 30,
+
     "recommendedLevel": 24
   },
 
@@ -4242,7 +4260,7 @@
       "g10-179",
       "g10-180"
     ],
-    "clearBonusExp": 30,
+            
     "recommendedLevel": 24
   },
 
@@ -4290,7 +4308,7 @@
       "g10-015",
       "g10-016"
     ],
-    "clearBonusExp": 30,
+            
     "recommendedLevel": 24
   }
 

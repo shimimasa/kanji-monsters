@@ -21,6 +21,10 @@ const monsterCaptureScreen = {
       this.canvas.style.pointerEvents = 'none';
     }
 
+    // 背面スクロールを抑止（退出時に復元）
+    this._prevBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const stageId = gameState.currentStageId;
     const clearCount = this._getStageClearCount(stageId);
     const isBonus = /^bonus_g/i.test(String(stageId || ''));
@@ -77,13 +81,20 @@ const monsterCaptureScreen = {
     Object.assign(this.container.style, {
       position: 'fixed',
       left: '0', top: '0',
-      width: '100vw', height: '100vh',
+      width: '100vw',
+      height: '100vh',           // フォールバック
       zIndex: '100001',
       background: 'rgba(0,0,0,0.6)',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      // モバイル快適化
+      touchAction: 'pan-y',
+      overscrollBehavior: 'contain',
+      paddingBottom: 'env(safe-area-inset-bottom)'
     });
+    // 対応ブラウザでは実表示高を使用
+    this.container.style.height = '100dvh';
 
     const panel = document.createElement('div');
     Object.assign(panel.style, {
@@ -93,7 +104,13 @@ const monsterCaptureScreen = {
       borderRadius: '16px',
       boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
       padding: '16px',
-      color: '#fff'
+      color: '#fff',
+      // スクロール可能に
+      maxHeight: '90dvh',
+      overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
+      display: 'flex',
+      flexDirection: 'column'
     });
 
     const header = document.createElement('div');
@@ -182,7 +199,13 @@ const monsterCaptureScreen = {
 
     const footer = document.createElement('div');
     Object.assign(footer.style, {
-      display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '12px'
+      display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '12px',
+      // 常に下に貼り付け
+      position: 'sticky',
+      bottom: '0',
+      background: 'linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.25))',
+      backdropFilter: 'blur(4px)',
+      padding: '8px 0'
     });
 
     const cancelBtn = document.createElement('button');
@@ -243,6 +266,11 @@ const monsterCaptureScreen = {
     if (this.canvas) {
       this.canvas.style.visibility = this._prevCanvasVisibility ?? '';
       this.canvas.style.pointerEvents = this._prevCanvasPointer ?? '';
+    }
+    // 背面スクロールを復元
+    if (this._prevBodyOverflow !== undefined) {
+      document.body.style.overflow = this._prevBodyOverflow;
+      this._prevBodyOverflow = undefined;
     }
     this.container = null;
     this.canvas = null;

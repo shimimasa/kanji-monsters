@@ -238,7 +238,7 @@ const practiceButton = {
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
-  text: '練習',
+  text: 'マスター',
   icon: '📝'
 };
 
@@ -340,7 +340,7 @@ const stageSelectScreenState = {
     this._clickHandler = this.handleClick.bind(this);
     this._mousemoveHandler = this.handleMouseMove.bind(this);
     this.canvas.addEventListener('click', this._clickHandler);
-    this.canvas.addEventListener('touchstart', this._clickHandler);
+    this.canvas.addEventListener('touchstart', this._clickHandler, { passive: false });
     this.canvas.addEventListener('mousemove', this._mousemoveHandler);
 
     // 復習ボタン（ヘッダー側）は使用しないため非表示
@@ -1228,7 +1228,7 @@ update(dt) {
     this._clickHandler = this.handleClick.bind(this);
     this._mousemoveHandler = this.handleMouseMove.bind(this);
     this.canvas.addEventListener('click', this._clickHandler);
-    this.canvas.addEventListener('touchstart', this._clickHandler);
+    this.canvas.addEventListener('touchstart', this._clickHandler, { passive: false });
     this.canvas.addEventListener('mousemove', this._mousemoveHandler);
   },
 
@@ -1241,6 +1241,14 @@ update(dt) {
 
   /** クリック処理 */
   handleClick(e) {
+    // モバイルの二重発火ガード
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (e.type === 'touchstart') {
+      this._lastTouchTime = now;
+      if (e.cancelable) e.preventDefault();
+    } else if (e.type === 'click') {
+      if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
+    }
     // 統一された座標変換を使用
     const coords = getGameCoordinates(e, this.canvas);
     if (!isValidCoordinates(coords)) {
@@ -1388,14 +1396,14 @@ update(dt) {
     }
   },
 
-  // ★★★ 練習モード開始処理を追加 ★★★
+  // ★★★ マスターモード開始処理を追加 ★★★
   /**
-   * 練習モードを開始する
+   * マスターモードを開始する
    */
   _startPracticeMode() {
     // 選択されたステージがある場合はそのステージで練習
     if (this.selectedStage) {
-      console.log('🎯 練習モード開始:', this.selectedStage.stageId);
+      console.log('🎯 マスターモード開始:', this.selectedStage.stageId);
       gameState.currentStageId = this.selectedStage.stageId;
       gameState.gameMode = 'practice';
       publish('changeScreen', 'practiceBattle');
@@ -1409,12 +1417,12 @@ update(dt) {
         gameState.gameMode = 'practice';
         publish('changeScreen', 'practiceBattle');
       } else {
-        alert('練習できるステージがありません。');
+        alert('マスターできるステージがありません。');
       }
     }
     // ステージが選択されていない場合
     else {
-      alert('練習したいステージを先に選択してください。');
+      alert('マスターしたいステージを先に選択してください。');
     }
   },
   

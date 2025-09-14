@@ -1091,9 +1091,15 @@ const settingsScreenState = {
 
   /** クリック処理 */
     handleClick(e) {
-      // Canvas上のボタン処理は全て削除済み
-      // 必要に応じて、Canvas背景クリック時の処理のみ残す
-      e.preventDefault();
+      // モバイルの二重発火ガード
+      const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+      if (e.type === 'touchstart') {
+        this._lastTouchTime = now;
+        if (e.cancelable) e.preventDefault();
+      } else if (e.type === 'click') {
+        if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
+      }
+      e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
     },
 
   /** データリセット処理 - 完全版 */

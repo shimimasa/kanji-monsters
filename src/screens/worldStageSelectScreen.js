@@ -329,7 +329,7 @@ const practiceButton = {
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
-  text: '練習',
+  text: 'マスター',
   icon: '📝'
 };
 
@@ -349,7 +349,7 @@ const monsterButton = {
   y: BUTTON_CONFIG.y, 
   width: BUTTON_CONFIG.width, 
   height: BUTTON_CONFIG.height, 
-  text: 'モンスター',
+  text: '世界ゴトモン',
   icon: '👾'
 };
 
@@ -453,9 +453,8 @@ const worldStageSelectScreen = {
     this._clickHandler = this.handleClick.bind(this);
     this._mousemoveHandler = this.handleMouseMove.bind(this);
     this.canvas.addEventListener('click', this._clickHandler);
-    this.canvas.addEventListener('touchstart', this._clickHandler);
+    this.canvas.addEventListener('touchstart', this._clickHandler, { passive: false });
     this.canvas.addEventListener('mousemove', this._mousemoveHandler);
-
     // ヘッダーUIは使用しない（stageSelect と同じフッター構成に統一）
   },
 
@@ -1137,6 +1136,14 @@ const worldStageSelectScreen = {
 
   /** クリックイベント処理 */
   handleClick(e) {
+    // モバイルの二重発火ガード（タップ直後のclickを無視）
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (e.type === 'touchstart') {
+      this._lastTouchTime = now;
+      if (e.cancelable) e.preventDefault();
+    } else if (e.type === 'click') {
+      if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
+    }
     if (this._inputLocked) return;
     this._inputLocked = true;
     setTimeout(() => { this._inputLocked = false; }, 250);
@@ -1265,14 +1272,14 @@ const worldStageSelectScreen = {
     }
   },  
 
-  // ★★★ 練習モード開始処理を追加 ★★★
+  // ★★★ マスターモード開始処理を追加 ★★★
   /**
-   * 練習モードを開始する（worldStageSelect版）
+   * マスターモードを開始する（worldStageSelect版）
    */
   _startPracticeMode() {
     // 選択されたステージがある場合はそのステージで練習
     if (this.selectedStage) {
-      console.log('🎯 練習モード開始（世界）:', this.selectedStage.stageId);
+      console.log('🎯 マスターモード開始（世界）:', this.selectedStage.stageId);
       gameState.currentStageId = this.selectedStage.stageId;
       gameState.gameMode = 'practice';
       publish('changeScreen', 'practiceBattle');

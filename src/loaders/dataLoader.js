@@ -106,6 +106,20 @@ export async function loadAllGameData() {
     stageData = await stageResponse.json();
     console.log("ステージデータ読み込み完了");
 
+    // 敵データに学年（grade）を補完（stageId → stageData／プレフィックス推定）
+    {
+      const stageGradeIndex = new Map(stageData.map(s => [s.stageId, s.grade]));
+      for (const e of enemyData) {
+        if (!e || typeof e.id !== 'string') continue;
+        if (String(e.id).startsWith('PRV-')) continue; // ことわざは除外
+        if (typeof e.grade !== 'number') {
+          let g = stageGradeIndex.get(e.stageId);
+          if (!g) g = getGradeFromStageId(String(e.stageId || '')) || null;
+          if (g) e.grade = g;
+        }
+      }
+    }
+
     // 🔽 正しいマッピング処理（stageIdごとにグループ化）
     const kanjiMap = {};
     for (const k of kanjiData) {
@@ -331,18 +345,16 @@ export function getKanjiByStageId(stageId) {
 
 // ステージIDから学年を推測するヘルパー関数
 function getGradeFromStageId(stageId) {
-  // ステージIDから学年を推測するロジック
   if (stageId.startsWith('hokkaido_')) return 1;
   if (stageId.startsWith('tohoku_')) return 2;
   if (stageId.startsWith('kanto_')) return 3;
   if (stageId.startsWith('chubu_')) return 4;
   if (stageId.startsWith('kinki_')) return 5;
-  if (stageId.startsWith('chugoku_')) return 6;
+  if (stageId.startsWith('chugoku_') || stageId.startsWith('chuugoku_')) return 6;
   if (stageId.startsWith('asia_')) return 7;
   if (stageId.startsWith('europe_')) return 8;
   if (stageId.startsWith('america_')) return 9;
   if (stageId.startsWith('africa_')) return 10;
-  
   return null;
 }
 
@@ -426,7 +438,7 @@ function findBonusBossForGrade(grade, allEnemies) {
   return null;
 }
 
-// ★★★ 練習モード用のマスター判定関数を追加 ★★★
+// ★★★ マスターモード用のマスター判定関数を追加 ★★★
 
 /**
  * 漢字がマスター済みかどうかを判定する
