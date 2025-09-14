@@ -48,7 +48,7 @@ const RECENT_QUESTIONS_BUFFER_SIZE = 5; // 直近5問は出題しない
 
 const BTN = {
   back:   { x: 20,  y: 20,  w: 100, h: 30,  label: 'タイトルへ' },
-  stage:  { x: 140, y: 20,  w: 120, h: 30,  label: 'ステージ選択' },
+  stage:  { x: 40, y: 20,  w: 220, h: 30,  label: 'ステージ選択（もどる）' },
   attack: { x: 230, y: 380, w: 110, h: 50,  label: 'こうげき' },
   heal:   { x: 350, y: 380, w: 110, h: 50,  label: 'かいふく' },
   hint:   { x: 470, y: 380, w: 110, h: 50,  label: 'ヒント' },
