@@ -38,8 +38,11 @@ const practiceBattleScreenState = {
       duration: 60
     },
   
-    // 進捗バーのアニメーション状態
-    progressState: { current: 0, target: 0 },
+        // 進捗バーのアニメーション状態
+        progressState: { current: 0, target: 0 },
+
+        // モバイルキーボード状態
+        keyboardState: { open: false, bottomInset: 0 },
 
 
   // 📐 最適化されたレイアウト設定（ボタンエリア削除後）
@@ -206,6 +209,15 @@ const practiceBattleScreenState = {
         this.inputEl.removeEventListener('keydown', this._keydownHandler);
       }
       this.inputEl.addEventListener('keydown', this._practiceKeydownHandler);
+
+      // モバイル入力最適化（iOS向け）
+      this.inputEl.setAttribute('inputmode', 'kana');
+      this.inputEl.setAttribute('autocapitalize', 'off');
+      this.inputEl.setAttribute('autocorrect', 'off');
+      this.inputEl.setAttribute('spellcheck', 'false');
+
+      // キーボード追従とスクロール抑止をセットアップ
+      this._setupMobileViewportWorkarounds();
       
       console.log('✅ キーハンドラ設定完了');
       
@@ -233,6 +245,50 @@ const practiceBattleScreenState = {
       
     } catch (error) {
       console.error('❌ 敵要素無効化エラー:', error);
+    }
+  },
+
+  /**
+   * モバイルのキーボード可視領域に追従＆スクロール抑止
+   */
+  _setupMobileViewportWorkarounds() {
+    try {
+      const el = this.inputEl;
+      if (!el) return;
+
+      const applyByViewport = () => {
+        const vv = window.visualViewport;
+        if (!vv) return;
+        const bottomInset = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop));
+        this.keyboardState.bottomInset = bottomInset;
+        this.keyboardState.open = bottomInset > 100;
+        // 位置再計算
+        this._adjustInputPosition();
+      };
+
+      this._vvResizeHandler = () => { applyByViewport(); };
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', this._vvResizeHandler);
+      }
+
+      this._focusHandler = () => {
+        // ページのスクロールを抑止
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+        applyByViewport();
+      };
+      this._blurHandler = () => {
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        this.keyboardState.open = false;
+        this.keyboardState.bottomInset = 0;
+        this._adjustInputPosition();
+      };
+
+      el.addEventListener('focus', this._focusHandler);
+      el.addEventListener('blur', this._blurHandler);
+    } catch (e) {
+      console.warn('⚠️ ビューポート調整の初期化に失敗:', e);
     }
   },
 
@@ -1468,7 +1524,8 @@ const practiceBattleScreenState = {
 
       // PC/タブレットのサイズ
       const isTablet = window.innerWidth <= 1024;
-      this.inputEl.style.width = isTablet ? 'min(70vw, 360px)' : '280px';
+      // モバイルでの横幅はやや広めに
+      this.inputEl.style.width = isTablet ? 'min(80vw, 520px)' : '280px';
       this.inputEl.style.fontSize = isTablet ? '18px' : '20px';
       this.inputEl.style.padding = '10px 15px';
       this.inputEl.style.textAlign = 'center';
@@ -1478,7 +1535,12 @@ const practiceBattleScreenState = {
       this.inputEl.style.boxSizing = 'border-box';
       this.inputEl.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
 
-      // キャンバス基準で下に配置（ボタンエリアを使用）
+      // visualViewportからキーボード開閉を推定
+      const vv = window.visualViewport;
+      const vvInset = vv ? Math.max(0, (window.innerHeight - vv.height - vv.offsetTop)) : 0;
+      const keyboardOpen = this.keyboardState.open || vvInset > 100;
+      const bottomInset = keyboardOpen ? Math.max(this.keyboardState.bottomInset, vvInset) : 0;
+
       const rect = this.canvas.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
 
@@ -1486,14 +1548,21 @@ const practiceBattleScreenState = {
       const inputW = this.inputEl.offsetWidth || parseInt(cs.width) || 280;
       const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 40;
 
-      // より下に配置（元々ボタンがあった位置）
-      const targetCanvasY = 400;
-      const cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
-
-      this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
-      this.inputEl.style.top = `${Math.round(cssTop)}px`;
-      this.inputEl.style.bottom = 'auto';
-      this.inputEl.style.transform = 'none';
+      if (keyboardOpen) {
+        // キーボード直上に固定（視認性重視）
+        this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
+        this.inputEl.style.top = 'auto';
+        this.inputEl.style.bottom = `${Math.round(bottomInset + 12)}px`;
+        this.inputEl.style.transform = 'none';
+      } else {
+        // 従来のキャンバス中央付近に配置（PCと同等）
+        const targetCanvasY = 400;
+        const cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
+        this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
+        this.inputEl.style.top = `${Math.round(cssTop)}px`;
+        this.inputEl.style.bottom = 'auto';
+        this.inputEl.style.transform = 'none';
+      }
       
     } catch (error) {
       console.error('❌ 入力欄位置調整エラー:', error);
@@ -1797,13 +1866,31 @@ const practiceBattleScreenState = {
         battleScreenState.exit.call(this);
       }
       
-      this.practiceMode = false;
-      this.onPracticeComplete = null;
-      this.unmasteredKanji = [];
-      this.lastIncorrectAnswer = null;
-      this.recentHistory = [];
-      this.reviewMode = false;
-      this.reviewTargetReading = null;
+         this.practiceMode = false;
+    this.onPracticeComplete = null;
+    this.unmasteredKanji = [];
+    this.lastIncorrectAnswer = null;
+    this.recentHistory = [];
+    this.reviewMode = false;
+    this.reviewTargetReading = null;
+    
+    // リスナー解除とスタイル復元
+    try {
+      if (this.inputEl && this._focusHandler) {
+        this.inputEl.removeEventListener('focus', this._focusHandler);
+        this._focusHandler = null;
+      }
+      if (this.inputEl && this._blurHandler) {
+        this.inputEl.removeEventListener('blur', this._blurHandler);
+        this._blurHandler = null;
+      }
+      if (this._vvResizeHandler && window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', this._vvResizeHandler);
+        this._vvResizeHandler = null;
+      }
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    } catch {}
       
 
       // 成功パーティクルをクリア
