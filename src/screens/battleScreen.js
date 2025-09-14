@@ -91,6 +91,8 @@ const battleScreenState = {
   timerId: null,
   _timeouts: [],
 
+  // モバイルキーボード状態
+  keyboardState: { open: false, bottomInset: 0 },
   // マウス座標を保存するプロパティを追加
   mouseX: 0,
   mouseY: 0,
@@ -830,52 +832,34 @@ updateShieldBreakEffect() {
         this.inputEl.style.display = 'block';
         this.inputEl.placeholder = 'よみを にゅうりょく';
         
-        // ここで関数を参照する前に、関数が定義されていることを確認
         // Enter キーで最後に選択したコマンドを呼び出す
         this._keydownHandler = e => {
           if (e.key === 'Enter') {
             e.preventDefault();
             if (battleState.turn === 'player' && battleState.inputEnabled) {
               const mode = battleState.lastCommandMode || 'attack';
-              
-              // 安全な遅延実行で関数の定義を待つ
               setTimeout(() => {
                 try {
-                  if (mode === 'attack') {
-                    if (typeof onAttack === 'function') {
-                      onAttack();
-                    } else {
-                      console.error('onAttack関数が定義されていません');
-                      battleState.inputEnabled = true;
-                    }
-                  } else if (mode === 'heal') {
-                    if (typeof onHeal === 'function') {
-                      onHeal();
-                    } else {
-                      console.error('onHeal関数が定義されていません');
-                      battleState.inputEnabled = true;
-                    }
-                  } else {
-                    if (typeof onHint === 'function') {
-                      onHint();
-                    } else {
-                      console.error('onHint関数が定義されていません');
-                      battleState.inputEnabled = true;
-                    }
-                  }
+                  if (mode === 'attack') { if (typeof onAttack === 'function') onAttack(); else { console.error('onAttack関数が定義されていません'); battleState.inputEnabled = true; } }
+                  else if (mode === 'heal') { if (typeof onHeal === 'function') onHeal(); else { console.error('onHeal関数が定義されていません'); battleState.inputEnabled = true; } }
+                  else { if (typeof onHint === 'function') onHint(); else { console.error('onHint関数が定義されていません'); battleState.inputEnabled = true; } }
                 } catch (error) {
                   console.error('処理中にエラーが発生しました:', error);
                   battleState.inputEnabled = true;
-                  // 入力欄をクリア
-                  if (this.inputEl) {
-                    this.inputEl.value = '';
-                  }
+                  if (this.inputEl) { this.inputEl.value = ''; }
                 }
-              }, 0); // 0ミリ秒の遅延で次のイベントループで実行
+              }, 0);
             }
           }
         };
         this.inputEl.addEventListener('keydown', this._keydownHandler);
+
+        // モバイル入力最適化＆キーボード追従
+        this.inputEl.setAttribute('inputmode', 'kana');
+        this.inputEl.setAttribute('autocapitalize', 'off');
+        this.inputEl.setAttribute('autocorrect', 'off');
+        this.inputEl.setAttribute('spellcheck', 'false');
+        this._setupMobileViewportWorkarounds();
       }
 
       this.victoryCallback = onVictory;
@@ -1469,39 +1453,53 @@ this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY)
     
 
     /* 入力欄 */
-if (this.inputEl) {
-  this.inputEl.style.display = 'block';
-  this.inputEl.style.position = 'fixed';
-  this.inputEl.style.zIndex = '1000';
-
-  // PC/タブレットのサイズ
-  const isTablet = window.innerWidth <= 1024;
-  this.inputEl.style.width = isTablet ? 'min(70vw, 360px)' : '280px';
-  this.inputEl.style.fontSize = isTablet ? '18px' : '20px';
-  this.inputEl.style.padding = '8px 12px';
-  this.inputEl.style.textAlign = 'center';
-  this.inputEl.style.backgroundColor = 'white';
-  this.inputEl.style.border = '2px solid #ccc';
-  this.inputEl.style.borderRadius = '5px';
-  this.inputEl.style.boxSizing = 'border-box';
-
-  // キャンバス基準の中央下（漢字とボタンの間）に固定
-  const rect = this.canvas.getBoundingClientRect();
-  const centerX = rect.left + rect.width / 2;
-
-  // 初回0対策を含めて寸法取得
-  const cs = getComputedStyle(this.inputEl);
-  const inputW = this.inputEl.offsetWidth || parseInt(cs.width) || 280;
-  const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 36;
-
-  const targetCanvasY = 330; // 漢字(約200)とボタン(380)の中間
-  const cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
-
-  this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
-  this.inputEl.style.top = `${Math.round(cssTop)}px`;
-  this.inputEl.style.bottom = 'auto';
-  this.inputEl.style.transform = 'none';
-}
+    /* 入力欄 */
+    if (this.inputEl) {
+      this.inputEl.style.display = 'block';
+      this.inputEl.style.position = 'fixed';
+      this.inputEl.style.zIndex = '1000';
+    
+      // PC/タブレットのサイズ
+      const isTablet = window.innerWidth <= 1024;
+      this.inputEl.style.width = isTablet ? 'min(80vw, 520px)' : '280px';
+      this.inputEl.style.fontSize = isTablet ? '18px' : '20px';
+      this.inputEl.style.padding = '8px 12px';
+      this.inputEl.style.textAlign = 'center';
+      this.inputEl.style.backgroundColor = 'white';
+      this.inputEl.style.border = '2px solid #ccc';
+      this.inputEl.style.borderRadius = '5px';
+      this.inputEl.style.boxSizing = 'border-box';
+    
+      // visualViewportからキーボード開閉を推定
+      const vv = window.visualViewport;
+      const vvInset = vv ? Math.max(0, (window.innerHeight - vv.height - vv.offsetTop)) : 0;
+      const keyboardOpen = this.keyboardState.open || vvInset > 100;
+      const bottomInset = keyboardOpen ? Math.max(this.keyboardState.bottomInset, vvInset) : 0;
+    
+      const rect = this.canvas.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+    
+      // 初回0対策を含めて寸法取得
+      const cs = getComputedStyle(this.inputEl);
+      const inputW = this.inputEl.offsetWidth || parseInt(cs.width) || 280;
+      const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 36;
+    
+      if (keyboardOpen) {
+        // キーボード直上に固定
+        this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
+        this.inputEl.style.top = 'auto';
+        this.inputEl.style.bottom = `${Math.round(bottomInset + 12)}px`;
+        this.inputEl.style.transform = 'none';
+      } else {
+        // 従来のキャンバス中央下
+        const targetCanvasY = 330; // 漢字(約200)とボタン(380)の中間
+        const cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
+        this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
+        this.inputEl.style.top = `${Math.round(cssTop)}px`;
+        this.inputEl.style.bottom = 'auto';
+        this.inputEl.style.transform = 'none';
+      }
+    }
 
   
 // 旧: this.drawPanelBackground(this.ctx, msgX, msgY, msgW, msgH, 'stone');
@@ -2282,6 +2280,43 @@ if (hh.visible) {
 
   },
 
+  
+/**
+ * モバイルのキーボード可視領域に追従＆スクロール抑止
+ */
+_setupMobileViewportWorkarounds() {
+  try {
+    const el = this.inputEl;
+    if (!el) return;
+    const applyByViewport = () => {
+      const vv = window.visualViewport;
+      if (!vv) return;
+      const bottomInset = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop));
+      this.keyboardState.bottomInset = bottomInset;
+      this.keyboardState.open = bottomInset > 100;
+      this.inputEl && this.inputEl.scrollIntoView?.({ block: 'nearest' });
+    };
+    this._vvResizeHandler = () => { applyByViewport(); };
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', this._vvResizeHandler);
+    }
+    this._focusHandler = () => {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      applyByViewport();
+    };
+    this._blurHandler = () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      this.keyboardState.open = false;
+      this.keyboardState.bottomInset = 0;
+    };
+    el.addEventListener('focus', this._focusHandler);
+    el.addEventListener('blur', this._blurHandler);
+  } catch (e) {
+    console.warn('⚠️ ビューポート調整の初期化に失敗:', e);
+  }
+},
   /**
    * リッチなボタンを描画するメソッド
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D コンテキスト
@@ -2862,7 +2897,14 @@ drawEnemyStatusPanel(ctx) {
       if (this.inputEl) {
         this.inputEl.style.display = 'none';
         this.inputEl.removeEventListener('keydown', this._keydownHandler);
+        if (this._focusHandler) this.inputEl.removeEventListener('focus', this._focusHandler);
+        if (this._blurHandler)  this.inputEl.removeEventListener('blur',  this._blurHandler);
       }
+      if (this._vvResizeHandler && window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', this._vvResizeHandler);
+      }
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
       // クリックイベントリスナ解除
       if (this._clickHandler) {
         this.unregisterHandlers();
