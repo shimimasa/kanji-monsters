@@ -236,32 +236,39 @@ const practiceBattleScreenState = {
     }
   },
 
-  /**
+    /**
    * 未マスターの漢字リストを構築
    */
-  _buildUnmasteredKanjiList() {
-    try {
-      const stageKanji = getKanjiByStageId(gameState.currentStageId);
-      this.unmasteredKanji = stageKanji.filter(kanji => {
-        try {
-          return !isKanjiMastered(kanji.id);
-        } catch (error) {
-          console.warn('⚠️ マスター判定エラー:', kanji.id, error);
-          return true;
+    _buildUnmasteredKanjiList() {
+      try {
+        const stageId = gameState.currentStageId;
+        if (gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[stageId]) {
+          this.unmasteredKanji = [];
+          console.log('🔓 このステージはレビュー解放済みとして未マスター0件で扱います');
+          return;
         }
-      });
-      
-      console.log(`📚 未マスター漢字: ${this.unmasteredKanji.length}件 / 全${stageKanji.length}件`);
-      
-      if (this.unmasteredKanji.length === 0) {
-        this._showAllMasteredMessage();
+  
+        const stageKanji = getKanjiByStageId(gameState.currentStageId);
+        this.unmasteredKanji = stageKanji.filter(kanji => {
+          try {
+            return !isKanjiMastered(kanji.id);
+          } catch (error) {
+            console.warn('⚠️ マスター判定エラー:', kanji.id, error);
+            return true;
+          }
+        });
+        
+        console.log(`📚 未マスター漢字: ${this.unmasteredKanji.length}件 / 全${stageKanji.length}件`);
+        
+        if (this.unmasteredKanji.length === 0) {
+          this._showAllMasteredMessage();
+        }
+        
+      } catch (error) {
+        console.error('❌ 未マスターリスト構築エラー:', error);
+        this.unmasteredKanji = [];
       }
-      
-    } catch (error) {
-      console.error('❌ 未マスターリスト構築エラー:', error);
-      this.unmasteredKanji = [];
-    }
-  },
+    },
 
   /**
    * 次の未マスター漢字を出題
@@ -331,6 +338,8 @@ const practiceBattleScreenState = {
     _enterReviewMode() {
       try {
         this.reviewMode = true;
+        if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+        gameState.stageReviewUnlocked[gameState.currentStageId] = true;
         console.log('🔁 レビューモードに移行（○で隠した読みを1つだけ出題）');
         this._pickNextReviewQuestion();
       } catch (error) {
@@ -950,7 +959,11 @@ const practiceBattleScreenState = {
       this._drawPreviousKanjiPanelWithReadings();  // 前回漢字（読み付き）
       this._drawCurrentKanjiDetailPanel();         // 現在漢字詳細
       this._drawEnhancedProgressPanel();           // 進捗パネル（簡素）
-      this._drawPracticeModeBadge();               // マスターモードバッジ
+      if (this.reviewMode) {
+        this._drawReviewModeBadge();               // レビューモードバッジ（オレンジ）
+      } else {
+        this._drawPracticeModeBadge();             // マスターモードバッジ（緑）
+      }
       this._drawOperationGuide();                  // 操作ガイド（ボタンの代替）
       // this._drawLearningHistoryPanel();          // 学習履歴パネル（非表示）
       this._drawDetailedStats();                 // 詳細統計（必要に応じて）
@@ -1200,23 +1213,24 @@ const practiceBattleScreenState = {
             this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
             this.ctx.fillText('📊 マスター進捗', x + 18, y + 24);
 
-            // 進捗値（ターゲットを毎フレーム追従）
-            const stageKanji = getKanjiByStageId(gameState.currentStageId);
-            const totalKanji = Math.max(1, stageKanji.length);
-            const masteredCount = totalKanji - this.unmasteredKanji.length;
-            const targetRatio = masteredCount / totalKanji;
-            this.progressState.target = targetRatio;
-      
-            // アニメーション（イージング）
-            this.progressState.current += (this.progressState.target - this.progressState.current) * 0.12;
-      
-            // 右上に数値（バーの上）
-            const progressLabel = `${masteredCount} / ${totalKanji} (${Math.round(this.progressState.current * 100)}%)`;
-            this.ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
-            this.ctx.textAlign = 'right';
-            this.ctx.fillStyle = 'white';
-            this.ctx.fillText(progressLabel, x + w - 18, y + 24);
-      
+                        // 進捗値（ターゲットを毎フレーム追従）
+                        const stageKanji = getKanjiByStageId(gameState.currentStageId);
+                        const totalKanji = Math.max(1, stageKanji.length);
+                        const unlocked = !!(gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[gameState.currentStageId]);
+                        const masteredCount = unlocked ? totalKanji : (totalKanji - this.unmasteredKanji.length);
+                        const targetRatio = unlocked ? 1 : (masteredCount / totalKanji);
+                        this.progressState.target = targetRatio;
+                  
+                        // アニメーション（イージング）
+                        this.progressState.current += (this.progressState.target - this.progressState.current) * 0.12;
+                  
+                        // 右上に数値（バーの上）
+                        const progressLabel = `${masteredCount} / ${totalKanji} (${Math.round(this.progressState.current * 100)}%)`;
+                        this.ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
+                        this.ctx.textAlign = 'right';
+                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillText(progressLabel, x + w - 18, y + 24);
+
             const barX = x + 18;
             const barY = y + h - 24;
             const barW = w - 36;
@@ -1266,6 +1280,33 @@ const practiceBattleScreenState = {
     }
   },
 
+
+    /**
+   * 🧪 レビューモードバッジ（オレンジ）
+   */
+    _drawReviewModeBadge() {
+      if (!this.ctx) return;
+      
+      try {
+        const { x, y, w, h } = this.panelConfig.modeBadge;
+        
+        this.ctx.fillStyle = 'rgba(255, 152, 0, 0.95)';
+        this.ctx.fillRect(x, y, w, h);
+        
+        this.ctx.strokeStyle = 'rgba(239, 108, 0, 1)';
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeRect(x, y, w, h);
+        
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('📚 レビューモード', x + w/2, y + h/2);
+        
+      } catch (error) {
+        console.error('❌ レビューモードバッジ描画エラー:', error);
+      }
+    },
   /**
    * 🎮 操作ガイド（ボタンの代替）
    */
@@ -1521,6 +1562,10 @@ const practiceBattleScreenState = {
         sessionTime: `${sessionTime}分`,
         maxStreak: `${maxStreak}問連続`
       });
+
+      // アンロックを記録（画面遷移後も継続）
+      if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+      gameState.stageReviewUnlocked[gameState.currentStageId] = true;
 
       // クリア後は強制遷移せず、レビューモードに移行して継続
       this.reviewMode = true;
