@@ -1485,7 +1485,7 @@ this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY)
       const inputW = this.inputEl.offsetWidth || parseInt(cs.width) || 280;
       const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 36;
     
-      if (keyboardOpen) {
+            if (keyboardOpen) {
         // キーボード直上に固定（余白を4pxに縮める）
         this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
         this.inputEl.style.top = 'auto';
@@ -2324,7 +2324,7 @@ _setupMobileViewportWorkarounds() {
         if (!this.canvas || !window.visualViewport) return;
         const vv = window.visualViewport;
         const rect = this.canvas.getBoundingClientRect();
-        const safety = 12;
+        const safety = 16;
 
         // 石版のキャンバス座標（中央y=200, 高さ=160）
         const boxTopC = 200 - 80;
