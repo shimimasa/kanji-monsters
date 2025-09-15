@@ -2250,9 +2250,10 @@ _setupMobileViewportWorkarounds() {
           try {
             const vk = e?.target || navigator.virtualKeyboard;
             const r = vk && vk.boundingRect;
-            const inset = r ? Math.max(0, window.innerHeight - r.y) : 0;
+            // 修正: y ではなく height を使用（非表示時は 0 になり誤判定しない）
+            const inset = r ? Math.max(0, r.height) : 0;
             this.keyboardState.bottomInset = inset;
-            this.keyboardState.open = inset > 20;
+            this.keyboardState.open = inset > 16;
             this._adjustInputPosition();
           } catch {}
         };
@@ -2414,12 +2415,13 @@ _adjustInputPosition() {
       this.inputEl.addEventListener('keydown', this._keydownHandler);
     }
 
-    // 重要: 強制表示（!important で他CSSに勝つ）
-    const s = this.inputEl.style;
-    s.setProperty('display', 'block', 'important');
-    s.setProperty('visibility', 'visible', 'important');
-    s.setProperty('opacity', '1', 'important');
-    this.inputEl.removeAttribute('hidden');
+  
+        // 重要: 強制表示（!important で他CSSに勝つ）
+        const s = this.inputEl.style;
+        s.setProperty('display', 'block', 'important');
+        s.setProperty('visibility', 'visible', 'important');
+        s.setProperty('opacity', '1', 'important');
+        this.inputEl.removeAttribute('hidden');
 
     s.setProperty('position', 'fixed', 'important');
     s.setProperty('z-index', '2147483647', 'important');
@@ -2440,8 +2442,9 @@ _adjustInputPosition() {
     const vv = window.visualViewport;
     const vvInset = vv ? Math.max(0, (window.innerHeight - vv.height - vv.offsetTop)) : 0;
     const vk = navigator.virtualKeyboard;
-    const vkInset = (vk && vk.boundingRect) ? Math.max(0, window.innerHeight - vk.boundingRect.y) : 0;
-
+    // 修正: y ではなく height を使用
+    const vkRect = (vk && vk.boundingRect) ? vk.boundingRect : null;
+    const vkInset = vkRect ? Math.max(0, vkRect.height) : 0;
     const insetMax = Math.max(vvInset, vkInset, this.keyboardState?.bottomInset || 0);
     const keyboardOpen = (this.keyboardState?.open) || insetMax > 30;
     const bottomInset = keyboardOpen ? insetMax : 0;
