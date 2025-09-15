@@ -1069,7 +1069,7 @@ const practiceBattleScreenState = {
         }
       };
 
-      // 敵エリアとプレイヤーエリアを背景で“埋め戻し”して歪みを防ぐ
+      // 敵エリアとプレイヤーエリアを背景で"埋め戻し"して歪みを防ぐ
       fillArea(480, 80, 280, 200);
       fillArea(500, 10, 280, 120);
       fillArea(20, 500, 280, 100);
@@ -1635,8 +1635,22 @@ const practiceBattleScreenState = {
       const vkRect = (vk && vk.boundingRect) ? vk.boundingRect : null;
       const vkInset = vkRect ? Math.max(0, vkRect.height) : 0;
 
-      const insetMax = Math.max(vvInset, vkInset, this.keyboardState?.bottomInset || 0);
-      const keyboardOpen = (this.keyboardState?.open) || insetMax > 30;
+      // 既存: vvInset / vkRect.height を計算済みとする
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      this._baseVH = this._baseVH || window.innerHeight; // 初回記録
+      const vvH = vv ? vv.height : window.innerHeight;
+      const focusDiff = Math.max(0, this._baseVH - vvH);
+
+      // 通常推定
+      let insetMax = Math.max(vvInset, vkInset, this.keyboardState?.bottomInset || 0);
+
+      // iOS対策: 差分0でもフォーカス中は下限値を採用
+      if (isIOS && document.activeElement === this.inputEl) {
+        const MIN_IOS_KB = 320;             // 端末により 300〜360 で調整可
+        insetMax = Math.max(insetMax, focusDiff, MIN_IOS_KB);
+      }
+
+      const keyboardOpen = insetMax > 30;
       const bottomInset = keyboardOpen ? insetMax : 0;
 
       // 位置計算
