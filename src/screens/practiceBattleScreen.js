@@ -52,9 +52,9 @@ const practiceBattleScreenState = {
         // 現在学習中漢字パネル（右上に移動）
     current: { x: 520, y: 70, w: 260, h: 200 },
     // マスターモードバッジ（上に移動）
-    modeBadge: { x: 320, y: 40, w: 160, h: 40 },
+    modeBadge: { x: 320, y: 20, w: 160, h: 40 },
     // 拡張マスター進捗パネル（よみ入力の下に配置）
-    progress: { x: 100, y: 460, w: 350, h: 70 },
+    progress: { x: 100, y: 480, w: 350, h: 70 },
     // 学習履歴パネル（未使用・非表示）
     history: { x: 480, y: 200, w: 300, h: 120 },
     // 操作ガイド（下部中央）
@@ -1557,7 +1557,7 @@ const practiceBattleScreenState = {
       const w = 230;
       const h = 90;
       const x = this.canvas.width - w - 20;
-      const y = this.canvas.height - h - 20;
+      const y = this.canvas.height - h - 40;
       
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
       this.ctx.fillRect(x, y, w, h);
