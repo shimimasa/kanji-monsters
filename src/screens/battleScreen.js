@@ -1454,9 +1454,7 @@ this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY)
     
 
         /* 入力欄 */
-        if (this.inputEl) {
-          this._adjustInputPosition();
-        }
+                this._adjustInputPosition();
 
   
 // 旧: this.drawPanelBackground(this.ctx, msgX, msgY, msgW, msgH, 'stone');
@@ -2390,11 +2388,34 @@ _adjustInputPosition() {
       this.inputEl.setAttribute('autocapitalize', 'off');
       this.inputEl.setAttribute('autocorrect', 'off');
       this.inputEl.setAttribute('spellcheck', 'false');
-      // 初期化（重複安全）
+      // ビューポート追従の初期化（重複安全）
       this._setupMobileViewportWorkarounds?.();
     }
+    // Enterキーのハンドラが未設定なら付与（重複防止）
+    if (this.inputEl && !this._keydownHandler) {
+      this._keydownHandler = e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (battleState.turn === 'player' && battleState.inputEnabled) {
+            const mode = battleState.lastCommandMode || 'attack';
+            setTimeout(() => {
+              try {
+                if (mode === 'attack') onAttack?.();
+                else if (mode === 'heal') onHeal?.();
+                else onHint?.();
+              } catch (err) {
+                console.error('処理中にエラー:', err);
+                battleState.inputEnabled = true;
+                if (this.inputEl) this.inputEl.value = '';
+              }
+            }, 0);
+          }
+        }
+      };
+      this.inputEl.addEventListener('keydown', this._keydownHandler);
+    }
 
-    // 常に可視化（他所で display:none された場合の復帰）
+    // 常に可視化
     this.inputEl.style.display = 'block';
     this.inputEl.style.visibility = 'visible';
     this.inputEl.style.opacity = '1';
@@ -2435,7 +2456,7 @@ _adjustInputPosition() {
       this.inputEl.style.bottom = `${Math.round(bottomInset + 4)}px`;
       this.inputEl.style.transform = 'none';
     } else {
-      // 石版に重ならない下寄せ（見切れてもOK）
+      // 石版に重ならない下寄せ
       if (rect) {
         const targetCanvasY = Math.min(this.canvas.height - 40, 460);
         const cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
@@ -2443,7 +2464,6 @@ _adjustInputPosition() {
         this.inputEl.style.top = `${Math.round(cssTop)}px`;
         this.inputEl.style.bottom = 'auto';
       } else {
-        // rect 取得失敗時は画面下から24pxの安全配置
         this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
         this.inputEl.style.top = 'auto';
         this.inputEl.style.bottom = '24px';
