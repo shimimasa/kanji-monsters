@@ -2388,10 +2388,9 @@ _adjustInputPosition() {
       this.inputEl.setAttribute('autocapitalize', 'off');
       this.inputEl.setAttribute('autocorrect', 'off');
       this.inputEl.setAttribute('spellcheck', 'false');
-      // ビューポート追従の初期化（重複安全）
       this._setupMobileViewportWorkarounds?.();
     }
-    // Enterキーのハンドラが未設定なら付与（重複防止）
+    // Enterキー未設定なら付与（重複防止）
     if (this.inputEl && !this._keydownHandler) {
       this._keydownHandler = e => {
         if (e.key === 'Enter') {
@@ -2415,24 +2414,28 @@ _adjustInputPosition() {
       this.inputEl.addEventListener('keydown', this._keydownHandler);
     }
 
-    // 常に可視化
-    this.inputEl.style.display = 'block';
-    this.inputEl.style.visibility = 'visible';
-    this.inputEl.style.opacity = '1';
+    // 重要: 強制表示（!important で他CSSに勝つ）
+    const s = this.inputEl.style;
+    s.setProperty('display', 'block', 'important');
+    s.setProperty('visibility', 'visible', 'important');
+    s.setProperty('opacity', '1', 'important');
     this.inputEl.removeAttribute('hidden');
 
-    this.inputEl.style.position = 'fixed';
-    this.inputEl.style.zIndex = '2147483647';
+    s.setProperty('position', 'fixed', 'important');
+    s.setProperty('z-index', '2147483647', 'important');
+    s.setProperty('transform', 'none', 'important');
+    s.setProperty('pointer-events', 'auto', 'important');
 
     const isTablet = window.innerWidth <= 1024;
-    this.inputEl.style.width = isTablet ? 'min(80vw, 520px)' : '280px';
-    this.inputEl.style.fontSize = isTablet ? '18px' : '20px';
-    this.inputEl.style.padding = '8px 12px';
-    this.inputEl.style.textAlign = 'center';
-    this.inputEl.style.backgroundColor = 'white';
-    this.inputEl.style.border = '2px solid #ccc';
-    this.inputEl.style.borderRadius = '5px';
-    this.inputEl.style.boxSizing = 'border-box';
+    s.width = isTablet ? 'min(80vw, 520px)' : '280px';
+    s.fontSize = isTablet ? '18px' : '20px';
+    s.padding = '8px 12px';
+    s.textAlign = 'center';
+    s.backgroundColor = 'white';
+    s.border = '2px solid #ccc';
+    s.borderRadius = '5px';
+    s.boxSizing = 'border-box';
+    s.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
 
     const vv = window.visualViewport;
     const vvInset = vv ? Math.max(0, (window.innerHeight - vv.height - vv.offsetTop)) : 0;
@@ -2451,24 +2454,24 @@ _adjustInputPosition() {
     const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 36;
 
     if (keyboardOpen) {
-      this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
-      this.inputEl.style.top = 'auto';
-      this.inputEl.style.bottom = `${Math.round(bottomInset + 4)}px`;
-      this.inputEl.style.transform = 'none';
+      s.left = `${Math.round(centerX - inputW / 2)}px`;
+      s.top = 'auto';
+      s.bottom = `${Math.round(bottomInset + 4)}px`;
     } else {
-      // 石版に重ならない下寄せ
+      // 石版に重ならない下寄せ + 画面内へクランプ
+      let cssTop;
       if (rect) {
         const targetCanvasY = Math.min(this.canvas.height - 40, 460);
-        const cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
-        this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
-        this.inputEl.style.top = `${Math.round(cssTop)}px`;
-        this.inputEl.style.bottom = 'auto';
+        cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
       } else {
-        this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
-        this.inputEl.style.top = 'auto';
-        this.inputEl.style.bottom = '24px';
+        cssTop = window.innerHeight - inputH - 24;
       }
-      this.inputEl.style.transform = 'none';
+      // ビューポート内に収める
+      cssTop = Math.max(0, Math.min(window.innerHeight - inputH - 8, cssTop));
+
+      s.left = `${Math.round(centerX - inputW / 2)}px`;
+      s.top = `${Math.round(cssTop)}px`;
+      s.bottom = 'auto';
     }
   } catch (e) {
     console.error('❌ 入力欄位置調整エラー:', e);
