@@ -10,11 +10,11 @@
     #kanjiInput { position: absolute; top: 350px; left: 50%; transform: translateX(-50%); width: 280px; padding: 6px 8px; font-size: 20px; text-align: center; display: none; }
     .progress-bar { height: 24px; background: #1e90ff; }
 
-    /* ▼ iOS向け：コンテンツ高さを“最大ビューポート”に固定（必要時のみ） */
-html.vh-lock, body.vh-lock { height: 100lvh; overflow: hidden; }
-@supports not (height: 100lvh) { html.vh-lock, body.vh-lock { height: 100vh; } } /* 古いSafariのフォールバック */
-#gameCanvas.vh-lock { position: fixed; inset: 0; width: 100vw; height: 100lvh; }
-
+        /* ▼ iOS向け：コンテンツ高さを“最大ビューポート”に固定（必要時のみ） */
+html.vh-lock, body.vh-lock { height: 100dvh; overflow: hidden; }
+@supports not (height: 100dvh) { html.vh-lock, body.vh-lock { height: 100svh; } }
+@supports not (height: 100svh) { html.vh-lock, body.vh-lock { height: 100lvh; } }
+#gameCanvas.vh-lock { position: fixed; inset: 0; width: 100vw; height: 100dvh; }
   </style>
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1e90ff" />

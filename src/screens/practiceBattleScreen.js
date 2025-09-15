@@ -84,12 +84,14 @@ const practiceBattleScreenState = {
             // 通常のバトル画面初期化を実行
             battleScreenState.enter.call(this, canvasEl);
 
-            // 画面固定（vh-lock）を有効化
-            try {
-              document.documentElement.classList.add('vh-lock');
-              document.body.classList.add('vh-lock');
-              if (this.canvas) this.canvas.classList.add('vh-lock');
-            } catch {}
+                  // 画面固定（vh-lock）を有効化
+      try {
+        requestAnimationFrame(() => {
+          document.documentElement.classList.add('vh-lock');
+          document.body.classList.add('vh-lock');
+          if (this.canvas) this.canvas.classList.add('vh-lock');
+        });
+      } catch {}
 
       // 背景画像を必ずステージのものに
       try {
@@ -2001,16 +2003,19 @@ const practiceBattleScreenState = {
       }
       
       if (this.inputEl && this._practiceKeydownHandler) {
+        try { this.inputEl.blur(); } catch {}
         this.inputEl.removeEventListener('keydown', this._practiceKeydownHandler);
         this._practiceKeydownHandler = null;
       }
       
-      // 画面固定（vh-lock）を無効化
+      // 画面固定（vh-lock）を無効化（1フレーム遅延で安全に解除）
       try {
-        document.documentElement.classList.remove('vh-lock');
-        document.body.classList.remove('vh-lock');
-        const cvs = document.getElementById('gameCanvas');
-        if (this.canvas) this.canvas.classList.remove('vh-lock');
+        requestAnimationFrame(() => {
+          document.documentElement.classList.remove('vh-lock');
+          document.body.classList.remove('vh-lock');
+          const cvs = document.getElementById('gameCanvas');
+          if (this.canvas) this.canvas.classList.remove('vh-lock');
+        });
       } catch {}
 
       if (battleScreenState.exit) {

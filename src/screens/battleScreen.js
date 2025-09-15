@@ -830,12 +830,14 @@ updateShieldBreakEffect() {
         throw new Error("Canvas 2Dコンテキストの取得に失敗しました");
       }
 
-      // 画面固定（vh-lock）を有効化
-      try {
-        document.documentElement.classList.add('vh-lock');
-        document.body.classList.add('vh-lock');
-        this.canvas.classList.add('vh-lock');
-      } catch {}
+            // 画面固定（vh-lock）を有効化
+            try {
+              requestAnimationFrame(() => {
+                document.documentElement.classList.add('vh-lock');
+                document.body.classList.add('vh-lock');
+                this.canvas.classList.add('vh-lock');
+              });
+            } catch {}
       
       // 以下、通常の初期化処理
       this.inputEl = document.getElementById('kanjiInput');
@@ -3080,18 +3082,21 @@ drawEnemyStatusPanel(ctx) {
   exit() {
     // 入力欄を非表示＆キーイベント解除
     if (this.inputEl) {
+      try { this.inputEl.blur(); } catch {}
       this.inputEl.style.display = 'none';
       this.inputEl.removeEventListener('keydown', this._keydownHandler);
       if (this._focusHandler) this.inputEl.removeEventListener('focus', this._focusHandler);
       if (this._blurHandler)  this.inputEl.removeEventListener('blur',  this._blurHandler);
     }
 
-    // 画面固定（vh-lock）を無効化
+    // 画面固定（vh-lock）を無効化（1フレーム遅延で安全に解除）
     try {
-      document.documentElement.classList.remove('vh-lock');
-      document.body.classList.remove('vh-lock');
-      const cvs = document.getElementById('gameCanvas');
-      if (cvs) cvs.classList.remove('vh-lock');
+      requestAnimationFrame(() => {
+        document.documentElement.classList.remove('vh-lock');
+        document.body.classList.remove('vh-lock');
+        const cvs = document.getElementById('gameCanvas');
+        if (cvs) cvs.classList.remove('vh-lock');
+      });
     } catch {}
 
     if (this._vvResizeHandler && window.visualViewport) {
