@@ -229,6 +229,14 @@ const battleScreenState = {
     
  },
 
+ getKanjiBoxMetrics() {
+  const isKbOpen = !!(this.keyboardState && this.keyboardState.open);
+  const centerX = this.canvas ? (this.canvas.width / 2) : (window.innerWidth / 2);
+  const centerY = isKbOpen ? 120 : 200;   // 入力中は上へ
+  const width   = isKbOpen ? 160 : 180;   // 少し縮小
+  const height  = isKbOpen ? 140 : 160;
+  return { centerX, centerY, width, height };
+},
 
 /**
  * シールドの色を段階的に変化させる
@@ -821,6 +829,15 @@ updateShieldBreakEffect() {
       if (!this.ctx) {
         throw new Error("Canvas 2Dコンテキストの取得に失敗しました");
       }
+
+            // 画面固定（vh-lock）を有効化
+            try {
+              requestAnimationFrame(() => {
+                document.documentElement.classList.add('vh-lock');
+                document.body.classList.add('vh-lock');
+                this.canvas.classList.add('vh-lock');
+              });
+            } catch {}
       
       // 以下、通常の初期化処理
       this.inputEl = document.getElementById('kanjiInput');
@@ -1237,27 +1254,25 @@ this.drawStageRemaining(this.ctx, frameArea);
 
     // ── 漢字 & ヒント ──
     // 問題漢字を枠付き＆拡大描画
-    const kanjiX = this.canvas.width / 2;
-    const kanjiY = 200;
-    const kanjiBoxW = 180, kanjiBoxH = 160;
-    
-    // 弱点表示を「テキストメッセージ」に変更
-    if (gameState.currentEnemy && gameState.currentEnemy.weakness) {
-      const weaknessLabel = gameState.currentEnemy.weakness === 'onyomi' ? '音読み' : '訓読み';
-      const message = `弱点は${weaknessLabel}！`;
-      
-      this.drawTextWithOutline(
-        message,
-        kanjiX, // X座標（中央寄せ）
-        kanjiY - kanjiBoxH / 2 - 20, // Y座標（漢字ボックスの上）
-        '#f39c12', // オレンジ色
-        'black',
-        'bold 20px "UDデジタル教科書体",sans-serif',
-        'center',
-        'bottom', // 基準点を下にすることで位置調整
-        3
-      );
-    }
+const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } = this.getKanjiBoxMetrics();
+
+// 弱点表示を「テキストメッセージ」に変更
+if (gameState.currentEnemy && gameState.currentEnemy.weakness) {
+  const weaknessLabel = gameState.currentEnemy.weakness === 'onyomi' ? '音読み' : '訓読み';
+  const message = `弱点は${weaknessLabel}！`;
+
+  this.drawTextWithOutline(
+    message,
+    kanjiX,
+    kanjiY - kanjiBoxH / 2 - 20,
+    '#f39c12',
+    'black',
+    'bold 20px "UDデジタル教科書体",sans-serif',
+    'center',
+    'bottom',
+    3
+  );
+}
     
     
     
@@ -2149,9 +2164,7 @@ if (hh.visible) {
         if (battleScreenState.masteryFlash.timer <= 0) battleScreenState.masteryFlash.active = false;
       }
     }
-
-        // 既存: レイアウトやボタン描画が終わったあたり
-
+    
     // 1) 配置境界（ステージ選択の右〜敵HPの左）
     const leftBound  = 200;
     const rightBound = this.canvas.width - 280;
@@ -2180,11 +2193,12 @@ if (hh.visible) {
       const hintH = Math.max(28, Math.min(36, Math.round(fontSize * 1.9)));
       const hintX = Math.max(leftBound, Math.min((leftBound + rightBound - hintW) / 2, rightBound - hintW));
 
-      // 4) Y位置: 弱点表示の「上」。ヘッダーと被らないように下限を設ける
-      const TOP_SAFE_Y = 100;           // ヘッダ（タイトル/ステージ選択）と確実に分離
-      const GAP_ABOVE_WEAKNESS = 18;    // 弱点テキストとの間隔を広めに
-      const weaknessY = 200 - 160 / 2 - 20; // kanjiY - kanjiBoxH/2 - 20 と同値
-      let hintY = Math.max(TOP_SAFE_Y, weaknessY - hintH - GAP_ABOVE_WEAKNESS);
+            // 4) Y位置: 弱点表示の「上」。石版の上に配置
+            const { centerY, height } = this.getKanjiBoxMetrics();
+            const TOP_SAFE_Y = 100;
+            const GAP_ABOVE_WEAKNESS = 18;
+            const weaknessY = centerY - height / 2 - 20;
+            let hintY = Math.max(TOP_SAFE_Y, weaknessY - hintH - GAP_ABOVE_WEAKNESS);
 
       // 5) 入力欄との重なりをチェックして必要なら退避
       const canvasRect = this.canvas?.getBoundingClientRect?.();
@@ -2291,58 +2305,41 @@ _setupMobileViewportWorkarounds() {
       }
     };
 
-    // 石版が見切れないように最低限のスクロール補正
-    const ensureKanjiBoxVisible = () => {
-      try {
-        if (!this.canvas || !window.visualViewport) return;
-        const vv = window.visualViewport;
-        const rect = this.canvas.getBoundingClientRect();
-        const safety = 16;
-
-        const boxTopC = 200 - 80;
-        const boxBottomC = 200 + 80;
-
-        const topCss = rect.top + (boxTopC / this.canvas.height) * rect.height;
-        const bottomCss = rect.top + (boxBottomC / this.canvas.height) * rect.height;
-
-        const keyboardTop = vv.height + vv.offsetTop;
-
-        if (bottomCss > keyboardTop - safety) {
-          const delta = bottomCss - (keyboardTop - safety);
-          window.scrollBy(0, Math.ceil(delta + 8));
-        }
-        if (topCss < safety) {
-          const delta2 = topCss - safety;
-          window.scrollBy(0, Math.floor(delta2 - 4));
-        }
-      } catch {}
-    };
-
-    const scheduleScrollCorrections = () => {
-      const times = [0, 60, 120, 240, 360];
-      this._focusScrollTimers = this._focusScrollTimers || [];
-      times.forEach(t => {
-        const id = setTimeout(() => { if (this.keyboardState.open) ensureKanjiBoxVisible(); }, t);
-        this._focusScrollTimers.push(id);
-      });
-    };
-
-    const applyByViewport = () => {
-      const vv = window.visualViewport;
-      if (!vv) return;
-      const bottomInset = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop));
-      this.keyboardState.bottomInset = bottomInset;
-      this.keyboardState.open = bottomInset > 30; // 閾値を緩める
-      if (this.keyboardState.open) {
-        setScrollPadding(true);
-        this._adjustInputPosition();
-        ensureKanjiBoxVisible();
-      }
-    };
-
-    this._vvResizeHandler = () => { applyByViewport(); };
-    this._vvScrollHandler = () => { if (this.keyboardState.open) ensureKanjiBoxVisible(); };
-
+        // 石版が見切れないように最低限のスクロール補正 → 画面上端へ寄せる方式に変更
+        const scrollCanvasTopIntoView = () => {
+          try {
+            const r = this.canvas && this.canvas.getBoundingClientRect && this.canvas.getBoundingClientRect();
+            if (!r) return;
+            const base = (window.pageYOffset || document.documentElement.scrollTop || 0);
+            const y = Math.max(0, base + r.top - 12); // キャンバス上端をほぼビューポート先頭へ
+            window.scrollTo(0, y);
+          } catch {}
+        };
+    
+        const scheduleScrollCorrections = () => {
+          const times = [0, 60, 120, 240, 360];
+          this._focusScrollTimers = this._focusScrollTimers || [];
+          times.forEach(t => {
+            const id = setTimeout(() => { if (this.keyboardState.open) scrollCanvasTopIntoView(); }, t);
+            this._focusScrollTimers.push(id);
+          });
+        };
+    
+        const applyByViewport = () => {
+          const vv = window.visualViewport;
+          if (!vv) return;
+          const bottomInset = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop));
+          this.keyboardState.bottomInset = bottomInset;
+          this.keyboardState.open = bottomInset > 30; // iPadは変化が小さいので緩め
+          if (this.keyboardState.open) {
+            setScrollPadding(true);
+            this._adjustInputPosition();
+            scrollCanvasTopIntoView(); // ← ここを必ず呼ぶ
+          }
+        };
+    
+        this._vvResizeHandler = () => { applyByViewport(); };
+        this._vvScrollHandler = () => { if (this.keyboardState.open) scrollCanvasTopIntoView(); };
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', this._vvResizeHandler);
       window.visualViewport.addEventListener('scroll', this._vvScrollHandler);
@@ -2414,7 +2411,6 @@ _adjustInputPosition() {
       };
       this.inputEl.addEventListener('keydown', this._keydownHandler);
     }
-
   
         // 重要: 強制表示（!important で他CSSに勝つ）
         const s = this.inputEl.style;
@@ -2464,33 +2460,47 @@ if (isIOS && document.activeElement === this.inputEl) {
 const keyboardOpen = insetMax > 30;
 const bottomInset = keyboardOpen ? insetMax : 0;
 
-    const rect = this.canvas.getBoundingClientRect?.();
-    const centerX = rect ? (rect.left + rect.width / 2) : Math.round(window.innerWidth / 2);
+const rect = this.canvas.getBoundingClientRect?.();
 
-    const cs = getComputedStyle(this.inputEl);
-    const inputW = this.inputEl.offsetWidth || parseInt(cs.width) || 280;
-    const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 36;
-
-    if (keyboardOpen) {
-      s.left = `${Math.round(centerX - inputW / 2)}px`;
-      s.top = 'auto';
-      s.bottom = `${Math.round(bottomInset + 4)}px`;
+    // 漢字パネルのメトリクス→CSS座標に変換（幅を入力欄に合わせる）
+    const metrics = (this.getKanjiBoxMetrics ? this.getKanjiBoxMetrics() : null);
+    let cssCenterX, cssPanelW;
+    if (rect && metrics) {
+      cssCenterX = rect.left + (metrics.centerX / this.canvas.width) * rect.width;
+      cssPanelW  = (metrics.width  / this.canvas.width) * rect.width;
     } else {
-      // 石版に重ならない下寄せ + 画面内へクランプ
-      let cssTop;
-      if (rect) {
-        const targetCanvasY = Math.min(this.canvas.height - 40, 460);
-        cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
-      } else {
-        cssTop = window.innerHeight - inputH - 24;
-      }
-      // ビューポート内に収める
-      cssTop = Math.max(0, Math.min(window.innerHeight - inputH - 8, cssTop));
-
-      s.left = `${Math.round(centerX - inputW / 2)}px`;
-      s.top = `${Math.round(cssTop)}px`;
-      s.bottom = 'auto';
+      cssCenterX = rect ? (rect.left + rect.width / 2) : Math.round(window.innerWidth / 2);
+      cssPanelW  = rect ? (180 / this.canvas.width) * rect.width : Math.min(520, window.innerWidth * 0.8);
     }
+    // 入力欄幅＝漢字パネル幅
+    s.setProperty('width', `${Math.round(cssPanelW)}px`, 'important');
+
+     const cs = getComputedStyle(this.inputEl);
+     const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 36;
+
+    // 左位置はパネル中心に合わせ、画面外へはみ出さないようクランプ
+    const leftX = Math.round(Math.max(8, Math.min(window.innerWidth - cssPanelW - 8, cssCenterX - cssPanelW / 2)));
+
+     if (keyboardOpen) {
+      s.left = `${leftX}px`;
+       s.top = 'auto';
+       s.bottom = `${Math.round(bottomInset + 4)}px`;
+     } else {
+       // 石版に重ならない下寄せ + 画面内へクランプ
+       let cssTop;
+       if (rect) {
+         const targetCanvasY = Math.min(this.canvas.height - 40, 460);
+         cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
+       } else {
+         cssTop = window.innerHeight - inputH - 24;
+       }
+       // ビューポート内に収める
+       cssTop = Math.max(0, Math.min(window.innerHeight - inputH - 8, cssTop));
+
+      s.left = `${leftX}px`;
+       s.top = `${Math.round(cssTop)}px`;
+       s.bottom = 'auto';
+     }
   } catch (e) {
     console.error('❌ 入力欄位置調整エラー:', e);
   }
@@ -3072,11 +3082,23 @@ drawEnemyStatusPanel(ctx) {
   exit() {
     // 入力欄を非表示＆キーイベント解除
     if (this.inputEl) {
+      try { this.inputEl.blur(); } catch {}
       this.inputEl.style.display = 'none';
       this.inputEl.removeEventListener('keydown', this._keydownHandler);
       if (this._focusHandler) this.inputEl.removeEventListener('focus', this._focusHandler);
       if (this._blurHandler)  this.inputEl.removeEventListener('blur',  this._blurHandler);
     }
+
+    // 画面固定（vh-lock）を無効化（1フレーム遅延で安全に解除）
+    try {
+      requestAnimationFrame(() => {
+        document.documentElement.classList.remove('vh-lock');
+        document.body.classList.remove('vh-lock');
+        const cvs = document.getElementById('gameCanvas');
+        if (cvs) cvs.classList.remove('vh-lock');
+      });
+    } catch {}
+
     if (this._vvResizeHandler && window.visualViewport) {
       window.visualViewport.removeEventListener('resize', this._vvResizeHandler);
     }
@@ -3416,13 +3438,9 @@ if (e.type === 'touchstart') {
     
     if (comboCount < 2) return; // 2コンボ未満は表示しない
     
-    const kanjiX = this.canvas.width / 2;
-    const kanjiY = 200;
-    const kanjiBoxW = 180;
-    
-    // コンボ表示の位置（漢字の左横に変更）
-    const comboX = kanjiX - kanjiBoxW / 2 - 40;
-    const comboY = kanjiY;
+    const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW } = this.getKanjiBoxMetrics();
+const comboX = kanjiX - kanjiBoxW / 2 - 40;
+const comboY = kanjiY;
     
     ctx.save();
     
@@ -4050,11 +4068,9 @@ if (e.type === 'touchstart') {
     
     // コンボタイマーの視覚化
     if (battleState.comboTimer > 0) {
-      const kanjiX = this.canvas.width / 2;
-      const kanjiY = 200;
-      const kanjiBoxW = 180;
-      const comboX = kanjiX - kanjiBoxW / 2 - 40; // 左側に変更
-      const comboY = kanjiY;
+      const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW } = this.getKanjiBoxMetrics();
+const comboX = kanjiX - kanjiBoxW / 2 - 40;
+const comboY = kanjiY;
       
       const timerRatio = battleState.comboTimer / 300; // 5秒 = 300フレーム
       const timerBarWidth = 60;
@@ -4296,16 +4312,16 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
     // 漢字ボックスのエフェクトを開始（黄色で光らせる）
     battleScreenState.startKanjiBoxEffect('rgba(241, 196, 15, 0.8)', 20);
 
-    // ★★★ ここに石版攻撃エフェクトを追加 ★★★
-    // 漢字ボックスの座標を取得
-    const kanjiX = battleScreenState.canvas.width / 2;
-    const kanjiY = 200;
-    const kanjiBoxW = 180;
-    const kanjiBoxH = 160;
-    
-    // 石版攻撃エフェクトを開始
-    battleScreenState.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
-    
+     // ★★★ ここに石版攻撃エフェクトを追加 ★★★
+
+    const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } =
+      (battleScreenState.getKanjiBoxMetrics
+        ? battleScreenState.getKanjiBoxMetrics()
+        : { centerX: (battleScreenState.canvas ? battleScreenState.canvas.width / 2 : Math.round(window.innerWidth / 2)),
+            centerY: (battleScreenState.keyboardState?.open ? 120 : 200),
+            width:   (battleScreenState.keyboardState?.open ? 160 : 180),
+            height:  (battleScreenState.keyboardState?.open ? 140 : 160) });
+     battleScreenState.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
     // 前回正解した漢字の情報を保存
     battleScreenState.lastAnsweredKanji = { ...gameState.currentKanji };
     

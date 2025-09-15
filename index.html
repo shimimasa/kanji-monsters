@@ -7,22 +7,14 @@
   <link rel="stylesheet" href="/style.css" />
   <style>
     body { margin: 0; background:#222; color:#fff; text-align:center; }
-    #kanjiInput {
-      position: absolute;
-      top: 350px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 280px;
-      padding: 6px 8px;
-      font-size: 20px;
-      text-align: center;
-      display: none;
-    }
-    /* ローディング用プログレスバーのスタイル */
-    .progress-bar {
-      height: 24px;
-      background: #1e90ff;
-    }
+    #kanjiInput { position: absolute; top: 350px; left: 50%; transform: translateX(-50%); width: 280px; padding: 6px 8px; font-size: 20px; text-align: center; display: none; }
+    .progress-bar { height: 24px; background: #1e90ff; }
+
+        /* ▼ iOS向け：コンテンツ高さを“最大ビューポート”に固定（必要時のみ） */
+html.vh-lock, body.vh-lock { height: 100dvh; overflow: hidden; }
+@supports not (height: 100dvh) { html.vh-lock, body.vh-lock { height: 100svh; } }
+@supports not (height: 100svh) { html.vh-lock, body.vh-lock { height: 100lvh; } }
+#gameCanvas.vh-lock { position: fixed; inset: 0; width: 100vw; height: 100dvh; }
   </style>
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1e90ff" />
