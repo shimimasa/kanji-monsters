@@ -248,104 +248,122 @@ const practiceBattleScreenState = {
     }
   },
 
-  /**
+    /**
    * モバイルのキーボード可視領域に追従＆スクロール抑止
    */
-   _setupMobileViewportWorkarounds() {
-    try {
-      const el = this.inputEl;
-      if (!el) return;
-
-      const setScrollPadding = (enable) => {
-        const html = document.documentElement;
-        const body = document.body;
-        if (enable) {
-          this._prevBodyStyles = this._prevBodyStyles || {
-            htmlOverflowY: html.style.overflowY,
-            bodyOverflowY: body.style.overflowY,
-            bodyPaddingBottom: body.style.paddingBottom,
-            htmlOverscroll: html.style.overscrollBehaviorY,
-            bodyOverscroll: body.style.overscrollBehaviorY
-          };
-          html.style.overflowY = 'auto';
-          body.style.overflowY = 'auto';
-          html.style.overscrollBehaviorY = 'contain';
-          body.style.overscrollBehaviorY = 'contain';
-          const vv = window.visualViewport;
-          const inset = vv ? Math.max(0, (window.innerHeight - vv.height - vv.offsetTop)) : 0;
-          const pad = Math.max(220, inset + 220);
-          body.style.paddingBottom = `${pad}px`;
-        } else {
-          const s = this._prevBodyStyles || {};
-          document.documentElement.style.overflowY = s.htmlOverflowY || '';
-          document.body.style.overflowY = s.bodyOverflowY || '';
-          document.documentElement.style.overscrollBehaviorY = s.htmlOverscroll || '';
-          document.body.style.overscrollBehaviorY = s.bodyOverscroll || '';
-          document.body.style.paddingBottom = s.bodyPaddingBottom || '';
-          this._prevBodyStyles = null;
-        }
-      };
-
-      const scrollCanvasTopIntoView = () => {
+    _setupMobileViewportWorkarounds() {
+      try {
+        const el = this.inputEl;
+        if (!el) return;
+  
+        // Virtual Keyboard API を優先（Chrome/Android/一部Chrome系）
         try {
-          const r = this.canvas && this.canvas.getBoundingClientRect && this.canvas.getBoundingClientRect();
-          if (!r) return;
-          const base = (window.pageYOffset || document.documentElement.scrollTop || 0);
-          const y = Math.max(0, base + r.top - 12);
-          window.scrollTo(0, y);
+          if (navigator.virtualKeyboard) {
+            navigator.virtualKeyboard.overlaysContent = true;
+            this._vkGeometryHandler = (e) => {
+              try {
+                const vk = e?.target || navigator.virtualKeyboard;
+                const r = vk && vk.boundingRect;
+                const inset = r ? Math.max(0, window.innerHeight - r.y) : 0;
+                this.keyboardState.bottomInset = inset;
+                this.keyboardState.open = inset > 20;
+                this._adjustInputPosition();
+              } catch {}
+            };
+            navigator.virtualKeyboard.addEventListener('geometrychange', this._vkGeometryHandler);
+          }
         } catch {}
-      };
-
-      const scheduleScrollCorrections = () => {
-        const times = [0, 60, 120, 240, 360];
-        this._focusScrollTimers = this._focusScrollTimers || [];
-        times.forEach(t => {
-          const id = setTimeout(() => { if (this.keyboardState.open) scrollCanvasTopIntoView(); }, t);
-          this._focusScrollTimers.push(id);
-        });
-      };
-
-      const applyByViewport = () => {
-        const vv = window.visualViewport;
-        if (!vv) return;
-        const bottomInset = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop));
-        this.keyboardState.bottomInset = bottomInset;
-        this.keyboardState.open = bottomInset > 100;
-        if (this.keyboardState.open) {
-          setScrollPadding(true);
+  
+        const setScrollPadding = (enable) => {
+          const html = document.documentElement;
+          const body = document.body;
+          if (enable) {
+            this._prevBodyStyles = this._prevBodyStyles || {
+              htmlOverflowY: html.style.overflowY,
+              bodyOverflowY: body.style.overflowY,
+              bodyPaddingBottom: body.style.paddingBottom,
+              htmlOverscroll: html.style.overscrollBehaviorY,
+              bodyOverscroll: body.style.overscrollBehaviorY
+            };
+            html.style.overflowY = 'auto';
+            body.style.overflowY = 'auto';
+            html.style.overscrollBehaviorY = 'contain';
+            body.style.overscrollBehaviorY = 'contain';
+            const vv = window.visualViewport;
+            const inset = vv ? Math.max(0, (window.innerHeight - vv.height - vv.offsetTop)) : 0;
+            const pad = Math.max(220, inset + 220);
+            body.style.paddingBottom = `${pad}px`;
+          } else {
+            const s = this._prevBodyStyles || {};
+            document.documentElement.style.overflowY = s.htmlOverflowY || '';
+            document.body.style.overflowY = s.bodyOverflowY || '';
+            document.documentElement.style.overscrollBehaviorY = s.htmlOverscroll || '';
+            document.body.style.overscrollBehaviorY = s.bodyOverscroll || '';
+            document.body.style.paddingBottom = s.bodyPaddingBottom || '';
+            this._prevBodyStyles = null;
+          }
+        };
+  
+        const scrollCanvasTopIntoView = () => {
+          try {
+            const r = this.canvas && this.canvas.getBoundingClientRect && this.canvas.getBoundingClientRect();
+            if (!r) return;
+            const base = (window.pageYOffset || document.documentElement.scrollTop || 0);
+            const y = Math.max(0, base + r.top - 12);
+            window.scrollTo(0, y);
+          } catch {}
+        };
+  
+        const scheduleScrollCorrections = () => {
+          const times = [0, 60, 120, 240, 360];
+          this._focusScrollTimers = this._focusScrollTimers || [];
+          times.forEach(t => {
+            const id = setTimeout(() => { if (this.keyboardState.open) scrollCanvasTopIntoView(); }, t);
+            this._focusScrollTimers.push(id);
+          });
+        };
+  
+        const applyByViewport = () => {
+          const vv = window.visualViewport;
+          if (!vv) return;
+          const bottomInset = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop));
+          this.keyboardState.bottomInset = bottomInset;
+          this.keyboardState.open = bottomInset > 30;
+          if (this.keyboardState.open) {
+            setScrollPadding(true);
+            this._adjustInputPosition();
+            scrollCanvasTopIntoView();
+          }
+        };
+  
+        this._vvResizeHandler = () => { applyByViewport(); };
+        this._vvScrollHandler = () => { if (this.keyboardState.open) scrollCanvasTopIntoView(); };
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', this._vvResizeHandler);
+          window.visualViewport.addEventListener('scroll', this._vvScrollHandler);
+        }
+  
+        this._focusHandler = () => {
+          applyByViewport();
+          scheduleScrollCorrections();
+        };
+        this._blurHandler = () => {
+          this.keyboardState.open = false;
+          this.keyboardState.bottomInset = 0;
+          setScrollPadding(false);
           this._adjustInputPosition();
-          scrollCanvasTopIntoView();
-        }
-      };
-
-      this._vvResizeHandler = () => { applyByViewport(); };
-      this._vvScrollHandler = () => { if (this.keyboardState.open) scrollCanvasTopIntoView(); };
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', this._vvResizeHandler);
-        window.visualViewport.addEventListener('scroll', this._vvScrollHandler);
+          if (Array.isArray(this._focusScrollTimers)) {
+            this._focusScrollTimers.forEach(id => { try { clearTimeout(id); } catch {} });
+            this._focusScrollTimers = [];
+          }
+        };
+  
+        el.addEventListener('focus', this._focusHandler);
+        el.addEventListener('blur', this._blurHandler);
+      } catch (e) {
+        console.warn('⚠️ ビューポート調整の初期化に失敗:', e);
       }
-
-      this._focusHandler = () => {
-        applyByViewport();
-        scheduleScrollCorrections();
-      };
-      this._blurHandler = () => {
-        this.keyboardState.open = false;
-        this.keyboardState.bottomInset = 0;
-        setScrollPadding(false);
-        this._adjustInputPosition();
-        if (Array.isArray(this._focusScrollTimers)) {
-          this._focusScrollTimers.forEach(id => { try { clearTimeout(id); } catch {} });
-          this._focusScrollTimers = [];
-        }
-      };
-
-      el.addEventListener('focus', this._focusHandler);
-      el.addEventListener('blur', this._blurHandler);
-    } catch (e) {
-      console.warn('⚠️ ビューポート調整の初期化に失敗:', e);
-    }
-  },
+    },
 
     /**
    * 未マスターの漢字リストを構築
@@ -1566,9 +1584,6 @@ const practiceBattleScreenState = {
     }
   },
  
-  /**
-   * 入力欄の位置調整（ボタンがない分下に配置）
-   */
   _adjustInputPosition() {
     if (!this.inputEl || !this.canvas) return;
     
@@ -1577,9 +1592,7 @@ const practiceBattleScreenState = {
       this.inputEl.style.position = 'fixed';
       this.inputEl.style.zIndex = '1000';
 
-      // PC/タブレットのサイズ
       const isTablet = window.innerWidth <= 1024;
-      // モバイルでの横幅はやや広めに
       this.inputEl.style.width = isTablet ? 'min(80vw, 520px)' : '280px';
       this.inputEl.style.fontSize = isTablet ? '18px' : '20px';
       this.inputEl.style.padding = '10px 15px';
@@ -1590,11 +1603,14 @@ const practiceBattleScreenState = {
       this.inputEl.style.boxSizing = 'border-box';
       this.inputEl.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
 
-      // visualViewportからキーボード開閉を推定
       const vv = window.visualViewport;
       const vvInset = vv ? Math.max(0, (window.innerHeight - vv.height - vv.offsetTop)) : 0;
-      const keyboardOpen = this.keyboardState.open || vvInset > 100;
-      const bottomInset = keyboardOpen ? Math.max(this.keyboardState.bottomInset, vvInset) : 0;
+      const vk = navigator.virtualKeyboard;
+      const vkInset = (vk && vk.boundingRect) ? Math.max(0, window.innerHeight - vk.boundingRect.y) : 0;
+
+      const insetMax = Math.max(vvInset, vkInset, this.keyboardState.bottomInset || 0);
+      const keyboardOpen = this.keyboardState.open || insetMax > 30;
+      const bottomInset = keyboardOpen ? insetMax : 0;
 
       const rect = this.canvas.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
@@ -1604,14 +1620,13 @@ const practiceBattleScreenState = {
       const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 40;
 
       if (keyboardOpen) {
-        // キーボード直上に固定（余白を4pxに縮める）
         this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
         this.inputEl.style.top = 'auto';
         this.inputEl.style.bottom = `${Math.round(bottomInset + 4)}px`;
         this.inputEl.style.transform = 'none';
       } else {
-        // 従来のキャンバス中央付近に配置（PCと同等）
-        const targetCanvasY = 400;
+        // 非入力時も石版に被らない下寄せ
+        const targetCanvasY = Math.min(this.canvas.height - 40, 460);
         const cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
         this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
         this.inputEl.style.top = `${Math.round(cssTop)}px`;
@@ -1929,45 +1944,49 @@ const practiceBattleScreenState = {
     this.reviewMode = false;
     this.reviewTargetReading = null;
     
-    // リスナー解除とスタイル復元
-        // リスナー解除とスタイル復元
-        try {
-          if (this.inputEl && this._focusHandler) {
-            this.inputEl.removeEventListener('focus', this._focusHandler);
-            this._focusHandler = null;
-          }
-          if (this.inputEl && this._blurHandler) {
-            this.inputEl.removeEventListener('blur', this._blurHandler);
-            this._blurHandler = null;
-          }
-          if (this._vvResizeHandler && window.visualViewport) {
-            window.visualViewport.removeEventListener('resize', this._vvResizeHandler);
-            this._vvResizeHandler = null;
-          }
-          if (this._vvScrollHandler && window.visualViewport) {
-            window.visualViewport.removeEventListener('scroll', this._vvScrollHandler);
-            this._vvScrollHandler = null;
-          }
-          if (Array.isArray(this._focusScrollTimers)) {
-            this._focusScrollTimers.forEach(id => { try { clearTimeout(id); } catch {} });
-            this._focusScrollTimers = [];
-          }
-          // 付与したスタイルを元に戻す
-          if (this._prevBodyStyles) {
-            const s = this._prevBodyStyles;
-            document.documentElement.style.overflowY = s.htmlOverflowY || '';
-            document.body.style.overflowY = s.bodyOverflowY || '';
-            document.documentElement.style.overscrollBehaviorY = s.htmlOverscroll || '';
-            document.body.style.overscrollBehaviorY = s.bodyOverscroll || '';
-            document.body.style.paddingBottom = s.bodyPaddingBottom || '';
-            this._prevBodyStyles = null;
-          } else {
-            document.documentElement.style.overflowY = '';
-            document.body.style.overflowY = '';
-            document.documentElement.style.overscrollBehaviorY = '';
-            document.body.style.overscrollBehaviorY = '';
-            document.body.style.paddingBottom = '';
-          }
+          // リスナー解除とスタイル復元
+      // リスナー解除とスタイル復元
+      try {
+        if (this.inputEl && this._focusHandler) {
+          this.inputEl.removeEventListener('focus', this._focusHandler);
+          this._focusHandler = null;
+        }
+        if (this.inputEl && this._blurHandler) {
+          this.inputEl.removeEventListener('blur', this._blurHandler);
+          this._blurHandler = null;
+        }
+        if (this._vvResizeHandler && window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', this._vvResizeHandler);
+          this._vvResizeHandler = null;
+        }
+        if (this._vvScrollHandler && window.visualViewport) {
+          window.visualViewport.removeEventListener('scroll', this._vvScrollHandler);
+          this._vvScrollHandler = null;
+        }
+        if (this._vkGeometryHandler && navigator.virtualKeyboard) {
+          navigator.virtualKeyboard.removeEventListener('geometrychange', this._vkGeometryHandler);
+          this._vkGeometryHandler = null;
+        }
+        if (Array.isArray(this._focusScrollTimers)) {
+          this._focusScrollTimers.forEach(id => { try { clearTimeout(id); } catch {} });
+          this._focusScrollTimers = [];
+        }
+        // 付与したスタイルを元に戻す
+        if (this._prevBodyStyles) {
+          const s = this._prevBodyStyles;
+          document.documentElement.style.overflowY = s.htmlOverflowY || '';
+          document.body.style.overflowY = s.bodyOverflowY || '';
+          document.documentElement.style.overscrollBehaviorY = s.htmlOverscroll || '';
+          document.body.style.overscrollBehaviorY = s.bodyOverscroll || '';
+          document.body.style.paddingBottom = s.bodyPaddingBottom || '';
+          this._prevBodyStyles = null;
+        } else {
+          document.documentElement.style.overflowY = '';
+          document.body.style.overflowY = '';
+          document.documentElement.style.overscrollBehaviorY = '';
+          document.body.style.overscrollBehaviorY = '';
+          document.body.style.paddingBottom = '';
+        }
     } catch {}
       
 
