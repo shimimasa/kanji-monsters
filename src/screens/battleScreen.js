@@ -1919,9 +1919,30 @@ if (this.logMode === 'blockPaged') {
         battleState.comboTimer = 0;
       }
     }
+    
+    // コンボカウントが0以下の場合は強制的に0にする
+    if (battleState.comboCount < 0) {
+      battleState.comboCount = 0;
+    }
 
-    // スケール対象の基準（石版の中心とサイズをメトリクスから）
-    const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } = this.getKanjiBoxMetrics();
+    // 例：異なる用途の場合は変数名を変更
+    const displayKanjiX = this.canvas.width / 2 - 90;
+    const displayKanjiY = 200;
+
+    // または、ブロックスコープを使用
+    {
+      const kanjiX = this.canvas.width / 2 - 90;
+      const kanjiY = 200;
+      // この処理...
+    }
+
+    // 別の処理
+    {
+      const kanjiX = this.canvas.width / 2; // 異なる値でも問題なし
+      const kanjiY = 180;
+      // この処理...
+    }
+
     // シェイクエフェクトの処理
     let shakeOffsetX = 0;
     let shakeOffsetY = 0;
