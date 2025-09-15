@@ -7,22 +7,13 @@
   <link rel="stylesheet" href="/style.css" />
   <style>
     body { margin: 0; background:#222; color:#fff; text-align:center; }
-    #kanjiInput {
-      position: absolute;
-      top: 350px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 280px;
-      padding: 6px 8px;
-      font-size: 20px;
-      text-align: center;
-      display: none;
-    }
-    /* ローディング用プログレスバーのスタイル */
-    .progress-bar {
-      height: 24px;
-      background: #1e90ff;
-    }
+    #kanjiInput { position: absolute; top: 350px; left: 50%; transform: translateX(-50%); width: 280px; padding: 6px 8px; font-size: 20px; text-align: center; display: none; }
+    .progress-bar { height: 24px; background: #1e90ff; }
+
+    /* ▼ iOS向け：コンテンツ高さを“最大ビューポート”に固定（キーボードで縮ませない） */
+    html, body { height: 100lvh; overflow: hidden; }
+    @supports not (height: 100lvh) { html, body { height: 100vh; } } /* 古いSafariのフォールバック */
+    #gameCanvas { position: fixed; inset: 0; width: 100vw; height: 100lvh; }
   </style>
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1e90ff" />
