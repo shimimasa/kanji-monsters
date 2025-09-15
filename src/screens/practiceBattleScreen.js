@@ -1665,32 +1665,47 @@ const practiceBattleScreenState = {
       const keyboardOpen = insetMax > 30;
       const bottomInset = keyboardOpen ? insetMax : 0;
 
-      // 位置計算
       const rect = this.canvas.getBoundingClientRect?.();
-      const centerX = rect ? (rect.left + rect.width / 2) : Math.round(window.innerWidth / 2);
 
-      const cs = getComputedStyle(this.inputEl);
-      const inputW = this.inputEl.offsetWidth || parseInt(cs.width) || 280;
-      const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 40;
-
-      if (keyboardOpen) {
-        s.left = `${Math.round(centerX - inputW / 2)}px`;
-        s.top = 'auto';
-        s.bottom = `${Math.round(bottomInset + 4)}px`;
-      } else {
-        // 石版に重ならない下寄せ + 画面内へクランプ
-        let cssTop;
-        if (rect) {
-          const targetCanvasY = Math.min(this.canvas.height - 40, 460);
-          const cssTopRaw = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
-          cssTop = Math.max(0, Math.min(window.innerHeight - inputH - 8, cssTopRaw));
-        } else {
-          cssTop = window.innerHeight - inputH - 24;
-        }
-        s.left = `${Math.round(centerX - inputW / 2)}px`;
-        s.top = `${Math.round(cssTop)}px`;
-        s.bottom = 'auto';
-      }
+          // 漢字パネルのメトリクス→CSS座標に変換（幅を入力欄に合わせる）
+          const metrics = (this.getKanjiBoxMetrics ? this.getKanjiBoxMetrics() : null);
+          let cssCenterX, cssPanelW;
+          if (rect && metrics) {
+            cssCenterX = rect.left + (metrics.centerX / this.canvas.width) * rect.width;
+            cssPanelW  = (metrics.width  / this.canvas.width) * rect.width;
+          } else {
+            cssCenterX = rect ? (rect.left + rect.width / 2) : Math.round(window.innerWidth / 2);
+            cssPanelW  = rect ? (180 / this.canvas.width) * rect.width : Math.min(520, window.innerWidth * 0.8);
+          }
+          // 入力欄幅＝漢字パネル幅
+          s.setProperty('width', `${Math.round(cssPanelW)}px`, 'important');
+      
+           const cs = getComputedStyle(this.inputEl);
+           const inputH = this.inputEl.offsetHeight || parseInt(cs.height) || 36;
+      
+          // 左位置はパネル中心に合わせ、画面外へはみ出さないようクランプ
+          const leftX = Math.round(Math.max(8, Math.min(window.innerWidth - cssPanelW - 8, cssCenterX - cssPanelW / 2)));
+      
+           if (keyboardOpen) {
+            s.left = `${leftX}px`;
+             s.top = 'auto';
+             s.bottom = `${Math.round(bottomInset + 4)}px`;
+           } else {
+             // 石版に重ならない下寄せ + 画面内へクランプ
+             let cssTop;
+             if (rect) {
+               const targetCanvasY = Math.min(this.canvas.height - 40, 460);
+               cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
+             } else {
+               cssTop = window.innerHeight - inputH - 24;
+             }
+             // ビューポート内に収める
+             cssTop = Math.max(0, Math.min(window.innerHeight - inputH - 8, cssTop));
+      
+            s.left = `${leftX}px`;
+             s.top = `${Math.round(cssTop)}px`;
+             s.bottom = 'auto';
+           }
       
     } catch (error) {
       console.error('❌ 入力欄位置調整エラー:', error);
