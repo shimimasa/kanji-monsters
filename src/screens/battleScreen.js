@@ -1925,24 +1925,6 @@ if (this.logMode === 'blockPaged') {
       battleState.comboCount = 0;
     }
 
-    // 例：異なる用途の場合は変数名を変更
-    const displayKanjiX = this.canvas.width / 2 - 90;
-    const displayKanjiY = 200;
-
-    // または、ブロックスコープを使用
-    {
-      const kanjiX = this.canvas.width / 2 - 90;
-      const kanjiY = 200;
-      // この処理...
-    }
-
-    // 別の処理
-    {
-      const kanjiX = this.canvas.width / 2; // 異なる値でも問題なし
-      const kanjiY = 180;
-      // この処理...
-    }
-
     // スケール対象の基準（石版の中心とサイズをメトリクスから）
     const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } = this.getKanjiBoxMetrics();
     // シェイクエフェクトの処理
