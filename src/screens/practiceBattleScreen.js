@@ -678,9 +678,8 @@ const practiceBattleScreenState = {
       
             // 石版攻撃エフェクト
             if (this.startStoneAttackEffect && this.canvas) {
-              const kanjiX = this.canvas.width / 2;
-              const kanjiY = 200;
-              this.startStoneAttackEffect(kanjiX, kanjiY, 180, 160);
+              const { centerX, centerY, width, height } = this.getKanjiBoxMetrics ? this.getKanjiBoxMetrics() : { centerX: this.canvas.width/2, centerY: (this.keyboardState?.open ? 120 : 200), width: (this.keyboardState?.open ? 160 : 180), height: (this.keyboardState?.open ? 140 : 160) };
+              this.startStoneAttackEffect(centerX, centerY, width, height);
             }
             
             publish('playSE', 'correct');
@@ -904,9 +903,13 @@ const practiceBattleScreenState = {
    * 漢字ボックスをエフェクト付きで描画
    */
   _drawKanjiBoxWithEffects() {
+    const isKbOpen = !!(this.keyboardState && this.keyboardState.open);
     const kanjiX = this.canvas.width / 2;
-    const kanjiY = 200;
-    const kanjiBoxW = 180, kanjiBoxH = 160;
+
+    //　入力中は上に寄せて少し縮小
+    const kanjiY = isKbOpen ? 120 : 200;
+    const baseW = isKbOpen ? 160 : 180;
+    const baseH = isKbOpen ? 140 : 160;
     
     let offsetX = 0, offsetY = 0, alpha = 1;
     let boxScale = 1.0;
@@ -932,6 +935,8 @@ const practiceBattleScreenState = {
       borderWidth = 4;
     }
 
+    const kanjiBoxW = baseW;
+    const kanjiBoxH = baseH;
     const scaledW = kanjiBoxW * boxScale;
     const scaledH = kanjiBoxH * boxScale;
     const adjustedX = kanjiX - (scaledW / 2) + offsetX;

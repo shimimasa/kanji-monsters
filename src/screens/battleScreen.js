@@ -229,6 +229,14 @@ const battleScreenState = {
     
  },
 
+ getKanjiBoxMetrics() {
+  const isKbOpen = !!(this.keyboardState && this.keyboardState.open);
+  const centerX = this.canvas ? (this.canvas.width / 2) : (window.innerWidth / 2);
+  const centerY = isKbOpen ? 120 : 200;   // 入力中は上へ
+  const width   = isKbOpen ? 160 : 180;   // 少し縮小
+  const height  = isKbOpen ? 140 : 160;
+  return { centerX, centerY, width, height };
+},
 
 /**
  * シールドの色を段階的に変化させる
@@ -2149,9 +2157,7 @@ if (hh.visible) {
         if (battleScreenState.masteryFlash.timer <= 0) battleScreenState.masteryFlash.active = false;
       }
     }
-
-        // 既存: レイアウトやボタン描画が終わったあたり
-
+    
     // 1) 配置境界（ステージ選択の右〜敵HPの左）
     const leftBound  = 200;
     const rightBound = this.canvas.width - 280;
@@ -2180,11 +2186,12 @@ if (hh.visible) {
       const hintH = Math.max(28, Math.min(36, Math.round(fontSize * 1.9)));
       const hintX = Math.max(leftBound, Math.min((leftBound + rightBound - hintW) / 2, rightBound - hintW));
 
-      // 4) Y位置: 弱点表示の「上」。ヘッダーと被らないように下限を設ける
-      const TOP_SAFE_Y = 100;           // ヘッダ（タイトル/ステージ選択）と確実に分離
-      const GAP_ABOVE_WEAKNESS = 18;    // 弱点テキストとの間隔を広めに
-      const weaknessY = 200 - 160 / 2 - 20; // kanjiY - kanjiBoxH/2 - 20 と同値
-      let hintY = Math.max(TOP_SAFE_Y, weaknessY - hintH - GAP_ABOVE_WEAKNESS);
+            // 4) Y位置: 弱点表示の「上」。石版の上に配置
+            const { centerY, height } = this.getKanjiBoxMetrics();
+            const TOP_SAFE_Y = 100;
+            const GAP_ABOVE_WEAKNESS = 18;
+            const weaknessY = centerY - height / 2 - 20;
+            let hintY = Math.max(TOP_SAFE_Y, weaknessY - hintH - GAP_ABOVE_WEAKNESS);
 
       // 5) 入力欄との重なりをチェックして必要なら退避
       const canvasRect = this.canvas?.getBoundingClientRect?.();
@@ -2397,7 +2404,6 @@ _adjustInputPosition() {
       };
       this.inputEl.addEventListener('keydown', this._keydownHandler);
     }
-
   
         // 重要: 強制表示（!important で他CSSに勝つ）
         const s = this.inputEl.style;
