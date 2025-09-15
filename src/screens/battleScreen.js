@@ -2291,58 +2291,41 @@ _setupMobileViewportWorkarounds() {
       }
     };
 
-    // 石版が見切れないように最低限のスクロール補正
-    const ensureKanjiBoxVisible = () => {
-      try {
-        if (!this.canvas || !window.visualViewport) return;
-        const vv = window.visualViewport;
-        const rect = this.canvas.getBoundingClientRect();
-        const safety = 16;
-
-        const boxTopC = 200 - 80;
-        const boxBottomC = 200 + 80;
-
-        const topCss = rect.top + (boxTopC / this.canvas.height) * rect.height;
-        const bottomCss = rect.top + (boxBottomC / this.canvas.height) * rect.height;
-
-        const keyboardTop = vv.height + vv.offsetTop;
-
-        if (bottomCss > keyboardTop - safety) {
-          const delta = bottomCss - (keyboardTop - safety);
-          window.scrollBy(0, Math.ceil(delta + 8));
-        }
-        if (topCss < safety) {
-          const delta2 = topCss - safety;
-          window.scrollBy(0, Math.floor(delta2 - 4));
-        }
-      } catch {}
-    };
-
-    const scheduleScrollCorrections = () => {
-      const times = [0, 60, 120, 240, 360];
-      this._focusScrollTimers = this._focusScrollTimers || [];
-      times.forEach(t => {
-        const id = setTimeout(() => { if (this.keyboardState.open) ensureKanjiBoxVisible(); }, t);
-        this._focusScrollTimers.push(id);
-      });
-    };
-
-    const applyByViewport = () => {
-      const vv = window.visualViewport;
-      if (!vv) return;
-      const bottomInset = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop));
-      this.keyboardState.bottomInset = bottomInset;
-      this.keyboardState.open = bottomInset > 30; // 閾値を緩める
-      if (this.keyboardState.open) {
-        setScrollPadding(true);
-        this._adjustInputPosition();
-        ensureKanjiBoxVisible();
-      }
-    };
-
-    this._vvResizeHandler = () => { applyByViewport(); };
-    this._vvScrollHandler = () => { if (this.keyboardState.open) ensureKanjiBoxVisible(); };
-
+        // 石版が見切れないように最低限のスクロール補正 → 画面上端へ寄せる方式に変更
+        const scrollCanvasTopIntoView = () => {
+          try {
+            const r = this.canvas && this.canvas.getBoundingClientRect && this.canvas.getBoundingClientRect();
+            if (!r) return;
+            const base = (window.pageYOffset || document.documentElement.scrollTop || 0);
+            const y = Math.max(0, base + r.top - 12); // キャンバス上端をほぼビューポート先頭へ
+            window.scrollTo(0, y);
+          } catch {}
+        };
+    
+        const scheduleScrollCorrections = () => {
+          const times = [0, 60, 120, 240, 360];
+          this._focusScrollTimers = this._focusScrollTimers || [];
+          times.forEach(t => {
+            const id = setTimeout(() => { if (this.keyboardState.open) scrollCanvasTopIntoView(); }, t);
+            this._focusScrollTimers.push(id);
+          });
+        };
+    
+        const applyByViewport = () => {
+          const vv = window.visualViewport;
+          if (!vv) return;
+          const bottomInset = Math.max(0, (window.innerHeight - vv.height - vv.offsetTop));
+          this.keyboardState.bottomInset = bottomInset;
+          this.keyboardState.open = bottomInset > 30; // iPadは変化が小さいので緩め
+          if (this.keyboardState.open) {
+            setScrollPadding(true);
+            this._adjustInputPosition();
+            scrollCanvasTopIntoView(); // ← ここを必ず呼ぶ
+          }
+        };
+    
+        this._vvResizeHandler = () => { applyByViewport(); };
+        this._vvScrollHandler = () => { if (this.keyboardState.open) scrollCanvasTopIntoView(); };
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', this._vvResizeHandler);
       window.visualViewport.addEventListener('scroll', this._vvScrollHandler);
