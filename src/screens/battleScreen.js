@@ -1245,27 +1245,25 @@ this.drawStageRemaining(this.ctx, frameArea);
 
     // ── 漢字 & ヒント ──
     // 問題漢字を枠付き＆拡大描画
-    const kanjiX = this.canvas.width / 2;
-    const kanjiY = 200;
-    const kanjiBoxW = 180, kanjiBoxH = 160;
-    
-    // 弱点表示を「テキストメッセージ」に変更
-    if (gameState.currentEnemy && gameState.currentEnemy.weakness) {
-      const weaknessLabel = gameState.currentEnemy.weakness === 'onyomi' ? '音読み' : '訓読み';
-      const message = `弱点は${weaknessLabel}！`;
-      
-      this.drawTextWithOutline(
-        message,
-        kanjiX, // X座標（中央寄せ）
-        kanjiY - kanjiBoxH / 2 - 20, // Y座標（漢字ボックスの上）
-        '#f39c12', // オレンジ色
-        'black',
-        'bold 20px "UDデジタル教科書体",sans-serif',
-        'center',
-        'bottom', // 基準点を下にすることで位置調整
-        3
-      );
-    }
+const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } = this.getKanjiBoxMetrics();
+
+// 弱点表示を「テキストメッセージ」に変更
+if (gameState.currentEnemy && gameState.currentEnemy.weakness) {
+  const weaknessLabel = gameState.currentEnemy.weakness === 'onyomi' ? '音読み' : '訓読み';
+  const message = `弱点は${weaknessLabel}！`;
+
+  this.drawTextWithOutline(
+    message,
+    kanjiX,
+    kanjiY - kanjiBoxH / 2 - 20,
+    '#f39c12',
+    'black',
+    'bold 20px "UDデジタル教科書体",sans-serif',
+    'center',
+    'bottom',
+    3
+  );
+}
     
     
     
@@ -1945,6 +1943,8 @@ if (this.logMode === 'blockPaged') {
       // この処理...
     }
 
+    // スケール対象の基準（石版の中心とサイズをメトリクスから）
+    const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } = this.getKanjiBoxMetrics();
     // シェイクエフェクトの処理
     let shakeOffsetX = 0;
     let shakeOffsetY = 0;
@@ -3405,13 +3405,9 @@ if (e.type === 'touchstart') {
     
     if (comboCount < 2) return; // 2コンボ未満は表示しない
     
-    const kanjiX = this.canvas.width / 2;
-    const kanjiY = 200;
-    const kanjiBoxW = 180;
-    
-    // コンボ表示の位置（漢字の左横に変更）
-    const comboX = kanjiX - kanjiBoxW / 2 - 40;
-    const comboY = kanjiY;
+    const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW } = this.getKanjiBoxMetrics();
+const comboX = kanjiX - kanjiBoxW / 2 - 40;
+const comboY = kanjiY;
     
     ctx.save();
     
@@ -4039,11 +4035,9 @@ if (e.type === 'touchstart') {
     
     // コンボタイマーの視覚化
     if (battleState.comboTimer > 0) {
-      const kanjiX = this.canvas.width / 2;
-      const kanjiY = 200;
-      const kanjiBoxW = 180;
-      const comboX = kanjiX - kanjiBoxW / 2 - 40; // 左側に変更
-      const comboY = kanjiY;
+      const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW } = this.getKanjiBoxMetrics();
+const comboX = kanjiX - kanjiBoxW / 2 - 40;
+const comboY = kanjiY;
       
       const timerRatio = battleState.comboTimer / 300; // 5秒 = 300フレーム
       const timerBarWidth = 60;
@@ -4286,15 +4280,8 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
     battleScreenState.startKanjiBoxEffect('rgba(241, 196, 15, 0.8)', 20);
 
     // ★★★ ここに石版攻撃エフェクトを追加 ★★★
-    // 漢字ボックスの座標を取得
-    const kanjiX = battleScreenState.canvas.width / 2;
-    const kanjiY = 200;
-    const kanjiBoxW = 180;
-    const kanjiBoxH = 160;
-    
-    // 石版攻撃エフェクトを開始
+    const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } = this.getKanjiBoxMetrics();
     battleScreenState.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
-    
     // 前回正解した漢字の情報を保存
     battleScreenState.lastAnsweredKanji = { ...gameState.currentKanji };
     
