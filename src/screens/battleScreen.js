@@ -2372,12 +2372,36 @@ _setupMobileViewportWorkarounds() {
 },
 
 _adjustInputPosition() {
-  if (!this.inputEl || !this.canvas) return;
+  if (!this.canvas) return;
 
   try {
+    // 入力欄を再取得（なければ生成してDOMに追加）
+    if (!this.inputEl) {
+      this.inputEl = document.getElementById('kanjiInput');
+    }
+    if (!this.inputEl) {
+      const el = document.createElement('input');
+      el.id = 'kanjiInput';
+      el.type = 'text';
+      el.autocomplete = 'off';
+      document.body.appendChild(el);
+      this.inputEl = el;
+      this.inputEl.setAttribute('inputmode', 'kana');
+      this.inputEl.setAttribute('autocapitalize', 'off');
+      this.inputEl.setAttribute('autocorrect', 'off');
+      this.inputEl.setAttribute('spellcheck', 'false');
+      // 初期化（重複安全）
+      this._setupMobileViewportWorkarounds?.();
+    }
+
+    // 常に可視化（他所で display:none された場合の復帰）
     this.inputEl.style.display = 'block';
+    this.inputEl.style.visibility = 'visible';
+    this.inputEl.style.opacity = '1';
+    this.inputEl.removeAttribute('hidden');
+
     this.inputEl.style.position = 'fixed';
-    this.inputEl.style.zIndex = '1000';
+    this.inputEl.style.zIndex = '2147483647';
 
     const isTablet = window.innerWidth <= 1024;
     this.inputEl.style.width = isTablet ? 'min(80vw, 520px)' : '280px';
@@ -2394,12 +2418,12 @@ _adjustInputPosition() {
     const vk = navigator.virtualKeyboard;
     const vkInset = (vk && vk.boundingRect) ? Math.max(0, window.innerHeight - vk.boundingRect.y) : 0;
 
-    const insetMax = Math.max(vvInset, vkInset, this.keyboardState.bottomInset || 0);
-    const keyboardOpen = this.keyboardState.open || insetMax > 30;
+    const insetMax = Math.max(vvInset, vkInset, this.keyboardState?.bottomInset || 0);
+    const keyboardOpen = (this.keyboardState?.open) || insetMax > 30;
     const bottomInset = keyboardOpen ? insetMax : 0;
 
-    const rect = this.canvas.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
+    const rect = this.canvas.getBoundingClientRect?.();
+    const centerX = rect ? (rect.left + rect.width / 2) : Math.round(window.innerWidth / 2);
 
     const cs = getComputedStyle(this.inputEl);
     const inputW = this.inputEl.offsetWidth || parseInt(cs.width) || 280;
@@ -2411,12 +2435,19 @@ _adjustInputPosition() {
       this.inputEl.style.bottom = `${Math.round(bottomInset + 4)}px`;
       this.inputEl.style.transform = 'none';
     } else {
-      // 石版に重ならない下寄せ（画面下半分が隠れてもOKの前提）
-      const targetCanvasY = Math.min(this.canvas.height - 40, 460);
-      const cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
-      this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
-      this.inputEl.style.top = `${Math.round(cssTop)}px`;
-      this.inputEl.style.bottom = 'auto';
+      // 石版に重ならない下寄せ（見切れてもOK）
+      if (rect) {
+        const targetCanvasY = Math.min(this.canvas.height - 40, 460);
+        const cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
+        this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
+        this.inputEl.style.top = `${Math.round(cssTop)}px`;
+        this.inputEl.style.bottom = 'auto';
+      } else {
+        // rect 取得失敗時は画面下から24pxの安全配置
+        this.inputEl.style.left = `${Math.round(centerX - inputW / 2)}px`;
+        this.inputEl.style.top = 'auto';
+        this.inputEl.style.bottom = '24px';
+      }
       this.inputEl.style.transform = 'none';
     }
   } catch (e) {
