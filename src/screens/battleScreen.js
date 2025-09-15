@@ -4277,9 +4277,16 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
     // 漢字ボックスのエフェクトを開始（黄色で光らせる）
     battleScreenState.startKanjiBoxEffect('rgba(241, 196, 15, 0.8)', 20);
 
-    // ★★★ ここに石版攻撃エフェクトを追加 ★★★
-    const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } = this.getKanjiBoxMetrics();
-battleScreenState.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
+     // ★★★ ここに石版攻撃エフェクトを追加 ★★★
+
+    const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } =
+      (battleScreenState.getKanjiBoxMetrics
+        ? battleScreenState.getKanjiBoxMetrics()
+        : { centerX: (battleScreenState.canvas ? battleScreenState.canvas.width / 2 : Math.round(window.innerWidth / 2)),
+            centerY: (battleScreenState.keyboardState?.open ? 120 : 200),
+            width:   (battleScreenState.keyboardState?.open ? 160 : 180),
+            height:  (battleScreenState.keyboardState?.open ? 140 : 160) });
+     battleScreenState.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
     // 前回正解した漢字の情報を保存
     battleScreenState.lastAnsweredKanji = { ...gameState.currentKanji };
     
