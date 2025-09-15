@@ -1919,11 +1919,6 @@ if (this.logMode === 'blockPaged') {
         battleState.comboTimer = 0;
       }
     }
-    
-    // コンボカウントが0以下の場合は強制的に0にする
-    if (battleState.comboCount < 0) {
-      battleState.comboCount = 0;
-    }
 
     // スケール対象の基準（石版の中心とサイズをメトリクスから）
     const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } = this.getKanjiBoxMetrics();
@@ -4263,7 +4258,7 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
 
     // ★★★ ここに石版攻撃エフェクトを追加 ★★★
     const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } = this.getKanjiBoxMetrics();
-    battleScreenState.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
+battleScreenState.startStoneAttackEffect(kanjiX, kanjiY, kanjiBoxW, kanjiBoxH);
     // 前回正解した漢字の情報を保存
     battleScreenState.lastAnsweredKanji = { ...gameState.currentKanji };
     
