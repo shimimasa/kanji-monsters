@@ -81,8 +81,15 @@ const practiceBattleScreenState = {
             // マスターモード専用のハンドラを先に設定
       this._setupPracticeHandlers();
       
-      // 通常のバトル画面初期化を実行
-      battleScreenState.enter.call(this, canvasEl);
+            // 通常のバトル画面初期化を実行
+            battleScreenState.enter.call(this, canvasEl);
+
+            // 画面固定（vh-lock）を有効化
+            try {
+              document.documentElement.classList.add('vh-lock');
+              document.body.classList.add('vh-lock');
+              if (this.canvas) this.canvas.classList.add('vh-lock');
+            } catch {}
 
       // 背景画像を必ずステージのものに
       try {
@@ -1983,6 +1990,14 @@ const practiceBattleScreenState = {
         this._practiceKeydownHandler = null;
       }
       
+      // 画面固定（vh-lock）を無効化
+      try {
+        document.documentElement.classList.remove('vh-lock');
+        document.body.classList.remove('vh-lock');
+        const cvs = document.getElementById('gameCanvas');
+        if (this.canvas) this.canvas.classList.remove('vh-lock');
+      } catch {}
+
       if (battleScreenState.exit) {
         battleScreenState.exit.call(this);
       }
@@ -1996,7 +2011,6 @@ const practiceBattleScreenState = {
     this.reviewTargetReading = null;
     
           // リスナー解除とスタイル復元
-      // リスナー解除とスタイル復元
       try {
         if (this.inputEl && this._focusHandler) {
           this.inputEl.removeEventListener('focus', this._focusHandler);

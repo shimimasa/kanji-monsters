@@ -37,7 +37,7 @@ const audio = new AudioManager();
 import { subscribe, publish } from './core/eventBus.js';
 subscribe('playSE',  name => audio.playSE(name));
 subscribe('playBGM', (name, loop = true) => audio.playBGM(name, loop));
-
+subscribe('stopBGM', (duration = 0) => audio.stopBGM(duration));
 // ────────────────
 // モバイルブラウザの自動再生制限対策：
 // 最初のユーザー操作のときだけ BGM を始動させる
