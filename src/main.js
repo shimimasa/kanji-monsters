@@ -1,5 +1,5 @@
 /* ----------------------------- 依存モジュール ----------------------------- */
-import { gameState, updatePlayerName } from './core/gameState.js';
+import { gameState, updatePlayerName, saveGameData } from './core/gameState.js';
 import { setCanvas, update as updateScreen, render as renderScreen } from './core/screenManager.js';
 import { initAssets } from './loaders/assetsLoader.js';
 import { loadAllGameData } from './loaders/dataLoader.js';
@@ -38,6 +38,10 @@ import { subscribe, publish } from './core/eventBus.js';
 subscribe('playSE',  name => audio.playSE(name));
 subscribe('playBGM', (name, loop = true) => audio.playBGM(name, loop));
 subscribe('stopBGM', (duration = 0) => audio.stopBGM(duration));
+subscribe('setBGMVolume', v => { audio.setBGMVolume(v); try { saveGameData(); } catch {} });
+subscribe('setSEVolume', v => { audio.setSEVolume(v); try { saveGameData(); } catch {} });
+subscribe('getBGMVolume', callback => callback(audio.getBGMVolume()));
+subscribe('getSEVolume', callback => callback(audio.getSEVolume()));
 // ────────────────
 // モバイルブラウザの自動再生制限対策：
 // 最初のユーザー操作のときだけ BGM を始動させる

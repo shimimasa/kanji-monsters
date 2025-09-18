@@ -1,5 +1,5 @@
 // js/settingsScreen.js
-import { gameState, saveGameData } from '../core/gameState.js';
+import { gameState, saveGameData, loadGameData, clearSaveData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect, drawThemeBackground, drawPanelBackground } from '../ui/uiRenderer.js';
 import { getCurrentUser } from '../services/firebase/firebaseController.js';
 import { publish } from '../core/eventBus.js';
@@ -955,7 +955,36 @@ const settingsScreenState = {
   createButtonSection() {
     const buttonSection = document.createElement('div');
     buttonSection.className = 'settings-button-section';
-    
+
+    // 手動セーブ
+    const manualSaveBtn = document.createElement('button');
+    manualSaveBtn.className = 'settings-button primary';
+    manualSaveBtn.textContent = '手動セーブ';
+    manualSaveBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      try { saveGameData(); alert('セーブしました。'); } catch (e) { alert('セーブに失敗しました。'); }
+    });
+
+    // セーブ読込
+    const manualLoadBtn = document.createElement('button');
+    manualLoadBtn.className = 'settings-button';
+    manualLoadBtn.textContent = 'セーブ読込';
+    manualLoadBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      try { loadGameData(); alert('セーブを読み込みました。'); } catch (e) { alert('読込に失敗しました。'); }
+    });
+
+    // セーブ初期化（軽量）
+    const clearSaveBtn = document.createElement('button');
+    clearSaveBtn.className = 'settings-button danger';
+    clearSaveBtn.textContent = 'セーブ初期化（軽）';
+    clearSaveBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      if (confirm('セーブデータを初期化しますか？（Firebaseは削除しません）')) {
+        try { clearSaveData(); alert('セーブを初期化しました。'); } catch {}
+      }
+    });
+
     // データリセットボタン（ツールチップ付き）
     const resetButtonContainer = document.createElement('div');
     resetButtonContainer.style.position = 'relative';
@@ -991,10 +1020,16 @@ const settingsScreenState = {
       publish('playSE', 'decide');
       publish('changeScreen', 'title');
     });
+
     
+
+    // 追加ボタンを先頭に配置
+    buttonSection.appendChild(manualSaveBtn);
+    buttonSection.appendChild(manualLoadBtn);
+    buttonSection.appendChild(clearSaveBtn);
     buttonSection.appendChild(resetButtonContainer);
     buttonSection.appendChild(backButton);
-    
+
     return buttonSection;
   },
 
