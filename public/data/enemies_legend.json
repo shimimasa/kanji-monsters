@@ -1,0 +1,1538 @@
+[
+    {
+      "id": "HKD-L01",
+      "stageId": "hokkaido_bonus",
+      "name": "オーロラスピリット",
+      "prefecture": "北海道",
+      "level": 8,
+      "maxHp": 180,
+      "atk": 40,
+      "thumb": "HKD-L01_thumb",
+      "image": "HKD-L01.webp",
+      "isBoss": true,
+      "exp": 300,
+      "weakness": "onyomi",
+      "category": "伝説",
+      "habitat": "知床の夜空",
+      "desc": "オーロラの光から生まれた精霊。氷と光の帯をまとい、天を舞う。",
+      "trivia": "北海道の知床や稚内などでは、まれにオーロラが観測されることがある。",
+      "catchphrase": "「天空を彩る極光の舞！」"
+    },
+    {
+      "id": "HKD-L02",
+      "stageId": "hokkaido_bonus",
+      "name": "シロクマガーディアン",
+      "prefecture": "北海道",
+      "level": 8,
+      "maxHp": 200,
+      "atk": 42,
+      "thumb": "HKD-L02_thumb",
+      "image": "HKD-L02.webp",
+      "isBoss": true,
+      "exp": 320,
+      "weakness": "kunyomi",
+      "category": "伝説",
+      "habitat": "旭川・雪原",
+      "desc": "白銀の鎧をまとう巨大な熊の守護者。雪原を踏みしめるたび、大地が震える。",
+      "trivia": "旭山動物園など北海道はホッキョクグマの飼育で有名。",
+      "catchphrase": "「雪原を護る白き巨獣！」"
+    },
+    {
+      "id": "HKD-L03",
+      "stageId": "hokkaido_bonus",
+      "name": "アイヌカムイロード",
+      "prefecture": "北海道",
+      "level": 9,
+      "maxHp": 220,
+      "atk": 45,
+      "thumb": "HKD-L03_thumb",
+      "image": "HKD-L03.webp",
+      "isBoss": true,
+      "exp": 350,
+      "weakness": "onyomi",
+      "category": "伝説",
+      "habitat": "阿寒湖・神居古潭",
+      "desc": "アイヌの神話に登場する戦士の姿をした存在。文様が輝く武具で戦う。",
+      "trivia": "『カムイ』はアイヌ語で神を意味し、自然や動物にも宿ると考えられている。",
+      "catchphrase": "「文様に宿る神威の力！」"
+    },
+    {
+      "id": "HKD-L04",
+      "stageId": "hokkaido_bonus",
+      "name": "流氷ドラゴン",
+      "prefecture": "北海道",
+      "level": 10,
+      "maxHp": 250,
+      "atk": 50,
+      "thumb": "HKD-L04_thumb",
+      "image": "HKD-L04.webp",
+      "isBoss": true,
+      "exp": 400,
+      "weakness": "kunyomi",
+      "category": "伝説",
+      "habitat": "オホーツク海",
+      "desc": "巨大な氷塊の翼を持ち、冷気を吐く伝説の龍。海を凍らせて進む。",
+      "trivia": "オホーツク海には冬に流氷が押し寄せる。地球規模の自然現象として知られる。",
+      "catchphrase": "「氷海を統べる極寒の龍！」"
+    },
+    {
+      "id": "HKD-L05",
+      "stageId": "hokkaido_bonus",
+      "name": "火山バードカムイ",
+      "prefecture": "北海道",
+      "level": 10,
+      "maxHp": 240,
+      "atk": 52,
+      "thumb": "HKD-L05_thumb",
+      "image": "HKD-L05.webp",
+      "isBoss": true,
+      "exp": 390,
+      "weakness": "onyomi",
+      "category": "伝説",
+      "habitat": "有珠山・昭和新山",
+      "desc": "炎と灰をまとった大鳥の神獣。翼を広げると大地が火を噴く。",
+      "trivia": "北海道には有珠山・昭和新山など活火山が多く存在する。",
+      "catchphrase": "「炎翼で舞う大地の神鳥！」"
+    },
+
+    {
+        "id": "HKD-F01",
+        "stageId": "hokkaido_bonus",
+        "name": "オーロラドラゴン",
+        "prefecture": "北海道",
+        "rarity": "幻",
+        "category": "自然・天象",
+        "habitat": "夜空",
+        "desc": "オーロラの光が竜の姿を取った幻獣。空を泳ぐように舞い、幻想的な光で大地を照らす。",
+        "trivia": "北海道でも条件が整えばオーロラを観測できることがある。",
+        "catchphrase": "「光の翼で夜空を駆ける！」"
+      },
+      {
+        "id": "HKD-F02",
+        "stageId": "hokkaido_bonus",
+        "name": "シマフクロウオラクル",
+        "prefecture": "北海道",
+        "rarity": "幻",
+        "category": "神話・精霊",
+        "habitat": "深い森",
+        "desc": "アイヌの守り神コタンコロカムイを象徴する巨大なフクロウ。金色の瞳は未来を見通す。",
+        "trivia": "シマフクロウは北海道のみに生息し、アイヌ文化で神の鳥とされる。",
+        "catchphrase": "「光の眼で未来を告げる！」"
+      },
+      {
+        "id": "HKD-F03",
+        "stageId": "hokkaido_bonus",
+        "name": "カムイオオカミ",
+        "prefecture": "北海道",
+        "rarity": "幻",
+        "category": "神獣",
+        "habitat": "雪山",
+        "desc": "絶滅したエゾオオカミが神格化した幻獣。銀色の毛並みと氷のオーラを纏い吹雪を呼ぶ。",
+        "trivia": "アイヌ伝承では狼はカムイ（神）の使いとされていた。",
+        "catchphrase": "「吹雪を従えし氷の牙！」"
+      },
+      {
+        "id": "HKD-F04",
+        "stageId": "hokkaido_bonus",
+        "name": "トカチバオバブーン",
+        "prefecture": "北海道",
+        "rarity": "幻",
+        "category": "自然・大地",
+        "habitat": "十勝平野",
+        "desc": "大地を歩く巨大な樹の幻獣。幹には霊の姿が浮かび、枝から光の果実を垂らす。",
+        "trivia": "十勝地方は広大な平野と農地で知られ、自然信仰も盛んだった。",
+        "catchphrase": "「大地を揺るがす光の樹！」"
+      },
+      {
+        "id": "HKD-F05",
+        "stageId": "hokkaido_bonus",
+        "name": "オホーツクシーサーペント",
+        "prefecture": "北海道",
+        "rarity": "幻",
+        "category": "海獣",
+        "habitat": "オホーツク海",
+        "desc": "流氷に覆われた海から現れる氷の海竜。青白い息で海を凍らせる。",
+        "trivia": "オホーツク海は冬に流氷が押し寄せる世界的にも珍しい海域。",
+        "catchphrase": "「氷海を統べる幻の竜！」"
+      },
+    {
+      "id": "TOH-L01",
+      "stageId": "tohoku_bonus",
+      "name": "ねぶたタイタン",
+      "prefecture": "青森・東北",
+      "level": 9,
+      "maxHp": 230,
+      "atk": 48,
+      "thumb": "TOH-L01_thumb",
+      "image": "TOH-L01.webp",
+      "isBoss": true,
+      "exp": 360,
+      "weakness": "onyomi",
+      "category": "祭典",
+      "habitat": "青森・ねぶた祭",
+      "desc": "光る巨大な武者の姿をした祭りの巨人。全身が炎のように輝く紙灯籠でできている。",
+      "trivia": "青森ねぶた祭は東北三大祭りのひとつ。『灯（とう）』『祭（まつり）』の漢字を覚えよう。",
+      "catchphrase": "「光と炎をまとい進む祭の巨神！」"
+    },
+    {
+      "id": "TOH-L02",
+      "stageId": "tohoku_bonus",
+      "name": "座敷わらしロード",
+      "prefecture": "岩手・東北",
+      "level": 8,
+      "maxHp": 210,
+      "atk": 42,
+      "thumb": "TOH-L02_thumb",
+      "image": "TOH-L02.webp",
+      "isBoss": true,
+      "exp": 330,
+      "weakness": "kunyomi",
+      "category": "妖怪伝承",
+      "habitat": "岩手・南部の古民家",
+      "desc": "幸運をもたらす子どもの姿の妖怪が進化した伝説級の守護者。周囲に福の光を放つ。",
+      "trivia": "座敷わらしは東北地方に伝わる家の守り神。『福（ふく）』の字と結びつけて覚えよう。",
+      "catchphrase": "「福を招き、災いを退ける童神！」"
+    },
+    {
+      "id": "TOH-L03",
+      "stageId": "tohoku_bonus",
+      "name": "竜飛海峡ドラゴン",
+      "prefecture": "青森・東北",
+      "level": 10,
+      "maxHp": 250,
+      "atk": 50,
+      "thumb": "TOH-L03_thumb",
+      "image": "TOH-L03.webp",
+      "isBoss": true,
+      "exp": 400,
+      "weakness": "onyomi",
+      "category": "海の伝説",
+      "habitat": "津軽海峡・竜飛岬",
+      "desc": "荒れ狂う津軽海峡の渦潮から現れた龍神。嵐を呼び、船を揺るがす。",
+      "trivia": "津軽海峡は本州と北海道を隔てる海峡。『竜（りゅう）』の字を学ぼう。",
+      "catchphrase": "「海鳴りを従える荒海の龍神！」"
+    },
+    {
+      "id": "TOH-L04",
+      "stageId": "tohoku_bonus",
+      "name": "なまはげオーガロード",
+      "prefecture": "秋田・東北",
+      "level": 9,
+      "maxHp": 240,
+      "atk": 47,
+      "thumb": "TOH-L04_thumb",
+      "image": "TOH-L04.webp",
+      "isBoss": true,
+      "exp": 370,
+      "weakness": "kunyomi",
+      "category": "祭典・伝承",
+      "habitat": "秋田・男鹿半島",
+      "desc": "鬼の面をかぶり、大きな包丁を手にした伝説の巨鬼。悪を退け、怠け者を叱咤する。",
+      "trivia": "秋田のなまはげはユネスコ無形文化遺産。『鬼（おに）』の字を覚えておこう。",
+      "catchphrase": "「怠けを斬り裂く怒りの守護鬼！」"
+    },
+    {
+      "id": "TOH-L05",
+      "stageId": "tohoku_bonus",
+      "name": "蔵王フロストフェニックス",
+      "prefecture": "宮城・山形・東北",
+      "level": 10,
+      "maxHp": 260,
+      "atk": 52,
+      "thumb": "TOH-L05_thumb",
+      "image": "TOH-L05.webp",
+      "isBoss": true,
+      "exp": 420,
+      "weakness": "onyomi",
+      "category": "自然現象",
+      "habitat": "蔵王連峰・樹氷原",
+      "desc": "樹氷から生まれた氷の不死鳥。翼を広げると吹雪が巻き起こる。",
+      "trivia": "蔵王連峰の樹氷は世界的にも有名な自然景観。『氷（こおり）』『鳥（とり）』をセットで覚えよう。",
+      "catchphrase": "「樹氷を統べる白銀の不死鳥！」"
+    },
+
+    {
+        "id": "TOH-F01",
+        "stageId": "tohoku_bonus",
+        "name": "ザオウアイスフェニックス",
+        "prefecture": "宮城・山形",
+        "rarity": "幻",
+        "category": "自然・天象",
+        "habitat": "蔵王の樹氷原",
+        "desc": "樹氷の結晶が不死鳥となった幻獣。冷気を纏いながらも胸奥に再生の炎を宿す。",
+        "trivia": "蔵王の“樹氷”は過冷却水滴が樹木に付着・凍結して生じる冬の名景。",
+        "catchphrase": "「氷翼は折れず、何度でも翔ぶ！」"
+      },
+      {
+        "id": "TOH-F02",
+        "stageId": "tohoku_bonus",
+        "name": "三内スピリットガーディアン",
+        "prefecture": "青森",
+        "rarity": "幻",
+        "category": "遺跡・精霊",
+        "habitat": "三内丸山遺跡",
+        "desc": "縄文の大柱と土の霊が融合した守護巨人。体表に縄文文様の光が巡る。",
+        "trivia": "三内丸山遺跡は縄文時代の大規模集落跡で、巨大建造物の柱穴が有名。",
+        "catchphrase": "「古の記憶、いま光となりて！」"
+      },
+      {
+        "id": "TOH-F03",
+        "stageId": "tohoku_bonus",
+        "name": "竜飛ミストドラゴン",
+        "prefecture": "青森",
+        "rarity": "幻",
+        "category": "霊獣・海風",
+        "habitat": "竜飛崎・津軽海峡",
+        "desc": "濃霧の帷から現れる半透明の竜。風と波を操り、姿は霧とともに変転する。",
+        "trivia": "竜飛崎は強風と急潮で知られる岬で、霧が発生しやすい。",
+        "catchphrase": "「霧裂き、風よ、道を示せ！」"
+      },
+      {
+        "id": "TOH-F04",
+        "stageId": "tohoku_bonus",
+        "name": "立石カミナリオオガミ",
+        "prefecture": "秋田",
+        "rarity": "幻",
+        "category": "雷・神獣",
+        "habitat": "男鹿・海岸の立石",
+        "desc": "雷雲を背負う鬼神の獣。角から稲光が奔り、咆哮は轟雷となる。",
+        "trivia": "男鹿のなまはげ伝承は“怠け者を戒める来訪神”として知られる。",
+        "catchphrase": "「雷鳴一閃、畏れを知れ！」"
+      },
+      {
+        "id": "TOH-F05",
+        "stageId": "tohoku_bonus",
+        "name": "奥入瀬ウォータースピリット",
+        "prefecture": "青森",
+        "rarity": "幻",
+        "category": "自然・水霊",
+        "habitat": "奥入瀬渓流",
+        "desc": "流れそのものが精霊となった存在。透明な体に苔と小石がきらめき、形を自在に変える。",
+        "trivia": "奥入瀬渓流は苔むす岩と連続する滝が美しい景勝地。",
+        "catchphrase": "「流転こそ、わがちから。」"
+      },
+
+        {
+          "id": "KNT-L01",
+          "stageId": "kanto_bonus",
+          "name": "雷門ガーディアン",
+          "prefecture": "東京・関東",
+          "level": 9,
+          "maxHp": 240,
+          "atk": 48,
+          "thumb": "KNT-L01_thumb",
+          "image": "KNT-L01.webp",
+          "isBoss": true,
+          "exp": 370,
+          "weakness": "onyomi",
+          "category": "建造物",
+          "habitat": "浅草・雷門",
+          "desc": "巨大な赤提灯を胸に抱く守護巨人。雷をまとい、街を護る。",
+          "trivia": "浅草寺の雷門は東京を代表する観光名所。『雷（かみなり）』『門（もん）』の字を確認しよう。",
+          "catchphrase": "「轟け雷光、護れ江戸の門！」"
+        },
+        {
+          "id": "KNT-L02",
+          "stageId": "kanto_bonus",
+          "name": "赤城サーペントロード",
+          "prefecture": "群馬・関東",
+          "level": 10,
+          "maxHp": 280,
+          "atk": 55,
+          "thumb": "KNT-L02_thumb",
+          "image": "KNT-L02.webp",
+          "isBoss": true,
+          "exp": 450,
+          "weakness": "kunyomi",
+          "category": "伝承",
+          "habitat": "赤城山・大沼",
+          "desc": "赤城山の湖に棲むとされる巨大な蛇の王。水を操り嵐を呼ぶ。",
+          "trivia": "群馬県赤城山には大蛇伝説が伝わる。『蛇（へび）』の漢字を学んでみよう。",
+          "catchphrase": "「湖底より現れし嵐蛇神！」"
+        },
+        {
+          "id": "KNT-L03",
+          "stageId": "kanto_bonus",
+          "name": "江戸サムライゴースト",
+          "prefecture": "東京・関東",
+          "level": 9,
+          "maxHp": 230,
+          "atk": 47,
+          "thumb": "KNT-L03_thumb",
+          "image": "KNT-L03.webp",
+          "isBoss": true,
+          "exp": 360,
+          "weakness": "onyomi",
+          "category": "歴史",
+          "habitat": "江戸城跡",
+          "desc": "江戸時代の武士の魂が姿を変えた幽霊剣士。刀から蒼い炎を放つ。",
+          "trivia": "江戸城は現在の皇居。『武（ぶ）』『士（し）』の漢字を学ぼう。",
+          "catchphrase": "「蒼炎の刃で守る武士の魂！」"
+        },
+        {
+          "id": "KNT-L04",
+          "stageId": "kanto_bonus",
+          "name": "日光ヤマトドラゴン",
+          "prefecture": "栃木・関東",
+          "level": 10,
+          "maxHp": 260,
+          "atk": 52,
+          "thumb": "KNT-L04_thumb",
+          "image": "KNT-L04.webp",
+          "isBoss": true,
+          "exp": 420,
+          "weakness": "kunyomi",
+          "category": "文化遺産",
+          "habitat": "日光東照宮",
+          "desc": "東照宮の装飾から生まれた龍。体に極彩色の文様を宿す。",
+          "trivia": "日光東照宮は徳川家康を祀る世界遺産。『龍（りゅう）』『宮（きゅう）』を覚えよう。",
+          "catchphrase": "「極彩の鱗に宿る天下の護り！」"
+        },
+        {
+          "id": "KNT-L05",
+          "stageId": "kanto_bonus",
+          "name": "相模湾シーレヴィアタン",
+          "prefecture": "神奈川・関東",
+          "level": 10,
+          "maxHp": 270,
+          "atk": 54,
+          "thumb": "KNT-L05_thumb",
+          "image": "KNT-L05.webp",
+          "isBoss": true,
+          "exp": 430,
+          "weakness": "onyomi",
+          "category": "海の伝説",
+          "habitat": "相模湾",
+          "desc": "相模湾の深海から現れる大海獣。海流を操り、津波を呼ぶ。",
+          "trivia": "相模湾は神奈川県に広がる深い海。『湾（わん）』の字を確認しよう。",
+          "catchphrase": "「荒波を統べる深海の覇者！」"
+        },
+
+        {
+            "id": "KNT-F01",
+            "stageId": "kanto_bonus",
+            "name": "江戸大江戸ドラゴン",
+            "prefecture": "東京",
+            "rarity": "幻",
+            "category": "歴史・都市霊",
+            "habitat": "江戸城跡・東京の空",
+            "desc": "江戸の霊気が結集して生まれた龍神。瓦屋根や提灯の文様を纏い、背には江戸城を象徴する光を宿す。",
+            "trivia": "江戸は現在の東京の旧名で、江戸城を中心に発展した。",
+            "catchphrase": "「歴史と霊気、天を翔ける大江戸の竜！」"
+          },
+          {
+            "id": "KNT-F02",
+            "stageId": "kanto_area1",
+            "name": "日光ヤタノカラス",
+            "prefecture": "栃木",
+            "rarity": "幻",
+            "category": "神話・導き",
+            "habitat": "日光東照宮",
+            "desc": "三本足の烏が霊的に進化した存在。翼から金色の光を放ち、旅人に道を示す。",
+            "trivia": "八咫烏は日本神話に登場し、導きの象徴とされる。",
+            "catchphrase": "「金色の翼、未来を照らす！」"
+          },
+          {
+            "id": "KNT-F03",
+            "stageId": "kanto_area1",
+            "name": "江戸スピリットサムライ",
+            "prefecture": "東京",
+            "rarity": "幻",
+            "category": "歴史・武士霊",
+            "habitat": "旧江戸の街",
+            "desc": "江戸の霊気が集まり顕現した武士の幻影。甲冑は光の霊体となり、青白い刀で空を断つ。",
+            "trivia": "江戸時代は武士階級が社会の中心にあり、武士道精神が根付いた。",
+            "catchphrase": "「霊刀一閃、歴史を刻む！」"
+          },
+          {
+            "id": "KNT-F04",
+            "stageId": "kanto_area1",
+            "name": "鹿島サンダースピリット",
+            "prefecture": "茨城",
+            "rarity": "幻",
+            "category": "神霊・雷獣",
+            "habitat": "鹿島神宮",
+            "desc": "雷を纏う白鹿の姿をした神霊。角から稲光を放ち、霊的な光を纏う。",
+            "trivia": "鹿島神宮は武神タケミカヅチを祀る古社で、神鹿の伝承が残る。",
+            "catchphrase": "「雷鳴轟き、武神の威光！」"
+          },
+          {
+            "id": "KNT-F05",
+            "stageId": "kanto_area1",
+            "name": "鶴ヶ島ムーンフェニックス",
+            "prefecture": "埼玉",
+            "rarity": "幻",
+            "category": "自然・月霊",
+            "habitat": "月夜の空",
+            "desc": "月の光を浴びて蘇る幻鳥。銀色の羽を広げ、夜空に幻想的な光を描く。",
+            "trivia": "フェニックスは再生の象徴とされ、月のイメージと組み合わされることで幻想性が増す。",
+            "catchphrase": "「月光に舞い、永遠を告げる！」"
+          },
+
+            {
+              "id": "CHB-L01",
+              "stageId": "chubu_bonus",
+              "name": "越後ユキオンロード",
+              "prefecture": "新潟",
+              "level": 50,
+              "maxHp": 2800,
+              "atk": 350,
+              "thumb": "CHB-L01_thumb",
+              "image": "CHB-L01.webp",
+              "isBoss": true,
+              "exp": 5000,
+              "weakness": "kunyomi",
+              "category": "伝説・自然",
+              "habitat": "越後山脈・雪原",
+              "desc": "新潟の大雪の精霊が巨人化した存在。吹雪と雪崩を従えて現れる氷雪の王。",
+              "trivia": "新潟は日本有数の豪雪地帯で、『雪国』として知られている。"
+            },
+            {
+              "id": "CHB-L02",
+              "stageId": "chubu_bonus",
+              "name": "立山サンダードラゴン",
+              "prefecture": "富山",
+              "level": 52,
+              "maxHp": 3000,
+              "atk": 370,
+              "thumb": "CHB-L02_thumb",
+              "image": "CHB-L02.webp",
+              "isBoss": true,
+              "exp": 5200,
+              "weakness": "onyomi",
+              "category": "伝説・龍",
+              "habitat": "立山連峰・雷雲",
+              "desc": "立山に住むと伝わる雷を司る龍。黒雲を纏い、咆哮と共に稲妻を落とす。",
+              "trivia": "立山は信仰の山として知られ、雷鳥の生息地でもある。"
+            },
+            {
+              "id": "CHB-L03",
+              "stageId": "chubu_bonus",
+              "name": "白川郷スピリットロード",
+              "prefecture": "岐阜",
+              "level": 51,
+              "maxHp": 2900,
+              "atk": 360,
+              "thumb": "CHB-L03_thumb",
+              "image": "CHB-L03.webp",
+              "isBoss": true,
+              "exp": 5100,
+              "weakness": "kunyomi",
+              "category": "伝説・文化",
+              "habitat": "白川郷・合掌造りの村",
+              "desc": "合掌造りの村を守護する巨人精霊。茅葺き屋根を背負い、光の結界で村を守る。",
+              "trivia": "白川郷は世界遺産に登録されており、冬の雪景色が有名。"
+            },
+            {
+              "id": "CHB-L04",
+              "stageId": "chubu_bonus",
+              "name": "富士火焔フェニックス",
+              "prefecture": "山梨・静岡",
+              "level": 55,
+              "maxHp": 3300,
+              "atk": 400,
+              "thumb": "CHB-L04_thumb",
+              "image": "CHB-L04.webp",
+              "isBoss": true,
+              "exp": 5500,
+              "weakness": "onyomi",
+              "category": "伝説・炎鳥",
+              "habitat": "富士山・火口",
+              "desc": "富士山の噴火から生まれた炎の霊鳥。翼を広げると炎と火山灰を撒き散らす。",
+              "trivia": "富士山は世界文化遺産に登録され、日本の象徴とされる山。"
+            },
+            {
+              "id": "CHB-L05",
+              "stageId": "chubu_bonus",
+              "name": "名古屋金鯱キング",
+              "prefecture": "愛知",
+              "level": 54,
+              "maxHp": 3200,
+              "atk": 380,
+              "thumb": "CHB-L05_thumb",
+              "image": "CHB-L05.webp",
+              "isBoss": true,
+              "exp": 5400,
+              "weakness": "kunyomi",
+              "category": "伝説・守護獣",
+              "habitat": "名古屋城・天守閣",
+              "desc": "名古屋城を守護する黄金の鯱の王。背びれから金光を放ち、城を守る。",
+              "trivia": "名古屋城の金鯱は江戸時代から続く象徴的存在。"
+            },
+
+            {
+                "id": "CHB-F01",
+              "stageId": "chubu_bonus",
+                "name": "立山スノードラゴン",
+                "prefecture": "富山",
+                "rarity": "幻",
+                "category": "自然・雪氷",
+                "habitat": "立山連峰・雪原上空",
+                "desc": "立山の雪と風が竜の姿を取った幻獣。氷の鱗をまとい、尾から吹雪を撒き散らす。",
+                "trivia": "立山は山岳信仰の霊山として知られ、雪の大谷など雪景が名物。",
+                "catchphrase": "「白き嵐、峰より降りる！」"
+              },
+              {
+                "id": "CHB-F02",
+                "stageId": "chubu_bonus",
+                "name": "白川郷スピリットハウス",
+                "prefecture": "岐阜",
+                "rarity": "幻",
+                "category": "文化財・守護霊",
+                "habitat": "白川郷・合掌造り集落",
+                "desc": "合掌造りの家屋が霊力を帯びた守護者。茅葺き屋根は光の結晶で輝き、窓は魂の目のように灯る。",
+                "trivia": "白川郷は合掌造り家屋で有名な世界遺産。豪雪に適応した急勾配の屋根が特徴。",
+                "catchphrase": "「家魂（いえだま）、里を護（まも）る！」"
+              },
+              {
+                "id": "CHB-F03",
+                "stageId": "chubu_bonus",
+                "name": "諏訪タケミナカタオオカミ",
+                "prefecture": "長野",
+                "rarity": "幻",
+                "category": "神獣・武神",
+                "habitat": "諏訪湖・諏訪大社周辺",
+                "desc": "武神タケミナカタの霊が狼の姿で顕現。赤銅色の体に霊光をまとい、武の気配を放つ。",
+                "trivia": "諏訪大社は日本最古級の神社の一つで御柱祭が有名。タケミナカタ神を祀る。",
+                "catchphrase": "「武の息吹、湖上に轟く！」"
+              },
+              {
+                "id": "CHB-F04",
+                "stageId": "chubu_bonus",
+                "name": "富士ノカガミフェニックス",
+                "prefecture": "山梨",
+                "rarity": "幻",
+                "category": "天象・再生",
+                "habitat": "富士山上空",
+                "desc": "火口の炎と雪の白光が交わって生まれた不死鳥。赤と白の羽が天へと再生の弧を描く。",
+                "trivia": "富士山は活火山でありながら雪化粧の姿で知られ、古来より山岳信仰の対象。",
+                "catchphrase": "「紅白の翼、永劫を告げる！」"
+              },
+              {
+                "id": "CHB-F05",
+                "stageId": "chubu_bonus",
+                "name": "伊勢ノアマテラスドラゴン",
+                "prefecture": "静岡・東海圏",
+                "rarity": "幻",
+                "category": "神話・太陽",
+                "habitat": "駿河湾上空・東海の空",
+                "desc": "太陽の霊気を背負う黄金の竜。背に光輪を掲げ、大地と海を照らす守護者。",
+                "trivia": "アマテラスは日本神話の太陽神として知られる。東海圏の海空を照らす象徴的存在にアレンジ。",
+                "catchphrase": "「日輪の咆哮、天地を照らせ！」"
+              },
+
+                {
+                  "id": "KINKI-L01",
+                  "stageId": "kinki_bonus",
+                  "name": "比叡雷鳴テンジン",
+                  "prefecture": "滋賀・京都",
+                  "category": "伝説・守護神",
+                  "habitat": "比叡山",
+                  "desc": "比叡山を守護する雷の天神。僧兵の鎧をまとった巨神で、背後には雷雲を背負い、光の輪を放つ。経文のような光の模様が体を巡る。",
+                  "trivia": "比叡山は天台宗の総本山として有名で、僧兵の伝承や雷神信仰と深く結びついている。",
+                  "catchphrase": "「雷鳴轟く、山の神威！」",
+                  "isBoss": true
+                },
+                {
+                  "id": "KINKI-L02",
+                  "stageId": "kinki_bonus",
+                  "name": "大阪城メタルロード",
+                  "prefecture": "大阪",
+                  "category": "伝説・城郭巨人",
+                  "habitat": "大阪城",
+                  "desc": "城郭が変じた鉄巨人。全身が金属の装甲で、大阪城の屋根を冠し、拳から衝撃波を放つ。城下を守護する王者の風格を持つ。",
+                  "trivia": "大阪城は豊臣秀吉によって築かれ、金箔瓦や豪壮な天守閣で知られる名城。",
+                  "catchphrase": "「鋼鉄の城壁、絶対守護！」",
+                  "isBoss": true
+                },
+                {
+                  "id": "KINKI-L03",
+                  "stageId": "kinki_bonus",
+                  "name": "神戸ドラゴンクレスト",
+                  "prefecture": "兵庫",
+                  "category": "伝説・海竜",
+                  "habitat": "神戸港",
+                  "desc": "港町に降り立った海竜。群青と銀の体を持ち、背びれは帆船の帆のように広がる。背中には錨の意匠を宿し、口からは海風を呼び起こす。",
+                  "trivia": "神戸港は日本有数の国際貿易港で、異国情緒と海の象徴として親しまれている。",
+                  "catchphrase": "「海鳴りと共に現れる蒼き竜！」",
+                  "isBoss": true
+                },
+                {
+                  "id": "KINKI-L04",
+                  "stageId": "kinki_bonus",
+                  "name": "大和シラサギロード",
+                  "prefecture": "奈良",
+                  "category": "伝説・霊鳥",
+                  "habitat": "古代神殿跡",
+                  "desc": "古代の神殿を守護する霊鳥。純白のシラサギを巨大化させた姿で、翼には古代文字風の紋様が刻まれ、光の羽を舞い散らせる。",
+                  "trivia": "奈良は古代都の地であり、神殿や仏閣と深い縁を持つ。シラサギは平和と神聖の象徴とされる。",
+                  "catchphrase": "「白き翼、古代の守護者！」",
+                  "isBoss": true
+                },
+                {
+                  "id": "KINKI-L05",
+                  "stageId": "kinki_bonus",
+                  "name": "熊野ヤタガラスロード",
+                  "prefecture": "和歌山・三重",
+                  "category": "伝説・神鳥",
+                  "habitat": "熊野の山々",
+                  "desc": "熊野の山に降り立つ三本足の神烏。体は黒から青にかけてのグラデーションで、目は金色に輝き、導きの光を放つ。背後には日の輪を背負い、道を照らす。",
+                  "trivia": "ヤタガラスは熊野信仰に登場する神の使いで、導きの象徴とされる。",
+                  "catchphrase": "「導きの翼、未来を照らす！」",
+                  "isBoss": true
+                },
+                {
+                    "id": "KINKI-F01",
+                    "stageId": "kinki_bonus",
+                    "name": "比叡ヤマトドラゴン",
+                    "prefecture": "滋賀・京都",
+                    "rarity": "幻",
+                    "category": "霊峰・龍神",
+                    "habitat": "比叡山",
+                    "desc": "比叡山の霊気が龍となった幻獣。黒と金の体を持ち、背に光の輪を背負う荘厳な姿。",
+                    "trivia": "比叡山延暦寺は天台宗の総本山で、日本仏教の中心地の一つ。",
+                    "catchphrase": "「光輪背負いし、霊峰の竜！」"
+                  },
+                  {
+                    "id": "KINKI-F02",
+                    "stageId": "kinki_bonus",
+                    "name": "熊野カミノカラス",
+                    "prefecture": "和歌山",
+                    "rarity": "幻",
+                    "category": "霊鳥・神話",
+                    "habitat": "熊野三山",
+                    "desc": "熊野の霊山に棲む神鳥。黒羽を広げ、赤い霊火を纏い旅人を導く。",
+                    "trivia": "熊野三山は熊野本宮大社・熊野速玉大社・熊野那智大社の総称で、古来より霊場として信仰を集めた。",
+                    "catchphrase": "「黒羽燃ゆる、導きの炎！」"
+                  },
+                  {
+                    "id": "KINKI-F03",
+                    "stageId": "kinki_bonus",
+                    "name": "淀川スピリットリヴァイアサン",
+                    "prefecture": "大阪",
+                    "rarity": "幻",
+                    "category": "水霊・蛇龍",
+                    "habitat": "淀川",
+                    "desc": "淀川の水霊が集合して生まれた蛇龍。青と緑の水流模様をまとい、水しぶきを纏って現れる。",
+                    "trivia": "淀川は近畿地方の大動脈で、古来より都市と自然をつなぐ水路として栄えた。",
+                    "catchphrase": "「奔流轟く、水都の守護者！」"
+                  },
+                  {
+                    "id": "KINKI-F04",
+                    "stageId": "kinki_bonus",
+                    "name": "奈良シカミコ",
+                    "prefecture": "奈良",
+                    "rarity": "幻",
+                    "category": "神獣・鹿霊",
+                    "habitat": "奈良公園・春日大社",
+                    "desc": "白鹿が霊体と融合した神獣。体に神光の模様が走り、古都奈良を守護する。",
+                    "trivia": "春日大社では神鹿が神の使いとされ、今も奈良公園に多数生息する。",
+                    "catchphrase": "「神光纏いし、古都の白鹿！」"
+                  },
+                  {
+                    "id": "KINKI-F05",
+                    "stageId": "kinki_bonus",
+                    "name": "天橋立ミラージュドラゴン",
+                    "prefecture": "京都",
+                    "rarity": "幻",
+                    "category": "幻景・龍神",
+                    "habitat": "天橋立",
+                    "desc": "天橋立の砂洲と海が生んだ幻想龍。青と白の砂と波の文様をまとい、天へ架かる橋を象徴する。",
+                    "trivia": "天橋立は日本三景の一つで、『天に架かる橋』と称される美しい景観を誇る。",
+                    "catchphrase": "「海と空を繋ぐ、幻の龍！」"
+                  },
+                    {
+                      "id": "CHG-L01",
+                      "stageId": "chugoku_bonus",
+                      "name": "砂嵐サンドゴーレム",
+                      "prefecture": "鳥取",
+                      "category": "伝説・大地巨人",
+                      "habitat": "鳥取砂丘",
+                      "desc": "鳥取砂丘の砂が結晶化して生まれた砂岩の巨人。体表を砂紋が走り、砂嵐をまとって姿を変える。風と砂を操り、大地の均衡を守る守護者。",
+                      "trivia": "鳥取砂丘は日本最大級の海岸砂丘で、風によってできる“風紋”が有名。",
+                      "catchphrase": "「砂よ舞え、護りの嵐！」",
+                      "isBoss": true
+                    },
+                    {
+                      "id": "CHG-L02",
+                      "stageId": "chugoku_bonus",
+                      "name": "出雲オオクニロード",
+                      "prefecture": "島根",
+                      "category": "伝説・国造り神",
+                      "habitat": "出雲平野・古社周辺",
+                      "desc": "白衣をまとい、背にしめ縄の光輪を負う巨神。神器の光が地を鎮め、人々を導く王者のオーラを放つ。",
+                      "trivia": "出雲は神話の舞台として知られ、しめ縄や縁結び信仰で名高い。",
+                      "catchphrase": "「国を鎮め、縁を結ばん！」",
+                      "isBoss": true
+                    },
+                    {
+                      "id": "CHG-L03",
+                      "stageId": "chugoku_bonus",
+                      "name": "桃源ドラゴンロード",
+                      "prefecture": "岡山",
+                      "category": "伝説・龍神",
+                      "habitat": "吉備の里・川辺",
+                      "desc": "桃色と金色の鱗を纏う龍神。背から桃花が舞い、口より放つ光波で邪を祓う。勇の象徴として畏敬される。",
+                      "trivia": "岡山は桃太郎伝説の地として知られ、白桃など果物の名産地でもある。",
+                      "catchphrase": "「花咲く光波、邪気一掃！」",
+                      "isBoss": true
+                    },
+                    {
+                      "id": "CHG-L04",
+                      "stageId": "chugoku_bonus",
+                      "name": "厳島シーガーディアン",
+                      "prefecture": "広島",
+                      "category": "伝説・海守獣",
+                      "habitat": "宮島・海上",
+                      "desc": "朱の大鳥居が角と背びれに変じた海の守護獣。潮流と共鳴し、海上に光の結界を張る神秘と荘厳の象徴。",
+                      "trivia": "厳島神社の大鳥居は海に立つ景観で世界的に有名。",
+                      "catchphrase": "「潮よ鎮まり、結界成れ！」",
+                      "isBoss": true
+                    },
+                    {
+                      "id": "CHG-L05",
+                      "stageId": "chugoku_bonus",
+                      "name": "海峡クラーケンロード",
+                      "prefecture": "山口",
+                      "category": "伝説・海魔王",
+                      "habitat": "関門海峡",
+                      "desc": "関門海峡に潜む巨大海魔。鎖や船骸を纏う触手が海路を封じ、背の灯りが航路をも照らす覇者の風格。",
+                      "trivia": "関門海峡は潮流が速く、古来より海の難所として知られる。",
+                      "catchphrase": "「海路を統べる深淵の王！」",
+                      "isBoss": true
+                    },
+                        {
+                          "id": "CHG-F01",
+                          "stageId": "chugoku_bonus",
+                          "name": "出雲イナズマオオカミ",
+                          "prefecture": "島根",
+                          "rarity": "幻",
+                          "category": "雷霊・神獣",
+                          "habitat": "出雲大社周辺",
+                          "desc": "出雲大社の雷雲から生まれた霊狼。黒雲と白雷に包まれ、神話の国を守護する。",
+                          "trivia": "出雲は神話の国と呼ばれ、日本最古の歴史伝承に登場する地。",
+                          "catchphrase": "「雷鳴轟き、神域を護る！」"
+                        },
+                        {
+                          "id": "CHG-F02",
+                          "stageId": "chugoku_bonus",
+                          "name": "宮島ミラージュフェニックス",
+                          "prefecture": "広島",
+                          "rarity": "幻",
+                          "category": "霊鳥・幻景",
+                          "habitat": "厳島神社・大鳥居",
+                          "desc": "厳島神社の大鳥居から顕現した幻鳥。朱色の羽を広げ、海と空を渡る。",
+                          "trivia": "宮島の厳島神社は世界遺産で、海に浮かぶ大鳥居が象徴的。",
+                          "catchphrase": "「朱の翼、潮風を越えて！」"
+                        },
+                        {
+                          "id": "CHG-F03",
+                          "stageId": "chugoku_bonus",
+                          "name": "鳥取サンドドラゴン",
+                          "prefecture": "鳥取",
+                          "rarity": "幻",
+                          "category": "砂霊・龍",
+                          "habitat": "鳥取砂丘",
+                          "desc": "鳥取砂丘の砂と風が化した竜。黄金色の砂の体を持ち、砂嵐を巻き起こす。",
+                          "trivia": "鳥取砂丘は日本最大の砂丘で、風によって砂の模様が刻々と変化する。",
+                          "catchphrase": "「砂嵐と共に現る！」"
+                        },
+                        {
+                          "id": "CHG-F04",
+                          "stageId": "chugoku_bonus",
+                          "name": "錦帯橋リバーガーディアン",
+                          "prefecture": "山口",
+                          "rarity": "幻",
+                          "category": "幻景・水霊",
+                          "habitat": "錦帯橋と錦川",
+                          "desc": "錦帯橋と川の霊気が融合した守護者。体は石と水の文様に覆われ、橋を象徴する形状を背に持つ。",
+                          "trivia": "錦帯橋は日本三名橋の一つで、五連アーチの美しい木造橋。",
+                          "catchphrase": "「水と石、永遠を紡ぐ！」"
+                        },
+                        {
+                          "id": "CHG-F05",
+                          "stageId": "chugoku_bonus",
+                          "name": "大山スノーゴーレム",
+                          "prefecture": "鳥取・岡山",
+                          "rarity": "幻",
+                          "category": "雪霊・巨人",
+                          "habitat": "大山連峰",
+                          "desc": "大山の雪と岩が結集して生まれた巨人。氷と岩の鎧をまとい、冷気を纏う守護者。",
+                          "trivia": "大山は『伯耆富士』とも呼ばれる霊山で、古来より山岳信仰の対象。",
+                          "catchphrase": "「氷雪の鎧、山岳を護る！」"
+                        },
+                      
+                      
+                        {
+                          "id": "AS-L01",
+                          "name": "龍帝シェンロンロード",
+                          "country": "中国",
+                          "category": "伝説・龍神",
+                          "habitat": "雲海・聖域峰",
+                          "desc": "天を巡る黄金の龍帝。赤金の鱗が雲海を照らし、光珠を操って風雨を統べる。",
+                          "trivia": "中国では龍は皇権・雨・豊穣の象徴で、吉祥のシンボルとして崇められる。",
+                          "catchphrase": "「天命、此処に降りる！」",
+                          "isBoss": true
+                        },
+                        {
+                          "id": "AS-L02",
+                          "name": "ガンジスリバーガーディアン",
+                          "country": "インド",
+                          "category": "伝説・水神獣",
+                          "habitat": "聖河・河畔聖域",
+                          "desc": "聖なる流れから顕現した水の守護獣。青白い体に蓮が咲き、清浄の波で穢れを祓う。",
+                          "trivia": "ガンジス（ガンガー）はインドにおける聖なる川で、浄化と恵みの象徴。",
+                          "catchphrase": "「清流一閃、万象を洗う！」",
+                          "isBoss": true
+                        },
+                        {
+                          "id": "AS-L03",
+                          "name": "ガルーダフレイムロード",
+                          "country": "インドネシア",
+                          "category": "伝説・神鳥王",
+                          "habitat": "天空神殿・火山上空",
+                          "desc": "炎を纏う神鳥王。赤と金の翼で嵐を切り裂き、真紅の焔で邪を焼き払う。",
+                          "trivia": "ガルーダはインドネシアの国章にも描かれる神鳥で、自由と力の象徴。",
+                          "catchphrase": "「焔翔ける、天空の覇！」",
+                          "isBoss": true
+                        },
+                        {
+                          "id": "AS-L04",
+                          "name": "韓雲ホワイトタイガー",
+                          "country": "韓国",
+                          "category": "伝説・守護獣",
+                          "habitat": "白頭大幹・霊峰",
+                          "desc": "星霜を越えて現れた白虎の守護。白銀の毛並みに青い霊火を纏い、咆哮で邪気を祓う。",
+                          "trivia": "白虎は方位神として西方を司る守護獣で、魔除けの象徴ともされる。",
+                          "catchphrase": "「蒼火轟き、邪気退散！」",
+                          "isBoss": true
+                        },
+                        {
+                          "id": "AS-L05",
+                          "name": "アユタヤナガロード",
+                          "country": "タイ",
+                          "category": "伝説・大蛇神",
+                          "habitat": "大河・寺院域",
+                          "desc": "緑と金の鱗を持つナガの王。大河のように長大な身で寺院を巡り、光の水流で結界を張る。",
+                          "trivia": "東南アジアでナガは水と豊穣を司る神蛇として崇められ、寺院装飾にも多い。",
+                          "catchphrase": "「水脈うねり、聖域護持！」",
+                          "isBoss": true
+                        },
+                        
+                        {
+                            "id": "AS-F01",
+                            "stageId": "asia_bonus",
+                            "name": "黄河ドラゴンセージ",
+                            "prefecture": "中国",
+                            "rarity": "幻",
+                            "category": "神聖・龍",
+                            "habitat": "黄河流域",
+                            "desc": "黄河の霊流から生まれた龍の賢者。金色の鱗に水流の紋様が走り、川の守護者として古代文明を見守る。",
+                            "trivia": "黄河は『中華文明の母なる川』と呼ばれ、古代中国の文化や歴史を育んだ。",
+                            "catchphrase": "「流れゆく歴史、龍が見守る！」"
+                          },
+                          {
+                            "id": "AS-F02",
+                            "stageId": "asia_area2",
+                            "name": "ガンジスライトフェニックス",
+                            "prefecture": "インド",
+                            "rarity": "幻",
+                            "category": "霊鳥・聖炎",
+                            "habitat": "ガンジス川",
+                            "desc": "ガンジス川の光を宿す不死鳥。白と金の羽が輝き、聖なる炎を纏う。再生と浄化の象徴。",
+                            "trivia": "ガンジス川はヒンドゥー教で最も神聖な川とされ、人々の信仰の中心となっている。",
+                            "catchphrase": "「光と炎で、世界を浄化！」"
+                          },
+                          {
+                            "id": "AS-F03",
+                            "stageId": "asia_area3",
+                            "name": "バリシーサーペント",
+                            "prefecture": "インドネシア",
+                            "rarity": "幻",
+                            "category": "海霊・蛇",
+                            "habitat": "バリ島沿岸",
+                            "desc": "バリ島の海と寺院を守護する海蛇。エメラルドの鱗を持ち、背に寺院装飾の文様が浮かぶ。",
+                            "trivia": "バリ島はヒンドゥー教文化と海洋信仰が融合した地域で、伝説や精霊信仰も盛ん。",
+                            "catchphrase": "「海を守護する緑の蛇、寺院の加護とともに！」"
+                          },
+                          {
+                            "id": "AS-F04",
+                            "stageId": "asia_area4",
+                            "name": "ヒマラヤアイスゴーレム",
+                            "prefecture": "パキスタン",
+                            "rarity": "幻",
+                            "category": "氷霊・巨人",
+                            "habitat": "ヒマラヤ山脈",
+                            "desc": "ヒマラヤの氷雪から生まれた巨人。氷の結晶に覆われ、青白い光を放つ。冷気を纏い霊峰を守る。",
+                            "trivia": "ヒマラヤ山脈は世界最高峰の山岳地帯で、多くの神話や信仰の対象となってきた。",
+                            "catchphrase": "「氷雪の力、大地を護る巨人！」"
+                          },
+                          {
+                            "id": "AS-F05",
+                            "stageId": "asia_area5",
+                            "name": "蒙古ステップスピリット",
+                            "prefecture": "モンゴル",
+                            "rarity": "幻",
+                            "category": "風霊・幻獣",
+                            "habitat": "モンゴル高原",
+                            "desc": "大草原の風と馬の魂が融合した幻獣。緑と金の体に風紋が浮かび、疾風のように駆け抜ける。",
+                            "trivia": "モンゴル高原は遊牧文化の中心であり、風や馬は人々の生活と信仰に深く結びついている。",
+                            "catchphrase": "「風とともに駆け抜ける草原の魂！」"
+                          },
+                            {
+                              "id": "EUR-L01",
+                              "stageId": "europe_bonus",
+                              "name": "ルーブルゴーレムロード",
+                              "country": "フランス",
+                              "category": "伝説・文化守護巨人",
+                              "habitat": "ルーヴル宮殿周辺",
+                              "desc": "宮殿の石造が覚醒した守護者。大理石の身体に芸術を象徴する光紋が走り、宝石の輝きを両腕に宿して文化を護る。",
+                              "trivia": "ルーヴル宮は世界最大級の美術館で、中世城塞から宮殿・美術館へと姿を変えてきた。",
+                              "catchphrase": "「美の砦、永遠不滅！」",
+                              "isBoss": true
+                            },
+                            {
+                              "id": "EUR-L02",
+                              "name": "テウトンアイゼンカイザー",
+                              "country": "ドイツ",
+                              "category": "伝説・機鋼帝",
+                              "habitat": "黒い森・古城域",
+                              "desc": "鋼鉄の城塞を思わせる鎧を纏う機械巨神。背に黒鷲の意匠を掲げ、雷の剣を振り下ろして秩序を示す。",
+                              "trivia": "黒い森は神話や伝承の宝庫。黒鷲は歴史的紋章として広く用いられてきた。",
+                              "catchphrase": "「雷帝の軍律、ここに成る！」",
+                              "isBoss": true
+                            },
+                            {
+                              "id": "EUR-L03",
+                              "name": "ローマンコロッセオロード",
+                              "country": "イタリア",
+                              "category": "伝説・闘技石巨人",
+                              "habitat": "古代円形闘技場",
+                              "desc": "コロッセオの闘志が石巨人として顕現。環状構造の意匠を背負い、剣と盾を構えて観衆の幻影を従える。",
+                              "trivia": "コロッセオは古代ローマ最大級の闘技場で、建築技術と娯楽文化の象徴。",
+                              "catchphrase": "「闘志よ、万雷の喝采と共に！」",
+                              "isBoss": true
+                            },
+                            {
+                              "id": "EUR-L04",
+                              "name": "ブリタニアレイヴンロード",
+                              "country": "イギリス",
+                              "category": "伝説・黒翼王",
+                              "habitat": "ロンドン塔・城塞域",
+                              "desc": "黒い大烏の王。翼は夜空のように深く、紅い眼光を放つ。王冠の光輪を背負い、王国を見守る守護鳥。",
+                              "trivia": "ロンドン塔のレイヴン（ワタリガラス）は“去れば王国が滅ぶ”という伝承で知られる。",
+                              "catchphrase": "「王冠の影、国を護れ！」",
+                              "isBoss": true
+                            },
+                            {
+                              "id": "EUR-L05",
+                              "name": "イベリアフレイムドラゴン",
+                              "country": "スペイン",
+                              "category": "伝説・炎竜王",
+                              "habitat": "イベリア高地・古都周辺",
+                              "desc": "情熱の炎を纏う竜。赤と金の鱗が燃え、背から火焔の羽根を広げて太陽の如き輝きを放つ。",
+                              "trivia": "スペインは太陽と情熱のイメージで語られ、炎や赤を象徴色として用いる文化表現も多い。",
+                              "catchphrase": "「紅蓮舞踏、太陽の咆哮！」",
+                              "isBoss": true
+                            },
+                            {
+                                "id": "EUR-F01",
+                                  "stageId": "europe_bonus",
+                                "name": "エッフェルスカイフェニックス",
+                                "prefecture": "フランス",
+                                "rarity": "幻",
+                                "category": "幻鳥・光",
+                                "habitat": "パリ・エッフェル塔上空",
+                                "desc": "エッフェル塔の鉄骨が霊火を帯びて不死鳥化した姿。銀と青の羽根にパリの夜空を映し出す。",
+                                "trivia": "エッフェル塔は1889年の万国博覧会で建造され、現在もフランスの象徴的存在。",
+                                "catchphrase": "「光の都に舞う、不滅の翼！」"
+                              },
+                              {
+                                "id": "EUR-F02",
+                                "stageId": "europe_bonus",
+                                "name": "ラインリバードラゴン",
+                                "prefecture": "ドイツ",
+                                "rarity": "幻",
+                                "category": "水霊・龍",
+                                "habitat": "ライン川流域",
+                                "desc": "ライン川の霊流から生まれた龍。水と岩の体を持ち、古城の紋章を背負う。",
+                                "trivia": "ライン川は古代から交易の要所で、竜や水の精霊の伝承が多く残る。",
+                                "catchphrase": "「流れを裂く、川の覇者！」"
+                              },
+                              {
+                                "id": "EUR-F03",
+                                "stageId": "europe_bonus",
+                                "name": "コロッセオゴーレム",
+                                "prefecture": "イタリア",
+                                "rarity": "幻",
+                                "category": "石霊・巨人",
+                                "habitat": "ローマ・コロッセオ跡",
+                                "desc": "ローマのコロッセオが具現化した巨人。石の体に古代剣闘士のオーラが宿る。",
+                                "trivia": "コロッセオは古代ローマの円形闘技場で、剣闘士の戦いや見世物が行われた。",
+                                "catchphrase": "「遺跡に蘇る、闘士の巨躯！」"
+                              },
+                              {
+                                "id": "EUR-F04",
+                                "stageId": "europe_bonus",
+                                "name": "ビッグベンスピリットクロック",
+                                "prefecture": "イギリス",
+                                "rarity": "幻",
+                                "category": "機械霊・守護者",
+                                "habitat": "ロンドン・ビッグベン",
+                                "desc": "ビッグベンの霊気が時計守護者となった幻獣。金と黒の歯車の体に大時計を背負う。",
+                                "trivia": "ビッグベンはロンドンの象徴で、1859年に完成した世界最大級の四面時計塔。",
+                                "catchphrase": "「時を刻む、不滅の番人！」"
+                              },
+                              {
+                                "id": "EUR-F05",
+                                "stageId": "europe_bonus",
+                                "name": "シベリアアイスドラゴン",
+                                "prefecture": "ロシア",
+                                "rarity": "幻",
+                                "category": "氷霊・龍",
+                                "habitat": "シベリア氷原",
+                                "desc": "シベリアの氷原に眠る氷龍。青白い体に氷の結晶を纏い、吐息は吹雪を呼ぶ。",
+                                "trivia": "シベリアは世界有数の寒冷地で、氷雪や竜の伝説が各地に残る。",
+                                "catchphrase": "「氷嵐を呼ぶ、極寒の覇者！」"
+                              },
+                                {
+                                  "id": "AME-L01",
+                                  "stageId": "america_bonus",
+                                  "name": "オーロラトーテムロード",
+                                  "country": "カナダ",
+                                  "category": "伝説・精霊神",
+                                  "habitat": "北極圏・極光の森",
+                                  "desc": "オーロラとトーテムポールが融合した守護神。極光を背負い、大地と森を護る。",
+                                  "trivia": "カナダの先住民文化ではトーテムポールが部族の象徴とされ、北部ではオーロラが神秘の力を持つと信じられてきた。",
+                                  "catchphrase": "「輝け極光、森羅を守護せよ！」",
+                                  "isBoss": true
+                                },
+                                {
+                                  "id": "AME-L02",
+                                  "stageId": "america_bonus",
+                                  "name": "グランドキャニオンゴーレム",
+                                  "country": "アメリカ合衆国",
+                                  "category": "伝説・大地巨人",
+                                  "habitat": "アリゾナ・グランドキャニオン",
+                                  "desc": "赤土と岩石でできた巨人。体には峡谷の縞模様が刻まれ、大地の力を象徴する。",
+                                  "trivia": "グランドキャニオンは数百万年の地層が刻まれた大峡谷で、アメリカ自然の象徴とされる。",
+                                  "catchphrase": "「大地よ震えろ、我が歩みと共に！」",
+                                  "isBoss": true
+                                },
+                                {
+                                  "id": "AME-L03",
+                                  "stageId": "america_bonus",
+                                  "name": "アステカサンロード",
+                                  "country": "メキシコ",
+                                  "category": "伝説・太陽戦神",
+                                  "habitat": "古代アステカ遺跡",
+                                  "desc": "太陽神の化身、黄金の戦神。背後に太陽円盤を宿し、燃える矢を放つ。",
+                                  "trivia": "アステカ文明では太陽神ウィツィロポチトリが崇拝され、人々は戦と太陽を一体の存在として捉えていた。",
+                                  "catchphrase": "「燃えよ太陽、戦の矢を放て！」",
+                                  "isBoss": true
+                                },
+                                {
+                                  "id": "AME-L04",
+                                  "stageId": "america_bonus",
+                                  "name": "アマゾンジャガーロード",
+                                  "country": "ブラジル",
+                                  "category": "伝説・密林獣王",
+                                  "habitat": "アマゾン熱帯雨林",
+                                  "desc": "ジャガーと熱帯雨林の精霊が融合した獣王。緑と黒の毛皮に黄金の斑点が光り、密林の王者として君臨する。",
+                                  "trivia": "ジャガーは南米先住民の神話で森を支配する王者とされ、力と威厳の象徴とされてきた。",
+                                  "catchphrase": "「密林轟く、黄金の咆哮！」",
+                                  "isBoss": true
+                                },
+                                {
+                                  "id": "AME-L05",
+                                  "stageId": "america_bonus",
+                                  "name": "イグアスフォールガーディアン",
+                                  "country": "アルゼンチン",
+                                  "category": "伝説・水滝守護者",
+                                  "habitat": "イグアスの滝",
+                                  "desc": "イグアスの滝の精霊が具現化した守護者。全身から水流を放ち、虹の光輪を背負う。",
+                                  "trivia": "イグアスの滝は世界三大瀑布の一つで、轟音と虹が大自然の奇跡と呼ばれている。",
+                                  "catchphrase": "「轟け水流、虹の守護を示せ！」",
+                                  "isBoss": true
+                                },
+
+                                {
+                                    "id": "AME-F01",
+                                    "stageId": "america_bonus",
+                                    "name": "カナディアンフロストトーテム",
+                                    "prefecture": "カナダ",
+                                    "rarity": "幻",
+                                    "category": "氷霊・トーテム",
+                                    "habitat": "ロッキー山脈",
+                                    "desc": "氷とトーテムポールが融合した守護者。氷の羽根を持ち、オオカミやワシの紋様が輝く。",
+                                    "trivia": "カナダ先住民のトーテムポールは、家系や信仰を象徴する重要な文化財。",
+                                    "catchphrase": "「氷霊の紋様、永遠に輝け！」"
+                                  },
+                                  {
+                                    "id": "AME-F02",
+                                    "stageId": "america_bonus",
+                                    "name": "スピリットイーグルオブリバティ",
+                                    "prefecture": "アメリカ合衆国",
+                                    "rarity": "幻",
+                                    "category": "天空守護・鳥霊",
+                                    "habitat": "グランドキャニオン上空",
+                                    "desc": "星条旗の星が宿る白頭鷲の幻獣。翼には赤い稲妻模様が走り、自由と勇気を象徴する。",
+                                    "trivia": "白頭鷲はアメリカの国鳥であり、国家の象徴として描かれる。",
+                                    "catchphrase": "「自由の翼、天空を駆けろ！」"
+                                  },
+                                  {
+                                    "id": "AME-F03",
+                                    "stageId": "america_area1",
+                                    "name": "テオティワカンスターセイバー",
+                                    "prefecture": "メキシコ",
+                                    "rarity": "幻",
+                                    "category": "幻騎士・星霊",
+                                    "habitat": "テオティワカン遺跡",
+                                    "desc": "古代遺跡の力を宿した黒曜石の剣士幻獣。背中に星型のオーラを纏う。",
+                                    "trivia": "テオティワカンは太陽の神殿で知られる古代都市で、星と宇宙信仰の中心地だった。",
+                                    "catchphrase": "「星の剣、時を裂け！」"
+                                  },
+                                  {
+                                    "id": "AME-F04",
+                                    "stageId": "america_area1",
+                                    "name": "カーニバルマスクスペクター",
+                                    "prefecture": "ブラジル",
+                                    "rarity": "幻",
+                                    "category": "祭霊・幻影",
+                                    "habitat": "リオ・デ・ジャネイロ",
+                                    "desc": "リオのカーニバルの仮面が霊体化した存在。極彩色の羽根と仮面を纏い、舞い踊るように現れる。",
+                                    "trivia": "リオのカーニバルは世界最大級の祭りであり、仮面と羽飾りはその象徴。",
+                                    "catchphrase": "「舞い踊れ、幻影の祭宴！」"
+                                  },
+                                  {
+                                    "id": "AME-F05",
+                                    "stageId": "america_area1",
+                                    "name": "パタゴニアアイスハイドラ",
+                                    "prefecture": "アルゼンチン",
+                                    "rarity": "幻",
+                                    "category": "氷蛇・幻獣",
+                                    "habitat": "パタゴニア氷河地帯",
+                                    "desc": "南端パタゴニアの氷河から生まれた三つ首の蛇幻獣。氷結の息を吐き、大地を凍らせる。",
+                                    "trivia": "アルゼンチンのパタゴニアは巨大な氷河地帯で、氷河崩壊の自然現象が有名。",
+                                    "catchphrase": "「氷蛇の咆哮、大地を凍てつかせよ！」"
+                                  },
+                                  
+                                    {
+                                      "id": "AFR-L01",
+                                      "stageId": "africa_bonus",
+                                      "name": "ピラミッドファラオロード",
+                                      "country": "エジプト",
+                                      "category": "伝説・太陽王",
+                                      "habitat": "ギザ高原・砂漠神域",
+                                      "desc": "巨石の王者が覚醒した守護神。黄金の太陽円盤を背負い、ピラミッドの力で砂嵐と光を操る。",
+                                      "trivia": "ピラミッドは王権と太陽信仰の象徴で、古代エジプトでは王は“ラーの子”とされた。",
+                                      "catchphrase": "「砂と陽光、永劫の王権！」",
+                                      "isBoss": true
+                                    },
+                                    {
+                                      "id": "AFR-L02",
+                                      "stageId": "africa_bonus",
+                                      "name": "ナイジェリアンアニマスロード",
+                                      "country": "ナイジェリア",
+                                      "category": "伝説・霊舞守護者",
+                                      "habitat": "森辺の祭祀域",
+                                      "desc": "仮面舞踏の精霊が融合した守護者。全身に部族紋様が脈打ち、太鼓の鼓動に合わせ霊炎と音で仲間を導く。",
+                                      "trivia": "ナイジェリア各地の仮面儀礼は祖霊・守護の象徴で、太鼓や舞と共に伝承される。",
+                                      "catchphrase": "「鼓動高鳴れ、精霊集え！」",
+                                      "isBoss": true
+                                    },
+                                    {
+                                      "id": "AFR-L03",
+                                      "stageId": "africa_bonus",
+                                      "name": "サハラデューンドラゴン",
+                                      "country": "リビア",
+                                      "category": "伝説・砂竜王",
+                                      "habitat": "サハラ砂漠・砂丘帯",
+                                      "desc": "金と茶の鱗を纏う砂竜。身に砂嵐を巻き起こし、背で蜃気楼の光をゆらめかせて砂海を統べる。",
+                                      "trivia": "サハラは世界最大級の砂漠で、砂丘の風紋や蜃気楼は過酷な自然の象徴。",
+                                      "catchphrase": "「砂海奔流、蜃気楼の王！」",
+                                      "isBoss": true
+                                    },
+                                    {
+                                      "id": "AFR-L04",
+                                      "stageId": "africa_bonus",
+                                      "name": "セレンゲティライオンロード",
+                                      "country": "ケニア",
+                                      "category": "伝説・草原王",
+                                      "habitat": "サバンナ・セレンゲティ境域",
+                                      "desc": "黄金のたてがみを持つ獅子王。背に太陽の炎輪を戴き、咆哮で草原と群れを守護する。",
+                                      "trivia": "東アフリカのサバンナは“百獣の王”ライオンの象徴的生息地として知られる。",
+                                      "catchphrase": "「咆哮轟け、草原の覇！」",
+                                      "isBoss": true
+                                    },
+                                    {
+                                      "id": "AFR-L05",
+                                      "stageId": "africa_bonus",
+                                      "name": "マダガスカルバオバブガーディアン",
+                                      "country": "マダガスカル",
+                                      "category": "伝説・樹霊守護",
+                                      "habitat": "バオバブ並木・聖樹域",
+                                      "desc": "巨大なバオバブが霊威を得て歩む守護者。太い幹に神秘文様が灯り、枝から光の実を下げて大地の循環を護る。",
+                                      "trivia": "マダガスカルのバオバブは“逆さまの木”とも呼ばれ、在来の生態系と文化の象徴。",
+                                      "catchphrase": "「光実芽吹け、命巡れ！」",
+                                      "isBoss": true
+                                    },
+
+                                    {
+                                        "id": "AFR-F01",
+                                      "stageId": "africa_bonus",
+                                        "name": "ナイルソーラーアヌビス",
+                                        "prefecture": "エジプト",
+                                        "rarity": "幻",
+                                        "category": "太陽神獣・守護者",
+                                        "habitat": "ナイル川流域・ピラミッド周辺",
+                                        "desc": "太陽神の光を背負うジャッカル姿の幻獣。黄金の装飾と黒い体を持ち、ナイル川の水を操る。",
+                                        "trivia": "アヌビスは古代エジプトの冥界神で、死と再生の象徴として信仰された。",
+                                        "catchphrase": "「太陽と冥界をつなぐ光の守護者！」"
+                                      },
+                                      {
+                                        "id": "AFR-F02",
+                                        "stageId": "africa_bonus",
+                                        "name": "ヨルバサンダーライオン",
+                                        "prefecture": "ナイジェリア",
+                                        "rarity": "幻",
+                                        "category": "雷霊・獅子",
+                                        "habitat": "ナイジェリア高原",
+                                        "desc": "ヨルバ神話の雷の力を宿した獅子。赤い鬣に稲妻が走り、咆哮とともに雷雨を呼ぶ。",
+                                        "trivia": "ヨルバ神話の雷神シャングーは稲妻と火を操る神として知られる。",
+                                        "catchphrase": "「雷鳴轟く、天空の獅子！」"
+                                      },
+                                      {
+                                        "id": "AFR-F03",
+                                        "stageId": "africa_bonus",
+                                        "name": "サバンナスピリットドラゴン",
+                                        "prefecture": "ケニア",
+                                        "rarity": "幻",
+                                        "category": "大地霊・龍",
+                                        "habitat": "サバンナ平原",
+                                        "desc": "サバンナの大地を統べる龍。体は草原の色を映し、背にアカシアの枝のような棘を持つ。",
+                                        "trivia": "ケニアのサバンナはライオンやゾウなど大型動物の聖地として知られる。",
+                                        "catchphrase": "「大地を駆ける、サバンナの守護龍！」"
+                                      },
+                                      {
+                                        "id": "AFR-F04",
+                                        "stageId": "africa_bonus",
+                                        "name": "バオバブガーディアン",
+                                        "prefecture": "マダガスカル",
+                                        "rarity": "幻",
+                                        "category": "樹霊・守護者",
+                                        "habitat": "マダガスカル島・バオバブ並木",
+                                        "desc": "巨大なバオバブの木が精霊化した守護者。幹には古代文字のような光が刻まれている。",
+                                        "trivia": "バオバブは『生命の木』と呼ばれ、乾燥地帯で生き物に恵みを与える。",
+                                        "catchphrase": "「大樹の力、生命を守る！」"
+                                      },
+                                      {
+                                        "id": "AFR-F05",
+                                        "stageId": "africa_bonus",
+                                        "name": "レインボープロテアドラゴン",
+                                        "prefecture": "南アフリカ",
+                                        "rarity": "幻",
+                                        "category": "花霊・竜",
+                                        "habitat": "ドラケンスバーグ山脈",
+                                        "desc": "国花プロテアが変じた幻の竜。花弁の翼から虹色の光を放ち、多様性を象徴する。",
+                                        "trivia": "南アフリカは『虹の国』と呼ばれ、多文化共生の象徴とされる。",
+                                        "catchphrase": "「虹色の翼で未来を照らす！」"
+                                      },
+                                                            
+                                                                {
+                                                                  "id": "KYU-F01",
+                                                                  "stageId": "kyushu_bonus",
+                                                                  "name": "阿蘇フレイムドラゴン",
+                                                                  "prefecture": "熊本",
+                                                                  "rarity": "幻",
+                                                                  "category": "炎竜・火山",
+                                                                  "habitat": "阿蘇山火口",
+                                                                  "desc": "阿蘇山の火口に宿る炎の竜。体は赤黒い岩に覆われ、口から溶岩を吐く。",
+                                                                  "trivia": "阿蘇山は世界最大級のカルデラを持つ活火山で、古代から信仰の対象となってきた。",
+                                                                  "catchphrase": "「灼熱の炎、噴き上がれ！」"
+                                                                },
+                                                                {
+                                                                  "id": "KYU-F02",
+                                                                  "stageId": "kyushu_bonus",
+                                                                  "name": "高千穂アマツツル",
+                                                                  "prefecture": "宮崎",
+                                                                  "rarity": "幻",
+                                                                  "category": "神聖・霊鳥",
+                                                                  "habitat": "高千穂峡・天岩戸周辺",
+                                                                  "desc": "高千穂の神話から生まれた天の霊鶴。白銀の羽を広げ、光を纏う。",
+                                                                  "trivia": "高千穂は天孫降臨の伝承が残る神話の里で、霊的な地として知られる。",
+                                                                  "catchphrase": "「天を翔ける、光の翼！」"
+                                                                },
+                                                                {
+                                                                  "id": "KYU-F03",
+                                                                  "stageId": "kyushu_bonus",
+                                                                  "name": "雲仙ミストゴーレム",
+                                                                  "prefecture": "長崎",
+                                                                  "rarity": "幻",
+                                                                  "category": "霧霊・巨人",
+                                                                  "habitat": "雲仙岳",
+                                                                  "desc": "雲仙の霧と硫黄の力から生まれた巨人。体は灰色の岩に白い霧が絡みつく。",
+                                                                  "trivia": "雲仙は活火山地帯であり、温泉と霧に包まれた景観でも有名。",
+                                                                  "catchphrase": "「霧煙る巨躯、地を揺るがす！」"
+                                                                },
+                                                                {
+                                                                  "id": "KYU-F04",
+                                                                  "stageId": "kyushu_bonus",
+                                                                  "name": "桜島サンダーフェニックス",
+                                                                  "prefecture": "鹿児島",
+                                                                  "rarity": "幻",
+                                                                  "category": "幻鳥・雷火",
+                                                                  "habitat": "桜島上空",
+                                                                  "desc": "桜島の雷と噴煙が融合した不死鳥。黒煙の翼に紫の雷を纏い、空を舞う。",
+                                                                  "trivia": "桜島は日本有数の活火山であり、噴火と雷の自然現象が同時に見られることもある。",
+                                                                  "catchphrase": "「雷火の翼、天地を裂け！」"
+                                                                },
+                                                                {
+                                                                  "id": "KYU-F05",
+                                                                    "stageId": "kyushu_bonus",
+                                                                  "name": "壱岐シーマスタークラーケン",
+                                                                  "prefecture": "長崎・壱岐",
+                                                                  "rarity": "幻",
+                                                                  "category": "海霊・怪物",
+                                                                  "habitat": "玄界灘",
+                                                                  "desc": "玄界灘に棲む巨大な幻のイカ。青黒い体を持ち、触手は海流のようにしなる。",
+                                                                  "trivia": "壱岐は古代から大陸との交流の要所であり、海の怪物伝承も多い。",
+                                                                  "catchphrase": "「深海の覇者、触腕を振るう！」"
+                                                                },
+                                                              
+                                                            
+                                                            
+                                                                   
+
+                                                                        {
+                                                                            "id": "SKG-F01",
+                                                                            "stageId": "shikoku_bonus",
+                                                                            "name": "石鎚サンダードラゴン",
+                                                                            "prefecture": "愛媛",
+                                                                            "rarity": "幻",
+                                                                            "category": "雷霊・龍",
+                                                                            "habitat": "石鎚山",
+                                                                            "desc": "石鎚山の霊峰から顕現した雷龍。全身は岩と雷で覆われ、黄金の稲妻を纏う。",
+                                                                            "trivia": "石鎚山は西日本最高峰で、日本七霊山の一つに数えられる。",
+                                                                            "catchphrase": "「雷鳴轟き、霊峰を護る！」"
+                                                                          },
+                                                                          {
+                                                                            "id": "SKG-F02",
+                                                                            "stageId": "shikoku_bonus",
+                                                                            "name": "鳴門ボルテックスサーペント",
+                                                                            "prefecture": "徳島",
+                                                                            "rarity": "幻",
+                                                                            "category": "水霊・大蛇",
+                                                                            "habitat": "鳴門海峡",
+                                                                            "desc": "鳴門海峡の渦潮が具現化した大蛇。青と白の渦模様で覆われ、尾は海流そのもの。",
+                                                                            "trivia": "鳴門の渦潮は世界三大潮流の一つで、自然現象としても有名。",
+                                                                            "catchphrase": "「渦潮轟く、海の大蛇！」"
+                                                                          },
+                                                                          {
+                                                                            "id": "SKG-F03",
+                                                                            "stageId": "shikoku_bonus",
+                                                                            "name": "金刀比羅シーガーディアン",
+                                                                            "prefecture": "香川",
+                                                                            "rarity": "幻",
+                                                                            "category": "守護神・海霊",
+                                                                            "habitat": "金刀比羅宮",
+                                                                            "desc": "金刀比羅宮の守護者が海の力を得て現れた幻獣。体は金色と青の波模様で、旅人と船乗りを守護する。",
+                                                                            "trivia": "金刀比羅宮は『こんぴらさん』として親しまれ、海上交通の守護神として信仰されている。",
+                                                                            "catchphrase": "「船旅を護る、蒼き守護神！」"
+                                                                          },
+                                                                          {
+                                                                            "id": "SKG-F04",
+                                                                            "stageId": "shikoku_bonus",
+                                                                            "name": "四万十リバースピリット",
+                                                                            "prefecture": "高知",
+                                                                            "rarity": "幻",
+                                                                            "category": "水霊・精霊",
+                                                                            "habitat": "四万十川",
+                                                                            "desc": "四万十川の清流から生まれた精霊。透き通る青緑の体を持ち、魚や流木を纏う。",
+                                                                            "trivia": "四万十川は『日本最後の清流』と呼ばれる四国の大河。",
+                                                                            "catchphrase": "「清流の煌めき、命を紡ぐ！」"
+                                                                          },
+                                                                          {
+                                                                            "id": "SKG-F05",
+                                                                            "stageId": "shikoku_area1",
+                                                                            "name": "剣山ミラージュオーガ",
+                                                                            "prefecture": "徳島",
+                                                                            "rarity": "幻",
+                                                                            "category": "幻鬼・山霊",
+                                                                            "habitat": "剣山",
+                                                                            "desc": "剣山に眠る鬼伝説から生まれた幻鬼。岩の鎧と霧のオーラを纏い、剣のように鋭い角を持つ。",
+                                                                            "trivia": "剣山は徳島県の霊峰で、古来より剣や鬼の伝承が語られる場所。",
+                                                                            "catchphrase": "「霧に潜む、山の幻鬼！」"
+                                                                          }
+                                                                    ]
+                                                                      
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+                                                                  
+                                                                  
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                            
+                                                                                                                    
+                                                                                                            
+                                                  
+                                                  
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                
+                                              
+                                              
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+                                          
+                                          
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                      
+                                      
+                                    
+                                    
+                                                              
+                              
+                            
+                            
+                            
+                          
+                          
+                      
+                      
+                  
+                  
+              
+              
+              
+              
+              
+          
+      
+      
+  
