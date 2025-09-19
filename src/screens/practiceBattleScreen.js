@@ -433,8 +433,17 @@ const practiceBattleScreenState = {
         return;
       }
       
-      const randomIndex = Math.floor(Math.random() * this.unmasteredKanji.length);
+      // 直前と同じ漢字を避ける（候補が2件以上ある場合）
+      let randomIndex = Math.floor(Math.random() * this.unmasteredKanji.length);
+      if (this.unmasteredKanji.length > 1 && this.lastPickedKanjiId) {
+        let guard = 0;
+        while (this.unmasteredKanji[randomIndex].id === this.lastPickedKanjiId && guard < 10) {
+          randomIndex = Math.floor(Math.random() * this.unmasteredKanji.length);
+          guard++;
+        }
+      }
       const selectedKanji = this.unmasteredKanji[randomIndex];
+      this.lastPickedKanjiId = selectedKanji.id;
       
       const processReadings = (readings) => {
         try {
@@ -505,14 +514,23 @@ const practiceBattleScreenState = {
           return;
         }
   
-        // ランダムに漢字選択
-        const selectedKanji = stageKanji[Math.floor(Math.random() * stageKanji.length)];
+        // ランダムに漢字選択（直前回避あり）
+        let idx = Math.floor(Math.random() * stageKanji.length);
+        if (stageKanji.length > 1 && this.lastPickedKanjiId) {
+          let guard = 0;
+          while (stageKanji[idx].id === this.lastPickedKanjiId && guard < 10) {
+            idx = Math.floor(Math.random() * stageKanji.length);
+            guard++;
+          }
+        }
+        const selectedKanji = stageKanji[idx];
+        this.lastPickedKanjiId = selectedKanji.id;
   
         const normalizeReadings = (readings) => {
           try {
             if (!readings) return [];
             if (Array.isArray(readings)) {
-
+  
               return readings.map(r => this._toHiragana(String(r).trim())).filter(Boolean);
             } else if (typeof readings === 'string') {
               return readings.split(' ').map(r => this._toHiragana(r.trim())).filter(Boolean);
@@ -1832,7 +1850,7 @@ const practiceBattleScreenState = {
       const prog = gameState.kanjiReadProgress[id];
       
       const isKun = (currentKanji.kunyomi || []).includes(answer);
-      const isOn = (currentKanji.onyomi || []).includes(answer);
+      const isOn  = (currentKanji.onyomi || []).includes(answer);
       
       if (isKun) {
         prog.kunyomi.add(answer);
@@ -1844,13 +1862,27 @@ const practiceBattleScreenState = {
       }
       
       const before = !!prog.mastered;
+      const hasKun = (currentKanji.kunyomi || []).length > 0;
+      const hasOn  = (currentKanji.onyomi || []).length > 0;
       const allKunOk = (currentKanji.kunyomi || []).every(r => prog.kunyomi.has(r));
-      const allOnOk = (currentKanji.onyomi || []).every(r => prog.onyomi.has(r));
-      prog.mastered = allKunOk && allOnOk;
-      
+      const allOnOk  = (currentKanji.onyomi || []).every(r => prog.onyomi.has(r));
+
+      // 厳格ルール:
+      // - 両方ある: 訓読み全 AND 音読み全 でマスター
+      // - 片方のみ: その片方を全習得でマスター
+      if (hasKun && hasOn) {
+        prog.mastered = allKunOk && allOnOk;
+      } else if (hasKun) {
+        prog.mastered = allKunOk;
+      } else if (hasOn) {
+        prog.mastered = allOnOk;
+      } else {
+        // 読みがどちらも無いデータは例外的にマスター扱い
+        prog.mastered = true;
+      }
+
       if (!before && prog.mastered) {
         console.log(`🎉 漢字「${currentKanji.text}」をマスターしました！`);
-        
         if (this.masteryFlash) {
           this.masteryFlash = { 
             active: true, 
