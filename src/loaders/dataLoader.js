@@ -185,32 +185,32 @@ export async function loadAllGameData() {
     setStageKanjiMap(kanjiMap);
 
         // --- 学年ボーナスステージを動的に追加（1〜10年） ---
-        const gradeToKankenName = (g) => (g===7?'4級':g===8?'3級':g===9?'準2級':'2級');
-        const gradeToWorldRegion = (g) => (g===7?'アジア':g===8?'ヨーロッパ':g===9?'アメリカ大陸':'アフリカ大陸');
+        //const gradeToKankenName = (g) => (g===7?'4級':g===8?'3級':g===9?'準2級':'2級');
+        //const gradeToWorldRegion = (g) => (g===7?'アジア':g===8?'ヨーロッパ':g===9?'アメリカ大陸':'アフリカ大陸');
     
         // 学年別 伝説/幻 候補取得ヘルパ
-        const pickLegendaryIdsForGrade = (g) => {
-          const list = enemyData.filter(e =>
-            e && e.grade === g && (
-              (typeof e.category === 'string' && e.category.includes('伝説')) ||
-              String(e.id).includes('-L')
-            )
-          );
+        ///const pickLegendaryIdsForGrade = (g) => {
+          //const list = enemyData.filter(e =>
+            //e && e.grade === g && (
+              //(typeof e.category === 'string' && e.category.includes('伝説')) ||
+              //String(e.id).includes('-L')
+            //)
+          //);
           // 安定順にソートして先頭5体
-          return [...list].sort((a,b) => String(a.id).localeCompare(String(b.id))).slice(0, 5).map(e => e.id);
-        };
+          //return [...list].sort((a,b) => String(a.id).localeCompare(String(b.id))).slice(0, 5).map(e => e.id);
+        //};
     
-        for (let g = 1; g <= 10; g++) {
-          const id = `bonus_g${g}`;
-          if (!stageData.some(s => s.stageId === id)) {
-            const name = (g <= 6) ? `${g}年 学年ボーナス` : `学年ボーナス（${gradeToKankenName(g)}）`;
-            const region = (g <= 6) ? 'ボーナス' : gradeToWorldRegion(g);
+        //for (let g = 1; g <= 10; g++) {
+          //const id = `bonus_g${g}`;
+          //if (!stageData.some(s => s.stageId === id)) {
+            //const name = (g <= 6) ? `${g}年 学年ボーナス` : `学年ボーナス（${gradeToKankenName(g)}）`;
+            //const region = (g <= 6) ? 'ボーナス' : gradeToWorldRegion(g);
             // 新仕様: 伝説5体を配置
-            const enemyIdList = pickLegendaryIdsForGrade(g);
-            stageData.push({ stageId: id, name, grade: g, region, enemyIdList });
-            console.log(`👍 追加: ${id} enemies=${enemyIdList.length}`);
-          }
-        }
+            //const enemyIdList = pickLegendaryIdsForGrade(g);
+            //stageData.push({ stageId: id, name, grade: g, region, enemyIdList });
+            //console.log(`👍 追加: ${id} enemies=${enemyIdList.length}`);
+          //}
+        //}
 
     return { kanjiData, enemyData, stageData };
   } catch (error) {

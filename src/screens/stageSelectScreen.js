@@ -584,14 +584,14 @@ const stageSelectScreenState = {
     ctx.fillText(isCleared ? 'クリア済み' : '未クリア', tooltipX + 10, tooltipY + yOffset);
 
     // 学年ボーナスの未解放メッセージ
-    const m2 = /^bonus_g(\d+)$/i.exec(stage.stageId);
-    if (m2) {
-      const g = parseInt(m2[1], 10);
-      if (!isBonusUnlocked(g)) {
-        ctx.fillStyle = '#ffb74d';
-        ctx.fillText('同学年の通常ステージ全クリ＋学年漢字を全マスターで解放', tooltipX + 10, tooltipY + yOffset + 20);
-      }
-    }
+        const isBonusId = /^bonus_g(\d+)$/i.test(stage.stageId) || /_bonus$/i.test(stage.stageId);
+        if (isBonusId) {
+          const g = stage.grade ?? null;
+          if (!g || !isBonusUnlocked(g)) {
+             ctx.fillStyle = '#ffb74d';
+             ctx.fillText('同学年の通常ステージ全クリ＋学年漢字を全マスターで解放', tooltipX + 10, tooltipY + yOffset + 20);
+           }
+         }
   },
 
   /** 総復習用の統計情報を描画 */
@@ -992,23 +992,26 @@ update(dt) {
           ctx.fillText('NEXT!', button.x + button.width - 50, button.y + button.height - 15);
         }
 
-        // 学年ボーナスのロック表示（鍵＋半透明）
-        const mBonus = /^bonus_g(\d+)$/i.exec(stage.stageId);
-        if (mBonus) {
-          const g = parseInt(mBonus[1], 10);
-          const unlocked = isBonusUnlocked(g);
-          if (!unlocked) {
-            ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.45)';
-            ctx.fillRect(button.x, button.y, button.width, button.height);
-            ctx.fillStyle = '#FFD700';
-            ctx.font = `${Math.max(12, Math.floor(button.height * 0.4))}px sans-serif`;
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🔒', button.x + 10, button.y + button.height / 2);
-            ctx.restore();
-          }
-        }
+                // 学年ボーナスのロック表示（鍵＋半透明）
+        const isBonusId = /^bonus_g(\d+)$/i.test(stage.stageId) || /_bonus$/i.test(stage.stageId);
+        if (isBonusId) {
+          const g = stage.grade ?? (() => {
+            const m = /^bonus_g(\d+)$/i.exec(stage.stageId);
+            return m ? parseInt(m[1], 10) : null;
+          })();
+          const unlocked = g ? isBonusUnlocked(g) : false;
+           if (!unlocked) {
+             ctx.save();
+             ctx.fillStyle = 'rgba(0,0,0,0.45)';
+             ctx.fillRect(button.x, button.y, button.width, button.height);
+             ctx.fillStyle = '#FFD700';
+             ctx.font = `${Math.max(12, Math.floor(button.height * 0.4))}px sans-serif`;
+             ctx.textAlign = 'left';
+             ctx.textBaseline = 'middle';
+             ctx.fillText('🔒', button.x + 10, button.y + button.height / 2);
+             ctx.restore();
+           }
+         }
       });
     }
 
@@ -1307,18 +1310,21 @@ update(dt) {
           // すでに選択中のステージをクリックした場合は遷移
           if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
             const targetId = button.id;
-            const mBonus = /^bonus_g(\d+)$/i.exec(targetId);
-            if (mBonus) {
-              const g = parseInt(mBonus[1], 10);
-              if (!isBonusUnlocked(g)) {
-                publish('playSE', 'wrong');
-                alert('この学年ボーナスはまだ解放されていません。\n同学年の通常ステージを全てクリアし、学年の漢字を全てマスターすると解放されます。');
-                return;
-              }
-            }
-            gameState.currentStageId = targetId;
-            resetStageProgress(targetId);
-            publish('changeScreen', 'stageLoading');
+            const isBonusId = /^bonus_g(\d+)$/i.test(targetId) || /_bonus$/i.test(targetId);
+            if (isBonusId) {
+              const g = button.stage?.grade ?? (() => {
+                const m = /^bonus_g(\d+)$/i.exec(targetId);
+                return m ? parseInt(m[1], 10) : null;
+              })();
+              if (!g || !isBonusUnlocked(g)) {
+                 publish('playSE', 'wrong');
+                 alert('この学年ボーナスはまだ解放されていません。\n同学年の通常ステージを全てクリアし、学年の漢字を全てマスターすると解放されます。');
+                 return;
+               }
+             }
+             gameState.currentStageId = targetId;
+             resetStageProgress(targetId);
+             publish('changeScreen', 'stageLoading');
           } else {
             // 1回目のクリック: ステージを選択状態にする
             this.selectedStage = button.stage;
@@ -1337,18 +1343,21 @@ update(dt) {
               publish('playSE', 'decide');
               if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
                 const targetId = stage.stageId;
-                const mBonus = /^bonus_g(\d+)$/i.exec(targetId);
-                if (mBonus) {
-                  const g = parseInt(mBonus[1], 10);
-                  if (!isBonusUnlocked(g)) {
-                    publish('playSE', 'wrong');
-                    alert('この学年ボーナスはまだ解放されていません。\n通常ステージをすべてクリアすると解放されます。');
-                    return;
-                  }
-                }
-                gameState.currentStageId = targetId;
-                resetStageProgress(targetId);
-                publish('changeScreen', 'stageLoading');
+                const isBonusId = /^bonus_g(\d+)$/i.test(targetId) || /_bonus$/i.test(targetId);
+                if (isBonusId) {
+                  const g = stage.grade ?? (() => {
+                    const m = /^bonus_g(\d+)$/i.exec(targetId);
+                    return m ? parseInt(m[1], 10) : null;
+                  })();
+                  if (!g || !isBonusUnlocked(g)) {
+                     publish('playSE', 'wrong');
+                     alert('この学年ボーナスはまだ解放されていません。\n通常ステージをすべてクリアすると解放されます。');
+                     return;
+                   }
+                 }
+                 gameState.currentStageId = targetId;
+                 resetStageProgress(targetId);
+                 publish('changeScreen', 'stageLoading');
               } else {
                 this.selectedStage = stage;
               }
