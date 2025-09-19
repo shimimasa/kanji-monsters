@@ -666,7 +666,7 @@ const worldStageSelectScreen = {
       const g = parseInt(m2[1], 10);
       if (!isBonusUnlocked(g)) {
         ctx.fillStyle = '#ffb74d';
-        ctx.fillText('この学年の通常ステージをすべてクリアで解放', tooltipX + 10, tooltipY + yOffset + 20);
+        ctx.fillText('同じ級の通常ステージ全クリ＋該当級の漢字を全マスターで解放', tooltipX + 10, tooltipY + yOffset + 20);
       }
     }
   },

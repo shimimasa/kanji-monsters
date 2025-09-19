@@ -1,27 +1,33 @@
-// src/core/bonusManager.js
 import { stageData } from '../loaders/dataLoader.js';
 import { gameState, unlockAchievement } from './gameState.js';
+import { getKanjiByGrade } from '../loaders/dataLoader.js';
 
 const TITLE_THRESHOLDS = { conqueror: 3, guardian: 5, champion: 10 }; // 征服者/守護者/覇者
 const RANK_THRESHOLDS = { S: 85, A: 70 }; // S>=85, A>=70, B<70
 const RANK_MULTIPLIERS = { S: 1.5, A: 1.2, B: 1.0 };
 
-export function isBonusStage(stageId) {
-  return /^bonus_g\d+$/i.test(String(stageId || ''));
-}
-export function fightsForGrade(grade) {
-  return grade <= 6 ? 3 : 4;
-}
-/** 学年内の通常ステージ全クリ判定 */
+/** 学年内の通常ステージ 全クリ＋学年の全漢字マスターで解放 */
 export function isBonusUnlocked(grade) {
   const targets = stageData.filter(s => s.grade === grade && !/^bonus_/i.test(s.stageId));
   if (targets.length === 0) return false;
-  return targets.every(s => {
+
+  // 1) 全通常ステージクリア
+  const allCleared = targets.every(s => {
     const ls = localStorage.getItem(`clear_${s.stageId}`) === '1';
     const gs = gameState.stageProgress?.[s.stageId]?.cleared;
     return !!(ls || gs);
   });
+  if (!allCleared) return false;
+
+  // 2) 学年の全漢字マスター
+  const kanjiList = getKanjiByGrade(grade) || [];
+  const allMastered = kanjiList.every(k => {
+    const prog = gameState.kanjiReadProgress?.[k.id];
+    return !!(prog && prog.mastered);
+  });
+  return allMastered;
 }
+
 
 /** 係数など定義 */
 function perBoss(grade) {

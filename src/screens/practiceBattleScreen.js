@@ -67,10 +67,18 @@ const practiceBattleScreenState = {
    */
   enter(canvasEl, onComplete) {
     console.log('🎯 練習バトル開始:', gameState.currentStageId);
-    
+
     try {
       this.onPracticeComplete = onComplete;
       gameState.gameMode = 'practice';
+
+      // ボーナスは即レビュー解放
+      const isBonus = /^bonus_g\d+$/i.test(String(gameState.currentStageId || ''));
+      if (isBonus) {
+        if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+        gameState.stageReviewUnlocked[gameState.currentStageId] = true;
+        this.reviewMode = true;
+      }
       
       // 練習統計の初期化
       this.practiceStats.startTime = Date.now();
@@ -658,7 +666,6 @@ const practiceBattleScreenState = {
       console.error('❌ ヒント処理エラー:', error);
     }
   },
-
   /**
    * 練習での正解処理
    */
@@ -694,6 +701,20 @@ const practiceBattleScreenState = {
             publish('playSE', 'correct');
             // ← 追加: 正解時に図鑑へ登録（重複は内部で無視される）
             publish('addToKanjiDex', gameState.currentKanji.id);
+
+             // レビュー回数カウント（ボーナスのみ）
+    try {
+      if (this.reviewMode && /^bonus_g(\d+)$/i.test(String(gameState.currentStageId || ''))) {
+        const m = /^bonus_g(\d+)$/i.exec(gameState.currentStageId);
+        const g = parseInt(m[1], 10);
+        const key = `bonus_g${g}_reviewClears`;
+        const REVIEW_CLEAR_THRESHOLD = 20; // 20問正答ごとを1クリア換算
+        if (this.practiceStats.correctCount > 0 && this.practiceStats.correctCount % REVIEW_CLEAR_THRESHOLD === 0) {
+          const cur = parseInt(localStorage.getItem(key) || '0', 10);
+          localStorage.setItem(key, String((Number.isFinite(cur) ? cur : 0) + 1));
+        }
+      }
+    } catch {}
             
             
       

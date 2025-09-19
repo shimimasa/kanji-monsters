@@ -92,12 +92,41 @@ export async function loadAllGameData() {
       kanjiByGrade[10] = kanjiByGrade[6] || [];
     }
 
-    // 敵データ読み込み
-    const enemyPath = '/data/enemies_proto.json';
-    const enemyResponse = await fetch(enemyPath);
-    if (!enemyResponse.ok) throw new Error(`敵データの読み込みに失敗: ${enemyResponse.statusText}`);
-    enemyData = await enemyResponse.json();
-    console.log("敵データ読み込み完了");
+        // 敵データ読み込み
+        const enemyPath = '/data/enemies_proto.json';
+        const enemyResponse = await fetch(enemyPath);
+        if (!enemyResponse.ok) throw new Error(`敵データの読み込みに失敗: ${enemyResponse.statusText}`);
+        enemyData = await enemyResponse.json();
+        console.log("敵データ読み込み完了");
+    
+        // 追加: 伝説/幻ゴトモンの読み込みをマージ
+        try {
+          const legendResp = await fetch('/data/enemies_legend.json');
+          if (legendResp && legendResp.ok) {
+            const more = await legendResp.json();
+            // 学年推定: stageId / id プレフィックス
+            const stageIdToGrade = {
+              hokkaido_bonus: 1, tohoku_bonus: 2, kanto_bonus: 3, chubu_bonus: 4, kinki_bonus: 5, chugoku_bonus: 6,
+              asia_bonus: 7, europe_bonus: 8, america_bonus: 9, africa_bonus: 10,
+            };
+            for (const e of more) {
+              if (!e || !e.id) continue;
+              if (typeof e.grade !== 'number') {
+                let g = null;
+                if (e.stageId && stageIdToGrade[e.stageId]) g = stageIdToGrade[e.stageId];
+                else if (String(e.id).startsWith('AS-')) g = 7;
+                else if (String(e.id).startsWith('EUR-')) g = 8;
+                else if (String(e.id).startsWith('AME-')) g = 9;
+                else if (String(e.id).startsWith('AFR-')) g = 10;
+                if (g) e.grade = g;
+              }
+              enemyData.push(e);
+            }
+            console.log(`伝説/幻ゴトモン: 追加 ${more.length} 件`);
+          }
+        } catch (e) {
+          console.warn('伝説/幻ゴトモンの読み込みに失敗:', e);
+        }
 
     // ステージデータ読み込み
     const stagePath = '/data/stages_proto.json';
@@ -131,25 +160,33 @@ export async function loadAllGameData() {
     }
     setStageKanjiMap(kanjiMap);
 
-    // --- 学年ボーナスステージを動的に追加（1〜10年） ---
-    // stageId: bonus_g{grade}
-    // name   : "{n}年 学年ボーナス"（7〜10は級表記）
-    // grade  : 対象学年
-    // region : 1〜6は"ボーナス"、7〜10は世界タブのフィルタ基準（アジア/ヨーロッパ/アメリカ大陸/アフリカ大陸）
-    // enemyIdList: 学年ボス1体（見つからなければ空配列）
-    const gradeToKankenName = (g) => (g===7?'4級':g===8?'3級':g===9?'準2級':'2級');
-    const gradeToWorldRegion = (g) => (g===7?'アジア':g===8?'ヨーロッパ':g===9?'アメリカ大陸':'アフリカ大陸');
-    for (let g = 1; g <= 10; g++) {
-      const id = `bonus_g${g}`;
-      if (!stageData.some(s => s.stageId === id)) {
-        const name = (g <= 6) ? `${g}年 学年ボーナス` : `学年ボーナス（${gradeToKankenName(g)}）`;
-        const region = (g <= 6) ? 'ボーナス' : gradeToWorldRegion(g);
-        const boss = findBonusBossForGrade(g, enemyData);
-        const enemyIdList = boss ? [boss.id] : [];
-        stageData.push({ stageId: id, name, grade: g, region, enemyIdList });
-        console.log(`👍 追加: ${id} name=${name}, grade=${g}, region=${region}, enemies=${enemyIdList.length}`);
-      }
-    }
+        // --- 学年ボーナスステージを動的に追加（1〜10年） ---
+        const gradeToKankenName = (g) => (g===7?'4級':g===8?'3級':g===9?'準2級':'2級');
+        const gradeToWorldRegion = (g) => (g===7?'アジア':g===8?'ヨーロッパ':g===9?'アメリカ大陸':'アフリカ大陸');
+    
+        // 学年別 伝説/幻 候補取得ヘルパ
+        const pickLegendaryIdsForGrade = (g) => {
+          const list = enemyData.filter(e =>
+            e && e.grade === g && (
+              (typeof e.category === 'string' && e.category.includes('伝説')) ||
+              String(e.id).includes('-L')
+            )
+          );
+          // 安定順にソートして先頭5体
+          return [...list].sort((a,b) => String(a.id).localeCompare(String(b.id))).slice(0, 5).map(e => e.id);
+        };
+    
+        for (let g = 1; g <= 10; g++) {
+          const id = `bonus_g${g}`;
+          if (!stageData.some(s => s.stageId === id)) {
+            const name = (g <= 6) ? `${g}年 学年ボーナス` : `学年ボーナス（${gradeToKankenName(g)}）`;
+            const region = (g <= 6) ? 'ボーナス' : gradeToWorldRegion(g);
+            // 新仕様: 伝説5体を配置
+            const enemyIdList = pickLegendaryIdsForGrade(g);
+            stageData.push({ stageId: id, name, grade: g, region, enemyIdList });
+            console.log(`👍 追加: ${id} enemies=${enemyIdList.length}`);
+          }
+        }
 
     return { kanjiData, enemyData, stageData };
   } catch (error) {
@@ -160,64 +197,55 @@ export async function loadAllGameData() {
 
 
 export function getEnemiesByStageId(stageId) {
-  // 学年ボーナス: 学年ボスのみ
-  const bonusMatchForEnemy = /^bonus_g(\d+)$/i.exec(stageId);
-  if (bonusMatchForEnemy) {
-    const g = parseInt(bonusMatchForEnemy[1], 10);
-    const fights = g <= 6 ? 3 : 4;
+  // ボーナス: 通常ステージ型（伝説5体）。レビュー解放で幻が混入
+  const m = /^bonus_g(\d+)$/i.exec(stageId);
+  if (m) {
+    const g = parseInt(m[1], 10);
+    // ステージ定義に敵が入っていればそれを使い、無ければ学年伝説から動的生成
+    const st = stageData.find(s => s.stageId === stageId);
+    let baseIds = Array.isArray(st?.enemyIdList) && st.enemyIdList.length > 0
+      ? st.enemyIdList.slice(0, 5)
+      : (() => {
+          const list = enemyData.filter(e =>
+            e && e.grade === g && (
+              (typeof e.category === 'string' && e.category.includes('伝説')) ||
+              String(e.id).includes('-L')
+            )
+          ).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+          return list.slice(0,5).map(e=>e.id);
+        })();
 
-    // 学年内の通常ステージを抽出（ボーナス自身は除外）
-    const gradeStages = stageData.filter(s => s.grade === g && !/^bonus_/i.test(s.stageId));
-    const byId = new Map(enemyData.map(e => [e.id, e]));
-
-    // 各ステージからボス（isBoss=true）を優先、無ければ末尾ID(最大)を採用
-    const picked = [];
-    const pickedIds = new Set();
-    for (const s of gradeStages) {
-      if (!Array.isArray(s.enemyIdList) || s.enemyIdList.length === 0) continue;
-      const enemies = s.enemyIdList.map(id => byId.get(id)).filter(Boolean);
-      let boss = enemies.find(e => e.isBoss);
-      if (!boss) {
-        const sorted = [...enemies].sort((a,b) => String(a.id).localeCompare(String(b.id)));
-        boss = sorted[sorted.length - 1];
-      }
-      if (boss && !pickedIds.has(boss.id)) {
-        // 念のためボス扱い
-        if (!boss.isBoss) boss.isBoss = true;
-        picked.push(boss);
-        pickedIds.add(boss.id);
-      }
-      if (picked.length >= fights) break;
-    }
-
-    // 足りない場合は学年内の敵からID末尾が大の順で補完（重複なし）
-    if (picked.length < fights) {
-      const gradeEnemyIds = new Set(
-        gradeStages.flatMap(s => Array.isArray(s.enemyIdList) ? s.enemyIdList : [])
-      );
-      const candidates = [...gradeEnemyIds]
-        .map(id => byId.get(id)).filter(Boolean)
-        .sort((a,b) => String(a.id).localeCompare(String(b.id)));
-
-      for (let i = candidates.length - 1; i >= 0 && picked.length < fights; i--) {
-        const e = candidates[i];
-        if (!pickedIds.has(e.id)) {
-          if (!e.isBoss) e.isBoss = true;
-          picked.push(e);
-          pickedIds.add(e.id);
+    // レビュー解放回数に応じて幻をランダム混入（置換1枠）
+    try {
+      const clears = parseInt(localStorage.getItem(`bonus_g${g}_reviewClears`) || '0', 10);
+      const UNLOCK_THRESHOLD = 3; // 何回か→最少3回で解放
+      if (Number.isFinite(clears) && clears >= UNLOCK_THRESHOLD && baseIds.length > 0) {
+        const phantoms = enemyData.filter(e =>
+          e && e.grade === g &&
+          ((typeof e.rarity === 'string' && e.rarity.includes('幻')) ||
+           (typeof e.category === 'string' && e.category.includes('幻')))
+        );
+        if (phantoms.length > 0) {
+          // 50%で混入（都度抽選）
+          if (Math.random() < 0.5) {
+            const p = phantoms[Math.floor(Math.random() * phantoms.length)];
+            const idx = Math.floor(Math.random() * baseIds.length);
+            baseIds[idx] = p.id;
+          }
         }
       }
-    }
+    } catch {}
 
-    return picked;
+    // 実体化
+    const byId = new Map(enemyData.map(e => [e.id, e]));
+    return baseIds.map(id => byId.get(id)).filter(Boolean);
   }
 
   const stage = stageData.find(s => s.stageId === stageId);
   if (!stage || !stage.enemyIdList) return [];
-  
-  // IDリストに基づいて敵データをフィルタリング
+
   let enemies = enemyData.filter(e => stage.enemyIdList.includes(e.id));
-  
+
   // 敵が見つからない場合、IDの接頭辞マッピングを試す
   if (enemies.length === 0) {
     console.warn(`⚠️ ステージ ${stageId} の敵が見つかりません。IDマッピングを試みます。`);

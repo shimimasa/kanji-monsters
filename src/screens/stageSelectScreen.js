@@ -589,7 +589,7 @@ const stageSelectScreenState = {
       const g = parseInt(m2[1], 10);
       if (!isBonusUnlocked(g)) {
         ctx.fillStyle = '#ffb74d';
-        ctx.fillText('この学年の通常ステージをすべてクリアで解放', tooltipX + 10, tooltipY + yOffset + 20);
+        ctx.fillText('同学年の通常ステージ全クリ＋学年漢字を全マスターで解放', tooltipX + 10, tooltipY + yOffset + 20);
       }
     }
   },
@@ -1312,7 +1312,7 @@ update(dt) {
               const g = parseInt(mBonus[1], 10);
               if (!isBonusUnlocked(g)) {
                 publish('playSE', 'wrong');
-                alert('この学年ボーナスはまだ解放されていません。\n通常ステージをすべてクリアすると解放されます。');
+                alert('この学年ボーナスはまだ解放されていません。\n同学年の通常ステージを全てクリアし、学年の漢字を全てマスターすると解放されます。');
                 return;
               }
             }
