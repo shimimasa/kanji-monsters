@@ -1021,19 +1021,54 @@ getMaxHealCountFromSettings() {
    * @param {string} stageId - ステージID
    * @returns {string} BGMのキー
    */
-  getBGMKeyForStage(stageId) {
-    // ボス戦の場合
-    if (stageId && stageId.includes('boss')) {
-      return 'boss';
-    }
-    // エリア付きステージは a / b をランダム
-    if (/_area\d+$/i.test(stageId)) {
-      const ab = Math.random() < 0.5 ? 'a' : 'b';
-      return `${stageId}_${ab}`;
-    }
-    // その他はステージIDをそのまま使用
-    return stageId;
-  },
+     getBGMKeyForStage(stageId) {
+      // ボス戦の場合
+      if (stageId && stageId.includes('boss')) {
+        return 'boss';
+      }
+      // 学年ボーナス（bonus_gN） → 学年に対応する地域BGMをランダム選択
+      const m = /^bonus_g(\d+)$/i.exec(stageId || '');
+      if (m) {
+        const g = parseInt(m[1], 10);
+        const regionByGrade = {1:'hokkaido',2:'tohoku',3:'kanto',4:'chubu',5:'kinki',6:'chugoku',7:'asia',8:'europe',9:'america',10:'africa'};
+        const region = regionByGrade[g] || null;
+        return this._pickRegionBgm(region);
+      }
+      // 地域ボーナス（xxx_bonus） → 地域BGMをランダム選択（表記ゆれ補正あり）
+      const m2 = /^([a-z]+)_bonus$/i.exec(stageId || '');
+      if (m2) {
+        const fix = { kantou:'kanto', chuubu:'chubu', chuugoku:'chugoku', cyuugoku:'chugoku' };
+        const region = fix[m2[1].toLowerCase()] || m2[1].toLowerCase();
+        return this._pickRegionBgm(region);
+      }
+      // エリア付きステージは a / b をランダム
+      if (/_area\d+$/i.test(stageId)) {
+        const ab = Math.random() < 0.5 ? 'a' : 'b';
+        return `${stageId}_${ab}`;
+      }
+      // その他はステージIDをそのまま使用
+      return stageId;
+    },
+  
+    _pickRegionBgm(region) {
+      const pool = {
+        hokkaido: ['hokkaido','hokkaido_a','hokkaido_b'],
+        tohoku:   ['tohoku_a','tohoku_b'],
+        kanto:    ['kanto_a','kanto_b'],
+        chubu:    ['chubu_a','chubu_b'],
+        kinki:    ['kinki_a','kinki_b'],
+        chugoku:  ['chugoku_a','chugoku_b'],
+        asia:     ['asia_a','asia_b'],
+        europe:   ['europe_a','europe_b'],
+        america:  ['america_a','america_a2'],
+        africa:   ['africa_a','africa_b'],
+      };
+      const list = pool[region];
+      if (Array.isArray(list) && list.length > 0) {
+        return list[Math.floor(Math.random() * list.length)];
+      }
+      return 'battle';
+    },
 
   getEnemyAttackMode() {
     try { return localStorage.getItem('enemyAttackMode') || 'onMistakeOnly'; } catch { return 'onMistakeOnly'; }

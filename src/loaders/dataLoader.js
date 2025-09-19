@@ -99,41 +99,65 @@ export async function loadAllGameData() {
         enemyData = await enemyResponse.json();
         console.log("敵データ読み込み完了");
     
-        // 追加: 伝説/幻ゴトモンの読み込みをマージ
+                // 追加: 伝説/幻ゴトモンの読み込みをマージ
+                try {
+                  const legendResp = await fetch('/data/enemies_legend.json');
+                  if (legendResp && legendResp.ok) {
+                    const more = await legendResp.json();
+                    // 学年推定: stageId / id プレフィックス
+                    const stageIdToGrade = {
+                      hokkaido_bonus: 1, tohoku_bonus: 2, kanto_bonus: 3, kantou_bonus: 3, chubu_bonus: 4, chuubu_bonus: 4,
+                      kinki_bonus: 5,
+                      chugoku_bonus: 6, chuugoku_bonus: 6, cyuugoku_bonus: 6,
+                      kyushu_bonus: 6, shikoku_bonus: 6, // 便宜的に6に寄せる（後段のステージ定義で正しく補完）
+                      asia_bonus: 7, europe_bonus: 8, america_bonus: 9, africa_bonus: 10,
+                    };
+                    for (const e of more) {
+                      if (!e || !e.id) continue;
+                      if (typeof e.grade !== 'number') {
+                        let g = null;
+                        if (e.stageId && stageIdToGrade[e.stageId]) g = stageIdToGrade[e.stageId];
+                        else if (String(e.id).startsWith('AS-')) g = 7;
+                        else if (String(e.id).startsWith('EUR-')) g = 8;
+                        else if (String(e.id).startsWith('AME-')) g = 9;
+                        else if (String(e.id).startsWith('AFR-')) g = 10;
+                        if (g) e.grade = g;
+                      }
+                      enemyData.push(e);
+                    }
+                    console.log(`伝説/幻ゴトモン: 追加 ${more.length} 件`);
+                  }
+                } catch (e) {
+                  console.warn('伝説/幻ゴトモンの読み込みに失敗:', e);
+                }
+
+        // ステージデータ読み込み
+        const stagePath = '/data/stages_proto.json';
+        const stageResponse = await fetch(stagePath);
+        if (!stageResponse.ok) throw new Error(`ステージデータの読み込みに失敗: ${stageResponse.statusText}`);
+        stageData = await stageResponse.json();
+        console.log("ステージデータ読み込み完了");
+    
+        // 追加: ボーナスステージ定義のマージ（存在時のみ）
         try {
-          const legendResp = await fetch('/data/enemies_legend.json');
-          if (legendResp && legendResp.ok) {
-            const more = await legendResp.json();
-            // 学年推定: stageId / id プレフィックス
-            const stageIdToGrade = {
-              hokkaido_bonus: 1, tohoku_bonus: 2, kanto_bonus: 3, chubu_bonus: 4, kinki_bonus: 5, chugoku_bonus: 6,
-              asia_bonus: 7, europe_bonus: 8, america_bonus: 9, africa_bonus: 10,
-            };
-            for (const e of more) {
-              if (!e || !e.id) continue;
-              if (typeof e.grade !== 'number') {
-                let g = null;
-                if (e.stageId && stageIdToGrade[e.stageId]) g = stageIdToGrade[e.stageId];
-                else if (String(e.id).startsWith('AS-')) g = 7;
-                else if (String(e.id).startsWith('EUR-')) g = 8;
-                else if (String(e.id).startsWith('AME-')) g = 9;
-                else if (String(e.id).startsWith('AFR-')) g = 10;
-                if (g) e.grade = g;
+          const bonusResp = await fetch('/data/stages.bonus.json').catch(() => null);
+          if (bonusResp && bonusResp.ok) {
+            const bonusStages = await bonusResp.json();
+            const exists = new Set(stageData.map(s => s.stageId));
+            let added = 0;
+            for (const s of bonusStages) {
+              if (!s || !s.stageId) continue;
+              if (!exists.has(s.stageId)) {
+                stageData.push(s);
+                exists.add(s.stageId);
+                added++;
               }
-              enemyData.push(e);
             }
-            console.log(`伝説/幻ゴトモン: 追加 ${more.length} 件`);
+            if (added > 0) console.log(`ボーナスステージを ${added} 件追加`);
           }
         } catch (e) {
-          console.warn('伝説/幻ゴトモンの読み込みに失敗:', e);
+          console.warn('stages.bonus.json の読み込みに失敗:', e);
         }
-
-    // ステージデータ読み込み
-    const stagePath = '/data/stages_proto.json';
-    const stageResponse = await fetch(stagePath);
-    if (!stageResponse.ok) throw new Error(`ステージデータの読み込みに失敗: ${stageResponse.statusText}`);
-    stageData = await stageResponse.json();
-    console.log("ステージデータ読み込み完了");
 
     // 敵データに学年（grade）を補完（stageId → stageData／プレフィックス推定）
     {

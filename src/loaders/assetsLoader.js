@@ -115,61 +115,65 @@ export async function loadBgImage(stageId) {
   const cacheKey = `bg_${stageId}`;
   if (images[cacheKey]) return images[cacheKey];
   
-  // ステージID別の背景画像パス（キャッシュバスターを追加）
   const timestamp = Date.now();
-  
-  // 地域名とエリア番号を抽出
-  let regionName = '';
-  let areaNumber = 1; // デフォルトはarea1
-  
-  // ステージIDからエリア番号を抽出
-  const areaMatch = stageId.match(/_area(\d+)$/);
-  if (areaMatch && areaMatch[1]) {
-    // エリア番号が奇数なら1、偶数なら2を使用
-    areaNumber = parseInt(areaMatch[1]) % 2 === 0 ? 2 : 1;
+
+  // 補助: 表記ゆれ対応（kanto→kantou, chubu→chuubu, chugoku→cyuugoku, 世界系の頭大文字）
+  const altSpellings = (id) => {
+    const alts = new Set();
+    alts.add(id);
+    // _bonus → _bonus_area も試す
+    if (!id.endsWith('_area')) alts.add(`${id}_area`);
+
+    const repl = (s, a, b) => s.includes(a) ? s.replace(a, b) : null;
+    const v1 = repl(id, 'kanto', 'kantou');        if (v1) { alts.add(v1); alts.add(`${v1}_area`); }
+    const v2 = repl(id, 'chubu', 'chuubu');         if (v2) { alts.add(v2); alts.add(`${v2}_area`); }
+    const v3 = repl(id, 'chugoku', 'cyuugoku');     if (v3) { alts.add(v3); alts.add(`${v3}_area`); }
+
+    // 世界系
+    const world = ['asia','europe','america','africa'];
+    for (const w of world) {
+      if (id.startsWith(`${w}_`)) {
+        const cap = w[0].toUpperCase() + w.slice(1);
+        const wid = id.replace(w, cap);
+        alts.add(wid);
+        alts.add(`${wid}_area`);
+      }
+    }
+    return Array.from(alts);
+  };
+
+  // 地域名抽出（フォールバック用）
+  const regionName = stageId.split('_')[0];
+
+  // 試行パスを列挙
+  const pathsToTry = [];
+  // 1) そのまま
+  pathsToTry.push(`/assets/images/backgrounds/${stageId}.webp?v=${timestamp}`);
+  // 2) 表記ゆれ・_area などの候補
+  for (const a of altSpellings(stageId)) {
+    pathsToTry.push(`/assets/images/backgrounds/${a}.webp?v=${timestamp}`);
   }
-  
-  // 中学生ステージ（世界）の場合
-  if (stageId.startsWith('Asia_')) {
-    regionName = 'asia'; // または 'asia'（ファイル名に合わせる）
-  }
-  else if (stageId.startsWith('Europe_')) regionName = 'europe';
-  else if (stageId.startsWith('America_')) regionName = 'america';
-  else if (stageId.startsWith('Africa_')) regionName = 'africa';
-  // 日本の地域の場合
-  else {
-    // stageIdから地域名部分を抽出（例：tohoku_area2 → tohoku）
-    regionName = stageId.split('_')[0];
-  }
-  
-    // パスの配列を作成
-    const pathsToTry = [
-      // 1. ステージIDに完全一致する背景画像
-      `/assets/images/backgrounds/${stageId}.webp?v=${timestamp}`,
-  
-      // 2. 学年別の背景画像（フォールバック）
-      `/assets/images/stage.select/stage.select${getGradeFromStageId(stageId)}.png?v=${timestamp}`
-    ];
-  
-  // 各パスを順番に試す
+  // 3) 地域 area1 の汎用フォールバック（webp → png の順）
+  pathsToTry.push(`/assets/images/backgrounds/${regionName}_area1.webp?v=${timestamp}`);
+  pathsToTry.push(`/assets/images/backgrounds/${regionName}_area1.png?v=${timestamp}`);
+  // 4) 学年別のステージ選択画像（最終フォールバック）
+  pathsToTry.push(`/assets/images/stage.select/stage.select${getGradeFromStageId(stageId)}.png?v=${timestamp}`);
+
   for (const path of pathsToTry) {
     try {
       console.log(`背景画像を試行: ${path}`);
-      // 透明度を確保するために loadImageWithTransparency を使用
       const img = await loadImageWithTransparency(path);
       images[cacheKey] = img;
       console.log(`✅ 背景画像ロード成功: ${path}`);
       return img;
     } catch (error) {
-      console.log(`背景画像ロード失敗: ${path}`);
-      // 次のパスを試す
+      // 次へ
     }
   }
-  
-  // すべてのパスが失敗した場合、デフォルト背景を返す
+
+  // デフォルト
   try {
     const defaultPath = `/assets/images/stage.select/stage.select.png?v=${timestamp}`;
-    console.log(`デフォルト背景画像を試行: ${defaultPath}`);
     const fallbackImg = await loadImageWithTransparency(defaultPath);
     images[cacheKey] = fallbackImg;
     return fallbackImg;
@@ -537,23 +541,25 @@ export function drawStoneButton(ctx, button, isHovered, isPressed) {
 
 // ステージIDから学年を取得するヘルパー関数
 function getGradeFromStageId(stageId) {
-  // 中学生ステージの場合
-  if (stageId.startsWith('Asia_')) return 12; // 4級
-  if (stageId.startsWith('Europe_')) return 13; // 3級
-  if (stageId.startsWith('America_')) return 14; // 準2級
-  if (stageId.startsWith('Africa_')) return 15; // 2級
+  // 世界
+  if (stageId.startsWith('Asia_') || stageId.startsWith('asia_')) return 12; // 4級
+  if (stageId.startsWith('Europe_') || stageId.startsWith('europe_')) return 13; // 3級
+  if (stageId.startsWith('America_') || stageId.startsWith('america_')) return 14; // 準2級
+  if (stageId.startsWith('Africa_') || stageId.startsWith('africa_')) return 15; // 2級
   
-  // 小学生ステージの場合（既存のマッピング）
+  // 日本（_area / _bonus ともに対応）
   const gradeMapping = {
-    'hokkaido_area1': 1,
-    'tohoku_area1': 2, 'tohoku_area2': 2, 'tohoku_area3': 2, 'tohoku_area4': 2, 'tohoku_area5': 2, 'tohoku_area6': 2,
-    'kanto_area1': 3, 'kanto_area2': 3, 'kanto_area3': 3, 'kanto_area4': 3, 'kanto_area5': 3, 'kanto_area6': 3, 'kanto_area7': 3,
-    'chubu_area1': 4, 'chubu_area2': 4, 'chubu_area3': 4, 'chubu_area4': 4, 'chubu_area5': 4, 'chubu_area6': 4, 'chubu_area7': 4, 'chubu_area8': 4, 'chubu_area9': 4,
-    'kinki_area1': 5, 'kinki_area2': 5, 'kinki_area3': 5, 'kinki_area4': 5, 'kinki_area5': 5, 'kinki_area6': 5, 'kinki_area7': 5,
-    'chugoku_area1': 6, 'chugoku_area2': 6, 'chugoku_area3': 6, 'chugoku_area4': 6, 'chugoku_area5': 6,
+    hokkaido_: 1,
+    tohoku_: 2,
+    kanto_: 3, kantou_: 3,
+    chubu_: 4, chuubu_: 4,
+    kinki_: 5,
+    chugoku_: 6, chuugoku_: 6, cyuugoku_: 6,
   };
-  
-  return gradeMapping[stageId] || '';
+  for (const prefix in gradeMapping) {
+    if (stageId.startsWith(prefix)) return gradeMapping[prefix];
+  }
+  return '';
 }
 
 
