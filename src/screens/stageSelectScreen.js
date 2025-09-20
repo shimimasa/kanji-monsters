@@ -971,12 +971,31 @@ update(dt) {
           ctx.fillText('✓', button.x + 10, button.y + 5);
         }
 
-        // クリア状況（星アイコン）
-        if (isCleared) {
-          ctx.fillStyle = '#FFD700';
-          ctx.font = '16px sans-serif';
-          ctx.fillText('⭐', button.x + button.width - 25, button.y + 5);
-        }
+                // クリア状況（星アイコン）
+                if (isCleared) {
+                  ctx.fillStyle = '#FFD700';
+                  ctx.font = '16px sans-serif';
+                  ctx.fillText('⭐', button.x + button.width - 25, button.y + 5);
+                }
+        
+                // レビュー解放バッジ（オレンジ）
+                const reviewUnlocked = !!(gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[stage.stageId]);
+                if (reviewUnlocked) {
+                  const bx = button.x + button.width - 62;
+                  const by = button.y + 5;
+                  const bw = 56;
+                  const bh = 18;
+                  ctx.fillStyle = 'rgba(255, 152, 0, 0.95)';
+                  ctx.fillRect(bx, by, bw, bh);
+                  ctx.strokeStyle = 'rgba(239, 108, 0, 1)';
+                  ctx.lineWidth = 1;
+                  ctx.strokeRect(bx, by, bw, bh);
+                  ctx.fillStyle = '#fff';
+                  ctx.font = '11px "UDデジタル教科書体", sans-serif';
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'middle';
+                  ctx.fillText('レビュー', bx + bw / 2, by + bh / 2);
+                }
 
         // 推奨レベル
         if (stage.recommendedLevel) {
@@ -1058,6 +1077,23 @@ update(dt) {
           ctx.globalAlpha = 0.7;
         }
 
+                // レビュー解放マーカー（小バッジ）
+                const reviewUnlocked = !!(gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[stage.stageId]);
+                if (reviewUnlocked) {
+                  ctx.save();
+                  ctx.fillStyle = 'rgba(255,152,0,0.95)';
+                  ctx.strokeStyle = 'rgba(239,108,0,1)';
+                  ctx.lineWidth = 1;
+                  const rW = 22, rH = 14;
+                  ctx.fillRect(x - 2, y - rH - 6, rW, rH);
+                  ctx.strokeRect(x - 2, y - rH - 6, rW, rH);
+                  ctx.fillStyle = '#fff';
+                  ctx.font = '10px sans-serif';
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'middle';
+                  ctx.fillText('R', x + rW/2 - 2, y - rH/2 - 6);
+                  ctx.restore();
+                }
         if (markerImage) {
           const drawSize = MARKER_SIZE * scale;
           const offsetX = (drawSize - MARKER_SIZE) / 2;

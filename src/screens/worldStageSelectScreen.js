@@ -1009,6 +1009,24 @@ const worldStageSelectScreen = {
           ctx.fillText('⭐', button.x + button.width - 25, button.y + 5);
         }
 
+                  // レビュー解放マーカー（小バッジ）
+                  const reviewUnlocked = !!(gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[stage.stageId]);
+                  if (reviewUnlocked) {
+                    this.ctx.save();
+                    this.ctx.fillStyle = 'rgba(255,152,0,0.95)';
+                    this.ctx.strokeStyle = 'rgba(239,108,0,1)';
+                    this.ctx.lineWidth = 1;
+                    const rW = 22, rH = 14;
+                    this.ctx.fillRect(markerX - 2, markerY - rH - 6, rW, rH);
+                    this.ctx.strokeRect(markerX - 2, markerY - rH - 6, rW, rH);
+                    this.ctx.fillStyle = '#fff';
+                    this.ctx.font = '10px sans-serif';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.textBaseline = 'middle';
+                    this.ctx.fillText('R', markerX + rW/2 - 2, markerY - rH/2 - 6);
+                    this.ctx.restore();
+                  }
+
         // 推奨レベル
         if (stage.recommendedLevel) {
           ctx.fillStyle = '#fff';

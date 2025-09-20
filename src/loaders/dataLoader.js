@@ -1,4 +1,5 @@
 // js/dataLoader.js
+import { gameState } from '../core/gameState.js';
 
 export let stageData = [];
 let enemyData = [];
@@ -498,21 +499,13 @@ function findBonusBossForGrade(grade, allEnemies) {
  * @returns {boolean} マスター済みならtrue
  */
 export function isKanjiMastered(kanjiId) {
-  // gameStateをインポート
-  import('../core/gameState.js').then(({ gameState }) => {
-    const progress = gameState.kanjiReadProgress?.[kanjiId];
+  try {
+    const gs = (typeof window !== 'undefined' && window.gameState) ? window.gameState : null;
+    const progress = gs?.kanjiReadProgress?.[kanjiId];
     return !!(progress && progress.mastered);
-  }).catch(() => {
+  } catch (e) {
     return false;
-  });
-  
-  // 同期的にチェックするため、直接参照
-  if (typeof window !== 'undefined' && window.gameState) {
-    const progress = window.gameState.kanjiReadProgress?.[kanjiId];
-    return !!(progress && progress.mastered);
   }
-  
-  return false;
 }
 
 /**

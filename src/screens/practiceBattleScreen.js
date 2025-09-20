@@ -1,7 +1,7 @@
 // 練習バトル画面 - UI改善版（ボタンレス・統計強化・フィードバック改善）
 
 import battleScreenState from './battleScreen.js';
-import { gameState, battleState } from '../core/gameState.js';
+import { gameState, battleState, saveGameData } from '../core/gameState.js';
 import { getKanjiByStageId, isKanjiMastered } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
 import { images, loadBgImage } from '../loaders/assetsLoader.js';
@@ -121,7 +121,8 @@ const practiceBattleScreenState = {
             {
               const stageKanji = getKanjiByStageId(gameState.currentStageId);
               const total = Math.max(1, stageKanji.length);
-              this.progressState.current = this.progressState.target = (total - this.unmasteredKanji.length) / total;
+              const unlocked = !!(gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[gameState.currentStageId]);
+              this.progressState.current = this.progressState.target = unlocked ? 1 : (total - this.unmasteredKanji.length) / total;
             }
       // 最初の未マスター漢字を出題
       this._pickNextUnmasteredKanji();
@@ -496,6 +497,7 @@ const practiceBattleScreenState = {
         this.reviewMode = true;
         if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
         gameState.stageReviewUnlocked[gameState.currentStageId] = true;
+        try { saveGameData(); } catch {}
         console.log('🔁 レビューモードに移行（○で隠した読みを1つだけ出題）');
         this._pickNextReviewQuestion();
       } catch (error) {
@@ -736,20 +738,20 @@ const practiceBattleScreenState = {
             
             
       
-      const wasAlreadyMastered = this._isKanjiMastered(gameState.currentKanji.id);
-      this._updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
-      const isNowMastered = this._isKanjiMastered(gameState.currentKanji.id);
-      
-      if (!wasAlreadyMastered && isNowMastered) {
-        this.unmasteredKanji = this.unmasteredKanji.filter(k => k.id !== gameState.currentKanji.id);
-        console.log(`🎉 漢字「${gameState.currentKanji.text}」が新しくマスターされました！`);
-        console.log(`📚 残り未マスター漢字: ${this.unmasteredKanji.length}件`);
-
-        // 進捗バーの目標値を更新（即時反映はアニメーションで）
-        const stageKanjiAll = getKanjiByStageId(gameState.currentStageId);
-        const total = Math.max(1, stageKanjiAll.length);
-        this.progressState.target = (total - this.unmasteredKanji.length) / total;
-      }
+    const wasAlreadyMastered = this._isKanjiMastered(gameState.currentKanji.id);
+    this._updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
+    const isNowMastered = this._isKanjiMastered(gameState.currentKanji.id);
+    
+    if (!wasAlreadyMastered && isNowMastered) {
+      this.unmasteredKanji = this.unmasteredKanji.filter(k => k.id !== gameState.currentKanji.id);
+      console.log(`🎉 漢字「${gameState.currentKanji.text}」が新しくマスターされました！`);
+      console.log(`📚 残り未マスター漢字: ${this.unmasteredKanji.length}件`);
+    
+      const stageKanjiAll = getKanjiByStageId(gameState.currentStageId);
+      const total = Math.max(1, stageKanjiAll.length);
+      this.progressState.target = (total - this.unmasteredKanji.length) / total;
+    }
+    try { saveGameData(); } catch {}
       
       console.log(`✅ 正解: ${gameState.currentKanji.text} = ${answer}`);
       
@@ -1817,12 +1819,13 @@ const practiceBattleScreenState = {
       });
 
       // アンロックを記録（画面遷移後も継続）
-      if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
-      gameState.stageReviewUnlocked[gameState.currentStageId] = true;
+if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+gameState.stageReviewUnlocked[gameState.currentStageId] = true;
+try { saveGameData(); } catch {}
 
-      // クリア後は強制遷移せず、レビューモードに移行して継続
-      this.reviewMode = true;
-      this._pickNextReviewQuestion();
+// クリア後は強制遷移せず、レビューモードに移行して継続
+this.reviewMode = true;
+this._pickNextReviewQuestion();
     } catch (error) {
       console.error('❌ 練習完了処理エラー:', error);
       // 何もしない（画面は維持）

@@ -570,21 +570,43 @@ const kanjiDexScreen = {
     }
   },
 
-  /** 漢字カードを生成 */
-  _createKanjiCard(kanjiData) {
-    const collected = this.dexSet.has(kanjiData.id);
-    
-    // カード要素を作成
-    const card = document.createElement('div');
-    card.className = 'kanji-card';
-    if (!collected) {
-      card.classList.add('locked');
-    }
-    
-    // 枠線のスタイルを直接設定
-    card.style.border = '1px solid #8B4513';
-    card.style.boxShadow = '3px 3px 5px rgba(0, 0, 0, 0.3)';
-    
+    /** 漢字カードを生成 */
+    _createKanjiCard(kanjiData) {
+      const collected = this.dexSet.has(kanjiData.id);
+      const prog = (gameState && gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiData.id]) || null;
+      const isMastered = !!(prog && prog.mastered);
+      
+      // カード要素を作成
+      const card = document.createElement('div');
+      card.className = 'kanji-card';
+      if (!collected) {
+        card.classList.add('locked');
+      }
+      
+      // 枠線のスタイルを直接設定
+      card.style.border = '1px solid #8B4513';
+      card.style.boxShadow = '3px 3px 5px rgba(0, 0, 0, 0.3)';
+      card.style.position = 'relative';
+      
+      if (isMastered) {
+        card.style.border = '2px solid #DAA520';
+        const badge = document.createElement('div');
+        badge.textContent = 'MASTER';
+        Object.assign(badge.style, {
+          position: 'absolute',
+          top: '6px',
+          right: '6px',
+          padding: '2px 6px',
+          fontSize: '11px',
+          fontWeight: '700',
+          color: '#fff',
+          background: 'linear-gradient(135deg, #e1b12c, #d4a017)',
+          border: '1px solid rgba(0,0,0,0.3)',
+          borderRadius: '6px',
+          letterSpacing: '0.5px'
+        });
+        card.appendChild(badge);
+      }
     // 漢字を表示
     const kanjiEl = document.createElement('h2');
     kanjiEl.className = 'kanji-character';
