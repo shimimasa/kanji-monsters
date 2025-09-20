@@ -698,24 +698,22 @@ const settingsScreenState = {
       autoInterval.appendChild(opt);
     });
 
+    // 追加: インラインの現在状態表示
+    const inlineStatus = document.createElement('span');
+    inlineStatus.id = 'autosaveInline';
+    inlineStatus.style.marginLeft = '8px';
+    autoRow.appendChild(inlineStatus);
 
+    // 初期値をロードしてUI・表示に反映
+    try {
+      const enabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
+      const minutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
+      autoToggle.checked = enabled;
+      autoInterval.value = String(Number.isFinite(minutes) ? minutes : 5);
+      inlineStatus.textContent = `（現在: ${enabled ? `${minutes}分ごと` : 'OFF'}）`;
+    } catch {}
 
- // apply後
-this._refreshSaveStatus();
-const enabledTxt = enabled ? `${minutes}分ごと` : 'OFF';
-inlineStatus.textContent = `（現在: ${enabledTxt}）`;
-
-        // 初期値をロード
-        try {
-          const enabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
-          const minutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
-          autoToggle.checked = enabled;
-          autoInterval.value = String(Number.isFinite(minutes) ? minutes : 5);
-          // ← 追加: 初期表示を反映
-          inlineStatus.textContent = `（現在: ${enabled ? `${minutes}分ごと` : 'OFF'}）`;
-        } catch {}
-
-        const applyBtn = document.createElement('button');
+    const applyBtn = document.createElement('button');
     applyBtn.className = 'settings-button';
     applyBtn.textContent = '適用';
     applyBtn.addEventListener('click', () => {
@@ -726,7 +724,6 @@ inlineStatus.textContent = `（現在: ${enabledTxt}）`;
         publish('updateAutosaveSettings', { enabled: enabledNow, minutes: minutesNow });
         this._showSaveToast('オートセーブ設定を更新しました');
         this._refreshSaveStatus();
-        // ← 追加: インライン表示も即時更新
         inlineStatus.textContent = `（現在: ${enabledNow ? `${minutesNow}分ごと` : 'OFF'}）`;
       } catch {}
     });
