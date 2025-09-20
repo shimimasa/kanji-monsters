@@ -81,10 +81,14 @@ const settingsScreenState = {
     const gameModePanel = this.createGameModePanel();
     settingsContainer.appendChild(gameModePanel);
     
-    // オーディオ設定パネル
-    const audioPanel = this.createAudioPanel();
-    settingsContainer.appendChild(audioPanel);
+        // オーディオ設定パネル
+        const audioPanel = this.createAudioPanel();
+        settingsContainer.appendChild(audioPanel);
     
+        // セーブとバックアップ
+        const savePanel = this.createSavePanel();
+        settingsContainer.appendChild(savePanel);
+        
     // レベル設定パネル（新規）
     const levelPanel = this.createLevelPanel();
     settingsContainer.appendChild(levelPanel);
@@ -582,7 +586,180 @@ const settingsScreenState = {
     console.log('敵の行動タイミング設定:', mode);
   },
 
+  /** セーブとバックアップ パネル */
+  createSavePanel() {
+    const panel = document.createElement('div');
+    panel.className = 'settings-panel';
 
+    const title = document.createElement('h3');
+    title.className = 'panel-title';
+    title.textContent = 'セーブとバックアップ';
+    panel.appendChild(title);
+
+    // ステータス行（最終保存・オートセーブ状態）
+    const status = document.createElement('div');
+    status.className = 'setting-group';
+    const lastSaved = document.createElement('div');
+    lastSaved.id = 'lastSavedLabel';
+    lastSaved.className = 'save-status';
+    lastSaved.textContent = '最終保存: 取得中…';
+    const autosaveStatus = document.createElement('div');
+    autosaveStatus.id = 'autosaveStatusLabel';
+    autosaveStatus.className = 'save-status';
+    autosaveStatus.textContent = 'オートセーブ: 取得中…';
+    status.appendChild(lastSaved);
+    status.appendChild(autosaveStatus);
+    panel.appendChild(status);
+
+    // ボタン群
+    const btnRow1 = document.createElement('div');
+    btnRow1.className = 'settings-button-row';
+
+    const btnSaveNow = document.createElement('button');
+    btnSaveNow.className = 'settings-button primary';
+    btnSaveNow.textContent = '今すぐ保存';
+    btnSaveNow.addEventListener('click', async () => {
+      publish('playSE', 'decide');
+      try { saveGameData(); this._showSaveToast('保存しました'); this._refreshSaveStatus(); } catch { alert('保存に失敗しました'); }
+    });
+
+    const btnExport = document.createElement('button');
+    btnExport.className = 'settings-button';
+    btnExport.textContent = 'バックアップ書き出し(.json)';
+    btnExport.addEventListener('click', async () => {
+      publish('playSE', 'decide');
+      try {
+        const mod = await import('../core/saveData.js');
+        const data = mod.loadSave();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const ts = new Date().toISOString().replace(/[:.]/g, '-');
+        a.download = `kanji-save-${ts}.json`;
+        document.body.appendChild(a); a.click(); a.remove();
+      } catch (e) {
+        alert('書き出しに失敗しました');
+      }
+    });
+
+    const btnImport = document.createElement('button');
+    btnImport.className = 'settings-button';
+    btnImport.textContent = 'バックアップから読み込み';
+    const file = document.createElement('input');
+    file.type = 'file'; file.accept = 'application/json'; file.style.display = 'none';
+    btnImport.addEventListener('click', () => { publish('playSE','decide'); file.click(); });
+    file.addEventListener('change', async (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      try {
+        const text = await f.text();
+        const data = JSON.parse(text);
+        const mod = await import('../core/saveData.js');
+        mod.saveNow(data);
+        loadGameData();
+        this._showSaveToast('バックアップを読み込みました');
+        this._refreshSaveStatus();
+      } catch (err) {
+        console.error(err);
+        alert('読み込みに失敗しました。ファイル形式を確認してください。');
+      } finally {
+        e.target.value = '';
+      }
+    });
+
+    btnRow1.appendChild(btnSaveNow);
+    btnRow1.appendChild(btnExport);
+    btnRow1.appendChild(btnImport);
+    panel.appendChild(btnRow1);
+
+    // オートセーブ設定
+    const autoGroup = document.createElement('div');
+    autoGroup.className = 'setting-group';
+
+    const autoLabel = document.createElement('div');
+    autoLabel.className = 'setting-label';
+    autoLabel.textContent = 'オートセーブ';
+
+    const autoRow = document.createElement('div');
+    autoRow.className = 'inline-controls';
+    const autoToggle = document.createElement('input');
+    autoToggle.type = 'checkbox';
+    const autoInterval = document.createElement('select');
+    [1,5,10,15].forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = String(m); opt.textContent = `${m}分`;
+      autoInterval.appendChild(opt);
+    });
+
+    // 初期値をロード
+    try {
+      const enabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
+      const minutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
+      autoToggle.checked = enabled;
+      autoInterval.value = String(Number.isFinite(minutes) ? minutes : 5);
+    } catch {}
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE','decide');
+      const enabled = !!autoToggle.checked;
+      const minutes = parseInt(autoInterval.value || '5', 10);
+      try {
+        publish('updateAutosaveSettings', { enabled, minutes });
+        this._showSaveToast('オートセーブ設定を更新しました');
+        this._refreshSaveStatus();
+      } catch {}
+    });
+
+    autoRow.appendChild(autoToggle);
+    autoRow.appendChild(autoInterval);
+    autoRow.appendChild(applyBtn);
+    autoGroup.appendChild(autoLabel);
+    autoGroup.appendChild(autoRow);
+    panel.appendChild(autoGroup);
+
+    // 最終保存などの表示を更新
+    this._refreshSaveStatus();
+
+    // 隠しfile inputをパネルに追加
+    panel.appendChild(file);
+
+    return panel;
+  },
+
+  _showSaveToast(message) {
+    const toast = document.createElement('div');
+    Object.assign(toast.style, {
+      position: 'fixed', right: '16px', bottom: '16px', zIndex: 100001,
+      background: 'rgba(0,0,0,0.85)', color: '#fff', padding: '10px 14px', borderRadius: '8px',
+      border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+    });
+    toast.textContent = message || '保存しました';
+    document.body.appendChild(toast);
+    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 1200);
+  },
+
+  _refreshSaveStatus() {
+    const last = document.getElementById('lastSavedLabel');
+    const auto = document.getElementById('autosaveStatusLabel');
+    // 最終保存
+    (async () => {
+      try {
+        const mod = await import('../core/saveData.js');
+        const s = mod.loadSave();
+        const t = s?.meta?.lastSavedAt ? new Date(s.meta.lastSavedAt) : null;
+        last && (last.textContent = `最終保存: ${t ? t.toLocaleString() : '不明'}`);
+      } catch { last && (last.textContent = '最終保存: 不明'); }
+    })();
+    // オートセーブ
+    try {
+      const enabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
+      const minutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
+      auto && (auto.textContent = `オートセーブ: ${enabled ? `${minutes}分ごと` : 'OFF'}`);
+    } catch { auto && (auto.textContent = 'オートセーブ: 不明'); }
+  },
 
   /** レベル設定グループを作成 */
   createLevelSettingGroup() {

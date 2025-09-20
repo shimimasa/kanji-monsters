@@ -203,13 +203,39 @@ function drawAchievementNotifications(ctx) {
   // DataSync 初期化（Firestore → localStorage のマージ監視開始）
   DataSync.initialize();
 
-  // 4) FSMは既に初期状態で'title'画面を設定済みのため、追加の画面遷移は不要
+   // 4) FSMは既に初期状態で'title'画面を設定済みのため、追加の画面遷移は不要
+
+  // オートセーブ開始
+  __setupAutosaveFromSettings();
 
   console.log('✅ Init done → Start loop');
   requestAnimationFrame(loop);
 })();
 
-
+// ── 追加: オートセーブ管理 ──
+let __autosaveTimer = null;
+function __setupAutosaveFromSettings() {
+  try {
+    const enabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
+    const minutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
+    if (__autosaveTimer) { clearInterval(__autosaveTimer); __autosaveTimer = null; }
+    if (enabled) {
+      const ms = Math.max(1, Math.min(60, Number.isFinite(minutes) ? minutes : 5)) * 60 * 1000;
+      __autosaveTimer = setInterval(() => {
+        try { saveGameData(); } catch (e) { console.warn('autosave failed:', e); }
+      }, ms);
+    }
+  } catch (e) {
+    console.warn('autosave setup error:', e);
+  }
+}
+subscribe('updateAutosaveSettings', ({ enabled, minutes }) => {
+  try {
+    if (typeof enabled === 'boolean') localStorage.setItem('autosaveEnabled', enabled ? '1' : '0');
+    if (Number.isFinite(minutes)) localStorage.setItem('autosaveMinutes', String(minutes));
+  } catch {}
+  __setupAutosaveFromSettings();
+});
 
 // ── 追加：音量設定／取得をEventBus経由に ──
 subscribe('setBGMVolume', v => audio.setBGMVolume(v));

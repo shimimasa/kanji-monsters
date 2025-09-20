@@ -458,7 +458,7 @@ const practiceBattleScreenState = {
         const stageKanji = getKanjiByStageId(gameState.currentStageId);
         this.unmasteredKanji = stageKanji.filter(kanji => {
           try {
-            return !isKanjiMastered(kanji.id);
+            return !this._isKanjiMastered(kanji.id); // ← 同期判定に統一
           } catch (error) {
             console.warn('⚠️ マスター判定エラー:', kanji.id, error);
             return true;
@@ -803,14 +803,14 @@ const practiceBattleScreenState = {
     this._updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
     const isNowMastered = this._isKanjiMastered(gameState.currentKanji.id);
 
-    // レビュースコア更新と永続化
-    if (this.reviewMode) {
-      let inc = 1;
-      if (this.practiceStats.correctStreak > 0 && this.practiceStats.correctStreak % 5 === 0) inc += 5;
-      this.reviewScore = Math.max(0, (this.reviewScore|0) - 3);
-            this.reviewScoreFlash = { active: true, timer: this.reviewScoreFlash.duration, duration: this.reviewScoreFlash.duration, color: '#e74c3c' };
-            this._persistReviewScore();
-    }
+        // レビュースコア更新と永続化（正解: +1／5連毎+5）
+        if (this.reviewMode) {
+          let inc = 1;
+          if (this.practiceStats.correctStreak > 0 && this.practiceStats.correctStreak % 5 === 0) inc += 5;
+          this.reviewScore = Math.min(999, Math.max(0, (this.reviewScore|0) + inc));
+          this.reviewScoreFlash = { active: true, timer: this.reviewScoreFlash.duration, duration: this.reviewScoreFlash.duration, color: '#2ecc71' };
+          this._persistReviewScore();
+        }
 
     if (!wasAlreadyMastered && isNowMastered) {
       this.unmasteredKanji = this.unmasteredKanji.filter(k => k.id !== gameState.currentKanji.id);
@@ -2048,7 +2048,8 @@ this._pickNextReviewQuestion();
    */
     _isKanjiMastered(kanjiId) {
       try {
-        return isKanjiMastered(kanjiId);
+        const prog = gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiId];
+        return !!(prog && prog.mastered);
       } catch {
         return false;
       }
