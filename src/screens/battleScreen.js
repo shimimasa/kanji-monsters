@@ -900,21 +900,20 @@ updateShieldBreakEffect() {
         this.stageBgImage = null;
       }
 
-      // ステージデータの取得
       gameState.enemies   = getEnemiesByStageId(gameState.currentStageId).map(src => {
-        // 破壊的変更の影響を避けるためクローン
-        const e = { ...src };
-        // 画像は後続でセット、ここでは基本ステータスを初期化
-        e.hp = e.maxHp;
-        if (e.isBoss) {
-          const baseShield = (typeof e.shieldHp === 'number') ? e.shieldHp : 3;
-          e.originalShieldHp = baseShield;
-          e.shieldHp = baseShield;
-        } else {
-          e.originalShieldHp = undefined;
-        }
-        return e;
+        const enemy = Object.assign({}, src);
+        enemy.currentHp = enemy.hp;
+        return enemy;
       });
+
+      // 幻置換の可視化（バトル開始時にログ表示）
+      try {
+        const info = gameState.__bonusPhantomInfo;
+        if (/^bonus_g/i.test(String(gameState.currentStageId || '')) && info && info.replaced > 0) {
+          battleState.log.push(`幻のゴトモンが ${info.replaced} 体出現！（進捗 ${Math.min(info.progress, 150)}/150）`);
+        }
+      } catch {}
+        
       gameState.kanjiPool = getKanjiByStageId(gameState.currentStageId);
       
       if (!gameState.kanjiPool.length) {
@@ -1020,34 +1019,59 @@ getMaxHealCountFromSettings() {
    * @param {string} stageId - ステージID
    * @returns {string} BGMのキー
    */
-     getBGMKeyForStage(stageId) {
-      // ボス戦の場合
-      if (stageId && stageId.includes('boss')) {
-        return 'boss';
+       /**
+   * ステージIDから適切なBGMキーを取得する
+   */
+  getBGMKeyForStage(stageId) {
+    const id = String(stageId || '');
+
+    // ボス
+    if (id.includes('boss')) return 'boss';
+
+    // 学年ボーナス: bonus_gN
+    const mg = /^bonus_g(\d+)$/i.exec(id);
+    if (mg) {
+      const g = parseInt(mg[1], 10);
+      const regionByGrade = {1:'hokkaido',2:'tohoku',3:'kanto',4:'chubu',5:'kinki',6:'chugoku',7:'asia',8:'europe',9:'america',10:'africa'};
+      return this._pickRegionBgm(regionByGrade[g] || null);
+    }
+
+    // 地域ボーナス: *_bonus を含む すべて
+    if (/_bonus/i.test(id)) {
+      const norm = id.toLowerCase();
+      const fix = { kantou:'kanto', chuubu:'chubu', chuugoku:'chugoku', cyuugoku:'chugoku' };
+      const tokens = ['hokkaido','tohoku','kanto','kantou','chubu','chuubu','kinki','chugoku','chuugoku','cyuugoku','asia','europe','america','africa'];
+      let region = null;
+      for (const t of tokens) {
+        if (norm.includes(t)) { region = fix[t] || t; break; }
       }
-      // 学年ボーナス（bonus_gN） → 学年に対応する地域BGMをランダム選択
-      const m = /^bonus_g(\d+)$/i.exec(stageId || '');
-      if (m) {
-        const g = parseInt(m[1], 10);
-        const regionByGrade = {1:'hokkaido',2:'tohoku',3:'kanto',4:'chubu',5:'kinki',6:'chugoku',7:'asia',8:'europe',9:'america',10:'africa'};
-        const region = regionByGrade[g] || null;
-        return this._pickRegionBgm(region);
+      // 先頭接頭辞でも推定（hokkaido_* など）
+      if (!region) {
+        const head = norm.split(/[_-]/)[0];
+        region = fix[head] || head;
       }
-      // 地域ボーナス（xxx_bonus） → 地域BGMをランダム選択（表記ゆれ補正あり）
-      const m2 = /^([a-z]+)_bonus$/i.exec(stageId || '');
-      if (m2) {
-        const fix = { kantou:'kanto', chuubu:'chubu', chuugoku:'chugoku', cyuugoku:'chugoku' };
-        const region = fix[m2[1].toLowerCase()] || m2[1].toLowerCase();
-        return this._pickRegionBgm(region);
-      }
-      // エリア付きステージは a / b をランダム
-      if (/_area\d+$/i.test(stageId)) {
-        const ab = Math.random() < 0.5 ? 'a' : 'b';
-        return `${stageId}_${ab}`;
-      }
-      // その他はステージIDをそのまま使用
-      return stageId;
-    },
+      return this._pickRegionBgm(region);
+    }
+
+    // 通常: _areaN は a/b からランダム
+    if (/_area\d+$/i.test(id)) {
+      const ab = Math.random() < 0.5 ? 'a' : 'b';
+      return `${id}_${ab}`;
+    }
+
+    // フォールバック: 既知接頭辞→地域BGM
+    {
+      const norm = id.toLowerCase();
+      const fix = { kantou:'kanto', chuubu:'chubu', chuugoku:'chugoku', cyuugoku:'chugoku' };
+      const head = norm.split(/[_-]/)[0];
+      const region = fix[head] || head;
+      const known = ['hokkaido','tohoku','kanto','chubu','kinki','chugoku','asia','europe','america','africa'];
+      if (known.includes(region)) return this._pickRegionBgm(region);
+    }
+
+    // 最後の手段
+    return 'battle';
+  },
   
     _pickRegionBgm(region) {
       const pool = {

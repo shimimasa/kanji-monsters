@@ -3,8 +3,7 @@ import { publish } from '../core/eventBus.js';
 import { gameState } from '../core/gameState.js';
 import { addMonster, loadDex } from '../models/monsterDex.js';
 
-import { getAllMonsterIds, getMonsterById } from '../loaders/dataLoader.js';
-
+import { getAllMonsterIds, getMonsterById, stageData } from '../loaders/dataLoader.js';
 const monsterCaptureScreen = {
   canvas: null,
   container: null,
@@ -38,35 +37,29 @@ const monsterCaptureScreen = {
       ? defeatedMonsters.map(m => m.id).filter(Boolean)
       : [];
 
-    if (!isBonus) {
-      // 通常: このステージのモンスターのみ
-      let stageIds = defeatedIds.length > 0
-        ? defeatedIds.slice()
-        : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
-      stageIds = Array.from(new Set(stageIds));
-      if (stageIds.length > 10) {
-        shuffle(stageIds);
-        stageIds = stageIds.slice(0, 10);
+      if (!isBonus) {
+        // 通常: このステージのモンスターのみ
+        let stageIds = defeatedIds.length > 0
+          ? defeatedIds.slice()
+          : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
+        stageIds = Array.from(new Set(stageIds));
+        if (stageIds.length > 10) {
+          shuffle(stageIds);
+          stageIds = stageIds.slice(0, 10);
+        }
+        this.candidates = stageIds;
+      } else {
+        // ボーナス: 同じくこのステージの5体のみ提示（捕獲数は常に1）
+        let stageIds = defeatedIds.length > 0
+          ? defeatedIds.slice()
+          : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
+        stageIds = Array.from(new Set(stageIds));
+        if (stageIds.length > 10) {
+          shuffle(stageIds);
+          stageIds = stageIds.slice(0, 10);
+        }
+        this.candidates = stageIds;
       }
-      this.candidates = stageIds;
-    } else {
-                  // ボーナス: 他ステージからランダム（未捕獲優先）、ただし捕獲数は常時1
-      const all = getAllMonsterIds().filter(id => {
-        const m = getMonsterById(id);
-        const idStr = String(id);
-        const isWorld = (m && m.grade >= 7) || idStr.startsWith('PRV-');
-        return m && !isWorld;
-      });
-      const unCaptured = all.filter(id => !this.dex.has(id)); // ← 修正: this.dex
-      shuffle(unCaptured);
-      const pool = unCaptured.slice(0, 10);
-      if (pool.length < 10) {
-        const filler = all.filter(id => !pool.includes(id));
-        shuffle(filler);
-        pool.push(...filler.slice(0, 10 - pool.length));
-      }
-      this.candidates = pool.slice(0, 10);
-    }
 
     this._createDOM();
 
@@ -114,7 +107,7 @@ const monsterCaptureScreen = {
     });
 
     const header = document.createElement('div');
-    header.textContent = `ヨミトモにしよう！：最大 ${this.captureLimit} 体選べます（全10候補）`;
+    header.textContent = `ヨミトモにしよう！：最大 ${this.captureLimit} 体選べます（全${this.candidates.length}候補）`;
     Object.assign(header.style, { fontSize: '20px', fontWeight: '700', marginBottom: '12px' });
 
     const grid = document.createElement('div');

@@ -240,25 +240,68 @@ export function getEnemiesByStageId(stageId) {
           return list.slice(0,5).map(e=>e.id);
         })();
 
-    // レビュー解放回数に応じて幻をランダム混入（置換1枠）
+    // 幻置換: ボーナス初クリア後のレビュー増分を集計 → 30ごとに1体、最大5体
+    let replacedCount = 0;
+    let eligibleSum = 0;
     try {
-      const clears = parseInt(localStorage.getItem(`bonus_g${g}_reviewClears`) || '0', 10);
-      const UNLOCK_THRESHOLD = 3; // 何回か→最少3回で解放
-      if (Number.isFinite(clears) && clears >= UNLOCK_THRESHOLD && baseIds.length > 0) {
+      if (gameState && gameState.practiceProgress && Array.isArray(stageData)) {
+        const stagesOfGrade = stageData.filter(s => s && s.grade === g);
+        for (const stg of stagesOfGrade) {
+          const sid = String(stg.stageId || '');
+          const entry = gameState.practiceProgress[sid] || {};
+          const cur = Math.max(0, Number(entry.reviewScore || 0));
+          const snap = Math.max(0, Number(entry.reviewScoreSnapshot || 0));
+          eligibleSum += Math.max(0, cur - snap);
+        }
+      }
+      const perPhantom = Math.max(1, parseInt(localStorage.getItem('phantomPerUnit') || '30', 10));
+      const maxSlots = 5;
+      let need = Math.min(maxSlots, Math.floor(eligibleSum / perPhantom));
+
+      if (need > 0 && baseIds.length > 0) {
         const phantoms = enemyData.filter(e =>
-          e && e.grade === g &&
-          ((typeof e.rarity === 'string' && e.rarity.includes('幻')) ||
-           (typeof e.category === 'string' && e.category.includes('幻')))
-        );
+          e && e.grade === g && (
+            (typeof e.rarity === 'string' && e.rarity.includes('幻')) ||
+            (typeof e.category === 'string' && e.category.includes('幻')) ||
+            String(e.id).includes('-F')
+          )
+        ).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+
         if (phantoms.length > 0) {
-          // 50%で混入（都度抽選）
-          if (Math.random() < 0.5) {
-            const p = phantoms[Math.floor(Math.random() * phantoms.length)];
-            const idx = Math.floor(Math.random() * baseIds.length);
-            baseIds[idx] = p.id;
+          // 置換対象インデックス（重複なし）
+          const idxs = [...Array(baseIds.length).keys()];
+          for (let i = idxs.length - 1; i > 0; i--) {
+            const j = (Math.random() * (i + 1)) | 0;
+            [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+          }
+          const pickedIdx = idxs.slice(0, Math.min(need, baseIds.length));
+
+          // 幻の候補から重複しないように選択
+          const pickedPhantoms = [];
+          const pool = [...phantoms];
+          for (let k = 0; k < pickedIdx.length && pool.length > 0; k++) {
+            const pi = (Math.random() * pool.length) | 0;
+            pickedPhantoms.push(pool.splice(pi, 1)[0]);
+          }
+
+          // 実置換
+          for (let t = 0; t < pickedIdx.length && t < pickedPhantoms.length; t++) {
+            baseIds[pickedIdx[t]] = pickedPhantoms[t].id;
+            replacedCount++;
           }
         }
       }
+    } catch {}
+
+    // バトル画面で表示するための情報を格納
+    try {
+      gameState.__bonusPhantomInfo = {
+        grade: g,
+        replaced: replacedCount,
+        progress: eligibleSum,
+        target: 150,
+        perUnit: 30
+      };
     } catch {}
 
     // 実体化
