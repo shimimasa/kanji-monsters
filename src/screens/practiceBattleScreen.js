@@ -122,18 +122,16 @@ const practiceBattleScreenState = {
             this._buildUnmasteredKanjiList();
 
                   // 進捗バー初期値
-      {
-        const stageKanji = getKanjiByStageId(gameState.currentStageId);
-        const total = Math.max(1, stageKanji.length);
-        const unlocked = !!(gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[gameState.currentStageId]);
-        this.progressState.current = this.progressState.target = unlocked ? 1 : (total - this.unmasteredKanji.length) / total;
-      }
-      // レビュー用スコアをロード
-      this._loadReviewScore();
-      // 最初の未マスター漢字を出題
-      this._pickNextUnmasteredKanji();
-      // 最初の未マスター漢字を出題
-      this._pickNextUnmasteredKanji();
+                  {
+                    const stageKanji = getKanjiByStageId(gameState.currentStageId);
+                    const total = Math.max(1, stageKanji.length);
+                    const unlocked = !!(gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[gameState.currentStageId]);
+                    this.progressState.current = this.progressState.target = unlocked ? 1 : (total - this.unmasteredKanji.length) / total;
+                  }
+                  // レビュー用スコアをロード
+                  this._loadReviewScore();
+                  // 最初の未マスター漢字を出題
+                  this._pickNextUnmasteredKanji();
       
       console.log('📚 マスターモードを開始しました');
       
@@ -422,6 +420,28 @@ const practiceBattleScreenState = {
         console.warn('⚠️ ビューポート調整の初期化に失敗:', e);
       }
     },
+
+
+      /**
+   * ステージ進捗バーの初期化（既マスター反映）
+   * gameState.kanjiReadProgress を単一ソースとして参照
+   */
+  _initProgressBar() {
+    try {
+      const stageKanji = getKanjiByStageId(gameState.currentStageId) || [];
+      const total = Math.max(1, stageKanji.length);
+      const unlocked = !!(gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[gameState.currentStageId]);
+      if (unlocked) {
+        this.progressState.current = this.progressState.target = 1;
+        return;
+      }
+      const masteredCount = stageKanji.reduce((acc, k) => acc + (isKanjiMastered(k.id) ? 1 : 0), 0);
+      const ratio = masteredCount / total;
+      this.progressState.current = this.progressState.target = ratio;
+    } catch (e) {
+      console.warn('進捗初期化エラー:', e);
+    }
+  },
 
     /**
    * 未マスターの漢字リストを構築
@@ -2023,15 +2043,16 @@ this._pickNextReviewQuestion();
   /**
    * 漢字がマスター済みかどうかを判定
    */
-  _isKanjiMastered(kanjiId) {
-    try {
-      const prog = gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiId];
-      return !!(prog && prog.mastered);
-    } catch (error) {
-      console.error('❌ マスター判定エラー:', error);
-      return false;
-    }
-  },
+    /**
+   * マスター判定（単一ソースへ委譲）
+   */
+    _isKanjiMastered(kanjiId) {
+      try {
+        return isKanjiMastered(kanjiId);
+      } catch {
+        return false;
+      }
+    },
 
   /**
    * パネル背景を描画
