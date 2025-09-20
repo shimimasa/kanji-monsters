@@ -46,10 +46,15 @@ const titleState = {
     }
     
     this.registerHandlers();
-
-    // 画面右上にセーブボタン
-    this._injectSaveButton();
+    // 非表示設定なら既存ボタンを確実に除去
+    try {
+      const showSave = localStorage.getItem('showSaveButton') === '1';
+      const old = document.getElementById('titleSaveButton');
+      if (!showSave && old) old.remove();
+      if (showSave) this._injectSaveButton();
+    } catch {}
   },
+
 
   /** 毎フレーム呼び出し（描画） */
   update(dt) {
@@ -390,6 +395,8 @@ const titleState = {
   /** 画面離脱時のクリーンアップ */
   exit() {
     this.unregisterHandlers();
+    const old = document.getElementById('titleSaveButton');
+    if (old) old.remove();
     this.canvas = null;
     this.ctx    = null;
   },

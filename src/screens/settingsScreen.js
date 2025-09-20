@@ -613,18 +613,25 @@ const settingsScreenState = {
 
     // ボタン群
     const btnRow1 = document.createElement('div');
-    btnRow1.className = 'settings-button-row';
+    btnRow1.className = 'settings-button-row compact'; // 小さめスタイル
 
     const btnSaveNow = document.createElement('button');
-    btnSaveNow.className = 'settings-button primary';
+    btnSaveNow.className = 'settings-button primary sm';
     btnSaveNow.textContent = '今すぐ保存';
     btnSaveNow.addEventListener('click', async () => {
       publish('playSE', 'decide');
-      try { saveGameData(); this._showSaveToast('保存しました'); this._refreshSaveStatus(); } catch { alert('保存に失敗しました'); }
+      try {
+        saveGameData();
+        await new Promise(r => setTimeout(r, 150)); // 保存反映待ち（軽量）
+        this._showSaveToast('保存しました');
+        this._refreshSaveStatus();
+      } catch {
+        this._showSaveToast('保存に失敗しました');
+      }
     });
 
     const btnExport = document.createElement('button');
-    btnExport.className = 'settings-button';
+    btnExport.className = 'settings-button sm';
     btnExport.textContent = 'バックアップ書き出し(.json)';
     btnExport.addEventListener('click', async () => {
       publish('playSE', 'decide');
@@ -643,7 +650,7 @@ const settingsScreenState = {
     });
 
     const btnImport = document.createElement('button');
-    btnImport.className = 'settings-button';
+    btnImport.className = 'settings-button sm';
     btnImport.textContent = 'バックアップから読み込み';
     const file = document.createElement('input');
     file.type = 'file'; file.accept = 'application/json'; file.style.display = 'none';
@@ -690,6 +697,16 @@ const settingsScreenState = {
       opt.value = String(m); opt.textContent = `${m}分`;
       autoInterval.appendChild(opt);
     });
+
+    const inlineStatus = document.createElement('span');
+inlineStatus.id = 'autosaveInline';
+inlineStatus.style.marginLeft = '8px';
+autoRow.appendChild(inlineStatus);
+
+ // apply後
+this._refreshSaveStatus();
+const enabledTxt = enabled ? `${minutes}分ごと` : 'OFF';
+inlineStatus.textContent = `（現在: ${enabledTxt}）`;
 
     // 初期値をロード
     try {
@@ -1134,22 +1151,10 @@ const settingsScreenState = {
     buttonSection.className = 'settings-button-section';
 
     // 手動セーブ
-    const manualSaveBtn = document.createElement('button');
-    manualSaveBtn.className = 'settings-button primary';
-    manualSaveBtn.textContent = '手動セーブ';
-    manualSaveBtn.addEventListener('click', () => {
-      publish('playSE', 'decide');
-      try { saveGameData(); alert('セーブしました。'); } catch (e) { alert('セーブに失敗しました。'); }
-    });
+    const manualSaveBtn = null;
 
     // セーブ読込
-    const manualLoadBtn = document.createElement('button');
-    manualLoadBtn.className = 'settings-button';
-    manualLoadBtn.textContent = 'セーブ読込';
-    manualLoadBtn.addEventListener('click', () => {
-      publish('playSE', 'decide');
-      try { loadGameData(); alert('セーブを読み込みました。'); } catch (e) { alert('読込に失敗しました。'); }
-    });
+    const manualLoadBtn = null;
 
     // セーブ初期化（軽量）
     const clearSaveBtn = document.createElement('button');
@@ -1201,8 +1206,12 @@ const settingsScreenState = {
     
 
     // 追加ボタンを先頭に配置
-    buttonSection.appendChild(manualSaveBtn);
-    buttonSection.appendChild(manualLoadBtn);
+    if (manualSaveBtn) {
+      buttonSection.appendChild(manualSaveBtn);
+    }
+    if (manualLoadBtn) {
+      buttonSection.appendChild(manualLoadBtn);
+    }
     buttonSection.appendChild(clearSaveBtn);
     buttonSection.appendChild(resetButtonContainer);
     buttonSection.appendChild(backButton);
