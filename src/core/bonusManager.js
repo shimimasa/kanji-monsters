@@ -6,9 +6,15 @@ const TITLE_THRESHOLDS = { conqueror: 3, guardian: 5, champion: 10 }; // 征服�
 const RANK_THRESHOLDS = { S: 85, A: 70 }; // S>=85, A>=70, B<70
 const RANK_MULTIPLIERS = { S: 1.5, A: 1.2, B: 1.0 };
 
-/** 学年内の通常ステージ 全クリ＋学年の全漢字マスターで解放 */
+
+function isNormalStage(stage) {
+  const id = String(stage?.stageId || '');
+  return !( /^bonus_/i.test(id) || /_bonus$/i.test(id) );
+}
+
+/** 学年内の通常ステージ 全クリ＋全通常ステージのレビュー解放で解放 */
 export function isBonusUnlocked(grade) {
-  const targets = stageData.filter(s => s.grade === grade && !/^bonus_/i.test(s.stageId));
+  const targets = stageData.filter(s => s.grade === grade && isNormalStage(s));
   if (targets.length === 0) return false;
 
   // 1) 全通常ステージクリア
@@ -19,13 +25,12 @@ export function isBonusUnlocked(grade) {
   });
   if (!allCleared) return false;
 
-  // 2) 全ステージのレビュー解放（＝各ステージの全漢字マスター）
+  // 2) 全通常ステージ「レビュー解放」（＝全漢字マスター）
   const reviewMap = gameState.stageReviewUnlocked || {};
   const allReviewed = targets.every(s => !!reviewMap[s.stageId]);
 
   return allReviewed;
 }
-
 
 /** 係数など定義 */
 function perBoss(grade) {
