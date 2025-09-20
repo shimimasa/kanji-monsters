@@ -238,6 +238,26 @@ const monsterCaptureScreen = {
     if (!stageId) return;
     const key = `stage_clear_${stageId}`;
     const current = parseInt(localStorage.getItem(key) || '0');
+    // 初クリア時にレビュー値のスナップショットを保存（同学年の全ステージ）
+    if (current <= 0 && /^bonus_g(\d+)$/i.test(String(stageId))) {
+      try {
+        const mg = /^bonus_g(\d+)$/i.exec(String(stageId));
+        const g = parseInt(mg[1], 10);
+        localStorage.setItem(`stage_first_clear_at_${stageId}`, String(Date.now()));
+        if (!gameState.practiceProgress) gameState.practiceProgress = {};
+        const targets = Array.isArray(stageData) ? stageData.filter(s => s && s.grade === g) : [];
+        for (const stg of targets) {
+          const sid = String(stg.stageId || '');
+          const entry = Object.assign({}, gameState.practiceProgress[sid] || {});
+          const cur = Number(entry.reviewScore || 0);
+          if (typeof entry.reviewScoreSnapshot !== 'number') {
+            entry.reviewScoreSnapshot = Math.max(0, cur);
+            gameState.practiceProgress[sid] = entry;
+          }
+        }
+        try { if (typeof saveGameData === 'function') saveGameData(); } catch {}
+      } catch {}
+    }
     localStorage.setItem(key, String(current + 1));
   },
 
