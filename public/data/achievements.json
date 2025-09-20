@@ -314,7 +314,14 @@
   { "id": "title_guardian_g9",   "title": "準2級 守護者","description": "学年ボーナスをA以上で5回クリア（準2級）", "condition": { "type": "manual", "value": 1 } },
   { "id": "title_champion_g9",   "title": "準2級 覇者",  "description": "学年ボーナスをA以上で10回クリア（準2級）","condition": { "type": "manual", "value": 1 } },
 
-  { "id": "title_conqueror_g10", "title": "2級 征服者",  "description": "学年ボーナスをA以上で3回クリア（2級）",  "condition": { "type": "manual", "value": 1 } },
-  { "id": "title_guardian_g10",  "title": "2級 守護者",  "description": "学年ボーナスをA以上で5回クリア（2級）",  "condition": { "type": "manual", "value": 1 } },
-  { "id": "title_champion_g10",  "title": "2級 覇者",    "description": "学年ボーナスをA以上で10回クリア（2級）", "condition": { "type": "manual", "value": 1 } }
-] 
+  { "id": "title_conqueror_g10",  "title": "2級 征服者",  "description": "学年ボーナスをA以上で3回クリア（2級）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g10",   "title": "2級 守護者",  "description": "学年ボーナスをA以上で5回クリア（2級）",  "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g10",   "title": "2級 覇者",    "description": "学年ボーナスをA以上で10回クリア（2級）", "condition": { "type": "manual", "value": 1 } },
+
+  { "id": "combo_20",           "title": "神業コンボ",     "description": "20回連続で正解した",            "condition": { "type": "comboReached",     "value": 20 } },
+  { "id": "playtime_30min",     "title": "ウォームアップ", "description": "累計30分プレイした",            "condition": { "type": "playtimeMinutes",  "value": 30 } },
+  { "id": "playtime_5hours",    "title": "継続王",         "description": "累計5時間プレイした",            "condition": { "type": "playtimeMinutes",  "value": 300 } },
+  { "id": "weakness_hit_200",   "title": "弱点の達人・極", "description": "敵の弱点を200回突いた",          "condition": { "type": "weaknessHits",     "value": 200 } },
+  { "id": "healing_master_300", "title": "回復の達人・極", "description": "回復を300回成功させた",          "condition": { "type": "healsSuccessful",  "value": 300 } },
+  { "id": "defeat_boss_50",     "title": "ボススレイヤー", "description": "ボスを50体倒した",              "condition": { "type": "bossesDefeated",   "value": 50 } }
+]

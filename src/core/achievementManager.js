@@ -49,6 +49,14 @@ function checkCondition(achievement, playerStats) {
       return playerStats.level >= value;
     case 'stagesCleared':
       return playerStats.stagesCleared >= value;
+    case 'stageCleared': {
+      const id = value;
+      const ls = typeof localStorage !== 'undefined' && localStorage.getItem(`clear_${id}`) === '1';
+      const gs = gameState.stageProgress?.[id]?.cleared;
+      return !!(ls || gs);
+    }
+    case 'comboReached':
+      return playerStats.comboCount >= value;
     case 'kanjiCollected':
       return loadKanjiDex().size >= value;
     case 'monstersCollected':
@@ -59,7 +67,7 @@ function checkCondition(achievement, playerStats) {
       return playerStats.skillPointsUsed >= value;
     case 'perfectStage':
       if (gameState.justClearedPerfectly) {
-        gameState.justClearedPerfectly = false; // 一度判定したらフラグをリセット
+        gameState.justClearedPerfectly = false;
         return true;
       }
       return false;
@@ -71,7 +79,6 @@ function checkCondition(achievement, playerStats) {
       return playerStats.weaknessHits >= value;
     case 'healsSuccessful':
       return playerStats.healsSuccessful >= value;
-    // 以下は複雑なロジック
     case 'regionCleared': {
       const regionStages = stageData.filter(s => s.region === value);
       if (regionStages.length === 0) return false;
@@ -193,6 +200,12 @@ export async function getAchievementProgress() {
     }))
   };
 }
+
+export async function getAchievementById(id) {
+  const achievements = await loadAchievements();
+  return achievements.find(a => a.id === id) || null;
+}
+
 
 // デバッグ用：全ての実績を強制解除
 export function unlockAllAchievements() {

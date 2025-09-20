@@ -311,7 +311,12 @@ function incrementStageClearCount(stageId) {
           maxHealCount: Number.isFinite(maxHealCount) ? Math.max(1, Math.min(5, maxHealCount)) : 3,
           enemyAttackMode
         });
-
+        
+        // 実績（v1）を保存
+        save.flags = Object.assign({}, save.flags || {}, {
+          achievementsUnlocked: Array.from(gameState.unlockedAchievements)
+        });
+        
         saveNow(save);
 
         // 旧フォーマットも当面残しておく（後方互換）
@@ -366,6 +371,10 @@ function incrementStageClearCount(stageId) {
           try { localStorage.setItem('lastPlayedStage', gameState.currentStageId); } catch {}
         }
 
+                // 実績（v1）読込
+                if (Array.isArray(save.flags?.achievementsUnlocked)) {
+                  gameState.unlockedAchievements = new Set(save.flags.achievementsUnlocked);
+                }
         // 音量等は AudioManager が localStorage から起動時読込するためここでは保存のみ（整合性確保）
         if (save.settings) {
           try {

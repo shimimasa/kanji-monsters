@@ -82,7 +82,7 @@ export function migrateSave(save) {
         Object.assign(wrapped.player.coreStats, save.playerStats);
       }
       if (save.unlockedAchievements && Array.isArray(save.unlockedAchievements)) {
-        // 実績は必要に応じて flags 側に寄せるなど拡張可能（今は保持しない）
+        wrapped.flags.achievementsUnlocked = save.unlockedAchievements.slice();
       }
       if (save.practiceProgress) wrapped.player.study.practiceProgress = save.practiceProgress || {};
       if (save.kanjiReadProgress) wrapped.player.study.kanjiReadProgress = save.kanjiReadProgress || {};
@@ -144,6 +144,9 @@ function migrateFromLegacyOrEmpty() {
       if (legacy?.playerStats) Object.assign(d.player.coreStats, legacy.playerStats);
       if (legacy?.practiceProgress) d.player.study.practiceProgress = legacy.practiceProgress || {};
       if (legacy?.kanjiReadProgress) d.player.study.kanjiReadProgress = legacy.kanjiReadProgress || {};
+      if (Array.isArray(legacy?.unlockedAchievements)) {
+        d.flags.achievementsUnlocked = legacy.unlockedAchievements.slice();
+      }
     }
   } catch {}
 

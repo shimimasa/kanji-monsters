@@ -1,6 +1,8 @@
 import { stageData } from '../loaders/dataLoader.js';
 import { gameState, unlockAchievement } from './gameState.js';
 import { getKanjiByGrade } from '../loaders/dataLoader.js';
+import { publish } from './eventBus.js';
+import { getAchievementById } from './achievementManager.js';
 
 const TITLE_THRESHOLDS = { conqueror: 3, guardian: 5, champion: 10 }; // 征服者/守護者/覇者
 const RANK_THRESHOLDS = { S: 85, A: 70 }; // S>=85, A>=70, B<70
@@ -74,21 +76,37 @@ function updateTitleProgress(grade, rank) {
     gained = true;
   }
 
+  function notifyTitleAchievement(id) {
+    getAchievementById(id).then(a => {
+      if (a) {
+        publish('achievementUnlocked', {
+          id,
+          title: a.title,
+          description: a.description,
+          achievement: a
+        });
+      }
+    }).catch(() => {});
+  }
+  
   const unlocked = [];
   // しきい値到達ごとに実績アンロック
   if (clearCount === TITLE_THRESHOLDS.conqueror) {
     const id = `title_conqueror_g${grade}`;
     unlockAchievement(id);
+    notifyTitleAchievement(id);
     unlocked.push(id);
   }
   if (clearCount === TITLE_THRESHOLDS.guardian) {
     const id = `title_guardian_g${grade}`;
     unlockAchievement(id);
+    notifyTitleAchievement(id);
     unlocked.push(id);
   }
   if (clearCount === TITLE_THRESHOLDS.champion) {
     const id = `title_champion_g${grade}`;
     unlockAchievement(id);
+    notifyTitleAchievement(id);
     unlocked.push(id);
   }
 
