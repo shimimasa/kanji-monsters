@@ -1181,16 +1181,17 @@ const settingsScreenState = {
     // セーブ読込
     const manualLoadBtn = null;
 
-    // セーブ初期化（軽量）
-    const clearSaveBtn = document.createElement('button');
-    clearSaveBtn.className = 'settings-button danger';
-    clearSaveBtn.textContent = 'セーブ初期化（軽）';
-    clearSaveBtn.addEventListener('click', () => {
-      publish('playSE', 'decide');
-      if (confirm('セーブデータを初期化しますか？（Firebaseは削除しません）')) {
-        try { clearSaveData(); alert('セーブを初期化しました。'); } catch {}
-      }
-    });
+        // セーブ初期化（軽） — 非表示で残す（開発者向け）
+        const clearSaveBtn = document.createElement('button');
+        clearSaveBtn.className = 'settings-button danger';
+        clearSaveBtn.textContent = 'セーブをなおす（こしょう時）';
+        clearSaveBtn.title = 'セーブ保存箱だけ作り直します。進み具合は基本的に残ります（復旧用）。';
+        clearSaveBtn.addEventListener('click', () => {
+          publish('playSE', 'decide');
+          if (confirm('セーブ保存箱を作り直します。通常は不要です。続行しますか？')) {
+            try { clearSaveData(); alert('セーブの保存箱を作り直しました。'); } catch {}
+          }
+        });
 
     // データリセットボタン（ツールチップ付き）
     const resetButtonContainer = document.createElement('div');
@@ -1228,20 +1229,37 @@ const settingsScreenState = {
       publish('changeScreen', 'title');
     });
 
+        // 追加ボタンを先頭に配置
+        if (manualSaveBtn) {
+          buttonSection.appendChild(manualSaveBtn);
+        }
+        if (manualLoadBtn) {
+          buttonSection.appendChild(manualLoadBtn);
+        }
     
-
-    // 追加ボタンを先頭に配置
-    if (manualSaveBtn) {
-      buttonSection.appendChild(manualSaveBtn);
-    }
-    if (manualLoadBtn) {
-      buttonSection.appendChild(manualLoadBtn);
-    }
-    buttonSection.appendChild(clearSaveBtn);
-    buttonSection.appendChild(resetButtonContainer);
-    buttonSection.appendChild(backButton);
-
-    return buttonSection;
+        // ▼ 可視化条件: 開発者のみ（localStorage/devフラグ or URLにdev=1/hash）
+        try {
+          const dev =
+            localStorage.getItem('devTools') === '1' ||
+            ((typeof location !== 'undefined') &&
+              ((location.search && location.search.includes('dev=1')) ||
+               (location.hash && location.hash.includes('dev'))));
+          if (dev) buttonSection.appendChild(clearSaveBtn);
+        } catch {}
+    
+        buttonSection.appendChild(resetButtonContainer);
+        buttonSection.appendChild(backButton);
+    
+        // 隠し操作: 設定ボタン領域で Alt+ダブルクリック → 一時的に表示
+        buttonSection.addEventListener('dblclick', (e) => {
+          if (e.altKey && !clearSaveBtn.parentNode) {
+            try { localStorage.setItem('devTools', '1'); } catch {}
+            buttonSection.insertBefore(clearSaveBtn, resetButtonContainer);
+            this._showSaveToast('開発者メニューを表示しました');
+          }
+        });
+    
+        return buttonSection;
   },
 
   /** ツールチップのイベントリスナーを設定 */
