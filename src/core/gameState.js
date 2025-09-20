@@ -73,6 +73,9 @@ export const gameState = {
     kanjiReadProgress: {
       // kanjiId: { onyomi: Set, kunyomi: Set, mastered: boolean }
     },
+
+    /* ★★★ バトルベストタイム管理 ★★★ */
+    stageBestTimes: {}, // { [stageId]: number(ms) }
 };
   
   export function updatePlayerStats(changes) {
@@ -289,7 +292,8 @@ function incrementStageClearCount(stageId) {
         save.player.coreStats = Object.assign({}, save.player.coreStats || {}, gameState.playerStats || {});
         save.player.progress = Object.assign({}, save.player.progress || {}, {
           currentStage: gameState.currentStageId || save.player?.progress?.currentStage || null,
-          clearedStages: Array.from(cleared)
+          clearedStages: Array.from(cleared),
+          stageBestTimes: Object.assign({}, save.player?.progress?.stageBestTimes, gameState.stageBestTimes || {})
         });
         save.player.collection = Object.assign({}, save.player.collection || {}, {
           gotomonIds
@@ -346,6 +350,9 @@ function incrementStageClearCount(stageId) {
         // 追加: レビュー解放のロード
         if (save.player?.study?.stageReviewUnlocked) {
           gameState.stageReviewUnlocked = save.player.study.stageReviewUnlocked || {};
+        }
+        if (save.player?.progress?.stageBestTimes) {
+          gameState.stageBestTimes = Object.assign({}, save.player.progress.stageBestTimes);
         }
 
         // ステージ進捗（軽量反映）

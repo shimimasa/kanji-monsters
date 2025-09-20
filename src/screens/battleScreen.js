@@ -1,4 +1,4 @@
-import { gameState, battleState, addPlayerExp, recordEnemyDefeated } from '../core/gameState.js';
+import { gameState, battleState, addPlayerExp, recordEnemyDefeated, saveGameData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect, drawStoneButton } from '../ui/uiRenderer.js';
 import { loadMonsterImage, loadBgImage, images, clearImageCache, drawStonePanel } from '../loaders/assetsLoader.js';
 import { getEnemiesByStageId, getKanjiByStageId, kanjiData } from '../loaders/dataLoader.js';
@@ -91,6 +91,11 @@ const battleScreenState = {
   timerId: null,
   _timeouts: [],
   _focusScrollTimers: [], // フォーカス時の再補正タイマー
+
+  // ストップウォッチ用
+  _timeStartMs: 0,
+  _timePauseAccMs: 0,
+  _timePauseStartMs: 0,
 
   // モバイルキーボード状態
   keyboardState: { open: false, bottomInset: 0 },
@@ -798,18 +803,12 @@ updateShieldBreakEffect() {
       this.expAnimQueue = [];
       this.levelUpMessage = '';
       
-      // チャレンジモードの場合、タイマーを開始
-      if (gameState.gameMode === 'challenge') {
-        battleState.timeRemaining = 60;
-        this.timerId = setInterval(() => {
-          battleState.timeRemaining--;
-          if (battleState.timeRemaining <= 0) {
-            clearInterval(this.timerId);
-            this.timerId = null;
-            publish('changeScreen', 'gameOver');
-          }
-        }, 1000);
-      }
+            // チャレンジモードの場合、タイマー開始（ストップウォッチ）
+            if (gameState.gameMode === 'challenge') {
+              this._timeStartMs = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+              this._timePauseAccMs = 0;
+              this._timePauseStartMs = 0;
+            }
 
       // ※※※ 重要な修正: キャンバス要素の取得 ※※※
       // 引数のcanvasElがnullまたはundefinedの場合は、DOMから取得する
@@ -1856,17 +1855,15 @@ if (this.logMode === 'blockPaged') {
       }
     }
 
-    // チャレンジモードの時のみ、残り時間を描画（縁取り付き）
+        // チャレンジモードの時のみ、経過タイムを描画
     if (gameState.gameMode === 'challenge') {
-      this.drawTextWithOutline(
-        `残り時間: ${battleState.timeRemaining}`,
-        this.canvas.width / 2,
-        30,
-        'yellow',
-        'black',
-        '24px "UDデジタル教科書体", sans-serif',
-        'center'
-      );
+      const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+      const elapsed = Math.max(0, Math.floor(now - (this._timeStartMs || now) - (this._timePauseAccMs || 0)));
+      const mm = String(Math.floor(elapsed / 60000)).padStart(2, '0');
+      const ss = String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0');
+      const cc = String(Math.floor((elapsed % 1000) / 10)).padStart(2, '0');
+      const text = `タイム: ${mm}:${ss}.${cc}`;
+      this.drawTextWithOutline(text, this.canvas.width / 2, 30, 'yellow', 'black', '24px "UDデジタル教科書体", sans-serif', 'center');
     }
 
     // ── 画面フラッシュ効果の更新と描画 ──
@@ -4388,10 +4385,7 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
       if (DEBUG) console.log(`📈 漢字ID:${gameState.currentKanji.id} の正解カウント: ${kanjiItem.correctCount}`);
     }
     
-    // チャレンジモードの場合、残り時間を加算
-    if (gameState.gameMode === 'challenge') {
-      battleState.timeRemaining += 5; // 正解ごとに5秒加算
-    }
+    // チャレンジモードの時間加算は廃止（ストップウォッチ化）
     
     // 1) 連続正解カウントアップ（既存のbattleState.comboCountは保持）
     battleState.comboCount++;
@@ -4700,12 +4694,24 @@ setManagedTimeout(() => {
                         });
                       }
                     
-                       // 最後の敵を倒した場合：ステージクリアを保留状態にする
-                      waitForDefeatAnimationThen(() => {
-                        const inputEl = battleScreenState.inputEl;
-                        if (inputEl) inputEl.value = '';
-                        battleScreenState.stageClearPending = true;
-                      });
+                                            // 最後の敵を倒した場合：ステージクリアを保留状態にする
+                                            waitForDefeatAnimationThen(() => {
+                                              const inputEl = battleScreenState.inputEl;
+                                              if (inputEl) inputEl.value = '';
+                                              // ベストタイム記録（ストップウォッチ）
+                                              try {
+                                                const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+                                                const ms = Math.max(0, Math.floor(now - (battleScreenState._timeStartMs || now) - (battleScreenState._timePauseAccMs || 0)));
+                                                const sid = gameState.currentStageId;
+                                                const prev = gameState.stageBestTimes?.[sid];
+                                                if (typeof prev !== 'number' || ms < prev) {
+                                                  gameState.stageBestTimes = gameState.stageBestTimes || {};
+                                                  gameState.stageBestTimes[sid] = ms;
+                                                  saveGameData();
+                                                }
+                                              } catch {}
+                                              battleScreenState.stageClearPending = true;
+                                            });
                      }
                      return;
     } else {
@@ -4963,10 +4969,7 @@ gameState.playerStats.healsSuccessful++;
     }
     // ▲▲▲ ここまで修正 ▲▲▲
 
-    // チャレンジモードの場合、残り時間を加算
-    if (gameState.gameMode === 'challenge') {
-      battleState.timeRemaining += 5; // 正解ごとに5秒加算
-    }
+        // チャレンジモードの時間加算は廃止（ストップウォッチ化）
   } else {
     // 不正解処理
     
