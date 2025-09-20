@@ -19,13 +19,11 @@ export function isBonusUnlocked(grade) {
   });
   if (!allCleared) return false;
 
-  // 2) 学年の全漢字マスター
-  const kanjiList = getKanjiByGrade(grade) || [];
-  const allMastered = kanjiList.every(k => {
-    const prog = gameState.kanjiReadProgress?.[k.id];
-    return !!(prog && prog.mastered);
-  });
-  return allMastered;
+  // 2) 全ステージのレビュー解放（＝各ステージの全漢字マスター）
+  const reviewMap = gameState.stageReviewUnlocked || {};
+  const allReviewed = targets.every(s => !!reviewMap[s.stageId]);
+
+  return allReviewed;
 }
 
 

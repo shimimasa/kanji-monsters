@@ -297,8 +297,9 @@ function incrementStageClearCount(stageId) {
         save.player.study = Object.assign({}, save.player.study || {}, {
           practiceProgress: gameState.practiceProgress || {},
           kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress || {}),
-          reviewQueue: reviewIds
-          // answers は別イベントで追記想定（今は触らない）
+          reviewQueue: reviewIds,
+          // 追加: ステージのレビュー解放状況を永続化
+          stageReviewUnlocked: gameState.stageReviewUnlocked || {}
         });
         save.settings = Object.assign({}, save.settings || {}, {
           bgmVolume: Number.isFinite(bgm) ? Math.max(0, Math.min(1, bgm)) : 0.7,
@@ -341,6 +342,10 @@ function incrementStageClearCount(stageId) {
         }
         if (save.player?.study?.kanjiReadProgress) {
           gameState.kanjiReadProgress = deserializeKanjiReadProgress(save.player.study.kanjiReadProgress || {});
+        }
+        // 追加: レビュー解放のロード
+        if (save.player?.study?.stageReviewUnlocked) {
+          gameState.stageReviewUnlocked = save.player.study.stageReviewUnlocked || {};
         }
 
         // ステージ進捗（軽量反映）
