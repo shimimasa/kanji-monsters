@@ -103,6 +103,14 @@
   font-weight: bold;
 } 
 
+/* セーブUIの一体感と分かりやすさ */
+.save-help{font-size:14px;opacity:.9;margin:6px 0 10px;}
+.settings-button.primary.big{font-size:20px;padding:14px 18px;width:100%;max-width:420px;margin:0 auto;}
+.settings-button.ghost{background:transparent;border:1px solid rgba(255,255,255,.25);}
+.settings-advanced{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px;margin-top:10px;}
+.settings-button-row.compact{gap:10px;justify-content:center;}
+.subnote{opacity:.85;font-size:12px;margin-bottom:6px;}
+
 /* 収集済みトグルを茶系UIに統一 */
 .kanji-dex-navigation .kanji-toggle-switch .slider {
   background: linear-gradient(145deg, #8B4513, #5a3210);

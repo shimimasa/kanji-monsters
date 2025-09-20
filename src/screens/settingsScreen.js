@@ -586,163 +586,190 @@ const settingsScreenState = {
     console.log('敵の行動タイミング設定:', mode);
   },
 
-  /** セーブとバックアップ パネル */
-  createSavePanel() {
-    const panel = document.createElement('div');
-    panel.className = 'settings-panel';
-
-    const title = document.createElement('h3');
-    title.className = 'panel-title';
-    title.textContent = 'セーブとバックアップ';
-    panel.appendChild(title);
-
-    // ステータス行（最終保存・オートセーブ状態）
-    const status = document.createElement('div');
-    status.className = 'setting-group';
-    const lastSaved = document.createElement('div');
-    lastSaved.id = 'lastSavedLabel';
-    lastSaved.className = 'save-status';
-    lastSaved.textContent = '最終保存: 取得中…';
-    const autosaveStatus = document.createElement('div');
-    autosaveStatus.id = 'autosaveStatusLabel';
-    autosaveStatus.className = 'save-status';
-    autosaveStatus.textContent = 'オートセーブ: 取得中…';
-    status.appendChild(lastSaved);
-    status.appendChild(autosaveStatus);
-    panel.appendChild(status);
-
-    // ボタン群
-    const btnRow1 = document.createElement('div');
-    btnRow1.className = 'settings-button-row compact'; // 小さめスタイル
-
-    const btnSaveNow = document.createElement('button');
-    btnSaveNow.className = 'settings-button primary sm';
-    btnSaveNow.textContent = '今すぐ保存';
-    btnSaveNow.addEventListener('click', async () => {
-      publish('playSE', 'decide');
+    /** セーブとバックアップ パネル */
+    createSavePanel() {
+      const panel = document.createElement('div');
+      panel.className = 'settings-panel';
+  
+      const title = document.createElement('h3');
+      title.className = 'panel-title';
+      title.textContent = 'セーブとバックアップ';
+      panel.appendChild(title);
+  
+      // ステータス行（最終保存・オートセーブ状態）
+      const status = document.createElement('div');
+      status.className = 'setting-group';
+      const lastSaved = document.createElement('div');
+      lastSaved.id = 'lastSavedLabel';
+      lastSaved.className = 'save-status';
+      lastSaved.textContent = '最終保存: 取得中…';
+      const autosaveStatus = document.createElement('div');
+      autosaveStatus.id = 'autosaveStatusLabel';
+      autosaveStatus.className = 'save-status';
+      autosaveStatus.textContent = 'オートセーブ: 取得中…';
+      status.appendChild(lastSaved);
+      status.appendChild(autosaveStatus);
+      panel.appendChild(status);
+  
+      // 子ども向けヘルプ
+      const help = document.createElement('div');
+      help.className = 'save-help';
+      help.textContent = '💡 「かんたんセーブ」をおすだけでOK！このゲームのつづきを守るよ。';
+      panel.appendChild(help);
+  
+      // かんたんセーブ（主ボタン）
+      const mainRow = document.createElement('div');
+      mainRow.className = 'settings-button-row compact';
+      const btnSaveNow = document.createElement('button');
+      btnSaveNow.className = 'settings-button primary big';
+      btnSaveNow.textContent = '💾 かんたんセーブ';
+      btnSaveNow.addEventListener('click', async () => {
+        publish('playSE', 'decide');
+        try {
+          saveGameData();
+          await new Promise(r => setTimeout(r, 150));
+          this._showSaveToast('保存しました');
+          this._refreshSaveStatus();
+        } catch {
+          this._showSaveToast('保存に失敗しました');
+        }
+      });
+      mainRow.appendChild(btnSaveNow);
+      panel.appendChild(mainRow);
+  
+      // くわしいメニュー（折りたたみ）
+      const advToggle = document.createElement('button');
+      advToggle.className = 'settings-button ghost sm';
+      advToggle.textContent = 'くわしいメニューをひらく';
+      panel.appendChild(advToggle);
+  
+      const advanced = document.createElement('div');
+      advanced.className = 'settings-advanced';
+      advanced.hidden = true;
+  
+      const advNote = document.createElement('div');
+      advNote.className = 'subnote';
+      advNote.textContent = 'おうちの人といっしょに使ってね。バックアップをつくったり、よみこんだりできます。';
+      advanced.appendChild(advNote);
+  
+      const btnRow1 = document.createElement('div');
+      btnRow1.className = 'settings-button-row compact';
+  
+      const btnExport = document.createElement('button');
+      btnExport.className = 'settings-button sm';
+      btnExport.textContent = '⬇️ バックアップをつくる (.json)';
+      btnExport.addEventListener('click', async () => {
+        publish('playSE', 'decide');
+        try {
+          const mod = await import('../core/saveData.js');
+          const data = mod.loadSave();
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          const ts = new Date().toISOString().replace(/[:.]/g, '-');
+          a.download = `kanji-save-${ts}.json`;
+          document.body.appendChild(a); a.click(); a.remove();
+        } catch (e) {
+          alert('書き出しに失敗しました');
+        }
+      });
+  
+      const btnImport = document.createElement('button');
+      btnImport.className = 'settings-button sm';
+      btnImport.textContent = '⬆️ バックアップをよみこむ';
+      const file = document.createElement('input');
+      file.type = 'file'; file.accept = 'application/json'; file.style.display = 'none';
+      btnImport.addEventListener('click', () => { publish('playSE','decide'); file.click(); });
+      file.addEventListener('change', async (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        try {
+          const text = await f.text();
+          const data = JSON.parse(text);
+          const mod = await import('../core/saveData.js');
+          mod.saveNow(data);
+          loadGameData();
+          this._showSaveToast('バックアップを読み込みました');
+          this._refreshSaveStatus();
+        } catch (err) {
+          console.error(err);
+          alert('読み込みに失敗しました。ファイル形式を確認してください。');
+        } finally {
+          e.target.value = '';
+        }
+      });
+  
+      btnRow1.appendChild(btnExport);
+      btnRow1.appendChild(btnImport);
+      advanced.appendChild(btnRow1);
+      panel.appendChild(advanced);
+  
+      advToggle.addEventListener('click', () => {
+        publish('playSE','decide');
+        advanced.hidden = !advanced.hidden;
+        advToggle.textContent = advanced.hidden ? 'くわしいメニューをひらく' : 'とじる';
+      });
+  
+      // オートセーブ設定（文言をやさしく）
+      const autoGroup = document.createElement('div');
+      autoGroup.className = 'setting-group';
+  
+      const autoLabel = document.createElement('div');
+      autoLabel.className = 'setting-label';
+      autoLabel.textContent = 'オートセーブ（じどう）';
+  
+      const autoRow = document.createElement('div');
+      autoRow.className = 'inline-controls';
+      const autoToggle = document.createElement('input');
+      autoToggle.type = 'checkbox';
+      const autoInterval = document.createElement('select');
+      [1,5,10,15].forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = String(m); opt.textContent = `${m}分`;
+        autoInterval.appendChild(opt);
+      });
+  
+      const inlineStatus = document.createElement('span');
+      inlineStatus.id = 'autosaveInline';
+      inlineStatus.style.marginLeft = '8px';
+      autoRow.appendChild(inlineStatus);
+  
       try {
-        saveGameData();
-        await new Promise(r => setTimeout(r, 150)); // 保存反映待ち（軽量）
-        this._showSaveToast('保存しました');
-        this._refreshSaveStatus();
-      } catch {
-        this._showSaveToast('保存に失敗しました');
-      }
-    });
-
-    const btnExport = document.createElement('button');
-    btnExport.className = 'settings-button sm';
-    btnExport.textContent = 'バックアップ書き出し(.json)';
-    btnExport.addEventListener('click', async () => {
-      publish('playSE', 'decide');
-      try {
-        const mod = await import('../core/saveData.js');
-        const data = mod.loadSave();
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        const ts = new Date().toISOString().replace(/[:.]/g, '-');
-        a.download = `kanji-save-${ts}.json`;
-        document.body.appendChild(a); a.click(); a.remove();
-      } catch (e) {
-        alert('書き出しに失敗しました');
-      }
-    });
-
-    const btnImport = document.createElement('button');
-    btnImport.className = 'settings-button sm';
-    btnImport.textContent = 'バックアップから読み込み';
-    const file = document.createElement('input');
-    file.type = 'file'; file.accept = 'application/json'; file.style.display = 'none';
-    btnImport.addEventListener('click', () => { publish('playSE','decide'); file.click(); });
-    file.addEventListener('change', async (e) => {
-      const f = e.target.files && e.target.files[0];
-      if (!f) return;
-      try {
-        const text = await f.text();
-        const data = JSON.parse(text);
-        const mod = await import('../core/saveData.js');
-        mod.saveNow(data);
-        loadGameData();
-        this._showSaveToast('バックアップを読み込みました');
-        this._refreshSaveStatus();
-      } catch (err) {
-        console.error(err);
-        alert('読み込みに失敗しました。ファイル形式を確認してください。');
-      } finally {
-        e.target.value = '';
-      }
-    });
-
-    btnRow1.appendChild(btnSaveNow);
-    btnRow1.appendChild(btnExport);
-    btnRow1.appendChild(btnImport);
-    panel.appendChild(btnRow1);
-
-    // オートセーブ設定
-    const autoGroup = document.createElement('div');
-    autoGroup.className = 'setting-group';
-
-    const autoLabel = document.createElement('div');
-    autoLabel.className = 'setting-label';
-    autoLabel.textContent = 'オートセーブ';
-
-    const autoRow = document.createElement('div');
-    autoRow.className = 'inline-controls';
-    const autoToggle = document.createElement('input');
-    autoToggle.type = 'checkbox';
-    const autoInterval = document.createElement('select');
-    [1,5,10,15].forEach(m => {
-      const opt = document.createElement('option');
-      opt.value = String(m); opt.textContent = `${m}分`;
-      autoInterval.appendChild(opt);
-    });
-
-    // 追加: インラインの現在状態表示
-    const inlineStatus = document.createElement('span');
-    inlineStatus.id = 'autosaveInline';
-    inlineStatus.style.marginLeft = '8px';
-    autoRow.appendChild(inlineStatus);
-
-    // 初期値をロードしてUI・表示に反映
-    try {
-      const enabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
-      const minutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
-      autoToggle.checked = enabled;
-      autoInterval.value = String(Number.isFinite(minutes) ? minutes : 5);
-      inlineStatus.textContent = `（現在: ${enabled ? `${minutes}分ごと` : 'OFF'}）`;
-    } catch {}
-
-    const applyBtn = document.createElement('button');
-    applyBtn.className = 'settings-button';
-    applyBtn.textContent = '適用';
-    applyBtn.addEventListener('click', () => {
-      publish('playSE','decide');
-      const enabledNow = !!autoToggle.checked;
-      const minutesNow = parseInt(autoInterval.value || '5', 10);
-      try {
-        publish('updateAutosaveSettings', { enabled: enabledNow, minutes: minutesNow });
-        this._showSaveToast('オートセーブ設定を更新しました');
-        this._refreshSaveStatus();
-        inlineStatus.textContent = `（現在: ${enabledNow ? `${minutesNow}分ごと` : 'OFF'}）`;
+        const enabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
+        const minutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
+        autoToggle.checked = enabled;
+        autoInterval.value = String(Number.isFinite(minutes) ? minutes : 5);
+        inlineStatus.textContent = `（いまは: ${enabled ? `${minutes}分ごと` : 'OFF'}）`;
       } catch {}
-    });
-
-    autoRow.appendChild(autoToggle);
-    autoRow.appendChild(autoInterval);
-    autoRow.appendChild(applyBtn);
-    autoGroup.appendChild(autoLabel);
-    autoGroup.appendChild(autoRow);
-    panel.appendChild(autoGroup);
-
-    // 最終保存などの表示を更新
-    this._refreshSaveStatus();
-
-    // 隠しfile inputをパネルに追加
-    panel.appendChild(file);
-
-    return panel;
-  },
+  
+      const applyBtn = document.createElement('button');
+      applyBtn.className = 'settings-button';
+      applyBtn.textContent = '適用';
+      applyBtn.addEventListener('click', () => {
+        publish('playSE','decide');
+        const enabledNow = !!autoToggle.checked;
+        const minutesNow = parseInt(autoInterval.value || '5', 10);
+        try {
+          publish('updateAutosaveSettings', { enabled: enabledNow, minutes: minutesNow });
+          this._showSaveToast('オートセーブ設定を更新しました');
+          this._refreshSaveStatus();
+          inlineStatus.textContent = `（いまは: ${enabledNow ? `${minutesNow}分ごと` : 'OFF'}）`;
+        } catch {}
+      });
+  
+      autoRow.appendChild(autoToggle);
+      autoRow.appendChild(autoInterval);
+      autoRow.appendChild(applyBtn);
+      autoGroup.appendChild(autoLabel);
+      autoGroup.appendChild(autoRow);
+      panel.appendChild(autoGroup);
+  
+      // 表示更新とfile input追加
+      this._refreshSaveStatus();
+      panel.appendChild(file);
+  
+      return panel;
+    },
 
   _showSaveToast(message) {
     const toast = document.createElement('div');
