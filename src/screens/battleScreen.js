@@ -1,7 +1,7 @@
 import { gameState, battleState, addPlayerExp, recordEnemyDefeated, saveGameData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect, drawStoneButton } from '../ui/uiRenderer.js';
 import { loadMonsterImage, loadBgImage, images, clearImageCache, drawStonePanel } from '../loaders/assetsLoader.js';
-import { getEnemiesByStageId, getKanjiByStageId, kanjiData } from '../loaders/dataLoader.js';
+import { getEnemiesByStageId, getKanjiByStageId, kanjiData, stageData } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
 import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
@@ -902,8 +902,55 @@ updateShieldBreakEffect() {
 
       gameState.enemies   = getEnemiesByStageId(gameState.currentStageId).map(src => {
         const enemy = Object.assign({}, src);
-        enemy.currentHp = enemy.hp;
         return enemy;
+      });
+
+      // ステージ順インデックスとプレイヤーLv
+      const getStageOrderIndex = (stageId) => {
+        try {
+          const normals = stageData.filter(s => {
+            const id = String(s?.stageId || '');
+            return !( /^bonus_/i.test(id) || /_bonus$/i.test(id) );
+          });
+          const idx = normals.findIndex(s => s.stageId === stageId);
+          return Math.max(0, idx);
+        } catch { return 0; }
+      };
+      const stageIdx = getStageOrderIndex(gameState.currentStageId);
+      const pl = gameState.playerStats?.level || 1;
+
+      // 敵パラメータ算出（プレイヤー比例＋ステージ係数）
+      const computeEnemyParams = ({ isBoss, stageIdx, playerLevel }) => {
+        const hp = Math.max(15, Math.round(
+          isBoss
+            ? (60 + 2.2 * stageIdx + 1.6 * playerLevel)
+            : (30 + 1.6 * stageIdx + 1.1 * playerLevel)
+        ));
+        const atk = Math.max(1, Math.round(
+          isBoss
+            ? (5 + 0.08 * stageIdx + 0.20 * playerLevel)
+            : (4 + 0.06 * stageIdx + 0.12 * playerLevel)
+        ));
+        // 表示用の敵レベル（使用箇所に合わせて拡張可）
+        const level = Math.max(1, Math.round(0.7 * playerLevel + 0.3 * (1 + stageIdx / 10)));
+
+        // 動的EXP（通常のみ使用。ボーナスは別ロジックで0）
+        const expBase = isBoss
+          ? (35 + 0.6 * stageIdx + 1.2 * playerLevel)
+          : (25 + 0.4 * stageIdx + 0.8 * playerLevel);
+        const exp = Math.max(5, Math.round(expBase));
+        return { hp, atk, level, exp };
+      };
+
+      // 敵の強さをスケール（全ステージ対象、ボスはやや高め）
+      gameState.enemies = gameState.enemies.map((e, idx, arr) => {
+        const willBeBoss = !!e.isBoss || idx === arr.length - 1;
+        const { hp, atk, level, exp } = computeEnemyParams({ isBoss: willBeBoss, stageIdx, playerLevel: pl });
+        e.maxHp = hp; e.hp = hp;
+        e.atk = atk;
+        e.level = level;
+        e.exp = exp; // defeat時に使用（ボーナス中は別途0に）
+        return e;
       });
 
       // 幻置換の可視化（バトル開始時にログ表示）
@@ -5466,22 +5513,15 @@ function drawExpBar(ctx, x, y, width, height, currentExp, maxExp) {
  * @param {number} level 計算したいレベル（1以上の整数）
  * @returns {number} そのレベルに到達するための必要経験値
  */
+/**
+ * 指定されたレベルの「次レベルまでの必要EXP」を計算する（新テーブル）
+ */
 function calculateExpForLevel(level) {
-  // 入力値の検証
-  if (!Number.isInteger(level) || level < 1) {
-    return 100; // エラー時のフォールバック
-  }
-  
-  // ベースケース: レベル1の必要経験値は100
-  if (level === 1) {
-    return 100;
-  }
-  
-  // 再帰ケース: レベルLからL+1になるための必要経験値
-  // Math.floor(（レベルL-1の必要経験値） * 1.2) + 20
-  const previousLevelExp = calculateExpForLevel(level - 1);
-  return Math.floor(previousLevelExp * 1.2) + 20;
+  if (!Number.isInteger(level) || level < 1) return 250;
+  const k = level - 1;
+  return Math.max(50, Math.round(250 + 34 * k + 1.7 * k * k));
 }
+
 
 function updatePlayerExp(expGained) {
   // 既存の経験値加算処理
@@ -5524,9 +5564,10 @@ function onAttackHandler() {
 
 
 function getLevelStartExp(level) {
-  // レベル開始時点の累積EXPを返す（Lv1は0）
   if (!Number.isInteger(level) || level <= 1) return 0;
-  return calculateExpForLevel(level - 1);
+  let sum = 0;
+  for (let l = 1; l < level; l++) sum += calculateExpForLevel(l);
+  return sum;
 }
 
 

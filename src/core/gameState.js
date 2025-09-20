@@ -35,7 +35,7 @@ export const gameState = {
       level: 1, exp: 0,
       attack: 10,
       healCount: 3,
-      nextLevelExp: 100,
+      nextLevelExp: 250,
       skillPoints: 0,  // スキルポイントを追加
       enemiesDefeated: 0,  // 倒した敵の数
       stagesCleared: 0,    // クリアしたステージ数
@@ -168,45 +168,43 @@ export const gameState = {
    */
   function checkLevelUp() {
     const stats = gameState.playerStats;
-    
+
+    // 次レベル必要EXP（新テーブル）
+    function nextExpFor(level) {
+      const L = Math.max(1, parseInt(level, 10));
+      const k = L - 1;
+      return Math.max(50, Math.round(250 + 34 * k + 1.7 * k * k));
+    }
+
     if (stats.exp >= stats.nextLevelExp) {
-      // レベルアップ前の情報を保存
       const oldLevel = stats.level;
-      
+
       // 経験値とレベルの更新
       stats.exp -= stats.nextLevelExp;
       stats.level++;
-      
-      // スキルポイントを1増加
+
+      // スキルポイント・ステ上昇
       stats.skillPoints += 1;
-      
-      // レベルアップ時のステータス上昇
-      stats.maxHp += 10; // 仕様書通り
-      stats.hp = stats.maxHp; // 全回復（必須）
-      stats.attack += 2; // 仕様書通り
-      
-      // 次のレベルに必要な経験値を設定 (指数関数的)
-      stats.nextLevelExp = Math.floor(stats.nextLevelExp * 1.2) + 20; // 緩やかな指数+固定値で調整
-      
-      // 他のボーナス（例：回復回数リセットなど）
+      stats.maxHp += 10;
+      stats.hp = stats.maxHp;
+      stats.attack += 2;
+
+      // 次のレベルに必要な経験値（新テーブル）
+      stats.nextLevelExp = nextExpFor(stats.level);
+
+      // 回復回数リセット
       stats.healCount = 3;
-  
-      // レベルアップしたことを通知するイベントを発行しても良い
-      // publish('playerLeveledUp', stats.level);
-      
-      // レベルアップ情報を返す
+
       return {
         leveledUp: true,
         oldLevel: oldLevel,
         newLevel: stats.level
       };
     }
-    
-    // レベルアップしなかった場合
-    return {
-      leveledUp: false
-    };
+
+    return { leveledUp: false };
   }
+  
 
   // Helper: serialize/deserialize kanjiReadProgress
 function serializeKanjiReadProgress(progress) {
