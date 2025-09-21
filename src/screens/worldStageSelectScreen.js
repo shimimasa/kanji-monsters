@@ -560,6 +560,21 @@ const worldStageSelectScreen = {
       fontSize,
       stage,
     }));
+
+    // 追加: 世界ステージにもボーナスステージを表示
+    const bonusId = `bonus_g${this.selectedGrade}`;
+    const levelText = (String(this.selectedTabLevel) === '準2') ? '準2級' : `${this.selectedTabLevel}級`;
+    const bonusLabel = `${levelText}ボーナス`;
+    this.stageButtons.push({
+      id: bonusId,
+      text: bonusLabel,
+      x: buttonX,
+      y: listStartY + this.stageButtons.length * (buttonHeight + buttonMargin),
+      width: buttonWidth,
+      height: buttonHeight,
+      fontSize,
+      stage: { stageId: bonusId, name: bonusLabel, grade: this.selectedGrade }
+    });
   },
 
   /** ステージのクリア状況を確認 */
@@ -1187,6 +1202,12 @@ const worldStageSelectScreen = {
         } else {
           const g = this.selectedGrade || 7; // 既定は4級相当
           const bonusId = `bonus_g${g}`;
+          // 解放判定を追加
+          if (!isBonusUnlocked(g)) {
+            publish('playSE', 'wrong');
+            alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
+            return;
+          }
           gameState.currentStageId = bonusId;
           resetStageProgress(bonusId);
           publish('changeScreen', 'stageLoading');
@@ -1215,17 +1236,32 @@ const worldStageSelectScreen = {
 
     // ステージボタンのクリック判定（総復習モードでは無効）
     if (!isReview) {
-      for (const button of this.stageButtons) {
-        if (isMouseOverRect(x, y, button)) {
-          publish('playSE', 'decide');
-          if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
-            gameState.currentStageId = button.id;
-            resetStageProgress(button.id);
-            publish('changeScreen', 'stageLoading');
-          } else {
-            this.selectedStage = button.stage;
+      for (const stage of this.stages) {
+        if (stage.pos) {
+          const { x: markerX, y: markerY } = stage.pos;
+          if (x >= markerX - MARKER_SIZE/2 && x <= markerX + MARKER_SIZE/2 &&
+              y >= markerY - MARKER_SIZE/2 && y <= markerY + MARKER_SIZE/2) {
+            publish('playSE', 'decide');
+            if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
+              const targetId = stage.stageId;
+              // 学年ボーナスの解放判定
+              const m = /^bonus_g(\d+)$/i.exec(targetId);
+              if (m) {
+                const g = parseInt(m[1], 10);
+                if (!isBonusUnlocked(g)) {
+                  publish('playSE', 'wrong');
+                  alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
+                  return;
+                }
+              }
+              gameState.currentStageId = targetId;
+              resetStageProgress(targetId);
+              publish('changeScreen', 'stageLoading');
+            } else {
+              this.selectedStage = stage;
+            }
+            return;
           }
-          return;
         }
       }
     }
