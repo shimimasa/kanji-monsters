@@ -138,7 +138,8 @@ const practiceBattleScreenState = {
     } catch (error) {
       console.error('❌ 練習バトル画面の初期化に失敗:', error);
       setTimeout(() => {
-        publish('changeScreen', 'stageSelect');
+        const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+        publish('changeScreen', target);
       }, 100);
     }
   },

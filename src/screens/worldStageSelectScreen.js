@@ -1205,31 +1205,33 @@ const worldStageSelectScreen = {
     const x = coords.x;
     const y = coords.y;
 
-    // 総復習モードのクリック（大ボタン）
-    const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
-    if (isReview) {
-      const btn = this.reviewChallengeButton;
-      if (isMouseOverRect(x, y, btn)) {
-        publish('playSE', 'decide');
-        if (ReviewQueue.size() > 0) {
-          publish('changeScreen', 'reviewStage');
-        } else {
-          const g = this.selectedGrade || 7; // 既定は4級相当
-          const bonusId = `bonus_g${g}`;
-          // 解放判定を追加
-          if (!isBonusUnlocked(g)) {
-            publish('playSE', 'wrong');
-            alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
-            return;
-          }
-          gameState.currentStageId = bonusId;
-          resetStageProgress(bonusId);
-          publish('changeScreen', 'stageLoading');
-        }
-        return;
-      }
-      // タブ／フッターはこの後も処理する。ステージボタン／マーカーは後段で無効化する。
-    }
+       // 総復習モードのクリック（大ボタン）
+       const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
+       if (isReview) {
+         const btn = this.reviewChallengeButton;
+         if (isMouseOverRect(x, y, btn)) {
+           publish('playSE', 'decide');
+           if (ReviewQueue.size() > 0) {
+             publish('changeScreen', 'reviewStage');
+           } else {
+             const g = this.selectedGrade || 7; // 既定は4級相当
+             const bonusId = `bonus_g${g}`;
+             // 解放判定を追加
+             if (!isBonusUnlocked(g)) {
+               publish('playSE', 'wrong');
+               alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
+               return;
+             }
+             // 戻り先を世界編に固定
+             gameState.previousScreen = 'worldStageSelect';
+             gameState.currentStageId = bonusId;
+             resetStageProgress(bonusId);
+             publish('changeScreen', 'stageLoading');
+           }
+           return;
+         }
+         // タブ／フッターはこの後も処理する。ステージボタン／マーカーは後段で無効化する。
+       }
 
     // タブクリック判定
     const tabCount = tabs.length;
@@ -1248,33 +1250,35 @@ const worldStageSelectScreen = {
       }
     }
 
-        // ステージボタンのクリック判定（総復習モードでは無効）
-        if (!isReview) {
-          for (const button of this.stageButtons) {
-            if (isMouseOverRect(x, y, button)) {
-              publish('playSE', 'decide');
-              if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
-                const targetId = button.id;
-                // 学年ボーナスの解放判定
-                const m = /^bonus_g(\d+)$/i.exec(targetId);
-                if (m) {
-                  const g = parseInt(m[1], 10);
-                  if (!isBonusUnlocked(g)) {
-                    publish('playSE', 'wrong');
-                    alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
-                    return;
-                  }
-                }
-                gameState.currentStageId = targetId;
-                resetStageProgress(targetId);
-                publish('changeScreen', 'stageLoading');
-              } else {
-                this.selectedStage = button.stage;
+            // ステージボタンのクリック判定（総復習モードでは無効）
+    if (!isReview) {
+      for (const button of this.stageButtons) {
+        if (isMouseOverRect(x, y, button)) {
+          publish('playSE', 'decide');
+          if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
+            const targetId = button.id;
+            // 学年ボーナスの解放判定
+            const m = /^bonus_g(\d+)$/i.exec(targetId);
+            if (m) {
+              const g = parseInt(m[1], 10);
+              if (!isBonusUnlocked(g)) {
+                publish('playSE', 'wrong');
+                alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
+                return;
               }
-              return;
             }
+            // 戻り先を世界編に固定
+            gameState.previousScreen = 'worldStageSelect';
+            gameState.currentStageId = targetId;
+            resetStageProgress(targetId);
+            publish('changeScreen', 'stageLoading');
+          } else {
+            this.selectedStage = button.stage;
           }
+          return;
         }
+      }
+    }
 
     // 戻るボタンのクリック処理
     if (isMouseOverRect(x, y, backButton)) {
@@ -1286,6 +1290,8 @@ const worldStageSelectScreen = {
     // ★★★ 練習ボタンのクリック処理を追加 ★★★
     if (isMouseOverRect(x, y, practiceButton)) {
       publish('playSE', 'decide');
+      // 練習バトルの戻り先も世界編に
+      gameState.previousScreen = 'worldStageSelect';
       this._startPracticeMode();
       return;
     }

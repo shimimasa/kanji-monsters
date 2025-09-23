@@ -965,7 +965,8 @@ updateShieldBreakEffect() {
       
       if (!gameState.kanjiPool.length) {
         alert('このステージに紐づく漢字データがありません。\nステージ選択へ戻ります。');
-        publish('changeScreen', 'stageSelect');
+        const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+        publish('changeScreen', target);
         return;
       }
       
@@ -1038,7 +1039,8 @@ updateShieldBreakEffect() {
       // エラーハンドリング
       console.error("❌ battleScreen.enter() でエラー発生:", error);
       alert(`ゲーム画面の初期化に失敗しました: ${error.message}\nステージ選択に戻ります。`);
-      publish('changeScreen', 'stageSelect');
+      const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+      publish('changeScreen', target);
     }
   },
 // 2. 設定から回復回数上限を取得する新しいメソッド
