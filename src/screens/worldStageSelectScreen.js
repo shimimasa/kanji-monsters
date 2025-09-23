@@ -1248,58 +1248,33 @@ const worldStageSelectScreen = {
       }
     }
 
-    // ステージボタンのクリック判定（総復習モードでは無効）
-    if (!isReview) {
-      for (const stage of this.stages) {
-        if (stage.pos) {
-          const { x: markerX, y: markerY } = stage.pos;
-          if (x >= markerX - MARKER_SIZE/2 && x <= markerX + MARKER_SIZE/2 &&
-              y >= markerY - MARKER_SIZE/2 && y <= markerY + MARKER_SIZE/2) {
-            publish('playSE', 'decide');
-            if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
-              const targetId = stage.stageId;
-              // 学年ボーナスの解放判定
-              const m = /^bonus_g(\d+)$/i.exec(targetId);
-              if (m) {
-                const g = parseInt(m[1], 10);
-                if (!isBonusUnlocked(g)) {
-                  publish('playSE', 'wrong');
-                  alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
-                  return;
+        // ステージボタンのクリック判定（総復習モードでは無効）
+        if (!isReview) {
+          for (const button of this.stageButtons) {
+            if (isMouseOverRect(x, y, button)) {
+              publish('playSE', 'decide');
+              if (this.selectedStage && this.selectedStage.stageId === button.stage.stageId) {
+                const targetId = button.id;
+                // 学年ボーナスの解放判定
+                const m = /^bonus_g(\d+)$/i.exec(targetId);
+                if (m) {
+                  const g = parseInt(m[1], 10);
+                  if (!isBonusUnlocked(g)) {
+                    publish('playSE', 'wrong');
+                    alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
+                    return;
+                  }
                 }
+                gameState.currentStageId = targetId;
+                resetStageProgress(targetId);
+                publish('changeScreen', 'stageLoading');
+              } else {
+                this.selectedStage = button.stage;
               }
-              gameState.currentStageId = targetId;
-              resetStageProgress(targetId);
-              publish('changeScreen', 'stageLoading');
-            } else {
-              this.selectedStage = stage;
+              return;
             }
-            return;
           }
         }
-      }
-    }
-
-    // マップマーカーのクリック判定（総復習モードでは無効）
-    if (!isReview) {
-      for (const stage of this.stages) {
-        if (stage.pos) {
-          const { x: markerX, y: markerY } = stage.pos;
-          if (x >= markerX - MARKER_SIZE/2 && x <= markerX + MARKER_SIZE/2 &&
-              y >= markerY - MARKER_SIZE/2 && y <= markerY + MARKER_SIZE/2) {
-            publish('playSE', 'decide');
-            if (this.selectedStage && this.selectedStage.stageId === stage.stageId) {
-              gameState.currentStageId = stage.stageId;
-              resetStageProgress(stage.stageId);
-              publish('changeScreen', 'stageLoading');
-            } else {
-              this.selectedStage = stage;
-            }
-            return;
-          }
-        }
-      }
-    }
 
     // 戻るボタンのクリック処理
     if (isMouseOverRect(x, y, backButton)) {
