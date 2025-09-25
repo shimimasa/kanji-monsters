@@ -26,13 +26,15 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
 /** 学年に応じたアイコンを返す */
 function getGradeIcon(grade) {
   const icons = {
-    1: '🌱', // 芽
-    2: '🌿', // 葉
-    3: '🌸', // 桜
-    4: '🏔️', // 山
-    5: '🏛️', // 神殿
-    6: '🗾', // 日本地図
-    0: '🔄'  // 復習
+    1: '🌱',
+    2: '🌿',
+    3: '🌸',
+    4: '🏔️',
+    5: '🏛️',
+    6: '🗾',
+    11: '🏝️', // 四国
+    12: '🌋',  // 九州
+    0: '🔄'
   };
   return icons[grade] || '📚';
 }
@@ -46,6 +48,8 @@ function getGradeRegion(grade) {
     4: '中部',
     5: '近畿',
     6: '中国',
+    11: '四国',
+    12: '九州',
     0: ''
   };
   return regions[grade] || '';
@@ -280,6 +284,8 @@ const tabs = [
   { label: '4年',   grade: 4 },
   { label: '5年',   grade: 5 },
   { label: '6年',   grade: 6 },
+  { label: '小学生まとめ', grade: 11 },
+  { label: '全漢字まとめ', grade: 12 },
   { label: '総復習', grade: 0 },
 ];
 
@@ -330,7 +336,7 @@ const stageSelectScreenState = {
 
     // 未設定時は総復習(0)に
     if (gameState.currentGrade == null) {
-      gameState.currentGrade = 0;
+      gameState.currentGrade = 1;
     }
 
     // ステージデータ初期化（現在の学年に応じたフィルタリング）
@@ -850,6 +856,8 @@ update(dt) {
         case 4: return '中部地方';
         case 5: return '近畿地方';
         case 6: return '中国地方';
+        case 11: return '四国地方';
+        case 12: return '九州地方';
         default: return '';
       }
     };
