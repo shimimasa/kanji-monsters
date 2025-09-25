@@ -286,7 +286,6 @@ const tabs = [
   { label: '6年',   grade: 6 },
   { label: '小学生', grade: 11 },
   { label: '全漢字', grade: 12 },
-  { label: '総復習', grade: 0 },
 ];
 
 // 選択中のステージを追跡するプロパティを追加（89行目付近）
@@ -861,10 +860,13 @@ update(dt) {
         default: return '';
       }
     };
-
+    
     const regionName = getRegionByGrade(gameState.currentGrade);
-    const gradeText = `${gameState.currentGrade}年`;
-    const headerText = `${regionName}（${gradeText}）`;
+    let headerText = regionName;
+    if (gameState.currentGrade >= 1 && gameState.currentGrade <= 6) {
+      const gradeText = `${gameState.currentGrade}年`;
+      headerText = `${regionName}（${gradeText}）`;
+    }
 
     // 見出しの背景とテキストを描画
     ctx.fillStyle = 'white';

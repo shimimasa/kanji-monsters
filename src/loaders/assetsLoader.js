@@ -53,10 +53,10 @@ const UI_IMAGE_PATHS = {
 
   
   // 世界ステージ選択用の画像を追加
-  stageSelect12: '/assets/images/stage.select/stage.select12.png', // 4級
-  stageSelect13: '/assets/images/stage.select/stage.select13.png', // 3級
-  stageSelect14: '/assets/images/stage.select/stage.select14.png', // 準2級
-  stageSelect15: '/assets/images/stage.select/stage.select15.png', // 2級
+  stageSelect7: '/assets/images/stage.select/stage.select7.png', // 4級
+  stageSelect8: '/assets/images/stage.select/stage.select8.png', // 3級
+  stageSelect9: '/assets/images/stage.select/stage.select9.png', // 準2級
+  stageSelect10: '/assets/images/stage.select/stage.select10.png', // 2級
 };
 
 // L.73 付近の initAssets 関数を修正
@@ -196,19 +196,22 @@ export async function loadMonsterImage(enemy) {
   console.log(`${enemy.id} (${enemyName}) の画像をロード中...`);
   
   // 学年別フォルダマッピング
-  const gradeFolderMap = {
-    1: 'grade1-hokkaido',
-    2: 'grade2-touhoku',
-    3: 'grade3-kantou',
-    4: 'grade4-chuubu',
-    5: 'grade5-kinki',
-    6: 'grade6-chuugoku',
-    // 中学生ステージ用のマッピングを追加
-    7: 'grade7-asia',  // 4級
-    8: 'grade8-europe',  // 3級
-    9: 'grade9-america',  // 準2級
-    10: 'grade10-africa', // 2級
-  };
+const gradeFolderMap = {
+  1: 'grade1-hokkaido',
+  2: 'grade2-touhoku',
+  3: 'grade3-kantou',
+  4: 'grade4-chuubu',
+  5: 'grade5-kinki',
+  6: 'grade6-chuugoku',
+  // 中学生ステージ用のマッピングを追加
+  7: 'grade7-asia',       // 4級
+  8: 'grade8-europe',     // 3級
+  9: 'grade9-america',    // 準2級
+  10:'grade10-africa',    // 2級
+  // 追加: 四国・九州
+  11:'grade11-shikoku',
+  12:'grade12-kyuusyuu',
+};
   
   // 学年に基づいてフォルダを決定
   const folder = gradeFolderMap[enemy.grade] || gradeFolderMap[1];

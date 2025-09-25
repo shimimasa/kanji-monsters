@@ -8,12 +8,14 @@ import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils
 
 // 地方マーカーの定義（mapRect基準の割合）
 const regionMarkers = [
-  { grade: 1, name: '北海道', px: 0.82,  py: 0.175, color: '#4A90E2' },
-  { grade: 2, name: '東北',   px: 0.721, py: 0.30,  color: '#7ED321' },
-  { grade: 3, name: '関東',   px: 0.683, py: 0.475, color: '#F5A623' },
-  { grade: 4, name: '中部',   px: 0.567, py: 0.538, color: '#BD10E0' },
-  { grade: 5, name: '近畿',   px: 0.452, py: 0.638, color: '#B8E986' },
-  { grade: 6, name: '中国',   px: 0.337, py: 0.688, color: '#50E3C2' },
+  { grade: 1,  name: '北海道', px: 0.82,  py: 0.175, color: '#4A90E2' },
+  { grade: 2,  name: '東北',   px: 0.721, py: 0.30,  color: '#7ED321' },
+  { grade: 3,  name: '関東',   px: 0.683, py: 0.475, color: '#F5A623' },
+  { grade: 4,  name: '中部',   px: 0.567, py: 0.538, color: '#BD10E0' },
+  { grade: 5,  name: '近畿',   px: 0.452, py: 0.638, color: '#B8E986' },
+  { grade: 6,  name: '中国',   px: 0.337, py: 0.688, color: '#50E3C2' },
+  { grade: 11, name: '四国',   px: 0.40,  py: 0.75,  color: '#00C7B7' },
+  { grade: 12, name: '九州',   px: 0.25,  py: 0.85,  color: '#FF6B6B' },
 ];
 const backButton = { x: 10, y: 540, width: 120, height: 40, text: 'もどる' };
 
@@ -544,6 +546,12 @@ const regionSelectState = {
       case 6: // 中国
         this.ctx.fillRect(mapX + mapWidth * 0.1, mapY + mapHeight * 0.55, mapWidth * 0.3, mapHeight * 0.25);
         break;
+      case 11: // 四国
+        this.ctx.fillRect(mapX + mapWidth * 0.37, mapY + mapHeight * 0.72, mapWidth * 0.12, mapHeight * 0.08);
+        break;
+      case 12: // 九州
+        this.ctx.fillRect(mapX + mapWidth * 0.20, mapY + mapHeight * 0.82, mapWidth * 0.15, mapHeight * 0.10);
+        break;
     }
     
     this.ctx.restore();
@@ -707,7 +715,11 @@ const regionSelectState = {
     this.ctx.fillStyle = '#FFFFFF';
     this.ctx.textAlign = 'left';
     this.ctx.font = 'bold 16px sans-serif';
-    this.ctx.fillText(`${marker.grade}年生 ${marker.name}地方`, tooltipX + 10, tooltipY + 25);
+const title =
+  (marker.grade >= 11)
+    ? `${marker.name}地方`
+    : `${marker.grade}年生 ${marker.name}地方`;
+this.ctx.fillText(title, tooltipX + 10, tooltipY + 25);
     
     this.ctx.font = '14px sans-serif';
     this.ctx.fillStyle = progress === 100 ? '#FFD700' : '#FFFFFF';
