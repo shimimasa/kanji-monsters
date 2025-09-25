@@ -895,23 +895,25 @@ const worldStageSelectScreen = {
       // 選択された漢検レベルに対応する画像を表示
       let bgImage = null;
       
-      // 文字列比較に修正
-      switch (String(this.selectedTabLevel)) {
-        case "4":
-          bgImage = images.stageSelect12;
-          break;
-        case "3":
-          bgImage = images.stageSelect13;
-          break;
-        case "準2":
-          bgImage = images.stageSelect14;
-          break;
-        case "2":
-          bgImage = images.stageSelect15;
-          break;
-        default:
-          bgImage = images.worldMap;
-      }
+            // 文字列比較に修正
+            switch (String(this.selectedTabLevel)) {
+              case "4":
+                bgImage = images.stageSelect7;   // 4級 → 7
+                break;
+              case "3":
+                bgImage = images.stageSelect8;   // 3級 → 8
+                break;
+              case "準2":
+                bgImage = images.stageSelect9;   // 準2級 → 9
+                break;
+              case "2":
+                bgImage = images.stageSelect10;  // 2級 → 10
+                break;
+              default:
+                bgImage = images.worldMap;
+            }
+      
+      
       
       // デバッグ情報を追加
       console.log(`選択された背景画像: selectedTabLevel=${this.selectedTabLevel}, 画像=${bgImage ? '読み込み成功' : '未読み込み'}`);
