@@ -284,8 +284,8 @@ const tabs = [
   { label: '4年',   grade: 4 },
   { label: '5年',   grade: 5 },
   { label: '6年',   grade: 6 },
-  { label: '小学生まとめ', grade: 11 },
-  { label: '全漢字まとめ', grade: 12 },
+  { label: '小学生', grade: 11 },
+  { label: '全漢字', grade: 12 },
   { label: '総復習', grade: 0 },
 ];
 

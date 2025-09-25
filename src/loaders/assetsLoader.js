@@ -41,6 +41,8 @@ const UI_IMAGE_PATHS = {
   stageSelect4:  '/assets/images/stage.select/stage.select.4.png',
   stageSelect5:  '/assets/images/stage.select/stage.select.5.png',
   stageSelect6:  '/assets/images/stage.select/stage.select.6.png',
+  stageSelect11:  '/assets/images/stage.select/stage.select.11.png',
+  stageSelect12:  '/assets/images/stage.select/stage.select.12.png',
   // 地方選択画面用の画像を追加
   japanMap: '/assets/images/stage.select/日本地図.png',
   worldMap: '/assets/images/stage.select/世界地図.png',
@@ -128,6 +130,8 @@ export async function loadBgImage(stageId) {
     const v1 = repl(id, 'kanto', 'kantou');        if (v1) { alts.add(v1); alts.add(`${v1}_area`); }
     const v2 = repl(id, 'chubu', 'chuubu');         if (v2) { alts.add(v2); alts.add(`${v2}_area`); }
     const v3 = repl(id, 'chugoku', 'cyuugoku');     if (v3) { alts.add(v3); alts.add(`${v3}_area`); }
+    const v4 = repl(id, 'shikoku', 'shikoku');     if (v4) { alts.add(v4); alts.add(`${v4}_area`); }
+    const v5 = repl(id, 'kyushu', 'kyushu');       if (v5) { alts.add(v5); alts.add(`${v5}_area`); }
 
     // 世界系
     const world = ['asia','europe','america','africa'];
