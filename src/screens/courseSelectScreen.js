@@ -72,7 +72,7 @@ const courseSelectScreen = {
     this._drawCourseArea(
       ctx,
       this.japanButton,
-      '日本地図（小学生の漢字）',
+      '日本編（小学生の漢字）',
       images.japanMap
     );
     
@@ -80,7 +80,7 @@ const courseSelectScreen = {
     this._drawCourseArea(
       ctx,
       this.worldButton,
-      '世界地図（中学生の漢字）',
+      '世界編（中学生の漢字）',
       images.worldMap
     );
         // ヒントテキスト

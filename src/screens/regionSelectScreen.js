@@ -15,8 +15,8 @@ const regionMarkers = [
   { grade: 5, name: '近畿',   px: 0.452, py: 0.638, color: '#B8E986' },
   { grade: 6, name: '中国',   px: 0.337, py: 0.688, color: '#50E3C2' },
 ];
+const backButton = { x: 10, y: 540, width: 120, height: 40, text: 'もどる' };
 
-const backButton = { x: 10, y: 540, width: 120, height: 40, text: 'タイトルへ' };
 
 const regionSelectState = {
   canvas: null,
@@ -816,12 +816,12 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       }
     }
 
-    // 戻るボタンのクリック処理（カメラ変換の影響を受けない）
-    if (isMouseOverRect(x, y, backButton)) {
-      publish('playSE', 'decide');
-      publish('changeScreen', 'title');
-      return;
-    }
+        // 戻るボタンのクリック処理（カメラ変換の影響を受けない）
+        if (isMouseOverRect(x, y, backButton)) {
+          publish('playSE', 'decide');
+          publish('changeScreen', 'courseSelect');
+          return;
+        }
   },
   
   render() {
