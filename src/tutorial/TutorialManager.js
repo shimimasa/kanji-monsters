@@ -1,5 +1,5 @@
 // TutorialManager.js
-import { getStepsFor } from './tutorialData.js';
+import getStepsFor from './tutorialData.js';
 import { createGuide } from './TutorialGuide.js';
 
 const TutorialManager = {
