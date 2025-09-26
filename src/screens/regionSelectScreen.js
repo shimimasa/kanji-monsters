@@ -70,6 +70,11 @@ const regionSelectState = {
     this.canvas.addEventListener('mousemove', this._mouseMoveHandler);
 
     this.mapRect = null;
+
+    // チュートリアル
+    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('regionSelect', { canvas: this.canvas, mapRect: this.mapRect }));
+
+    this.mapRect = null;
   },
 
   /**

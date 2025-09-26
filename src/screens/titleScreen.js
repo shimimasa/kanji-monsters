@@ -46,6 +46,8 @@ const titleState = {
     }
     
     this.registerHandlers();
+    // チュートリアル（初回のみ）
+    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('title', { canvas: this.canvas, playButton: this.playButton }));
     // 非表示設定なら既存ボタンを確実に除去
     try {
       const showSave = localStorage.getItem('showSaveButton') === '1';
@@ -241,6 +243,7 @@ const titleState = {
     ctx.restore();
   },
 
+  
   /** 歓迎メッセージを巻物風に描画 */
   _drawWelcomeMessage(ctx, cw, ch) {
     const message = `ようこそ、${gameState.playerName}さん！`;

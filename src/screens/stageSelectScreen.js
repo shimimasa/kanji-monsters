@@ -341,6 +341,9 @@ const stageSelectScreenState = {
     // ステージデータ初期化（現在の学年に応じたフィルタリング）
     this.updateStageList();
 
+    // チュートリアル
+    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('stageSelect', { canvas: this.canvas }));
+
     // イベント登録
     this._clickHandler = this.handleClick.bind(this);
     this._mousemoveHandler = this.handleMouseMove.bind(this);
