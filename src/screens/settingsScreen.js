@@ -179,7 +179,7 @@ const settingsScreenState = {
     // ツールチップとイベントリスナーを設定
     this._setupTooltipEvents(
       modeTooltipTrigger,
-      'じっくりモード: 時間制限なし、ゆっくり考えながらプレイできます。\nチャレンジモード: ステージクリアまでの時間を測れるよ！'
+      'じっくりモード: ゆっくり考えながらプレイできるよ！\nチャレンジモード: ステージクリアまでの時間を測れるよ！'
     );
     this.setupGameModeEvents();
     
@@ -249,8 +249,8 @@ const settingsScreenState = {
   /** モードの説明文を更新 */
   _updateModeDescription(mode, descriptionElement) {
     const descriptions = {
-      jikkuri: '🐌 じっくりモード：時間制限なしで、ゆっくり考えながら漢字の読みを学習できます。初心者の方やじっくり学びたい方におすすめです。',
-      challenge: '⚡ チャレンジモード：時間制限ありで、スピードと正確性が求められます。ゲーム感覚で楽しみたい方や、実力を試したい方におすすめです。'
+      jikkuri: '🐌 じっくりモード：ゆっくり考えながら漢字の読みを学習できます。初心者の方やじっくり学びたい方におすすめです。',
+      challenge: '⚡ チャレンジモード：スピードと正確性が求められます。ステージクリアまでの時間を計れます。'
     };
     
     descriptionElement.textContent = descriptions[mode] || descriptions.jikkuri;

@@ -451,12 +451,25 @@ const stageSelectScreenState = {
       };
     });
   },
-
+  
   /** ステージのクリア状況を確認 */
   isStageCleared(stageId) {
     const localStorageCleared = localStorage.getItem(`clear_${stageId}`);
     const gameStateCleared = gameState.stageProgress && gameState.stageProgress[stageId]?.cleared;
     return localStorageCleared || gameStateCleared;
+  },
+
+  // ← 追加: 地方アンロック判定（ステージ選択用）
+  isRegionUnlocked(grade) {
+    if (grade <= 6) return true;
+    const needMax = (grade === 11) ? 6 : 11;
+    for (let g = 1; g <= needMax; g++) {
+      const regionStages = stageData.filter(s => s.grade === g);
+      if (regionStages.length === 0) return false;
+      const cleared = regionStages.filter(s => this.isStageCleared(s.stageId)).length;
+      if (Math.round((cleared / regionStages.length) * 100) < 100) return false;
+    }
+    return true;
   },
 
   /** 次に挑戦すべきステージを取得 */
@@ -1305,8 +1318,17 @@ update(dt) {
       const tab = tabs[idx];
       if (tab) {
         const oldGrade = gameState.currentGrade;
+
+        // ← 追加: 四国/九州の未解放ブロック
+        if ((tab.grade === 11 || tab.grade === 12) && !this.isRegionUnlocked(tab.grade)) {
+          publish('playSE', 'wrong');
+          alert(tab.grade === 11
+            ? '四国地方はまだ解放されていません。\n解放条件: 1〜6年の通常ステージを全てクリア'
+            : '九州地方はまだ解放されていません。\n解放条件: 1〜11年の通常ステージを全てクリア');
+          return;
+        }
+
         gameState.currentGrade = tab.grade;
-        
         // クロスフェードアニメーションを開始
         this.startCrossfade(oldGrade, tab.grade);
         
