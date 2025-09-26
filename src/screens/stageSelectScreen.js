@@ -576,11 +576,6 @@ const stageSelectScreenState = {
     ctx.fillText(`ステージ: ${stage.name}`, tooltipX + 10, tooltipY + yOffset);
     yOffset += 20;
     
-    if (stage.recommendedLevel) {
-      ctx.fillText(`推奨Lv: ${stage.recommendedLevel}`, tooltipX + 10, tooltipY + yOffset);
-      yOffset += 20;
-    }
-    
     ctx.fillText(`地方: ${stage.region}`, tooltipX + 10, tooltipY + yOffset);
     yOffset += 20;
     
@@ -1007,12 +1002,6 @@ update(dt) {
                   ctx.fillText('レビュー', bx + bw / 2, by + bh / 2);
                 }
 
-        // 推奨レベル
-        if (stage.recommendedLevel) {
-          ctx.fillStyle = '#fff';
-          ctx.font = '10px sans-serif';
-          ctx.fillText(`推奨Lv.${stage.recommendedLevel}`, button.x + 5, button.y + button.height - 15);
-        }
 
         // 次に挑戦すべきステージの表示
         if (isNext) {

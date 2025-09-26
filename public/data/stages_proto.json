@@ -9970,16 +9970,16 @@
         "stageId": "kyushu_area6",
         "name": "宮崎県(小1~中1)",
         "enemyIdList": [
-          "MIY-E01",
-          "MIY-E02",
-          "MIY-E03",
-          "MIY-E04",
-          "MIY-E05",
-          "MIY-E06",
-          "MIY-E07",
-          "MIY-E08",
-          "MIY-E09",
-          "MIY-E10"
+          "MIYA-E01",
+          "MIYA-E02",
+          "MIYA-E03",
+          "MIYA-E04",
+          "MIYA-E05",
+          "MIYA-E06",
+          "MIYA-E07",
+          "MIYA-E08",
+          "MIYA-E09",
+          "MIYA-E10"
         ],
         "kanjiPoolIdList": [
 "g1-001",

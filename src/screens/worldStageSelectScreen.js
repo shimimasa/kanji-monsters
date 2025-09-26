@@ -664,11 +664,6 @@ const worldStageSelectScreen = {
     ctx.fillText(`ステージ: ${stage.name}`, tooltipX + 10, tooltipY + yOffset);
     yOffset += 20;
     
-    if (stage.recommendedLevel) {
-      ctx.fillText(`推奨Lv: ${stage.recommendedLevel}`, tooltipX + 10, tooltipY + yOffset);
-      yOffset += 20;
-    }
-    
     // 漢検レベルを表示
     const levelText = typeof this.selectedTabLevel === 'number' ? 
       `漢検 ${this.selectedTabLevel}級 相当` : `漢検 ${this.selectedTabLevel} 相当`;

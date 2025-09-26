@@ -85,13 +85,22 @@ const settingsScreenState = {
         const audioPanel = this.createAudioPanel();
         settingsContainer.appendChild(audioPanel);
     
-        // セーブとバックアップ
-        const savePanel = this.createSavePanel();
-        settingsContainer.appendChild(savePanel);
+            // セーブとバックアップ
+    const savePanel = this.createSavePanel();
+    settingsContainer.appendChild(savePanel);
         
-    // レベル設定パネル（新規）
-    const levelPanel = this.createLevelPanel();
-    settingsContainer.appendChild(levelPanel);
+    // レベル設定パネル（開発者のみ表示）
+    try {
+      const dev =
+        localStorage.getItem('devTools') === '1' ||
+        ((typeof location !== 'undefined') &&
+          ((location.search && location.search.includes('dev=1')) ||
+           (location.hash && location.hash.includes('dev'))));
+      if (dev) {
+        const levelPanel = this.createLevelPanel();
+        settingsContainer.appendChild(levelPanel);
+      }
+    } catch {}
     
     // バトル設定パネル（回復回数 + 回復後の敵行動）
     const battlePanel = this.createBattlePanel();
@@ -170,7 +179,7 @@ const settingsScreenState = {
     // ツールチップとイベントリスナーを設定
     this._setupTooltipEvents(
       modeTooltipTrigger,
-      'じっくりモード: 時間制限なし、ゆっくり考えながらプレイできます。\nチャレンジモード: 時間制限あり、スピードと正確性が求められます。'
+      'じっくりモード: 時間制限なし、ゆっくり考えながらプレイできます。\nチャレンジモード: ステージクリアまでの時間を測れるよ！'
     );
     this.setupGameModeEvents();
     

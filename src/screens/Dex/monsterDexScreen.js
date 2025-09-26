@@ -88,11 +88,12 @@ function createCard(monster) {
   nameEl.classList.add('monster-name');
   card.appendChild(nameEl);
 
-  // 生息地（都道府県/大陸地域）の表示
-  const prefectureEl = document.createElement('p');
-  const regionFallback = monster.grade <= 6 ? japanRegionMap[monster.grade] : worldRegionMap[monster.grade];
-  prefectureEl.textContent = monster.collected ? (monster.prefecture || regionFallback || '不明') : '？？？';
-  prefectureEl.classList.add('monster-prefecture');
+    // 生息地（都道府県/大陸地域）の表示
+    const prefectureEl = document.createElement('p');
+    const regionFallback = ([1,2,3,4,5,6,11,12].includes(monster.grade)
+      ? japanRegionMap[monster.grade] : worldRegionMap[monster.grade]);
+    prefectureEl.textContent = monster.collected ? (monster.prefecture || regionFallback || '不明') : '？？？';
+    prefectureEl.classList.add('monster-prefecture');
   card.appendChild(prefectureEl);
 
   // NEWバッジの追加
@@ -159,13 +160,13 @@ function showMonsterModal(monster) {
   const info = document.createElement('div');
   info.classList.add('monster-info');
   info.innerHTML = `
-    <h2>${monster.name}</h2>
-    <p><strong>地域:</strong> ${monster.prefecture || (monster.grade <= 6 ? japanRegionMap[monster.grade] : worldRegionMap[monster.grade]) || '不明'}</p>
+        <h2>${monster.name}</h2>
+    <p><strong>地域:</strong> ${monster.prefecture || ([1,2,3,4,5,6,11,12].includes(monster.grade)
+      ? japanRegionMap[monster.grade] : worldRegionMap[monster.grade]) || '不明'}</p>
     <p><strong>カテゴリ:</strong> ${monster.category || '不明'}</p>
     <p><strong>生息地:</strong> ${monster.habitat || '不明'}</p>
     <p><strong>説明:</strong> ${monster.desc || '—'}</p>
     <p><strong>豆知識:</strong> ${monster.trivia || '—'}</p>
-    <p><strong>決め台詞:</strong> ${monster.catchphrase || '—'}</p>
   `;
 
   modalContent.appendChild(closeBtn);
@@ -286,7 +287,7 @@ const monsterDexState = {
 
   /** 現在モードに応じた学年リストを返す */
   _getAllowedGrades() {
-    return this.currentMode === 'japan' ? [1,2,3,4,5,6] : [7,8,9,10];
+    return this.currentMode === 'japan' ? [1,2,3,4,5,6,11,12] : [7,8,9,10];
   },
 
   /** 地域ごとのコンプリート状況を計算（現在モードのみ） */
