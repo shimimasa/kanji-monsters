@@ -60,6 +60,8 @@ const settingsScreenState = {
     // 設定画面専用のコンテナを作成
     this.createSettingsContainer(uiRoot);
 
+    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('settings', {}));
+
     // クリックイベント登録
     this.registerHandlers();
   },

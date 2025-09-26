@@ -256,6 +256,7 @@ const monsterDexState = {
       }
     };
     window.addEventListener('keydown', this._keyHandler);
+    import('../../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('monsterDex', { canvas: this.canvas }));
   },
 
   /** DOMコンテナを作成（KanjiDexと統一） */

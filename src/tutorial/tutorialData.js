@@ -60,19 +60,56 @@ export function getStepsFor(screenId, ctx = {}) {
           }
         ];
   
-      case 'resultWin':
-        return [
-          {
-            title: 'けっか',
-            text: 'できた！ つぎのステージへ すすもう。\n「ヨミトモ」も つかまえられるよ。',
-            anchor: () => centerBox(ctx.canvas, 420, 160)
-          }
-        ];
-  
-      default:
-        return [];
-    }
-  }
+      
+        case 'resultWin':
+            return [
+              {
+                title: 'けっか',
+                text: 'できた！ つぎのステージへ すすもう。\n「ヨミトモ」も つかまえられるよ。',
+                anchor: () => centerBox(ctx.canvas, 420, 160)
+              }
+            ];
+    
+          case 'monsterDex':
+            return [
+              { title: 'なび', text: 'ならべかえ や しぼりこみ が できるよ。', anchor: () => domRect('.monster-dex-navigation') },
+              { title: 'カード', text: 'とったゴトモンを みてみよう！\nおすと しょうさいが ひらくよ。', anchor: () => domRect('.monster-card-grid') }
+            ];
+    
+          case 'kanjiDex':
+            return [
+              { title: 'ならべかえ', text: '学年/五十音 などで ならべかえ！', anchor: () => domRect('.kanji-dex-navigation') },
+              { title: 'カード', text: 'かんじカードを おすと しょうさい！', anchor: () => domRect('#kanjiCardGrid') }
+            ];
+    
+          case 'profile':
+            return [
+              { title: 'プロフィール', text: 'せいせきと しょうごうを チェック！\n図鑑へのショートカットも あるよ。', anchor: () => domRect('#profileScreenContainer') }
+            ];
+    
+          case 'settings':
+            return [
+              { title: 'BGMおんりょう', text: 'ここで おんがくの おおきさを かえられるよ。', anchor: () => domRect('#bgmVolumeSlider', 20) },
+              { title: 'SEおんりょう', text: 'こうかおんの おおきさを ちょうせい！', anchor: () => domRect('#seVolumeSlider', 20) },
+              { title: 'バトルせってい', text: 'かいふく回数や 行動タイミングを えらべるよ。', anchor: () => domRect('#healCountSlider', 20) }
+            ];
+    
+          case 'practiceBattle':
+            return [
+              { title: 'れんしゅうバトル', text: 'かなで よみを入力 → Enter！\nまちがえても へいき、れんしゅうだよ。', anchor: () => bottomCenter(ctx.canvas, 320, 80) }
+            ];
+    
+          default:
+            return [];
+        }
+      }
+    
+      function domRect(selector, pad = 8) {
+        const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
+        if (!el) return { x: 80, y: 120, w: 300, h: 120 };
+        const r = el.getBoundingClientRect();
+        return { x: r.left - pad, y: r.top - pad, w: r.width + pad * 2, h: r.height + pad * 2 };
+      }
   
   // 位置ユーティリティ
   function buttonRect(btn) { return { x: btn.x, y: btn.y, w: btn.width, h: btn.height }; }

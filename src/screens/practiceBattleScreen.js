@@ -84,6 +84,8 @@ const practiceBattleScreenState = {
         this.reviewMode = true;
       }
       
+      import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('practiceBattle', { canvas: canvasEl }));
+      
       // 練習統計の初期化
       this.practiceStats.startTime = Date.now();
       this.practiceStats.lastQuestionTime = Date.now();
