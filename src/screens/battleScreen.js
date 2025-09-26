@@ -1026,7 +1026,7 @@ updateShieldBreakEffect() {
             this.playerExpDisplay = player.exp;
             this.playerExpTarget = player.exp;
             this.playerExpAnimating = false;
-
+            // （中略: 初期化）
       // ヒント初期化
       gameState.hintLevel = 0;
       this.currentHintText = '';
@@ -1034,6 +1034,9 @@ updateShieldBreakEffect() {
       this.helpHint = { visible: true, text: 'Enterキーでこうげき', timer: 120, alpha: 1 };
 
       console.log("✅ battleScreen.enter() 完了");
+
+      import('../tutorial/TutorialManager.js')
+      .then(m => m.default.startIfNeeded('battle', { canvas: this.canvas }));
       
     } catch (error) {
       // エラーハンドリング

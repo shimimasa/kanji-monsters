@@ -20,7 +20,7 @@ function getUiRoot() {
     const overlay = document.createElement('div');
     Object.assign(overlay.style, {
       position: 'fixed', left: 0, top: 0, width: '100vw', height: '100vh',
-      background: 'rgba(0,0,0,0.6)', zIndex: 100000, pointerEvents: 'auto',
+  background: 'rgba(0,0,0,0.6)', zIndex: 100002, pointerEvents: 'auto',
       display: 'flex', alignItems: 'center', justifyContent: 'center'
     });
   

@@ -38,10 +38,18 @@ const courseSelectScreen = {
         };
     
       // イベントハンドラを登録
-  this.registerHandlers();
-  // 画面遷移直後のタップを無視（クリックスルー防止）
-  this._inputBlockUntil = ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) + 350;
-
+      this.registerHandlers();
+      this._inputBlockUntil = ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) + 350;
+    
+      // チュートリアル（ゲーム全体の説明）
+      import('../tutorial/TutorialManager.js').then(m =>
+        m.default.startIfNeeded('courseSelect', {
+          canvas: this.canvas,
+          japan:  this.japanButton,
+          world:  this.worldButton,
+          back:   this.backButton
+        })
+      );
   },
 
   /** 毎フレーム呼び出し（描画） */
