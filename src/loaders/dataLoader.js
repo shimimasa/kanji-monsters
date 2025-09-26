@@ -314,8 +314,8 @@ export function getEnemiesByStageId(stageId) {
 
   let enemies = enemyData.filter(e => stage.enemyIdList.includes(e.id));
 
-  // 敵が見つからない場合、IDの接頭辞マッピングを試す
-  if (enemies.length === 0) {
+   // 敵が見つからない場合、IDの接頭辞マッピングを試す
+   if (enemies.length === 0) {
     console.warn(`⚠️ ステージ ${stageId} の敵が見つかりません。IDマッピングを試みます。`);
     
     // ステージIDから地域を判断
@@ -339,18 +339,34 @@ export function getEnemiesByStageId(stageId) {
       'chubu_area4': 'HKI',    // 福井
       'chubu_area5': 'NGN',    // 長野
       'chubu_area6': 'GF',     // 岐阜
-      'kinki_area1': 'ME',    // 三重
-      'kinki_area2': 'SG',    // 滋賀
+      'kinki_area1': 'ME',     // 三重
+      'kinki_area2': 'SG',     // 滋賀
       'kinki_area3': 'OSK',    // 大阪
       'kinki_area4': 'KYT',    // 京都
       'kinki_area5': 'HYG',    // 兵庫
-      'kinki_area6': 'NR',    // 奈良
-      'kinki_area7': 'WKY',   // 和歌山
-      'chuugoku_area1': 'TTR',    // 鳥取
-      'chuugoku_area2': 'OKY',    // 岡山
-      'chuugoku_area3': 'SMN',    // 島根
-      'chuugoku_area4': 'HRS',    // 広島
-      'chuugoku_area5': 'YMGC',    // 山口
+      'kinki_area6': 'NR',     // 奈良
+      'kinki_area7': 'WKY',    // 和歌山
+      'chuugoku_area1': 'TTR', // 鳥取
+      'chuugoku_area2': 'OKY', // 岡山
+      'chuugoku_area3': 'SMN', // 島根
+      'chuugoku_area4': 'HRS', // 広島
+      'chuugoku_area5': 'YMGC',// 山口
+
+      // 追加: 四国
+      'shikoku_area1': 'TOKU', // 徳島
+      'shikoku_area2': 'KAGA', // 香川（KAG ではなく KAGA）
+      'shikoku_area3': 'EHIM', // 愛媛（EHM ではなく EHIM）
+      'shikoku_area4': 'KOCH', // 高知
+
+      // 追加: 九州
+      'kyushu_area1': 'FUK',   // 福岡（FUKU ではなく FUK）
+      'kyushu_area2': 'SAGA',  // 佐賀（SAG ではなく SAGA）
+      'kyushu_area3': 'NAGA',  // 長崎（NAG ではなく NAGA）
+      'kyushu_area4': 'OITA',  // 大分（OIT ではなく OITA）
+      'kyushu_area5': 'KUMA',  // 熊本（KUM ではなく KUMA）
+      'kyushu_area6': 'MIYA',  // 宮崎（MIY ではなく MIYA）
+      'kyushu_area7': 'KAGO',  // 鹿児島（KAG ではなく KAGO）
+      'kyushu_area8': 'OKI',   // 沖縄
     };
     
     const prefCode = regionMapping[stageId];
@@ -422,10 +438,22 @@ export function getKanjiByStageId(stageId) {
     return getKanjiByGrade(10);
   }
   
-  // 既存のロジック
+  // 既存のロジック + 追加フォールバック
   if (!stageKanjiMap[normalizedId]) {
     console.log(`stageKanjiMap[${normalizedId}] が見つかりません。正規化されたID: ${normalizedId}`);
-    
+
+    // 追加: ステージ定義にある kanjiPoolIdList を直接参照
+    try {
+      const st = stageData.find(s => String(s.stageId).toLowerCase() === normalizedId);
+      if (st && Array.isArray(st.kanjiPoolIdList) && st.kanjiPoolIdList.length > 0) {
+        const pool = st.kanjiPoolIdList.map(id => getKanjiById(id)).filter(Boolean);
+        if (pool.length > 0) {
+          console.log(`✅ stages_proto の kanjiPoolIdList から ${pool.length} 件を構築`);
+          return pool;
+        }
+      }
+    } catch {}
+
     // ステージIDから学年を推測
     const grade = getGradeFromStageId(normalizedId);
     if (grade) {
@@ -447,6 +475,8 @@ function getGradeFromStageId(stageId) {
   if (stageId.startsWith('chubu_')) return 4;
   if (stageId.startsWith('kinki_')) return 5;
   if (stageId.startsWith('chugoku_') || stageId.startsWith('chuugoku_')) return 6;
+  if (stageId.startsWith('shikoku_')) return 11;   // 追加
+  if (stageId.startsWith('kyushu_'))  return 12;   // 追加
   if (stageId.startsWith('asia_')) return 7;
   if (stageId.startsWith('europe_')) return 8;
   if (stageId.startsWith('america_')) return 9;

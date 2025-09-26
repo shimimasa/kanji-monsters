@@ -4584,7 +4584,7 @@
     "pref": "香川県",
     "pos": {
       "x": 650,
-      "y": 160
+      "y": 170
     },
     "stageId": "shikoku_area2",
     "name": "香川県(小1~小3)",
@@ -5049,7 +5049,7 @@
     "region": "四国",
     "pref": "愛媛県",
     "pos": {
-      "x": 500,
+      "x": 550,
       "y": 220
     },
     "stageId": "shikoku_area3",
@@ -5470,21 +5470,21 @@
     "pref": "高知県",
     "pos": {
       "x": 520,
-      "y": 400
+      "y": 300
     },
     "stageId": "shikoku_area4",
     "name": "高知県(小4~小6)",
     "enemyIdList": [
-      "EHM-E01",
-      "EHM-E02",
-      "EHM-E03",
-      "EHM-E04",
-      "EHM-E05",
-      "EHM-E06",
-      "EHM-E07",
-      "EHM-E08",
-      "EHM-E09",
-      "EHM-E10"
+      "KOCH-E01",
+      "KOCH-E02",
+      "KOCH-E03",
+      "KOCH-E04",
+      "KOCH-E05",
+      "KOCH-E06",
+      "KOCH-E07",
+      "KOCH-E08",
+      "KOCH-E09",
+      "KOCH-E10"
     ],
     "kanjiPoolIdList": [
       "g4-001",
@@ -8830,8 +8830,8 @@
         "region": "九州",
         "pref": "熊本県",
         "pos": {
-          "x": 550,
-          "y": 250
+          "x": 570,
+          "y": 230
         },
         "stageId": "kyushu_area5",
         "name": "熊本県(中1~高1)",

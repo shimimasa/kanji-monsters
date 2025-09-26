@@ -562,6 +562,8 @@ function getGradeFromStageId(stageId) {
     chubu_: 4, chuubu_: 4,
     kinki_: 5,
     chugoku_: 6, chuugoku_: 6, cyuugoku_: 6,
+    shikoku_: 11,     // 追加
+    kyushu_: 12,      // 追加
   };
   for (const prefix in gradeMapping) {
     if (stageId.startsWith(prefix)) return gradeMapping[prefix];
