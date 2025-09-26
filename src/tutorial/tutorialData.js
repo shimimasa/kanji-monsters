@@ -26,7 +26,7 @@ export function getStepsFor(screenId, ctx = {}) {
         return [
           {
             title: '学年タブ',
-            text: 'じぶんの学年をタップ/クリック！\n四国・九州は「ちからだめし」だよ。',
+            text: 'じぶんの学年をタップ/クリック！\n四国・九州はほかのステージをクリアしたら遊べるよ。',
             anchor: () => ({ x: 0, y: 0, w: ctx.canvas?.width || 800, h: 60 })
           },
           {
@@ -36,7 +36,7 @@ export function getStepsFor(screenId, ctx = {}) {
           },
           {
             title: 'マスターにちょうせん！',
-            text: '「マスター」ボタンで れんしゅうもできるよ。',
+            text: '「マスター」ボタンで漢字の読みをマスターしよう！マスターを押した後に、ステージに入ろう！',
             anchor: () => buttonRect({ x: 800/2 - 70, y: 540, width: 140, height: 40 })
           }
         ];
@@ -72,8 +72,8 @@ export function getStepsFor(screenId, ctx = {}) {
     
           case 'monsterDex':
             return [
-              { title: 'なび', text: 'ならべかえ や しぼりこみ が できるよ。', anchor: () => domRect('.monster-dex-navigation') },
-              { title: 'カード', text: 'とったゴトモンを みてみよう！\nおすと しょうさいが ひらくよ。', anchor: () => domRect('.monster-card-grid') }
+              { title: 'ナビ', text: 'ならべかえ や しぼりこみ が できるよ。', anchor: () => domRect('.monster-dex-navigation') },
+              { title: 'カード', text: 'ヨミトモにしたゴトモンを みてみよう！\nおすと しょうさいが ひらくよ。', anchor: () => domRect('.monster-card-grid') }
             ];
     
           case 'kanjiDex':
@@ -96,7 +96,7 @@ export function getStepsFor(screenId, ctx = {}) {
     
           case 'practiceBattle':
             return [
-              { title: 'れんしゅうバトル', text: 'かなで よみを入力 → Enter！\nまちがえても へいき、れんしゅうだよ。', anchor: () => bottomCenter(ctx.canvas, 320, 80) }
+              { title: 'マスターモード', text: 'かなで よみを入力 → Enter！\nまちがえても へいき、れんしゅうだよ。', anchor: () => bottomCenter(ctx.canvas, 320, 80) }
             ];
         
              case 'courseSelect':
