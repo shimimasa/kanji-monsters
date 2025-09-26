@@ -136,52 +136,71 @@ export function getStepsFor(screenId, ctx = {}) {
       }
   
  // 位置ユーティリティ
-function buttonRect(btn, canvas) {
-    const x = btn.x ?? btn.left ?? 0;
-    const y = btn.y ?? btn.top ?? 0;
-    const w = btn.w ?? btn.width ?? 0;
-    const h = btn.h ?? btn.height ?? 0;
-    return canvas ? toScreenRectFromCanvas(canvas, { x, y, w, h }) : { x, y, w, h };
-  }
-  function centerBox(canvas, w, h) {
-    const cw = canvas?.width || 800, ch = canvas?.height || 600;
-    const r = { x: (cw - w) / 2, y: (ch - h) / 2, w, h };
-    return canvas ? toScreenRectFromCanvas(canvas, r) : r;
-  }
-  function topLeft(canvas, w, h)  {
-    const r = { x: 20, y: 20, w, h };
-    return canvas ? toScreenRectFromCanvas(canvas, r) : r;
-  }
-  function topRight(canvas, w, h) {
-    const cw = canvas?.width || 800;
-    const r = { x: cw - w - 20, y: 20, w, h };
-    return canvas ? toScreenRectFromCanvas(canvas, r) : r;
-  }
-  function bottomCenter(canvas, w, h) {
-    const cw = canvas?.width || 800, ch = canvas?.height || 600;
-    const r = { x: (cw - w) / 2, y: ch - h - 20, w, h };
-    return canvas ? toScreenRectFromCanvas(canvas, r) : r;
-  }
-  // regionSelect / courseSelect 用（地図比率→キャンバス→画面）
-  function approxRect(mapRect, px, py, w, h) {
-    // mapRect はキャンバス座標で来る前提（未設定時はフォールバック）
-    const canvas = (typeof document !== 'undefined') ? document.getElementById('gameCanvas') : null;
-    if (!mapRect || !canvas) return { x: 560, y: 120, w, h };
-    const r = { x: mapRect.x + mapRect.width * px - w / 2,
-                y: mapRect.y + mapRect.height * py - h / 2, w, h };
-    return toScreenRectFromCanvas(canvas, r);
+ function buttonRect(btn, canvas) {
+    const c = canvas || document.getElementById('gameCanvas');
+    const b = c?.getBoundingClientRect?.();
+    const cw = b?.width  || c?.width  || 800;
+    const ch = b?.height || c?.height || 600;
+  
+    // ボタン情報が {x,y,w,h} か {x,y,width,height} のいずれでも対応
+    const x = (btn.x ?? btn.left ?? 0);
+    const y = (btn.y ?? btn.top  ?? 0);
+    const w = (btn.w ?? btn.width  ?? 0);
+    const h = (btn.h ?? btn.height ?? 0);
+  
+    // 以降は CSS ピクセルを前提に扱う（必要ならここで比率変換も可能）
+    return toScreenRectFromCanvas(c, { x, y, w, h });
   }
   
-  // 共通: キャンバス座標→スクリーン座標
-  function toScreenRectFromCanvas(canvas, r) {
-    const b = canvas.getBoundingClientRect();
-    const sx = b.width / canvas.width;
-    const sy = b.height / canvas.height;
+  function centerBox(canvas, w, h) {
+    const c  = canvas || document.getElementById('gameCanvas');
+    const br = c?.getBoundingClientRect?.();
+    const cw = br?.width  || c?.width  || 800;
+    const ch = br?.height || c?.height || 600;
+    const r = { x: (cw - w) / 2, y: (ch - h) / 2, w, h };
+    return toScreenRectFromCanvas(c, r);
+  }
+  
+  function topLeft(canvas, w, h)  {
+    const c = canvas || document.getElementById('gameCanvas');
+    return toScreenRectFromCanvas(c, { x: 20, y: 20, w, h });
+  }
+  function topRight(canvas, w, h) {
+    const c  = canvas || document.getElementById('gameCanvas');
+    const br = c?.getBoundingClientRect?.();
+    const cw = br?.width || c?.width || 800;
+    return toScreenRectFromCanvas(c, { x: cw - w - 20, y: 20, w, h });
+  }
+  function bottomCenter(canvas, w, h) {
+    const c  = canvas || document.getElementById('gameCanvas');
+    const br = c?.getBoundingClientRect?.();
+    const cw = br?.width  || c?.width  || 800;
+    const ch = br?.height || c?.height || 600;
+    return toScreenRectFromCanvas(c, { x: (cw - w) / 2, y: ch - h - 20, w, h });
+  }
+  
+  // regionSelect / courseSelect: mapRect はキャンバス論理座標想定→CSSピクセルへ
+  function approxRect(mapRect, px, py, w, h) {
+    const c = document.getElementById('gameCanvas');
+    if (!mapRect || !c) return { x: 560, y: 120, w, h };
+    const r = { x: mapRect.x + mapRect.width  * px - w / 2,
+                y: mapRect.y + mapRect.height * py - h / 2, w, h };
+    return toScreenRectFromCanvas(c, r);
+  }
+  
+ // 共通: キャンバス座標→スクリーン座標（CSSピクセル基準）
+function toScreenRectFromCanvas(canvas, r) {
+    const b = canvas?.getBoundingClientRect?.();
+    if (!b) return { x: r.x|0, y: r.y|0, w: r.w|0, h: r.h|0 };
+  
+    // キャンバス実解像度と見かけサイズが異なる(HDR/HiDPI)場合でも、
+    // 論理描画は CSS ピクセル相当なのでスケールは 1 にする。
+    // 位置 = BCR原点 + 論理座標, サイズ = 論理サイズ
     return {
-      x: Math.round(b.left + r.x * sx),
-      y: Math.round(b.top  + r.y * sy),
-      w: Math.round(r.w * sx),
-      h: Math.round(r.h * sy)
+      x: Math.round(b.left + r.x),
+      y: Math.round(b.top  + r.y),
+      w: Math.round(r.w),
+      h: Math.round(r.h)
     };
   }
   export default getStepsFor;
