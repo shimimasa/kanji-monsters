@@ -135,23 +135,53 @@ export function getStepsFor(screenId, ctx = {}) {
         return { x: r.left - pad, y: r.top - pad, w: r.width + pad * 2, h: r.height + pad * 2 };
       }
   
-  // 位置ユーティリティ
-  function buttonRect(btn) { return { x: btn.x, y: btn.y, w: btn.width, h: btn.height }; }
+ // 位置ユーティリティ
+function buttonRect(btn, canvas) {
+    const x = btn.x ?? btn.left ?? 0;
+    const y = btn.y ?? btn.top ?? 0;
+    const w = btn.w ?? btn.width ?? 0;
+    const h = btn.h ?? btn.height ?? 0;
+    return canvas ? toScreenRectFromCanvas(canvas, { x, y, w, h }) : { x, y, w, h };
+  }
   function centerBox(canvas, w, h) {
     const cw = canvas?.width || 800, ch = canvas?.height || 600;
-    return { x: (cw - w) / 2, y: (ch - h) / 2, w, h };
+    const r = { x: (cw - w) / 2, y: (ch - h) / 2, w, h };
+    return canvas ? toScreenRectFromCanvas(canvas, r) : r;
   }
-  function topLeft(canvas, w, h)  { return { x: 20, y: 20, w, h }; }
-  function topRight(canvas, w, h) { const cw = canvas?.width || 800; return { x: cw - w - 20, y: 20, w, h }; }
+  function topLeft(canvas, w, h)  {
+    const r = { x: 20, y: 20, w, h };
+    return canvas ? toScreenRectFromCanvas(canvas, r) : r;
+  }
+  function topRight(canvas, w, h) {
+    const cw = canvas?.width || 800;
+    const r = { x: cw - w - 20, y: 20, w, h };
+    return canvas ? toScreenRectFromCanvas(canvas, r) : r;
+  }
   function bottomCenter(canvas, w, h) {
     const cw = canvas?.width || 800, ch = canvas?.height || 600;
-    return { x: (cw - w) / 2, y: ch - h - 20, w, h };
+    const r = { x: (cw - w) / 2, y: ch - h - 20, w, h };
+    return canvas ? toScreenRectFromCanvas(canvas, r) : r;
   }
-  // regionSelect 用（地図比率→px）
+  // regionSelect / courseSelect 用（地図比率→キャンバス→画面）
   function approxRect(mapRect, px, py, w, h) {
-    if (!mapRect) return { x: 560, y: 120, w, h };
-    const x = mapRect.x + mapRect.width * px - w / 2;
-    const y = mapRect.y + mapRect.height * py - h / 2;
-    return { x, y, w, h };
+    // mapRect はキャンバス座標で来る前提（未設定時はフォールバック）
+    const canvas = (typeof document !== 'undefined') ? document.getElementById('gameCanvas') : null;
+    if (!mapRect || !canvas) return { x: 560, y: 120, w, h };
+    const r = { x: mapRect.x + mapRect.width * px - w / 2,
+                y: mapRect.y + mapRect.height * py - h / 2, w, h };
+    return toScreenRectFromCanvas(canvas, r);
+  }
+  
+  // 共通: キャンバス座標→スクリーン座標
+  function toScreenRectFromCanvas(canvas, r) {
+    const b = canvas.getBoundingClientRect();
+    const sx = b.width / canvas.width;
+    const sy = b.height / canvas.height;
+    return {
+      x: Math.round(b.left + r.x * sx),
+      y: Math.round(b.top  + r.y * sy),
+      w: Math.round(r.w * sx),
+      h: Math.round(r.h * sy)
+    };
   }
   export default getStepsFor;
