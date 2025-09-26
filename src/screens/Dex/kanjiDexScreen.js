@@ -116,10 +116,6 @@ const kanjiDexScreen = {
       }
     };
     window.addEventListener('keydown', this._keyHandler);
-
-    this.container.append(header, statsDiv, overview, collection, titles);
-    document.body.appendChild(this.container);
-    
     import('../../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('kanjiDex', { canvas: this.canvas }));
   },
 
