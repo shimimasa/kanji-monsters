@@ -18,6 +18,8 @@ const gradeFolderMap = {
   8: 'grade8-europe',
   9: 'grade9-america',
   10: 'grade10-africa',
+  11: 'grade11-shikoku',
+  12: 'grade12-kyuusyuu',
 };
 
 // 地方/地域マッピング
@@ -28,6 +30,8 @@ const japanRegionMap = {
   4: '中部',
   5: '近畿',
   6: '中国',
+  11: '四国',
+  12: '九州',
 };
 
 const worldRegionMap = {

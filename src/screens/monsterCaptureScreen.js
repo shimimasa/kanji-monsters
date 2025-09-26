@@ -140,7 +140,7 @@ const monsterCaptureScreen = {
         1:'grade1-hokkaido', 2:'grade2-touhoku', 3:'grade3-kantou',
         4:'grade4-chuubu',   5:'grade5-kinki',   6:'grade6-chuugoku',
         7:'grade7-asia',     8:'grade8-europe', 9:'grade9-america',
-        10:'grade10-africa'
+        10:'grade10-africa', 11:'grade11-shikoku', 12:'grade12-kyuusyuu'
       };
       const idStr = String(m.id);
       const folder = folderMap[m.grade] || folderMap[1];
