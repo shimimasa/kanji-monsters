@@ -116,12 +116,17 @@ function getUiRoot() {
     }
   
     btnSkip.onclick = () => close(false);
-    btnBack.onclick = () => { if (idx > 0) { idx--; apply(steps[idx]); } };
-    btnNext.onclick = () => {
-      if (idx < steps.length - 1) { idx++; apply(steps[idx]); }
-      else close(false);
+    btnBack.onclick = () => { if (idx > 0) { idx--; applyWhenReady(steps[idx], 0); } };
+    btnNext.onclick = () => { if (idx < steps.length - 1) { idx++; applyWhenReady(steps[idx], 0); } else close(false); };
     };
   
+    // 既存の applyWhenReady を流用（最大10回、1フレーム毎に再評価）
+function applyWhenReady(step, attempt = 0) {
+      const r = typeof step.anchor === 'function' ? step.anchor() : step.anchor;
+      const bad = !r || !Number.isFinite(r.x) || !Number.isFinite(r.y) || r.w < 5 || r.h < 5;
+      if (bad && attempt < 10) { requestAnimationFrame(() => applyWhenReady(step, attempt + 1)); return; }
+      apply(step);
+    };
     // 右上×と「もう表示しない」
     const closeBar = document.createElement('div');
     Object.assign(closeBar.style, { position: 'absolute', right: '12px', top: '12px', display: 'flex', gap: '10px' });
@@ -143,7 +148,7 @@ function getUiRoot() {
  applyWhenReady(steps[idx], 0);
 
  // 画面サイズやスクロールで位置が変わる場合に追従
- const onRelayout = () => apply(steps[idx]);
+ const onRelayout = () => applyWhenReady(steps[idx], 0);
  window.addEventListener('resize', onRelayout);
  window.addEventListener('orientationchange', onRelayout);
  window.addEventListener('scroll', onRelayout, { passive: true });
@@ -156,4 +161,4 @@ function getUiRoot() {
      window.removeEventListener('scroll', onRelayout);
    }
   };
-    };
+

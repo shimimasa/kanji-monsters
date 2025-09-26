@@ -135,6 +135,20 @@ export function getStepsFor(screenId, ctx = {}) {
         return { x: r.left - pad, y: r.top - pad, w: r.width + pad * 2, h: r.height + pad * 2 };
       }
   
+// キャンバス論理座標 → 画面(CSS px) 変換
+function canvasRectToViewport(canvas, r) {
+      const b = canvas?.getBoundingClientRect?.();
+      if (!b) return { x: r.x|0, y: r.y|0, w: r.w|0, h: r.h|0 };
+      const sx = b.width  / (canvas.width  || b.width);
+      const sy = b.height / (canvas.height || b.height);
+      return {
+        x: Math.round(b.left + r.x * sx),
+        y: Math.round(b.top  + r.y * sy),
+        w: Math.round(r.w * sx),
+        h: Math.round(r.h * sy),
+      };
+    }
+
  // 位置ユーティリティ
  function buttonRect(btn, canvas) {
     const c = canvas || document.getElementById('gameCanvas');
@@ -152,55 +166,32 @@ export function getStepsFor(screenId, ctx = {}) {
     return toScreenRectFromCanvas(c, { x, y, w, h });
   }
   
-  function centerBox(canvas, w, h) {
-    const c  = canvas || document.getElementById('gameCanvas');
-    const br = c?.getBoundingClientRect?.();
-    const cw = br?.width  || c?.width  || 800;
-    const ch = br?.height || c?.height || 600;
-    const r = { x: (cw - w) / 2, y: (ch - h) / 2, w, h };
-    return toScreenRectFromCanvas(c, r);
-  }
-  
-  function topLeft(canvas, w, h)  {
-    const c = canvas || document.getElementById('gameCanvas');
-    return toScreenRectFromCanvas(c, { x: 20, y: 20, w, h });
-  }
-  function topRight(canvas, w, h) {
-    const c  = canvas || document.getElementById('gameCanvas');
-    const br = c?.getBoundingClientRect?.();
-    const cw = br?.width || c?.width || 800;
-    return toScreenRectFromCanvas(c, { x: cw - w - 20, y: 20, w, h });
-  }
-  function bottomCenter(canvas, w, h) {
-    const c  = canvas || document.getElementById('gameCanvas');
-    const br = c?.getBoundingClientRect?.();
-    const cw = br?.width  || c?.width  || 800;
-    const ch = br?.height || c?.height || 600;
-    return toScreenRectFromCanvas(c, { x: (cw - w) / 2, y: ch - h - 20, w, h });
-  }
-  
-  // regionSelect / courseSelect: mapRect はキャンバス論理座標想定→CSSピクセルへ
-  function approxRect(mapRect, px, py, w, h) {
-    const c = document.getElementById('gameCanvas');
-    if (!mapRect || !c) return { x: 560, y: 120, w, h };
-    const r = { x: mapRect.x + mapRect.width  * px - w / 2,
-                y: mapRect.y + mapRect.height * py - h / 2, w, h };
-    return toScreenRectFromCanvas(c, r);
-  }
-  
- // 共通: キャンバス座標→スクリーン座標（CSSピクセル基準）
-function toScreenRectFromCanvas(canvas, r) {
-    const b = canvas?.getBoundingClientRect?.();
-    if (!b) return { x: r.x|0, y: r.y|0, w: r.w|0, h: r.h|0 };
-  
-    // キャンバス実解像度と見かけサイズが異なる(HDR/HiDPI)場合でも、
-    // 論理描画は CSS ピクセル相当なのでスケールは 1 にする。
-    // 位置 = BCR原点 + 論理座標, サイズ = 論理サイズ
-    return {
-      x: Math.round(b.left + r.x),
-      y: Math.round(b.top  + r.y),
-      w: Math.round(r.w),
-      h: Math.round(r.h)
-    };
-  }
+   function buttonRect(btn, canvas) {
+       const c = canvas || document.getElementById('gameCanvas');
+       const x = (btn.x ?? btn.left ?? 0), y = (btn.y ?? btn.top ?? 0);
+       const w = (btn.w ?? btn.width ?? 0), h = (btn.h ?? btn.height ?? 0);
+       return canvasRectToViewport(c, { x, y, w, h });
+}
+   
+     function centerBox(canvas, w, h) {
+       const c = canvas || document.getElementById('gameCanvas');
+       const cw = c?.width  || (c?.getBoundingClientRect?.().width  || 800);
+       const ch = c?.height || (c?.getBoundingClientRect?.().height || 600);
+       return canvasRectToViewport(c, { x:(cw-w)/2, y:(ch-h)/2, w, h });
+    }
+
+     function topLeft(canvas, w, h)       { const c=canvas||document.getElementById('gameCanvas'); return canvasRectToViewport(c,{x:20,y:20,w,h}); }
+     function topRight(canvas, w, h)      { const c=canvas||document.getElementById('gameCanvas'); const cw=c?.width||800; return canvasRectToViewport(c,{x:cw-w-20,y:20,w,h}); }
+     function bottomCenter(canvas, w, h)  { const c=canvas||document.getElementById('gameCanvas'); const cw=c?.width||800, ch=c?.height||600; return canvasRectToViewport(c,{x:(cw-w)/2,y:ch-h-20,w,h}); }
+    
+     function approxRect(mapRect, px, py, w, h) {
+       const c = document.getElementById('gameCanvas');
+       if (!mapRect || !c) return { x: 560, y: 120, w, h };
+       return canvasRectToViewport(c, {
+         x: mapRect.x + mapRect.width  * px - w / 2,
+         y: mapRect.y + mapRect.height * py - h / 2,
+         w, h
+       });
+    }  
+
   export default getStepsFor;
