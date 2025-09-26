@@ -98,6 +98,30 @@ export function getStepsFor(screenId, ctx = {}) {
             return [
               { title: 'れんしゅうバトル', text: 'かなで よみを入力 → Enter！\nまちがえても へいき、れんしゅうだよ。', anchor: () => bottomCenter(ctx.canvas, 320, 80) }
             ];
+        
+             case 'courseSelect':
+               return [
+                 {
+                   title: 'このゲームについて',
+                   text: '日本編（小学生の漢字）と 世界編（中学生の漢字）があります。\nはじめは 日本編から すすんでいこう！',
+                   anchor: () => centerBox(ctx.canvas, 500, 160)
+                 },
+                 {
+                   title: '日本編',
+                   text: 'ここをおすと 日本の地方へ。ステージをクリアして かんじをおぼえよう！',
+                   anchor: () => buttonRect(ctx.japan || { x: 50, y: 150, width: 280, height: 260 })
+                 },
+                 {
+                   title: '世界編',
+                   text: 'ここは ちからが ついてからでもOK。中学生レベルのかんじに ちょうせん！',
+                   anchor: () => buttonRect(ctx.world || { x: 430, y: 150, width: 280, height: 260 })
+                 },
+                 {
+                   title: 'もどる',
+                   text: 'わからなくなったら タイトルへ もどれるよ。',
+                   anchor: () => buttonRect(ctx.back || { x: 10, y: (ctx.canvas?.height||600)-60, width:120, height:40 })
+                 }
+               ];
     
           default:
             return [];

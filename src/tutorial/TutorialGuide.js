@@ -16,7 +16,6 @@ function getUiRoot() {
   }
   
   export function createGuide(steps, onClose) {
-    const root = getUiRoot();
     const overlay = document.createElement('div');
     Object.assign(overlay.style, {
       position: 'fixed', left: 0, top: 0, width: '100vw', height: '100vh',
@@ -73,8 +72,8 @@ function getUiRoot() {
   
     overlay.appendChild(focus);
     overlay.appendChild(frame);
-    root.appendChild(overlay);
-  
+    document.body.appendChild(overlay);
+    
     let idx = 0;
   
     function apply(step) {
