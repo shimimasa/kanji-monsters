@@ -150,21 +150,6 @@ function canvasRectToViewport(canvas, r) {
     }
 
  // 位置ユーティリティ
- function buttonRect(btn, canvas) {
-    const c = canvas || document.getElementById('gameCanvas');
-    const b = c?.getBoundingClientRect?.();
-    const cw = b?.width  || c?.width  || 800;
-    const ch = b?.height || c?.height || 600;
-  
-    // ボタン情報が {x,y,w,h} か {x,y,width,height} のいずれでも対応
-    const x = (btn.x ?? btn.left ?? 0);
-    const y = (btn.y ?? btn.top  ?? 0);
-    const w = (btn.w ?? btn.width  ?? 0);
-    const h = (btn.h ?? btn.height ?? 0);
-  
-    // 以降は CSS ピクセルを前提に扱う（必要ならここで比率変換も可能）
-    return toScreenRectFromCanvas(c, { x, y, w, h });
-  }
   
    function buttonRect(btn, canvas) {
        const c = canvas || document.getElementById('gameCanvas');
