@@ -109,6 +109,8 @@ const resultWinState = {
     
     // イベントハンドラ登録
     this.registerHandlers();
+    // チュートリアル（初回のみ）
+    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('resultWin', { canvas: this.canvas }));
   },
 
   /** 毎フレーム呼び出し（描画） */

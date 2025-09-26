@@ -1,9 +1,10 @@
 // src/screens/achievementsScreen.js
 // 実績一覧画面
-
 import { publish } from '../core/eventBus.js';
 import { gameState, isAchievementUnlocked } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
+import { loadDex as loadKanjiDex } from '../models/kanjiDex.js';
+import { loadDex as loadMonsterDex } from '../models/monsterDex.js';
 
 const BTN = {
   back: { x: 20, y: 20, w: 100, h: 30, label: 'メニューへ' },
@@ -73,10 +74,10 @@ const achievementsScreen = {
     window.addEventListener('keydown', this._keyHandler);
   },
 
-  /** 実績データを読み込む */
-  async loadAchievements() {
+   /** 実績データを読み込む */
+   async loadAchievements() {
     try {
-      const response = await fetch('/src/data/achievements.json');
+      const response = await fetch('/data/achievements.json');
       if (!response.ok) {
         throw new Error(`実績データの読み込みに失敗: ${response.statusText}`);
       }
@@ -239,24 +240,27 @@ const achievementsScreen = {
     }
   },
 
-  /** ヒントを表示するかどうかの判定 */
-  shouldShowHint(achievement) {
-    // プレイヤーが一定の進歩をしている場合はヒントを表示
+   /** ヒントを表示するかどうかの判定 */
+   shouldShowHint(achievement) {
     const { condition } = achievement;
     const playerStats = gameState.playerStats;
     
     switch (condition.type) {
-      case 'enemiesDefeated':
-        return playerStats.enemiesDefeated > 0;
-      case 'levelReached':
-        return playerStats.level > 1;
-      case 'stagesCleared':
-        return playerStats.stagesCleared > 0;
+      case 'enemiesDefeated':   return playerStats.enemiesDefeated > 0;
+      case 'levelReached':      return playerStats.level > 1;
+      case 'stagesCleared':     return playerStats.stagesCleared > 0;
+      case 'stageCleared':      return true;
+      case 'comboReached':      return playerStats.comboCount > 0;
+      case 'totalCorrect':      return playerStats.totalCorrect > 0;
+      case 'skillPointsUsed':   return playerStats.skillPointsUsed > 0;
+      case 'bossesDefeated':    return playerStats.bossesDefeated > 0;
+      case 'playtimeMinutes':   return playerStats.playtimeSeconds > 0;
+      case 'weaknessHits':      return playerStats.weaknessHits > 0;
+      case 'healsSuccessful':   return playerStats.healsSuccessful > 0;
       default:
         return false;
     }
   },
-
   /** 条件のヒントテキストを生成 */
   getConditionHint(achievement) {
     const { condition } = achievement;
@@ -269,12 +273,30 @@ const achievementsScreen = {
         return `レベル ${playerStats.level}/${condition.value}`;
       case 'stagesCleared':
         return `ステージ ${playerStats.stagesCleared}/${condition.value}`;
-      case 'kanjiCollected':
-        const kanjiCount = gameState.kanjiDex?.size || 0;
+      case 'stageCleared':
+        return `対象: ${condition.value}`;
+      case 'comboReached':
+        return `コンボ ${playerStats.comboCount}/${condition.value}`;
+      case 'kanjiCollected': {
+        const kanjiCount = loadKanjiDex().size;
         return `漢字 ${kanjiCount}/${condition.value}`;
-      case 'monstersCollected':
-        const monsterCount = gameState.monsterDex?.size || 0;
+      }
+      case 'monstersCollected': {
+        const monsterCount = loadMonsterDex().size;
         return `モンスター ${monsterCount}/${condition.value}`;
+      }
+      case 'totalCorrect':
+        return `正解 ${playerStats.totalCorrect}/${condition.value}`;
+      case 'skillPointsUsed':
+        return `SP使用 ${playerStats.skillPointsUsed}/${condition.value}`;
+      case 'bossesDefeated':
+        return `ボス ${playerStats.bossesDefeated}/${condition.value}`;
+      case 'playtimeMinutes':
+        return `プレイ ${Math.floor(playerStats.playtimeSeconds / 60)}/${condition.value}分`;
+      case 'weaknessHits':
+        return `弱点 ${playerStats.weaknessHits}/${condition.value}`;
+      case 'healsSuccessful':
+        return `回復 ${playerStats.healsSuccessful}/${condition.value}`;
       default:
         return '条件を満たすと解除';
     }

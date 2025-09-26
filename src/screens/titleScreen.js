@@ -46,10 +46,17 @@ const titleState = {
     }
     
     this.registerHandlers();
-
-    // 画面右上にセーブボタン
-    this._injectSaveButton();
+    // チュートリアル（初回のみ）
+    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('title', { canvas: this.canvas, playButton: this.playButton }));
+    // 非表示設定なら既存ボタンを確実に除去
+    try {
+      const showSave = localStorage.getItem('showSaveButton') === '1';
+      const old = document.getElementById('titleSaveButton');
+      if (!showSave && old) old.remove();
+      if (showSave) this._injectSaveButton();
+    } catch {}
   },
+
 
   /** 毎フレーム呼び出し（描画） */
   update(dt) {
@@ -236,6 +243,7 @@ const titleState = {
     ctx.restore();
   },
 
+  
   /** 歓迎メッセージを巻物風に描画 */
   _drawWelcomeMessage(ctx, cw, ch) {
     const message = `ようこそ、${gameState.playerName}さん！`;
@@ -390,6 +398,8 @@ const titleState = {
   /** 画面離脱時のクリーンアップ */
   exit() {
     this.unregisterHandlers();
+    const old = document.getElementById('titleSaveButton');
+    if (old) old.remove();
     this.canvas = null;
     this.ctx    = null;
   },

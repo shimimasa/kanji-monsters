@@ -1,5 +1,5 @@
 /* ----------------------------- 依存モジュール ----------------------------- */
-import { gameState, updatePlayerName } from './core/gameState.js';
+import { gameState, updatePlayerName, saveGameData } from './core/gameState.js';
 import { setCanvas, update as updateScreen, render as renderScreen } from './core/screenManager.js';
 import { initAssets } from './loaders/assetsLoader.js';
 import { loadAllGameData } from './loaders/dataLoader.js';
@@ -38,6 +38,10 @@ import { subscribe, publish } from './core/eventBus.js';
 subscribe('playSE',  name => audio.playSE(name));
 subscribe('playBGM', (name, loop = true) => audio.playBGM(name, loop));
 subscribe('stopBGM', (duration = 0) => audio.stopBGM(duration));
+subscribe('setBGMVolume', v => { audio.setBGMVolume(v); try { saveGameData(); } catch {} });
+subscribe('setSEVolume', v => { audio.setSEVolume(v); try { saveGameData(); } catch {} });
+subscribe('getBGMVolume', callback => callback(audio.getBGMVolume()));
+subscribe('getSEVolume', callback => callback(audio.getSEVolume()));
 // ────────────────
 // モバイルブラウザの自動再生制限対策：
 // 最初のユーザー操作のときだけ BGM を始動させる
@@ -52,17 +56,25 @@ document.body.addEventListener(
 
 /* ----------------------------- アプリ初期化 ----------------------------- */
 let lastTime = performance.now();
+let __achvCheckAccum = 0;
 function loop(now) {
   const dt = now - lastTime;
   lastTime = now;
   
   // プレイ時間の統計更新（毎フレーム）
   gameState.playerStats.playtimeSeconds += dt / 1000;
+  __achvCheckAccum += dt;
   
   // ロジック更新
   updateScreen(dt);
   // 描画
   renderScreen();
+  
+  // 実績の定期チェック（プレイ時間系など）
+  if (__achvCheckAccum >= 15000) {
+    checkAchievements().catch(() => {});
+    __achvCheckAccum = 0;
+  }
   
   // 実績通知の描画
   drawAchievementNotifications(ctx);
@@ -118,36 +130,38 @@ function drawAchievementNotifications(ctx) {
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     
-    // 🏆アイコンと「実績解除！」
-    ctx.font = 'bold 24px "UDデジタル教科書体", sans-serif';
-    ctx.fillText('🏆', popupX + 25, y + popupHeight / 2 - 10);
-    
-    ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
-    ctx.fillText('実績解除！', popupX + 80, y + 25);
-    
-    // 実績タイトル
-    ctx.font = '16px "UDデジタル教科書体", sans-serif';
-    ctx.fillStyle = '#333';
-    
-    // 長いタイトルは省略
-    let title = notification.title;
-    if (title.length > 20) {
-      title = title.substring(0, 20) + '...';
-    }
-    
-    ctx.fillText(title, popupX + 80, y + 50);
-    
-    // キラキラエフェクト（簡易版）
-    const sparkles = ['✨', '⭐', '💫'];
-    for (let i = 0; i < 3; i++) {
-      const sparkleX = popupX + popupWidth - 60 + (i * 20);
-      const sparkleY = y + 20 + (Math.sin(Date.now() / 500 + i) * 10);
-      ctx.font = '20px sans-serif';
-      ctx.fillStyle = '#FFF';
-      ctx.fillText(sparkles[i], sparkleX, sparkleY);
-    }
-    
-    ctx.restore();
+       // 🏆アイコンと「実績解除！」
+       ctx.font = 'bold 24px "UDデジタル教科書体", sans-serif';
+       ctx.fillText('🏆', popupX + 25, y + popupHeight / 2 - 10);
+       
+       ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+       ctx.fillText('実績解除！', popupX + 80, y + 25);
+       
+       // 実績タイトル
+       ctx.font = '16px "UDデジタル教科書体", sans-serif';
+       ctx.fillStyle = '#333';
+       let title = notification.title || '';
+       if (title.length > 20) title = title.substring(0, 20) + '...';
+       ctx.fillText(title, popupX + 80, y + 44);
+       
+       // 説明（1行）
+       ctx.font = '14px "UDデジタル教科書体", sans-serif';
+       ctx.fillStyle = '#222';
+       let desc = notification.description || '';
+       if (desc.length > 28) desc = desc.substring(0, 28) + '...';
+       ctx.fillText(desc, popupX + 80, y + 64);
+       
+       // キラキラエフェクト（簡易版）
+       const sparkles = ['✨', '⭐', '💫'];
+       for (let i = 0; i < 3; i++) {
+         const sparkleX = popupX + popupWidth - 60 + (i * 20);
+         const sparkleY = y + 20 + (Math.sin(Date.now() / 500 + i) * 10);
+         ctx.font = '20px sans-serif';
+         ctx.fillStyle = '#FFF';
+         ctx.fillText(sparkles[i], sparkleX, sparkleY);
+       }
+       
+       ctx.restore();
   });
 }
 
@@ -199,13 +213,39 @@ function drawAchievementNotifications(ctx) {
   // DataSync 初期化（Firestore → localStorage のマージ監視開始）
   DataSync.initialize();
 
-  // 4) FSMは既に初期状態で'title'画面を設定済みのため、追加の画面遷移は不要
+   // 4) FSMは既に初期状態で'title'画面を設定済みのため、追加の画面遷移は不要
+
+  // オートセーブ開始
+  __setupAutosaveFromSettings();
 
   console.log('✅ Init done → Start loop');
   requestAnimationFrame(loop);
 })();
 
-
+// ── 追加: オートセーブ管理 ──
+let __autosaveTimer = null;
+function __setupAutosaveFromSettings() {
+  try {
+    const enabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
+    const minutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
+    if (__autosaveTimer) { clearInterval(__autosaveTimer); __autosaveTimer = null; }
+    if (enabled) {
+      const ms = Math.max(1, Math.min(60, Number.isFinite(minutes) ? minutes : 5)) * 60 * 1000;
+      __autosaveTimer = setInterval(() => {
+        try { saveGameData(); } catch (e) { console.warn('autosave failed:', e); }
+      }, ms);
+    }
+  } catch (e) {
+    console.warn('autosave setup error:', e);
+  }
+}
+subscribe('updateAutosaveSettings', ({ enabled, minutes }) => {
+  try {
+    if (typeof enabled === 'boolean') localStorage.setItem('autosaveEnabled', enabled ? '1' : '0');
+    if (Number.isFinite(minutes)) localStorage.setItem('autosaveMinutes', String(minutes));
+  } catch {}
+  __setupAutosaveFromSettings();
+});
 
 // ── 追加：音量設定／取得をEventBus経由に ──
 subscribe('setBGMVolume', v => audio.setBGMVolume(v));
@@ -213,7 +253,6 @@ subscribe('setSEVolume', v => audio.setSEVolume(v));
 subscribe('getBGMVolume', callback => callback(audio.getBGMVolume()));
 subscribe('getSEVolume', callback => callback(audio.getSEVolume()));
 
-// 実績解除イベントの購読
 subscribe('achievementUnlocked', (achievementData) => {
   console.log(`🎉 実績解除通知: ${achievementData.title}`);
   
@@ -223,6 +262,9 @@ subscribe('achievementUnlocked', (achievementData) => {
     description: achievementData.description,
     timestamp: Date.now()
   });
+  
+  // 効果音
+  publish('playSE', 'achievement');
   
   // 3.5秒後に通知を自動削除
   setTimeout(() => {
@@ -236,6 +278,19 @@ subscribe('achievementUnlocked', (achievementData) => {
     if (achievementNotificationQueue.length > 0) {
       achievementNotificationQueue.shift();
     }
+  }, 3500);
+});
+
+// 複数同時解除のバンドル通知
+subscribe('multipleAchievementsUnlocked', (arr) => {
+  if (!Array.isArray(arr) || arr.length === 0) return;
+  achievementNotificationQueue.push({
+    title: `新しい実績を${arr.length}件 解除`,
+    description: 'トロフィー画面で詳細を確認',
+    timestamp: Date.now()
+  });
+  setTimeout(() => {
+    if (achievementNotificationQueue.length > 0) achievementNotificationQueue.shift();
   }, 3500);
 });
 

@@ -270,6 +270,8 @@ const profileScreen = {
         // 画面構成
         this.container.append(header, statsDiv, overview, collection, titles);
         document.body.appendChild(this.container);
+        
+        import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('profile', {}));
       
   },
 

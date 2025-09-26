@@ -1,7 +1,7 @@
-import { gameState, battleState, addPlayerExp, recordEnemyDefeated } from '../core/gameState.js';
+import { gameState, battleState, addPlayerExp, recordEnemyDefeated, saveGameData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect, drawStoneButton } from '../ui/uiRenderer.js';
 import { loadMonsterImage, loadBgImage, images, clearImageCache, drawStonePanel } from '../loaders/assetsLoader.js';
-import { getEnemiesByStageId, getKanjiByStageId, kanjiData } from '../loaders/dataLoader.js';
+import { getEnemiesByStageId, getKanjiByStageId, kanjiData, stageData } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
 import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
@@ -91,6 +91,11 @@ const battleScreenState = {
   timerId: null,
   _timeouts: [],
   _focusScrollTimers: [], // フォーカス時の再補正タイマー
+
+  // ストップウォッチ用
+  _timeStartMs: 0,
+  _timePauseAccMs: 0,
+  _timePauseStartMs: 0,
 
   // モバイルキーボード状態
   keyboardState: { open: false, bottomInset: 0 },
@@ -798,18 +803,12 @@ updateShieldBreakEffect() {
       this.expAnimQueue = [];
       this.levelUpMessage = '';
       
-      // チャレンジモードの場合、タイマーを開始
-      if (gameState.gameMode === 'challenge') {
-        battleState.timeRemaining = 60;
-        this.timerId = setInterval(() => {
-          battleState.timeRemaining--;
-          if (battleState.timeRemaining <= 0) {
-            clearInterval(this.timerId);
-            this.timerId = null;
-            publish('changeScreen', 'gameOver');
-          }
-        }, 1000);
-      }
+            // チャレンジモードの場合、タイマー開始（ストップウォッチ）
+            if (gameState.gameMode === 'challenge') {
+              this._timeStartMs = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+              this._timePauseAccMs = 0;
+              this._timePauseStartMs = 0;
+            }
 
       // ※※※ 重要な修正: キャンバス要素の取得 ※※※
       // 引数のcanvasElがnullまたはundefinedの場合は、DOMから取得する
@@ -901,26 +900,73 @@ updateShieldBreakEffect() {
         this.stageBgImage = null;
       }
 
-      // ステージデータの取得
       gameState.enemies   = getEnemiesByStageId(gameState.currentStageId).map(src => {
-        // 破壊的変更の影響を避けるためクローン
-        const e = { ...src };
-        // 画像は後続でセット、ここでは基本ステータスを初期化
-        e.hp = e.maxHp;
-        if (e.isBoss) {
-          const baseShield = (typeof e.shieldHp === 'number') ? e.shieldHp : 3;
-          e.originalShieldHp = baseShield;
-          e.shieldHp = baseShield;
-        } else {
-          e.originalShieldHp = undefined;
-        }
+        const enemy = Object.assign({}, src);
+        return enemy;
+      });
+
+      // ステージ順インデックスとプレイヤーLv
+      const getStageOrderIndex = (stageId) => {
+        try {
+          const normals = stageData.filter(s => {
+            const id = String(s?.stageId || '');
+            return !( /^bonus_/i.test(id) || /_bonus$/i.test(id) );
+          });
+          const idx = normals.findIndex(s => s.stageId === stageId);
+          return Math.max(0, idx);
+        } catch { return 0; }
+      };
+      const stageIdx = getStageOrderIndex(gameState.currentStageId);
+      const pl = gameState.playerStats?.level || 1;
+
+      // 敵パラメータ算出（プレイヤー比例＋ステージ係数）
+      const computeEnemyParams = ({ isBoss, stageIdx, playerLevel }) => {
+        const hp = Math.max(15, Math.round(
+          isBoss
+            ? (60 + 2.2 * stageIdx + 1.6 * playerLevel)
+            : (30 + 1.6 * stageIdx + 1.1 * playerLevel)
+        ));
+        const atk = Math.max(1, Math.round(
+          isBoss
+            ? (5 + 0.08 * stageIdx + 0.20 * playerLevel)
+            : (4 + 0.06 * stageIdx + 0.12 * playerLevel)
+        ));
+        // 表示用の敵レベル（使用箇所に合わせて拡張可）
+        const level = Math.max(1, Math.round(0.7 * playerLevel + 0.3 * (1 + stageIdx / 10)));
+
+        // 動的EXP（通常のみ使用。ボーナスは別ロジックで0）
+        const expBase = isBoss
+          ? (35 + 0.6 * stageIdx + 1.2 * playerLevel)
+          : (25 + 0.4 * stageIdx + 0.8 * playerLevel);
+        const exp = Math.max(5, Math.round(expBase));
+        return { hp, atk, level, exp };
+      };
+
+      // 敵の強さをスケール（全ステージ対象、ボスはやや高め）
+      gameState.enemies = gameState.enemies.map((e, idx, arr) => {
+        const willBeBoss = !!e.isBoss || idx === arr.length - 1;
+        const { hp, atk, level, exp } = computeEnemyParams({ isBoss: willBeBoss, stageIdx, playerLevel: pl });
+        e.maxHp = hp; e.hp = hp;
+        e.atk = atk;
+        e.level = level;
+        e.exp = exp; // defeat時に使用（ボーナス中は別途0に）
         return e;
       });
+
+      // 幻置換の可視化（バトル開始時にログ表示）
+      try {
+        const info = gameState.__bonusPhantomInfo;
+        if (/^bonus_g/i.test(String(gameState.currentStageId || '')) && info && info.replaced > 0) {
+          battleState.log.push(`幻のゴトモンが ${info.replaced} 体出現！（進捗 ${Math.min(info.progress, 150)}/150）`);
+        }
+      } catch {}
+        
       gameState.kanjiPool = getKanjiByStageId(gameState.currentStageId);
       
       if (!gameState.kanjiPool.length) {
         alert('このステージに紐づく漢字データがありません。\nステージ選択へ戻ります。');
-        publish('changeScreen', 'stageSelect');
+        const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+        publish('changeScreen', target);
         return;
       }
       
@@ -980,7 +1026,7 @@ updateShieldBreakEffect() {
             this.playerExpDisplay = player.exp;
             this.playerExpTarget = player.exp;
             this.playerExpAnimating = false;
-
+            // （中略: 初期化）
       // ヒント初期化
       gameState.hintLevel = 0;
       this.currentHintText = '';
@@ -988,12 +1034,16 @@ updateShieldBreakEffect() {
       this.helpHint = { visible: true, text: 'Enterキーでこうげき', timer: 120, alpha: 1 };
 
       console.log("✅ battleScreen.enter() 完了");
+
+      import('../tutorial/TutorialManager.js')
+      .then(m => m.default.startIfNeeded('battle', { canvas: this.canvas }));
       
     } catch (error) {
       // エラーハンドリング
       console.error("❌ battleScreen.enter() でエラー発生:", error);
       alert(`ゲーム画面の初期化に失敗しました: ${error.message}\nステージ選択に戻ります。`);
-      publish('changeScreen', 'stageSelect');
+      const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+      publish('changeScreen', target);
     }
   },
 // 2. 設定から回復回数上限を取得する新しいメソッド
@@ -1021,19 +1071,79 @@ getMaxHealCountFromSettings() {
    * @param {string} stageId - ステージID
    * @returns {string} BGMのキー
    */
+       /**
+   * ステージIDから適切なBGMキーを取得する
+   */
   getBGMKeyForStage(stageId) {
-    // ボス戦の場合
-    if (stageId && stageId.includes('boss')) {
-      return 'boss';
+    const id = String(stageId || '');
+
+    // ボス
+    if (id.includes('boss')) return 'boss';
+
+    // 学年ボーナス: bonus_gN
+    const mg = /^bonus_g(\d+)$/i.exec(id);
+    if (mg) {
+      const g = parseInt(mg[1], 10);
+      const regionByGrade = {1:'hokkaido',2:'tohoku',3:'kanto',4:'chubu',5:'kinki',6:'chugoku',7:'asia',8:'europe',9:'america',10:'africa'};
+      return this._pickRegionBgm(regionByGrade[g] || null);
     }
-    // エリア付きステージは a / b をランダム
-    if (/_area\d+$/i.test(stageId)) {
+
+    // 地域ボーナス: *_bonus を含む すべて
+    if (/_bonus/i.test(id)) {
+      const norm = id.toLowerCase();
+      const fix = { kantou:'kanto', chuubu:'chubu', chuugoku:'chugoku', cyuugoku:'chugoku' };
+      const tokens = ['hokkaido','tohoku','kanto','kantou','chubu','chuubu','kinki','chugoku','chuugoku','cyuugoku','asia','europe','america','africa'];
+      let region = null;
+      for (const t of tokens) {
+        if (norm.includes(t)) { region = fix[t] || t; break; }
+      }
+      // 先頭接頭辞でも推定（hokkaido_* など）
+      if (!region) {
+        const head = norm.split(/[_-]/)[0];
+        region = fix[head] || head;
+      }
+      return this._pickRegionBgm(region);
+    }
+
+    // 通常: _areaN は a/b からランダム
+    if (/_area\d+$/i.test(id)) {
       const ab = Math.random() < 0.5 ? 'a' : 'b';
-      return `${stageId}_${ab}`;
+      return `${id}_${ab}`;
     }
-    // その他はステージIDをそのまま使用
-    return stageId;
+
+    // フォールバック: 既知接頭辞→地域BGM
+    {
+      const norm = id.toLowerCase();
+      const fix = { kantou:'kanto', chuubu:'chubu', chuugoku:'chugoku', cyuugoku:'chugoku' };
+      const head = norm.split(/[_-]/)[0];
+      const region = fix[head] || head;
+      const known = ['hokkaido','tohoku','kanto','chubu','kinki','chugoku','asia','europe','america','africa'];
+      if (known.includes(region)) return this._pickRegionBgm(region);
+    }
+
+    // 最後の手段
+    return 'battle';
   },
+  
+    _pickRegionBgm(region) {
+      const pool = {
+        hokkaido: ['hokkaido','hokkaido_a','hokkaido_b'],
+        tohoku:   ['tohoku_a','tohoku_b'],
+        kanto:    ['kanto_a','kanto_b'],
+        chubu:    ['chubu_a','chubu_b'],
+        kinki:    ['kinki_a','kinki_b'],
+        chugoku:  ['chugoku_a','chugoku_b'],
+        asia:     ['asia_a','asia_b'],
+        europe:   ['europe_a','europe_b'],
+        america:  ['america_a','america_a2'],
+        africa:   ['africa_a','africa_b'],
+      };
+      const list = pool[region];
+      if (Array.isArray(list) && list.length > 0) {
+        return list[Math.floor(Math.random() * list.length)];
+      }
+      return 'battle';
+    },
 
   getEnemyAttackMode() {
     try { return localStorage.getItem('enemyAttackMode') || 'onMistakeOnly'; } catch { return 'onMistakeOnly'; }
@@ -1821,17 +1931,15 @@ if (this.logMode === 'blockPaged') {
       }
     }
 
-    // チャレンジモードの時のみ、残り時間を描画（縁取り付き）
+        // チャレンジモードの時のみ、経過タイムを描画
     if (gameState.gameMode === 'challenge') {
-      this.drawTextWithOutline(
-        `残り時間: ${battleState.timeRemaining}`,
-        this.canvas.width / 2,
-        30,
-        'yellow',
-        'black',
-        '24px "UDデジタル教科書体", sans-serif',
-        'center'
-      );
+      const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+      const elapsed = Math.max(0, Math.floor(now - (this._timeStartMs || now) - (this._timePauseAccMs || 0)));
+      const mm = String(Math.floor(elapsed / 60000)).padStart(2, '0');
+      const ss = String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0');
+      const cc = String(Math.floor((elapsed % 1000) / 10)).padStart(2, '0');
+      const text = `タイム: ${mm}:${ss}.${cc}`;
+      this.drawTextWithOutline(text, this.canvas.width / 2, 30, 'yellow', 'black', '24px "UDデジタル教科書体", sans-serif', 'center');
     }
 
     // ── 画面フラッシュ効果の更新と描画 ──
@@ -4353,10 +4461,7 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
       if (DEBUG) console.log(`📈 漢字ID:${gameState.currentKanji.id} の正解カウント: ${kanjiItem.correctCount}`);
     }
     
-    // チャレンジモードの場合、残り時間を加算
-    if (gameState.gameMode === 'challenge') {
-      battleState.timeRemaining += 5; // 正解ごとに5秒加算
-    }
+    // チャレンジモードの時間加算は廃止（ストップウォッチ化）
     
     // 1) 連続正解カウントアップ（既存のbattleState.comboCountは保持）
     battleState.comboCount++;
@@ -4665,12 +4770,24 @@ setManagedTimeout(() => {
                         });
                       }
                     
-                       // 最後の敵を倒した場合：ステージクリアを保留状態にする
-                      waitForDefeatAnimationThen(() => {
-                        const inputEl = battleScreenState.inputEl;
-                        if (inputEl) inputEl.value = '';
-                        battleScreenState.stageClearPending = true;
-                      });
+                                            // 最後の敵を倒した場合：ステージクリアを保留状態にする
+                                            waitForDefeatAnimationThen(() => {
+                                              const inputEl = battleScreenState.inputEl;
+                                              if (inputEl) inputEl.value = '';
+                                              // ベストタイム記録（ストップウォッチ）
+                                              try {
+                                                const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+                                                const ms = Math.max(0, Math.floor(now - (battleScreenState._timeStartMs || now) - (battleScreenState._timePauseAccMs || 0)));
+                                                const sid = gameState.currentStageId;
+                                                const prev = gameState.stageBestTimes?.[sid];
+                                                if (typeof prev !== 'number' || ms < prev) {
+                                                  gameState.stageBestTimes = gameState.stageBestTimes || {};
+                                                  gameState.stageBestTimes[sid] = ms;
+                                                  saveGameData();
+                                                }
+                                              } catch {}
+                                              battleScreenState.stageClearPending = true;
+                                            });
                      }
                      return;
     } else {
@@ -4928,10 +5045,7 @@ gameState.playerStats.healsSuccessful++;
     }
     // ▲▲▲ ここまで修正 ▲▲▲
 
-    // チャレンジモードの場合、残り時間を加算
-    if (gameState.gameMode === 'challenge') {
-      battleState.timeRemaining += 5; // 正解ごとに5秒加算
-    }
+        // チャレンジモードの時間加算は廃止（ストップウォッチ化）
   } else {
     // 不正解処理
     
@@ -5404,22 +5518,15 @@ function drawExpBar(ctx, x, y, width, height, currentExp, maxExp) {
  * @param {number} level 計算したいレベル（1以上の整数）
  * @returns {number} そのレベルに到達するための必要経験値
  */
+/**
+ * 指定されたレベルの「次レベルまでの必要EXP」を計算する（新テーブル）
+ */
 function calculateExpForLevel(level) {
-  // 入力値の検証
-  if (!Number.isInteger(level) || level < 1) {
-    return 100; // エラー時のフォールバック
-  }
-  
-  // ベースケース: レベル1の必要経験値は100
-  if (level === 1) {
-    return 100;
-  }
-  
-  // 再帰ケース: レベルLからL+1になるための必要経験値
-  // Math.floor(（レベルL-1の必要経験値） * 1.2) + 20
-  const previousLevelExp = calculateExpForLevel(level - 1);
-  return Math.floor(previousLevelExp * 1.2) + 20;
+  if (!Number.isInteger(level) || level < 1) return 250;
+  const k = level - 1;
+  return Math.max(50, Math.round(250 + 34 * k + 1.7 * k * k));
 }
+
 
 function updatePlayerExp(expGained) {
   // 既存の経験値加算処理
@@ -5462,9 +5569,10 @@ function onAttackHandler() {
 
 
 function getLevelStartExp(level) {
-  // レベル開始時点の累積EXPを返す（Lv1は0）
   if (!Number.isInteger(level) || level <= 1) return 0;
-  return calculateExpForLevel(level - 1);
+  let sum = 0;
+  for (let l = 1; l < level; l++) sum += calculateExpForLevel(l);
+  return sum;
 }
 
 

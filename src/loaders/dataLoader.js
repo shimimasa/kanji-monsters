@@ -1,4 +1,5 @@
 // js/dataLoader.js
+import { gameState } from '../core/gameState.js';
 
 export let stageData = [];
 let enemyData = [];
@@ -92,19 +93,72 @@ export async function loadAllGameData() {
       kanjiByGrade[10] = kanjiByGrade[6] || [];
     }
 
-    // 敵データ読み込み
-    const enemyPath = '/data/enemies_proto.json';
-    const enemyResponse = await fetch(enemyPath);
-    if (!enemyResponse.ok) throw new Error(`敵データの読み込みに失敗: ${enemyResponse.statusText}`);
-    enemyData = await enemyResponse.json();
-    console.log("敵データ読み込み完了");
+        // 敵データ読み込み
+        const enemyPath = '/data/enemies_proto.json';
+        const enemyResponse = await fetch(enemyPath);
+        if (!enemyResponse.ok) throw new Error(`敵データの読み込みに失敗: ${enemyResponse.statusText}`);
+        enemyData = await enemyResponse.json();
+        console.log("敵データ読み込み完了");
+    
+                // 追加: 伝説/幻ゴトモンの読み込みをマージ
+                try {
+                  const legendResp = await fetch('/data/enemies_legend.json');
+                  if (legendResp && legendResp.ok) {
+                    const more = await legendResp.json();
+                    // 学年推定: stageId / id プレフィックス
+                    const stageIdToGrade = {
+                      hokkaido_bonus: 1, tohoku_bonus: 2, kanto_bonus: 3, kantou_bonus: 3, chubu_bonus: 4, chuubu_bonus: 4,
+                      kinki_bonus: 5,
+                      chugoku_bonus: 6, chuugoku_bonus: 6, cyuugoku_bonus: 6,
+                      kyushu_bonus: 6, shikoku_bonus: 6, // 便宜的に6に寄せる（後段のステージ定義で正しく補完）
+                      asia_bonus: 7, europe_bonus: 8, america_bonus: 9, africa_bonus: 10,
+                    };
+                    for (const e of more) {
+                      if (!e || !e.id) continue;
+                      if (typeof e.grade !== 'number') {
+                        let g = null;
+                        if (e.stageId && stageIdToGrade[e.stageId]) g = stageIdToGrade[e.stageId];
+                        else if (String(e.id).startsWith('AS-')) g = 7;
+                        else if (String(e.id).startsWith('EUR-')) g = 8;
+                        else if (String(e.id).startsWith('AME-')) g = 9;
+                        else if (String(e.id).startsWith('AFR-')) g = 10;
+                        if (g) e.grade = g;
+                      }
+                      enemyData.push(e);
+                    }
+                    console.log(`伝説/幻ゴトモン: 追加 ${more.length} 件`);
+                  }
+                } catch (e) {
+                  console.warn('伝説/幻ゴトモンの読み込みに失敗:', e);
+                }
 
-    // ステージデータ読み込み
-    const stagePath = '/data/stages_proto.json';
-    const stageResponse = await fetch(stagePath);
-    if (!stageResponse.ok) throw new Error(`ステージデータの読み込みに失敗: ${stageResponse.statusText}`);
-    stageData = await stageResponse.json();
-    console.log("ステージデータ読み込み完了");
+        // ステージデータ読み込み
+        const stagePath = '/data/stages_proto.json';
+        const stageResponse = await fetch(stagePath);
+        if (!stageResponse.ok) throw new Error(`ステージデータの読み込みに失敗: ${stageResponse.statusText}`);
+        stageData = await stageResponse.json();
+        console.log("ステージデータ読み込み完了");
+    
+        // 追加: ボーナスステージ定義のマージ（存在時のみ）
+        try {
+          const bonusResp = await fetch('/data/stages.bonus.json').catch(() => null);
+          if (bonusResp && bonusResp.ok) {
+            const bonusStages = await bonusResp.json();
+            const exists = new Set(stageData.map(s => s.stageId));
+            let added = 0;
+            for (const s of bonusStages) {
+              if (!s || !s.stageId) continue;
+              if (!exists.has(s.stageId)) {
+                stageData.push(s);
+                exists.add(s.stageId);
+                added++;
+              }
+            }
+            if (added > 0) console.log(`ボーナスステージを ${added} 件追加`);
+          }
+        } catch (e) {
+          console.warn('stages.bonus.json の読み込みに失敗:', e);
+        }
 
     // 敵データに学年（grade）を補完（stageId → stageData／プレフィックス推定）
     {
@@ -131,25 +185,33 @@ export async function loadAllGameData() {
     }
     setStageKanjiMap(kanjiMap);
 
-    // --- 学年ボーナスステージを動的に追加（1〜10年） ---
-    // stageId: bonus_g{grade}
-    // name   : "{n}年 学年ボーナス"（7〜10は級表記）
-    // grade  : 対象学年
-    // region : 1〜6は"ボーナス"、7〜10は世界タブのフィルタ基準（アジア/ヨーロッパ/アメリカ大陸/アフリカ大陸）
-    // enemyIdList: 学年ボス1体（見つからなければ空配列）
-    const gradeToKankenName = (g) => (g===7?'4級':g===8?'3級':g===9?'準2級':'2級');
-    const gradeToWorldRegion = (g) => (g===7?'アジア':g===8?'ヨーロッパ':g===9?'アメリカ大陸':'アフリカ大陸');
-    for (let g = 1; g <= 10; g++) {
-      const id = `bonus_g${g}`;
-      if (!stageData.some(s => s.stageId === id)) {
-        const name = (g <= 6) ? `${g}年 学年ボーナス` : `学年ボーナス（${gradeToKankenName(g)}）`;
-        const region = (g <= 6) ? 'ボーナス' : gradeToWorldRegion(g);
-        const boss = findBonusBossForGrade(g, enemyData);
-        const enemyIdList = boss ? [boss.id] : [];
-        stageData.push({ stageId: id, name, grade: g, region, enemyIdList });
-        console.log(`👍 追加: ${id} name=${name}, grade=${g}, region=${region}, enemies=${enemyIdList.length}`);
-      }
-    }
+        // --- 学年ボーナスステージを動的に追加（1〜10年） ---
+        //const gradeToKankenName = (g) => (g===7?'4級':g===8?'3級':g===9?'準2級':'2級');
+        //const gradeToWorldRegion = (g) => (g===7?'アジア':g===8?'ヨーロッパ':g===9?'アメリカ大陸':'アフリカ大陸');
+    
+        // 学年別 伝説/幻 候補取得ヘルパ
+        ///const pickLegendaryIdsForGrade = (g) => {
+          //const list = enemyData.filter(e =>
+            //e && e.grade === g && (
+              //(typeof e.category === 'string' && e.category.includes('伝説')) ||
+              //String(e.id).includes('-L')
+            //)
+          //);
+          // 安定順にソートして先頭5体
+          //return [...list].sort((a,b) => String(a.id).localeCompare(String(b.id))).slice(0, 5).map(e => e.id);
+        //};
+    
+        //for (let g = 1; g <= 10; g++) {
+          //const id = `bonus_g${g}`;
+          //if (!stageData.some(s => s.stageId === id)) {
+            //const name = (g <= 6) ? `${g}年 学年ボーナス` : `学年ボーナス（${gradeToKankenName(g)}）`;
+            //const region = (g <= 6) ? 'ボーナス' : gradeToWorldRegion(g);
+            // 新仕様: 伝説5体を配置
+            //const enemyIdList = pickLegendaryIdsForGrade(g);
+            //stageData.push({ stageId: id, name, grade: g, region, enemyIdList });
+            //console.log(`👍 追加: ${id} enemies=${enemyIdList.length}`);
+          //}
+        //}
 
     return { kanjiData, enemyData, stageData };
   } catch (error) {
@@ -160,66 +222,100 @@ export async function loadAllGameData() {
 
 
 export function getEnemiesByStageId(stageId) {
-  // 学年ボーナス: 学年ボスのみ
-  const bonusMatchForEnemy = /^bonus_g(\d+)$/i.exec(stageId);
-  if (bonusMatchForEnemy) {
-    const g = parseInt(bonusMatchForEnemy[1], 10);
-    const fights = g <= 6 ? 3 : 4;
+  // ボーナス: 通常ステージ型（伝説5体）。レビュー解放で幻が混入
+  const m = /^bonus_g(\d+)$/i.exec(stageId);
+  if (m) {
+    const g = parseInt(m[1], 10);
+    // ステージ定義に敵が入っていればそれを使い、無ければ学年伝説から動的生成
+    const st = stageData.find(s => s.stageId === stageId);
+    let baseIds = Array.isArray(st?.enemyIdList) && st.enemyIdList.length > 0
+      ? st.enemyIdList.slice(0, 5)
+      : (() => {
+          const list = enemyData.filter(e =>
+            e && e.grade === g && (
+              (typeof e.category === 'string' && e.category.includes('伝説')) ||
+              String(e.id).includes('-L')
+            )
+          ).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+          return list.slice(0,5).map(e=>e.id);
+        })();
 
-    // 学年内の通常ステージを抽出（ボーナス自身は除外）
-    const gradeStages = stageData.filter(s => s.grade === g && !/^bonus_/i.test(s.stageId));
-    const byId = new Map(enemyData.map(e => [e.id, e]));
-
-    // 各ステージからボス（isBoss=true）を優先、無ければ末尾ID(最大)を採用
-    const picked = [];
-    const pickedIds = new Set();
-    for (const s of gradeStages) {
-      if (!Array.isArray(s.enemyIdList) || s.enemyIdList.length === 0) continue;
-      const enemies = s.enemyIdList.map(id => byId.get(id)).filter(Boolean);
-      let boss = enemies.find(e => e.isBoss);
-      if (!boss) {
-        const sorted = [...enemies].sort((a,b) => String(a.id).localeCompare(String(b.id)));
-        boss = sorted[sorted.length - 1];
-      }
-      if (boss && !pickedIds.has(boss.id)) {
-        // 念のためボス扱い
-        if (!boss.isBoss) boss.isBoss = true;
-        picked.push(boss);
-        pickedIds.add(boss.id);
-      }
-      if (picked.length >= fights) break;
-    }
-
-    // 足りない場合は学年内の敵からID末尾が大の順で補完（重複なし）
-    if (picked.length < fights) {
-      const gradeEnemyIds = new Set(
-        gradeStages.flatMap(s => Array.isArray(s.enemyIdList) ? s.enemyIdList : [])
-      );
-      const candidates = [...gradeEnemyIds]
-        .map(id => byId.get(id)).filter(Boolean)
-        .sort((a,b) => String(a.id).localeCompare(String(b.id)));
-
-      for (let i = candidates.length - 1; i >= 0 && picked.length < fights; i--) {
-        const e = candidates[i];
-        if (!pickedIds.has(e.id)) {
-          if (!e.isBoss) e.isBoss = true;
-          picked.push(e);
-          pickedIds.add(e.id);
+    // 幻置換: ボーナス初クリア後のレビュー増分を集計 → 30ごとに1体、最大5体
+    let replacedCount = 0;
+    let eligibleSum = 0;
+    try {
+      if (gameState && gameState.practiceProgress && Array.isArray(stageData)) {
+        const stagesOfGrade = stageData.filter(s => s && s.grade === g);
+        for (const stg of stagesOfGrade) {
+          const sid = String(stg.stageId || '');
+          const entry = gameState.practiceProgress[sid] || {};
+          const cur = Math.max(0, Number(entry.reviewScore || 0));
+          const snap = Math.max(0, Number(entry.reviewScoreSnapshot || 0));
+          eligibleSum += Math.max(0, cur - snap);
         }
       }
-    }
+      const perPhantom = Math.max(1, parseInt(localStorage.getItem('phantomPerUnit') || '30', 10));
+      const maxSlots = 5;
+      let need = Math.min(maxSlots, Math.floor(eligibleSum / perPhantom));
 
-    return picked;
+      if (need > 0 && baseIds.length > 0) {
+        const phantoms = enemyData.filter(e =>
+          e && e.grade === g && (
+            (typeof e.rarity === 'string' && e.rarity.includes('幻')) ||
+            (typeof e.category === 'string' && e.category.includes('幻')) ||
+            String(e.id).includes('-F')
+          )
+        ).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+
+        if (phantoms.length > 0) {
+          // 置換対象インデックス（重複なし）
+          const idxs = [...Array(baseIds.length).keys()];
+          for (let i = idxs.length - 1; i > 0; i--) {
+            const j = (Math.random() * (i + 1)) | 0;
+            [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+          }
+          const pickedIdx = idxs.slice(0, Math.min(need, baseIds.length));
+
+          // 幻の候補から重複しないように選択
+          const pickedPhantoms = [];
+          const pool = [...phantoms];
+          for (let k = 0; k < pickedIdx.length && pool.length > 0; k++) {
+            const pi = (Math.random() * pool.length) | 0;
+            pickedPhantoms.push(pool.splice(pi, 1)[0]);
+          }
+
+          // 実置換
+          for (let t = 0; t < pickedIdx.length && t < pickedPhantoms.length; t++) {
+            baseIds[pickedIdx[t]] = pickedPhantoms[t].id;
+            replacedCount++;
+          }
+        }
+      }
+    } catch {}
+
+    // バトル画面で表示するための情報を格納
+    try {
+      gameState.__bonusPhantomInfo = {
+        grade: g,
+        replaced: replacedCount,
+        progress: eligibleSum,
+        target: 150,
+        perUnit: 30
+      };
+    } catch {}
+
+    // 実体化
+    const byId = new Map(enemyData.map(e => [e.id, e]));
+    return baseIds.map(id => byId.get(id)).filter(Boolean);
   }
 
   const stage = stageData.find(s => s.stageId === stageId);
   if (!stage || !stage.enemyIdList) return [];
-  
-  // IDリストに基づいて敵データをフィルタリング
+
   let enemies = enemyData.filter(e => stage.enemyIdList.includes(e.id));
-  
-  // 敵が見つからない場合、IDの接頭辞マッピングを試す
-  if (enemies.length === 0) {
+
+   // 敵が見つからない場合、IDの接頭辞マッピングを試す
+   if (enemies.length === 0) {
     console.warn(`⚠️ ステージ ${stageId} の敵が見つかりません。IDマッピングを試みます。`);
     
     // ステージIDから地域を判断
@@ -243,18 +339,34 @@ export function getEnemiesByStageId(stageId) {
       'chubu_area4': 'HKI',    // 福井
       'chubu_area5': 'NGN',    // 長野
       'chubu_area6': 'GF',     // 岐阜
-      'kinki_area1': 'ME',    // 三重
-      'kinki_area2': 'SG',    // 滋賀
+      'kinki_area1': 'ME',     // 三重
+      'kinki_area2': 'SG',     // 滋賀
       'kinki_area3': 'OSK',    // 大阪
       'kinki_area4': 'KYT',    // 京都
       'kinki_area5': 'HYG',    // 兵庫
-      'kinki_area6': 'NR',    // 奈良
-      'kinki_area7': 'WKY',   // 和歌山
-      'chuugoku_area1': 'TTR',    // 鳥取
-      'chuugoku_area2': 'OKY',    // 岡山
-      'chuugoku_area3': 'SMN',    // 島根
-      'chuugoku_area4': 'HRS',    // 広島
-      'chuugoku_area5': 'YMGC',    // 山口
+      'kinki_area6': 'NR',     // 奈良
+      'kinki_area7': 'WKY',    // 和歌山
+      'chuugoku_area1': 'TTR', // 鳥取
+      'chuugoku_area2': 'OKY', // 岡山
+      'chuugoku_area3': 'SMN', // 島根
+      'chuugoku_area4': 'HRS', // 広島
+      'chuugoku_area5': 'YMGC',// 山口
+
+      // 追加: 四国
+      'shikoku_area1': 'TOKU', // 徳島
+      'shikoku_area2': 'KAGA', // 香川（KAG ではなく KAGA）
+      'shikoku_area3': 'EHIM', // 愛媛（EHM ではなく EHIM）
+      'shikoku_area4': 'KOCH', // 高知
+
+      // 追加: 九州
+      'kyushu_area1': 'FUK',   // 福岡（FUKU ではなく FUK）
+      'kyushu_area2': 'SAGA',  // 佐賀（SAG ではなく SAGA）
+      'kyushu_area3': 'NAGA',  // 長崎（NAG ではなく NAGA）
+      'kyushu_area4': 'OITA',  // 大分（OIT ではなく OITA）
+      'kyushu_area5': 'KUMA',  // 熊本（KUM ではなく KUMA）
+      'kyushu_area6': 'MIYA',  // 宮崎（MIY ではなく MIYA）
+      'kyushu_area7': 'KAGO',  // 鹿児島（KAG ではなく KAGO）
+      'kyushu_area8': 'OKI',   // 沖縄
     };
     
     const prefCode = regionMapping[stageId];
@@ -326,10 +438,22 @@ export function getKanjiByStageId(stageId) {
     return getKanjiByGrade(10);
   }
   
-  // 既存のロジック
+  // 既存のロジック + 追加フォールバック
   if (!stageKanjiMap[normalizedId]) {
     console.log(`stageKanjiMap[${normalizedId}] が見つかりません。正規化されたID: ${normalizedId}`);
-    
+
+    // 追加: ステージ定義にある kanjiPoolIdList を直接参照
+    try {
+      const st = stageData.find(s => String(s.stageId).toLowerCase() === normalizedId);
+      if (st && Array.isArray(st.kanjiPoolIdList) && st.kanjiPoolIdList.length > 0) {
+        const pool = st.kanjiPoolIdList.map(id => getKanjiById(id)).filter(Boolean);
+        if (pool.length > 0) {
+          console.log(`✅ stages_proto の kanjiPoolIdList から ${pool.length} 件を構築`);
+          return pool;
+        }
+      }
+    } catch {}
+
     // ステージIDから学年を推測
     const grade = getGradeFromStageId(normalizedId);
     if (grade) {
@@ -351,6 +475,8 @@ function getGradeFromStageId(stageId) {
   if (stageId.startsWith('chubu_')) return 4;
   if (stageId.startsWith('kinki_')) return 5;
   if (stageId.startsWith('chugoku_') || stageId.startsWith('chuugoku_')) return 6;
+  if (stageId.startsWith('shikoku_')) return 11;   // 追加
+  if (stageId.startsWith('kyushu_'))  return 12;   // 追加
   if (stageId.startsWith('asia_')) return 7;
   if (stageId.startsWith('europe_')) return 8;
   if (stageId.startsWith('america_')) return 9;
@@ -446,21 +572,13 @@ function findBonusBossForGrade(grade, allEnemies) {
  * @returns {boolean} マスター済みならtrue
  */
 export function isKanjiMastered(kanjiId) {
-  // gameStateをインポート
-  import('../core/gameState.js').then(({ gameState }) => {
-    const progress = gameState.kanjiReadProgress?.[kanjiId];
+  try {
+    const gs = (typeof window !== 'undefined' && window.gameState) ? window.gameState : null;
+    const progress = gs?.kanjiReadProgress?.[kanjiId];
     return !!(progress && progress.mastered);
-  }).catch(() => {
+  } catch (e) {
     return false;
-  });
-  
-  // 同期的にチェックするため、直接参照
-  if (typeof window !== 'undefined' && window.gameState) {
-    const progress = window.gameState.kanjiReadProgress?.[kanjiId];
-    return !!(progress && progress.mastered);
   }
-  
-  return false;
 }
 
 /**

@@ -116,6 +116,7 @@ const kanjiDexScreen = {
       }
     };
     window.addEventListener('keydown', this._keyHandler);
+    import('../../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('kanjiDex', { canvas: this.canvas }));
   },
 
   createDOMHeader() {
@@ -570,21 +571,43 @@ const kanjiDexScreen = {
     }
   },
 
-  /** 漢字カードを生成 */
-  _createKanjiCard(kanjiData) {
-    const collected = this.dexSet.has(kanjiData.id);
-    
-    // カード要素を作成
-    const card = document.createElement('div');
-    card.className = 'kanji-card';
-    if (!collected) {
-      card.classList.add('locked');
-    }
-    
-    // 枠線のスタイルを直接設定
-    card.style.border = '1px solid #8B4513';
-    card.style.boxShadow = '3px 3px 5px rgba(0, 0, 0, 0.3)';
-    
+    /** 漢字カードを生成 */
+    _createKanjiCard(kanjiData) {
+      const collected = this.dexSet.has(kanjiData.id);
+      const prog = (gameState && gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiData.id]) || null;
+      const isMastered = !!(prog && prog.mastered);
+      
+      // カード要素を作成
+      const card = document.createElement('div');
+      card.className = 'kanji-card';
+      if (!collected) {
+        card.classList.add('locked');
+      }
+      
+      // 枠線のスタイルを直接設定
+      card.style.border = '1px solid #8B4513';
+      card.style.boxShadow = '3px 3px 5px rgba(0, 0, 0, 0.3)';
+      card.style.position = 'relative';
+      
+      if (isMastered) {
+        card.style.border = '2px solid #DAA520';
+        const badge = document.createElement('div');
+        badge.textContent = 'MASTER';
+        Object.assign(badge.style, {
+          position: 'absolute',
+          top: '6px',
+          right: '6px',
+          padding: '2px 6px',
+          fontSize: '11px',
+          fontWeight: '700',
+          color: '#fff',
+          background: 'linear-gradient(135deg, #e1b12c, #d4a017)',
+          border: '1px solid rgba(0,0,0,0.3)',
+          borderRadius: '6px',
+          letterSpacing: '0.5px'
+        });
+        card.appendChild(badge);
+      }
     // 漢字を表示
     const kanjiEl = document.createElement('h2');
     kanjiEl.className = 'kanji-character';
@@ -717,62 +740,66 @@ const kanjiDexScreen = {
    frag.appendChild(modalContainer);
    document.body.appendChild(frag); // 一括追加でレイアウト1回
 
-    // 重い部分は次フレームに分割して描画（カクつき防止）
-    requestAnimationFrame(() => {
-      const toArray = v => Array.isArray(v) ? v : (typeof v === 'string' ? v.split(' ').filter(Boolean) : []);
-      const prog = (gameState && gameState.kanjiReadProgress && gameState.kanjiReadProgress[k.id]) || null;
-      const kunSet = prog?.kunyomi || new Set();
-      const onSet  = prog?.onyomi  || new Set();
-
-      const makeRow = (label, list, masteredSet) => {
-        const row = document.createElement('div');
-        row.style.margin = '6px 0';
-
-        const header = document.createElement('strong');
-        const total = list.length;
-        let masteredCount = 0;
-        header.textContent = `${label}（${total}）`;
-        row.appendChild(header);
-
-        const wrap = document.createElement('div');
-        wrap.style.display = 'flex';
-        wrap.style.flexWrap = 'wrap';
-        wrap.style.gap = '6px';
-        wrap.style.marginTop = '4px';
-
-        list.forEach((r) => {
-          const chip = document.createElement('span');
-          const mastered = masteredSet && masteredSet.has && masteredSet.has(r);
-          if (mastered) masteredCount++;
-  
-          chip.textContent = mastered ? `✓ ${r}` : `○ ${r}`;
-          chip.style.display = 'inline-block';
-          chip.style.padding = '4px 8px';
-          chip.style.borderRadius = '999px';
-          chip.style.fontSize = '13px';
-  
-          if (mastered) {
-            chip.style.border = '1px solid #1f4f8d';
-            chip.style.background = '#2d6cdf';
-            chip.style.color = '#fff';
-          } else {
-            chip.style.border = '1px dashed rgba(255,255,255,0.6)';
-            chip.style.background = 'rgba(255,255,255,0.15)';
-            chip.style.color = '#fff';
-          }
-  
-          chip.title = mastered ? '読めた' : '未読';
-          wrap.appendChild(chip);
-        });
-
-        header.textContent = `${label}（${masteredCount}/${total}）`;
-        row.appendChild(wrap);
-        return row;
-      };
-
-      progressSection.textContent = '';
-
-      const legend = document.createElement('div');
+        // 重い部分は次フレームに分割して描画（カクつき防止）
+        requestAnimationFrame(() => {
+          const toArray = v => Array.isArray(v) ? v : (typeof v === 'string' ? v.split(' ').filter(Boolean) : []);
+          const prog = (gameState && gameState.kanjiReadProgress && gameState.kanjiReadProgress[k.id]) || null;
+          const kunSet = prog?.kunyomi || new Set();
+          const onSet  = prog?.onyomi  || new Set();
+    
+          // 追加: 比較用のひらがな正規化
+          const hiraShift = ch => String.fromCharCode(ch.charCodeAt(0) - 0x60);
+          const toHiragana = (s) => String(s || '').replace(/[\u30a1-\u30f6]/g, hiraShift);
+    
+          const makeRow = (label, list, masteredSet) => {
+            const row = document.createElement('div');
+            row.style.margin = '6px 0';
+    
+            const header = document.createElement('strong');
+            const total = list.length;
+            let masteredCount = 0;
+            header.textContent = `${label}（${total}）`;
+            row.appendChild(header);
+    
+            const wrap = document.createElement('div');
+            wrap.style.display = 'flex';
+            wrap.style.flexWrap = 'wrap';
+            wrap.style.gap = '6px';
+            wrap.style.marginTop = '4px';
+    
+            list.forEach((r) => {
+              const chip = document.createElement('span');
+              const mastered = masteredSet && masteredSet.has && masteredSet.has(toHiragana(r));
+              if (mastered) masteredCount++;
+    
+              chip.textContent = mastered ? `✓ ${r}` : `○ ${r}`;
+              chip.style.display = 'inline-block';
+              chip.style.padding = '4px 8px';
+              chip.style.borderRadius = '999px';
+              chip.style.fontSize = '13px';
+    
+              if (mastered) {
+                chip.style.border = '1px solid #1f4f8d';
+                chip.style.background = '#2d6cdf';
+                chip.style.color = '#fff';
+              } else {
+                chip.style.border = '1px dashed rgba(255,255,255,0.6)';
+                chip.style.background = 'rgba(255,255,255,0.15)';
+                chip.style.color = '#fff';
+              }
+    
+              chip.title = mastered ? '読めた' : '未読';
+              wrap.appendChild(chip);
+            });
+    
+            header.textContent = `${label}（${masteredCount}/${total}）`;
+            row.appendChild(wrap);
+            return row;
+          };
+    
+          progressSection.textContent = '';
+    
+          const legend = document.createElement('div');
       legend.style.display = 'flex';
       legend.style.gap = '12px';
       legend.style.alignItems = 'center';

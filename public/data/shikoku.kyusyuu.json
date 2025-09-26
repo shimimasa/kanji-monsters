@@ -1,0 +1,1355 @@
+[
+    {
+      "id": "TOKU-E01",
+      "name": "すだちスライム",
+      "prefecture": "徳島",
+      "category": "食文化",
+      "habitat": "徳島の畑や台所",
+      "desc": "すだちの香りをまとった小さなスライム。酸味のしずくを飛ばして攻撃する。",
+      "trivia": "すだちは徳島県の特産品で、料理に爽やかな酸味を加える。",
+      "catchphrase": "「しぼってさわやか、元気はつらつ！」",
+      "isBoss": false
+    },
+    {
+      "id": "TOKU-E02",
+      "name": "阿波おどりスピリット",
+      "prefecture": "徳島",
+      "category": "祭り",
+      "habitat": "阿波おどり会場",
+      "desc": "阿波おどりの舞を舞う精霊。舞うたびに鈴の音が鳴り響き、仲間を鼓舞する。",
+      "trivia": "阿波おどりは400年以上続く徳島の夏祭り。『踊る阿呆に見る阿呆』の掛け声が有名。",
+      "catchphrase": "「踊れや踊れ！リズムに乗って！」",
+      "isBoss": false
+    },
+    {
+      "id": "TOKU-E03",
+      "name": "鳴門ワカメインプ",
+      "prefecture": "徳島",
+      "category": "自然",
+      "habitat": "鳴門海峡",
+      "desc": "ワカメの体を持つ小悪魔。潮に乗ってひらひらと舞い泳ぐ。",
+      "trivia": "徳島の鳴門ワカメは肉厚でシャキシャキとした食感が特徴。",
+      "catchphrase": "「海の恵みでぴちぴち元気！」",
+      "isBoss": false
+    },
+    {
+      "id": "TOKU-E04",
+      "name": "レンコンアーマー",
+      "prefecture": "徳島",
+      "category": "食文化",
+      "habitat": "徳島の田畑",
+      "desc": "レンコンでできた鎧を纏う戦士。穴からは力の風が吹き出す。",
+      "trivia": "徳島のレンコンはシャキッとした歯ごたえがあり、料理に使われる。",
+      "catchphrase": "「穴からパワー、全力解放！」",
+      "isBoss": false
+    },
+    {
+      "id": "TOKU-E05",
+      "name": "祖谷かずらブリッジフェアリー",
+      "prefecture": "徳島",
+      "category": "自然・建造物",
+      "habitat": "祖谷のかずら橋",
+      "desc": "かずら橋に宿る妖精。橋を渡る者をそっと見守る。",
+      "trivia": "祖谷のかずら橋はシラクチカズラで編まれた吊り橋で、日本三奇橋の一つ。",
+      "catchphrase": "「ゆらりゆらり、あなたを支える！」",
+      "isBoss": false
+    },
+    {
+      "id": "TOKU-E06",
+      "name": "なると金時チャイルド",
+      "prefecture": "徳島",
+      "category": "食文化",
+      "habitat": "なると市の畑",
+      "desc": "さつまいもの子ども妖精。甘い香りで人を和ませる。",
+      "trivia": "なると金時は徳島特産のさつまいもで、ホクホクした甘さが特徴。",
+      "catchphrase": "「甘さバクハツ、ほっこりパワー！」",
+      "isBoss": false
+    },
+    {
+      "id": "TOKU-E07",
+      "name": "鳴門渦シーホース",
+      "prefecture": "徳島",
+      "category": "自然",
+      "habitat": "鳴門海峡の渦潮",
+      "desc": "渦潮の力をまとったタツノオトシゴ。敵を巻き込み翻弄する。",
+      "trivia": "鳴門の渦潮は世界三大潮流の一つで、最大直径は30mを超える。",
+      "catchphrase": "「渦に巻かれておぼれてしまえ！」",
+      "isBoss": false
+      },
+      {
+        "id": "TOKU-E08",
+        "name": "剣山サムライガーディアン",
+        "prefecture": "徳島",
+        "category": "自然・守護者",
+        "habitat": "剣山山頂",
+        "desc": "剣山を守る侍の姿をした守護者。剣のような岩を背負う。",
+        "trivia": "剣山は標高1955mの山で、山頂には『平家の落人伝説』が残る。",
+        "catchphrase": "「山を背負い、剣を振るう！」",
+        "isBoss": false
+      },
+    {
+      "id": "TOKU-E09",
+      "name": "阿波紙ゴーレム",
+      "prefecture": "徳島",
+      "category": "工芸",
+      "habitat": "和紙工房",
+      "desc": "阿波和紙でできた体を持つゴーレム。折り紙のように自在に形を変える。",
+      "trivia": "阿波和紙は1300年の歴史を持つ伝統工芸品。",
+      "catchphrase": "「紙の力で包み込む！」",
+      "isBoss": false
+    },
+    {
+      "id": "TOKU-E10",
+      "name": "大鳴門オロチロード",
+      "prefecture": "徳島",
+      "category": "伝説・ボス",
+      "habitat": "鳴門海峡",
+      "desc": "鳴門の渦潮から生まれた大蛇の王。八つの首で海を支配する。",
+      "trivia": "徳島の鳴門海峡は激しい潮流で知られ、古来より伝説の舞台となっている。",
+      "catchphrase": "「渦潮を支配する、八岐の王！」",
+      "isBoss": true
+    },
+        {
+          "id": "KAGA-E01",
+          "name": "うどんキャット",
+          "prefecture": "香川",
+          "category": "食文化・動物",
+          "habitat": "高松市周辺",
+          "desc": "うどんを首に巻いた福猫。もちもちしたしっぽで攻撃する。",
+          "trivia": "香川県は『うどん県』として知られ、讃岐うどんが名物。",
+          "catchphrase": "「にゃんとコシのあるしっぽ攻撃！」",
+          "isBoss": false
+        },
+        {
+          "id": "KAGA-E02",
+          "name": "オリーブフェアリー",
+          "prefecture": "香川",
+          "category": "自然・植物",
+          "habitat": "小豆島のオリーブ畑",
+          "desc": "オリーブの葉の翼を持つ妖精。緑の力で仲間を癒す。",
+          "trivia": "小豆島は日本で初めてオリーブが栽培された地。",
+          "catchphrase": "「オリーブの光でいやしを！」",
+          "isBoss": false
+        },
+        {
+          "id": "KAGA-E03",
+          "name": "しょうゆ壺スライム",
+          "prefecture": "香川",
+          "category": "食文化",
+          "habitat": "小豆島の醤油蔵",
+          "desc": "醤油壺から生まれた黒いスライム。しょっぱいしずくを飛ばす。",
+          "trivia": "小豆島は醤油の産地としても有名。",
+          "catchphrase": "「しょっぱさ全開！」",
+          "isBoss": false
+        },
+        {
+          "id": "KAGA-E04",
+          "name": "直島アートスピリット",
+          "prefecture": "香川",
+          "category": "文化",
+          "habitat": "直島の美術館",
+          "desc": "現代アートの島に宿る精霊。カラフルな模様で姿を変える。",
+          "trivia": "直島は現代アートの聖地として世界的に知られる。",
+          "catchphrase": "「アートは無限の力！」",
+          "isBoss": false
+        },
+        {
+          "id": "KAGA-E05",
+          "name": "骨付き鳥ビースト",
+          "prefecture": "香川",
+          "category": "食文化",
+          "habitat": "丸亀の屋台",
+          "desc": "香ばしい香りを漂わせる鳥型モンスター。灼熱の炎を吐く。",
+          "trivia": "骨付き鳥は丸亀市のご当地グルメ。",
+          "catchphrase": "「肉汁ほとばしる炎の翼！」",
+          "isBoss": false
+        },
+        {
+          "id": "KAGA-E06",
+          "name": "金刀比羅ネコ",
+          "prefecture": "香川",
+          "category": "動物・信仰",
+          "habitat": "金刀比羅宮参道",
+          "desc": "参拝客を導く守り猫。鈴の音で人々を癒やす。",
+          "trivia": "金刀比羅宮は『こんぴらさん』の名で親しまれる海の守り神。",
+          "catchphrase": "「福を招く、神のネコ！」",
+          "isBoss": false
+        },
+        {
+          "id": "KAGA-E07",
+          "name": "こんぴらシードラゴン",
+          "prefecture": "香川",
+          "category": "信仰・守護者",
+          "habitat": "金刀比羅宮奥社",
+          "desc": "金色の鱗を持つ龍魚。波の力をまとい参拝者を守る。",
+          "trivia": "金刀比羅宮は古来より海の安全を祈る信仰の対象となってきた。",
+          "catchphrase": "「波を従える龍の守護！」",
+          "isBoss": false
+        },
+        {
+          "id": "KAGA-E08",
+          "name": "オリーブナイト",
+          "prefecture": "香川",
+          "category": "自然・騎士",
+          "habitat": "小豆島のオリーブ畑",
+          "desc": "オリーブの木で作られた盾と剣を持つ騎士。実りの力を宿す。",
+          "trivia": "オリーブは香川県小豆島のシンボル。",
+          "catchphrase": "「実りの力で大地を守る！」",
+          "isBoss": false
+        },
+        {
+          "id": "KAGA-E09",
+          "name": "庵治石ジャイアント",
+          "prefecture": "香川",
+          "category": "工芸・巨人",
+          "habitat": "庵治町の採石場",
+          "desc": "庵治石でできた巨人。硬く重い体で地面を揺らす。",
+          "trivia": "庵治石は最高級の花崗岩で、墓石や彫刻に使われる。",
+          "catchphrase": "「石の力で不滅の守り！」",
+          "isBoss": false
+        },
+        {
+            "id": "KAGA-E10",
+            "name": "瀬戸大橋タイタン",
+            "prefecture": "香川",
+            "category": "建造・ボス",
+            "habitat": "瀬戸大橋・瀬戸内海",
+            "desc": "瀬戸大橋を背にした巨大な石の巨人。橋を武器のように振るい、海と大地を揺るがす。鉄と石の装甲を纏い、圧倒的な存在感を放つ。",
+            "trivia": "瀬戸大橋は香川県と岡山県を結ぶ大規模橋梁群で、世界最大級の道路鉄道併用橋として知られる。",
+            "catchphrase": "「海を渡り、大地を揺らす巨橋の守護神！」",
+            "isBoss": true
+          },
+
+          
+            {
+              "id": "EHIM-E01",
+              "name": "みかんスライム",
+              "prefecture": "愛媛",
+              "category": "特産・スライム",
+              "habitat": "みかん畑",
+              "desc": "愛媛みかんから生まれた小さなスライム。柑橘の香りを漂わせる。",
+              "trivia": "愛媛県は日本有数のみかんの産地。",
+              "catchphrase": "「ビタミンパワーで元気いっぱい！」",
+              "isBoss": false
+            },
+            {
+              "id": "EHIM-E02",
+              "name": "道後オンセンスピリット",
+              "prefecture": "愛媛",
+              "category": "温泉・精霊",
+              "habitat": "道後温泉",
+              "desc": "温泉の湯気から生まれた精霊。癒しの力を持つ。",
+              "trivia": "道後温泉は日本三古湯のひとつで、夏目漱石『坊っちゃん』にも登場。",
+              "catchphrase": "「ぽかぽかパワーでみんな回復！」",
+              "isBoss": false
+            },
+            {
+              "id": "EHIM-E03",
+              "name": "内子紙フェアリー",
+              "prefecture": "愛媛",
+              "category": "工芸・妖精",
+              "habitat": "内子町",
+              "desc": "手漉き和紙から生まれた妖精。白く透き通った羽を広げる。",
+              "trivia": "内子町は伝統的な和紙作りで知られる。",
+              "catchphrase": "「清らかな紙の力で舞い上がれ！」",
+              "isBoss": false
+            },
+            {
+              "id": "EHIM-E04",
+              "name": "タオルゴーレム",
+              "prefecture": "愛媛",
+              "category": "工業・ゴーレム",
+              "habitat": "今治市",
+              "desc": "タオルを幾重にも巻きつけてできたゴーレム。柔らかくも守りは堅い。",
+              "trivia": "今治タオルは高品質で世界的にも有名。",
+              "catchphrase": "「ふわふわだけど負けないぞ！」",
+              "isBoss": false
+            },
+            {
+              "id": "EHIM-E05",
+              "name": "石鎚クラウドドラゴン",
+              "prefecture": "愛媛",
+              "category": "伝説・竜",
+              "habitat": "石鎚山",
+              "desc": "石鎚山の雲と雷から生まれた龍。雲をまとい稲光を放つ。",
+              "trivia": "石鎚山は西日本最高峰で、修験道の聖地とされる。",
+              "catchphrase": "「雷鳴轟く、天空の守護竜！」",
+              "isBoss": false
+            },
+            {
+              "id": "EHIM-E06",
+              "name": "しまなみサイクルバード",
+              "prefecture": "愛媛",
+              "category": "自然・鳥",
+              "habitat": "しまなみ海道",
+              "desc": "しまなみ海道を駆け抜ける風を背負った鳥。翼に自転車の車輪模様を持つ。",
+              "trivia": "しまなみ海道はサイクリストの聖地として有名。",
+              "catchphrase": "「風と共に走り抜けろ！」",
+              "isBoss": false
+            },
+            {
+              "id": "EHIM-E07",
+              "name": "宇和海パールマーメイド",
+              "prefecture": "愛媛",
+              "category": "自然・人魚",
+              "habitat": "宇和海",
+              "desc": "真珠のように輝く鱗を持つ人魚。海を優雅に泳ぎ回る。",
+              "trivia": "宇和海は真珠養殖が盛んな地域。",
+              "catchphrase": "「海の宝石、きらめきの舞！」",
+              "isBoss": false
+            },
+            {
+              "id": "EHIM-E08",
+              "name": "松山キャッスルナイト",
+              "prefecture": "愛媛",
+              "category": "歴史・騎士",
+              "habitat": "松山城",
+              "desc": "松山城を守る騎士。兜には天守閣を模した飾りを持つ。",
+              "trivia": "松山城は江戸時代の天守が現存する貴重な城の一つ。",
+              "catchphrase": "「城と共に不滅の守り！」",
+              "isBoss": false
+            },
+            {
+              "id": "EHIM-E09",
+              "name": "坊っちゃんトリックスター",
+              "prefecture": "愛媛",
+              "category": "文学・妖怪",
+              "habitat": "松山市内",
+              "desc": "夏目漱石の小説から生まれたいたずら好きの妖怪。下駄を履いて跳ね回る。",
+              "trivia": "『坊っちゃん』は愛媛県松山市が舞台となった小説。",
+              "catchphrase": "「いたずら心は文学のスパイス！」",
+              "isBoss": false
+            },
+            {
+              "id": "EHIM-E10",
+              "name": "瀬戸内シーキングロード",
+              "prefecture": "愛媛",
+              "category": "伝説・ボス",
+              "habitat": "瀬戸内海",
+              "desc": "瀬戸内海を支配する海王。潮流を操り、真珠の冠を戴く巨大な海の王。",
+              "trivia": "瀬戸内海は多島美と豊かな漁場で知られる。",
+              "catchphrase": "「潮流を制す、海の王者！」",
+              "isBoss": true
+            },
+                {
+                  "id": "KOCH-E01",
+                  "name": "土佐犬ビースト",
+                  "prefecture": "高知",
+                  "category": "動物",
+                  "habitat": "土佐地方",
+                  "desc": "闘志に満ちた土佐犬の怪物。炎をまとって咆哮する。",
+                  "trivia": "土佐犬は高知県の代表的な犬種で、闘犬として知られる。",
+                  "catchphrase": "「闘志の炎を燃やす猛犬！」",
+                  "isBoss": false
+                },
+                {
+                  "id": "KOCH-E02",
+                  "name": "坂本リョウマスピリット",
+                  "prefecture": "高知",
+                  "category": "歴史",
+                  "habitat": "高知市・桂浜周辺",
+                  "desc": "羽織袴をまとい、剣と希望の光を持つ精霊。",
+                  "trivia": "坂本龍馬は幕末に活躍した土佐藩出身の志士。",
+                  "catchphrase": "「未来を切り拓く維新の光！」",
+                  "isBoss": false
+                },
+                {
+                  "id": "KOCH-E03",
+                  "name": "よさこいフェアリー",
+                  "prefecture": "高知",
+                  "category": "祭り",
+                  "habitat": "高知市中心部",
+                  "desc": "鳴子を振って舞う小さな妖精。華やかな光を放つ。",
+                  "trivia": "よさこい祭りは毎年8月に開催される高知の代表的な祭り。",
+                  "catchphrase": "「舞え！鳴子のリズム！」",
+                  "isBoss": false
+                },
+                {
+                  "id": "KOCH-E04",
+                  "name": "カツオブレード",
+                  "prefecture": "高知",
+                  "category": "食文化",
+                  "habitat": "高知県沿岸部",
+                  "desc": "カツオの形をした剣士。背中から炎が立ち上る。",
+                  "trivia": "高知県はカツオの一本釣りで有名。タタキも名物料理。",
+                  "catchphrase": "「炎の刃で斬り裂け！」",
+                  "isBoss": false
+                },
+                {
+                  "id": "KOCH-E05",
+                  "name": "四万十リバードラゴン",
+                  "prefecture": "高知",
+                  "category": "自然",
+                  "habitat": "四万十川流域",
+                  "desc": "四万十川の清流をまとった龍。水の鱗を輝かせる。",
+                  "trivia": "四万十川は「日本最後の清流」と呼ばれる。",
+                  "catchphrase": "「清流の力で舞い上がれ！」",
+                  "isBoss": false
+                },
+                {
+                  "id": "KOCH-E06",
+                  "name": "室戸ミネラルゴーレム",
+                  "prefecture": "高知",
+                  "category": "自然",
+                  "habitat": "室戸岬",
+                  "desc": "室戸岬の岩と鉱石でできた巨人。海の力を宿す。",
+                  "trivia": "室戸岬は地質学的にも貴重な場所で、ユネスコ世界ジオパークに認定されている。",
+                  "catchphrase": "「鉱石の力で立ちはだかる！」",
+                  "isBoss": false
+                },
+                {
+                  "id": "KOCH-E07",
+                  "name": "鯨タイタン",
+                  "prefecture": "高知",
+                  "category": "海洋",
+                  "habitat": "土佐湾",
+                  "desc": "巨大な鯨の守護者。潮を吹いて嵐を呼ぶ。",
+                  "trivia": "高知県沿岸では古くから捕鯨文化があった。",
+                  "catchphrase": "「潮吹きで海を揺るがす巨鯨！」",
+                  "isBoss": false
+                },
+                {
+                  "id": "KOCH-E08",
+                  "name": "安芸シトラスチャイルド",
+                  "prefecture": "高知",
+                  "category": "食文化",
+                  "habitat": "安芸市の果樹園",
+                  "desc": "文旦や柚子を抱えた子ども精霊。爽やかな香りを漂わせる。",
+                  "trivia": "安芸市は柑橘類の名産地で、特に文旦や柚子が有名。",
+                      "catchphrase": "「さわやかシトラスパワー！」",
+                  "isBoss": false
+                },
+                {
+                  "id": "KOCH-E09",
+                  "name": "桂浜ムーンフォックス",
+                  "prefecture": "高知",
+                  "category": "幻想",
+                  "habitat": "桂浜",
+                  "desc": "桂浜の月を背負った狐精霊。夜の光で敵を惑わす。",
+                  "trivia": "桂浜は月の名所として知られる景勝地。",
+                  "catchphrase": "「月夜に舞う幻影の狐！」",
+                  "isBoss": false
+                },
+                {
+                    "id": "KOCH-E10",
+                  "name": "龍馬トレジャーロード",
+                  "prefecture": "高知",
+                  "category": "伝説・ボス",
+                  "habitat": "高知市・太平洋沿岸",
+                  "desc": "龍の姿をした坂本龍馬の化身。歴史と海の力を融合した存在。",
+                  "trivia": "坂本龍馬は海援隊を率い、日本の近代化に大きな影響を与えた。",
+                  "catchphrase": "「龍と共に進む未来！」",
+                  "isBoss": true
+                },
+                    {
+                      "id": "FUK-E01",
+                      "name": "博多ラーメンスライム",
+                      "prefecture": "福岡",
+                      "category": "食文化・スライム",
+                      "habitat": "博多の屋台通り",
+                      "desc": "麺とスープが絡み合ったスライム。湯気をまとい、温かさで仲間を癒す。",
+                      "trivia": "博多ラーメンは細麺と濃厚な豚骨スープが特徴。",
+                      "catchphrase": "「ズルズルっと元気注入！」",
+                      "isBoss": false
+                    },
+                    {
+                      "id": "FUK-E02",
+                      "name": "明太子インプ",
+                      "prefecture": "福岡",
+                      "category": "食文化・小悪魔",
+                      "habitat": "博多湾沿岸",
+                      "desc": "赤く弾ける小悪魔。ピリッと辛い力で敵を驚かす。",
+                      "trivia": "福岡は辛子明太子の名産地として有名。",
+                      "catchphrase": "「ピリッと刺激、明太パワー！」",
+                      "isBoss": false
+                    },
+                    {
+                      "id": "FUK-E03",
+                      "name": "太宰府ウメフェアリー",
+                      "prefecture": "福岡",
+                      "category": "自然・妖精",
+                      "habitat": "太宰府天満宮の梅林",
+                      "desc": "梅の花を背に舞う小妖精。香りと花びらで癒しを与える。",
+                      "trivia": "太宰府天満宮は梅の名所として知られる。",
+                      "catchphrase": "「香り咲かせる癒しの舞！」",
+                      "isBoss": false
+                    },
+                    {
+                      "id": "FUK-E04",
+                      "name": "博多どんたくスピリット",
+                      "prefecture": "福岡",
+                      "category": "祭り・精霊",
+                      "habitat": "福岡市・祭り会場",
+                      "desc": "祭りの仮面をつけた精霊。笛や太鼓を鳴らして仲間を鼓舞する。",
+                      "trivia": "博多どんたくはゴールデンウィークに行われる日本最大級の祭り。",
+                      "catchphrase": "「音色響かせ祭りの力！」",
+                      "isBoss": false
+                    },
+                    {
+                      "id": "FUK-E05",
+                      "name": "玄界灘カモメモンスター",
+                      "prefecture": "福岡",
+                      "category": "自然・鳥獣",
+                      "habitat": "玄界灘の海岸",
+                      "desc": "白い翼を広げた海鳥型モンスター。風と波を操り、空を舞う。",
+                      "trivia": "玄界灘は荒波で知られ、多くの海鳥が生息する。",
+                      "catchphrase": "「波を越えて飛翔する！」",
+                      "isBoss": false
+                    },
+                    {
+                      "id": "FUK-E06",
+                      "name": "焼きカシワゴブリン",
+                      "prefecture": "福岡",
+                      "category": "食文化・妖怪",
+                      "habitat": "屋台の煙漂う路地",
+                      "desc": "炭火を背負う鶏の妖怪。香ばしい匂いを漂わせながら戦う。",
+                      "trivia": "福岡では焼き鳥を「焼きカシワ」と呼ぶ。",
+                      "catchphrase": "「炭火の力で香ばしく！」",
+                      "isBoss": false
+                    },
+                    {
+                     "id": "FUK-E07",
+                      "name": "中洲ランタンガーディアン",
+                      "prefecture": "福岡",
+                      "category": "都市・守護者",
+                      "habitat": "中洲の夜街",
+                      "desc": "屋台の灯りを宿した守護者。柔らかな光で闇を払う。",
+                      "trivia": "福岡・中洲は屋台街として有名で、夜の灯りが象徴的。",
+                      "catchphrase": "「光で導く夜の守護者！」",
+                      "isBoss": false
+                    },
+                    {
+                      "id": "FUK-E08",
+                      "name": "黒田ブシアーマー",
+                      "prefecture": "福岡",
+                      "category": "歴史・武者",
+                      "habitat": "福岡城跡",
+                      "desc": "黒田武士を象徴する鎧武者モンスター。忠義と力を兼ね備える。",
+                      "trivia": "黒田官兵衛・長政は福岡藩の礎を築いた戦国武将。",
+                      "catchphrase": "「忠義と力、黒田の魂！」",
+                      "isBoss": false
+                    },
+                    {
+                      "id": "FUK-E09",
+                      "name": "福岡キャナルゴーレム",
+                      "prefecture": "福岡",
+                      "category": "都市・ゴーレム",
+                      "habitat": "キャナルシティ博多",
+                      "desc": "水と石でできた都市の守護者。流れる噴水の力を操る。",
+                      "trivia": "キャナルシティ博多は水と光をテーマにした大型商業施設。",
+                      "catchphrase": "「流れを制する都市の守り！」",
+                      "isBoss": false
+                    },
+                    {
+                      "id": "FUK-E10",
+                      "name": "大宰府天神ロード",
+                      "prefecture": "福岡",
+                      "category": "伝説・ボス",
+                      "habitat": "太宰府天満宮",
+                      "desc": "菅原道真公の力を宿した雷神モンスター。筆と雷を操る姿は知恵と力の象徴。",
+                      "trivia": "学問の神様として信仰される菅原道真を祀る太宰府天満宮。",
+                      "catchphrase": "「雷鳴と筆が導く知の力！」",
+                      "isBoss": true
+                    },
+
+                      {
+                        "id": "SAGA-E01",
+                        "name": "有明ムツゴロウインプ",
+                        "prefecture": "佐賀",
+                        "category": "自然・小悪魔",
+                        "habitat": "有明海の干潟",
+                        "desc": "ムツゴロウの姿をした小悪魔。泥の上を跳ね回り元気いっぱい。",
+                        "trivia": "有明海のムツゴロウは干潟の象徴的な生物。",
+                        "catchphrase": "「泥んこジャンプで元気満タン！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "SAGA-E02",
+                        "name": "虹の松原トレント",
+                        "prefecture": "佐賀",
+                        "category": "自然・植物",
+                        "habitat": "唐津・虹の松原",
+                        "desc": "松林が命を得た樹木の守護者。枝を伸ばして敵を防ぐ。",
+                        "trivia": "虹の松原は日本三大松原のひとつで、防風林としても有名。",
+                        "catchphrase": "「松の力で風を制す！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "SAGA-E03",
+                        "name": "伊万里焼ゴーレム",
+                        "prefecture": "佐賀",
+                        "category": "工芸・ゴーレム",
+                        "habitat": "伊万里市",
+                        "desc": "陶磁器でできたゴーレム。青白い釉薬の体に模様が光る。",
+                        "trivia": "伊万里焼は日本を代表する磁器で、海外でも高く評価された。",
+                        "catchphrase": "「陶の体は割れぬ誇り！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "SAGA-E04",
+                        "name": "唐津クジライカロード",
+                        "prefecture": "佐賀",
+                        "category": "海・大型",
+                        "habitat": "唐津湾",
+                        "desc": "巨大なクジラとイカが融合したモンスター。海の覇者として君臨する。",
+                        "trivia": "唐津湾はクジラやイカ漁で知られる海域。",
+                        "catchphrase": "「海を揺るがす覇王の咆哮！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "SAGA-E05",
+                        "name": "呼子イカフェアリー",
+                        "prefecture": "佐賀",
+                        "category": "食文化・妖精",
+                        "habitat": "呼子町",
+                        "desc": "透明な体を持つイカの妖精。夜の海で光りながら舞う。",
+                        "trivia": "呼子のイカは鮮度抜群で「イカの町」として有名。",
+                        "catchphrase": "「光と共に舞う海の妖精！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "SAGA-E06",
+                        "name": "嬉野チャスライム",
+                        "prefecture": "佐賀",
+                        "category": "食文化・スライム",
+                        "habitat": "嬉野温泉周辺",
+                        "desc": "お茶の香りを放つ緑色のスライム。リラックス効果抜群。",
+                        "trivia": "嬉野茶は香り高く日本茶の名産地。",
+                        "catchphrase": "「お茶の香りでほっと一息！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "SAGA-E07",
+                        "name": "バルーンガーディアン",
+                        "prefecture": "佐賀",
+                        "category": "祭り・守護者",
+                        "habitat": "佐賀市上空",
+                        "desc": "無数の熱気球を背負った守護者。空から街を見守る。",
+                        "trivia": "佐賀インターナショナルバルーンフェスタは世界的に有名。",
+                        "catchphrase": "「大空に舞う守りの風船！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "SAGA-E08",
+                        "name": "七ツ釜シーホース",
+                        "prefecture": "佐賀",
+                        "category": "自然・怪物",
+                        "habitat": "七ツ釜海岸",
+                        "desc": "荒波の洞窟から現れるタツノオトシゴの怪物。",
+                        "trivia": "七ツ釜は海食洞が連なる名勝で、観光名所でもある。",
+                        "catchphrase": "「荒波を背に海を駆ける！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "SAGA-E09",
+                        "name": "鍋島ネコシャドウ",
+                        "prefecture": "佐賀",
+                        "category": "歴史・妖怪",
+                        "habitat": "佐賀城下",
+                        "desc": "鍋島家の怪談から生まれた影猫。夜の闇に溶け込む。",
+                        "trivia": "鍋島藩には化け猫の伝説が残されている。",
+                        "catchphrase": "「闇夜に潜む影の猫！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "SAGA-E10",
+                        "name": "吉野ヶ里ロード",
+                        "prefecture": "佐賀",
+                        "category": "伝説・ボス",
+                        "habitat": "吉野ヶ里遺跡",
+                        "desc": "弥生の戦士と祭祀を象徴する巨大な守護者。銅剣・銅鏡・銅鐸を操る。",
+                        "trivia": "吉野ヶ里遺跡は日本最大級の弥生時代の環濠集落跡。",
+                        "catchphrase": "「古代の力で未来を護る！」",
+                        "isBoss": true
+                      }
+                    ,
+                    
+                      {
+                        "id": "NAGA-E01",
+                        "name": "出島トレードスライム",
+                        "prefecture": "長崎",
+                        "category": "歴史・スライム",
+                        "habitat": "長崎市・出島周辺",
+                        "desc": "出島の交易を象徴するスライム。体の中に異国の品々が浮かんでいる。",
+                        "trivia": "出島は江戸時代、日本と海外をつなぐ唯一の貿易窓口だった。",
+                        "catchphrase": "「世界をつなぐ交易スライム！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "NAGA-E02",
+                        "name": "グラバーゴーレム",
+                        "prefecture": "長崎",
+                        "category": "歴史・巨人",
+                        "habitat": "長崎市・グラバー園",
+                        "desc": "洋館の石と木材でできた巨人。文明開化の象徴として立ちはだかる。",
+                        "trivia": "グラバー園は外国人居留地の遺構として有名。",
+                        "catchphrase": "「異国の力で守り抜く！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "NAGA-E03",
+                        "name": "平和のハトスピリット",
+                        "prefecture": "長崎",
+                        "category": "幻想・精霊",
+                        "habitat": "長崎市・平和公園",
+                        "desc": "光の翼を持つ鳩の精霊。平和の祈りを光として広げる。",
+                        "trivia": "長崎の平和公園は原爆の悲劇と平和への願いを象徴する場所。",
+                        "catchphrase": "「祈りを光に、未来へ届け！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "NAGA-E04",
+                        "name": "雲仙サラマンダー",
+                        "prefecture": "長崎",
+                        "category": "自然・竜",
+                        "habitat": "雲仙岳",
+                        "desc": "火山の炎をまとったトカゲ竜。噴煙のように炎を吐く。",
+                        "trivia": "雲仙岳は火山活動が盛んな山で、普賢岳の噴火でも知られる。",
+                        "catchphrase": "「炎と大地を統べる竜！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "NAGA-E05",
+                        "name": "長崎ランタンフェアリー",
+                        "prefecture": "長崎",
+                        "category": "祭り・妖精",
+                        "habitat": "長崎市・中華街",
+                        "desc": "体中に小さなランタンをまとった妖精。夜空を彩る光を放つ。",
+                        "trivia": "長崎ランタンフェスティバルは旧正月を祝う華やかな祭り。",
+                        "catchphrase": "「灯れ、夢幻の光！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "NAGA-E06",
+                        "name": "カステラベア",
+                        "prefecture": "長崎",
+                        "category": "食文化・獣",
+                        "habitat": "長崎市内",
+                        "desc": "カステラのふわふわの体を持つ熊型モンスター。甘い香りを漂わせる。",
+                        "trivia": "カステラは南蛮文化から伝わった長崎名物のお菓子。",
+                        "catchphrase": "「ふわふわパワーでみんなを癒す！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "NAGA-E07",
+                        "name": "軍艦島ゴーレム",
+                        "prefecture": "長崎",
+                        "category": "歴史・ゴーレム",
+                        "habitat": "端島（軍艦島）",
+                        "desc": "石炭のエネルギーを宿した廃墟の巨人。崩れた建物を背負っている。",
+                        "trivia": "軍艦島は炭鉱で栄えた無人島で、世界文化遺産に登録されている。",
+                        "catchphrase": "「廃墟の中に眠る力を解き放つ！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "NAGA-E08",
+                        "name": "九十九島タートル",
+                        "prefecture": "長崎",
+                        "category": "自然・怪獣",
+                        "habitat": "佐世保・九十九島",
+                        "desc": "無数の島々を背負った亀怪物。大海原をゆったりと進む。",
+                        "trivia": "九十九島は実際には200以上の小島からなる群島。",
+                        "catchphrase": "「島々を背に悠然と進む！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "NAGA-E09",
+                        "name": "眼鏡橋ガーディアン",
+                        "prefecture": "長崎",
+                        "category": "建築・守護者",
+                        "habitat": "長崎市・眼鏡橋",
+                        "desc": "石橋の精霊が守護者となった姿。川面に映る二つの円が光の盾となる。",
+                        "trivia": "眼鏡橋は日本最古の石造りアーチ橋で、観光名所。",
+                        "catchphrase": "「歴史の石橋で未来を守る！」",
+                        "isBoss": false
+                      },
+                      {
+                        "id": "NAGA-E10",
+                        "name": "ペンギンロード",
+                        "prefecture": "長崎",
+                        "category": "伝説・ボス",
+                        "habitat": "長崎ペンギン水族館",
+                        "desc": "氷と海を統べる巨大なペンギン王。冷気のオーラで敵を凍らせる。",
+                        "trivia": "長崎ペンギン水族館は世界最多のペンギン飼育種類を誇る。",
+                        "catchphrase": "「氷の王国を歩む皇帝！」",
+                        "isBoss": true
+                      },
+
+                      
+                        {
+                          "id": "OITA-E01",
+                          "name": "別府オンセンゴーレム",
+                          "prefecture": "大分",
+                          "category": "自然・巨人",
+                          "habitat": "別府温泉",
+                          "desc": "温泉の蒸気と石でできたゴーレム。体から常に湯気を噴き出す。",
+                          "trivia": "別府温泉は源泉数・湧出量ともに日本一。",
+                          "catchphrase": "「湯けむり立ちのぼる温泉巨人！」",
+                          "isBoss": false
+                        },
+                        {
+                          "id": "OITA-E02",
+                          "name": "地獄蒸しスライム",
+                          "prefecture": "大分",
+                          "category": "食文化・スライム",
+                          "habitat": "鉄輪地獄温泉",
+                          "desc": "赤や青の湯気をまとったスライム。蒸気の熱で敵を包み込む。",
+                          "trivia": "大分の地獄蒸し料理は温泉の蒸気で素材を蒸す伝統的な調理法。",
+                          "catchphrase": "「蒸気のチカラでアツアツ攻撃！」",
+                          "isBoss": false
+                        },
+                        {
+                          "id": "OITA-E03",
+                          "name": "関サバシーフィッシュ",
+                          "prefecture": "大分",
+                          "category": "食文化・魚",
+                          "habitat": "豊予海峡",
+                          "desc": "鋭い刃のようなヒレを持つ魚モンスター。海を素早く泳ぎ回る。",
+                          "trivia": "関サバは大分県佐賀関で水揚げされる高級ブランド魚。",
+                          "catchphrase": "「切れ味抜群、海の斬撃！」",
+                          "isBoss": false
+                        },
+                        {
+                          "id": "OITA-E04",
+                          "name": "豊後牛ミノタウロス",
+                          "prefecture": "大分",
+                          "category": "食文化・獣",
+                          "habitat": "大分平野",
+                          "desc": "豊後牛の姿をしたミノタウロス。力強い角で突進する。",
+                          "trivia": "豊後牛は全国的にも有名な高級和牛のひとつ。",
+                          "catchphrase": "「和牛パワーで突進あるのみ！」"
+                        },
+                        {
+                          "id": "OITA-E05",
+                          "name": "耶馬溪ロックガーディアン",
+                          "prefecture": "大分",
+                          "category": "自然・守護者",
+                          "habitat": "耶馬溪",
+                          "desc": "奇岩を背負った守護者。大地を揺るがす力を持つ。",
+                          "trivia": "耶馬溪は奇岩と渓谷美で知られる景勝地。",
+                          "catchphrase": "「岩の力で侵入者を拒む！」"
+                        },
+                        {
+                          "id": "OITA-E06",
+                          "name": "宇佐神宮フェニックス",
+                          "prefecture": "大分",
+                          "category": "伝説・鳥",
+                          "habitat": "宇佐神宮",
+                          "desc": "炎をまとった霊鳥。神々しい光で辺りを照らす。",
+                          "trivia": "宇佐神宮は全国の八幡宮の総本社。",
+                          "catchphrase": "「神炎を背負い飛翔せよ！」"
+                        },
+                        {
+                          "id": "OITA-E07",
+                          "name": "杵築サムライキャッスル",
+                          "prefecture": "大分",
+                          "category": "歴史・武者",
+                          "habitat": "杵築城",
+                          "desc": "城を背負った武者型モンスター。城壁のごとき防御力を誇る。",
+                          "trivia": "杵築城は「日本一小さな城」として知られる。",
+                          "catchphrase": "「城を背負い守り抜く！」"
+                        },
+                        {
+                          "id": "OITA-E08",
+                          "name": "臼杵石仏ゴーレム",
+                          "prefecture": "大分",
+                          "category": "歴史・ゴーレム",
+                          "habitat": "臼杵市",
+                          "desc": "石仏が動き出した守護者。穏やかな顔に秘められた力を持つ。",
+                          "trivia": "臼杵石仏は国宝に指定された磨崖仏群。",
+                          "catchphrase": "「石仏の力で静かに守る！」"
+                        },
+                        {
+                          "id": "OITA-E09",
+                          "name": "九重ハイランドドラゴン",
+                          "prefecture": "大分",
+                          "category": "自然・竜",
+                          "habitat": "九重高原",
+                          "desc": "草原と風をまとった緑竜。大空を悠然と舞う。",
+                          "trivia": "九重連山は「九州の屋根」と呼ばれる高原地帯。",
+                          "catchphrase": "「風と共に空を翔ける！」",
+                          "isBoss": false
+                        },
+                        {
+                          "id": "OITA-E10",
+                          "name": "別府地獄ロード",
+                          "prefecture": "大分",
+                          "category": "伝説・ボス",
+                          "habitat": "別府地獄めぐり",
+                          "desc": "複数の地獄の力を融合した巨大魔神。赤や青の炎と蒸気を操る。",
+                          "trivia": "別府地獄めぐりは観光名所で、色や性質の異なる温泉が湧き出す。",
+                          "catchphrase": "「地獄の力を統べる王！」",
+                          "isBoss": true
+                        },
+
+                        
+                          {
+                            "id": "KUMA-E01",
+                            "name": "からしレンコンサプライム",
+                            "prefecture": "熊本",
+                            "category": "食文化・小型",
+                            "habitat": "熊本市周辺",
+                            "desc": "辛子レンコンを模した小型モンスター。穴から辛子のエネルギー光線を噴射する。",
+                            "trivia": "からしレンコンは加藤清正の滋養食として広まったとされる郷土料理。",
+                            "catchphrase": "「ピリッと効かせる黄金の根！」",
+                            "isBoss": false
+                          },
+                          {
+                            "id": "KUMA-E02",
+                            "name": "スイカバルーン",
+                            "prefecture": "熊本",
+                            "category": "農産・転がり系",
+                            "habitat": "植木町・合志平野",
+                            "desc": "大玉スイカがモンスター化。自ら空気をため、弾むように転がって突撃する。",
+                            "trivia": "熊本はスイカの名産地として有名で、春から初夏にかけて出荷の最盛期を迎える。",
+                            "catchphrase": "「ごろごろ転がる水の爆弾！」",
+                            "isBoss": false
+                          },
+                          {
+                            "id": "KUMA-E03",
+                            "name": "あか牛ブルチャージ",
+                            "prefecture": "熊本",
+                            "category": "自然・獣",
+                            "habitat": "阿蘇草原",
+                            "desc": "阿蘇のあか牛をモチーフにした小型獣。大地を蹴り、力強い角で突進する。",
+                            "trivia": "あか牛は赤身の旨味とヘルシーさで人気の阿蘇ブランド牛。",
+                            "catchphrase": "「大地を揺らす赤き突進！」",
+                            "isBoss": false
+                          },
+                          {
+                            "id": "KUMA-E04",
+                            "name": "肥後ペッパースプライト",
+                            "prefecture": "熊本",
+                            "category": "食文化・精霊",
+                            "habitat": "八代平野",
+                            "desc": "赤唐辛子の精霊。小さな炎をまとい、舞うような動きで相手を翻弄する。",
+                            "trivia": "九州各地では唐辛子を活かした郷土料理が多く、熊本でも薬味として親しまれる。",
+                            "catchphrase": "「燃えるリズムでアツアツダンス！」",
+                            "isBoss": false
+                          },
+                          {
+                            "id": "KUMA-E05",
+                            "name": "イグサスプライト",
+                            "prefecture": "熊本",
+                            "category": "工芸・精霊",
+                            "habitat": "八代市",
+                            "desc": "畳表に使われるい草の妖精。清涼な香りで味方を癒やし、敵の動きを和らげる。",
+                            "trivia": "八代地域はい草生産で知られ、畳文化を支えてきた。",
+                            "catchphrase": "「癒しの香りでリフレッシュ！」",
+                            "isBoss": false
+                          },
+                          {
+                            "id": "KUMA-E06",
+                            "name": "くまモチスライム",
+                            "prefecture": "熊本",
+                            "category": "菓子・スライム",
+                            "habitat": "県内各地の商店街",
+                            "desc": "郷土菓子“いきなり団子”をイメージしたもちスライム。熱々の湯気で自己強化する。",
+                            "trivia": "いきなり団子はサツマイモと餡を小麦生地で包んで蒸した素朴な味わい。",
+                            "catchphrase": "「甘さと力でねばり勝ち！」",
+                            "isBoss": false
+                          },
+                          {
+                            "id": "KUMA-E07",
+                            "name": "阿蘇カルデラゴーレム",
+                            "prefecture": "熊本",
+                            "category": "自然・巨人",
+                            "habitat": "阿蘇山外輪山",
+                            "desc": "火山岩で組み上がった大地の巨人。体内にマグマの鼓動を宿し、噴煙を上げる。",
+                            "trivia": "阿蘇は世界最大級のカルデラ地形で知られ、草原景観と火山活動が特徴。",
+                            "catchphrase": "「火と大地の鼓動、目覚める！」",
+                            "isBoss": false
+                          },
+                          {
+                            "id": "KUMA-E08",
+                            "name": "熊本城サムライガード",
+                            "prefecture": "熊本",
+                            "category": "歴史・武者",
+                            "habitat": "熊本城",
+                            "desc": "黒漆の城を背にした武者守護。石垣のような装甲で攻撃をはね返す。",
+                            "trivia": "熊本城は加藤清正の築城で、復元・復旧が進められている名城。",
+                            "catchphrase": "「難攻不落の城壁を守る！」",
+                            "isBoss": false
+                          },
+                          {
+                            "id": "KUMA-E09",
+                            "name": "山鹿灯籠ダンサー",
+                            "prefecture": "熊本",
+                            "category": "祭礼・舞",
+                            "habitat": "山鹿温泉",
+                            "desc": "金灯籠を頭に載せた舞の精霊。柔らかな光で敵を幻惑し、味方の士気を高める。",
+                            "trivia": "山鹿灯籠まつりは夏の夜を彩る伝統行事で、優美な千人踊りが見どころ。",
+                            "catchphrase": "「金の灯りで舞い惑わせる！」",
+                            "isBoss": false
+                          },
+                          {
+                              "id": "KUMA-E10",
+                            "name": "火の国ドラゴンロード",
+                            "prefecture": "熊本",
+                            "category": "伝説・ボス",
+                            "habitat": "阿蘇火口域",
+                            "desc": "火の国を象徴する炎の竜王。紅蓮の翼で熱風を巻き起こし、荒ぶる火柱を操る。",
+                            "trivia": "熊本は“火の国”の愛称で親しまれ、阿蘇の火山景観がその象徴とされる。",
+                            "catchphrase": "「火の国を統べる炎竜王！」",
+                            "isBoss": true
+                          },
+                            {
+                              "id": "MIYA-E01",
+                              "name": "マンゴースライム",
+                              "prefecture": "宮崎",
+                              "category": "食文化・スライム",
+                              "habitat": "宮崎市・温室周辺",
+                              "desc": "完熟マンゴーを模したぷるぷるスライム。甘い香りをまとい転がって攻撃する。",
+                              "trivia": "宮崎マンゴーは『太陽のタマゴ』など高級ブランドで知られる。",
+                              "catchphrase": "「南国の甘さでとろけ攻撃！」",
+                              "isBoss": false
+                            },
+                            {
+                              "id": "MIYA-E02",
+                              "name": "チキン南蛮バーズ",
+                              "prefecture": "宮崎",
+                              "category": "食文化・鳥",
+                              "habitat": "延岡・宮崎市の商店街",
+                              "desc": "衣をまとった小型の鶏モンスター。甘酢タルタルの光膜をまとい突進する。",
+                              "trivia": "チキン南蛮は宮崎発祥の人気料理として全国に広まった。",
+                              "catchphrase": "「甘酢ソースでピリリと一撃！」",
+                              "isBoss": false
+                            },
+                            {
+                              "id": "MIYA-E03",
+                              "name": "日向夏スピリット",
+                              "prefecture": "宮崎",
+                              "category": "果実・精霊",
+                              "habitat": "日向市・宮崎市",
+                              "desc": "日向夏を冠にした爽やかな妖精。清涼の光で味方を癒やす。",
+                              "trivia": "日向夏は白い甘皮ごと食べるのが特徴の柑橘。",
+                              "catchphrase": "「さっぱり光る夏の精！」",
+                              "isBoss": false
+                            },
+                            {
+                              "id": "MIYA-E04",
+                              "name": "飫肥杉トレント",
+                              "prefecture": "宮崎",
+                              "category": "自然・樹霊",
+                              "habitat": "日南市・飫肥の森",
+                              "desc": "飫肥杉の精霊。しなる木の腕で敵を絡め取り森を守る。",
+                              "trivia": "飫肥杉は日南地方の代表的な林業資源で、船材や建築材として用いられた。",
+                              "catchphrase": "「深緑の腕でしっかりガード！」",
+                              "isBoss": false
+                            },
+                            {
+                              "id": "MIYA-E05",
+                              "name": "鬼の洗濯板クラブ",
+                              "prefecture": "宮崎",
+                              "category": "地形・甲殻",
+                              "habitat": "日南海岸・青島周辺",
+                              "desc": "波状岩『鬼の洗濯板』を背負ったカニ型モンスター。岩の刃で防御と連撃をこなす。",
+                              "trivia": "青島周辺の海岸は硬軟の地層が浸食されてできた独特の波状岩が広がる。",
+                              "catchphrase": "「ゴツゴツ岩盤でガリガリ防御！」",
+                              "isBoss": false
+                            },
+                            {
+                              "id": "MIYA-E06",
+                              "name": "高千穂ソバスプライト",
+                              "prefecture": "宮崎",
+                              "category": "食文化・精霊",
+                              "habitat": "高千穂町",
+                              "desc": "そばの実をまとった香ばしき小妖精。舞いながら仲間を小回復する。",
+                              "trivia": "高千穂は山間の冷涼な気候を活かしたそば処として知られる。",
+                              "catchphrase": "「香り立つ郷土の精霊！」",
+                              "isBoss": false
+                            },
+                            {
+                              "id": "MIYA-E07",
+                              "name": "高千穂ヨウセイウィング",
+                              "prefecture": "宮崎",
+                              "category": "神話・精霊",
+                              "habitat": "高千穂峡・天岩戸周辺",
+                              "desc": "神話の里を守る羽根の精霊。光の羽で飛翔し神々しい風を巻き起こす。",
+                              "trivia": "高千穂は天孫降臨や天岩戸伝説など日本神話ゆかりの地。",
+                              "catchphrase": "「神の翼で舞い降りる！」",
+                              "isBoss": false
+                            },
+                            {
+                              "id": "MIYA-E08",
+                              "name": "宮崎牛ミノタウロス",
+                              "prefecture": "宮崎",
+                              "category": "食文化・獣",
+                              "habitat": "宮崎平野",
+                              "desc": "黒毛和牛の獣戦士。しなやかな赤身の力を宿し、角で豪快に突進する。",
+                              "trivia": "宮崎牛は品評会でも評価の高い黒毛和牛ブランド。",
+                              "catchphrase": "「極上パワーで豪快突進！」",
+                              "isBoss": false
+                            },
+                            {
+                              "id": "MIYA-E09",
+                              "name": "青島ヤシガーディアン",
+                              "prefecture": "宮崎",
+                              "category": "自然・守護者",
+                              "habitat": "青島",
+                              "desc": "フェニックスヤシを模した南国守護者。陽光を集めて光の盾を展開する。",
+                              "trivia": "青島は温暖な気候とヤシ並木で知られる観光地。",
+                              "catchphrase": "「常夏のヤシで南国守護！」",
+                              "isBoss": false
+                            },
+                            {
+                              "id": "MIYA-E10",
+                              "name": "天岩戸ドラゴンロード",
+                              "prefecture": "宮崎",
+                              "category": "伝説・ボス",
+                              "habitat": "高千穂・天岩戸域",
+                              "desc": "天岩戸の光を背負う神話の竜王。岩戸の扉を裂くような神光の咆哮を放つ。",
+                              "trivia": "天岩戸伝説では天照大神が隠れた岩戸が開かれ、世界に再び光が差したとされる。",
+                              "catchphrase": "「天の光と共に現れる神竜王！」",
+                              "isBoss": true
+                            },
+
+                            
+                              {
+                                "id": "KAGO-E01",
+                                "name": "さつまイモポリン",
+                                "prefecture": "鹿児島",
+                                "category": "食文化・小型",
+                                "habitat": "薩摩地方の畑",
+                                "desc": "紫の皮と黄金の中身を思わせるイモ型モンスター。甘い香りをまとい転がって攻撃する。",
+                                "trivia": "鹿児島はサツマイモの主要産地として有名で、郷土料理にも多用される。",
+                                "catchphrase": "「ほっくり甘さでパワーチャージ！」",
+                                "isBoss": false
+                              },
+                              {
+                                "id": "KAGO-E02",
+                                "name": "黒豚チャージャー",
+                                "prefecture": "鹿児島",
+                                "category": "食文化・獣",
+                                "habitat": "鹿児島市近郊の牧場",
+                                "desc": "薩摩黒豚をモチーフにした小型獣。低い姿勢からの突進と丈夫な体が持ち味。",
+                                "trivia": "薩摩黒豚は脂の甘みと歯切れの良さで知られるブランド豚。",
+                                "catchphrase": "「ジューシーパワーで豪快アタック！」",
+                                "isBoss": false
+                              },
+                              {
+                                "id": "KAGO-E03",
+                                "name": "桜島ダイコンウォーカー",
+                                "prefecture": "鹿児島",
+                                "category": "農産・歩行型",
+                                "habitat": "桜島",
+                                "desc": "巨大な桜島大根を脚に持つ守護者。根を振り回して衝撃波を起こす。",
+                                "trivia": "桜島大根は世界最大級の大根として知られる特産品。",
+                                "catchphrase": "「大地を揺らす大根の一撃！」",
+                                "isBoss": false
+                              },
+                              {
+                                "id": "KAGO-E04",
+                                "name": "しろくまアイススライム",
+                                "prefecture": "鹿児島",
+                                "category": "菓子・スライム",
+                                "habitat": "天文館周辺",
+                                "desc": "名物“白くま”かき氷をモチーフにした冷気スライム。色とりどりの果実を頭にのせる。",
+                                "trivia": "白くまは練乳ベースのかき氷に果物をあしらった鹿児島発の人気スイーツ。",
+                                "catchphrase": "「ひんやり甘い氷の術！」",
+                                "isBoss": false
+                              },
+                              {
+                                "id": "KAGO-E05",
+                                "name": "キビナゴフィッシュ",
+                                "prefecture": "鹿児島",
+                                "category": "海産・群体",
+                                "habitat": "錦江湾",
+                                "desc": "銀色の小魚が群れとなって合体したモンスター。光の矢のように一直線に突撃する。",
+                                "trivia": "キビナゴは鹿児島の郷土料理で刺身や天ぷらとして親しまれる。",
+                                "catchphrase": "「群れなして放つ光の突撃！」",
+                                "isBoss": false
+                              },
+                              {
+                                "id": "KAGO-E06",
+                                "name": "薩摩焼カップゴーレム",
+                                "prefecture": "鹿児島",
+                                "category": "工芸・ゴーレム",
+                                "habitat": "美山・龍門司焼の里",
+                                "desc": "薩摩焼の壺や器が組み上がって動く小型ゴーレム。陶器の装甲で仲間を守る。",
+                                "trivia": "薩摩焼は白薩摩・黒薩摩に大別される伝統陶工芸。",
+                                "catchphrase": "「焼き物ボディで割れぬ守り！」",
+                                "isBoss": false
+                              },
+                              {
+                                "id": "KAGO-E07",
+                                "name": "西郷サムライスピリット",
+                                "prefecture": "鹿児島",
+                                "category": "歴史・武者霊",
+                                "habitat": "城山公園",
+                                "desc": "堂々たる体格の武者霊。豪胆な気迫で剣気をまとい前進する。",
+                                "trivia": "西郷隆盛は明治維新の中心人物の一人として知られる。",
+                                "catchphrase": "「維新の魂で突き進む！」",
+                                "isBoss": false
+                              },
+                              {
+                                  "id": "KAGO-E08",
+                                "name": "屋久杉エルダーガーディアン",
+                                "prefecture": "鹿児島",
+                                "category": "自然・守護者",
+                                "habitat": "屋久島・白谷雲水峡",
+                                "desc": "苔むす屋久杉が姿を得た古樹の守護者。年輪の力で堅牢な盾を展開する。",
+                                "trivia": "屋久島は世界自然遺産。樹齢千年以上の屋久杉が多数存在する。",
+                                "catchphrase": "「悠久の森の守り神！」",
+                                "isBoss": false
+                              },
+                              {
+                                "id": "KAGO-E09",
+                                "name": "指宿砂蒸しゴーレム",
+                                "prefecture": "鹿児島",
+                                "category": "温泉・巨人",
+                                "habitat": "指宿・砂むし会館周辺",
+                                "desc": "熱砂をまとった巨体のゴーレム。砂のマントで相手を包み込み動きを封じる。",
+                                "trivia": "指宿温泉の砂むしは温かい砂に全身を埋める独特の入浴法。",
+                                "catchphrase": "「熱砂の力で全てを包む！」",
+                                "isBoss": false
+                              },
+                              {
+                                "id": "KAGO-E10",
+                                "name": "桜島マグマドラゴンロード",
+                                "prefecture": "鹿児島",
+                                "category": "伝説・ボス",
+                                "habitat": "桜島火口域",
+                                "desc": "桜島の噴火の力を宿す炎の竜王。灼熱の翼とマグマの鱗で大地を震わせる。",
+                                "trivia": "桜島は活火山として知られ、錦江湾にそびえる鹿児島の象徴。",
+                                "catchphrase": "「火と大地を揺るがす噴火竜王！」",
+                                "isBoss": true
+                              },
+
+                            
+                                {
+                                  "id": "OKI-E01",
+                                  "name": "ゴーヤスライム",
+                                  "prefecture": "沖縄",
+                                  "category": "食文化・スライム",
+                                  "habitat": "那覇・家庭菜園周辺",
+                                  "desc": "イボイボの皮を持つ緑色スライム。苦味のオーラで耐性が高い。",
+                                  "trivia": "ゴーヤーは沖縄の代表的な夏野菜で、チャンプルーが定番料理。",
+                                  "catchphrase": "「にがにがパワーで元気モリモリ！」",
+                                  "isBoss": false
+                                },
+                                {
+                                  "id": "OKI-E02",
+                                  "name": "ちんすこうフェアリー",
+                                  "prefecture": "沖縄",
+                                  "category": "菓子・精霊",
+                                  "habitat": "国際通り・市場本通り",
+                                  "desc": "ほろほろクッキーの妖精。甘い粉砂糖を舞わせて味方を癒やす。",
+                                  "trivia": "ちんすこうは琉球王朝時代からの伝統菓子。",
+                                  "catchphrase": "「ほろほろ甘さで幸せタイム！」",
+                                  "isBoss": false
+                                },
+                                {
+                                  "id": "OKI-E03",
+                                  "name": "ソーキリブチャージ",
+                                  "prefecture": "沖縄",
+                                  "category": "食文化・獣",
+                                  "habitat": "名護・食堂街",
+                                  "desc": "骨付きソーキを背負う小型獣。肉の力で豪快に突進する。",
+                                  "trivia": "ソーキそばは豚のあばら肉をのせた沖縄そばの人気メニュー。",
+                                  "catchphrase": "「肉厚パワーでドーンと一撃！」",
+                                  "isBoss": false
+                                },
+                                {
+                                  "id": "OKI-E04",
+                                  "name": "海ぶどうスプライト",
+                                  "prefecture": "沖縄",
+                                  "category": "海産・精霊",
+                                  "habitat": "糸満・養殖場沿岸",
+                                  "desc": "緑の粒をまとった海藻の精。プチプチの水玉弾で攻撃する。",
+                                  "trivia": "海ぶどうは“グリーンキャビア”とも呼ばれるクビレズタの一種。",
+                                  "catchphrase": "「プチプチ波動でリズミカル！」",
+                                  "isBoss": false
+                                },
+                                {
+                                  "id": "OKI-E05",
+                                  "name": "紅いもクラゲ",
+                                  "prefecture": "沖縄",
+                                  "category": "海産・軟体",
+                                  "habitat": "読谷・残波岬沖",
+                                  "desc": "紅いも色のクラゲ型モンスター。紫の触手から甘く痺れる霧を放つ。",
+                                  "trivia": "紅いもは沖縄の人気食材でスイーツにも多用される。",
+                                  "catchphrase": "「甘さと毒でゆらり漂う！」",
+                                  "isBoss": false
+                                },
+                                {
+                                  "id": "OKI-E06",
+                                  "name": "パイナップルバード",
+                                  "prefecture": "沖縄",
+                                  "category": "果実・鳥",
+                                  "habitat": "名護パイナップル園",
+                                  "desc": "パイナップルの冠をかぶる鳥型。果汁の弾を撃ち出す。",
+                                  "trivia": "沖縄本島北部はパイナップルの栽培で知られる。",
+                                  "catchphrase": "「ジューシー弾で爽快アタック！」",
+                                  "isBoss": false
+                                },
+                                {
+                                  "id": "OKI-E07",
+                                  "name": "守礼シーサーガード",
+                                  "prefecture": "沖縄",
+                                  "category": "伝統・守護獣",
+                                  "habitat": "首里・赤瓦屋根",
+                                  "desc": "瓦屋根に座す獅子の守護獣。咆哮で邪気を祓い、火と風を操る。",
+                                  "trivia": "シーサーは魔除けとして屋根や門柱に置かれる獅子像。",
+                                  "catchphrase": "「悪霊退散！島を護る守護獣！」",
+                                  "isBoss": false
+                                },
+                                {
+                                  "id": "OKI-E08",
+                                  "name": "石垣マングローブゴーレム",
+                                  "prefecture": "沖縄",
+                                  "category": "自然・巨人",
+                                  "habitat": "石垣島・名蔵湾の干潟",
+                                  "desc": "絡み合う根と泥でできた巨人。潮汐を呼び起こし湿地を守る。",
+                                  "trivia": "八重山のマングローブ林は多様な生態系を育む。",
+                                  "catchphrase": "「根の力で大地を縛る！」",
+                                  "isBoss": false
+                                },
+                                {
+                                  "id": "OKI-E09",
+                                  "name": "エイサードラマー",
+                                  "prefecture": "沖縄",
+                                  "category": "祭礼・舞",
+                                  "habitat": "沖縄本島各地の祭り会場",
+                                  "desc": "大太鼓を背負う踊り手モンスター。躍動のリズムで仲間を鼓舞する。",
+                                  "trivia": "エイサーは旧盆に祖先の霊を送る伝統芸能で、太鼓と掛け声が特徴。",
+                                  "catchphrase": "「太鼓の響きで魂を燃やす！」",
+                                  "isBoss": false
+                                },
+                                {
+                                  "id": "OKI-E10",
+                                  "name": "首里城ドラゴンロード",
+                                  "prefecture": "沖縄",
+                                  "category": "伝説・ボス",
+                                  "habitat": "首里城跡",
+                                  "desc": "首里城の意匠をまとった伝説の竜王。紅い鱗と金装飾を揺らし炎を吐く。",
+                                  "trivia": "首里城は琉球王国の象徴的城郭で、独自の歴史と文化を伝える。",
+                                  "catchphrase": "「琉球の誇りを燃やす炎竜王！」",
+                                  "isBoss": true
+                                }
+                              
+                              
+
+                            
+                          
+                          
+                        
+                        
+                      
+                      
+                                        
+
+                    
+                  
+                  
+              
+              
+          
+          
+          
+
+
+      
+      
+  ]
+  

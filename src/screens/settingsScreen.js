@@ -1,5 +1,5 @@
 // js/settingsScreen.js
-import { gameState, saveGameData } from '../core/gameState.js';
+import { gameState, saveGameData, loadGameData, clearSaveData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect, drawThemeBackground, drawPanelBackground } from '../ui/uiRenderer.js';
 import { getCurrentUser } from '../services/firebase/firebaseController.js';
 import { publish } from '../core/eventBus.js';
@@ -60,6 +60,8 @@ const settingsScreenState = {
     // 設定画面専用のコンテナを作成
     this.createSettingsContainer(uiRoot);
 
+    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('settings', {}));
+
     // クリックイベント登録
     this.registerHandlers();
   },
@@ -81,13 +83,26 @@ const settingsScreenState = {
     const gameModePanel = this.createGameModePanel();
     settingsContainer.appendChild(gameModePanel);
     
-    // オーディオ設定パネル
-    const audioPanel = this.createAudioPanel();
-    settingsContainer.appendChild(audioPanel);
+        // オーディオ設定パネル
+        const audioPanel = this.createAudioPanel();
+        settingsContainer.appendChild(audioPanel);
     
-    // レベル設定パネル（新規）
-    const levelPanel = this.createLevelPanel();
-    settingsContainer.appendChild(levelPanel);
+            // セーブとバックアップ
+    const savePanel = this.createSavePanel();
+    settingsContainer.appendChild(savePanel);
+        
+    // レベル設定パネル（開発者のみ表示）
+    try {
+      const dev =
+        localStorage.getItem('devTools') === '1' ||
+        ((typeof location !== 'undefined') &&
+          ((location.search && location.search.includes('dev=1')) ||
+           (location.hash && location.hash.includes('dev'))));
+      if (dev) {
+        const levelPanel = this.createLevelPanel();
+        settingsContainer.appendChild(levelPanel);
+      }
+    } catch {}
     
     // バトル設定パネル（回復回数 + 回復後の敵行動）
     const battlePanel = this.createBattlePanel();
@@ -166,7 +181,7 @@ const settingsScreenState = {
     // ツールチップとイベントリスナーを設定
     this._setupTooltipEvents(
       modeTooltipTrigger,
-      'じっくりモード: 時間制限なし、ゆっくり考えながらプレイできます。\nチャレンジモード: 時間制限あり、スピードと正確性が求められます。'
+      'じっくりモード: ゆっくり考えながらプレイできるよ！\nチャレンジモード: ステージクリアまでの時間を測れるよ！'
     );
     this.setupGameModeEvents();
     
@@ -236,8 +251,8 @@ const settingsScreenState = {
   /** モードの説明文を更新 */
   _updateModeDescription(mode, descriptionElement) {
     const descriptions = {
-      jikkuri: '🐌 じっくりモード：時間制限なしで、ゆっくり考えながら漢字の読みを学習できます。初心者の方やじっくり学びたい方におすすめです。',
-      challenge: '⚡ チャレンジモード：時間制限ありで、スピードと正確性が求められます。ゲーム感覚で楽しみたい方や、実力を試したい方におすすめです。'
+      jikkuri: '🐌 じっくりモード：ゆっくり考えながら漢字の読みを学習できます。初心者の方やじっくり学びたい方におすすめです。',
+      challenge: '⚡ チャレンジモード：スピードと正確性が求められます。ステージクリアまでの時間を計れます。'
     };
     
     descriptionElement.textContent = descriptions[mode] || descriptions.jikkuri;
@@ -582,7 +597,222 @@ const settingsScreenState = {
     console.log('敵の行動タイミング設定:', mode);
   },
 
+    /** セーブとバックアップ パネル */
+    createSavePanel() {
+      const panel = document.createElement('div');
+      panel.className = 'settings-panel';
+  
+      const title = document.createElement('h3');
+      title.className = 'panel-title';
+      title.textContent = 'セーブとバックアップ';
+      panel.appendChild(title);
+  
+      // ステータス行（最終保存・オートセーブ状態）
+      const status = document.createElement('div');
+      status.className = 'setting-group';
+      const lastSaved = document.createElement('div');
+      lastSaved.id = 'lastSavedLabel';
+      lastSaved.className = 'save-status';
+      lastSaved.textContent = '最終保存: 取得中…';
+      const autosaveStatus = document.createElement('div');
+      autosaveStatus.id = 'autosaveStatusLabel';
+      autosaveStatus.className = 'save-status';
+      autosaveStatus.textContent = 'オートセーブ: 取得中…';
+      status.appendChild(lastSaved);
+      status.appendChild(autosaveStatus);
+      panel.appendChild(status);
+  
+      // 子ども向けヘルプ
+      const help = document.createElement('div');
+      help.className = 'save-help';
+      help.textContent = '💡 「かんたんセーブ」をおすだけでOK！このゲームのつづきを守るよ。';
+      panel.appendChild(help);
+  
+      // かんたんセーブ（主ボタン）
+      const mainRow = document.createElement('div');
+      mainRow.className = 'settings-button-row compact';
+      const btnSaveNow = document.createElement('button');
+      btnSaveNow.className = 'settings-button primary big';
+      btnSaveNow.textContent = '💾 かんたんセーブ';
+      btnSaveNow.addEventListener('click', async () => {
+        publish('playSE', 'decide');
+        try {
+          saveGameData();
+          await new Promise(r => setTimeout(r, 150));
+          this._showSaveToast('保存しました');
+          this._refreshSaveStatus();
+        } catch {
+          this._showSaveToast('保存に失敗しました');
+        }
+      });
+      mainRow.appendChild(btnSaveNow);
+      panel.appendChild(mainRow);
+  
+      // くわしいメニュー（折りたたみ）
+      const advToggle = document.createElement('button');
+      advToggle.className = 'settings-button ghost sm';
+      advToggle.textContent = 'くわしいメニューをひらく';
+      panel.appendChild(advToggle);
+  
+      const advanced = document.createElement('div');
+      advanced.className = 'settings-advanced';
+      advanced.hidden = true;
+  
+      const advNote = document.createElement('div');
+      advNote.className = 'subnote';
+      advNote.textContent = 'おうちの人といっしょに使ってね。バックアップをつくったり、よみこんだりできます。';
+      advanced.appendChild(advNote);
+  
+      const btnRow1 = document.createElement('div');
+      btnRow1.className = 'settings-button-row compact';
+  
+      const btnExport = document.createElement('button');
+      btnExport.className = 'settings-button sm';
+      btnExport.textContent = '⬇️ バックアップをつくる (.json)';
+      btnExport.addEventListener('click', async () => {
+        publish('playSE', 'decide');
+        try {
+          const mod = await import('../core/saveData.js');
+          const data = mod.loadSave();
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          const ts = new Date().toISOString().replace(/[:.]/g, '-');
+          a.download = `kanji-save-${ts}.json`;
+          document.body.appendChild(a); a.click(); a.remove();
+        } catch (e) {
+          alert('書き出しに失敗しました');
+        }
+      });
+  
+      const btnImport = document.createElement('button');
+      btnImport.className = 'settings-button sm';
+      btnImport.textContent = '⬆️ バックアップをよみこむ';
+      const file = document.createElement('input');
+      file.type = 'file'; file.accept = 'application/json'; file.style.display = 'none';
+      btnImport.addEventListener('click', () => { publish('playSE','decide'); file.click(); });
+      file.addEventListener('change', async (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        try {
+          const text = await f.text();
+          const data = JSON.parse(text);
+          const mod = await import('../core/saveData.js');
+          mod.saveNow(data);
+          loadGameData();
+          this._showSaveToast('バックアップを読み込みました');
+          this._refreshSaveStatus();
+        } catch (err) {
+          console.error(err);
+          alert('読み込みに失敗しました。ファイル形式を確認してください。');
+        } finally {
+          e.target.value = '';
+        }
+      });
+  
+      btnRow1.appendChild(btnExport);
+      btnRow1.appendChild(btnImport);
+      advanced.appendChild(btnRow1);
+      panel.appendChild(advanced);
+  
+      advToggle.addEventListener('click', () => {
+        publish('playSE','decide');
+        advanced.hidden = !advanced.hidden;
+        advToggle.textContent = advanced.hidden ? 'くわしいメニューをひらく' : 'とじる';
+      });
+  
+      // オートセーブ設定（文言をやさしく）
+      const autoGroup = document.createElement('div');
+      autoGroup.className = 'setting-group';
+  
+      const autoLabel = document.createElement('div');
+      autoLabel.className = 'setting-label';
+      autoLabel.textContent = 'オートセーブ（じどう）';
+  
+      const autoRow = document.createElement('div');
+      autoRow.className = 'inline-controls';
+      const autoToggle = document.createElement('input');
+      autoToggle.type = 'checkbox';
+      const autoInterval = document.createElement('select');
+      [1,5,10,15].forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = String(m); opt.textContent = `${m}分`;
+        autoInterval.appendChild(opt);
+      });
+  
+      const inlineStatus = document.createElement('span');
+      inlineStatus.id = 'autosaveInline';
+      inlineStatus.style.marginLeft = '8px';
+      autoRow.appendChild(inlineStatus);
+  
+      try {
+        const enabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
+        const minutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
+        autoToggle.checked = enabled;
+        autoInterval.value = String(Number.isFinite(minutes) ? minutes : 5);
+        inlineStatus.textContent = `（いまは: ${enabled ? `${minutes}分ごと` : 'OFF'}）`;
+      } catch {}
+  
+      const applyBtn = document.createElement('button');
+      applyBtn.className = 'settings-button';
+      applyBtn.textContent = '適用';
+      applyBtn.addEventListener('click', () => {
+        publish('playSE','decide');
+        const enabledNow = !!autoToggle.checked;
+        const minutesNow = parseInt(autoInterval.value || '5', 10);
+        try {
+          publish('updateAutosaveSettings', { enabled: enabledNow, minutes: minutesNow });
+          this._showSaveToast('オートセーブ設定を更新しました');
+          this._refreshSaveStatus();
+          inlineStatus.textContent = `（いまは: ${enabledNow ? `${minutesNow}分ごと` : 'OFF'}）`;
+        } catch {}
+      });
+  
+      autoRow.appendChild(autoToggle);
+      autoRow.appendChild(autoInterval);
+      autoRow.appendChild(applyBtn);
+      autoGroup.appendChild(autoLabel);
+      autoGroup.appendChild(autoRow);
+      panel.appendChild(autoGroup);
+  
+      // 表示更新とfile input追加
+      this._refreshSaveStatus();
+      panel.appendChild(file);
+  
+      return panel;
+    },
 
+  _showSaveToast(message) {
+    const toast = document.createElement('div');
+    Object.assign(toast.style, {
+      position: 'fixed', right: '16px', bottom: '16px', zIndex: 100001,
+      background: 'rgba(0,0,0,0.85)', color: '#fff', padding: '10px 14px', borderRadius: '8px',
+      border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+    });
+    toast.textContent = message || '保存しました';
+    document.body.appendChild(toast);
+    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 1200);
+  },
+
+  _refreshSaveStatus() {
+    const last = document.getElementById('lastSavedLabel');
+    const auto = document.getElementById('autosaveStatusLabel');
+    // 最終保存
+    (async () => {
+      try {
+        const mod = await import('../core/saveData.js');
+        const s = mod.loadSave();
+        const t = s?.meta?.lastSavedAt ? new Date(s.meta.lastSavedAt) : null;
+        last && (last.textContent = `最終保存: ${t ? t.toLocaleString() : '不明'}`);
+      } catch { last && (last.textContent = '最終保存: 不明'); }
+    })();
+    // オートセーブ
+    try {
+      const enabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
+      const minutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
+      auto && (auto.textContent = `オートセーブ: ${enabled ? `${minutes}分ごと` : 'OFF'}`);
+    } catch { auto && (auto.textContent = 'オートセーブ: 不明'); }
+  },
 
   /** レベル設定グループを作成 */
   createLevelSettingGroup() {
@@ -955,7 +1185,25 @@ const settingsScreenState = {
   createButtonSection() {
     const buttonSection = document.createElement('div');
     buttonSection.className = 'settings-button-section';
-    
+
+    // 手動セーブ
+    const manualSaveBtn = null;
+
+    // セーブ読込
+    const manualLoadBtn = null;
+
+        // セーブ初期化（軽） — 非表示で残す（開発者向け）
+        const clearSaveBtn = document.createElement('button');
+        clearSaveBtn.className = 'settings-button danger';
+        clearSaveBtn.textContent = 'セーブをなおす（こしょう時）';
+        clearSaveBtn.title = 'セーブ保存箱だけ作り直します。進み具合は基本的に残ります（復旧用）。';
+        clearSaveBtn.addEventListener('click', () => {
+          publish('playSE', 'decide');
+          if (confirm('セーブ保存箱を作り直します。通常は不要です。続行しますか？')) {
+            try { clearSaveData(); alert('セーブの保存箱を作り直しました。'); } catch {}
+          }
+        });
+
     // データリセットボタン（ツールチップ付き）
     const resetButtonContainer = document.createElement('div');
     resetButtonContainer.style.position = 'relative';
@@ -991,11 +1239,38 @@ const settingsScreenState = {
       publish('playSE', 'decide');
       publish('changeScreen', 'title');
     });
+
+        // 追加ボタンを先頭に配置
+        if (manualSaveBtn) {
+          buttonSection.appendChild(manualSaveBtn);
+        }
+        if (manualLoadBtn) {
+          buttonSection.appendChild(manualLoadBtn);
+        }
     
-    buttonSection.appendChild(resetButtonContainer);
-    buttonSection.appendChild(backButton);
+        // ▼ 可視化条件: 開発者のみ（localStorage/devフラグ or URLにdev=1/hash）
+        try {
+          const dev =
+            localStorage.getItem('devTools') === '1' ||
+            ((typeof location !== 'undefined') &&
+              ((location.search && location.search.includes('dev=1')) ||
+               (location.hash && location.hash.includes('dev'))));
+          if (dev) buttonSection.appendChild(clearSaveBtn);
+        } catch {}
     
-    return buttonSection;
+        buttonSection.appendChild(resetButtonContainer);
+        buttonSection.appendChild(backButton);
+    
+        // 隠し操作: 設定ボタン領域で Alt+ダブルクリック → 一時的に表示
+        buttonSection.addEventListener('dblclick', (e) => {
+          if (e.altKey && !clearSaveBtn.parentNode) {
+            try { localStorage.setItem('devTools', '1'); } catch {}
+            buttonSection.insertBefore(clearSaveBtn, resetButtonContainer);
+            this._showSaveToast('開発者メニューを表示しました');
+          }
+        });
+    
+        return buttonSection;
   },
 
   /** ツールチップのイベントリスナーを設定 */

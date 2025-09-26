@@ -3,8 +3,7 @@ import { publish } from '../core/eventBus.js';
 import { gameState } from '../core/gameState.js';
 import { addMonster, loadDex } from '../models/monsterDex.js';
 
-import { getAllMonsterIds, getMonsterById } from '../loaders/dataLoader.js';
-
+import { getAllMonsterIds, getMonsterById, stageData } from '../loaders/dataLoader.js';
 const monsterCaptureScreen = {
   canvas: null,
   container: null,
@@ -38,35 +37,29 @@ const monsterCaptureScreen = {
       ? defeatedMonsters.map(m => m.id).filter(Boolean)
       : [];
 
-    if (!isBonus) {
-      // 通常: このステージのモンスターのみ
-      let stageIds = defeatedIds.length > 0
-        ? defeatedIds.slice()
-        : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
-      stageIds = Array.from(new Set(stageIds));
-      if (stageIds.length > 10) {
-        shuffle(stageIds);
-        stageIds = stageIds.slice(0, 10);
+      if (!isBonus) {
+        // 通常: このステージのモンスターのみ
+        let stageIds = defeatedIds.length > 0
+          ? defeatedIds.slice()
+          : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
+        stageIds = Array.from(new Set(stageIds));
+        if (stageIds.length > 10) {
+          shuffle(stageIds);
+          stageIds = stageIds.slice(0, 10);
+        }
+        this.candidates = stageIds;
+      } else {
+        // ボーナス: 同じくこのステージの5体のみ提示（捕獲数は常に1）
+        let stageIds = defeatedIds.length > 0
+          ? defeatedIds.slice()
+          : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
+        stageIds = Array.from(new Set(stageIds));
+        if (stageIds.length > 10) {
+          shuffle(stageIds);
+          stageIds = stageIds.slice(0, 10);
+        }
+        this.candidates = stageIds;
       }
-      this.candidates = stageIds;
-    } else {
-                  // ボーナス: 他ステージからランダム（未捕獲優先）、ただし捕獲数は常時1
-      const all = getAllMonsterIds().filter(id => {
-        const m = getMonsterById(id);
-        const idStr = String(id);
-        const isWorld = (m && m.grade >= 7) || idStr.startsWith('PRV-');
-        return m && !isWorld;
-      });
-      const unCaptured = all.filter(id => !this.dex.has(id)); // ← 修正: this.dex
-      shuffle(unCaptured);
-      const pool = unCaptured.slice(0, 10);
-      if (pool.length < 10) {
-        const filler = all.filter(id => !pool.includes(id));
-        shuffle(filler);
-        pool.push(...filler.slice(0, 10 - pool.length));
-      }
-      this.candidates = pool.slice(0, 10);
-    }
 
     this._createDOM();
 
@@ -114,7 +107,7 @@ const monsterCaptureScreen = {
     });
 
     const header = document.createElement('div');
-    header.textContent = `ヨミトモにしよう！：最大 ${this.captureLimit} 体選べます（全10候補）`;
+    header.textContent = `ヨミトモにしよう！：最大 ${this.captureLimit} 体選べます（全${this.candidates.length}候補）`;
     Object.assign(header.style, { fontSize: '20px', fontWeight: '700', marginBottom: '12px' });
 
     const grid = document.createElement('div');
@@ -147,7 +140,7 @@ const monsterCaptureScreen = {
         1:'grade1-hokkaido', 2:'grade2-touhoku', 3:'grade3-kantou',
         4:'grade4-chuubu',   5:'grade5-kinki',   6:'grade6-chuugoku',
         7:'grade7-asia',     8:'grade8-europe', 9:'grade9-america',
-        10:'grade10-africa'
+        10:'grade10-africa', 11:'grade11-shikoku', 12:'grade12-kyuusyuu'
       };
       const idStr = String(m.id);
       const folder = folderMap[m.grade] || folderMap[1];
@@ -245,6 +238,26 @@ const monsterCaptureScreen = {
     if (!stageId) return;
     const key = `stage_clear_${stageId}`;
     const current = parseInt(localStorage.getItem(key) || '0');
+    // 初クリア時にレビュー値のスナップショットを保存（同学年の全ステージ）
+    if (current <= 0 && /^bonus_g(\d+)$/i.test(String(stageId))) {
+      try {
+        const mg = /^bonus_g(\d+)$/i.exec(String(stageId));
+        const g = parseInt(mg[1], 10);
+        localStorage.setItem(`stage_first_clear_at_${stageId}`, String(Date.now()));
+        if (!gameState.practiceProgress) gameState.practiceProgress = {};
+        const targets = Array.isArray(stageData) ? stageData.filter(s => s && s.grade === g) : [];
+        for (const stg of targets) {
+          const sid = String(stg.stageId || '');
+          const entry = Object.assign({}, gameState.practiceProgress[sid] || {});
+          const cur = Number(entry.reviewScore || 0);
+          if (typeof entry.reviewScoreSnapshot !== 'number') {
+            entry.reviewScoreSnapshot = Math.max(0, cur);
+            gameState.practiceProgress[sid] = entry;
+          }
+        }
+        try { if (typeof saveGameData === 'function') saveGameData(); } catch {}
+      } catch {}
+    }
     localStorage.setItem(key, String(current + 1));
   },
 

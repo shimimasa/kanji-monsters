@@ -8,15 +8,17 @@ import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils
 
 // 地方マーカーの定義（mapRect基準の割合）
 const regionMarkers = [
-  { grade: 1, name: '北海道', px: 0.82,  py: 0.175, color: '#4A90E2' },
-  { grade: 2, name: '東北',   px: 0.721, py: 0.30,  color: '#7ED321' },
-  { grade: 3, name: '関東',   px: 0.683, py: 0.475, color: '#F5A623' },
-  { grade: 4, name: '中部',   px: 0.567, py: 0.538, color: '#BD10E0' },
-  { grade: 5, name: '近畿',   px: 0.452, py: 0.638, color: '#B8E986' },
-  { grade: 6, name: '中国',   px: 0.337, py: 0.688, color: '#50E3C2' },
+  { grade: 1,  name: '北海道', px: 0.82,  py: 0.175, color: '#4A90E2' },
+  { grade: 2,  name: '東北',   px: 0.721, py: 0.30,  color: '#7ED321' },
+  { grade: 3,  name: '関東',   px: 0.683, py: 0.475, color: '#F5A623' },
+  { grade: 4,  name: '中部',   px: 0.567, py: 0.538, color: '#BD10E0' },
+  { grade: 5,  name: '近畿',   px: 0.452, py: 0.638, color: '#B8E986' },
+  { grade: 6,  name: '中国',   px: 0.337, py: 0.688, color: '#50E3C2' },
+  { grade: 11, name: '四国',   px: 0.40,  py: 0.75,  color: '#00C7B7' },
+  { grade: 12, name: '九州',   px: 0.25,  py: 0.85,  color: '#FF6B6B' },
 ];
+const backButton = { x: 10, y: 540, width: 120, height: 40, text: 'もどる' };
 
-const backButton = { x: 10, y: 540, width: 120, height: 40, text: 'タイトルへ' };
 
 const regionSelectState = {
   canvas: null,
@@ -68,6 +70,11 @@ const regionSelectState = {
     this.canvas.addEventListener('mousemove', this._mouseMoveHandler);
 
     this.mapRect = null;
+
+    // チュートリアル
+    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('regionSelect', { canvas: this.canvas, mapRect: this.mapRect }));
+
+    this.mapRect = null;
   },
 
   /**
@@ -92,18 +99,29 @@ const regionSelectState = {
   },
 
   /**
+    /**
    * 次に挑戦すべき地方を判定
    * @returns {number|null} 学年（1-6）またはnull
    */
-  getNextRegion() {
-    for (let grade = 1; grade <= 6; grade++) {
-      const progress = this.calculateRegionProgress(grade);
-      if (progress < 100) {
-        return grade;
+    getNextRegion() {
+      for (let grade = 1; grade <= 6; grade++) {
+        const progress = this.calculateRegionProgress(grade);
+        if (progress < 100) {
+          return grade;
+        }
       }
-    }
-    return null; // 全地方クリア済み
-  },
+      return null; // 全地方クリア済み
+    },
+  
+    // ← 追加: 地方アンロック判定
+    isRegionUnlocked(grade) {
+      if (grade <= 6) return true;
+      const needMax = (grade === 11) ? 6 : 11;
+      for (let g = 1; g <= needMax; g++) {
+        if (this.calculateRegionProgress(g) < 100) return false;
+      }
+      return true;
+    },
 
   /**
    * ズームアニメーションを開始
@@ -377,8 +395,11 @@ const regionSelectState = {
       this.ctx.ellipse(x + shadowOffset, y + shadowOffset, 25 * scale, 25 * scale, 0, 0, 2 * Math.PI);
       this.ctx.fill();
 
+      // ← 追加: ロック判定
+      const unlocked = this.isRegionUnlocked(marker.grade);
+
       // 光る背景
-      if (isHovered) {
+      if (isHovered && unlocked) {
         const glowRadius = 40 * scale;
         const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
         gradient.addColorStop(0, `${marker.color}40`);
@@ -394,32 +415,47 @@ const regionSelectState = {
       // 本体
       if (images.regionMarker) {
         const size = 50 * scale;
+        this.ctx.save();
+        if (!unlocked) this.ctx.filter = 'grayscale(100%) brightness(0.7)';
         this.ctx.drawImage(images.regionMarker, x - size / 2, y - size / 2, size, size);
+        this.ctx.restore();
       } else {
-        this.ctx.fillStyle = isHovered ? this.lightenColor(marker.color, 30) : marker.color;
+        this.ctx.fillStyle = (isHovered && unlocked) ? this.lightenColor(marker.color, 30) : marker.color;
+        if (!unlocked) this.ctx.fillStyle = '#777';
         this.ctx.beginPath();
         this.ctx.ellipse(x, y, 25 * scale, 25 * scale, 0, 0, 2 * Math.PI);
         this.ctx.fill();
 
-        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillStyle = unlocked ? '#FFFFFF' : '#AAAAAA';
         this.ctx.beginPath();
         this.ctx.ellipse(x, y, 18 * scale, 18 * scale, 0, 0, 2 * Math.PI);
         this.ctx.fill();
 
-        this.ctx.fillStyle = isHovered ? this.lightenColor(marker.color, 30) : marker.color;
+        this.ctx.fillStyle = (isHovered && unlocked) ? this.lightenColor(marker.color, 30) : (unlocked ? marker.color : '#999');
         this.ctx.beginPath();
         this.ctx.ellipse(x, y, 8 * scale, 8 * scale, 0, 0, 2 * Math.PI);
         this.ctx.fill();
       }
 
       // 学年番号
-      this.ctx.fillStyle = '#FFFFFF';
+      this.ctx.fillStyle = unlocked ? '#FFFFFF' : '#DDDDDD';
       this.ctx.strokeStyle = '#000000';
       this.ctx.lineWidth = 2;
       this.ctx.textAlign = 'center';
       this.ctx.font = `bold ${16 * scale}px sans-serif`;
       this.ctx.strokeText(marker.grade.toString(), x, y + 5);
       this.ctx.fillText(marker.grade.toString(), x, y + 5);
+
+      // ← 追加: 鍵バッジ
+      if (!unlocked) {
+        this.ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        this.ctx.fillRect(x - 14, y - 34, 28, 16);
+        this.ctx.fillStyle = '#FFD54F';
+        this.ctx.font = '12px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('🔒', x, y - 26);
+      }
 
       // 進捗バーと%表示
       this.drawProgressBar(x, y + 40 * scale, progress, isHovered);
@@ -543,6 +579,12 @@ const regionSelectState = {
         break;
       case 6: // 中国
         this.ctx.fillRect(mapX + mapWidth * 0.1, mapY + mapHeight * 0.55, mapWidth * 0.3, mapHeight * 0.25);
+        break;
+      case 11: // 四国
+        this.ctx.fillRect(mapX + mapWidth * 0.37, mapY + mapHeight * 0.72, mapWidth * 0.12, mapHeight * 0.08);
+        break;
+      case 12: // 九州
+        this.ctx.fillRect(mapX + mapWidth * 0.20, mapY + mapHeight * 0.82, mapWidth * 0.15, mapHeight * 0.10);
         break;
     }
     
@@ -703,19 +745,35 @@ const regionSelectState = {
     this.ctx.lineWidth = 1;
     this.ctx.strokeRect(tooltipX + 2, tooltipY + 2, tooltipWidth - 4, tooltipHeight - 4);
 
-    // テキスト
-    this.ctx.fillStyle = '#FFFFFF';
-    this.ctx.textAlign = 'left';
-    this.ctx.font = 'bold 16px sans-serif';
-    this.ctx.fillText(`${marker.grade}年生 ${marker.name}地方`, tooltipX + 10, tooltipY + 25);
-    
-    this.ctx.font = '14px sans-serif';
-    this.ctx.fillStyle = progress === 100 ? '#FFD700' : '#FFFFFF';
-    this.ctx.fillText(`進捗: ${progress}%`, tooltipX + 10, tooltipY + 50);
-    
-    this.ctx.fillStyle = '#CCCCCC';
-    this.ctx.font = '12px sans-serif';
-    this.ctx.fillText(`${clearedStages.length} / ${regionStages.length} ステージクリア`, tooltipX + 10, tooltipY + 70);
+       // テキスト
+       this.ctx.fillStyle = '#FFFFFF';
+       this.ctx.textAlign = 'left';
+       this.ctx.font = 'bold 16px sans-serif';
+   const title =
+     (marker.grade >= 11)
+       ? `${marker.name}地方`
+       : `${marker.grade}年生 ${marker.name}地方`;
+   this.ctx.fillText(title, tooltipX + 10, tooltipY + 25);
+       
+       this.ctx.font = '14px sans-serif';
+       this.ctx.fillStyle = progress === 100 ? '#FFD700' : '#FFFFFF';
+       this.ctx.fillText(`進捗: ${progress}%`, tooltipX + 10, tooltipY + 50);
+       
+       this.ctx.fillStyle = '#CCCCCC';
+       this.ctx.font = '12px sans-serif';
+       this.ctx.fillText(`${clearedStages.length} / ${regionStages.length} ステージクリア`, tooltipX + 10, tooltipY + 70);
+           // ロック案内
+    try {
+      const unlocked = this.isRegionUnlocked(marker.grade);
+      if (!unlocked) {
+        this.ctx.fillStyle = '#FFB74D';
+        this.ctx.font = '12px sans-serif';
+        const req = (marker.grade === 11)
+          ? '解放条件: 1〜6年の通常ステージを全てクリア'
+          : (marker.grade === 12 ? '解放条件: 他の地方の通常ステージを全てクリア' : '');
+        if (req) this.ctx.fillText(req, tooltipX + 10, tooltipY + 10);
+      }
+    } catch {}
   },
 
   handleMouseMove(e) {
@@ -811,17 +869,25 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       const y = map.y + marker.py * map.height;
       const distance = Math.sqrt((worldX - x) ** 2 + (worldY - y) ** 2);
       if (distance <= 35) {
+        // ← 追加: ロック中は弾く
+        if (!this.isRegionUnlocked(marker.grade)) {
+          publish('playSE', 'wrong');
+          alert(marker.grade === 11
+            ? '四国地方はまだ解放されていません。\n解放条件: 1〜6年の通常ステージを全てクリア'
+            : '九州地方はまだ解放されていません。\n解放条件: 1〜11年の通常ステージを全てクリア');
+          return;
+        }
         this.startZoomAnimation(marker);
         return;
       }
     }
 
-    // 戻るボタンのクリック処理（カメラ変換の影響を受けない）
-    if (isMouseOverRect(x, y, backButton)) {
-      publish('playSE', 'decide');
-      publish('changeScreen', 'title');
-      return;
-    }
+        // 戻るボタンのクリック処理（カメラ変換の影響を受けない）
+        if (isMouseOverRect(x, y, backButton)) {
+          publish('playSE', 'decide');
+          publish('changeScreen', 'courseSelect');
+          return;
+        }
   },
   
   render() {

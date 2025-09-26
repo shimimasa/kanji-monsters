@@ -35,7 +35,7 @@ export const gameState = {
       level: 1, exp: 0,
       attack: 10,
       healCount: 3,
-      nextLevelExp: 100,
+      nextLevelExp: 250,
       skillPoints: 0,  // スキルポイントを追加
       enemiesDefeated: 0,  // 倒した敵の数
       stagesCleared: 0,    // クリアしたステージ数
@@ -73,6 +73,9 @@ export const gameState = {
     kanjiReadProgress: {
       // kanjiId: { onyomi: Set, kunyomi: Set, mastered: boolean }
     },
+
+    /* ★★★ バトルベストタイム管理 ★★★ */
+    stageBestTimes: {}, // { [stageId]: number(ms) }
 };
   
   export function updatePlayerStats(changes) {
@@ -165,45 +168,43 @@ export const gameState = {
    */
   function checkLevelUp() {
     const stats = gameState.playerStats;
-    
+
+    // 次レベル必要EXP（新テーブル）
+    function nextExpFor(level) {
+      const L = Math.max(1, parseInt(level, 10));
+      const k = L - 1;
+      return Math.max(50, Math.round(250 + 34 * k + 1.7 * k * k));
+    }
+
     if (stats.exp >= stats.nextLevelExp) {
-      // レベルアップ前の情報を保存
       const oldLevel = stats.level;
-      
+
       // 経験値とレベルの更新
       stats.exp -= stats.nextLevelExp;
       stats.level++;
-      
-      // スキルポイントを1増加
+
+      // スキルポイント・ステ上昇
       stats.skillPoints += 1;
-      
-      // レベルアップ時のステータス上昇
-      stats.maxHp += 10; // 仕様書通り
-      stats.hp = stats.maxHp; // 全回復（必須）
-      stats.attack += 2; // 仕様書通り
-      
-      // 次のレベルに必要な経験値を設定 (指数関数的)
-      stats.nextLevelExp = Math.floor(stats.nextLevelExp * 1.2) + 20; // 緩やかな指数+固定値で調整
-      
-      // 他のボーナス（例：回復回数リセットなど）
+      stats.maxHp += 10;
+      stats.hp = stats.maxHp;
+      stats.attack += 2;
+
+      // 次のレベルに必要な経験値（新テーブル）
+      stats.nextLevelExp = nextExpFor(stats.level);
+
+      // 回復回数リセット
       stats.healCount = 3;
-  
-      // レベルアップしたことを通知するイベントを発行しても良い
-      // publish('playerLeveledUp', stats.level);
-      
-      // レベルアップ情報を返す
+
       return {
         leveledUp: true,
         oldLevel: oldLevel,
         newLevel: stats.level
       };
     }
-    
-    // レベルアップしなかった場合
-    return {
-      leveledUp: false
-    };
+
+    return { leveledUp: false };
   }
+  
 
   // Helper: serialize/deserialize kanjiReadProgress
 function serializeKanjiReadProgress(progress) {
@@ -240,80 +241,171 @@ function incrementStageClearCount(stageId) {
    */
   export function saveGameData() {
     try {
-      const saveData = {
-        playerName: gameState.playerName,
-        playerStats: gameState.playerStats,
-        unlockedAchievements: Array.from(gameState.unlockedAchievements),
-        // ★★★ ここを直列化したものに置換 ★★★
-        practiceProgress: gameState.practiceProgress,
-        kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress)
-      };
-      localStorage.setItem('kanjiGameSave', JSON.stringify(saveData));
-      console.log('💾 ゲームデータを保存しました');
-      import('../services/firebase/firebaseController.js').then(firebase => {
-        firebase.savePlayerData({
-          name: gameState.playerName,
-          level: gameState.playerStats.level,
-          exp: gameState.playerStats.exp,
-          maxHp: gameState.playerStats.maxHp,
-          attack: gameState.playerStats.attack,
-          nextLevelExp: gameState.playerStats.nextLevelExp
-        }).catch(error => {
-          console.warn('Firestoreへのプレイヤーデータ保存に失敗:', error);
+      // セーブのベースを取得
+      import('./saveData.js').then(mod => {
+        const { getDefaultSave, loadSave, saveNow } = mod;
+        const base = loadSave ? loadSave() : getDefaultSave();
+
+        // 現在のレビューキュー/図鑑などはローカルキーからスナップショット
+        let gotomonIds = [];
+        try {
+          const dex = JSON.parse(localStorage.getItem('krb_monster_dex') || '[]');
+          if (Array.isArray(dex)) gotomonIds = dex.filter(x => typeof x === 'string');
+        } catch {}
+        let reviewIds = [];
+        try {
+          const rq = JSON.parse(localStorage.getItem('krb_review_queue') || '[]');
+          if (Array.isArray(rq)) reviewIds = rq.map(e => e?.id).filter(Boolean);
+        } catch {}
+
+        // ステージクリアの統合
+        const cleared = new Set(base?.player?.progress?.clearedStages || []);
+        if (typeof window !== 'undefined' && window.gameState?.stageProgress) {
+          Object.entries(window.gameState.stageProgress).forEach(([sid, v]) => {
+            if (v && v.cleared) cleared.add(sid);
+          });
+        }
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k) continue;
+          if (k.startsWith('clear_') && localStorage.getItem(k) === '1') cleared.add(k.replace(/^clear_/, ''));
+          if (k.startsWith('stage_clear_')) {
+            const sid = k.replace(/^stage_clear_/, '');
+            const v = parseInt(localStorage.getItem(k) || '0', 10);
+            if (v > 0) cleared.add(sid);
+          }
+        }
+
+        // 音量・設定
+        const bgm = parseFloat(localStorage.getItem('bgmVolume') || `${base.settings?.bgmVolume ?? 0.7}`);
+        const se  = parseFloat(localStorage.getItem('seVolume')  || `${base.settings?.seVolume  ?? 0.8}`);
+        const gameMode = localStorage.getItem('gameMode') || base.settings?.gameMode || 'jikkuri';
+        const maxHealCount = parseInt(localStorage.getItem('maxHealCount') || `${base.settings?.maxHealCount ?? 3}`, 10);
+        const enemyAttackMode = localStorage.getItem('enemyAttackMode') || base.settings?.enemyAttackMode || 'onMistakeOnly';
+
+        // 新スキーマを更新
+        const save = base || getDefaultSave();
+        save.player = save.player || {};
+        save.player.name = gameState.playerName || save.player.name || '';
+        save.player.coreStats = Object.assign({}, save.player.coreStats || {}, gameState.playerStats || {});
+        save.player.progress = Object.assign({}, save.player.progress || {}, {
+          currentStage: gameState.currentStageId || save.player?.progress?.currentStage || null,
+          clearedStages: Array.from(cleared),
+          stageBestTimes: Object.assign({}, save.player?.progress?.stageBestTimes, gameState.stageBestTimes || {})
         });
-      }).catch(error => {
-        console.warn('Firebase controller読み込み失敗:', error);
-      });
+        save.player.collection = Object.assign({}, save.player.collection || {}, {
+          gotomonIds
+        });
+        save.player.study = Object.assign({}, save.player.study || {}, {
+          practiceProgress: gameState.practiceProgress || {},
+          kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress || {}),
+          reviewQueue: reviewIds,
+          // 追加: ステージのレビュー解放状況を永続化
+          stageReviewUnlocked: gameState.stageReviewUnlocked || {}
+        });
+        save.settings = Object.assign({}, save.settings || {}, {
+          bgmVolume: Number.isFinite(bgm) ? Math.max(0, Math.min(1, bgm)) : 0.7,
+          seVolume:  Number.isFinite(se)  ? Math.max(0, Math.min(1, se )) : 0.8,
+          lang: save.settings?.lang || 'ja',
+          gameMode,
+          maxHealCount: Number.isFinite(maxHealCount) ? Math.max(1, Math.min(5, maxHealCount)) : 3,
+          enemyAttackMode
+        });
+        
+        // 実績（v1）を保存
+        save.flags = Object.assign({}, save.flags || {}, {
+          achievementsUnlocked: Array.from(gameState.unlockedAchievements)
+        });
+        
+        saveNow(save);
+
+        // 旧フォーマットも当面残しておく（後方互換）
+        localStorage.setItem('kanjiGameSave', JSON.stringify({
+          playerName: gameState.playerName,
+          playerStats: gameState.playerStats,
+          unlockedAchievements: Array.from(gameState.unlockedAchievements),
+          practiceProgress: gameState.practiceProgress,
+          kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress)
+        }));
+        console.log('💾 ゲームデータを保存しました');
+      }).catch(e => console.warn('saveData import failed:', e));
     } catch (error) {
       console.error('❌ ゲームデータの保存に失敗しました:', error);
     }
   }
 
-  /**
-   * ゲームデータをlocalStorageから読み込む
-   */
   export function loadGameData() {
     try {
-      const saveDataStr = localStorage.getItem('kanjiGameSave');
-      if (!saveDataStr) {
-        console.log('💾 セーブデータが見つかりません。新規ゲームを開始します。');
+      import('./saveData.js').then(mod => {
+        const save = mod.loadSave();
+        if (!save) return false;
+
+        // 反映
+        if (save.player?.name) gameState.playerName = save.player.name;
+        if (save.player?.coreStats) Object.assign(gameState.playerStats, save.player.coreStats);
+
+        if (save.player?.study?.practiceProgress) {
+          gameState.practiceProgress = save.player.study.practiceProgress || {};
+        }
+        if (save.player?.study?.kanjiReadProgress) {
+          gameState.kanjiReadProgress = deserializeKanjiReadProgress(save.player.study.kanjiReadProgress || {});
+        }
+        // 追加: レビュー解放のロード
+        if (save.player?.study?.stageReviewUnlocked) {
+          gameState.stageReviewUnlocked = save.player.study.stageReviewUnlocked || {};
+        }
+        if (save.player?.progress?.stageBestTimes) {
+          gameState.stageBestTimes = Object.assign({}, save.player.progress.stageBestTimes);
+        }
+
+        // ステージ進捗（軽量反映）
+        if (Array.isArray(save.player?.progress?.clearedStages)) {
+          gameState.stageProgress = gameState.stageProgress || {};
+          save.player.progress.clearedStages.forEach(id => {
+            gameState.stageProgress[id] = { cleared: true };
+            try { localStorage.setItem(`clear_${id}`, '1'); } catch {}
+          });
+        }
+        if (save.player?.progress?.currentStage) {
+          gameState.currentStageId = save.player.progress.currentStage;
+          try { localStorage.setItem('lastPlayedStage', gameState.currentStageId); } catch {}
+        }
+
+                // 実績（v1）読込
+                if (Array.isArray(save.flags?.achievementsUnlocked)) {
+                  gameState.unlockedAchievements = new Set(save.flags.achievementsUnlocked);
+                }
+        // 音量等は AudioManager が localStorage から起動時読込するためここでは保存のみ（整合性確保）
+        if (save.settings) {
+          try {
+            if (typeof save.settings.bgmVolume === 'number') localStorage.setItem('bgmVolume', `${save.settings.bgmVolume}`);
+            if (typeof save.settings.seVolume  === 'number') localStorage.setItem('seVolume',  `${save.settings.seVolume}`);
+            if (save.settings.gameMode)      localStorage.setItem('gameMode', save.settings.gameMode);
+            if (save.settings.maxHealCount)  localStorage.setItem('maxHealCount', `${save.settings.maxHealCount}`);
+            if (save.settings.enemyAttackMode) localStorage.setItem('enemyAttackMode', save.settings.enemyAttackMode);
+          } catch {}
+        }
+
+        console.log('💾 ゲームデータを読み込みました');
+        return true;
+      }).catch(e => {
+        console.warn('load saveData failed:', e);
         return false;
-      }
-      const saveData = JSON.parse(saveDataStr);
-  
-      if (saveData.playerName) {
-        gameState.playerName = saveData.playerName;
-      }
-      if (saveData.playerStats) {
-        Object.assign(gameState.playerStats, saveData.playerStats);
-      }
-      if (saveData.unlockedAchievements && Array.isArray(saveData.unlockedAchievements)) {
-        gameState.unlockedAchievements = new Set(saveData.unlockedAchievements);
-      }
-      if (saveData.practiceProgress) {
-        gameState.practiceProgress = saveData.practiceProgress;
-      }
-      if (saveData.kanjiReadProgress) {
-        gameState.kanjiReadProgress = deserializeKanjiReadProgress(saveData.kanjiReadProgress);
-      }
-  
-      console.log('💾 ゲームデータを読み込みました');
-      console.log(`📊 レベル: ${gameState.playerStats.level}, 倒した敵: ${gameState.playerStats.enemiesDefeated}, クリアしたステージ: ${gameState.playerStats.stagesCleared}`);
-      console.log(`🏆 解除済み実績数: ${gameState.unlockedAchievements.size}`);
-      return true;
+      });
     } catch (error) {
       console.error('❌ ゲームデータの読み込みに失敗しました:', error);
       return false;
     }
   }
 
-  /**
-   * セーブデータを削除する（デバッグ用）
-   */
   export function clearSaveData() {
-    localStorage.removeItem('kanjiGameSave');
-    console.log('💾 セーブデータを削除しました');
+    try {
+      import('./saveData.js').then(mod => mod.clearSave && mod.clearSave());
+      localStorage.removeItem('kanjiGameSave'); // 旧フォーマットも削除
+      console.log('💾 セーブデータを削除しました');
+    } catch {}
   }
+
 
   /* ---- 🔧 ラッパ関数（必要最低限だけ用意） ----------------------------- */
   
