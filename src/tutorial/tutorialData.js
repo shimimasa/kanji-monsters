@@ -18,7 +18,7 @@ export function getStepsFor(screenId, ctx = {}) {
           {
             title: 'ちいきをえらぼう',
             text: 'マーカーをおすと そのちいきへ。\nはじめは「北海道」から！',
-            anchor: () => approxRect(ctx?.mapRect, 0.82, 0.175, 50, 50) // 北海道マーカー近辺
+            anchor: () => canvasApprox(ctx?.mapRect, 0.82, 0.175, 50, 50) // 北海道マーカー近辺
           }
         ];
   
@@ -27,17 +27,17 @@ export function getStepsFor(screenId, ctx = {}) {
           {
             title: '学年タブ',
             text: 'じぶんの学年をタップ/クリック！\n四国・九州はほかのステージをクリアしたら遊べるよ。',
-            anchor: () => ({ x: 0, y: 0, w: ctx.canvas?.width || 800, h: 60 })
+            anchor: () => canvasRect(ctx.canvas, 0, 0, (ctx.canvas?.width||800), 60)
           },
           {
             title: 'ステージをえらぶ',
             text: '左のリストから えらんでね。\nマップのマーカーをおしてもOK！',
-            anchor: () => ({ x: 20, y: 120, w: (ctx.canvas?.width || 800) / 2 - 40, h: (ctx.canvas?.height || 600) - 180 })
+            anchor: () => canvasRect(ctx.canvas, 20, 120, ((ctx.canvas?.width||800)/2 - 40), ((ctx.canvas?.height||600) - 180))
           },
           {
             title: 'マスターにちょうせん！',
             text: '「マスター」ボタンで漢字の読みをマスターしよう！マスターを押した後に、ステージに入ろう！',
-            anchor: () => buttonRect({ x: 800/2 - 70, y: 540, width: 140, height: 40 })
+            anchor: () => canvasRect(ctx.canvas, ( (ctx.canvas?.width||800)/2 - 70 ), 540, 140, 40)
           }
         ];
   
@@ -46,17 +46,17 @@ export function getStepsFor(screenId, ctx = {}) {
           {
             title: 'もんだい',
             text: 'かんじの よみを いれよう。\nかなで入力 → Enterキー！',
-            anchor: () => bottomCenter(ctx.canvas, 320, 80) // 入力域の下辺を目安に
+            anchor: () => canvasBottomCenter(ctx.canvas, 320, 80) // 入力域の下辺を目安に
           },
           {
             title: 'ヒント',
             text: 'わからないときは ヒントをつかってOK！',
-            anchor: () => topRight(ctx.canvas, 180, 80)
+            anchor: () => canvasTopRight(ctx.canvas, 180, 80)
           },
           {
             title: 'HPとこうげき',
             text: 'こたえると こうげき！ まちがえると ダメージ！\nがんばって ぜんいん たおそう！',
-            anchor: () => topLeft(ctx.canvas, 260, 120)
+            anchor: () => canvasTopLeft(ctx.canvas, 260, 120)
           }
         ];
   
@@ -96,7 +96,7 @@ export function getStepsFor(screenId, ctx = {}) {
     
           case 'practiceBattle':
             return [
-              { title: 'マスターモード', text: 'かなで よみを入力 → Enter！\nまちがえても へいき、れんしゅうだよ。', anchor: () => bottomCenter(ctx.canvas, 320, 80) }
+              { title: 'マスターモード', text: 'かなで よみを入力 → Enter！\nまちがえても へいき、れんしゅうだよ。', anchor: () => canvasBottomCenter(ctx.canvas, 320, 80) }
             ];
         
              case 'courseSelect':
@@ -104,12 +104,12 @@ export function getStepsFor(screenId, ctx = {}) {
                  {
                    title: 'このゲームについて',
                    text: '日本編（小学生の漢字）と 世界編（中学生の漢字）があります。\nはじめは 日本編から すすんでいこう！',
-                   anchor: () => centerBox(ctx.canvas, 500, 160)
+                   anchor: () => canvasCenterBox(ctx.canvas, 500, 160)
                  },
                  {
                    title: '日本編',
                    text: 'ここをおすと 日本の地方へ。ステージをクリアして かんじをおぼえよう！',
-                   anchor: () => buttonRect(ctx.japan || { x: 50, y: 150, width: 280, height: 260 })
+                   anchor: () => canvasRect(ctx.canvas, (ctx.japan?.x||50), (ctx.japan?.y||150), (ctx.japan?.width||280), (ctx.japan?.height||260))
                  },
                  {
                    title: '世界編',
@@ -128,55 +128,49 @@ export function getStepsFor(screenId, ctx = {}) {
         }
       }
     
-      function domRect(selector, pad = 8) {
-        const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
-        if (!el) return { x: 80, y: 120, w: 300, h: 120 };
-        const r = el.getBoundingClientRect();
-        return { x: r.left - pad, y: r.top - pad, w: r.width + pad * 2, h: r.height + pad * 2 };
-      }
+  // 1) キャンバス論理座標 → 画面(CSS px)
+ function canvasRectToViewport(canvas, r) {
+     const b = canvas?.getBoundingClientRect?.();
+     if (!b) return { x: r.x|0, y: r.y|0, w: r.w|0, h: r.h|0 };
+     const sx = b.width  / (canvas.width  || b.width);
+     const sy = b.height / (canvas.height || b.height);
+     return {
+       x: Math.round(b.left + r.x * sx),
+       y: Math.round(b.top  + r.y * sy),
+       w: Math.round(r.w * sx),
+       h: Math.round(r.h * sy),
+     };
+   }    
   
-// キャンバス論理座標 → 画面(CSS px) 変換
-function canvasRectToViewport(canvas, r) {
-      const b = canvas?.getBoundingClientRect?.();
-      if (!b) return { x: r.x|0, y: r.y|0, w: r.w|0, h: r.h|0 };
-      const sx = b.width  / (canvas.width  || b.width);
-      const sy = b.height / (canvas.height || b.height);
-      return {
-        x: Math.round(b.left + r.x * sx),
-        y: Math.round(b.top  + r.y * sy),
-        w: Math.round(r.w * sx),
-        h: Math.round(r.h * sy),
-      };
-    }
-
- // 位置ユーティリティ
+  // 2) キャンバス用ヘルパ（論理座標で受けて画面座標へ）
+ function canvasRect(canvas, x, y, w, h) {
+     const c = canvas || document.getElementById('gameCanvas');
+     return canvasRectToViewport(c, { x, y, w, h });
+   }
+   function canvasCenterBox(canvas, w, h) {
+     const c = canvas || document.getElementById('gameCanvas');
+     const cw = c?.width || 800, ch = c?.height || 600;
+     return canvasRectToViewport(c, { x:(cw-w)/2, y:(ch-h)/2, w, h });
+   }
+   function canvasTopLeft(canvas, w, h)      { return canvasRect(canvas, 20, 20, w, h); }
+   function canvasTopRight(canvas, w, h)     { const c=canvas||document.getElementById('gameCanvas'); const cw=c?.width||800; return canvasRect(c, cw-w-20, 20, w, h); }
+   function canvasBottomCenter(canvas, w, h) { const c=canvas||document.getElementById('gameCanvas'); const cw=c?.width||800, ch=c?.height||600; return canvasRect(c, (cw-w)/2, ch-h-20, w, h); }
+   function canvasApprox(mapRect, px, py, w, h) {
+     const c = document.getElementById('gameCanvas');
+     if (!mapRect || !c) return { x: 80, y: 120, w, h }; // フォールバック
+     return canvasRectToViewport(c, {
+       x: mapRect.x + mapRect.width  * px - w / 2,
+       y: mapRect.y + mapRect.height * py - h / 2,
+       w, h
+     });
+   }
   
-   function buttonRect(btn, canvas) {
-       const c = canvas || document.getElementById('gameCanvas');
-       const x = (btn.x ?? btn.left ?? 0), y = (btn.y ?? btn.top ?? 0);
-       const w = (btn.w ?? btn.width ?? 0), h = (btn.h ?? btn.height ?? 0);
-       return canvasRectToViewport(c, { x, y, w, h });
-}
-   
-     function centerBox(canvas, w, h) {
-       const c = canvas || document.getElementById('gameCanvas');
-       const cw = c?.width  || (c?.getBoundingClientRect?.().width  || 800);
-       const ch = c?.height || (c?.getBoundingClientRect?.().height || 600);
-       return canvasRectToViewport(c, { x:(cw-w)/2, y:(ch-h)/2, w, h });
-    }
-
-     function topLeft(canvas, w, h)       { const c=canvas||document.getElementById('gameCanvas'); return canvasRectToViewport(c,{x:20,y:20,w,h}); }
-     function topRight(canvas, w, h)      { const c=canvas||document.getElementById('gameCanvas'); const cw=c?.width||800; return canvasRectToViewport(c,{x:cw-w-20,y:20,w,h}); }
-     function bottomCenter(canvas, w, h)  { const c=canvas||document.getElementById('gameCanvas'); const cw=c?.width||800, ch=c?.height||600; return canvasRectToViewport(c,{x:(cw-w)/2,y:ch-h-20,w,h}); }
-    
-     function approxRect(mapRect, px, py, w, h) {
-       const c = document.getElementById('gameCanvas');
-       if (!mapRect || !c) return { x: 560, y: 120, w, h };
-       return canvasRectToViewport(c, {
-         x: mapRect.x + mapRect.width  * px - w / 2,
-         y: mapRect.y + mapRect.height * py - h / 2,
-         w, h
-       });
-    }  
+   // 3) DOM要素（既にCSS px）→そのまま
+   function domRect(selector, pad = 8) {
+     const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
+     if (!el) return { x: 80, y: 120, w: 300, h: 120 };
+     const r = el.getBoundingClientRect();
+     return { x: r.left - pad, y: r.top - pad, w: r.width + pad * 2, h: r.height + pad * 2 };
+   } 
 
   export default getStepsFor;
