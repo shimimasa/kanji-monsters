@@ -68,6 +68,34 @@ const quickReviewPracticeScreen = {
     }
   },
 
+    // 確認ダイアログなし版：一覧を出してステージ選択へ戻る
+    _completeQuickReview() {
+        try {
+          battleState.inputEnabled = false;
+    
+          const stageId = gameState.currentStageId;
+          const stageKanji = getKanjiByStageId(stageId) || [];
+          const ids   = this.wrongTargets?.ids ? new Set([...this.wrongTargets.ids].map(v => String(v))) : new Set();
+          const texts = this.wrongTargets?.texts ? new Set([...this.wrongTargets.texts].map(s => String(s).trim())) : new Set();
+    
+          const pool = stageKanji.filter(k => {
+            const idKey = String(k.id);
+            const textKey = String(k.kanji).trim();
+            return (ids.size && ids.has(idKey)) || (texts.size && texts.has(textKey));
+          });
+          const list = pool.map(k => (k.kanji || k.text || '')).filter(Boolean);
+    
+          try { alert(`誤答の復習が完了しました！\n今回マスター: ${list.length ? list.join(' ') : '（なし）'}`); } catch {}
+    
+          publish('playBGM', 'title');
+          const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+          publish('changeScreen', target);
+        } catch (e) {
+          console.error('❌ quickReviewPractice._completeQuickReview error:', e);
+          publish('changeScreen', gameState.previousScreen || 'stageSelect');
+        }
+      },
+
   // 常に誤答ターゲットからだけ生成
   _buildUnmasteredKanjiList() {
     try {

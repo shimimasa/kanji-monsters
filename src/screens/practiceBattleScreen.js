@@ -2081,59 +2081,6 @@ if (this.wrongOnlyMode) {
       console.error('❌ マスター進捗更新エラー:', error);
     }
   },
-
-  /**
- * 1分復習（誤答限定）完了時の選択
- * - レビュー継続 or ステージ選択へ戻る
- */
-_completeQuickReview() {
-  try {
-    // 以降の自動出題を止める
-    battleState.inputEnabled = false;
-
-    setTimeout(() => {
-      let goReview = false;
-      try {
-        goReview = window.confirm('誤答の復習が完了しました！\nレビューモードを続けますか？\n（キャンセルでステージ選択へ）');
-      } catch {
-        // confirm が使えない環境ではデフォルトで戻る
-        goReview = false;
-      }
-
-      // 受け渡しデータをクリア
-      try { delete gameState.quickReviewTargets; } catch {}
-
-      if (goReview) {
-        this.wrongOnlyMode = false;
-        this.reviewMode = true;
-        this._pickNextReviewQuestion();
-        battleState.inputEnabled = true;
-      } else {
-        publish('playBGM', 'title');
-        const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-        publish('changeScreen', target);
-      }
-    }, 50);
-  } catch (e) {
-    console.error('❌ 1分復習完了処理エラー:', e);
-  }
-},
-
-  /**
-   * 漢字がマスター済みかどうかを判定
-   */
-   /**
- * マスター判定（単一ソースへ委譲）
- */
-_isKanjiMastered(kanjiId) {
-  try {
-    const prog = gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiId];
-    return !!(prog && prog.mastered);
-  } catch {
-    return false;
-  }
-},
-
   /**
    * パネル背景を描画
    */
