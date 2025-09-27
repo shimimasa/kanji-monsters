@@ -10,9 +10,21 @@ const quickReviewPracticeScreen = {
     try {
       this.onPracticeComplete = onComplete;
       gameState.gameMode = 'practice';
-
-      // 受け渡しデータの検証（無ければ中断）
-      const qr = gameState.quickReviewTargets;
+  
+      // quickReviewTargets が空/欠落なら、gameState.wrongKanjiList から復元
+      let qr = gameState.quickReviewTargets;
+      const empty = !qr || ((!Array.isArray(qr.ids) || qr.ids.length === 0) &&
+                            (!Array.isArray(qr.texts) || qr.texts.length === 0));
+      if (empty) {
+        const wrongRaw = Array.isArray(gameState.wrongKanjiList) ? gameState.wrongKanjiList : [];
+        const texts = Array.from(new Set(wrongRaw.map(w => (typeof w === 'string')
+          ? w : (w?.text || w?.kanji || String(w || ''))).filter(Boolean)));
+        const ids = Array.from(new Set(wrongRaw.map(w => (typeof w === 'object' && w && 'id' in w)
+          ? w.id : null).filter(v => v !== null && v !== undefined)));
+        qr = { stageId: gameState.currentStageId, ids, texts };
+        gameState.quickReviewTargets = qr;
+      }
+  
       const hasIds = Array.isArray(qr?.ids) && qr.ids.length > 0;
       const hasTexts = Array.isArray(qr?.texts) && qr.texts.length > 0;
       if (!qr || (!hasIds && !hasTexts)) {
@@ -20,7 +32,7 @@ const quickReviewPracticeScreen = {
         publish('changeScreen', gameState.previousScreen || 'stageSelect');
         return;
       }
-
+  
       // 誤答限定を強制
       this.wrongOnlyMode = true;
       this.reviewMode = false;
@@ -28,8 +40,7 @@ const quickReviewPracticeScreen = {
         ids: new Set(hasIds ? qr.ids : []),
         texts: new Set(hasTexts ? qr.texts : []),
       };
-
-      // ベース初期化（bonusの自動レビューは base 内で wrongOnlyMode を見て抑止される）
+  
       basePractice.enter.call(this, canvasEl, onComplete);
     } catch (e) {
       console.error('❌ quickReviewPractice.enter error:', e);

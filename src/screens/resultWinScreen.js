@@ -34,6 +34,7 @@ const resultWinState = {
   animationTime: 0, // アニメーション用タイマー
   resultData: null, // 結果データを保存
   bonusSummary: null, // 学年ボーナスの結果データを保持
+  _countCommitted: false, // ← 追加: カウント二重加算防止
 
   /** 画面表示時の初期化 */
   async enter(canvas, resultData) {
@@ -67,10 +68,12 @@ const resultWinState = {
     // クリア画面に入ったらクリアBGMを再生
     publish('playBGM', 'victory');
 
-    // ステージクリアの統計データを更新
-    recordStageCleared();
-    gameState.playerStats.stagesCleared++;
-    
+    // ステージクリアの統計データを更新（多重防止）
+if (!this._countCommitted) {
+  recordStageCleared();
+  gameState.playerStats.stagesCleared++;
+  this._countCommitted = true;
+}
     // パーフェクトクリア判定
     if (battleState.mistakesThisStage === 0) {
       gameState.justClearedPerfectly = true;
@@ -622,6 +625,7 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     this.ctx = null;
     this.resultData = null;
     this.bonusSummary = null;
+    this._countCommitted = false; // ← 追加: 次回のためにリセット
   },
 
   /** イベントハンドラ登録 */
@@ -687,7 +691,11 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
 
     if (isMouseOverRect(x, y, nextStageButton)) {
       publish('playSE', 'decide');
-      const targetScreen = gameState.previousScreen || 'stageSelect';
+      // 同画面への遷移を禁止して確実に抜ける
+      let targetScreen = gameState.previousScreen;
+      if (!targetScreen || targetScreen === 'resultWin' || targetScreen === 'battle') {
+        targetScreen = 'stageSelect';
+      }
       // 画面遷移前にメニュー系BGMへ切替
       publish('playBGM', 'title');
       publish('changeScreen', targetScreen);
