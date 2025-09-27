@@ -9,7 +9,7 @@ export function getStepsFor(screenId, ctx = {}) {
           {
             title: 'ゲームをはじめよう',
             text: 'スタートボタンをおそう！\nなまえを入れたら ぼうけんへ。',
-            anchor: () => buttonRect(ctx?.playButton || { x: 300, y: 350, width: 300, height: 50 })
+            anchor: () => buttonRect(ctx?.playButton || { x: 300, y: 350, width: 300, height: 50 }, ctx.canvas)
           }
         ];
   
@@ -107,20 +107,20 @@ export function getStepsFor(screenId, ctx = {}) {
                    anchor: () => canvasCenterBox(ctx.canvas, 500, 160)
                  },
                  {
-                   title: '日本編',
-                   text: 'ここをおすと 日本の地方へ。ステージをクリアして かんじをおぼえよう！',
-                   anchor: () => canvasRect(ctx.canvas, (ctx.japan?.x||50), (ctx.japan?.y||150), (ctx.japan?.width||280), (ctx.japan?.height||260))
-                 },
-                 {
-                   title: '世界編',
-                   text: 'ここは ちからが ついてからでもOK。中学生レベルのかんじに ちょうせん！',
-                   anchor: () => buttonRect(ctx.world || { x: 430, y: 150, width: 280, height: 260 })
-                 },
-                 {
-                   title: 'もどる',
-                   text: 'わからなくなったら タイトルへ もどれるよ。',
-                   anchor: () => buttonRect(ctx.back || { x: 10, y: (ctx.canvas?.height||600)-60, width:120, height:40 })
-                 }
+                  title: '日本編',
+                  text: 'ここをおすと 日本の地方へ。ステージをクリアして かんじをおぼえよう！',
+                  anchor: () => canvasRect(ctx.canvas, (ctx.japan?.x||50), (ctx.japan?.y||150), (ctx.japan?.width||280), (ctx.japan?.height||260))
+                },
+                {
+                  title: '世界編',
+                  text: 'ここは ちからが ついてからでもOK。中学生レベルのかんじに ちょうせん！',
+                  anchor: () => buttonRect(ctx.world || { x: 430, y: 150, width: 280, height: 260 }, ctx.canvas)
+                },
+                {
+                  title: 'もどる',
+                  text: 'わからなくなったら タイトルへ もどれるよ。',
+                  anchor: () => buttonRect(ctx.back || { x: 10, y: (ctx.canvas?.height||600)-60, width:120, height:40 }, ctx.canvas)
+                }
                ];
     
           default:
@@ -142,28 +142,36 @@ export function getStepsFor(screenId, ctx = {}) {
      };
    }    
   
-  // 2) キャンバス用ヘルパ（論理座標で受けて画面座標へ）
- function canvasRect(canvas, x, y, w, h) {
-     const c = canvas || document.getElementById('gameCanvas');
-     return canvasRectToViewport(c, { x, y, w, h });
-   }
-   function canvasCenterBox(canvas, w, h) {
-     const c = canvas || document.getElementById('gameCanvas');
-     const cw = c?.width || 800, ch = c?.height || 600;
-     return canvasRectToViewport(c, { x:(cw-w)/2, y:(ch-h)/2, w, h });
-   }
-   function canvasTopLeft(canvas, w, h)      { return canvasRect(canvas, 20, 20, w, h); }
-   function canvasTopRight(canvas, w, h)     { const c=canvas||document.getElementById('gameCanvas'); const cw=c?.width||800; return canvasRect(c, cw-w-20, 20, w, h); }
-   function canvasBottomCenter(canvas, w, h) { const c=canvas||document.getElementById('gameCanvas'); const cw=c?.width||800, ch=c?.height||600; return canvasRect(c, (cw-w)/2, ch-h-20, w, h); }
-   function canvasApprox(mapRect, px, py, w, h) {
-     const c = document.getElementById('gameCanvas');
-     if (!mapRect || !c) return { x: 80, y: 120, w, h }; // フォールバック
-     return canvasRectToViewport(c, {
-       x: mapRect.x + mapRect.width  * px - w / 2,
-       y: mapRect.y + mapRect.height * py - h / 2,
-       w, h
-     });
-   }
+    // 2) キャンバス用ヘルパ（論理座標で受けて画面座標へ）
+    function canvasRect(canvas, x, y, w, h) {
+      const c = canvas || document.getElementById('gameCanvas');
+      return canvasRectToViewport(c, { x, y, w, h });
+    }
+    function canvasCenterBox(canvas, w, h) {
+      const c = canvas || document.getElementById('gameCanvas');
+      const cw = c?.width || 800, ch = c?.height || 600;
+      return canvasRectToViewport(c, { x:(cw-w)/2, y:(ch-h)/2, w, h });
+    }
+    function canvasTopLeft(canvas, w, h)      { return canvasRect(canvas, 20, 20, w, h); }
+    function canvasTopRight(canvas, w, h)     { const c=canvas||document.getElementById('gameCanvas'); const cw=c?.width||800; return canvasRect(c, cw-w-20, 20, w, h); }
+    function canvasBottomCenter(canvas, w, h) { const c=canvas||document.getElementById('gameCanvas'); const cw=c?.width||800, ch=c?.height||600; return canvasRect(c, (cw-w)/2, ch-h-20, w, h); }
+  
+      // 追加: ボタン矩形（{x,y,width,height}）→画面座標（必ず同じ canvas を使う）
+  function buttonRect(btn, canvas) {
+    const c = canvas || document.getElementById('gameCanvas');
+    const b = btn || { x: 300, y: 350, width: 300, height: 50 };
+    return canvasRectToViewport(c, { x: b.x|0, y: b.y|0, w: b.width|0, h: b.height|0 });
+  }
+  
+    function canvasApprox(mapRect, px, py, w, h) {
+      const c = document.getElementById('gameCanvas');
+      if (!mapRect || !c) return { x: 80, y: 120, w, h }; // フォールバック
+      return canvasRectToViewport(c, {
+        x: mapRect.x + mapRect.width  * px - w / 2,
+        y: mapRect.y + mapRect.height * py - h / 2,
+        w, h
+      });
+    }
   
    // 3) DOM要素（既にCSS px）→そのまま
    function domRect(selector, pad = 8) {
