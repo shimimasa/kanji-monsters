@@ -11,7 +11,7 @@ const quickReviewPracticeScreen = {
   originalReviewIds: new Set(),
   masteredThisSession: new Set(),
   // 進捗用の内部状態（ファイル先頭のプロパティ群の近くに）
-  quickProgress = { current: 0, target: 0 },
+  quickProgress: { current: 0, target: 0 },
   
   enter(canvasEl, onComplete) {
     try {
