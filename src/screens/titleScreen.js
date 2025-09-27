@@ -40,7 +40,7 @@ const titleState = {
       };
     } else {
       // 新規プレイヤー用のボタン配置（モード統一）
-      this.playButton = { x: cx - 150, y: 380, width: 300, height: 50, text: 'はじめる' };
+      this.playButton = { x: cx - 150, y: 380, width: 300, height: 50, text: 'スタート' };
       this.resetButton = null; // リセットボタンは表示しない
       this.settingsButton = { x: cx - 80, y: 450, width: 160, height: 50, text: 'せってい' };
     }
