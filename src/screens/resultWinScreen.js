@@ -709,9 +709,17 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       const ids   = Array.from(new Set(wrongRaw.map(w => (typeof w === 'object' && w && 'id' in w) ? w.id : null).filter(v => v !== null && v !== undefined)));
     
       gameState.quickReviewTargets = { stageId: targetStageId, ids, texts };
+    
+      // ← 追加: フェールセーフとしてローカルに退避
+      try {
+        localStorage.setItem('quickReviewBuffer', JSON.stringify({
+          stageId: targetStageId, ids, texts, ts: Date.now()
+        }));
+      } catch {}
+    
       gameState.previousScreen = 'resultWin';
       gameState.gameMode = 'practice';
-      publish('changeScreen', 'quickReviewPractice'); // ← 遷移先を専用画面に
+      publish('changeScreen', 'quickReviewPractice'); // 専用画面へ
     }
   }
 };

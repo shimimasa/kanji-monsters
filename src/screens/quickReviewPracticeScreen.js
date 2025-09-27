@@ -11,11 +11,26 @@ const quickReviewPracticeScreen = {
       this.onPracticeComplete = onComplete;
       gameState.gameMode = 'practice';
   
-      // quickReviewTargets が空/欠落なら、gameState.wrongKanjiList から復元
+      // 1) まず quickReviewTargets
       let qr = gameState.quickReviewTargets;
-      const empty = !qr || ((!Array.isArray(qr.ids) || qr.ids.length === 0) &&
-                            (!Array.isArray(qr.texts) || qr.texts.length === 0));
-      if (empty) {
+      let hasIds = Array.isArray(qr?.ids) && qr.ids.length > 0;
+      let hasTexts = Array.isArray(qr?.texts) && qr.texts.length > 0;
+  
+      // 2) 空ならローカル退避から復元
+      if (!qr || (!hasIds && !hasTexts)) {
+        try {
+          const buf = JSON.parse(localStorage.getItem('quickReviewBuffer') || 'null');
+          if (buf && (Array.isArray(buf.ids) && buf.ids.length || Array.isArray(buf.texts) && buf.texts.length)) {
+            qr = { stageId: buf.stageId, ids: buf.ids || [], texts: buf.texts || [] };
+            gameState.quickReviewTargets = qr;
+            hasIds = Array.isArray(qr.ids) && qr.ids.length > 0;
+            hasTexts = Array.isArray(qr.texts) && qr.texts.length > 0;
+          }
+        } catch {}
+      }
+  
+      // 3) それでも空なら wrongKanjiList から復元
+      if (!qr || (!hasIds && !hasTexts)) {
         const wrongRaw = Array.isArray(gameState.wrongKanjiList) ? gameState.wrongKanjiList : [];
         const texts = Array.from(new Set(wrongRaw.map(w => (typeof w === 'string')
           ? w : (w?.text || w?.kanji || String(w || ''))).filter(Boolean)));
@@ -23,22 +38,27 @@ const quickReviewPracticeScreen = {
           ? w.id : null).filter(v => v !== null && v !== undefined)));
         qr = { stageId: gameState.currentStageId, ids, texts };
         gameState.quickReviewTargets = qr;
+        hasIds = ids.length > 0; hasTexts = texts.length > 0;
       }
   
-      const hasIds = Array.isArray(qr?.ids) && qr.ids.length > 0;
-      const hasTexts = Array.isArray(qr?.texts) && qr.texts.length > 0;
+      // 最終チェック
       if (!qr || (!hasIds && !hasTexts)) {
         alert('復習対象の漢字が見つかりませんでした。');
         publish('changeScreen', gameState.previousScreen || 'stageSelect');
         return;
       }
   
+      // ステージIDを強制同期（照合の母集団を正す）
+      if (qr.stageId && String(gameState.currentStageId || '') !== String(qr.stageId)) {
+        gameState.currentStageId = qr.stageId;
+      }
+  
       // 誤答限定を強制
       this.wrongOnlyMode = true;
       this.reviewMode = false;
       this.wrongTargets = {
-        ids: new Set(hasIds ? qr.ids : []),
-        texts: new Set(hasTexts ? qr.texts : []),
+        ids: new Set(qr.ids || []),
+        texts: new Set(qr.texts || []),
       };
   
       basePractice.enter.call(this, canvasEl, onComplete);
