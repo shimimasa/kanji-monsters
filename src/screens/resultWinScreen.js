@@ -159,9 +159,26 @@ if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
   const panelRect = { x: 50, y: 420, w: 250, h: 150 };
   // パネル
   this.drawMistakeScrollPanel(ctx, panelRect.x, panelRect.y, panelRect.w, panelRect.h);
-  // ボタン座標を動的に決定（右側の空きに置く／はみ出し防止）
+
+  // 右側に基本配置
   quickReviewButton.x = Math.min(panelRect.x + panelRect.w + 20, canvas.width - quickReviewButton.width - 20);
   quickReviewButton.y = panelRect.y + Math.floor((panelRect.h - quickReviewButton.height) / 2);
+
+  // ステージ選択ボタンと重なったら上下に退避
+  const overlap = !(quickReviewButton.x + quickReviewButton.width < nextStageButton.x ||
+                    quickReviewButton.x > nextStageButton.x + nextStageButton.width ||
+                    quickReviewButton.y + quickReviewButton.height < nextStageButton.y ||
+                    quickReviewButton.y > nextStageButton.y + nextStageButton.height);
+  if (overlap) {
+    // まずはパネルの上へ
+    let newY = panelRect.y - quickReviewButton.height - 10;
+    if (newY < 20) {
+      // 上が狭ければパネルの下へ
+      newY = panelRect.y + panelRect.h + 10;
+    }
+    quickReviewButton.y = Math.min(newY, canvas.height - quickReviewButton.height - 20);
+  }
+
   const isHoveredReview = isMouseOverRect(this.mouseX, this.mouseY, quickReviewButton);
   this.drawRichButton(ctx, quickReviewButton, isHoveredReview);
 }

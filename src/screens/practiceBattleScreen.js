@@ -487,7 +487,7 @@ _buildUnmasteredKanjiList() {
       console.log(`📚 誤答限定: 未マスター ${this.unmasteredKanji.length}件 / 対象${pool.length}件`);
       return;
     }
-    
+
     if (gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[stageId]) {
       this.unmasteredKanji = [];
       console.log('🔓 このステージはレビュー解放済みとして未マスター0件で扱います');
@@ -1991,15 +1991,17 @@ _completePractice() {
     });
 
     // アンロックを記録（画面遷移後も継続）
-    if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
-    gameState.stageReviewUnlocked[gameState.currentStageId] = true;
-    try { saveGameData(); } catch {}
+if (!this.wrongOnlyMode) {
+  if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+  gameState.stageReviewUnlocked[gameState.currentStageId] = true;
+  try { saveGameData(); } catch {}
+}
 
-    // 誤答限定モードでは自動でレビューへ移行しない
-    if (this.wrongOnlyMode) {
-      this._completeQuickReview();
-      return;
-    }
+// 誤答限定モードでは自動でレビューへ移行しない
+if (this.wrongOnlyMode) {
+  this._completeQuickReview();
+  return;
+}
 
     // 通常はレビューへ移行し継続
     this.reviewMode = true;
