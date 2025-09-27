@@ -16,6 +16,14 @@ const nextStageButton = {
   text: 'ステージ選択へ'
 };
 
+const quickReviewButton = {
+  x: 50,
+  y: 480,
+  width: 220,
+  height: 50,
+  text: 'まちがえた漢字をマスター'
+};
+
 const resultWinState = {
   canvas: null,
   ctx: null,
@@ -142,13 +150,17 @@ const resultWinState = {
         }
     
         // 5. リッチなボタン
-        const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
-        this.drawRichButton(ctx, nextStageButton, isHovered);
-    
-        // 6. 間違えた漢字の巻物風表示
-        if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
-          this.drawMistakeScrollPanel(ctx, 50, 420, 250, 150);
-        }
+const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
+this.drawRichButton(ctx, nextStageButton, isHovered);
+
+// 5b. 1分復習ボタン
+const isHoveredReview = isMouseOverRect(this.mouseX, this.mouseY, quickReviewButton);
+this.drawRichButton(ctx, quickReviewButton, isHoveredReview);
+
+// 6. 間違えた漢字の巻物風表示
+if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
+  this.drawMistakeScrollPanel(ctx, 50, 420, 250, 150);
+}
 
    
   },
@@ -658,6 +670,20 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       // 画面遷移前にメニュー系BGMへ切替
       publish('playBGM', 'title');
       publish('changeScreen', targetScreen);
+    }
+    
+    if (isMouseOverRect(x, y, quickReviewButton)) {
+      publish('playSE', 'decide');
+      const targetStageId = (this.resultData && this.resultData.stageId) || gameState.currentStageId;
+      const wrongRaw = (this.resultData && this.resultData.wrong) || gameState.wrongKanjiList || [];
+      // texts: 文字, ids: 数値/文字ID を可能な限り抽出して重複排除
+      const texts = Array.from(new Set(wrongRaw.map(w => (typeof w === 'string') ? w : (w?.text || w?.kanji || String(w || ''))).filter(Boolean)));
+      const ids   = Array.from(new Set(wrongRaw.map(w => (typeof w === 'object' && w && 'id' in w) ? w.id : null).filter(v => v !== null && v !== undefined)));
+    
+      gameState.quickReviewTargets = { stageId: targetStageId, ids, texts };
+      gameState.previousScreen = 'resultWin';
+      gameState.gameMode = 'practice';
+      publish('changeScreen', 'practiceBattle');
     }
   }
 };
