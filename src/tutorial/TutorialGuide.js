@@ -99,16 +99,21 @@ function getUiRoot() {
       btnNext.textContent = (idx >= steps.length - 1) ? 'はじめる！' : 'つぎへ';
     }
 
- // anchor が安定するまでリトライ
- function applyWhenReady(step, attempt = 0) {
-   const r = typeof step.anchor === 'function' ? step.anchor() : step.anchor;
-   const isBad = !r || !Number.isFinite(r.x) || !Number.isFinite(r.y) || r.w <= 4 || r.h <= 4;
-   if (isBad && attempt < 10) {
-     requestAnimationFrame(() => applyWhenReady(step, attempt + 1));
-     return;
-   }
-   apply(step);
- }
+    // anchor が安定するまでリトライ（例外にも耐性を持たせる）
+function applyWhenReady(step, attempt = 0) {
+  let r;
+  try {
+    r = (typeof step.anchor === 'function') ? step.anchor() : step.anchor;
+  } catch (e) {
+    console.error('Tutorial anchor error:', e);
+    r = { x: 80, y: 120, w: 300, h: 120 }; // フォールバック
+  }
+  const bad = !r || !Number.isFinite(r.x) || !Number.isFinite(r.y) || r.w < 5 || r.h < 5;
+  if (bad && attempt < 10) { requestAnimationFrame(() => applyWhenReady(step, attempt + 1)); return; }
+  // 安全な anchor を供給して適用
+  const safeStep = (typeof step.anchor === 'function') ? Object.assign({}, step, { anchor: () => r }) : step;
+  apply(safeStep);
+}
 
     function close(neverShow = false) {
       overlay.remove();
@@ -119,13 +124,7 @@ function getUiRoot() {
     btnBack.onclick = () => { if (idx > 0) { idx--; applyWhenReady(steps[idx], 0); } };
     btnNext.onclick = () => { if (idx < steps.length - 1) { idx++; applyWhenReady(steps[idx], 0); } else close(false); };
 
-    // anchor が安定するまでリトライ
-    function applyWhenReady(step, attempt = 0) {
-      const r = typeof step.anchor === 'function' ? step.anchor() : step.anchor;
-      const bad = !r || !Number.isFinite(r.x) || !Number.isFinite(r.y) || r.w < 5 || r.h < 5;
-      if (bad && attempt < 10) { requestAnimationFrame(() => applyWhenReady(step, attempt + 1)); return; }
-      apply(step);
-    }
+    
 
     // 右上×と「もう表示しない」
     const closeBar = document.createElement('div');
