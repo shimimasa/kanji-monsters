@@ -3,8 +3,6 @@ import { gameState, battleState, saveGameData } from '../core/gameState.js';
 import { publish } from '../core/eventBus.js';
 import { getKanjiByStageId } from '../loaders/dataLoader.js';
 
-  // 進捗用の内部状態（ファイル先頭のプロパティ群の近くに）
-  quickProgress = { current: 0, target: 0 };
 
 const quickReviewPracticeScreen = {
   ...basePractice,
@@ -12,7 +10,9 @@ const quickReviewPracticeScreen = {
   pendingReviewIds: new Set(),
   originalReviewIds: new Set(),
   masteredThisSession: new Set(),
-
+  // 進捗用の内部状態（ファイル先頭のプロパティ群の近くに）
+  quickProgress = { current: 0, target: 0 },
+  
   enter(canvasEl, onComplete) {
     try {
       this.onPracticeComplete = onComplete;
