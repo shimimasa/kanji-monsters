@@ -31,6 +31,7 @@ import gradeQuizScreen     from '../screens/gradeQuizScreen.js';
 import monsterCaptureScreen from '../screens/monsterCaptureScreen.js';
 // ★★★ 練習バトル画面を追加 ★★★
 import practiceBattleScreen from '../screens/practiceBattleScreen.js';
+import quickReviewPracticeScreen from '../screens/quickReviewPracticeScreen.js';
 
 export async function setupFSM() {
   const { stageData } = await loadAllGameData();
