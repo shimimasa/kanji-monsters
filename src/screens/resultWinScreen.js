@@ -153,13 +153,20 @@ const resultWinState = {
 const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
 this.drawRichButton(ctx, nextStageButton, isHovered);
 
-// 5b. 1分復習ボタン
-const isHoveredReview = isMouseOverRect(this.mouseX, this.mouseY, quickReviewButton);
-this.drawRichButton(ctx, quickReviewButton, isHoveredReview);
+// 5. ステージ選択ボタン
+const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
+this.drawRichButton(ctx, nextStageButton, isHovered);
 
-// 6. 間違えた漢字の巻物風表示
+// 6. 復習パネル＋「間違えた漢字をマスター」ボタン（右側に配置）
 if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
-  this.drawMistakeScrollPanel(ctx, 50, 420, 250, 150);
+  const panelRect = { x: 50, y: 420, w: 250, h: 150 };
+  // パネル
+  this.drawMistakeScrollPanel(ctx, panelRect.x, panelRect.y, panelRect.w, panelRect.h);
+  // ボタン座標を動的に決定（右側の空きに置く／はみ出し防止）
+  quickReviewButton.x = Math.min(panelRect.x + panelRect.w + 20, canvas.width - quickReviewButton.width - 20);
+  quickReviewButton.y = panelRect.y + Math.floor((panelRect.h - quickReviewButton.height) / 2);
+  const isHoveredReview = isMouseOverRect(this.mouseX, this.mouseY, quickReviewButton);
+  this.drawRichButton(ctx, quickReviewButton, isHoveredReview);
 }
 
    

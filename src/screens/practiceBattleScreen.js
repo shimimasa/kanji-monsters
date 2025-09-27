@@ -80,26 +80,26 @@ wrongTargets: { ids: new Set(), texts: new Set() },
       this.onPracticeComplete = onComplete;
       gameState.gameMode = 'practice';
 
-      // ボーナスは即レビュー解放
-const isBonus = /^bonus_g\d+$/i.test(String(gameState.currentStageId || ''));
-if (isBonus) {
-  if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
-  gameState.stageReviewUnlocked[gameState.currentStageId] = true;
-  this.reviewMode = true;
-}
-
-// 1分復習（誤答限定）を検出
+// 1分復習（誤答限定）を検出（最優先）
 try {
   const qr = gameState.quickReviewTargets;
   if (qr && (!qr.stageId || String(qr.stageId) === String(gameState.currentStageId))) {
     this.wrongOnlyMode = true;
-    this.reviewMode = false; // 自動レビュー移行はしない
+    this.reviewMode = false; // 自動レビュー移行は抑止
     this.wrongTargets = {
       ids: new Set(Array.isArray(qr.ids) ? qr.ids : []),
       texts: new Set(Array.isArray(qr.texts) ? qr.texts : [])
     };
   }
 } catch {}
+
+// ボーナスは即レビュー解放（ただし誤答限定中は適用しない）
+const isBonus = /^bonus_g\d+$/i.test(String(gameState.currentStageId || ''));
+if (isBonus && !this.wrongOnlyMode) {
+  if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+  gameState.stageReviewUnlocked[gameState.currentStageId] = true;
+  this.reviewMode = true;
+}
       
       import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('practiceBattle', { canvas: canvasEl }));
       
@@ -473,17 +473,21 @@ _buildUnmasteredKanjiList() {
     const stageKanji = getKanjiByStageId(stageId);
 
     if (this.wrongOnlyMode) {
-      // 誤答対象のみ抽出（id優先、無ければ文字一致）
-      const ids = this.wrongTargets?.ids || new Set();
-      const texts = this.wrongTargets?.texts || new Set();
-      const pool = stageKanji.filter(k => (ids.size && ids.has(k.id)) || (texts.size && texts.has(k.kanji)));
+      // 誤答対象のみ抽出（idは文字列化、文字はtrimして比較）
+      const ids = this.wrongTargets?.ids ? new Set([...this.wrongTargets.ids].map(v => String(v))) : new Set();
+      const texts = this.wrongTargets?.texts ? new Set([...this.wrongTargets.texts].map(s => String(s).trim())) : new Set();
+      const pool = stageKanji.filter(k => {
+        const idKey = String(k.id);
+        const textKey = String(k.kanji).trim();
+        return (ids.size && ids.has(idKey)) || (texts.size && texts.has(textKey));
+      });
       this.unmasteredKanji = pool.filter(kanji => {
         try { return !this._isKanjiMastered(kanji.id); } catch { return true; }
       });
       console.log(`📚 誤答限定: 未マスター ${this.unmasteredKanji.length}件 / 対象${pool.length}件`);
       return;
     }
-
+    
     if (gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[stageId]) {
       this.unmasteredKanji = [];
       console.log('🔓 このステージはレビュー解放済みとして未マスター0件で扱います');
