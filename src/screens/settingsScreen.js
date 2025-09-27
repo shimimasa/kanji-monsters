@@ -79,13 +79,13 @@ const settingsScreenState = {
     settingsTitle.className = 'settings-title';
     settingsContainer.appendChild(settingsTitle);
     
-    // ゲームモード設定パネル
-    const gameModePanel = this.createGameModePanel();
-    settingsContainer.appendChild(gameModePanel);
-    
-        // オーディオ設定パネル
-        const audioPanel = this.createAudioPanel();
-        settingsContainer.appendChild(audioPanel);
+    // 表示設定パネル
+const displayPanel = this.createDisplayPanel();
+settingsContainer.appendChild(displayPanel);
+
+// オーディオ設定パネル
+const audioPanel = this.createAudioPanel();
+settingsContainer.appendChild(audioPanel);
     
             // セーブとバックアップ
     const savePanel = this.createSavePanel();
@@ -114,6 +114,75 @@ const settingsScreenState = {
     
     uiRoot.appendChild(settingsContainer);
   },
+
+  createDisplayPanel() {
+    const panel = document.createElement('div');
+    panel.className = 'settings-panel';
+  
+    const title = document.createElement('h3');
+    title.className = 'panel-title';
+    title.textContent = '表示設定';
+    panel.appendChild(title);
+  
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+  
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+  
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'タイマー表示';
+  
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+  label.appendChild(tip);
+
+  const row = document.createElement('div');
+  row.className = 'inline-controls';
+
+  const toggle = document.createElement('input');
+  toggle.type = 'checkbox';
+  const status = document.createElement('span');
+  status.style.marginLeft = '8px';
+
+  try {
+    const on = (localStorage.getItem('showTimer') ?? '0') === '1';
+    toggle.checked = on;
+    status.textContent = `（いまは: ${on ? '表示ON' : '表示OFF'}）`;
+  } catch {}
+
+  const applyBtn = document.createElement('button');
+  applyBtn.className = 'settings-button';
+  applyBtn.textContent = '適用';
+  applyBtn.addEventListener('click', () => {
+    publish('playSE','decide');
+    const on = !!toggle.checked;
+    try { localStorage.setItem('showTimer', on ? '1' : '0'); } catch {}
+    status.textContent = `（いまは: ${on ? '表示ON' : '表示OFF'}）`;
+    this._showSaveToast('タイマー表示を更新しました');
+  });
+
+  row.appendChild(toggle);
+  row.appendChild(applyBtn);
+  row.appendChild(status);
+
+  group.appendChild(label);
+  group.appendChild(row);
+  panel.appendChild(group);
+
+  this._setupTooltipEvents(
+    tip,
+    'タイマーは内部でいつも計測されます。ここでは画面に表示するかどうかだけを切り替えます。'
+  );
+
+  return panel;
+},
+
+
 
   /** ゲームモード設定パネルを作成 */
   createGameModePanel() {

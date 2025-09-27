@@ -458,25 +458,16 @@ const titleState = {
   },
 
   /** プレイヤー名確認と画面遷移の共通処理 */
-  _startGame() {
-    // ローカルストレージからゲームモードを取得（デフォルトはじっくり）
-    const gameMode = localStorage.getItem('gameMode') || 'jikkuri';
-    
-    // プレイヤー名未設定なら名前入力画面へ遷移
-    if (!gameState.playerName) {
-      // ゲームモードを保存して名前入力画面へ
-      gameState.pendingGameMode = gameMode;
-      publish('changeScreen', 'playerNameInput');
-      return;
-    }
-    
-    // ゲームモードを設定
-    gameState.gameMode = gameMode;
-    
-    // 直接ステージセレクト（総復習モード）へ
-    gameState.currentGrade = 0;
-    publish('changeScreen', 'courseSelect');
-  },
+_startGame() {
+  // プレイヤー名未設定なら名前入力画面へ遷移
+  if (!gameState.playerName) {
+    publish('changeScreen', 'playerNameInput');
+    return;
+  }
+  // 直接ステージセレクト（総復習モード）へ
+  gameState.currentGrade = 0;
+  publish('changeScreen', 'courseSelect');
+},
 
   /** データリセット処理 */
   async _resetGameData() {

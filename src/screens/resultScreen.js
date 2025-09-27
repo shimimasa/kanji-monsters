@@ -41,13 +41,10 @@ const resultScreenState = {
     let baseScore = this.correctCount * 10;
     // HP ボーナス：残りHP × 1点
     let hpBonus = result.playerHp || 0;
-    // 時間ボーナス（チャレンジモードの場合）
-    let timeBonus = 0;
-    if (gameState.gameMode === 'challenge' && result.time > 0) {
-      timeBonus = result.time * 2; // 残り時間 × 2点
-    }
-    
-    this.finalScore = baseScore + hpBonus + timeBonus;
+    // 時間ボーナス（モード廃止のため常に0）
+let timeBonus = 0;
+
+this.finalScore = baseScore + hpBonus + timeBonus;
 
     const cx = this.canvas.width / 2;
     this.retryButton = { x: cx - 150, y: 400, width: 300, height: 50, text: 'もう一度プレイ' };
