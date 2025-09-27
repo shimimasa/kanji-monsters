@@ -149,9 +149,6 @@ const resultWinState = {
           this.drawResultPanel(ctx, canvas.width / 2 - 150, 200, 300, 180);
         }
     
-        // 5. リッチなボタン
-const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
-this.drawRichButton(ctx, nextStageButton, isHovered);
 
 // 5. ステージ選択ボタン
 const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
