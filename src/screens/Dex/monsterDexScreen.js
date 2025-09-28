@@ -885,68 +885,8 @@ rightControls.appendChild(nextBtn);
     leftControls.appendChild(regionLabel);
     leftControls.appendChild(regionSelect);
 
-    // ページネーションボタン
-    const createPageButton = (text, action, disabled = false) => {
-      const btn = document.createElement('button');
-      btn.className = 'btn-pagination';
-      btn.textContent = text;
-      btn.disabled = disabled;
-      
-      const baseStyle = {
-        background: disabled ? 
-          'linear-gradient(135deg, #6c757d, #5a6268)' : 
-          'linear-gradient(135deg, #4a90e2, #357abd)',
-        color: disabled ? '#adb5bd' : 'white',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        borderRadius: '8px',
-        padding: '8px 16px',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        fontSize: '14px',
-        transition: 'all 0.3s ease',
-        boxShadow: disabled ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.2)'
-      };
-      
-      Object.assign(btn.style, baseStyle);
-      
-      if (!disabled) {
-        btn.addEventListener('mouseenter', () => {
-          Object.assign(btn.style, {
-            background: 'linear-gradient(135deg, #357abd, #2e6da4)',
-            transform: 'translateY(-2px)',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
-          });
-        });
-        
-        btn.addEventListener('mouseleave', () => {
-          Object.assign(btn.style, baseStyle);
-        });
-      }
-      
-      btn.addEventListener('click', action);
-      return btn;
-    };
-
-    const prevBtn = createPageButton('⬅️ 前のページ', () => this.changePage(this.currentPage - 1), this.currentPage === 0);
-    
-    const pageInfo = document.createElement('span');
-    pageInfo.className = 'page-info';
-    Object.assign(pageInfo.style, {
-      background: 'rgba(255, 255, 255, 0.15)',
-      color: 'white',
-      padding: '6px 12px',
-      borderRadius: '6px',
-      fontWeight: '600',
-      border: '1px solid rgba(255, 255, 255, 0.3)',
-      minWidth: '80px',
-      textAlign: 'center'
-    });
-    pageInfo.textContent = `${this.currentPage + 1} / ${this.totalPages}`;
-    
-    const nextBtn = createPageButton('次のページ ➡️', () => this.changePage(this.currentPage + 1), this.currentPage >= this.totalPages - 1);
-
-    rightControls.appendChild(prevBtn);
-    rightControls.appendChild(pageInfo);
-    rightControls.appendChild(nextBtn);
+    // ページネーションボタン（右側コントロールで定義済みの関数を使用）
+    // ここでの重複定義は削除済み
 
     // 全体を組み立て
     navDiv.appendChild(leftControls);
