@@ -885,16 +885,6 @@ rightControls.appendChild(nextBtn);
     leftControls.appendChild(regionLabel);
     leftControls.appendChild(regionSelect);
 
-    // === 中央コントロール（ソートボタン） ===
-    const centerControls = document.createElement('div');
-    centerControls.className = 'nav-controls-center';
-    Object.assign(centerControls.style, {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      justifyContent: 'center',
-      flex: '1'
-    });
 
     // ソートボタンを作成する関数
     const createSortButton = (text, mode, isActive) => {
