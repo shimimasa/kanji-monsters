@@ -12,6 +12,9 @@ const quickReviewPracticeScreen = {
   masteredThisSession: new Set(),
   // 進捗用の内部状態（ファイル先頭のプロパティ群の近くに）
   quickProgress: { current: 0, target: 0 },
+  // 今回追加（クイック復習のレビューを「今回の集合だけ」に限定するため）
+  quickReviewOnlyPoolMode: false,
+  quickReviewPoolIds: new Set(),
   
   enter(canvasEl, onComplete) {
     try {
@@ -99,28 +102,46 @@ const quickReviewPracticeScreen = {
     }
   },
 
-    // 確認ダイアログなし版：一覧を出してステージ選択へ戻る
-    _completeQuickReview() {
-        try {
-          battleState.inputEnabled = false;
-    
-          const stageId = gameState.currentStageId;
-          const stageKanji = getKanjiByStageId(stageId) || [];
-          const list = stageKanji
-            .filter(k => this.originalReviewIds.has(String(k.id)))
-            .map(k => (k.kanji || k.text || ''))
-            .filter(Boolean);
-    
-          try { alert(`誤答の復習が完了しました！\n今回マスター: ${list.length ? list.join(' ') : '（なし）'}`); } catch {}
-    
-          publish('playBGM', 'title');
-          const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-          publish('changeScreen', target);
-        } catch (e) {
-          console.error('❌ quickReviewPractice._completeQuickReview error:', e);
-          publish('changeScreen', gameState.previousScreen || 'stageSelect');
-        }
-      },
+  _completeQuickReview() {
+    try {
+      battleState.inputEnabled = false;
+  
+      const stageId = gameState.currentStageId;
+      const stageKanji = getKanjiByStageId(stageId) || [];
+      const list = stageKanji
+        .filter(k => this.originalReviewIds.has(String(k.id)))
+        .map(k => (k.kanji || k.text || ''))
+        .filter(Boolean);
+  
+      try { alert(`誤答の復習が完了しました！\n今回マスター: ${list.length ? list.join(' ') : '（なし）'}`); } catch {}
+  
+      // レビューに進むか？（OK=レビュー / キャンセル=ステージ選択）
+      let goReview = false;
+      try {
+        goReview = window.confirm('このまま○で隠した読みのレビューを続けますか？\nOK=レビュー / キャンセル=ステージ選択');
+      } catch {} 
+
+      if (goReview) {
+        // 今回の集合のみを対象にする「限定レビュー」へ
+        this.quickReviewOnlyPoolMode = true;
+        this.quickReviewPoolIds = new Set(this.originalReviewIds);
+        this.wrongOnlyMode = false;      // 誤答限定は解除
+        this.reviewMode = true;          // レビューモードON
+        // スコア等はそのまま（persistは既存ロジックに任せる）
+        this._enterQuickReviewReview();
+        return;
+      }
+  
+      // もどる（従来どおりステージ選択へ）
+      publish('playBGM', 'title');
+      const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+      publish('changeScreen', target);
+    } catch (e) {
+      console.error('❌ quickReviewPractice._completeQuickReview error:', e);
+      publish('changeScreen', gameState.previousScreen || 'stageSelect');
+    }
+  },
+   
 
   // 常に「セッションの未消化集合」からだけ生成（グローバルのマスター状態に依存しない）
   _buildUnmasteredKanjiList() {
@@ -228,6 +249,91 @@ const quickReviewPracticeScreen = {
     }
   },
 
+// ベースのレビューピッカーを上書き：quickReviewOnlyPoolMode=true のときだけ限定出題
+_pickNextReviewQuestion() {
+  try {
+    if (!this.quickReviewOnlyPoolMode) {
+      // 通常レビューは親の実装に委譲
+      if (typeof basePractice._pickNextReviewQuestion === 'function') {
+        return basePractice._pickNextReviewQuestion.call(this);
+      }
+    }
+
+    const stageKanji = getKanjiByStageId(gameState.currentStageId) || [];
+    const idSet = this.quickReviewPoolIds && this.quickReviewPoolIds.size
+      ? this.quickReviewPoolIds
+      : this.originalReviewIds;
+
+    const pool = stageKanji.filter(k => idSet.has(String(k.id)));
+    if (pool.length === 0) {
+      console.warn('⚠️ 限定レビュー対象が空のため終了します');
+      return this._completeQuickReview();
+    }
+
+    // 直前回避
+    let idx = Math.floor(Math.random() * pool.length);
+    if (pool.length > 1 && this.lastPickedKanjiId) {
+      let guard = 0;
+      while (pool[idx].id === this.lastPickedKanjiId && guard < 10) {
+        idx = Math.floor(Math.random() * pool.length);
+        guard++;
+      }
+    }
+    const selectedKanji = pool[idx];
+    this.lastPickedKanjiId = selectedKanji.id;
+
+    const toHiragana = (s) => {
+      if (!s) return '';
+      const t = String(s).trim();
+      return t.replace(/[\u30a1-\u30f6]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+    };
+    const normalizeReadings = (readings) => {
+      try {
+        if (!readings) return [];
+        if (Array.isArray(readings)) return readings.map(r => toHiragana(String(r).trim())).filter(Boolean);
+        if (typeof readings === 'string') return readings.split(' ').map(r => toHiragana(r.trim())).filter(Boolean);
+        return [];
+      } catch { return []; }
+    };
+
+    gameState.currentKanji = {
+      id: selectedKanji.id,
+      text: selectedKanji.kanji,
+      kunyomi: normalizeReadings(selectedKanji.kunyomi),
+      onyomi: normalizeReadings(selectedKanji.onyomi),
+      meaning: selectedKanji.meaning || '',
+      strokes: selectedKanji.strokes || 0,
+      radical: selectedKanji.radical || '',
+      jlpt: selectedKanji.jlpt || '',
+    };
+
+    // マスク対象の読みを1つ決定
+    const allReadings = [
+      ...(gameState.currentKanji.kunyomi || []),
+      ...(gameState.currentKanji.onyomi || []),
+    ].filter(Boolean);
+    if (allReadings.length === 0) {
+      // 読みが無ければ次へ
+      return this._pickNextReviewQuestion();
+    }
+    this.reviewTargetReading = allReadings[Math.floor(Math.random() * allReadings.length)];
+
+    gameState.hintLevel = 0;
+    this.practiceStats.lastQuestionTime = Date.now();
+  } catch (e) {
+    console.error('❌ 限定レビュー問題選択エラー:', e);
+  }
+},
+
+  _enterQuickReviewReview() {
+    try {
+      // 直ちに次のレビュー問題を用意
+      this._pickNextReviewQuestion();
+    } catch (e) {
+      console.error('❌ クイック限定レビュー開始エラー:', e);
+    }
+  },
+
 // 誤答ベースの進捗パネル描画（practiceBattleScreen と同じ見た目で中身だけ差し替え）
 _drawEnhancedProgressPanel() {
   if (!this.ctx) return;
@@ -319,6 +425,8 @@ _drawImprovedPracticeUI() {
     } finally {
       this.wrongOnlyMode = false;
       this.wrongTargets = { ids: new Set(), texts: new Set() };
+      this.quickReviewOnlyPoolMode = false;
+      this.quickReviewPoolIds = new Set();
       try { delete gameState.quickReviewTargets; } catch {}
     }
   },
