@@ -149,61 +149,7 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { rootMargin: '200px' });
 
-// モンスターカードを生成する関数
-function createCard(monster) {
-  const card = document.createElement('div');
-  card.classList.add('monster-card');
-  
-  // 捕獲済みかどうかで判定（未捕獲は非表示）
-  if (!monster.collected) {
-    return null;
-  }
 
-  // カードクリック時のモーダル表示処理
-  card.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (monster.collected) {
-      showMonsterModal(monster);
-      // モンスターを「確認済み」として記録
-      markAsSeen(monster.id);
-      // NEWバッジを削除
-      const newBadge = card.querySelector('.new-badge');
-      if (newBadge) newBadge.remove();
-    }
-  });
-
-  const img = document.createElement('img');
-  const folder = gradeFolderMap[monster.grade] || gradeFolderMap[1];
-  const thumbPath = `/assets/images/monsters/thumb/${folder}/${monster.id}.webp`;
-  img.dataset.thumb = thumbPath;
-  img.alt = monster.name;
-  card.appendChild(img);
-
-  const nameEl = document.createElement('p');
-  nameEl.textContent = monster.collected ? monster.name : '？？？';
-  nameEl.classList.add('monster-name');
-  card.appendChild(nameEl);
-
-    // 生息地（都道府県/大陸地域）の表示
-    const prefectureEl = document.createElement('p');
-    const regionFallback = ([1,2,3,4,5,6,11,12].includes(monster.grade)
-      ? japanRegionMap[monster.grade] : worldRegionMap[monster.grade]);
-    prefectureEl.textContent = monster.collected ? (monster.prefecture || regionFallback || '不明') : '？？？';
-    prefectureEl.classList.add('monster-prefecture');
-  card.appendChild(prefectureEl);
-
-  // NEWバッジの追加
-  if (isNewMonster(monster.id)) {
-    const newBadge = document.createElement('div');
-    newBadge.classList.add('new-badge');
-    newBadge.textContent = 'NEW!';
-    card.appendChild(newBadge);
-  }
-
-  observer.observe(card); // 遅延読み込みの対象として監視
-  return card;
-}
 
 // モンスター詳細モーダルを表示する関数
 function showMonsterModal(monster) {
