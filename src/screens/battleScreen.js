@@ -803,12 +803,10 @@ updateShieldBreakEffect() {
       this.expAnimQueue = [];
       this.levelUpMessage = '';
       
-            // チャレンジモードの場合、タイマー開始（ストップウォッチ）
-            if (gameState.gameMode === 'challenge') {
-              this._timeStartMs = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-              this._timePauseAccMs = 0;
-              this._timePauseStartMs = 0;
-            }
+      // タイマー開始（常時計測）
+      this._timeStartMs = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+      this._timePauseAccMs = 0;
+      this._timePauseStartMs = 0;
 
       // ※※※ 重要な修正: キャンバス要素の取得 ※※※
       // 引数のcanvasElがnullまたはundefinedの場合は、DOMから取得する
@@ -1931,16 +1929,19 @@ if (this.logMode === 'blockPaged') {
       }
     }
 
-        // チャレンジモードの時のみ、経過タイムを描画
-    if (gameState.gameMode === 'challenge') {
-      const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-      const elapsed = Math.max(0, Math.floor(now - (this._timeStartMs || now) - (this._timePauseAccMs || 0)));
-      const mm = String(Math.floor(elapsed / 60000)).padStart(2, '0');
-      const ss = String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0');
-      const cc = String(Math.floor((elapsed % 1000) / 10)).padStart(2, '0');
-      const text = `タイム: ${mm}:${ss}.${cc}`;
-      this.drawTextWithOutline(text, this.canvas.width / 2, 30, 'yellow', 'black', '24px "UDデジタル教科書体", sans-serif', 'center');
-    }
+    // 設定でONのときだけタイムを表示
+try {
+  const show = (localStorage.getItem('showTimer') ?? '0') === '1';
+  if (show) {
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    const elapsed = Math.max(0, Math.floor(now - (this._timeStartMs || now) - (this._timePauseAccMs || 0)));
+    const mm = String(Math.floor(elapsed / 60000)).padStart(2, '0');
+    const ss = String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0');
+    const cc = String(Math.floor((elapsed % 1000) / 10)).padStart(2, '0');
+    const text = `タイム: ${mm}:${ss}.${cc}`;
+    this.drawTextWithOutline(text, this.canvas.width / 2, 30, 'yellow', 'black', '24px "UDデジタル教科書体", sans-serif', 'center');
+  }
+} catch {}
 
     // ── 画面フラッシュ効果の更新と描画 ──
     if (this.flashEffect.active) {
@@ -4484,7 +4485,7 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
       baseDamage = Math.floor(baseDamage * 2);
       battleState.masteryBonusActive = false;
       battleState.log.push('マスターかんじボーナス！2ばい！');
-      publish('playSE', 'master'); // ← 追加
+      publish('playSE', 'master');
     }
     
     // ダメージに少しゆらぎ（±10%）
@@ -5686,6 +5687,8 @@ function updateKanjiMasteryAfterCorrect(currentKanji, answer) {
     battleScreenState.masteryFlash = { active: true, timer: 30, kanjiId: currentKanji.id };
     addToLog('ぜんぶよめた！マスターかんじになった！');
     battleScreenState.showLogBlock(['ぜんぶよめた！', 'マスターかんじになった！']);
+    // 新規にマスター達成した瞬間のみ効果音を鳴らす
+    publish('playSE', 'master');
   }
 }
 

@@ -11,13 +11,17 @@ const practiceBattleScreenState = {
   ...battleScreenState,
   
   // マスターモード専用のプロパティ
-  practiceMode: true,
-  onPracticeComplete: null,
-  unmasteredKanji: [],
-  lastIncorrectAnswer: null,
-  recentHistory: [], // 最近の学習履歴（最大10件）
-  reviewMode: false,
-  reviewTargetReading: null,
+practiceMode: true,
+onPracticeComplete: null,
+unmasteredKanji: [],
+lastIncorrectAnswer: null,
+recentHistory: [], // 最近の学習履歴（最大10件）
+reviewMode: false,
+reviewTargetReading: null,
+
+// 誤答限定「1分復習」モード
+wrongOnlyMode: false,
+wrongTargets: { ids: new Set(), texts: new Set() },
   practiceStats: {
     totalPracticed: 0,
     correctCount: 0,
@@ -76,13 +80,26 @@ const practiceBattleScreenState = {
       this.onPracticeComplete = onComplete;
       gameState.gameMode = 'practice';
 
-      // ボーナスは即レビュー解放
-      const isBonus = /^bonus_g\d+$/i.test(String(gameState.currentStageId || ''));
-      if (isBonus) {
-        if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
-        gameState.stageReviewUnlocked[gameState.currentStageId] = true;
-        this.reviewMode = true;
-      }
+// 1分復習（誤答限定）を検出（最優先）
+try {
+  const qr = gameState.quickReviewTargets;
+  if (qr && (!qr.stageId || String(qr.stageId) === String(gameState.currentStageId))) {
+    this.wrongOnlyMode = true;
+    this.reviewMode = false; // 自動レビュー移行は抑止
+    this.wrongTargets = {
+      ids: new Set(Array.isArray(qr.ids) ? qr.ids : []),
+      texts: new Set(Array.isArray(qr.texts) ? qr.texts : [])
+    };
+  }
+} catch {}
+
+// ボーナスは即レビュー解放（ただし誤答限定中は適用しない）
+const isBonus = /^bonus_g\d+$/i.test(String(gameState.currentStageId || ''));
+if (isBonus && !this.wrongOnlyMode) {
+  if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+  gameState.stageReviewUnlocked[gameState.currentStageId] = true;
+  this.reviewMode = true;
+}
       
       import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('practiceBattle', { canvas: canvasEl }));
       
@@ -447,38 +464,49 @@ const practiceBattleScreenState = {
   },
 
     /**
-   * 未マスターの漢字リストを構築
-   */
-    _buildUnmasteredKanjiList() {
-      try {
-        const stageId = gameState.currentStageId;
-        if (gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[stageId]) {
-          this.unmasteredKanji = [];
-          console.log('🔓 このステージはレビュー解放済みとして未マスター0件で扱います');
-          return;
-        }
-  
-        const stageKanji = getKanjiByStageId(gameState.currentStageId);
-        this.unmasteredKanji = stageKanji.filter(kanji => {
-          try {
-            return !this._isKanjiMastered(kanji.id); // ← 同期判定に統一
-          } catch (error) {
-            console.warn('⚠️ マスター判定エラー:', kanji.id, error);
-            return true;
-          }
-        });
-        
-        console.log(`📚 未マスター漢字: ${this.unmasteredKanji.length}件 / 全${stageKanji.length}件`);
-        
-        if (this.unmasteredKanji.length === 0) {
-          this._showAllMasteredMessage();
-        }
-        
-      } catch (error) {
-        console.error('❌ 未マスターリスト構築エラー:', error);
-        this.unmasteredKanji = [];
-      }
-    },
+ * 未マスターの漢字リストを構築
+ */
+_buildUnmasteredKanjiList() {
+  try {
+    const stageId = gameState.currentStageId;
+
+    const stageKanji = getKanjiByStageId(stageId);
+
+    if (this.wrongOnlyMode) {
+      // 誤答対象のみ抽出（idは文字列化、文字はtrimして比較）
+      const ids = this.wrongTargets?.ids ? new Set([...this.wrongTargets.ids].map(v => String(v))) : new Set();
+      const texts = this.wrongTargets?.texts ? new Set([...this.wrongTargets.texts].map(s => String(s).trim())) : new Set();
+      const pool = stageKanji.filter(k => {
+        const idKey = String(k.id);
+        const textKey = String(k.kanji).trim();
+        return (ids.size && ids.has(idKey)) || (texts.size && texts.has(textKey));
+      });
+      this.unmasteredKanji = pool.filter(kanji => {
+        try { return !this._isKanjiMastered(kanji.id); } catch { return true; }
+      });
+      console.log(`📚 誤答限定: 未マスター ${this.unmasteredKanji.length}件 / 対象${pool.length}件`);
+      return;
+    }
+
+    if (gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[stageId]) {
+      this.unmasteredKanji = [];
+      console.log('🔓 このステージはレビュー解放済みとして未マスター0件で扱います');
+      return;
+    }
+
+    this.unmasteredKanji = stageKanji.filter(kanji => {
+      try { return !this._isKanjiMastered(kanji.id); } catch { return true; }
+    });
+
+    console.log(`📚 未マスター漢字: ${this.unmasteredKanji.length}件 / 全${stageKanji.length}件`);
+    if (this.unmasteredKanji.length === 0) {
+      this._showAllMasteredMessage();
+    }
+  } catch (error) {
+    console.error('❌ 未マスターリスト構築エラー:', error);
+    this.unmasteredKanji = [];
+  }
+},
 
   /**
    * 次の未マスター漢字を出題
@@ -486,15 +514,20 @@ const practiceBattleScreenState = {
   _pickNextUnmasteredKanji() {
     try {
       // ここで未マスターリストを再構築しない（進捗が0に戻るのを防止）
-      if (this.unmasteredKanji.length === 0) {
-        // 全マスター後はレビューモードへ移行し、以降は○で隠した読みのみを出題
-        if (!this.reviewMode) {
-          this._enterReviewMode();
-        } else {
-          this._pickNextReviewQuestion();
-        }
-        return;
-      }
+if (this.unmasteredKanji.length === 0) {
+  // 誤答限定完了 → 自動レビューへ移行せず選択ダイアログ
+  if (this.wrongOnlyMode) {
+    this._completeQuickReview();
+  } else {
+    // 全マスター後はレビューモードへ移行し、以降は○で隠した読みのみを出題
+    if (!this.reviewMode) {
+      this._enterReviewMode();
+    } else {
+      this._pickNextReviewQuestion();
+    }
+  }
+  return;
+}
       
       // 直前と同じ漢字を避ける（候補が2件以上ある場合）
       let randomIndex = Math.floor(Math.random() * this.unmasteredKanji.length);
@@ -1927,51 +1960,57 @@ const practiceBattleScreenState = {
   },
 
   /**
-   * 全漢字マスター完了メッセージ
-   */
-  _showAllMasteredMessage() {
-    try {
-      console.log('🎉 全ての漢字をマスターしました！');
-      
-      setTimeout(() => {
-        this._completePractice();
-      }, 1000);
-      
-    } catch (error) {
-      console.error('❌ 全マスターメッセージエラー:', error);
-    }
-  },
+ * 全漢字マスター完了メッセージ
+ */
+_showAllMasteredMessage() {
+  try {
+    console.log('🎉 全ての漢字をマスターしました！');
+    setTimeout(() => {
+      this._completePractice();
+    }, 1000);
+  } catch (error) {
+    console.error('❌ 全マスターメッセージエラー:', error);
+  }
+},
 
-  /**
-   * 練習完了処理
-   */
-  _completePractice() {
-    try {
-      const { totalPracticed, correctCount, maxStreak } = this.practiceStats;
-      const accuracy = totalPracticed > 0 ? Math.round((correctCount / totalPracticed) * 100) : 0;
-      const sessionTime = Math.floor((Date.now() - this.practiceStats.startTime) / 1000 / 60);
+ /**
+ * 練習完了処理
+ */
+_completePractice() {
+  try {
+    const { totalPracticed, correctCount, maxStreak } = this.practiceStats;
+    const accuracy = totalPracticed > 0 ? Math.round((correctCount / totalPracticed) * 100) : 0;
+    const sessionTime = Math.floor((Date.now() - this.practiceStats.startTime) / 1000 / 60);
 
-      console.log('🎯 練習完了:', {
-        totalPracticed,
-        correctCount, 
-        accuracy: `${accuracy}%`,
-        sessionTime: `${sessionTime}分`,
-        maxStreak: `${maxStreak}問連続`
-      });
+    console.log('🎯 練習完了:', {
+      totalPracticed,
+      correctCount, 
+      accuracy: `${accuracy}%`,
+      sessionTime: `${sessionTime}分`,
+      maxStreak: `${maxStreak}問連続`
+    });
 
-      // アンロックを記録（画面遷移後も継続）
-if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
-gameState.stageReviewUnlocked[gameState.currentStageId] = true;
-try { saveGameData(); } catch {}
+    // アンロックを記録（画面遷移後も継続）
+if (!this.wrongOnlyMode) {
+  if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+  gameState.stageReviewUnlocked[gameState.currentStageId] = true;
+  try { saveGameData(); } catch {}
+}
 
-// クリア後は強制遷移せず、レビューモードに移行して継続
-this.reviewMode = true;
-this._pickNextReviewQuestion();
-    } catch (error) {
-      console.error('❌ 練習完了処理エラー:', error);
-      // 何もしない（画面は維持）
-    }
-  },
+// 誤答限定モードでは自動でレビューへ移行しない
+if (this.wrongOnlyMode) {
+  this._completeQuickReview();
+  return;
+}
+
+    // 通常はレビューへ移行し継続
+    this.reviewMode = true;
+    this._pickNextReviewQuestion();
+  } catch (error) {
+    console.error('❌ 練習完了処理エラー:', error);
+    // 何もしない（画面は維持）
+  }
+},
 
   /**
    * マスター進捗更新
@@ -2042,22 +2081,6 @@ this._pickNextReviewQuestion();
       console.error('❌ マスター進捗更新エラー:', error);
     }
   },
-
-  /**
-   * 漢字がマスター済みかどうかを判定
-   */
-    /**
-   * マスター判定（単一ソースへ委譲）
-   */
-    _isKanjiMastered(kanjiId) {
-      try {
-        const prog = gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiId];
-        return !!(prog && prog.mastered);
-      } catch {
-        return false;
-      }
-    },
-
   /**
    * パネル背景を描画
    */
@@ -2146,6 +2169,28 @@ this._pickNextReviewQuestion();
   /**
    * ユーティリティメソッド
    */
+    _isKanjiMastered(kanjiId) {
+        // IDの型ズレ（数値/文字列）に強い判定
+        try {
+          if (typeof isKanjiMastered === 'function') {
+            // まず元の型で判定
+            if (isKanjiMastered(kanjiId)) return true;
+            // 型を反転して再判定
+            const alt = (typeof kanjiId === 'string') ? Number(kanjiId) : String(kanjiId);
+            if (isKanjiMastered(alt)) return true;
+          }
+        } catch {}
+        try {
+          // 直接 gameState を見る場合も数値/文字列の両方で確認
+          const progA = gameState?.kanjiReadProgress?.[kanjiId];
+          if (progA && progA.mastered) return true;
+          const alt = (typeof kanjiId === 'string') ? Number(kanjiId) : String(kanjiId);
+          const progB = gameState?.kanjiReadProgress?.[alt];
+          return !!(progB && progB.mastered);
+        } catch {
+          return false;
+        }
+      },
   _toHiragana(input) {
     try {
       if (!input) return '';
@@ -2282,11 +2327,16 @@ this._pickNextReviewQuestion();
       gameState.gameMode = 'normal';
       
       console.log('🎯 練習バトル画面を終了しました');
-      
+
     } catch (error) {
       console.error('❌ 終了処理エラー:', error);
+    } finally {
+      // 誤答限定状態をクリア
+      this.wrongOnlyMode = false;
+      this.wrongTargets = { ids: new Set(), texts: new Set() };
+      try { delete gameState.quickReviewTargets; } catch {}
     }
-  }
+    }
 };
 
 export default practiceBattleScreenState;

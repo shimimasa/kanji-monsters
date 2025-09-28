@@ -621,12 +621,12 @@
               },
 
                 {
-                  "id": "KINKI-L01",
+                  "id": "KIN-L01",
                   "stageId": "kinki_bonus",
                   "name": "比叡雷鳴テンジン",
                   "prefecture": "滋賀・京都",
-                  "thumb": "KINKI-L01_thumb",
-                  "image": "KINKI-L01.webp",
+                  "thumb": "KIN-L01_thumb",
+                  "image": "KIN-L01.webp",
                   "isBoss": true,
                   "weakness": "onyomi",
                   "rarity": "幻",
@@ -637,12 +637,12 @@
                   "catchphrase": "「雷鳴轟く、山の神威！」"
                 },
                 {
-                  "id": "KINKI-L02",
+                  "id": "KIN-L02",
                   "stageId": "kinki_bonus",
                   "name": "大阪城メタルロード",
                   "prefecture": "大阪",
-                  "thumb": "KINKI-L02_thumb",
-                  "image": "KINKI-L02.webp",
+                  "thumb": "KIN-L02_thumb",
+                  "image": "KIN-L02.webp",
                   "isBoss": true,
                   "weakness": "kunyomi",
                   "rarity": "幻",
@@ -652,12 +652,12 @@
                   "trivia": "大阪城は豊臣秀吉によって築かれ、金箔瓦や豪壮な天守閣で知られる名城。",
                   "catchphrase": "「鋼鉄の城壁、絶対守護！」"                },
                 {
-                  "id": "KINKI-L03",
+                  "id": "KIN-L03",
                   "stageId": "kinki_bonus",
                   "name": "神戸ドラゴンクレスト",
                   "prefecture": "兵庫",
-                  "thumb": "KINKI-L03_thumb",
-                  "image": "KINKI-L03.webp",
+                  "thumb": "KIN-L03_thumb",
+                  "image": "KIN-L03.webp",
                   "isBoss": true,   
                   "weakness": "onyomi",
                     "rarity": "幻",
@@ -668,12 +668,12 @@
                   "catchphrase": "「海鳴りと共に現れる蒼き竜！」"
                 },
                 {
-                  "id": "KINKI-L04",
+                  "id": "KIN-L04",
                   "stageId": "kinki_bonus",
                   "name": "大和シラサギロード",
                   "prefecture": "奈良",
-                  "thumb": "KINKI-L04_thumb",
-                  "image": "KINKI-L04.webp",
+                  "thumb": "KIN-L04_thumb",
+                  "image": "KIN-L04.webp",
                   "isBoss": true,
                   "weakness": "kunyomi",
                   "rarity": "幻",
@@ -684,12 +684,12 @@
                   "catchphrase": "「白き翼、古代の守護者！」"
                 },
                 {
-                  "id": "KINKI-L05",
+                  "id": "KIN-L05",
                   "stageId": "kinki_bonus",
                   "name": "熊野ヤタガラスロード",
                   "prefecture": "和歌山・三重",
-                  "thumb": "KINKI-L05_thumb",
-                  "image": "KINKI-L05.webp",
+                  "thumb": "KIN-L05_thumb",
+                  "image": "KIN-L05.webp",
                   "isBoss": true,
                   "weakness": "kunyomi",
                   "rarity": "幻",
@@ -700,12 +700,12 @@
                   "catchphrase": "「導きの翼、未来を照らす！」"
                 },
                 {
-                    "id": "KINKI-F01",
+                    "id": "KIN-F01",
                     "stageId": "kinki_bonus",
                     "name": "比叡ヤマトドラゴン",
                     "prefecture": "滋賀・京都",
-                    "thumb": "KINKI-F01_thumb",
-                    "image": "KINKI-F01.webp",
+                    "thumb": "KIN-F01_thumb",
+                    "image": "KIN-F01.webp",
                     "isBoss": true,
                     "weakness": "onyomi",
                     "rarity": "幻",
@@ -716,12 +716,12 @@
                     "catchphrase": "「光輪背負いし、霊峰の竜！」"
                   },
                   {
-                    "id": "KINKI-F02",
+                    "id": "KIN-F02",
                     "stageId": "kinki_bonus",
                     "name": "熊野カミノカラス",
                     "prefecture": "和歌山",
-                    "thumb": "KINKI-F02_thumb",
-                    "image": "KINKI-F02.webp",
+                    "thumb": "KIN-F02_thumb",
+                    "image": "KIN-F02.webp",
                     "isBoss": true,
                     "weakness": "kunyomi",
                     "rarity": "幻",
@@ -732,12 +732,12 @@
                     "catchphrase": "「黒羽燃ゆる、導きの炎！」"
                   },
                   {
-                    "id": "KINKI-F03",
+                    "id": "KIN-F03",
                     "stageId": "kinki_bonus",
                     "name": "淀川スピリットリヴァイアサン",
                     "prefecture": "大阪",
-                    "thumb": "KINKI-F03_thumb",
-                    "image": "KINKI-F03.webp",
+                    "thumb": "KIN-F03_thumb",
+                    "image": "KIN-F03.webp",
                     "isBoss": true,
                     "weakness": "onyomi",
                     "rarity": "幻",
@@ -748,12 +748,12 @@
                     "catchphrase": "「奔流轟く、水都の守護者！」"
                   },
                   {
-                    "id": "KINKI-F04",
+                    "id": "KIN-F04",
                     "stageId": "kinki_bonus",
                     "name": "奈良シカミコ",
                     "prefecture": "奈良",
-                    "thumb": "KINKI-F04_thumb",
-                    "image": "KINKI-F04.webp",
+                    "thumb": "KIN-F04_thumb",
+                    "image": "KIN-F04.webp",
                     "isBoss": true,
                     "weakness": "kunyomi",
                     "rarity": "幻",
@@ -764,12 +764,12 @@
                     "catchphrase": "「神光纏いし、古都の白鹿！」"
                   },
                   {
-                    "id": "KINKI-F05",
+                    "id": "KIN-F05",
                     "stageId": "kinki_bonus",
                     "name": "天橋立ミラージュドラゴン",
                     "prefecture": "京都",
-                    "thumb": "KINKI-F05_thumb",
-                    "image": "KINKI-F05.webp",
+                    "thumb": "KIN-F05_thumb",
+                    "image": "KIN-F05.webp",
                     "isBoss": true,
                     "weakness": "onyomi",
                       "rarity": "幻",
@@ -940,7 +940,187 @@
                           "trivia": "大山は『伯耆富士』とも呼ばれる霊山で、古来より山岳信仰の対象。",
                           "catchphrase": "「氷雪の鎧、山岳を護る！」"
                         },
-                      
+
+                        {
+                          "id": "SKG-F01",
+                          "stageId": "shikoku_bonus",
+                          "name": "石鎚サンダードラゴン",
+                          "prefecture": "愛媛",
+                          "grade": 11,
+                          "thumb": "SKG-F01_thumb",
+                          "image": "SKG-F01.webp",
+                          "isBoss": true,
+                          
+                          "weakness": "kunyomi",
+                              "rarity": "幻",
+                          "category": "雷霊・龍",
+                          "habitat": "石鎚山",
+                          "desc": "石鎚山の霊峰から顕現した雷龍。全身は岩と雷で覆われ、黄金の稲妻を纏う。",
+                          "trivia": "石鎚山は西日本最高峰で、日本七霊山の一つに数えられる。",
+                          "catchphrase": "「雷鳴轟き、霊峰を護る！」"
+                        },
+                        {
+                          "id": "SKG-F02",
+                          "stageId": "shikoku_bonus",
+                          "name": "鳴門ボルテックスサーペント",
+                          "prefecture": "徳島",
+                          "grade": 11,
+                          "thumb": "SKG-F02_thumb",
+                          "image": "SKG-F02.webp",
+                          "isBoss": true,
+                          
+                          "weakness": "onyomi",
+                              "rarity": "幻",
+                          "category": "水霊・大蛇",
+                          "habitat": "鳴門海峡",
+                          "desc": "鳴門海峡の渦潮が具現化した大蛇。青と白の渦模様で覆われ、尾は海流そのもの。",
+                          "trivia": "鳴門の渦潮は世界三大潮流の一つで、自然現象としても有名。",
+                          "catchphrase": "「渦潮轟く、海の大蛇！」"
+                        },
+                        {
+                          "id": "SKG-F03",
+                          "stageId": "shikoku_bonus",
+                          "name": "金刀比羅シーガーディアン",
+                          "prefecture": "香川",
+                          "grade": 11,
+                          "thumb": "SKG-F03_thumb",
+                          "image": "SKG-F03.webp",
+                          "isBoss": true,
+                          
+                            "weakness": "kunyomi",
+                              "rarity": "幻",
+                          "category": "守護神・海霊",
+                          "habitat": "金刀比羅宮",
+                          "desc": "金刀比羅宮の守護者が海の力を得て現れた幻獣。体は金色と青の波模様で、旅人と船乗りを守護する。",
+                          "trivia": "金刀比羅宮は『こんぴらさん』として親しまれ、海上交通の守護神として信仰されている。",
+                          "catchphrase": "「船旅を護る、蒼き守護神！」"
+                        },
+                        {
+                          "id": "SKG-F04",
+                          "stageId": "shikoku_bonus",
+                          "name": "四万十リバースピリット",
+                          "prefecture": "高知",
+                          "grade": 11,
+                          "thumb": "SKG-F04_thumb",
+                          "image": "SKG-F04.webp",
+                          "isBoss": true,
+                          
+                          "weakness": "onyomi",
+                              "rarity": "幻",
+                          "category": "水霊・精霊",
+                          "habitat": "四万十川",
+                          "desc": "四万十川の清流から生まれた精霊。透き通る青緑の体を持ち、魚や流木を纏う。",
+                          "trivia": "四万十川は『日本最後の清流』と呼ばれる四国の大河。",
+                          "catchphrase": "「清流の煌めき、命を紡ぐ！」"
+                        },
+                        {
+                          "id": "SKG-F05",
+                          "stageId": "shikoku_area1",
+                          "name": "剣山ミラージュオーガ",
+                          "prefecture": "徳島",
+                          "grade": 11,
+                          "thumb": "SKG-F05_thumb",
+                          "image": "SKG-F05.webp",
+                          "isBoss": true,
+
+                          "weakness": "kunyomi",
+                                  "rarity": "幻",
+                          "category": "幻鬼・山霊",
+                          "habitat": "剣山",
+                          "desc": "剣山に眠る鬼伝説から生まれた幻鬼。岩の鎧と霧のオーラを纏い、剣のように鋭い角を持つ。",
+                          "trivia": "剣山は徳島県の霊峰で、古来より剣や鬼の伝承が語られる場所。",
+                          "catchphrase": "「霧に潜む、山の幻鬼！」"
+                        },
+
+                        {
+                          "id": "KYU-F01",
+                          "stageId": "kyushu_bonus",
+                          "name": "阿蘇フレイムドラゴン",
+                          "prefecture": "熊本",
+                          "grade": 12,
+                          "thumb": "KYU-F01_thumb",
+                          "image": "KYU-F01.webp",
+                          "isBoss": true,
+                          "weakness": "onyomi",
+                              "rarity": "幻",
+                          "category": "炎竜・火山",
+                          "habitat": "阿蘇山火口",
+                          "desc": "阿蘇山の火口に宿る炎の竜。体は赤黒い岩に覆われ、口から溶岩を吐く。",
+                          "trivia": "阿蘇山は世界最大級のカルデラを持つ活火山で、古代から信仰の対象となってきた。",
+                          "catchphrase": "「灼熱の炎、噴き上がれ！」"
+                        },
+                        {
+                          "id": "KYU-F02",
+                          "stageId": "kyushu_bonus",
+                          "name": "高千穂アマツツル",
+                          "prefecture": "宮崎",
+                          "grade": 12,
+                          "thumb": "KYU-F02_thumb",
+                          "image": "KYU-F02.webp",
+                          "isBoss": true,   
+                          "weakness": "kunyomi",
+                              "rarity": "幻",
+                          "category": "神聖・霊鳥",
+                          "habitat": "高千穂峡・天岩戸周辺",
+                          "desc": "高千穂の神話から生まれた天の霊鶴。白銀の羽を広げ、光を纏う。",
+                          "trivia": "高千穂は天孫降臨の伝承が残る神話の里で、霊的な地として知られる。",
+                          "catchphrase": "「天を翔ける、光の翼！」"
+                        },
+                        {
+                          "id": "KYU-F03",
+                          "stageId": "kyushu_bonus",
+                          "name": "雲仙ミストゴーレム",
+                          "prefecture": "長崎",
+                          "grade": 12,
+                          "thumb": "KYU-F03_thumb",
+                          "image": "KYU-F03.webp",
+                          "isBoss": true,
+                          "weakness": "onyomi",
+                              "rarity": "幻",
+                          "category": "霧霊・巨人",
+                          "habitat": "雲仙岳",
+                          "desc": "雲仙の霧と硫黄の力から生まれた巨人。体は灰色の岩に白い霧が絡みつく。",
+                          "trivia": "雲仙は活火山地帯であり、温泉と霧に包まれた景観でも有名。",
+                          "catchphrase": "「霧煙る巨躯、地を揺るがす！」"
+                        },
+                        {
+                          "id": "KYU-F04",
+                          "stageId": "kyushu_bonus",
+                          "name": "桜島サンダーフェニックス",
+                          "prefecture": "鹿児島",
+                          "grade": 12,
+                          "thumb": "KYU-F04_thumb",
+                          "image": "KYU-F04.webp",
+                          "isBoss": true,
+                          
+                          "weakness": "kunyomi",
+                              "rarity": "幻",
+                          "category": "幻鳥・雷火",
+                          "habitat": "桜島上空",
+                          "desc": "桜島の雷と噴煙が融合した不死鳥。黒煙の翼に紫の雷を纏い、空を舞う。",
+                          "trivia": "桜島は日本有数の活火山であり、噴火と雷の自然現象が同時に見られることもある。",
+                          "catchphrase": "「雷火の翼、天地を裂け！」"
+                        },
+                        {
+                          "id": "KYU-F05",
+                            "stageId": "kyushu_bonus",
+                          "name": "壱岐シーマスタークラーケン",
+                          "prefecture": "長崎・壱岐",
+                          "grade": 12,
+                          "thumb": "KYU-F05_thumb",
+                          "image": "KYU-F05.webp",
+                          "isBoss": true,
+                        
+                          "weakness": "onyomi",
+                              "rarity": "幻",
+                          "category": "海霊・怪物",
+                          "habitat": "玄界灘",
+                          "desc": "玄界灘に棲む巨大な幻のイカ。青黒い体を持ち、触手は海流のようにしなる。",
+                          "trivia": "壱岐は古代から大陸との交流の要所であり、海の怪物伝承も多い。",
+                          "catchphrase": "「深海の覇者、触腕を振るう！」"
+                        },
+
+                                
                       
                         {
                           "id": "AS-L01",
@@ -1594,187 +1774,9 @@
                                         "desc": "国花プロテアが変じた幻の竜。花弁の翼から虹色の光を放ち、多様性を象徴する。",
                                         "trivia": "南アフリカは『虹の国』と呼ばれ、多文化共生の象徴とされる。",
                                         "catchphrase": "「虹色の翼で未来を照らす！」"
-                                      },
+                                      }
                                                             
-                                                                {
-                                                                  "id": "KYU-F01",
-                                                                  "stageId": "kyushu_bonus",
-                                                                  "name": "阿蘇フレイムドラゴン",
-                                                                  "prefecture": "熊本",
-                                                                  "thumb": "KYU-F01_thumb",
-                                                                  "image": "KYU-F01.webp",
-                                                                  "isBoss": true,
-                                                                  "weakness": "onyomi",
-                                                                      "rarity": "幻",
-                                                                  "category": "炎竜・火山",
-                                                                  "habitat": "阿蘇山火口",
-                                                                  "desc": "阿蘇山の火口に宿る炎の竜。体は赤黒い岩に覆われ、口から溶岩を吐く。",
-                                                                  "trivia": "阿蘇山は世界最大級のカルデラを持つ活火山で、古代から信仰の対象となってきた。",
-                                                                  "catchphrase": "「灼熱の炎、噴き上がれ！」"
-                                                                },
-                                                                {
-                                                                  "id": "KYU-F02",
-                                                                  "stageId": "kyushu_bonus",
-                                                                  "name": "高千穂アマツツル",
-                                                                  "prefecture": "宮崎",
-                                                                  "thumb": "KYU-F02_thumb",
-                                                                  "image": "KYU-F02.webp",
-                                                                  "isBoss": true,   
-                                                                  "weakness": "kunyomi",
-                                                                      "rarity": "幻",
-                                                                  "category": "神聖・霊鳥",
-                                                                  "habitat": "高千穂峡・天岩戸周辺",
-                                                                  "desc": "高千穂の神話から生まれた天の霊鶴。白銀の羽を広げ、光を纏う。",
-                                                                  "trivia": "高千穂は天孫降臨の伝承が残る神話の里で、霊的な地として知られる。",
-                                                                  "catchphrase": "「天を翔ける、光の翼！」"
-                                                                },
-                                                                {
-                                                                  "id": "KYU-F03",
-                                                                  "stageId": "kyushu_bonus",
-                                                                  "name": "雲仙ミストゴーレム",
-                                                                  "prefecture": "長崎",
-                                                                  "thumb": "KYU-F03_thumb",
-                                                                  "image": "KYU-F03.webp",
-                                                                  "isBoss": true,
-                                                                  "weakness": "onyomi",
-                                                                      "rarity": "幻",
-                                                                  "category": "霧霊・巨人",
-                                                                  "habitat": "雲仙岳",
-                                                                  "desc": "雲仙の霧と硫黄の力から生まれた巨人。体は灰色の岩に白い霧が絡みつく。",
-                                                                  "trivia": "雲仙は活火山地帯であり、温泉と霧に包まれた景観でも有名。",
-                                                                  "catchphrase": "「霧煙る巨躯、地を揺るがす！」"
-                                                                },
-                                                                {
-                                                                  "id": "KYU-F04",
-                                                                  "stageId": "kyushu_bonus",
-                                                                  "name": "桜島サンダーフェニックス",
-                                                                  "prefecture": "鹿児島",
-                                                                  
-                                                                  "thumb": "KYU-F04_thumb",
-                                                                  "image": "KYU-F04.webp",
-                                                                  "isBoss": true,
-                                                                  
-                                                                  "weakness": "kunyomi",
-                                                                      "rarity": "幻",
-                                                                  "category": "幻鳥・雷火",
-                                                                  "habitat": "桜島上空",
-                                                                  "desc": "桜島の雷と噴煙が融合した不死鳥。黒煙の翼に紫の雷を纏い、空を舞う。",
-                                                                  "trivia": "桜島は日本有数の活火山であり、噴火と雷の自然現象が同時に見られることもある。",
-                                                                  "catchphrase": "「雷火の翼、天地を裂け！」"
-                                                                },
-                                                                {
-                                                                  "id": "KYU-F05",
-                                                                    "stageId": "kyushu_bonus",
-                                                                  "name": "壱岐シーマスタークラーケン",
-                                                                  "prefecture": "長崎・壱岐",
-                                                                
-                                                                  "thumb": "KYU-F05_thumb",
-                                                                  "image": "KYU-F05.webp",
-                                                                  "isBoss": true,
-                                                                
-                                                                  "weakness": "onyomi",
-                                                                      "rarity": "幻",
-                                                                  "category": "海霊・怪物",
-                                                                  "habitat": "玄界灘",
-                                                                  "desc": "玄界灘に棲む巨大な幻のイカ。青黒い体を持ち、触手は海流のようにしなる。",
-                                                                  "trivia": "壱岐は古代から大陸との交流の要所であり、海の怪物伝承も多い。",
-                                                                  "catchphrase": "「深海の覇者、触腕を振るう！」"
-                                                                },
-                                                              
-                                                            
-                                                            
-                                                                   
-
-                                                                        {
-                                                                            "id": "SKG-F01",
-                                                                            "stageId": "shikoku_bonus",
-                                                                            "name": "石鎚サンダードラゴン",
-                                                                            "prefecture": "愛媛",
-                                                                          
-                                                                            "thumb": "SKG-F01_thumb",
-                                                                            "image": "SKG-F01.webp",
-                                                                            "isBoss": true,
-                                                                            
-                                                                            "weakness": "kunyomi",
-                                                                                "rarity": "幻",
-                                                                            "category": "雷霊・龍",
-                                                                            "habitat": "石鎚山",
-                                                                            "desc": "石鎚山の霊峰から顕現した雷龍。全身は岩と雷で覆われ、黄金の稲妻を纏う。",
-                                                                            "trivia": "石鎚山は西日本最高峰で、日本七霊山の一つに数えられる。",
-                                                                            "catchphrase": "「雷鳴轟き、霊峰を護る！」"
-                                                                          },
-                                                                          {
-                                                                            "id": "SKG-F02",
-                                                                            "stageId": "shikoku_bonus",
-                                                                            "name": "鳴門ボルテックスサーペント",
-                                                                            "prefecture": "徳島",
-                                                                            
-                                                                            "thumb": "SKG-F02_thumb",
-                                                                            "image": "SKG-F02.webp",
-                                                                            "isBoss": true,
-                                                                            
-                                                                            "weakness": "onyomi",
-                                                                                "rarity": "幻",
-                                                                            "category": "水霊・大蛇",
-                                                                            "habitat": "鳴門海峡",
-                                                                            "desc": "鳴門海峡の渦潮が具現化した大蛇。青と白の渦模様で覆われ、尾は海流そのもの。",
-                                                                            "trivia": "鳴門の渦潮は世界三大潮流の一つで、自然現象としても有名。",
-                                                                            "catchphrase": "「渦潮轟く、海の大蛇！」"
-                                                                          },
-                                                                          {
-                                                                            "id": "SKG-F03",
-                                                                            "stageId": "shikoku_bonus",
-                                                                            "name": "金刀比羅シーガーディアン",
-                                                                            "prefecture": "香川",
-                                                                            
-                                                                            "thumb": "SKG-F03_thumb",
-                                                                            "image": "SKG-F03.webp",
-                                                                            "isBoss": true,
-                                                                            
-                                                                              "weakness": "kunyomi",
-                                                                                "rarity": "幻",
-                                                                            "category": "守護神・海霊",
-                                                                            "habitat": "金刀比羅宮",
-                                                                            "desc": "金刀比羅宮の守護者が海の力を得て現れた幻獣。体は金色と青の波模様で、旅人と船乗りを守護する。",
-                                                                            "trivia": "金刀比羅宮は『こんぴらさん』として親しまれ、海上交通の守護神として信仰されている。",
-                                                                            "catchphrase": "「船旅を護る、蒼き守護神！」"
-                                                                          },
-                                                                          {
-                                                                            "id": "SKG-F04",
-                                                                            "stageId": "shikoku_bonus",
-                                                                            "name": "四万十リバースピリット",
-                                                                            "prefecture": "高知",
-                                                                            
-                                                                            "thumb": "SKG-F04_thumb",
-                                                                            "image": "SKG-F04.webp",
-                                                                            "isBoss": true,
-                                                                            
-                                                                            "weakness": "onyomi",
-                                                                                "rarity": "幻",
-                                                                            "category": "水霊・精霊",
-                                                                            "habitat": "四万十川",
-                                                                            "desc": "四万十川の清流から生まれた精霊。透き通る青緑の体を持ち、魚や流木を纏う。",
-                                                                            "trivia": "四万十川は『日本最後の清流』と呼ばれる四国の大河。",
-                                                                            "catchphrase": "「清流の煌めき、命を紡ぐ！」"
-                                                                          },
-                                                                          {
-                                                                            "id": "SKG-F05",
-                                                                            "stageId": "shikoku_area1",
-                                                                            "name": "剣山ミラージュオーガ",
-                                                                            "prefecture": "徳島",
-                                                                            
-                                                                            "thumb": "SKG-F05_thumb",
-                                                                            "image": "SKG-F05.webp",
-                                                                            "isBoss": true,
-                                                                              
-                                                                            "weakness": "kunyomi",
-                                                                                    "rarity": "幻",
-                                                                            "category": "幻鬼・山霊",
-                                                                            "habitat": "剣山",
-                                                                            "desc": "剣山に眠る鬼伝説から生まれた幻鬼。岩の鎧と霧のオーラを纏い、剣のように鋭い角を持つ。",
-                                                                            "trivia": "剣山は徳島県の霊峰で、古来より剣や鬼の伝承が語られる場所。",
-                                                                            "catchphrase": "「霧に潜む、山の幻鬼！」"
-                                                                          }
+                                                          
                                                                     ]
                                                                       
                                                                     

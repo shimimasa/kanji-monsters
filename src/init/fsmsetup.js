@@ -31,6 +31,7 @@ import gradeQuizScreen     from '../screens/gradeQuizScreen.js';
 import monsterCaptureScreen from '../screens/monsterCaptureScreen.js';
 // ★★★ 練習バトル画面を追加 ★★★
 import practiceBattleScreen from '../screens/practiceBattleScreen.js';
+import quickReviewPracticeScreen from '../screens/quickReviewPracticeScreen.js';
 
 export async function setupFSM() {
   const { stageData } = await loadAllGameData();
@@ -64,6 +65,7 @@ export async function setupFSM() {
     monsterCapture:   monsterCaptureScreen,
     // ★★★ 練習バトル画面を追加 ★★★
     practiceBattle:   practiceBattleScreen,
+    quickReviewPractice: quickReviewPracticeScreen,
     // 共通バトル画面を追加
     battle:           battleFactory('default'),
   };
@@ -87,7 +89,8 @@ export async function setupFSM() {
                         'profile',
                         'monsterCapture',
                         // ★★★ 練習バトル画面を安全リストに追加 ★★★
-                        'practiceBattle'];
+                        'practiceBattle',
+                        'quickReviewPractice'];
     
     if (safeScreens.includes(name)) {
       console.log(`安全な画面[${name}]への遷移を許可`);

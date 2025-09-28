@@ -16,6 +16,14 @@ const nextStageButton = {
   text: 'ステージ選択へ'
 };
 
+const quickReviewButton = {
+  x: 50,
+  y: 480,
+  width: 220,
+  height: 50,
+  text: '復習'
+};
+
 const resultWinState = {
   canvas: null,
   ctx: null,
@@ -26,6 +34,7 @@ const resultWinState = {
   animationTime: 0, // アニメーション用タイマー
   resultData: null, // 結果データを保存
   bonusSummary: null, // 学年ボーナスの結果データを保持
+  _countCommitted: false, // ← 追加: カウント二重加算防止
 
   /** 画面表示時の初期化 */
   async enter(canvas, resultData) {
@@ -59,10 +68,12 @@ const resultWinState = {
     // クリア画面に入ったらクリアBGMを再生
     publish('playBGM', 'victory');
 
-    // ステージクリアの統計データを更新
-    recordStageCleared();
-    gameState.playerStats.stagesCleared++;
-    
+    // ステージクリアの統計データを更新（多重防止）
+if (!this._countCommitted) {
+  recordStageCleared();
+  gameState.playerStats.stagesCleared++;
+  this._countCommitted = true;
+}
     // パーフェクトクリア判定
     if (battleState.mistakesThisStage === 0) {
       gameState.justClearedPerfectly = true;
@@ -141,14 +152,39 @@ const resultWinState = {
           this.drawResultPanel(ctx, canvas.width / 2 - 150, 200, 300, 180);
         }
     
-        // 5. リッチなボタン
-        const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
-        this.drawRichButton(ctx, nextStageButton, isHovered);
-    
-        // 6. 間違えた漢字の巻物風表示
-        if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
-          this.drawMistakeScrollPanel(ctx, 50, 420, 250, 150);
-        }
+
+// 5. ステージ選択ボタン
+const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
+this.drawRichButton(ctx, nextStageButton, isHovered);
+
+// 6. 復習パネル＋「間違えた漢字をマスター」ボタン（右側に配置）
+if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
+  const panelRect = { x: 50, y: 420, w: 250, h: 150 };
+  // パネル
+  this.drawMistakeScrollPanel(ctx, panelRect.x, panelRect.y, panelRect.w, panelRect.h);
+
+  // 右側に基本配置
+  quickReviewButton.x = Math.min(panelRect.x + panelRect.w + 20, canvas.width - quickReviewButton.width - 20);
+  quickReviewButton.y = panelRect.y + Math.floor((panelRect.h - quickReviewButton.height) / 2);
+
+  // ステージ選択ボタンと重なったら上下に退避
+  const overlap = !(quickReviewButton.x + quickReviewButton.width < nextStageButton.x ||
+                    quickReviewButton.x > nextStageButton.x + nextStageButton.width ||
+                    quickReviewButton.y + quickReviewButton.height < nextStageButton.y ||
+                    quickReviewButton.y > nextStageButton.y + nextStageButton.height);
+  if (overlap) {
+    // まずはパネルの上へ
+    let newY = panelRect.y - quickReviewButton.height - 10;
+    if (newY < 20) {
+      // 上が狭ければパネルの下へ
+      newY = panelRect.y + panelRect.h + 10;
+    }
+    quickReviewButton.y = Math.min(newY, canvas.height - quickReviewButton.height - 20);
+  }
+
+  const isHoveredReview = isMouseOverRect(this.mouseX, this.mouseY, quickReviewButton);
+  this.drawRichButton(ctx, quickReviewButton, isHoveredReview);
+}
 
    
   },
@@ -589,6 +625,7 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     this.ctx = null;
     this.resultData = null;
     this.bonusSummary = null;
+    this._countCommitted = false; // ← 追加: 次回のためにリセット
   },
 
   /** イベントハンドラ登録 */
@@ -654,10 +691,35 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
 
     if (isMouseOverRect(x, y, nextStageButton)) {
       publish('playSE', 'decide');
-      const targetScreen = gameState.previousScreen || 'stageSelect';
+      // 同画面への遷移を禁止して確実に抜ける
+      let targetScreen = gameState.previousScreen;
+      if (!targetScreen || targetScreen === 'resultWin' || targetScreen === 'battle') {
+        targetScreen = 'stageSelect';
+      }
       // 画面遷移前にメニュー系BGMへ切替
       publish('playBGM', 'title');
       publish('changeScreen', targetScreen);
+    }
+    
+    if (isMouseOverRect(x, y, quickReviewButton)) {
+      publish('playSE', 'decide');
+      const targetStageId = (this.resultData && this.resultData.stageId) || gameState.currentStageId;
+      const wrongRaw = (this.resultData && this.resultData.wrong) || gameState.wrongKanjiList || [];
+      const texts = Array.from(new Set(wrongRaw.map(w => (typeof w === 'string') ? w : (w?.text || w?.kanji || String(w || ''))).filter(Boolean)));
+      const ids   = Array.from(new Set(wrongRaw.map(w => (typeof w === 'object' && w && 'id' in w) ? w.id : null).filter(v => v !== null && v !== undefined)));
+    
+      gameState.quickReviewTargets = { stageId: targetStageId, ids, texts };
+    
+      // ← 追加: フェールセーフとしてローカルに退避
+      try {
+        localStorage.setItem('quickReviewBuffer', JSON.stringify({
+          stageId: targetStageId, ids, texts, ts: Date.now()
+        }));
+      } catch {}
+    
+      gameState.previousScreen = 'resultWin';
+      gameState.gameMode = 'practice';
+      publish('changeScreen', 'quickReviewPractice'); // 専用画面へ
     }
   }
 };
