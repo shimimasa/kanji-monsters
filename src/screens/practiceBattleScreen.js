@@ -2170,15 +2170,23 @@ if (this.wrongOnlyMode) {
    * ユーティリティメソッド
    */
     _isKanjiMastered(kanjiId) {
+        // IDの型ズレ（数値/文字列）に強い判定
         try {
-          const id = String(kanjiId);
           if (typeof isKanjiMastered === 'function') {
-            return !!isKanjiMastered(id);
+            // まず元の型で判定
+            if (isKanjiMastered(kanjiId)) return true;
+            // 型を反転して再判定
+            const alt = (typeof kanjiId === 'string') ? Number(kanjiId) : String(kanjiId);
+            if (isKanjiMastered(alt)) return true;
           }
         } catch {}
         try {
-          const prog = gameState?.kanjiReadProgress?.[kanjiId];
-          return !!(prog && prog.mastered);
+          // 直接 gameState を見る場合も数値/文字列の両方で確認
+          const progA = gameState?.kanjiReadProgress?.[kanjiId];
+          if (progA && progA.mastered) return true;
+          const alt = (typeof kanjiId === 'string') ? Number(kanjiId) : String(kanjiId);
+          const progB = gameState?.kanjiReadProgress?.[alt];
+          return !!(progB && progB.mastered);
         } catch {
           return false;
         }
