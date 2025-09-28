@@ -1376,7 +1376,7 @@
     "stageId": "kanto_area1",
     "name": "日光猿ポルター",
     "prefecture": "栃木",
-    "grade": 2,
+    "grade": 3,
     "thumb": "TCG-E06_thumb",
     "image": "TCG-E06.webp",
     "isBoss": false,
@@ -1424,7 +1424,7 @@
     "stageId": "kanto_area1",
     "name": "日光能面ファントム",
     "prefecture": "栃木",
-    "grade": 2,
+    "grade": 3,
     "thumb": "TCG-E09_thumb",
     "image": "TCG-E09.webp",
     "isBoss": false,
@@ -11853,7 +11853,7 @@
             "catchphrase": "「密林を護る緑の巨神！」"
   },
   {
-    "id": "DRC-10",
+    "id": "DRC-E010",
         "stageId":"Africa_area8",
         "name": "ヴィルンガゴリラロード",
         "prefecture": "コンゴ民主共和国",
