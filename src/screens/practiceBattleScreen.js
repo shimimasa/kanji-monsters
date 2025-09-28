@@ -2169,6 +2169,20 @@ if (this.wrongOnlyMode) {
   /**
    * ユーティリティメソッド
    */
+    _isKanjiMastered(kanjiId) {
+        try {
+          const id = String(kanjiId);
+          if (typeof isKanjiMastered === 'function') {
+            return !!isKanjiMastered(id);
+          }
+        } catch {}
+        try {
+          const prog = gameState?.kanjiReadProgress?.[kanjiId];
+          return !!(prog && prog.mastered);
+        } catch {
+          return false;
+        }
+      },
   _toHiragana(input) {
     try {
       if (!input) return '';
