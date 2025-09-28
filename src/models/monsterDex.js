@@ -8,6 +8,39 @@ import DataSync from '../services/firebase/dataSync.js';
 const STORAGE_KEY = 'krb_monster_dex';
 const SEEN_STORAGE_KEY = 'krb_seen_monsters';
 
+// --- お気に入り管理 ---
+const FAVORITES_KEY = 'krb_monster_favorites';
+
+/**
+ * お気に入り Set<string> をロード
+ * @returns {Set<string>}
+ */
+export function loadFavorites() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(arr)) return new Set();
+    const strings = arr.filter(id => typeof id === 'string');
+    return new Set(strings);
+  } catch (e) {
+    console.error('monsterDex: お気に入りのロードに失敗しました', e);
+    return new Set();
+  }
+}
+
+/**
+ * お気に入り Set<string> を保存
+ * @param {Set<string>} favSet
+ */
+export function saveFavorites(favSet) {
+  try {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favSet]));
+    DataSync.syncAll();
+  } catch (e) {
+    console.error('monsterDex: お気に入りの保存に失敗しました', e);
+  }
+}
+
 /**
  * 図鑑をロードして Set<string> を返却
  * localStorage にデータがなければ空の Set を返す

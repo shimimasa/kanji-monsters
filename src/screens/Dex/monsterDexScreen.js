@@ -1,5 +1,5 @@
 // js/screens/monsterDexScreen.js
-import { loadDex, loadSeenMonsters, markAsSeen, isNewMonster } from '../../models/monsterDex.js';
+import { loadDex, loadSeenMonsters, markAsSeen, isNewMonster, loadFavorites, saveFavorites } from '../../models/monsterDex.js';
 import { getMonsterById, getAllMonsterIds } from '../../loaders/dataLoader.js';
 import { publish } from '../../core/eventBus.js';
 import { gameState } from '../../core/gameState.js';
@@ -40,6 +40,103 @@ const worldRegionMap = {
   9: 'アメリカ大陸',
   10: 'アフリカ大陸'
 };
+
+// かな正規化（カタカナ→ひらがな、NFKC、空白除去）
+function normalizeKana(str) {
+  const s = (str || '').normalize('NFKC').toLowerCase();
+  let out = '';
+  for (const ch of s) {
+    const code = ch.charCodeAt(0);
+    if (code >= 0x30A1 && code <= 0x30F6) {
+      out += String.fromCharCode(code - 0x60); // カタカナ→ひらがな
+    } else if (ch === 'ヴ') {
+      out += 'ゔ';
+    } else {
+      out += ch;
+    }
+  }
+  return out.replace(/[ぁぃぅぇぉっゃゅょゎ]/g, m => ({
+    'ぁ':'あ','ぃ':'い','ぅ':'う','ぇ':'え','ぉ':'お','っ':'つ','ゃ':'や','ゅ':'ゆ','ょ':'よ','ゎ':'わ'
+  }[m] || m)).replace(/\s+/g, '').trim();
+}
+
+function createCard(monster, { showUncollected = false, isFavorite = false, onToggleFavorite = null } = {}) {
+  const card = document.createElement('div');
+  card.classList.add('monster-card');
+
+  const isCollected = !!monster.collected;
+  if (!isCollected && !showUncollected) {
+    return null;
+  }
+
+  card.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isCollected) {
+      showMonsterModal(monster);
+      markAsSeen(monster.id);
+      const newBadge = card.querySelector('.new-badge');
+      if (newBadge) newBadge.remove();
+    }
+  });
+
+  const img = document.createElement('img');
+  const folder = gradeFolderMap[monster.grade] || gradeFolderMap[1];
+  const thumbPath = `/assets/images/monsters/thumb/${folder}/${monster.id}.webp`;
+  img.dataset.thumb = thumbPath;
+  img.alt = monster.name;
+  if (!isCollected) {
+    img.style.filter = 'grayscale(100%) brightness(0.55) contrast(0.9)';
+  }
+  card.appendChild(img);
+
+  // お気に入り（☆）トグル
+  const favBtn = document.createElement('button');
+  favBtn.classList.add('fav-toggle');
+  favBtn.textContent = isFavorite ? '★' : '☆';
+  Object.assign(favBtn.style, {
+    position: 'absolute',
+    right: '8px',
+    top: '8px',
+    fontSize: '20px',
+    lineHeight: '20px',
+    background: 'transparent',
+    border: 'none',
+    color: isFavorite ? '#ffd54a' : '#ffffff',
+    textShadow: '0 1px 2px rgba(0,0,0,0.6)',
+    cursor: 'pointer',
+    padding: '0'
+  });
+  favBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (onToggleFavorite) {
+      onToggleFavorite(monster.id, !isFavorite);
+    }
+  });
+  card.appendChild(favBtn);
+
+  const nameEl = document.createElement('p');
+  nameEl.textContent = isCollected ? monster.name : '？？？';
+  nameEl.classList.add('monster-name');
+  card.appendChild(nameEl);
+
+  const prefectureEl = document.createElement('p');
+  const regionFallback = ([1,2,3,4,5,6,11,12].includes(monster.grade)
+    ? japanRegionMap[monster.grade] : worldRegionMap[monster.grade]);
+  prefectureEl.textContent = isCollected ? (monster.prefecture || regionFallback || '不明') : '？？？';
+  prefectureEl.classList.add('monster-prefecture');
+  card.appendChild(prefectureEl);
+
+  if (isNewMonster(monster.id) && isCollected) {
+    const newBadge = document.createElement('div');
+    newBadge.classList.add('new-badge');
+    newBadge.textContent = 'NEW!';
+    card.appendChild(newBadge);
+  }
+
+  observer.observe(card);
+  return card;
+}
 
 // IntersectionObserver を用いたサムネイル遅延読み込み
 const observer = new IntersectionObserver((entries) => {
@@ -194,60 +291,66 @@ const monsterDexState = {
   allMonsterIds: [],
   filteredMonsterIds: [],
   
-  // ページ管理用の状態を追加
-  itemsPerPage: 15, // 1ページに表示する数 (3行x5列)
+  // ページ管理
+  itemsPerPage: 15,
   currentPage: 0,
   totalPages: 0,
 
-  // フィルタリング・ソート用の状態
-  currentRegionFilter: 'all', // 'all', 1..6 or 7..10
-  currentSortOrder: 'id', // 'id' (図鑑番号順), 'name' (五十音順)
-  currentMode: 'japan', // 'japan' | 'world'
+  // フィルタ・ソート
+  currentRegionFilter: 'all',
+  currentSortOrder: 'id',
+  currentMode: 'japan',
 
-  // DOM管理用プロパティ
+  // 追加状態
+  favoritesSet: new Set(),
+  favoritesOnly: false,
+  favoritesFirst: false,
+  searchQuery: '',
+  showUncollectedSilhouette: false,
+
+  // 保存キー
+  _prefsKey: 'krb_monsterDex_prefs_v1',
+
+  // DOM
   container: null,
 
   enter(canvas) {
     this.canvas = canvas || document.getElementById('gameCanvas');
     
-    // キャンバスを不可視化（KanjiDexと同様）
     if (this.canvas) {
       this._prevCanvasVisibility = this.canvas.style.visibility;
       this._prevCanvasPointer = this.canvas.style.pointerEvents;
       this.canvas.style.visibility = 'hidden';
       this.canvas.style.pointerEvents = 'none';
     }
-
-    // 画面専用BGMを再生
+  
     publish('playBGM', 'bgm_monsterDex');
-
-    // データの読み込み
+  
     this.dexSet = loadDex();
     this.seenSet = loadSeenMonsters();
-
-    // すべての（ことわざ以外の）モンスターIDを保持（日本1-6＋世界7-10）
+    this.favoritesSet = loadFavorites();
+  
     this.allMonsterIds = getAllMonsterIds().filter(id => {
       const idStr = String(id);
-      if (idStr.startsWith('PRV-')) return false; // ことわざ除外
+      if (idStr.startsWith('PRV-')) return false;
       const m = getMonsterById(id);
       return !!m;
     });
-
-    // 初期状態では日本モード
+  
+    // 既存デフォルト
     this.currentMode = 'japan';
     this.currentRegionFilter = 'all';
-
-    // 初期状態で全ての対象モンスターを表示
+  
+    // 設定復元
+    this.loadPreferences();
+  
     this.applyFiltersAndSort();
-    this.currentPage = 0;
-
-    // DOMコンテナを作成
+    // ページ境界補正
+    this.currentPage = Math.min(Math.max(0, this.currentPage || 0), Math.max(0, this.totalPages - 1));
+  
     this.createDOMContainer();
-    
-    // ページを描画
     this.renderPage();
-
-    // キーボードイベント（KanjiDexと同様）
+  
     this._keyHandler = e => {
       if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
         this.changePage(this.currentPage - 1);
@@ -311,43 +414,103 @@ const monsterDexState = {
     return regionCompletion;
   },
 
+/** 設定の保存 */
+savePreferences() {
+  try {
+    const prefs = {
+      currentMode: this.currentMode,
+      currentRegionFilter: this.currentRegionFilter,
+      currentSortOrder: this.currentSortOrder,
+      favoritesOnly: this.favoritesOnly,
+      favoritesFirst: this.favoritesFirst,
+      currentPage: this.currentPage,
+      searchQuery: this.searchQuery,
+      showUncollectedSilhouette: this.showUncollectedSilhouette
+    };
+    localStorage.setItem(this._prefsKey, JSON.stringify(prefs));
+  } catch (e) {
+    // noop
+  }
+},
+
+/** 設定の読込 */
+loadPreferences() {
+  try {
+    const raw = localStorage.getItem(this._prefsKey);
+    if (!raw) return;
+    const p = JSON.parse(raw) || {};
+    if (p.currentMode === 'japan' || p.currentMode === 'world') this.currentMode = p.currentMode;
+    this.currentRegionFilter = (p.currentRegionFilter === 'all' || typeof p.currentRegionFilter === 'number') ? p.currentRegionFilter : 'all';
+    this.currentSortOrder = (p.currentSortOrder === 'name') ? 'name' : 'id';
+    this.favoritesOnly = !!p.favoritesOnly;
+    this.favoritesFirst = !!p.favoritesFirst;
+    this.currentPage = Number.isInteger(p.currentPage) ? p.currentPage : 0;
+    this.searchQuery = typeof p.searchQuery === 'string' ? p.searchQuery : '';
+    this.showUncollectedSilhouette = !!p.showUncollectedSilhouette;
+  } catch (e) {
+    // noop
+  }
+},
+
   /** フィルタリングとソートを適用 */
   applyFiltersAndSort() {
     const allowed = this._getAllowedGrades();
-
-    // 対象モードのみに限定
+  
     let filtered = this.allMonsterIds.filter(id => {
       const m = getMonsterById(id);
       return m && allowed.includes(m.grade);
     });
-
-    // 地域フィルタリング
+  
     if (this.currentRegionFilter !== 'all') {
       filtered = filtered.filter(id => {
         const monster = getMonsterById(id);
         return monster && monster.grade === this.currentRegionFilter;
       });
     }
-
-    // ソート
-    if (this.currentSortOrder === 'name') {
-      // 五十音順
-      filtered.sort((a, b) => {
-        const monsterA = getMonsterById(a);
-        const monsterB = getMonsterById(b);
-        if (!monsterA || !monsterB) return 0;
-        return monsterA.name.localeCompare(monsterB.name, 'ja');
+  
+    // 検索（名前ひらがな正規化）
+    if (this.searchQuery && this.searchQuery.trim()) {
+      const q = normalizeKana(this.searchQuery);
+      filtered = filtered.filter(id => {
+        const m = getMonsterById(id);
+        if (!m) return false;
+        const name = normalizeKana(m.name);
+        return name.includes(q);
       });
-    } else {
-      // 図鑑番号順（デフォルト）
-      filtered.sort((a, b) => String(a).localeCompare(String(b)));
     }
-
-    // 捕獲済みのみ表示
-    filtered = filtered.filter(id => this.dexSet.has(id));
-
+  
+    // お気に入りのみ
+    if (this.favoritesOnly) {
+      filtered = filtered.filter(id => this.favoritesSet.has(id));
+    }
+  
+    // 未捕獲の扱い
+    if (!this.showUncollectedSilhouette) {
+      filtered = filtered.filter(id => this.dexSet.has(id));
+    }
+  
+    // ソート
+    filtered.sort((a, b) => {
+      const aM = getMonsterById(a);
+      const bM = getMonsterById(b);
+      const aFav = this.favoritesSet.has(a);
+      const bFav = this.favoritesSet.has(b);
+  
+      if (this.favoritesFirst && aFav !== bFav) {
+        return aFav ? -1 : 1;
+      }
+  
+      if (this.currentSortOrder === 'name') {
+        const an = aM?.name || '';
+        const bn = bM?.name || '';
+        return an.localeCompare(bn, 'ja');
+      } else {
+        return String(a).localeCompare(String(b));
+      }
+    });
+  
     this.filteredMonsterIds = filtered;
-    this.totalPages = Math.ceil(this.filteredMonsterIds.length / this.itemsPerPage);
+    this.totalPages = Math.ceil(this.filteredMonsterIds.length / this.itemsPerPage) || 1;
   },
 
   /** 現在のページを描画する（KanjiDexスタイルに統一） */
@@ -434,6 +597,217 @@ const monsterDexState = {
       flexWrap: 'wrap',
       gap: '12px'
     });
+
+
+    // === 中央コントロール（ソート＋検索） ===
+const centerControls = document.createElement('div');
+centerControls.className = 'nav-controls-center';
+Object.assign(centerControls.style, {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  justifyContent: 'center',
+  flex: '1',
+  flexWrap: 'wrap'
+});
+
+// ソートボタン
+const createSortButton = (text, mode, isActive) => {
+  const btn = document.createElement('button');
+  btn.className = `btn-sort ${isActive ? 'sort-active' : ''}`;
+  btn.textContent = text;
+  const baseStyle = {
+    background: isActive ? 
+      'linear-gradient(135deg, #f39c12, #e67e22)' : 
+      'linear-gradient(135deg, #ffc107, #e0a800)',
+    color: isActive ? 'white' : '#000',
+    border: isActive ? '2px solid #fff' : '1px solid rgba(255, 255, 255, 0.2)',
+    borderRadius: '8px',
+    padding: '8px 16px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.3s ease',
+    boxShadow: isActive ? 
+      '0 0 12px rgba(243, 156, 18, 0.5)' : 
+      '0 2px 4px rgba(0, 0, 0, 0.2)'
+  };
+  Object.assign(btn.style, baseStyle);
+  if (!isActive) {
+    btn.addEventListener('mouseenter', () => {
+      Object.assign(btn.style, {
+        background: 'linear-gradient(135deg, #e0a800, #d39e00)',
+        transform: 'translateY(-2px)',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+      });
+    });
+    btn.addEventListener('mouseleave', () => Object.assign(btn.style, baseStyle));
+  }
+  btn.addEventListener('click', () => {
+    this.currentSortOrder = mode;
+    this.applyFiltersAndSort();
+    this.currentPage = 0;
+    this.renderPage();
+    this.savePreferences();
+    publish('playSE', 'decide');
+  });
+  return btn;
+};
+
+const sortByIdBtn = createSortButton('📊 図鑑番号順', 'id', this.currentSortOrder === 'id');
+const sortByNameBtn = createSortButton('🔤 五十音順', 'name', this.currentSortOrder === 'name');
+centerControls.appendChild(sortByIdBtn);
+centerControls.appendChild(sortByNameBtn);
+
+// 検索ボックス
+const searchInput = document.createElement('input');
+Object.assign(searchInput.style, {
+  background: 'rgba(255,255,255,0.15)',
+  color: 'white',
+  border: '1px solid rgba(255,255,255,0.3)',
+  borderRadius: '6px',
+  padding: '6px 10px',
+  fontSize: '14px',
+  minWidth: '200px'
+});
+searchInput.type = 'text';
+searchInput.placeholder = '名前で検索…';
+searchInput.value = this.searchQuery || '';
+let searchTimer = null;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    this.searchQuery = searchInput.value;
+    this.applyFiltersAndSort();
+    this.currentPage = 0;
+    this.renderPage();
+    this.savePreferences();
+  }, 300);
+});
+centerControls.appendChild(searchInput);
+
+// === 右側コントロール（ページネーション＋トグル） ===
+const rightControls = document.createElement('div');
+rightControls.className = 'nav-controls-right';
+Object.assign(rightControls.style, {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  flexWrap: 'wrap'
+});
+
+// トグル群
+const toggles = document.createElement('div');
+Object.assign(toggles.style, { display: 'flex', alignItems: 'center', gap: '8px' });
+
+// お気に入りのみ
+const favOnlyLabel = document.createElement('label');
+favOnlyLabel.style.color = '#fff';
+const favOnlyCb = document.createElement('input');
+favOnlyCb.type = 'checkbox';
+favOnlyCb.checked = !!this.favoritesOnly;
+favOnlyCb.addEventListener('change', () => {
+  this.favoritesOnly = favOnlyCb.checked;
+  this.applyFiltersAndSort();
+  this.currentPage = 0;
+  this.renderPage();
+  this.savePreferences();
+  publish('playSE', 'decide');
+});
+favOnlyLabel.appendChild(favOnlyCb);
+favOnlyLabel.appendChild(document.createTextNode(' ☆のみ'));
+toggles.appendChild(favOnlyLabel);
+
+// お気に入り優先
+const favFirstLabel = document.createElement('label');
+favFirstLabel.style.color = '#fff';
+const favFirstCb = document.createElement('input');
+favFirstCb.type = 'checkbox';
+favFirstCb.checked = !!this.favoritesFirst;
+favFirstCb.addEventListener('change', () => {
+  this.favoritesFirst = favFirstCb.checked;
+  this.applyFiltersAndSort();
+  this.currentPage = 0;
+  this.renderPage();
+  this.savePreferences();
+  publish('playSE', 'decide');
+});
+favFirstLabel.appendChild(favFirstCb);
+favFirstLabel.appendChild(document.createTextNode(' ☆優先'));
+toggles.appendChild(favFirstLabel);
+
+// 未捕獲シルエット
+const silLabel = document.createElement('label');
+silLabel.style.color = '#fff';
+const silCb = document.createElement('input');
+silCb.type = 'checkbox';
+silCb.checked = !!this.showUncollectedSilhouette;
+silCb.addEventListener('change', () => {
+  this.showUncollectedSilhouette = silCb.checked;
+  this.applyFiltersAndSort();
+  this.currentPage = 0;
+  this.renderPage();
+  this.savePreferences();
+  publish('playSE', 'decide');
+});
+silLabel.appendChild(silCb);
+silLabel.appendChild(document.createTextNode(' 未捕獲を表示'));
+toggles.appendChild(silLabel);
+
+// ページネーション（既存）
+const createPageButton = (text, action, disabled = false) => {
+  const btn = document.createElement('button');
+  btn.className = 'btn-pagination';
+  btn.textContent = text;
+  btn.disabled = disabled;
+  const baseStyle = {
+    background: disabled ? 
+      'linear-gradient(135deg, #6c757d, #5a6268)' : 
+      'linear-gradient(135deg, #4a90e2, #357abd)',
+    color: disabled ? '#adb5bd' : 'white',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    borderRadius: '8px',
+    padding: '8px 16px',
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    fontSize: '14px',
+    transition: 'all 0.3s ease',
+    boxShadow: disabled ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.2)'
+  };
+  Object.assign(btn.style, baseStyle);
+  if (!disabled) {
+    btn.addEventListener('mouseenter', () => {
+      Object.assign(btn.style, {
+        background: 'linear-gradient(135deg, #357abd, #2e6da4)',
+        transform: 'translateY(-2px)',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+      });
+    });
+    btn.addEventListener('mouseleave', () => Object.assign(btn.style, baseStyle));
+  }
+  btn.addEventListener('click', action);
+  return btn;
+};
+
+const prevBtn = createPageButton('⬅️ 前のページ', () => this.changePage(this.currentPage - 1), this.currentPage === 0);
+const pageInfo = document.createElement('span');
+pageInfo.className = 'page-info';
+Object.assign(pageInfo.style, {
+  background: 'rgba(255, 255, 255, 0.15)',
+  color: 'white',
+  padding: '6px 12px',
+  borderRadius: '6px',
+  fontWeight: '600',
+  border: '1px solid rgba(255, 255, 255, 0.3)',
+  minWidth: '80px',
+  textAlign: 'center'
+});
+pageInfo.textContent = `${this.currentPage + 1} / ${this.totalPages}`;
+const nextBtn = createPageButton('次のページ ➡️', () => this.changePage(this.currentPage + 1), this.currentPage >= this.totalPages - 1);
+
+rightControls.appendChild(toggles);
+rightControls.appendChild(prevBtn);
+rightControls.appendChild(pageInfo);
+rightControls.appendChild(nextBtn);
 
     // === 左側コントロール ===
     const leftControls = document.createElement('div');
@@ -729,10 +1103,20 @@ const monsterDexState = {
       const monsterData = getMonsterById(id);
       if (monsterData) {
         monsterData.collected = this.dexSet.has(id);
-        const card = createCard(monsterData);
-        if (!card) return; // 未捕獲は非表示
-
-        // カードのスタイルを統一（KanjiDexと同様）
+        const card = createCard(monsterData, {
+          showUncollected: this.showUncollectedSilhouette,
+          isFavorite: this.favoritesSet.has(id),
+          onToggleFavorite: (monsterId, next) => {
+            if (next) this.favoritesSet.add(monsterId);
+            else this.favoritesSet.delete(monsterId);
+            saveFavorites(this.favoritesSet);
+            this.applyFiltersAndSort();
+            this.renderPage();
+            this.savePreferences();
+          }
+        });
+        if (!card) return;
+    
         Object.assign(card.style, {
           background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.8), rgba(160, 82, 45, 0.6))',
           border: '2px solid #8B4513',
@@ -742,9 +1126,10 @@ const monsterDexState = {
           cursor: monsterData.collected ? 'pointer' : 'default',
           transition: 'all 0.3s ease',
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-          color: '#fff'
+          color: '#fff',
+          position: 'relative'
         });
-
+    
         if (monsterData.collected) {
           card.addEventListener('mouseenter', () => {
             Object.assign(card.style, {
@@ -776,6 +1161,7 @@ const monsterDexState = {
     if (newPage >= 0 && newPage < this.totalPages) {
       this.currentPage = newPage;
       this.renderPage();
+      this.savePreferences();
       publish('playSE', 'decide');
     }
   },
