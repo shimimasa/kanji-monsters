@@ -1,7 +1,7 @@
 // js/settingsScreen.js
-import { gameState, saveGameData, loadGameData, clearSaveData } from '../core/gameState.js';
+import { gameState, saveGameData, loadGameData, clearSaveData, updatePlayerName } from '../core/gameState.js';
 import { drawButton, isMouseOverRect, drawThemeBackground, drawPanelBackground } from '../ui/uiRenderer.js';
-import { getCurrentUser } from '../services/firebase/firebaseController.js';
+import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
 import { publish } from '../core/eventBus.js';
 
 // レベルプリセット定義
@@ -66,7 +66,6 @@ const settingsScreenState = {
     this.registerHandlers();
   },
 
-  /** 設定画面専用のコンテナを作成 */
   createSettingsContainer(uiRoot) {
     // メインコンテナ
     const settingsContainer = document.createElement('div');
@@ -78,14 +77,18 @@ const settingsScreenState = {
     settingsTitle.textContent = '設定';
     settingsTitle.className = 'settings-title';
     settingsContainer.appendChild(settingsTitle);
+
+    // ▼ プレイヤー名パネルを追加
+    const namePanel = this.createPlayerNamePanel();
+    settingsContainer.appendChild(namePanel);
     
     // 表示設定パネル
-const displayPanel = this.createDisplayPanel();
-settingsContainer.appendChild(displayPanel);
+    const displayPanel = this.createDisplayPanel();
+    settingsContainer.appendChild(displayPanel);
 
-// オーディオ設定パネル
-const audioPanel = this.createAudioPanel();
-settingsContainer.appendChild(audioPanel);
+    // オーディオ設定パネル
+    const audioPanel = this.createAudioPanel();
+    settingsContainer.appendChild(audioPanel);
     
             // セーブとバックアップ
     const savePanel = this.createSavePanel();
@@ -326,6 +329,79 @@ settingsContainer.appendChild(audioPanel);
     
     descriptionElement.textContent = descriptions[mode] || descriptions.jikkuri;
   },
+
+
+  createPlayerNamePanel() {
+    const panel = document.createElement('div');
+    panel.className = 'settings-panel';
+  
+    const title = document.createElement('h3');
+    title.className = 'panel-title';
+    title.textContent = 'プレイヤー名';
+    panel.appendChild(title);
+  
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+  
+    const label = document.createElement('div');
+    label.className = 'setting-label';
+    label.textContent = 'なまえ（5もじまで）';
+  
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const input = document.createElement('input');
+  input.type = 'text';
+  input.maxLength = 5;
+  input.value = (gameState?.playerName || '').slice(0, 5);
+  input.placeholder = 'なまえ';
+
+  const apply = document.createElement('button');
+  apply.className = 'settings-button';
+  apply.textContent = '変更する';
+
+  const status = document.createElement('span');
+  status.style.marginLeft = '8px';
+  status.textContent = `（いまは: ${gameState?.playerName || '未設定'}）`;
+
+  const applyChange = async () => {
+    const name = input.value.trim();
+    if (
+      !name ||
+      name.length > 5 ||
+      name === 'ななしのごんべえ' ||
+      name === 'ゲスト' ||
+      name === '新規プレイヤー'
+    ) {
+      alert('有効な なまえを いれてください。（5もじまで）');
+      input.focus();
+      return;
+    }
+    publish('playSE', 'decide');
+    updatePlayerName(name);
+    try { saveGameData(); } catch {}
+
+    const user = getCurrentUser();
+    if (user?.uid) {
+      try { await initializeNewPlayerData(user.uid, name); } catch (e) { console.warn('Firebase更新失敗', e); }
+    }
+
+    status.textContent = `（いまは: ${name}）`;
+    this._showSaveToast('プレイヤー名を更新しました');
+  };
+
+  apply.addEventListener('click', applyChange);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') applyChange(); });
+
+  row.appendChild(input);
+  row.appendChild(apply);
+  row.appendChild(status);
+
+  group.appendChild(label);
+  group.appendChild(row);
+  panel.appendChild(group);
+  return panel;
+},
 
   /** オーディオ設定パネルを作成 */
   createAudioPanel() {
