@@ -4,7 +4,7 @@ import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
 import ReviewQueue from '../models/reviewQueue.js';
-import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
+import { getKanjiByGrade, getKanjiById, getKanjiByStageId } from '../loaders/dataLoader.js';
 import { isBonusUnlocked } from '../core/bonusManager.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
@@ -1202,33 +1202,66 @@ const worldStageSelectScreen = {
     const x = coords.x;
     const y = coords.y;
 
-       // 総復習モードのクリック（大ボタン）
-       const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
-       if (isReview) {
-         const btn = this.reviewChallengeButton;
-         if (isMouseOverRect(x, y, btn)) {
-           publish('playSE', 'decide');
-           if (ReviewQueue.size() > 0) {
-             publish('changeScreen', 'reviewStage');
-           } else {
-             const g = this.selectedGrade || 7; // 既定は4級相当
-             const bonusId = `bonus_g${g}`;
-             // 解放判定を追加
-             if (!isBonusUnlocked(g)) {
-               publish('playSE', 'wrong');
-               alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
-               return;
-             }
-             // 戻り先を世界編に固定
-             gameState.previousScreen = 'worldStageSelect';
-             gameState.currentStageId = bonusId;
-             resetStageProgress(bonusId);
-             publish('changeScreen', 'stageLoading');
-           }
-           return;
-         }
-         // タブ／フッターはこの後も処理する。ステージボタン／マーカーは後段で無効化する。
-       }
+            // 総復習モードのクリック（大ボタン）
+            const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
+            if (isReview) {
+              const btn = this.reviewChallengeButton;
+              if (isMouseOverRect(x, y, btn)) {
+                publish('playSE', 'decide');
+      
+                // 1) 今日の10問を作る（同日中は固定）
+                const today = new Date().toISOString().slice(0,10);
+                const cacheKey = `dailyReview_${today}_g${this.selectedGrade}`;
+                try {
+                  const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+                  if (cached && Array.isArray(cached.ids) && cached.ids.length && cached.stageId) {
+                    gameState.quickReviewTargets = cached;
+                  } else {
+                    // 代表ステージ（左パネルに出ている最初のステージを採用）
+                    const representative = (this.stages && this.stages[0]) ? this.stages[0] : null;
+                    if (!representative) {
+                      alert('復習できるステージが見つかりません。');
+                      return;
+                    }
+                    const stageId = representative.stageId;
+                    const stageKanji = getKanjiByStageId(stageId) || [];
+                    const stageIdSet = new Set(stageKanji.map(k => String(k.id)));
+      
+                    // 誤答からそのステージに属するIDのみ抽出
+                    const wrongRaw = Array.isArray(gameState.wrongKanjiList) ? gameState.wrongKanjiList : [];
+                    const wrongIds = Array.from(new Set(
+                      wrongRaw.map(w => (typeof w === 'object' && w && 'id' in w) ? String(w.id) : null)
+                             .filter(id => id && stageIdSet.has(id))
+                    ));
+      
+                    // 10件サンプル（不足はステージ内の未マスター等で補完してもOK：ここでは誤答優先で10件に丸める）
+                    const pick10 = (arr) => {
+                      const a = arr.slice();
+                      for (let i = a.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [a[i], a[j]] = [a[j], a[i]];
+                      }
+                      return a.slice(0, 10);
+                    };
+                    let ids = pick10(wrongIds);
+                    if (ids.length === 0) {
+                      alert('復習対象の誤答が見つかりませんでした。');
+                      return;
+                    }
+      
+                    const pack = { stageId, ids };
+                    gameState.quickReviewTargets = pack;
+                    localStorage.setItem(cacheKey, JSON.stringify(pack));
+                  }
+                } catch {}
+      
+                // 2) 画面遷移（クイック復習）
+                gameState.previousScreen = 'worldStageSelect';
+                publish('changeScreen', 'quickReviewPractice');
+                return;
+              }
+              // タブ／フッターはこの後も処理する。ステージボタン／マーカーは後段で無効化する。
+            }
 
     // タブクリック判定
     const tabCount = tabs.length;
