@@ -1107,7 +1107,7 @@
     "grade": 2,
     "thumb": "YMG-E09_thumb",
     "image": "YMG-E09.webp",
-    "isBoss": true,
+    "isBoss": false,
     "weakness": "kunyomi",
     "category": "自然",
     "habitat": "蔵王連峰",

@@ -77,24 +77,27 @@ const regionSelectState = {
     this.mapRect = null;
   },
 
-  /**
+    /**
    * 各地方の達成率を計算
    * @param {number} grade 学年（1-6）
    * @returns {number} 達成率（0-100）
    */
-  calculateRegionProgress(grade) {
-    // 該当学年のステージを取得
-    const regionStages = stageData.filter(stage => stage.grade === grade);
-    if (regionStages.length === 0) return 0;
+  // ← 追加: 通常ステージ判定（ボーナス等を除外）
+  isNormalStage(stage) {
+    const id = String(stage?.stageId || '');
+    return !( /^bonus_/i.test(id) || /_bonus$/i.test(id) );
+  },
 
+  calculateRegionProgress(grade) {
+    // 該当学年の通常ステージのみを取得
+    const regionStages = stageData.filter(stage => stage.grade === grade && this.isNormalStage(stage));
+    if (regionStages.length === 0) return 0;
     // クリア済みステージ数を計算
     const clearedStages = regionStages.filter(stage => {
-      // localStorageとgameState.stageProgressの両方をチェック
       const localStorageCleared = localStorage.getItem(`clear_${stage.stageId}`);
       const gameStateCleared = gameState.stageProgress && gameState.stageProgress[stage.stageId]?.cleared;
       return localStorageCleared || gameStateCleared;
     });
-
     return Math.round((clearedStages.length / regionStages.length) * 100);
   },
 
@@ -699,7 +702,7 @@ const regionSelectState = {
    */
   drawMarkerTooltip(marker) {
     const progress = this.calculateRegionProgress(marker.grade);
-    const regionStages = stageData.filter(stage => stage.grade === marker.grade);
+    const regionStages = stageData.filter(stage => stage.grade === marker.grade && this.isNormalStage(stage));
     const clearedStages = regionStages.filter(stage => {
       const localStorageCleared = localStorage.getItem(`clear_${stage.stageId}`);
       const gameStateCleared = gameState.stageProgress && gameState.stageProgress[stage.stageId]?.cleared;
@@ -769,9 +772,9 @@ const regionSelectState = {
         this.ctx.fillStyle = '#FFB74D';
         this.ctx.font = '12px sans-serif';
         const req = (marker.grade === 11)
-          ? '解放条件: 1〜6年の通常ステージを全てクリア'
-          : (marker.grade === 12 ? '解放条件: 他の地方の通常ステージを全てクリア' : '');
-        if (req) this.ctx.fillText(req, tooltipX + 10, tooltipY + 10);
+        ? '解放条件: 1〜6年の通常ステージを全てクリア'
+        : (marker.grade === 12 ? '解放条件: 1〜11年の通常ステージを全てクリア' : '');
+      if (req) this.ctx.fillText(req, tooltipX + 10, tooltipY + 10);
       }
     } catch {}
   },

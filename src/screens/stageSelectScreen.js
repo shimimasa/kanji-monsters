@@ -462,18 +462,24 @@ const stageSelectScreenState = {
     return localStorageCleared || gameStateCleared;
   },
 
-  // ← 追加: 地方アンロック判定（ステージ選択用）
-  isRegionUnlocked(grade) {
-    if (grade <= 6) return true;
-    const needMax = (grade === 11) ? 6 : 11;
-    for (let g = 1; g <= needMax; g++) {
-      const regionStages = stageData.filter(s => s.grade === g);
-      if (regionStages.length === 0) return false;
-      const cleared = regionStages.filter(s => this.isStageCleared(s.stageId)).length;
-      if (Math.round((cleared / regionStages.length) * 100) < 100) return false;
-    }
-    return true;
-  },
+    // ← 追加: 通常ステージ判定（ボーナス等を除外）
+    isNormalStage(stage) {
+      const id = String(stage?.stageId || '');
+      return !( /^bonus_/i.test(id) || /_bonus$/i.test(id) );
+    },
+  
+    // ← 追加: 地方アンロック判定（ステージ選択用）
+    isRegionUnlocked(grade) {
+      if (grade <= 6) return true;
+      const needMax = (grade === 11) ? 6 : 11;
+      for (let g = 1; g <= needMax; g++) {
+        const regionStages = stageData.filter(s => s.grade === g && this.isNormalStage(s));
+        if (regionStages.length === 0) return false;
+        const cleared = regionStages.filter(s => this.isStageCleared(s.stageId)).length;
+        if (Math.round((cleared / regionStages.length) * 100) < 100) return false;
+      }
+      return true;
+    },
 
   /** 次に挑戦すべきステージを取得 */
   getNextStage() {
