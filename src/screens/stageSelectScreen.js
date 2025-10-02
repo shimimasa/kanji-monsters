@@ -995,17 +995,11 @@ update(dt) {
     
     this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered);
 
-    // 未捕獲数バッジ（あと○体！）
-const uncaught = this._getUncaughtCount(stage.stageId);
-const badgeX = button.x + button.width - 110;
-const badgeY = button.y + 5;
-this._drawUncaughtBadge(this.ctx, badgeX, badgeY, uncaught);
     // アイコン追加
     ctx.fillStyle = 'white';
     ctx.font = '24px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('🎯', button.x + 30, button.y + button.height / 2);
-
     // 統計情報パネル
     this.drawReviewStats(ctx);
 
@@ -1034,11 +1028,19 @@ this._drawUncaughtBadge(this.ctx, badgeX, badgeY, uncaught);
           buttonColor = '#FF8C00'; // 選択中は鮮やかなオレンジ色
         }
 
-        // リッチなボタンを描画
-        this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered);
+                // リッチなボタンを描画
+                this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered);
 
-        // 追加情報の描画
-        ctx.textAlign = 'left';
+                // 未捕獲数バッジ（あと○体！）— ボタンの上に重ねる
+                {
+                  const uncaught = this._getUncaughtCount(stage.stageId);
+                  const badgeX = button.x + button.width - 110;
+                  const badgeY = button.y + 5;
+                  this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
+                }
+        
+                // 追加情報の描画
+                ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
         ctx.font = '12px sans-serif';
 

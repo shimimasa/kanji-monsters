@@ -986,18 +986,29 @@ this._dex = loadDex();
       ctx.shadowOffsetY = 0;
     }
 
-    // ステージボタンの描画（総復習モードでは表示しない）
     if (!this.isReviewMode && this.stageButtons && this.stageButtons.length > 0) {
       this.stageButtons.forEach(button => {
         const stage = button.stage;
         const isCleared = this.isStageCleared(stage.stageId);
-        const isNext = false; // 自動点滅を無効化
+        const isNext = false;
         const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
+
+        // ボタンの色
+        let buttonColor = '#2980b9';
+        if (isCleared) buttonColor = '#27ae60';
+        else if (isNext) buttonColor = '#e74c3c';
+
+        const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
+        if (isSelected) buttonColor = '#FF8C00';
+
+        // 先にボタンを描く
+        this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered, isSelected);
+
+        // ボタンの上に未捕獲数バッジを重ねる
         const uncaught = this._getUncaughtCount(stage.stageId);
-        const badgeX = button.x + button.width - 110; // 右寄り
+        const badgeX = button.x + button.width - 110;
         const badgeY = button.y + 5;
         this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
-
 
         // ボタンの色を決定
         let buttonColor = '#2980b9'; // デフォルト青
