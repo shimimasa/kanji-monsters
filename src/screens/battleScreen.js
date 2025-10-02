@@ -6,7 +6,6 @@ import { publish } from '../core/eventBus.js';
 import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
 import { checkAchievements } from '../core/achievementManager.js';
-import { stageData } from '../loaders/dataLoader.js';
 // 1. まず、ファイル冒頭にimportを追加
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
