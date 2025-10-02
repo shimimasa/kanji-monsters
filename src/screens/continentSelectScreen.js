@@ -2,8 +2,8 @@ import { publish } from '../core/eventBus.js';
 import { gameState } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { images } from '../loaders/assetsLoader.js';
+import { stageData } from '../loaders/dataLoader.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
-
 // 大陸マーカーの定義を修正（7行目付近）
 const continentMarkers = [
   // 漢検レベルを文字列として明示的に定義し、regionも追加
@@ -219,6 +219,46 @@ const continentSelectState = {
     }
   },
 
+// 大陸（=漢検レベル）ごとの達成率を算出（0-100）
+calculateContinentProgress(grade) {
+  try {
+    if (grade == null) return 0;
+    const stages = stageData.filter(s => s.grade === grade && this.isNormalStage(s));
+    if (stages.length === 0) return 0;
+    const cleared = stages.filter(s => {
+      const ls = localStorage.getItem(`clear_${s.stageId}`);
+      const gs = gameState.stageProgress && gameState.stageProgress[s.stageId]?.cleared;
+      return !!ls || !!gs;
+    });
+    return Math.round((cleared.length / stages.length) * 100);
+  } catch {
+    return 0;
+  }
+},
+
+// regionSelect と同じ見た目のプログレスバー
+drawProgressBar(x, y, progress, isHovered = false) {
+  const barWidth = isHovered ? 70 : 60;
+  const barHeight = isHovered ? 10 : 8;
+  const barX = x - barWidth / 2;
+  const barY = y - barHeight / 2;
+
+  this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  this.ctx.fillRect(barX, barY, barWidth, barHeight);
+
+  const w = (barWidth * (progress || 0)) / 100;
+  if (progress === 100) this.ctx.fillStyle = isHovered ? '#FFED4E' : '#FFD700';
+  else if (progress >= 75) this.ctx.fillStyle = isHovered ? '#4ADE80' : '#32CD32';
+  else if (progress >= 50) this.ctx.fillStyle = isHovered ? '#FBBF24' : '#FFA500';
+  else if (progress >= 25) this.ctx.fillStyle = isHovered ? '#FB7185' : '#FF6347';
+  else this.ctx.fillStyle = isHovered ? '#F87171' : '#FF4500';
+
+  this.ctx.fillRect(barX, barY, w, barHeight);
+  this.ctx.strokeStyle = '#FFFFFF';
+  this.ctx.lineWidth = isHovered ? 2 : 1;
+  this.ctx.strokeRect(barX, barY, barWidth, barHeight);
+},
+
   /**
    * フォールバック用のシンプルな世界地図描画
    * 世界地図画像が利用できない場合のみ使用
@@ -361,11 +401,24 @@ const continentSelectState = {
       this.ctx.ellipse(marker.x, marker.y, 18 * scale, 18 * scale, 0, 0, 2 * Math.PI);
       this.ctx.fill();
       
-      // 中央の点
-      this.ctx.fillStyle = isHovered ? this.lightenColor(marker.color, 30) : marker.color;
-      this.ctx.beginPath();
-      this.ctx.ellipse(marker.x, marker.y, 8 * scale, 8 * scale, 0, 0, 2 * Math.PI);
-      this.ctx.fill();
+            // 中央の点
+            this.ctx.fillStyle = isHovered ? this.lightenColor(marker.color, 30) : marker.color;
+            this.ctx.beginPath();
+            this.ctx.ellipse(marker.x, marker.y, 8 * scale, 8 * scale, 0, 0, 2 * Math.PI);
+            this.ctx.fill();
+      
+            // 進捗バーと%表示（regionSelectと同仕様）
+            const grade = this._kankenToGrade(String(marker.kanken_level));
+            const progress = this.calculateContinentProgress(grade);
+            this.drawProgressBar(marker.x, marker.y + 40 * scale, progress, isHovered);
+      
+            this.ctx.fillStyle = '#FFFFFF';
+            this.ctx.strokeStyle = '#000000';
+            this.ctx.lineWidth = 1;
+            this.ctx.textAlign = 'center';
+            this.ctx.font = `bold ${12 * (isHovered ? 1.1 : 1)}px sans-serif`;
+            this.ctx.strokeText(`${progress}%`, marker.x, marker.y + 65 * scale);
+            this.ctx.fillText(`${progress}%`, marker.x, marker.y + 65 * scale);
 
             // 漢検レベル表示
             this.ctx.fillStyle = '#FFFFFF';
