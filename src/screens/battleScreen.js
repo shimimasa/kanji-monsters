@@ -917,37 +917,47 @@ updateShieldBreakEffect() {
       const stageIdx = getStageOrderIndex(gameState.currentStageId);
       const pl = gameState.playerStats?.level || 1;
 
-      // 敵パラメータ算出（プレイヤー比例＋ステージ係数）
-      const computeEnemyParams = ({ isBoss, stageIdx, playerLevel }) => {
-        const hp = Math.max(15, Math.round(
-          isBoss
-            ? (60 + 2.2 * stageIdx + 1.6 * playerLevel)
-            : (30 + 1.6 * stageIdx + 1.1 * playerLevel)
-        ));
-        const atk = Math.max(1, Math.round(
-          isBoss
-            ? (5 + 0.08 * stageIdx + 0.20 * playerLevel)
-            : (4 + 0.06 * stageIdx + 0.12 * playerLevel)
-        ));
-        // 表示用の敵レベル（使用箇所に合わせて拡張可）
-        const level = Math.max(1, Math.round(0.7 * playerLevel + 0.3 * (1 + stageIdx / 10)));
-
-        // 動的EXP（通常のみ使用。ボーナスは別ロジックで0）
-        const expBase = isBoss
-          ? (35 + 0.6 * stageIdx + 1.2 * playerLevel)
-          : (25 + 0.4 * stageIdx + 0.8 * playerLevel);
-        const exp = Math.max(5, Math.round(expBase));
-        return { hp, atk, level, exp };
-      };
+            // 敵パラメータ算出（プレイヤー比例＋ステージ係数）
+            const computeEnemyParams = ({ isBoss, stageIdx, playerLevel, playerAtk = 0, playerMaxHp = 1 }) => {
+              const hp = Math.max(15, Math.round(
+                isBoss
+                  ? (60 + 2.2 * stageIdx + 1.6 * playerLevel)
+                  : (30 + 1.6 * stageIdx + 1.1 * playerLevel)
+              ));
+      
+              const atkBase = isBoss
+                ? (5 + 0.08 * stageIdx + 0.20 * playerLevel)
+                : (4 + 0.06 * stageIdx + 0.12 * playerLevel);
+      
+              // 緩やかな比例項＋安全上限（%はゲームバランス用）
+              const uncapped = isBoss
+                ? (atkBase + 0.22 * playerAtk + 0.04 * playerMaxHp)
+                : (atkBase + 0.18 * playerAtk + 0.03 * playerMaxHp);
+              const cap = Math.max(1, Math.floor(playerMaxHp * (isBoss ? 0.30 : 0.25)));
+              const atk = Math.max(1, Math.min(cap, Math.round(uncapped)));
+      
+              const level = Math.max(1, Math.round(0.7 * playerLevel + 0.3 * (1 + stageIdx / 10)));
+              const expBase = isBoss
+                ? (35 + 0.6 * stageIdx + 1.2 * playerLevel)
+                : (25 + 0.4 * stageIdx + 0.8 * playerLevel);
+              const exp = Math.max(5, Math.round(expBase));
+              return { hp, atk, level, exp };
+            };
 
       // 敵の強さをスケール（全ステージ対象、ボスはやや高め）
       gameState.enemies = gameState.enemies.map((e, idx, arr) => {
         const willBeBoss = !!e.isBoss || idx === arr.length - 1;
-        const { hp, atk, level, exp } = computeEnemyParams({ isBoss: willBeBoss, stageIdx, playerLevel: pl });
+        const { hp, atk, level, exp } = computeEnemyParams({
+          isBoss: willBeBoss,
+          stageIdx,
+          playerLevel: pl,
+          playerAtk: gameState.playerStats?.attack || 0,
+          playerMaxHp: gameState.playerStats?.maxHp || 1
+        });
         e.maxHp = hp; e.hp = hp;
         e.atk = atk;
         e.level = level;
-        e.exp = exp; // defeat時に使用（ボーナス中は別途0に）
+        e.exp = exp;
         return e;
       });
 
@@ -5094,8 +5104,11 @@ function onHeal() {
     // 回復前のHPを保存
     const prevHp = gameState.playerStats.hp;
     publish('playSE', 'heal');
-    let healAmount = calculateHealAmount(gameState.playerStats.level);
-
+    let healAmount = calculateHealAmount(
+      gameState.playerStats.level,
+      gameState.playerStats.attack,
+      gameState.playerStats.maxHp
+    );
     // 追加: 5連続正解ボーナス（回復時）
     if (battleState.comboCount === 5) {
       healAmount = Math.floor(healAmount * 1.5);
@@ -5721,16 +5734,15 @@ const UI_THEME = {
 const threshold = 240; // 白と判定する明るさのしきい値
 const colorDifferenceThreshold = 15; // R,G,B間の許容色差
 
-// 回復量をレベルに応じて計算する関数
-function calculateHealAmount(playerLevel) {
-  // 基本回復量（レベル1の時）
-  const baseHeal = 30;
-  
-  // レベルごとの増加量
-  const levelBonus = Math.floor(playerLevel * 2.5);
-  
-  // 合計回復量（基本値 + レベルボーナス）
-  return baseHeal + levelBonus;
+// 回復量をレベル/攻撃/最大HPに応じて計算（上限: 最大HPの40%）
+function calculateHealAmount(playerLevel, playerAttack, playerMaxHp) {
+  const base = 20;
+  const levelBonus = Math.floor(playerLevel * 1.8);
+  const atkBonus = Math.floor((playerAttack || 0) * 0.25);
+  const hpBonus  = Math.floor((playerMaxHp || 1) * 0.05);
+  const raw = base + levelBonus + atkBonus + hpBonus;
+  const cap = Math.max(12, Math.floor((playerMaxHp || 1) * 0.40));
+  return Math.max(12, Math.min(cap, raw));
 }
 
 // 読み進捗のエントリを確保
