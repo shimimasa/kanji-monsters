@@ -219,6 +219,23 @@ const continentSelectState = {
     }
   },
 
+  // ← 追加: 通常ステージ判定（ボーナス等を除外）
+isNormalStage(stage) {
+  const id = String(stage?.stageId || '');
+  return !( /^bonus_/i.test(id) || /_bonus$/i.test(id) );
+},
+
+// ← 追加: 漢検レベル → 学年マップ（世界ステージ）
+_kankenToGrade(level) {
+  const s = String(level).trim();
+  if (s === '4' || s === '４') return 7;
+  if (s === '3' || s === '３') return 8;
+  if (s === '準2' || s === '准2' || s === '準２' || s === '准２') return 9;
+  if (s === '2' || s === '２') return 10;
+  return null;
+},
+
+
 // 大陸（=漢検レベル）ごとの達成率を算出（0-100）
 calculateContinentProgress(grade) {
   try {
