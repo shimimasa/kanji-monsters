@@ -3042,7 +3042,7 @@ drawEnemyStatusPanel(ctx) {
     padY: 8,
     colors: {
       normal: '#3498db',
-      elite:  '#9b59b6',
+      elite:  '#3498db',
       boss:   '#e74c3c',
       empty:  'rgba(255,255,255,0.15)',
       done:   'rgba(255,255,255,0.65)',
@@ -3153,7 +3153,47 @@ drawEnemyStatusPanel(ctx) {
     // 文字
     this.drawTextWithOutline(label, cx, cy, 'white', 'black', 'bold 16px "UDデジタル教科書体", sans-serif', 'center', 'middle', 2);
     ctx.restore();
+    return { x, y, w, h };
   },
+
+  drawShieldCounterBadge(ctx, leftX, cy, count, h = 26) {
+    const label = `🛡 ${count}`;
+    ctx.save();
+    ctx.font = 'bold 15px "UDデジタル教科書体", sans-serif';
+    const tw = Math.ceil(ctx.measureText(label).width);
+    const w = tw + 18;
+    const x = leftX;
+    const y = cy - Math.floor(h / 2);
+    const r = Math.floor(h / 2);
+
+    // 青グラデのピル
+    const g = ctx.createLinearGradient(x, y, x, y + h);
+    g.addColorStop(0, '#3498db');
+    g.addColorStop(1, '#2980b9');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    ctx.fill();
+
+    // 縁
+    ctx.strokeStyle = '#1f4e79';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 文字
+    const cx = x + Math.floor(w / 2);
+    this.drawTextWithOutline(label, cx, cy, 'white', 'black', 'bold 15px "UDデジタル教科書体", sans-serif', 'center', 'middle', 2);
+    ctx.restore();
+    return { x, y, w, h };
+    
+  },
+
+  
   drawFootprints(ctx, x1, x2, y) {
     if (x2 <= x1) return;
     ctx.save();
@@ -3184,12 +3224,20 @@ drawEnemyStatusPanel(ctx) {
     const remain = Math.max(0, total - (gameState.currentEnemyIndex || 0)); // 現在を含めた残数
 
     // 敵枠の真下に余白を設けて配置（枠と重ならない）
-    const marginBelowFrame = 10;   // 枠からの下マージン
-    const badgeHalfH       = 13;   // drawRemainingBadgeの高さ26pxの半分
-    const cx = frameArea.x + Math.floor(frameArea.width / 2);
-    const cy = frameArea.y + frameArea.height + marginBelowFrame + badgeHalfH;
+const marginBelowFrame = 10;   // 枠からの下マージン
+const badgeHalfH       = 13;   // drawRemainingBadgeの高さ26pxの半分
+const cx = frameArea.x + Math.floor(frameArea.width / 2);
+const cy = frameArea.y + frameArea.height + marginBelowFrame + badgeHalfH;
 
-    this.drawRemainingBadge(ctx, cx, cy, remain);
+const baseRect = this.drawRemainingBadge(ctx, cx, cy, remain);
+
+// ボスにシールドがある場合、右に残回数バッジを表示
+const enemy = gameState.currentEnemy || gameState.enemies?.[Math.max(0, (gameState.currentEnemyIndex||0))];
+if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
+  const gap = 8;
+  const leftX = baseRect.x + baseRect.w + gap;
+  this.drawShieldCounterBadge(ctx, leftX, cy, enemy.shieldHp, baseRect.h);
+}
   },
   exit() {
     // 入力欄を非表示＆キーイベント解除
@@ -5881,7 +5929,6 @@ function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'norma
   const frameThickness = 6;
   const innerPadding = 8;
   
-  // スタイル別の色設定
   const styles = {
     normal: {
       outerColor: '#4a5568',
@@ -5891,11 +5938,11 @@ function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'norma
       accentColor: '#4299e1'
     },
     elite: {
-      outerColor: '#9f7aea',
-      innerColor: '#553c9a',
-      glowColor: '#d53f8c',
-      bgColor: 'rgba(85, 60, 154, 0.8)',
-      accentColor: '#b794f6'
+      outerColor: '#4a5568',
+      innerColor: '#2d3748',
+      glowColor: '#63b3ed',
+      bgColor: 'rgba(45, 55, 72, 0.8)',
+      accentColor: '#4299e1'
     },
     boss: {
       outerColor: '#e53e3e',
