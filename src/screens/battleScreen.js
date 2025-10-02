@@ -1200,25 +1200,46 @@ if (typeof drawStoneButton === 'function') {
   this.ctx.fillText(BTN.stage.label, BTN.stage.x + BTN.stage.w / 2, BTN.stage.y + BTN.stage.h / 2);
 }
 
-// ← 追加: 現在ステージ名ラベル
+// ← ステージ名を視認性高く（非ボタン風のタイトルチップ）
 try {
   const st = stageData.find(s => s.stageId === gameState.currentStageId);
   const title = st?.name;
   if (title) {
-    const tx = BTN.stage.x + BTN.stage.w + 12;
-    const ty = BTN.stage.y;
-    this.ctx.font = '14px "UDデジタル教科書体", sans-serif';
-    const tw = Math.ceil(this.ctx.measureText(title).width) + 16;
-    const th = BTN.stage.h;
-    this.ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    this.ctx.fillRect(tx, ty, tw, th);
-    this.ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    const baseX = BTN.stage.x + BTN.stage.w + 14;
+    const baseY = BTN.stage.y + 2;
+
+    const icon = '🗺️';
+    this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+    const iconW = Math.ceil(this.ctx.measureText(icon).width);
+    const textW = Math.ceil(this.ctx.measureText(title).width);
+
+    const padX = 12, padY = 6;
+    const h = 18 + padY * 2;
+    const w = iconW + 8 + textW + padX * 2;
+
+    const x = baseX;
+    const y = baseY + Math.floor((BTN.stage.h - h) / 2);
+
+    // 背景: 半透明ダーク + 左側アクセントバー
+    this.ctx.save();
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+    this.ctx.fillRect(x, y, w, h);
+    this.ctx.fillStyle = '#63b3ed'; // アクセント
+    this.ctx.fillRect(x, y, 4, h);
+    this.ctx.strokeStyle = 'rgba(255,255,255,0.45)';
     this.ctx.lineWidth = 1;
-    this.ctx.strokeRect(tx, ty, tw, th);
+    this.ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+
+    // テキスト（影付き）
     this.ctx.fillStyle = '#fff';
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillText(title, tx + 8, ty + th / 2);
+    this.ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    this.ctx.shadowBlur = 4;
+    const textX = x + padX + iconW + 8;
+    this.ctx.fillText(icon, x + padX, y + h / 2);
+    this.ctx.fillText(title, textX, y + h / 2);
+    this.ctx.restore();
   }
 } catch {}
 
