@@ -1037,20 +1037,20 @@ const BTN = {
   const isHovered = this.mouseX && this.mouseY
     ? (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h)
     : false;
-  if (typeof drawStoneButton === 'function') {
-    drawStoneButton(this.ctx, b, isHovered, false);
-  } else {
-    this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
-    this.ctx.fillRect(b.x, b.y, b.w, b.h);
-    this.ctx.fillStyle = 'white';
-    this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'middle';
-    this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
-    this.ctx.strokeStyle = 'white';
-    this.ctx.lineWidth = 2;
-    this.ctx.strokeRect(b.x, b.y, b.w, b.h);
-  }
+    if (typeof drawStoneButton === 'function') {
+      drawStoneButton(this.ctx, BTN.stage.x, BTN.stage.y, BTN.stage.w, BTN.stage.h, BTN.stage.label, hovered, pressed);
+    } else {
+      this.ctx.fillStyle = hovered ? '#4e6d8c' : '#34495e';
+      this.ctx.fillRect(BTN.stage.x, BTN.stage.y, BTN.stage.w, BTN.stage.h);
+      this.ctx.strokeStyle = 'white';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(BTN.stage.x, BTN.stage.y, BTN.stage.w, BTN.stage.h);
+      this.ctx.fillStyle = 'white';
+      this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(BTN.stage.label, BTN.stage.x + BTN.stage.w / 2, BTN.stage.y + BTN.stage.h / 2);
+    }
 });
 
     // ③ 漢字ボックス描画

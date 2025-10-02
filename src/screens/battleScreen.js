@@ -1176,7 +1176,7 @@ BTN.stage.y = topMargin;
 const hovered = isMouseOverRect(this.mouseX, this.mouseY, BTN.stage);
 const pressed = false;
 if (typeof drawStoneButton === 'function') {
-  drawStoneButton(this.ctx, BTN.stage, hovered, pressed);
+  drawStoneButton(this.ctx, BTN.stage.x, BTN.stage.y, BTN.stage.w, BTN.stage.h, BTN.stage.label, hovered, pressed);
 } else {
   this.ctx.fillStyle = hovered ? '#4e6d8c' : '#34495e';
   this.ctx.fillRect(BTN.stage.x, BTN.stage.y, BTN.stage.w, BTN.stage.h);
