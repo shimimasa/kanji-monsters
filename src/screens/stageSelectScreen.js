@@ -7,6 +7,8 @@ import reviewQueue from '../models/reviewQueue.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { calcBonusReward, isFirstClear, markBonusFirstClear, isBonusUnlocked } from '../core/bonusManager.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import { getEnemiesByStageId } from '../loaders/dataLoader.js';
+import { loadDex } from '../models/monsterDex.js';
 
 /** 角丸矩形を描画するヘルパー関数 */
 function drawRoundedRect(ctx, x, y, width, height, radius) {
@@ -111,6 +113,13 @@ function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime, 
     drawRoundedRect(ctx, x0 + 2, insetY, tabW - 4, insetH, cornerRadius);
     ctx.fill();
     
+// 例: update() のステージボタン描画直後
+const uncaught = this._getUncaughtCount(stage.stageId);
+const badgeX = button.x + button.width - 110; // 右寄り
+const badgeY = button.y + 5;
+this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
+
+
     // 枠線
     if (isSelected) {
       ctx.strokeStyle = '#ffffff';
@@ -324,6 +333,47 @@ const stageSelectScreenState = {
     text: '今日の復習に挑戦！'
   },
 
+// ファイル内どこか（methods領域）
+_getUncaughtCount(stageId) {
+  try {
+    this._uncaughtCache = this._uncaughtCache || new Map();
+    if (this._uncaughtCache.has(stageId)) return this._uncaughtCache.get(stageId);
+    const dex = this._dex || loadDex();
+    const enemies = getEnemiesByStageId(stageId) || [];
+    const ids = enemies.map(e => String(e.id));
+    const cnt = ids.filter(id => !dex.has(id)).length;
+    this._uncaughtCache.set(stageId, cnt);
+    return cnt;
+  } catch { return 0; }
+},
+
+_drawUncaughtBadge(ctx, x, y, count) {
+  if (!count || count <= 0) return;
+  const label = `あと ${count} たい！`;
+  ctx.save();
+  ctx.font = '12px "UDデジタル教科書体", sans-serif';
+  const tw = Math.ceil(ctx.measureText(label).width);
+  const w = tw + 16, h = 18;
+  const r = h / 2;
+  ctx.fillStyle = '#f39c12';
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#8e4400';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + w / 2, y + h / 2);
+  ctx.restore();
+},
+
   /** 画面表示時の初期化 */
   enter(arg) {
     // BGM 再生 & canvas 取得
@@ -400,7 +450,9 @@ const stageSelectScreenState = {
   updateStageList() {
     // 選択中のステージをクリア
     this.selectedStage = null;
-
+    // 適切な初期化箇所で
+this._uncaughtCache = new Map();
+this._dex = loadDex();
     // 既存のフィルタリング処理
     this.stages = (gameState.currentGrade === 0)
       ? stageData

@@ -6,6 +6,7 @@ import { publish } from '../core/eventBus.js';
 import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
 import { checkAchievements } from '../core/achievementManager.js';
+import { stageData } from '../loaders/dataLoader.js';
 // 1. まず、ファイル冒頭にimportを追加
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
@@ -1170,7 +1171,7 @@ const topMargin = 20;
 BTN.stage.label = 'もどる';
 BTN.stage.w = 120;
 BTN.stage.h = 36;
-BTN.stage.x = topMargin;   // ← 左上
+BTN.stage.x = topMargin;
 BTN.stage.y = topMargin;
 
 const hovered = isMouseOverRect(this.mouseX, this.mouseY, BTN.stage);
@@ -1189,6 +1190,28 @@ if (typeof drawStoneButton === 'function') {
   this.ctx.textBaseline = 'middle';
   this.ctx.fillText(BTN.stage.label, BTN.stage.x + BTN.stage.w / 2, BTN.stage.y + BTN.stage.h / 2);
 }
+
+// ← 追加: 現在ステージ名ラベル
+try {
+  const st = stageData.find(s => s.stageId === gameState.currentStageId);
+  const title = st?.name;
+  if (title) {
+    const tx = BTN.stage.x + BTN.stage.w + 12;
+    const ty = BTN.stage.y;
+    this.ctx.font = '14px "UDデジタル教科書体", sans-serif';
+    const tw = Math.ceil(this.ctx.measureText(title).width) + 16;
+    const th = BTN.stage.h;
+    this.ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    this.ctx.fillRect(tx, ty, tw, th);
+    this.ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeRect(tx, ty, tw, th);
+    this.ctx.fillStyle = '#fff';
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText(title, tx + 8, ty + th / 2);
+  }
+} catch {}
 
 /* 敵（新しいモンスター枠付き） */
 const enemy = gameState.currentEnemy;

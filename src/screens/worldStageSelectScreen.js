@@ -7,7 +7,8 @@ import ReviewQueue from '../models/reviewQueue.js';
 import { getKanjiByGrade, getKanjiById, getKanjiByStageId } from '../loaders/dataLoader.js';
 import { isBonusUnlocked } from '../core/bonusManager.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
-
+import { getEnemiesByStageId } from '../loaders/dataLoader.js';
+import { loadDex } from '../models/monsterDex.js';
 // === 1. importの後に共通関数を追加 ===
 
 /** 角丸矩形を描画するヘルパー関数 */
@@ -420,6 +421,10 @@ const worldStageSelectScreen = {
     // 初期値を設定
     this.selectedTabLevel = "4"; // デフォルトは4級
     this.selectedGrade = 7;     // デフォルトは7（4級）
+
+// 適切な初期化箇所で
+this._uncaughtCache = new Map();
+this._dex = loadDex();
 
     // デフォルトの漢検レベルを設定（大陸情報から取得）
     if (this.continentInfo && this.continentInfo.kanken_level) {
@@ -988,6 +993,11 @@ const worldStageSelectScreen = {
         const isCleared = this.isStageCleared(stage.stageId);
         const isNext = false; // 自動点滅を無効化
         const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
+        const uncaught = this._getUncaughtCount(stage.stageId);
+        const badgeX = button.x + button.width - 110; // 右寄り
+        const badgeY = button.y + 5;
+        this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
+
 
         // ボタンの色を決定
         let buttonColor = '#2980b9'; // デフォルト青
@@ -1350,6 +1360,47 @@ const worldStageSelectScreen = {
       return;
     }
   },  
+
+  // ファイル内どこか（methods領域）
+_getUncaughtCount(stageId) {
+  try {
+    this._uncaughtCache = this._uncaughtCache || new Map();
+    if (this._uncaughtCache.has(stageId)) return this._uncaughtCache.get(stageId);
+    const dex = this._dex || loadDex();
+    const enemies = getEnemiesByStageId(stageId) || [];
+    const ids = enemies.map(e => String(e.id));
+    const cnt = ids.filter(id => !dex.has(id)).length;
+    this._uncaughtCache.set(stageId, cnt);
+    return cnt;
+  } catch { return 0; }
+},
+
+_drawUncaughtBadge(ctx, x, y, count) {
+  if (!count || count <= 0) return;
+  const label = `あと ${count} たい！`;
+  ctx.save();
+  ctx.font = '12px "UDデジタル教科書体", sans-serif';
+  const tw = Math.ceil(ctx.measureText(label).width);
+  const w = tw + 16, h = 18;
+  const r = h / 2;
+  ctx.fillStyle = '#f39c12';
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#8e4400';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + w / 2, y + h / 2);
+  ctx.restore();
+},
 
   // ★★★ マスターモード開始処理を追加 ★★★
   /**
