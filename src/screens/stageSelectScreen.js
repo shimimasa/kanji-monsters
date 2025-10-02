@@ -368,6 +368,33 @@ _drawUncaughtBadge(ctx, x, y, count) {
   ctx.restore();
 },
 
+// 全捕獲マーク（緑のピル型バッジ）
+_drawAllCaughtMark(ctx, x, y) {
+  const label = 'コンプ!';
+  ctx.save();
+  ctx.font = '12px "UDデジタル教科書体", sans-serif';
+  const tw = Math.ceil(ctx.measureText(label).width);
+  const w = tw + 16, h = 18;
+  const r = h / 2;
+  ctx.fillStyle = '#27ae60';
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#145a32';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + w / 2, y + h / 2);
+  ctx.restore();
+},
+
   /** 画面表示時の初期化 */
   enter(arg) {
     // BGM 再生 & canvas 取得
