@@ -1010,35 +1010,17 @@ this._dex = loadDex();
         const badgeY = button.y + 5;
         this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
 
-        // ボタンの色を決定
-        let buttonColor = '#2980b9'; // デフォルト青
-        if (isCleared) {
-          buttonColor = '#27ae60'; // クリア済みは緑
-        } else if (isNext) {
-          buttonColor = '#e74c3c'; // 次に挑戦すべきは赤
-        }
-
-        // 選択中のボタンは目立つ色に変更
-        const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
-        if (isSelected) {
-          buttonColor = '#FF8C00'; // 選択中は鮮やかなオレンジ色
-        }
-
-        // リッチなボタンを描画
-        this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered, isSelected);
-
-        // 追加情報の描画
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.font = '12px sans-serif';
-
-        // 選択中のボタンには特別なマーク（チェックマーク）を表示
-        if (isSelected) {
-          ctx.fillStyle = '#FFFFFF';
-          ctx.font = '16px sans-serif';
-          ctx.fillText('✓', button.x + 10, button.y + 5);
-        }
-
+                // 追加情報の描画
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.font = '12px sans-serif';
+        
+                if (isSelected) {
+                  ctx.fillStyle = '#FFFFFF';
+                  ctx.font = '16px sans-serif';
+                  ctx.fillText('✓', button.x + 10, button.y + 5);
+                }
+        
                 // クリア状況（星アイコン）
                 if (isCleared) {
                   ctx.fillStyle = '#FFD700';
