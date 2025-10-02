@@ -48,7 +48,7 @@ const RECENT_QUESTIONS_BUFFER_SIZE = 5; // 直近5問は出題しない
 
 const BTN = {
   back:   { x: 20,  y: 20,  w: 100, h: 30,  label: 'タイトルへ' },
-  stage:  { x: 40, y: 20,  w: 220, h: 30,  label: 'ステージ選択（もどる）' },
+  stage:  { x: 40,  y: 20,  w: 120, h: 36,  label: 'もどる' }, // ← 名称・サイズ更新
   attack: { x: 230, y: 380, w: 110, h: 50,  label: 'こうげき' },
   heal:   { x: 350, y: 380, w: 110, h: 50,  label: 'かいふく' },
   hint:   { x: 470, y: 380, w: 110, h: 50,  label: 'ヒント' },
@@ -1164,22 +1164,30 @@ getMaxHealCountFromSettings() {
     grad.addColorStop(1, '#2a5298');
     this.ctx.fillStyle = grad;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    }
+    }// ② 右上「もどる」ボタン（石版デザイン）
+const margin = 20;
+BTN.stage.label = 'もどる';
+BTN.stage.w = 120;
+BTN.stage.h = 36;
+BTN.stage.x = this.canvas.width - BTN.stage.w - margin;
+BTN.stage.y = margin;
 
-       // ② 左上に「ステージ選択」ボタンを描画（リッチなデザイン）
-       [BTN.stage].forEach(b => {
-        const isHovered = isMouseOverRect(this.mouseX, this.mouseY, b);
-        this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
-        this.ctx.fillRect(b.x, b.y, b.w, b.h);
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2);
-        this.ctx.strokeStyle = 'white';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(b.x, b.y, b.w, b.h);
-      });
+const hovered = isMouseOverRect(this.mouseX, this.mouseY, BTN.stage);
+const pressed = false; // 押下状態を使う場合はフラグで管理
+if (typeof drawStoneButton === 'function') {
+  drawStoneButton(this.ctx, BTN.stage, hovered, pressed);
+} else {
+  this.ctx.fillStyle = hovered ? '#4e6d8c' : '#34495e';
+  this.ctx.fillRect(BTN.stage.x, BTN.stage.y, BTN.stage.w, BTN.stage.h);
+  this.ctx.strokeStyle = 'white';
+  this.ctx.lineWidth = 2;
+  this.ctx.strokeRect(BTN.stage.x, BTN.stage.y, BTN.stage.w, BTN.stage.h);
+  this.ctx.fillStyle = 'white';
+  this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
+  this.ctx.textAlign = 'center';
+  this.ctx.textBaseline = 'middle';
+  this.ctx.fillText(BTN.stage.label, BTN.stage.x + BTN.stage.w / 2, BTN.stage.y + BTN.stage.h / 2);
+}
 
 /* 敵（新しいモンスター枠付き） */
 const enemy = gameState.currentEnemy;

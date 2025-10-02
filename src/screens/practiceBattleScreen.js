@@ -956,9 +956,10 @@ if (this.unmasteredKanji.length === 0) {
       const x = (eventX - rect.left) * scaleX;
       const y = (eventY - rect.top) * scaleY;
 
-      const BTN = {
-        stage:  { x: 140, y: 20,  w: 120, h: 30 },
-      };
+      const margin = 20;
+const BTN = {
+  stage:  { x: this.canvas.width - 120 - margin, y: margin, w: 120, h: 36, label: 'もどる' },
+};
 
       const isMouseOverRect = (mx, my, rect) => {
         return mx >= rect.x && mx <= rect.x + rect.w && 
@@ -1027,24 +1028,31 @@ gameState.enemies = originalEnemies;
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-        // ② 上部ボタン描画（ステージ選択のみ）
-        const BTN = {
-          stage:  { x: 40, y: 20,  w: 220, h: 30,  label: 'ステージ選択（もどる）' },
-        };
-        [BTN.stage].forEach(b => {
-          const isHovered = this.mouseX && this.mouseY ? 
-            (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h) : false;
-          this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
-          this.ctx.fillRect(b.x, b.y, b.w, b.h);
-          this.ctx.fillStyle = 'white';
-          this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
-          this.ctx.textAlign = 'center';
-          this.ctx.textBaseline = 'middle';
-          this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
-          this.ctx.strokeStyle = 'white';
-          this.ctx.lineWidth = 2;
-          this.ctx.strokeRect(b.x, b.y, b.w, b.h);
-        });
+       // ② 上部ボタン描画（右上「もどる」）
+const margin = 20;
+const BTN = {
+  stage: { x: this.canvas.width - 120 - margin, y: margin, w: 120, h: 36, label: 'もどる' },
+};
+
+[BTN.stage].forEach(b => {
+  const isHovered = this.mouseX && this.mouseY
+    ? (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h)
+    : false;
+  if (typeof drawStoneButton === 'function') {
+    drawStoneButton(this.ctx, b, isHovered, false);
+  } else {
+    this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
+    this.ctx.fillRect(b.x, b.y, b.w, b.h);
+    this.ctx.fillStyle = 'white';
+    this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
+    this.ctx.strokeStyle = 'white';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(b.x, b.y, b.w, b.h);
+  }
+});
 
     // ③ 漢字ボックス描画
     this._drawKanjiBoxWithEffects();
