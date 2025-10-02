@@ -993,14 +993,17 @@ if (this.unmasteredKanji.length === 0) {
       gameState.enemies = [];
       
       // 最小限のバトルUI描画
-      this._drawMinimalBattleUI(dt);
-      
-      // 🎨 改善されたUIを描画
-      this._hideEnemyAndPlayerUIAreas();
-      this._drawImprovedPracticeUI();
-      
-      gameState.currentEnemy = originalEnemy;
-      gameState.enemies = originalEnemies;
+this._drawMinimalBattleUI(dt);
+
+// 🎨 改善されたUIを描画
+this._hideEnemyAndPlayerUIAreas();
+this._drawImprovedPracticeUI();
+
+// ← 追加: 漢字パネル＋エフェクトを最前面に再描画（上書きで見切れ防止）
+this._drawKanjiBoxWithEffects();
+
+gameState.currentEnemy = originalEnemy;
+gameState.enemies = originalEnemies;
       
     } catch (error) {
       console.error('❌ 描画更新エラー:', error);

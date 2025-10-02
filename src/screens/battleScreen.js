@@ -1181,9 +1181,24 @@ getMaxHealCountFromSettings() {
         this.ctx.strokeRect(b.x, b.y, b.w, b.h);
       });
 
-    /* 敵（新しいモンスター枠付き） */
+/* 敵（新しいモンスター枠付き） */
 const enemy = gameState.currentEnemy;
-const ex = 500, ey = 120, ew = 240, eh = 120;
+
+// ← 変更: 漢字パネルの右側に枠が被らないように動的配置
+const ew = 240, eh = 120;
+const { centerX: kx, width: kw } = this.getKanjiBoxMetrics();
+const kanjiRight = kx + kw / 2;
+const margin = 24;    // パネルとの余白
+const outerPad = 10;  // drawMonsterFrame で足す余白(左右合計20)
+let ex = Math.max(kanjiRight + margin + outerPad, 520); // 既定より少し右へ
+let ey = 120;
+
+// キャンバス端でクリップ（はみ出し防止）
+const outerW = ew + 20;
+if (this.canvas) {
+  const maxEx = (this.canvas.width - outerW) - outerPad;
+  ex = Math.min(ex, maxEx);
+}
 
 // アニメーション用オフセット計算
 let offsetX = 0, offsetY = 0, rotateAngle = 0, alpha = 1;
@@ -1201,18 +1216,6 @@ else if (battleState.enemyAction === 'attack' && battleState.enemyActionTimer > 
   const t     = battleState.enemyActionTimer;
   const progress = (half - Math.abs(t - half)) / half;
   offsetX = -progress * 30;
-  battleState.enemyActionTimer--;
-  if (battleState.enemyActionTimer === 0) {
-    battleState.enemyAction = null;
-  }
-}
-
-if (battleState.enemyAction === 'defeat' && battleState.enemyActionTimer > 0) {
-  const total    = ENEMY_DEFEAT_ANIM_DURATION;
-  const timer    = battleState.enemyActionTimer;
-  const progress = (total - timer) / total;
-  rotateAngle    = progress * (Math.PI / 2);
-  alpha          = 1 - progress;
   battleState.enemyActionTimer--;
   if (battleState.enemyActionTimer === 0) {
     battleState.enemyAction = null;
