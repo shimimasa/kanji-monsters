@@ -1101,6 +1101,12 @@ gameState.enemies = originalEnemies;
     const adjustedX = kanjiX - (scaledW / 2) + offsetX;
     const adjustedY = kanjiY - (scaledH / 2) + offsetY;
 
+    // ←追加:　サブピクセル誤差を排除（右辺ズレ対策）
+    const ax = Math.round(adjustedX);
+    const ay = Math.round(adjustedY);
+    const sw = Math.round(scaledW);
+    const sh = Math.round(scaledH);
+
     // 石版パネル描画
     if (typeof drawStonePanel === 'function') {
       drawStonePanel(this.ctx, adjustedX, adjustedY, scaledW, scaledH);
