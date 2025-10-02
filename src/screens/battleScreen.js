@@ -1220,6 +1220,16 @@ else if (battleState.enemyAction === 'attack' && battleState.enemyActionTimer > 
   if (battleState.enemyActionTimer === 0) {
     battleState.enemyAction = null;
   }
+} else if (battleState.enemyAction === 'defeat' && battleState.enemyActionTimer > 0) {
+  const total = ENEMY_DEFEAT_ANIM_DURATION;
+  const timer = battleState.enemyActionTimer;
+  const progress = (total - timer) / total;
+  rotateAngle = progress * (Math.PI / 2);
+  alpha = 1 - progress;
+}
+battleState.enemyActionTimer--;
+if (battleState.enemyActionTimer === 0) {
+  battleState.enemyAction = null;
 }
 
 // 1. モンスター枠を描画
