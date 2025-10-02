@@ -113,12 +113,6 @@ function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime, 
     drawRoundedRect(ctx, x0 + 2, insetY, tabW - 4, insetH, cornerRadius);
     ctx.fill();
     
-// 例: update() のステージボタン描画直後
-const uncaught = this._getUncaughtCount(stage.stageId);
-const badgeX = button.x + button.width - 110; // 右寄り
-const badgeY = button.y + 5;
-this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
-
 
     // 枠線
     if (isSelected) {
@@ -1001,6 +995,11 @@ update(dt) {
     
     this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered);
 
+    // 未捕獲数バッジ（あと○体！）
+const uncaught = this._getUncaughtCount(stage.stageId);
+const badgeX = button.x + button.width - 110;
+const badgeY = button.y + 5;
+this._drawUncaughtBadge(this.ctx, badgeX, badgeY, uncaught);
     // アイコン追加
     ctx.fillStyle = 'white';
     ctx.font = '24px sans-serif';
