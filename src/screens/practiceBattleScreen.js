@@ -956,11 +956,10 @@ if (this.unmasteredKanji.length === 0) {
       const x = (eventX - rect.left) * scaleX;
       const y = (eventY - rect.top) * scaleY;
 
-      const margin = 20;
-const BTN = {
-  stage:  { x: this.canvas.width - 120 - margin, y: margin, w: 120, h: 36, label: 'もどる' },
-};
-
+      const topMargin = 20;
+      const BTN = {
+        stage:  { x: topMargin, y: topMargin, w: 120, h: 36, label: 'もどる' },
+      };
       const isMouseOverRect = (mx, my, rect) => {
         return mx >= rect.x && mx <= rect.x + rect.w && 
                my >= rect.y && my <= rect.y + rect.h;
@@ -1028,10 +1027,10 @@ gameState.enemies = originalEnemies;
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-       // ② 上部ボタン描画（右上「もどる」）
-const margin = 20;
+// ② 上部ボタン描画（左上「もどる」）
+const topMargin = 20;
 const BTN = {
-  stage: { x: this.canvas.width - 120 - margin, y: margin, w: 120, h: 36, label: 'もどる' },
+  stage: { x: topMargin, y: topMargin, w: 120, h: 36, label: 'もどる' },
 };
 
 [BTN.stage].forEach(b => {

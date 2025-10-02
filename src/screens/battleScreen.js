@@ -1165,15 +1165,16 @@ getMaxHealCountFromSettings() {
     this.ctx.fillStyle = grad;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }// ② 右上「もどる」ボタン（石版デザイン）
-const margin = 20;
+// ② 左上「もどる」ボタン（石版デザイン）
+const topMargin = 20;
 BTN.stage.label = 'もどる';
 BTN.stage.w = 120;
 BTN.stage.h = 36;
-BTN.stage.x = this.canvas.width - BTN.stage.w - margin;
-BTN.stage.y = margin;
+BTN.stage.x = topMargin;   // ← 左上
+BTN.stage.y = topMargin;
 
 const hovered = isMouseOverRect(this.mouseX, this.mouseY, BTN.stage);
-const pressed = false; // 押下状態を使う場合はフラグで管理
+const pressed = false;
 if (typeof drawStoneButton === 'function') {
   drawStoneButton(this.ctx, BTN.stage, hovered, pressed);
 } else {
