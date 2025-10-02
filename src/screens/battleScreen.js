@@ -1188,9 +1188,9 @@ const enemy = gameState.currentEnemy;
 const ew = 240, eh = 120;
 const { centerX: kx, width: kw } = this.getKanjiBoxMetrics();
 const kanjiRight = kx + kw / 2;
-const margin = 24;    // パネルとの余白
+const enemyMargin = 24;    // パネルとの余白
 const outerPad = 10;  // drawMonsterFrame で足す余白(左右合計20)
-let ex = Math.max(kanjiRight + margin + outerPad, 520); // 既定より少し右へ
+let ex = Math.max(kanjiRight + enemyMargin + outerPad, 520); // 既定より少し右へ
 let ey = 120;
 
 // キャンバス端でクリップ（はみ出し防止）
