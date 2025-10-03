@@ -217,6 +217,10 @@ try {
   getBGMKeyForStage(stageId) {
     try {
       const id = String(stageId || '');
+      // 小1総復習のみ固定BGM
+      if (/^bonus_g1$/i.test(id)) {
+        return 'hokkaido_area1_a';
+      }
       if (!/^bonus_g\d+$/i.test(id)) {
         return (typeof battleScreenState.getBGMKeyForStage === 'function')
           ? battleScreenState.getBGMKeyForStage.call(this, stageId)
