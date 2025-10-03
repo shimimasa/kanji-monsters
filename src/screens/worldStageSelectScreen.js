@@ -411,19 +411,24 @@ const worldStageSelectScreen = {
   isReviewMode: false,
 
   /** 画面表示時の初期化 */
-  enter(arg) {
-    // BGM 再生
-    // publish('playBGM', 'title');
-    // 引数が Canvas の場合と props の場合の両方に対応
-    const isCanvasArg = arg && typeof arg.getContext === 'function';
-    this.canvas = isCanvasArg ? arg : document.getElementById('gameCanvas');
-    this.ctx = this.canvas.getContext('2d');
+enter(arg) {
+  // BGM 再生
+  // publish('playBGM', 'title');
+  // 引数が Canvas の場合と props の場合の両方に対応
+  const isCanvasArg = arg && typeof arg.getContext === 'function';
+  this.canvas = isCanvasArg ? arg : document.getElementById('gameCanvas');
+  this.ctx = this.canvas.getContext('2d');
 
-    // continentSelect からは props オブジェクトがそのまま渡ってくる
-    // stageLoading 等から Canvas が来るケースでは props は空
-    this.continentInfo = (!isCanvasArg && arg && typeof arg === 'object') ? arg : {};
-    console.log("受け取った大陸情報:", JSON.stringify(this.continentInfo));
-    
+  // ← 追加: 入場タイムスタンプ（残留クリック抑止に使用）
+  try {
+    this._enterTS = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  } catch { this._enterTS = Date.now(); }
+
+  // continentSelect からは props オブジェクトがそのまま渡ってくる
+  // stageLoading 等から Canvas が来るケースでは props は空
+  this.continentInfo = (!isCanvasArg && arg && typeof arg === 'object') ? arg : {};
+  console.log("受け取った大陸情報:", JSON.stringify(this.continentInfo));
+
     // 初期値を設定
     this.selectedTabLevel = "4"; // デフォルトは4級
     this.selectedGrade = 7;     // デフォルトは7（4級）
@@ -1237,19 +1242,24 @@ this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
   },
 
   /** クリックイベント処理 */
-  handleClick(e) {
-    // モバイルの二重発火ガード（タップ直後のclickを無視）
-    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-    if (e.type === 'touchstart') {
-      this._lastTouchTime = now;
-      if (e.cancelable) e.preventDefault();
-    } else if (e.type === 'click') {
-      if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
-    }
-    if (this._inputLocked) return;
-    this._inputLocked = true;
-    setTimeout(() => { this._inputLocked = false; }, 250);
+handleClick(e) {
+  // モバイルの二重発火ガード（タップ直後のclickを無視）
+  const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  if (e.type === 'touchstart') {
+    this._lastTouchTime = now;
+    if (e.cancelable) e.preventDefault();
+  } else if (e.type === 'click') {
+    if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
+  }
+  if (this._inputLocked) return;
+  this._inputLocked = true;
+  setTimeout(() => { this._inputLocked = false; }, 250);
 
+  // ← 追加: 直後クリック抑止（入場から250msは無視）
+  try {
+    const ts = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (this._enterTS && (ts - this._enterTS) < 250) return;
+  } catch {}
     if (this.isZooming) return; // ズーム中はクリックを無効化
     
     const coords = getGameCoordinates(e, this.canvas);
