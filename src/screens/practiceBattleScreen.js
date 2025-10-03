@@ -1034,7 +1034,7 @@ const BTN = {
   stage: { x: topMargin, y: topMargin, w: 120, h: 36, label: 'もどる' },
 };
 
-[BNT.stage].forEach(b => {
+[BTN.stage].forEach(b => {  // ← BNT → BTN に修正
   const isHovered = this.mouseX && this.mouseY
     ? (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h)
     : false;
