@@ -121,6 +121,7 @@ try {
       this._preselectedBonusBg = images[`bg_bonus_g${g}`];
     }
   }
+  this._setupGlobalBackHandler();
 }
       
       import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('practiceBattle', { canvas: canvasEl }));
@@ -1218,7 +1219,55 @@ if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
   this.drawStoneAttackEffect(ax, ay, sw, sh);
 }
   },
+// 追加: もどる領域をグローバル捕捉で処理
+_setupGlobalBackHandler() {
+  try {
+    if (!this.canvas) return;
+    const handler = (e) => {
+      try {
+        const rect = this.canvas.getBoundingClientRect();
+        let cx, cy;
+        if (e.changedTouches && e.changedTouches[0]) {
+          cx = e.changedTouches[0].clientX;
+          cy = e.changedTouches[0].clientY;
+        } else {
+          cx = e.clientX;
+          cy = e.clientY;
+        }
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        const x = (cx - rect.left) * scaleX;
+        const y = (cy - rect.top) * scaleY;
 
+        // もどるボタンのヒット領域（描画と同じ）
+        const topMargin = 20;
+        const bx = topMargin, by = topMargin, bw = 120, bh = 36;
+
+        if (x >= bx && x <= bx + bw && y >= by && y <= by + bh) {
+          e.preventDefault();
+          e.stopPropagation();
+          publish('playBGM', 'title');
+          const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+          publish('changeScreen', target);
+        }
+      } catch {}
+    };
+    // キャプチャ段階で拾う（入力欄に覆われていても反応させる）
+    document.addEventListener('touchstart', handler, { passive: false, capture: true });
+    document.addEventListener('click', handler, true);
+    this._globalBackHandler = handler;
+  } catch {}
+},
+
+_teardownGlobalBackHandler() {
+  try {
+    if (this._globalBackHandler) {
+      document.removeEventListener('touchstart', this._globalBackHandler, true);
+      document.removeEventListener('click', this._globalBackHandler, true);
+      this._globalBackHandler = null;
+    }
+  } catch {}
+},
   /**
    * エフェクトの更新
    */
@@ -2423,7 +2472,9 @@ if (this.wrongOnlyMode) {
       this.wrongTargets = { ids: new Set(), texts: new Set() };
       try { delete gameState.quickReviewTargets; } catch {}
     }
-    }
+    this._teardownGlobalBackHandler();  
+  }
+    
 };
 
 export default practiceBattleScreenState;
