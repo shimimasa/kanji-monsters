@@ -979,9 +979,6 @@ if (this.unmasteredKanji.length === 0) {
     }
   },
 
-  /**
-   * マウスクリック処理（マスターモード専用にオーバーライド）
-   */
   handleClick(e) {
     console.log('🖱️ マスターモードクリック処理');
 
@@ -1004,15 +1001,13 @@ if (this.unmasteredKanji.length === 0) {
       const y = (eventY - rect.top) * scaleY;
 
       const topMargin = 20;
-      const BTN = {
-        stage:  { x: topMargin, y: topMargin, w: 120, h: 36, label: 'もどる' },
-      };
-      const isMouseOverRect = (mx, my, rect) => {
-        return mx >= rect.x && mx <= rect.x + rect.w && 
-               my >= rect.y && my <= rect.y + rect.h;
-      };
+      const bx = topMargin, by = topMargin, bw = 120, bh = 36;
+      const SLOP = 16; // 当たり判定を広げる
 
-      if (isMouseOverRect(x, y, BTN.stage)) {
+      const hitBack = (x >= bx - SLOP && x <= bx + bw + SLOP &&
+                       y >= by - SLOP && y <= by + bh + SLOP);
+
+      if (hitBack) {
         console.log('🗺️ ステージ選択へ');
         publish('playBGM', 'title');
         const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
@@ -1021,12 +1016,12 @@ if (this.unmasteredKanji.length === 0) {
       }
 
       return false;
-      
     } catch (error) {
       console.error('❌ クリック処理エラー:', error);
       return false;
     }
   },
+  
 
   /**
    * 画面の描画更新（ボタンなし版）
@@ -1216,7 +1211,7 @@ if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
   this.drawStoneAttackEffect(ax, ay, sw, sh);
 }
   },
-// 既存 _setupGlobalBackHandler を以下の通り置き換え（practiceBattleScreen.js 内）
+// 追加・置換: グローバル捕捉（pointer系＋キャプチャ）
 _setupGlobalBackHandler() {
   try {
     if (!this.canvas) return;
@@ -1230,19 +1225,17 @@ _setupGlobalBackHandler() {
         const x = (cx - rect.left) * scaleX;
         const y = (cy - rect.top) * scaleY;
 
-        const topMargin = 20, bx = topMargin, by = topMargin, bw = 120, bh = 36;
-        if (x >= bx && x <= bx + bw && y >= by && y <= by + bh) {
-          e.preventDefault();
-          e.stopPropagation();
+        const topMargin = 20, bx = topMargin, by = topMargin, bw = 120, bh = 36, SLOP = 16;
+        if (x >= bx - SLOP && x <= bx + bw + SLOP && y >= by - SLOP && y <= by + bh + SLOP) {
+          e.preventDefault(); e.stopPropagation();
           publish('playBGM', 'title');
           const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
           publish('changeScreen', target);
         }
       } catch {}
     };
-    // pointerdown/mousedown/touchstart をキャプチャ段階で捕捉
     document.addEventListener('pointerdown', handler, { passive: false, capture: true });
-    document.addEventListener('mousedown', handler, true);
+    document.addEventListener('mousedown',  handler, true);
     document.addEventListener('touchstart', handler, { passive: false, capture: true });
     this._globalBackHandler = handler;
   } catch {}
@@ -1251,7 +1244,7 @@ _teardownGlobalBackHandler() {
   try {
     if (this._globalBackHandler) {
       document.removeEventListener('pointerdown', this._globalBackHandler, true);
-      document.removeEventListener('mousedown', this._globalBackHandler, true);
+      document.removeEventListener('mousedown',  this._globalBackHandler, true);
       document.removeEventListener('touchstart', this._globalBackHandler, true);
       this._globalBackHandler = null;
     }

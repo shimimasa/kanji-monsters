@@ -52,9 +52,9 @@ export class AudioManager {
         yomitomo: '/assets/audio/bgm_yomitomo.mp3',
 
         // ステージ別BGMを追加
-        hokkaido: '/assets/audio/北海道.mp3',
-        hokkaido_a: '/assets/audio/北海道.mp3',
-        hokkaido_b: '/assets/audio/北海道.mp3',
+        hokkaido: '/assets/audio/北海道A.mp3',
+        hokkaido_a: '/assets/audio/北海道A.mp3',
+        hokkaido_b: '/assets/audio/北海道B.mp3',
             
         tohoku_a: '/assets/audio/東北A.mp3',
         tohoku_b: '/assets/audio/東北B.mp3',
