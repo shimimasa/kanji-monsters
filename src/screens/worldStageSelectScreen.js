@@ -433,28 +433,26 @@ enter(arg) {
         this.selectedTabLevel = "4"; // デフォルトは4級
         this.selectedGrade = 7;     // デフォルトは7（4級）
     
-    // ← 追加: gameState 経由の戻り先（最優先）
-    try {
-      const ret = gameState && gameState._returnToWorld;
-      if (ret && ret.kanken_level) {
-        const lvl = String(ret.kanken_level);
-        if (lvl === 'review') {
-          this.selectedTabLevel = 'review';
-          this.selectedGrade = 0;
-        } else {
-          // タブに存在するレベルなら採用
-          for (const tab of tabs) {
-            if (String(tab.kanken_level) === lvl) {
-              this.selectedTabLevel = tab.kanken_level;
-              this.selectedGrade = tab.grade;
-              break;
+        // ← 追加: gameState 経由の戻り先（最優先）
+        try {
+          const ret = gameState && gameState._returnToWorld;
+          if (ret && ret.kanken_level) {
+            const lvl = String(ret.kanken_level);
+            if (lvl === 'review') {
+              this.selectedTabLevel = 'review';
+              this.selectedGrade = 0;
+            } else {
+              for (const tab of tabs) {
+                if (String(tab.kanken_level) === lvl) {
+                  this.selectedTabLevel = tab.kanken_level;
+                  this.selectedGrade = tab.grade;
+                  break;
+                }
+              }
             }
           }
-        }
-      }
-    } catch {}
-    try { if (gameState && gameState._returnToWorld) delete gameState._returnToWorld; } catch {}
-    
+        } catch {}
+        try { if (gameState && gameState._returnToWorld) delete gameState._returnToWorld; } catch {}
         // 適切な初期化箇所で
         this._uncaughtCache = new Map();
 this._dex = loadDex();
@@ -1280,7 +1278,7 @@ handleClick(e) {
   // ← 追加: 直後クリック抑止（入場から250msは無視）
   try {
     const ts = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-    if (this._enterTS && (ts - this._enterTS) < 250) return;
+    if (this._enterTS && (ts - this._enterTS) < 700) return;
   } catch {}
     if (this.isZooming) return; // ズーム中はクリックを無効化
     
