@@ -1031,12 +1031,17 @@ if (this.unmasteredKanji.length === 0) {
 
       const hitBack = (x >= bx - SLOP && x <= bx + bw + SLOP &&
                        y >= by - SLOP && y <= by + bh + SLOP);
-      if (hitBack) {
-        publish('playBGM', 'title');
-        const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-        publish('changeScreen', targetScreen);
-        return true;
-      } 
+                       if (hitBack) {
+                        console.log('🗺️ ステージ選択へ');
+                        publish('playBGM', 'title');
+                        if (/^bonus_g\d+$/i.test(String(gameState.currentStageId || ''))) {
+                          publish('changeScreen', 'worldStageSelect', { kanken_level: 'review' });
+                        } else {
+                          const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+                          publish('changeScreen', targetScreen);
+                        }
+                        return true;
+                      }
 
       return false;
     } catch (error) {
@@ -1246,8 +1251,12 @@ if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
           if (x >= bx - SLOP && x <= bx + bw + SLOP && y >= by - SLOP && y <= by + bh + SLOP) {
             e.preventDefault(); e.stopPropagation();
             publish('playBGM', 'title');
-            const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-            publish('changeScreen', target);
+            if (/^bonus_g\d+$/i.test(String(gameState.currentStageId || ''))) {
+              publish('changeScreen', 'worldStageSelect', { kanken_level: 'review' });
+            } else {
+              const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+              publish('changeScreen', target);
+            }
           }
         } catch {}
       };

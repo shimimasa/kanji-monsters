@@ -396,6 +396,9 @@ const worldStageSelectScreen = {
   selectedGrade: 7, // デフォルトは7（4級）
   continentInfo: null, // 選択された大陸の情報
   _inputLocked: false, // 二重発火防止の簡易ロック
+  // 総復習モード用
+  reviewButtons: [],
+  selectedReviewGrade: null, // ← 追加: 総復習用の選択中学年
   // 総復習モード用の大ボタン
   reviewChallengeButton: {
     x: 50,
@@ -520,6 +523,7 @@ if (this.isReviewMode) {
       grade: g
     };
   });
+  this.selectedReviewGrade = null;  // ← 追加
   return;
 }
     // 選択された大陸と学年（grade）でフィルタリング
@@ -905,10 +909,10 @@ if (this.isReviewMode) {
       if (this.reviewButtons && this.reviewButtons.length) {
         this.reviewButtons.forEach(btn => {
           const isHovered = isMouseOverRect(this.mouseX, this.mouseY, btn);
-          // アンロック状態
+          const isSelected = (this.selectedReviewGrade === btn.grade); // ← 追加
           const unlocked = isBonusUnlocked(btn.grade);
           let color = unlocked ? '#4CAF50' : '#666';
-          this.drawRichButton(ctx, btn.x, btn.y, btn.width, btn.height, btn.text, color, isHovered, false);
+          this.drawRichButton(ctx, btn.x, btn.y, btn.width, btn.height, btn.text, color, isHovered, isSelected); // ← 第4引数 isSelected
     
           if (!unlocked) {
             ctx.save();
@@ -1257,39 +1261,42 @@ this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
     const y = coords.y;
 
             // 総復習モードのクリック
-// 総復習モードのクリック
-const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
-if (isReview) {
-  if (this.reviewButtons && this.reviewButtons.length) {
-    for (const btn of this.reviewButtons) {
-      if (isMouseOverRect(x, y, btn)) {
-        if (!isBonusUnlocked(btn.grade)) {
-          publish('playSE', 'wrong');
-          alert('この学年の総復習はまだ解放されていません。\n同学年のボーナスを解放してください。');
-          return;
-        }
-
-        const grade = btn.grade;
-        const bonusId = `bonus_g${grade}`;
-
-        // ← 今日の復習（quickReviewTargets）や reviewStage 経由は廃止
-        // ボーナスのレビューを強制解放して、練習画面でレビュー開始
-        if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
-        gameState.stageReviewUnlocked[bonusId] = true;
-
-        try { delete gameState.quickReviewTargets; } catch {}
-        gameState.previousScreen = 'worldStageSelect';
-        gameState.currentStageId = bonusId;
-        gameState.gameMode = 'practice';
-
-        publish('playSE', 'decide');
-        publish('changeScreen', 'practiceBattle');
-        return;
-      }
-    }
-  }
-  return;
-}
+            const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
+            if (isReview) {
+              if (this.reviewButtons && this.reviewButtons.length) {
+                for (const btn of this.reviewButtons) {
+                  if (isMouseOverRect(x, y, btn)) {
+                    if (!isBonusUnlocked(btn.grade)) {
+                      publish('playSE', 'wrong');
+                      alert('この学年の総復習はまだ解放されていません。\n同学年のボーナスを解放してください。');
+                      return;
+                    }
+            
+                    // 2回クリック方式
+                    if (this.selectedReviewGrade === btn.grade) {
+                      const grade = btn.grade;
+                      const bonusId = `bonus_g${grade}`;
+            
+                      if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+                      gameState.stageReviewUnlocked[bonusId] = true;
+            
+                      try { delete gameState.quickReviewTargets; } catch {}
+                      gameState.previousScreen = 'worldStageSelect';
+                      gameState.currentStageId = bonusId;
+                      gameState.gameMode = 'practice';
+            
+                      publish('playSE', 'decide');
+                      publish('changeScreen', 'practiceBattle');
+                    } else {
+                      this.selectedReviewGrade = btn.grade;
+                      publish('playSE', 'decide'); // 選択音のみ
+                    }
+                    return;
+                  }
+                }
+              }
+              return;
+            }
   
 
 
