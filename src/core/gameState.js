@@ -369,8 +369,16 @@ function incrementStageClearCount(stageId) {
         if (save.player?.study?.stageReviewUnlocked) {
           gameState.stageReviewUnlocked = save.player.study.stageReviewUnlocked || {};
         }
+        
         if (save.player?.progress?.stageBestTimes) {
           gameState.stageBestTimes = Object.assign({}, save.player.progress.stageBestTimes);
+        }
+
+        // ▼ 追加: ゴトモン図鑑（krb_monster_dex）を localStorage に復元
+        if (Array.isArray(save.player?.collection?.gotomonIds)) {
+          try {
+            localStorage.setItem('krb_monster_dex', JSON.stringify(save.player.collection.gotomonIds));
+          } catch {}
         }
 
         // ステージ進捗（軽量反映）
@@ -386,10 +394,10 @@ function incrementStageClearCount(stageId) {
           try { localStorage.setItem('lastPlayedStage', gameState.currentStageId); } catch {}
         }
 
-                // 実績（v1）読込
-                if (Array.isArray(save.flags?.achievementsUnlocked)) {
-                  gameState.unlockedAchievements = new Set(save.flags.achievementsUnlocked);
-                }
+        // 実績（v1）読込
+        if (Array.isArray(save.flags?.achievementsUnlocked)) {
+          gameState.unlockedAchievements = new Set(save.flags.achievementsUnlocked);
+        }
         // 音量等は AudioManager が localStorage から起動時読込するためここでは保存のみ（整合性確保）
         if (save.settings) {
           try {
@@ -398,8 +406,6 @@ function incrementStageClearCount(stageId) {
             if (save.settings.gameMode)      localStorage.setItem('gameMode', save.settings.gameMode);
             if (save.settings.maxHealCount)  localStorage.setItem('maxHealCount', `${save.settings.maxHealCount}`);
             if (save.settings.enemyAttackMode) localStorage.setItem('enemyAttackMode', save.settings.enemyAttackMode);
-
-            // ▼ 追加: 表示/回復後行動/オートセーブ/アクセシビリティ
             if ('showTimer' in save.settings) localStorage.setItem('showTimer', save.settings.showTimer ? '1' : '0');
             if (save.settings.healMode) localStorage.setItem('healMode', save.settings.healMode);
             if ('autosaveEnabled' in save.settings) localStorage.setItem('autosaveEnabled', save.settings.autosaveEnabled ? '1' : '0');
