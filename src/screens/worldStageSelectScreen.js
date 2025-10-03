@@ -1056,12 +1056,11 @@ if (this.isReviewMode) {
         // 先にボタンを描く
         this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered, isSelected);
 
-        // ボタンの上に未捕獲数バッジを重ねる
-        const uncaught = this._getUncaughtCount(stage.stageId);
-        const badgeX = button.x + button.width - 110;
-        const badgeY = button.y + 5;
-        this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
-
+        // ボタンの左側に未捕獲数バッジを表示（右側のレビュー表示と重ならないように）
+const uncaught = this._getUncaughtCount(stage.stageId);
+const badgeX = button.x + 12;
+const badgeY = button.y + 5;
+this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
                 // 追加情報の描画
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
@@ -1258,9 +1257,9 @@ if (this.isReviewMode) {
     const y = coords.y;
 
             // 総復習モードのクリック
+// 総復習モードのクリック
 const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
 if (isReview) {
-  // 学年別のレビュー開始（ボタン群）
   if (this.reviewButtons && this.reviewButtons.length) {
     for (const btn of this.reviewButtons) {
       if (isMouseOverRect(x, y, btn)) {
@@ -1269,6 +1268,7 @@ if (isReview) {
           alert('この学年の総復習はまだ解放されていません。\n同学年のボーナスを解放してください。');
           return;
         }
+
         // 10問パックを作成（誤答優先→ランダム補完）
         const grade = btn.grade;
         const all = (getKanjiByGrade && getKanjiByGrade(grade)) ? getKanjiByGrade(grade) : [];
@@ -1300,17 +1300,24 @@ if (isReview) {
           return;
         }
 
-        // 遷移
-        const pack = { stageId: `review_g${grade}`, ids };
-        gameState.quickReviewTargets = pack;
+        const bonusId = `bonus_g${grade}`;
+        gameState.quickReviewTargets = { stageId: bonusId, ids };
         gameState.previousScreen = 'worldStageSelect';
         publish('playSE', 'decide');
-        publish('changeScreen', 'quickReviewPractice');
+
+        // レビュー解放済みならレビューへ、未解放はマスターへ
+        const reviewUnlocked = !!(gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[bonusId]);
+        if (reviewUnlocked) {
+          publish('changeScreen', 'reviewStage');
+        } else {
+          gameState.currentStageId = bonusId;
+          gameState.gameMode = 'practice';
+          publish('changeScreen', 'practiceBattle');
+        }
         return;
       }
     }
   }
-  // フッター等の後続処理は継続
 }
 
     // タブクリック判定
