@@ -1275,7 +1275,7 @@ handleClick(e) {
   this._inputLocked = true;
   setTimeout(() => { this._inputLocked = false; }, 250);
 
-  // ← 追加: 直後クリック抑止（入場から250msは無視）
+  // ← 追加: 直後クリック抑止（入場から700msは無視）
   try {
     const ts = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     if (this._enterTS && (ts - this._enterTS) < 700) return;
@@ -1325,7 +1325,7 @@ handleClick(e) {
                   }
                 }
               }
-              return;
+              // 総復習モードでも、レビュー学年以外のクリック（タブ/フッター等）を処理できるように、ここで打ち切らない
             }
   
 
