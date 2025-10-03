@@ -6,6 +6,7 @@ import { getKanjiByStageId, isKanjiMastered } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
 import { images, loadBgImage } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 // 練習バトル画面状態
 const practiceBattleScreenState = {
   // 既存のbattleScreenStateの全機能を継承
@@ -122,7 +123,6 @@ try {
       this.stageBgImage = images[`bg_bonus_g${g}`];
     }
   }
-  this._setupGlobalBackHandler();
 }
       
       import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('practiceBattle', { canvas: canvasEl }));
@@ -139,6 +139,7 @@ try {
             // 通常のバトル画面初期化を実行
             battleScreenState.enter.call(this, canvasEl);
 
+            this._setupGlobalBackHandler();
                   // 画面固定（vh-lock）を有効化
       try {
         requestAnimationFrame(() => {
@@ -555,6 +556,17 @@ _buildUnmasteredKanjiList() {
   }
 },
 
+_completeQuickReview() {
+  try {
+    // 復習セット完了時は通常レビューへ移行（簡易）
+    this.reviewMode = true;
+    this._pickNextReviewQuestion?.();
+  } catch {
+    // どうしても出せない場合はステージ選択へ退避
+    const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+    publish('changeScreen', target);
+  }
+},
   /**
    * 次の未マスター漢字を出題
    */
@@ -997,16 +1009,18 @@ if (this.unmasteredKanji.length === 0) {
       const rect = this.canvas.getBoundingClientRect();
       const scaleX = this.canvas.width / rect.width;
       const scaleY = this.canvas.height / rect.height;
-      const x = (eventX - rect.left) * scaleX;
-      const y = (eventY - rect.top) * scaleY;
+      
+      const coords = getGameCoordinates(e, this.canvas);
+      if (!isValidCoordinates(coords)) return false;
+      const x = coords.x;
+      const y = coords.y;
 
       const topMargin = 20;
       const bx = topMargin, by = topMargin, bw = 120, bh = 36;
-      const SLOP = 16; // 当たり判定を広げる
+      const SLOP = 16;
 
       const hitBack = (x >= bx - SLOP && x <= bx + bw + SLOP &&
                        y >= by - SLOP && y <= by + bh + SLOP);
-
       if (hitBack) {
         console.log('🗺️ ステージ選択へ');
         publish('playBGM', 'title');
@@ -1211,35 +1225,29 @@ if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
   this.drawStoneAttackEffect(ax, ay, sw, sh);
 }
   },
-// 追加・置換: グローバル捕捉（pointer系＋キャプチャ）
-_setupGlobalBackHandler() {
-  try {
-    if (!this.canvas) return;
-    const handler = (e) => {
-      try {
-        const rect = this.canvas.getBoundingClientRect();
-        const cx = (e.changedTouches?.[0]?.clientX ?? e.clientX);
-        const cy = (e.changedTouches?.[0]?.clientY ?? e.clientY);
-        const scaleX = this.canvas.width / rect.width;
-        const scaleY = this.canvas.height / rect.height;
-        const x = (cx - rect.left) * scaleX;
-        const y = (cy - rect.top) * scaleY;
-
-        const topMargin = 20, bx = topMargin, by = topMargin, bw = 120, bh = 36, SLOP = 16;
-        if (x >= bx - SLOP && x <= bx + bw + SLOP && y >= by - SLOP && y <= by + bh + SLOP) {
-          e.preventDefault(); e.stopPropagation();
-          publish('playBGM', 'title');
-          const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-          publish('changeScreen', target);
-        }
-      } catch {}
-    };
-    document.addEventListener('pointerdown', handler, { passive: false, capture: true });
-    document.addEventListener('mousedown',  handler, true);
-    document.addEventListener('touchstart', handler, { passive: false, capture: true });
-    this._globalBackHandler = handler;
-  } catch {}
-},
+  _setupGlobalBackHandler() {
+    try {
+      if (!this.canvas) return;
+      const handler = (e) => {
+        try {
+          const coords = getGameCoordinates(e, this.canvas);
+          if (!isValidCoordinates(coords)) return;
+          const x = coords.x, y = coords.y;
+          const topMargin = 20, bx = topMargin, by = topMargin, bw = 120, bh = 36, SLOP = 16;
+          if (x >= bx - SLOP && x <= bx + bw + SLOP && y >= by - SLOP && y <= by + bh + SLOP) {
+            e.preventDefault(); e.stopPropagation();
+            publish('playBGM', 'title');
+            const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+            publish('changeScreen', target);
+          }
+        } catch {}
+      };
+      document.addEventListener('pointerdown', handler, { passive: false, capture: true });
+      document.addEventListener('mousedown',  handler, true);
+      document.addEventListener('touchstart', handler, { passive: false, capture: true });
+      this._globalBackHandler = handler;
+    } catch {}
+  },
 _teardownGlobalBackHandler() {
   try {
     if (this._globalBackHandler) {
