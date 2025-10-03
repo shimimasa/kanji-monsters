@@ -94,31 +94,32 @@ try {
   }
 } catch {}
 
-// practiceBattleScreen.js の enter() 内、battleScreenState.enter.call(this, canvasEl) より前に追加
+// 学年ボーナス時の背景/BGM候補を事前選定し、背景は確実にロードして適用
 {
   const sid = String(gameState.currentStageId || '');
   const m = /^bonus_g(\d+)$/i.exec(sid);
   this._preselectedBonusBg = null;
   this._preselectedBonusBgmKey = null;
+  this._candidateStageForBonus = null;
 
   if (m) {
     const g = parseInt(m[1], 10);
-    // 学年内の通常ステージ候補
     const candidates = (stageData || []).filter(s => s.grade === g && !/^bonus_/i.test(String(s.stageId || '')));
     if (candidates.length > 0) {
       const pick = candidates[Math.floor(Math.random() * candidates.length)];
-      // 背景（候補のステージ背景）
-      if (images && images[`bg_${pick.stageId}`]) {
-        this._preselectedBonusBg = images[`bg_${pick.stageId}`];
-      }
-      // BGMキーは親実装で算出（候補のstageIdを渡す）
+      this._candidateStageForBonus = pick;
+      // 画像が未キャッシュでも確実にロードして適用
+      loadBgImage(pick.stageId).then(img => {
+        if (img) this.stageBgImage = img;
+      });
+      // BGMキー（親のロジックで候補IDから算出）
       if (typeof battleScreenState.getBGMKeyForStage === 'function') {
         this._preselectedBonusBgmKey = battleScreenState.getBGMKeyForStage.call(this, pick.stageId);
       }
     }
     // 学年専用ボーナス背景があれば最優先
     if (images && images[`bg_bonus_g${g}`]) {
-      this._preselectedBonusBg = images[`bg_bonus_g${g}`];
+      this.stageBgImage = images[`bg_bonus_g${g}`];
     }
   }
   this._setupGlobalBackHandler();
@@ -148,12 +149,15 @@ try {
       } catch {}
 
       // 背景画像を必ずステージのものに
-      try {
-        this.stageBgImage = (images && images[`bg_${gameState.currentStageId}`]) || this.stageBgImage || null;
-        if (!this.stageBgImage) {
-          loadBgImage(gameState.currentStageId).then(img => { this.stageBgImage = img; });
-        }
-      } catch {}
+try {
+  const isBonus = /^bonus_g\d+$/i.test(String(gameState.currentStageId || ''));
+  if (!isBonus) {
+    this.stageBgImage = (images && images[`bg_${gameState.currentStageId}`]) || this.stageBgImage || null;
+    if (!this.stageBgImage) {
+      loadBgImage(gameState.currentStageId).then(img => { this.stageBgImage = img; });
+    }
+  }
+} catch {}
 
       // マスターモード専用のキーハンドラを設定
       this._setupPracticeKeyHandler();
@@ -201,33 +205,25 @@ try {
   },
 
   // practiceBattleScreen.js のオブジェクト内に追加
-getBGMKeyForStage(stageId) {
-  try {
-    const id = String(stageId || '');
-    const m = /^bonus_g(\d+)$/i.exec(id);
-    if (!m) {
+  getBGMKeyForStage(stageId) {
+    try {
+      const id = String(stageId || '');
+      if (!/^bonus_g\d+$/i.test(id)) {
+        return (typeof battleScreenState.getBGMKeyForStage === 'function')
+          ? battleScreenState.getBGMKeyForStage.call(this, stageId)
+          : null;
+      }
+      if (this._preselectedBonusBgmKey) return this._preselectedBonusBgmKey;
+      if (this._candidateStageForBonus && typeof battleScreenState.getBGMKeyForStage === 'function') {
+        return battleScreenState.getBGMKeyForStage.call(this, this._candidateStageForBonus.stageId);
+      }
       return (typeof battleScreenState.getBGMKeyForStage === 'function')
         ? battleScreenState.getBGMKeyForStage.call(this, stageId)
         : null;
+    } catch {
+      return null;
     }
-    // 事前選定があればそれを返す
-    if (this._preselectedBonusBgmKey) return this._preselectedBonusBgmKey;
-
-    // 学年の通常ステージから再度選定（保険）
-    const g = parseInt(m[1], 10);
-    const candidates = (stageData || []).filter(s => s.grade === g && !/^bonus_/i.test(String(s.stageId || '')));
-    if (candidates.length && typeof battleScreenState.getBGMKeyForStage === 'function') {
-      const pick = candidates[Math.floor(Math.random() * candidates.length)];
-      return battleScreenState.getBGMKeyForStage.call(this, pick.stageId);
-    }
-    // 最後の手段：親に委譲
-    return (typeof battleScreenState.getBGMKeyForStage === 'function')
-      ? battleScreenState.getBGMKeyForStage.call(this, stageId)
-      : null;
-  } catch {
-    return null;
-  }
-},
+  },
   /**
    * 今日の練習回数を更新
    */
@@ -1084,12 +1080,13 @@ const BTN = {
   stage: { x: topMargin, y: topMargin, w: 120, h: 36, label: 'もどる' },
 };
 
-[BTN.stage].forEach(b => {  // ← BNT → BTN に修正
+[BTN.stage].forEach(b => {
   const isHovered = this.mouseX && this.mouseY
     ? (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h)
     : false;
   if (typeof drawStoneButton === 'function') {
-    drawStoneButton(this.ctx, b.x, b.y, b.w, b.h, b.label, isHovered, false);
+    // 修正: ボタン情報をオブジェクトで渡す
+    drawStoneButton(this.ctx, { x: b.x, y: b.y, w: b.w, h: b.h, label: b.label }, isHovered, false);
   } else {
     this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
     this.ctx.fillRect(b.x, b.y, b.w, b.h);
@@ -1219,30 +1216,21 @@ if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
   this.drawStoneAttackEffect(ax, ay, sw, sh);
 }
   },
-// 追加: もどる領域をグローバル捕捉で処理
+// 既存 _setupGlobalBackHandler を以下の通り置き換え（practiceBattleScreen.js 内）
 _setupGlobalBackHandler() {
   try {
     if (!this.canvas) return;
     const handler = (e) => {
       try {
         const rect = this.canvas.getBoundingClientRect();
-        let cx, cy;
-        if (e.changedTouches && e.changedTouches[0]) {
-          cx = e.changedTouches[0].clientX;
-          cy = e.changedTouches[0].clientY;
-        } else {
-          cx = e.clientX;
-          cy = e.clientY;
-        }
+        const cx = (e.changedTouches?.[0]?.clientX ?? e.clientX);
+        const cy = (e.changedTouches?.[0]?.clientY ?? e.clientY);
         const scaleX = this.canvas.width / rect.width;
         const scaleY = this.canvas.height / rect.height;
         const x = (cx - rect.left) * scaleX;
         const y = (cy - rect.top) * scaleY;
 
-        // もどるボタンのヒット領域（描画と同じ）
-        const topMargin = 20;
-        const bx = topMargin, by = topMargin, bw = 120, bh = 36;
-
+        const topMargin = 20, bx = topMargin, by = topMargin, bw = 120, bh = 36;
         if (x >= bx && x <= bx + bw && y >= by && y <= by + bh) {
           e.preventDefault();
           e.stopPropagation();
@@ -1252,18 +1240,19 @@ _setupGlobalBackHandler() {
         }
       } catch {}
     };
-    // キャプチャ段階で拾う（入力欄に覆われていても反応させる）
+    // pointerdown/mousedown/touchstart をキャプチャ段階で捕捉
+    document.addEventListener('pointerdown', handler, { passive: false, capture: true });
+    document.addEventListener('mousedown', handler, true);
     document.addEventListener('touchstart', handler, { passive: false, capture: true });
-    document.addEventListener('click', handler, true);
     this._globalBackHandler = handler;
   } catch {}
 },
-
 _teardownGlobalBackHandler() {
   try {
     if (this._globalBackHandler) {
+      document.removeEventListener('pointerdown', this._globalBackHandler, true);
+      document.removeEventListener('mousedown', this._globalBackHandler, true);
       document.removeEventListener('touchstart', this._globalBackHandler, true);
-      document.removeEventListener('click', this._globalBackHandler, true);
       this._globalBackHandler = null;
     }
   } catch {}
