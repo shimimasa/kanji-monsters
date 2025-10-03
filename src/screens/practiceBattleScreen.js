@@ -82,6 +82,14 @@ wrongTargets: { ids: new Set(), texts: new Set() },
       this.onPracticeComplete = onComplete;
       gameState.gameMode = 'practice';
 
+      // ← 追加: ボーナス練習は必ず世界編に戻れるように補強
+      try {
+        const sid = String(gameState.currentStageId || '');
+        if (/^bonus_g\d+$/i.test(sid)) {
+          gameState.previousScreen = 'worldStageSelect';
+        }
+      } catch {}
+
 // 1分復習（誤答限定）を検出（最優先）
 try {
   const qr = gameState.quickReviewTargets;
@@ -556,17 +564,20 @@ _buildUnmasteredKanjiList() {
   }
 },
 
-_completeQuickReview() {
-  try {
-    // 復習セット完了時は通常レビューへ移行（簡易）
-    this.reviewMode = true;
-    this._pickNextReviewQuestion?.();
-  } catch {
-    // どうしても出せない場合はステージ選択へ退避
+  // ← 追加: quick review 完了ハンドラ（緊急退避もあり）
+  _completeQuickReview() {
+    try {
+      // まずは通常レビューへ移行して継続
+      this.reviewMode = true;
+      if (typeof this._pickNextReviewQuestion === 'function') {
+        this._pickNextReviewQuestion();
+        return;
+      }
+    } catch {}
+    // どうしても続行できない場合は安全に戻る
     const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
     publish('changeScreen', target);
-  }
-},
+  },
   /**
    * 次の未マスター漢字を出題
    */
@@ -1012,8 +1023,7 @@ if (this.unmasteredKanji.length === 0) {
       
       const coords = getGameCoordinates(e, this.canvas);
       if (!isValidCoordinates(coords)) return false;
-      const x = coords.x;
-      const y = coords.y;
+      const x = coords.x, y = coords.y;
 
       const topMargin = 20;
       const bx = topMargin, by = topMargin, bw = 120, bh = 36;
@@ -1022,12 +1032,11 @@ if (this.unmasteredKanji.length === 0) {
       const hitBack = (x >= bx - SLOP && x <= bx + bw + SLOP &&
                        y >= by - SLOP && y <= by + bh + SLOP);
       if (hitBack) {
-        console.log('🗺️ ステージ選択へ');
         publish('playBGM', 'title');
         const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
         publish('changeScreen', targetScreen);
         return true;
-      }
+      } 
 
       return false;
     } catch (error) {
