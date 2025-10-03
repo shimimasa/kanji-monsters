@@ -1035,6 +1035,8 @@ if (this.unmasteredKanji.length === 0) {
                         console.log('🗺️ ステージ選択へ');
                         publish('playBGM', 'title');
                         if (/^bonus_g\d+$/i.test(String(gameState.currentStageId || ''))) {
+                          // 総復習タブへ確実に戻すためのフラグを保存
+                          gameState._returnToWorld = { kanken_level: 'review' };
                           publish('changeScreen', 'worldStageSelect', { kanken_level: 'review' });
                         } else {
                           const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';

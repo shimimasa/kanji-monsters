@@ -429,12 +429,34 @@ enter(arg) {
   this.continentInfo = (!isCanvasArg && arg && typeof arg === 'object') ? arg : {};
   console.log("受け取った大陸情報:", JSON.stringify(this.continentInfo));
 
-    // 初期値を設定
-    this.selectedTabLevel = "4"; // デフォルトは4級
-    this.selectedGrade = 7;     // デフォルトは7（4級）
-
-// 適切な初期化箇所で
-this._uncaughtCache = new Map();
+        // 初期値を設定
+        this.selectedTabLevel = "4"; // デフォルトは4級
+        this.selectedGrade = 7;     // デフォルトは7（4級）
+    
+    // ← 追加: gameState 経由の戻り先（最優先）
+    try {
+      const ret = gameState && gameState._returnToWorld;
+      if (ret && ret.kanken_level) {
+        const lvl = String(ret.kanken_level);
+        if (lvl === 'review') {
+          this.selectedTabLevel = 'review';
+          this.selectedGrade = 0;
+        } else {
+          // タブに存在するレベルなら採用
+          for (const tab of tabs) {
+            if (String(tab.kanken_level) === lvl) {
+              this.selectedTabLevel = tab.kanken_level;
+              this.selectedGrade = tab.grade;
+              break;
+            }
+          }
+        }
+      }
+    } catch {}
+    try { if (gameState && gameState._returnToWorld) delete gameState._returnToWorld; } catch {}
+    
+        // 適切な初期化箇所で
+        this._uncaughtCache = new Map();
 this._dex = loadDex();
 
     // デフォルトの漢検レベルを設定（大陸情報から取得）
