@@ -94,12 +94,33 @@ try {
   }
 } catch {}
 
-// ボーナスは即レビュー解放（ただし誤答限定中は適用しない）
-const isBonus = /^bonus_g\d+$/i.test(String(gameState.currentStageId || ''));
-if (isBonus && !this.wrongOnlyMode) {
-  if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
-  gameState.stageReviewUnlocked[gameState.currentStageId] = true;
-  this.reviewMode = true;
+// practiceBattleScreen.js の enter() 内、battleScreenState.enter.call(this, canvasEl) より前に追加
+{
+  const sid = String(gameState.currentStageId || '');
+  const m = /^bonus_g(\d+)$/i.exec(sid);
+  this._preselectedBonusBg = null;
+  this._preselectedBonusBgmKey = null;
+
+  if (m) {
+    const g = parseInt(m[1], 10);
+    // 学年内の通常ステージ候補
+    const candidates = (stageData || []).filter(s => s.grade === g && !/^bonus_/i.test(String(s.stageId || '')));
+    if (candidates.length > 0) {
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      // 背景（候補のステージ背景）
+      if (images && images[`bg_${pick.stageId}`]) {
+        this._preselectedBonusBg = images[`bg_${pick.stageId}`];
+      }
+      // BGMキーは親実装で算出（候補のstageIdを渡す）
+      if (typeof battleScreenState.getBGMKeyForStage === 'function') {
+        this._preselectedBonusBgmKey = battleScreenState.getBGMKeyForStage.call(this, pick.stageId);
+      }
+    }
+    // 学年専用ボーナス背景があれば最優先
+    if (images && images[`bg_bonus_g${g}`]) {
+      this._preselectedBonusBg = images[`bg_bonus_g${g}`];
+    }
+  }
 }
       
       import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('practiceBattle', { canvas: canvasEl }));
@@ -178,6 +199,34 @@ if (isBonus && !this.wrongOnlyMode) {
     }
   },
 
+  // practiceBattleScreen.js のオブジェクト内に追加
+getBGMKeyForStage(stageId) {
+  try {
+    const id = String(stageId || '');
+    const m = /^bonus_g(\d+)$/i.exec(id);
+    if (!m) {
+      return (typeof battleScreenState.getBGMKeyForStage === 'function')
+        ? battleScreenState.getBGMKeyForStage.call(this, stageId)
+        : null;
+    }
+    // 事前選定があればそれを返す
+    if (this._preselectedBonusBgmKey) return this._preselectedBonusBgmKey;
+
+    // 学年の通常ステージから再度選定（保険）
+    const g = parseInt(m[1], 10);
+    const candidates = (stageData || []).filter(s => s.grade === g && !/^bonus_/i.test(String(s.stageId || '')));
+    if (candidates.length && typeof battleScreenState.getBGMKeyForStage === 'function') {
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      return battleScreenState.getBGMKeyForStage.call(this, pick.stageId);
+    }
+    // 最後の手段：親に委譲
+    return (typeof battleScreenState.getBGMKeyForStage === 'function')
+      ? battleScreenState.getBGMKeyForStage.call(this, stageId)
+      : null;
+  } catch {
+    return null;
+  }
+},
   /**
    * 今日の練習回数を更新
    */
@@ -1130,44 +1179,44 @@ const BTN = {
     const adjustedX = kanjiX - (scaledW / 2) + offsetX;
     const adjustedY = kanjiY - (scaledH / 2) + offsetY;
 
-    // ←追加:　サブピクセル誤差を排除（右辺ズレ対策）
-    const ax = Math.round(adjustedX);
-    const ay = Math.round(adjustedY);
-    const sw = Math.round(scaledW);
-    const sh = Math.round(scaledH);
+    // ← サブピクセル誤差を排除してスナップした値を実際の描画に使用
+const ax = Math.round(adjustedX);
+const ay = Math.round(adjustedY);
+const sw = Math.round(scaledW);
+const sh = Math.round(scaledH);
 
-    // 石版パネル描画
-    if (typeof drawStonePanel === 'function') {
-      drawStonePanel(this.ctx, adjustedX, adjustedY, scaledW, scaledH);
-    } else {
-      this.ctx.fillStyle = 'rgba(50, 50, 60, 0.85)';
-      this.ctx.fillRect(adjustedX, adjustedY, scaledW, scaledH);
-      this.ctx.strokeStyle = borderColor;
-      this.ctx.lineWidth = borderWidth;
-      this.ctx.strokeRect(adjustedX, adjustedY, scaledW, scaledH);
-    }
+// 石版パネル描画（スナップ後の矩形で描画）
+if (typeof drawStonePanel === 'function') {
+  drawStonePanel(this.ctx, ax, ay, sw, sh);
+} else {
+  this.ctx.fillStyle = 'rgba(50, 50, 60, 0.85)';
+  this.ctx.fillRect(ax, ay, sw, sh);
+  this.ctx.strokeStyle = borderColor;
+  this.ctx.lineWidth = borderWidth;
+  this.ctx.strokeRect(ax, ay, sw, sh);
+}
 
-    // 漢字表示
-    if (gameState.currentKanji) {
-      this.ctx.font = `${80 * boxScale}px serif`;
-      this.ctx.fillStyle = 'white';
-      this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'middle';
-      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-      this.ctx.shadowBlur = 5;
-      this.ctx.shadowOffsetX = 3 * boxScale;
-      this.ctx.shadowOffsetY = 3 * boxScale;
-      this.ctx.fillText(gameState.currentKanji.text, adjustedX + scaledW / 2, adjustedY + scaledH / 2);
-      this.ctx.shadowColor = 'transparent';
-      this.ctx.shadowBlur = 0;
-      this.ctx.shadowOffsetX = 0;
-      this.ctx.shadowOffsetY = 0;
-    }
+// 漢字表示（中央座標もスナップ矩形に合わせる）
+if (gameState.currentKanji) {
+  this.ctx.font = `${80 * boxScale}px serif`;
+  this.ctx.fillStyle = 'white';
+  this.ctx.textAlign = 'center';
+  this.ctx.textBaseline = 'middle';
+  this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  this.ctx.shadowBlur = 5;
+  this.ctx.shadowOffsetX = 3 * boxScale;
+  this.ctx.shadowOffsetY = 3 * boxScale;
+  this.ctx.fillText(gameState.currentKanji.text, ax + sw / 2, ay + sh / 2);
+  this.ctx.shadowColor = 'transparent';
+  this.ctx.shadowBlur = 0;
+  this.ctx.shadowOffsetX = 0;
+  this.ctx.shadowOffsetY = 0;
+}
 
-    // 石版攻撃エフェクト
-    if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
-      this.drawStoneAttackEffect(adjustedX, adjustedY, scaledW, scaledH);
-    }
+// 石版攻撃エフェクト（同じ矩形で）
+if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
+  this.drawStoneAttackEffect(ax, ay, sw, sh);
+}
   },
 
   /**
