@@ -935,35 +935,6 @@ if (this.isReviewMode) {
         ctx.fillStyle = '#1a365d';
         ctx.fillRect(mapX, mapY, mapWidth, mapHeight);
       }
-
-      // 左側パネル
-      const panelX = 10;
-      const panelY = 60;
-      const panelW = cw / 2 - 20;
-      const panelH = ch - 140;
-      this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
-
-      // タイトル
-      ctx.fillStyle = 'white';
-      ctx.font = '24px "UDデジタル教科書体", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText('総復習モード', panelX + panelW / 2, panelY + 20);
-
-      // 説明
-      ctx.font = '14px "UDデジタル教科書体", sans-serif';
-      ctx.fillStyle = '#ccc';
-      ctx.fillText('あなたに最適なステージを自動選択します', panelX + panelW / 2, panelY + 55);
-
-      // 大ボタン
-      const btn = this.reviewChallengeButton;
-      const isHovered = isMouseOverRect(this.mouseX, this.mouseY, btn);
-      // 少し動きのある配色
-      const pulse = Math.sin(this.animationTime * 0.003) * 0.2 + 0.8;
-      const buttonColor = `hsl(${200 + Math.sin(this.animationTime * 0.002) * 30}, 70%, ${50 + pulse * 10}%)`;
-      this.drawRichButton(ctx, btn.x, btn.y, btn.width, btn.height, btn.text, buttonColor, isHovered);
-      // 総復習モードではステージボタン/マーカーは描画しないが、
-      // この後のフッター描画処理は引き続き実行する（returnしない）
     }
 
     // 右側の大陸地図を描画（総復習モードではスキップ）
