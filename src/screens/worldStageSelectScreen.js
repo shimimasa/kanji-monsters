@@ -1269,56 +1269,29 @@ if (isReview) {
           return;
         }
 
-        // 10問パックを作成（誤答優先→ランダム補完）
         const grade = btn.grade;
-        const all = (getKanjiByGrade && getKanjiByGrade(grade)) ? getKanjiByGrade(grade) : [];
-        const allIds = all.map(k => String(k.id));
-
-        const wrongRaw = Array.isArray(gameState.wrongKanjiList) ? gameState.wrongKanjiList : [];
-        const wrongIds = Array.from(new Set(
-          wrongRaw
-            .map(w => (typeof w === 'object' && w && 'id' in w) ? String(w.id) : null)
-            .filter(id => id && allIds.includes(id))
-        ));
-
-        const pick = (arr, n) => {
-          const a = arr.slice();
-          for (let i = a.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [a[i], a[j]] = [a[j], a[i]];
-          }
-          return a.slice(0, n);
-        };
-
-        let ids = pick(wrongIds, 10);
-        if (ids.length < 10) {
-          const rest = allIds.filter(id => !ids.includes(id));
-          ids = ids.concat(pick(rest, 10 - ids.length));
-        }
-        if (ids.length === 0) {
-          alert('この学年で復習できる漢字が見つかりません。');
-          return;
-        }
-
         const bonusId = `bonus_g${grade}`;
-        gameState.quickReviewTargets = { stageId: bonusId, ids };
-        gameState.previousScreen = 'worldStageSelect';
-        publish('playSE', 'decide');
 
-        // レビュー解放済みならレビューへ、未解放はマスターへ
-        const reviewUnlocked = !!(gameState.stageReviewUnlocked && gameState.stageReviewUnlocked[bonusId]);
-        if (reviewUnlocked) {
-          publish('changeScreen', 'reviewStage');
-        } else {
-          gameState.currentStageId = bonusId;
-          gameState.gameMode = 'practice';
-          publish('changeScreen', 'practiceBattle');
-        }
+        // ← 今日の復習（quickReviewTargets）や reviewStage 経由は廃止
+        // ボーナスのレビューを強制解放して、練習画面でレビュー開始
+        if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+        gameState.stageReviewUnlocked[bonusId] = true;
+
+        try { delete gameState.quickReviewTargets; } catch {}
+        gameState.previousScreen = 'worldStageSelect';
+        gameState.currentStageId = bonusId;
+        gameState.gameMode = 'practice';
+
+        publish('playSE', 'decide');
+        publish('changeScreen', 'practiceBattle');
         return;
       }
     }
   }
+  return;
 }
+  
+
 
     // タブクリック判定
     const tabCount = tabs.length;
