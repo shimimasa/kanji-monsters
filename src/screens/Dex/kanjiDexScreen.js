@@ -571,33 +571,32 @@ const kanjiDexScreen = {
     }
   },
 
-      /** 漢字カードを生成 */
-  _createKanjiCard(kanjiData) {
-    const collected = this.dexSet.has(kanjiData.id);
-    const prog = (gameState && gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiData.id]) || null;
-
-    // mastered が保存されていないバックアップでも、読み達成状況から派生判定
-    const isMastered = (() => {
-      if (!prog) return false;
-      if (prog.mastered) return true;
-
-      const hiraShift = ch => String.fromCharCode(ch.charCodeAt(0) - 0x60);
-      const toHiragana = (s) => String(s || '').replace(/[\u30a1-\u30f6]/g, hiraShift);
-      const toArray = v => Array.isArray(v) ? v : (typeof v === 'string' ? v.split(' ').filter(Boolean) : []);
-
-      const reqOn  = toArray(kanjiData.onyomi).map(toHiragana);
-      const reqKun = toArray(kanjiData.kunyomi).map(toHiragana);
-
-      // prog.onyomi/kunyomi は Set を想定。配列で来た旧データにも対応
-      const progOn  = (prog.onyomi && typeof prog.onyomi.has === 'function') ? prog.onyomi : new Set(Array.isArray(prog?.onyomi) ? prog.onyomi : []);
-      const progKun = (prog.kunyomi && typeof prog.kunyomi.has === 'function') ? prog.kunyomi : new Set(Array.isArray(prog?.kunyomi) ? prog.kunyomi : []);
-
-      // 全読み（存在する場合）を満たしていればマスター扱い
-      const allOn  = reqOn.length  === 0 ? true : reqOn.every(r => progOn.has(toHiragana(r)));
-      const allKun = reqKun.length === 0 ? true : reqKun.every(r => progKun.has(toHiragana(r)));
-
-      return (reqOn.length + reqKun.length) === 0 ? false : (allOn && allKun);
-    })();
+    /** 漢字カードを生成 */
+    _createKanjiCard(kanjiData) {
+      const prog = (gameState && gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiData.id]) || null;
+  
+      // mastered が保存されていないバックアップでも、読み達成状況から派生判定
+      const isMastered = (() => {
+        if (!prog) return false;
+        if (prog.mastered) return true;
+  
+        const hiraShift = ch => String.fromCharCode(ch.charCodeAt(0) - 0x60);
+        const toHiragana = (s) => String(s || '').replace(/[\u30a1-\u30f6]/g, hiraShift);
+        const toArray = v => Array.isArray(v) ? v : (typeof v === 'string' ? v.split(' ').filter(Boolean) : []);
+  
+        const reqOn  = toArray(kanjiData.onyomi).map(toHiragana);
+        const reqKun = toArray(kanjiData.kunyomi).map(toHiragana);
+  
+        const progOn  = (prog.onyomi && typeof prog.onyomi.has === 'function') ? prog.onyomi : new Set(Array.isArray(prog?.onyomi) ? prog.onyomi : []);
+        const progKun = (prog.kunyomi && typeof prog.kunyomi.has === 'function') ? prog.kunyomi : new Set(Array.isArray(prog?.kunyomi) ? prog.kunyomi : []);
+  
+        const allOn  = reqOn.length  === 0 ? true : reqOn.every(r => progOn.has(toHiragana(r)));
+        const allKun = reqKun.length === 0 ? true : reqKun.every(r => progKun.has(toHiragana(r)));
+        return (reqOn.length + reqKun.length) === 0 ? false : (allOn && allKun);
+      })();
+  
+      // ▼ マスター済みは公開扱い（? を外す）
+      const collected = this.dexSet.has(kanjiData.id) || isMastered;
 
     // カード要素を作成
     const card = document.createElement('div');

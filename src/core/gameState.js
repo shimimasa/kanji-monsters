@@ -362,8 +362,19 @@ function incrementStageClearCount(stageId) {
         if (save.player?.study?.practiceProgress) {
           gameState.practiceProgress = save.player.study.practiceProgress || {};
         }
-        if (save.player?.study?.kanjiReadProgress) {
-          gameState.kanjiReadProgress = deserializeKanjiReadProgress(save.player.study.kanjiReadProgress || {});
+        // ▼ kanjiReadProgress 反映＋図鑑を復元
+        const rawKRP = save.player?.study?.kanjiReadProgress || {};
+        if (rawKRP) {
+          gameState.kanjiReadProgress = deserializeKanjiReadProgress(rawKRP || {});
+          try {
+            const ids = [];
+            for (const [id, prog] of Object.entries(rawKRP)) {
+              const onLen  = Array.isArray(prog?.onyomi) ? prog.onyomi.length : 0;
+              const kunLen = Array.isArray(prog?.kunyomi) ? prog.kunyomi.length : 0;
+              if (prog?.mastered || onLen > 0 || kunLen > 0) ids.push(id);
+            }
+            if (ids.length > 0) localStorage.setItem('krb_kanji_dex', JSON.stringify(ids));
+          } catch {}
         }
         // 追加: レビュー解放のロード
         if (save.player?.study?.stageReviewUnlocked) {
