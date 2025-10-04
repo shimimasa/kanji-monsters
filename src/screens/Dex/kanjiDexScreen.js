@@ -752,13 +752,6 @@ const kanjiDexScreen = {
     kanjiEl.textContent = k.kanji;
     modalContent.appendChild(kanjiEl);
 
-    // まずは骨格だけを同期で表示（体感を速く）
-    const progressSection = document.createElement('div');
-    progressSection.className = 'kanji-reading-progress';
-    progressSection.style.margin = '8px 0 12px';
-    progressSection.textContent = '読みの進捗を読み込み中…';
-    modalContent.appendChild(progressSection);
-
     const infoSection = document.createElement('div');
     infoSection.className = 'kanji-detail-info';
     modalContent.appendChild(infoSection);
@@ -767,91 +760,7 @@ const kanjiDexScreen = {
    frag.appendChild(modalContainer);
    document.body.appendChild(frag); // 一括追加でレイアウト1回
 
-        // 重い部分は次フレームに分割して描画（カクつき防止）
-        requestAnimationFrame(() => {
-          const toArray = v => Array.isArray(v) ? v : (typeof v === 'string' ? v.split(' ').filter(Boolean) : []);
-          const prog = (gameState && gameState.kanjiReadProgress && gameState.kanjiReadProgress[k.id]) || null;
-          const kunSet = prog?.kunyomi || new Set();
-          const onSet  = prog?.onyomi  || new Set();
-    
-          // 追加: 比較用のひらがな正規化
-          const hiraShift = ch => String.fromCharCode(ch.charCodeAt(0) - 0x60);
-          const toHiragana = (s) => String(s || '').replace(/[\u30a1-\u30f6]/g, hiraShift);
-    
-          const makeRow = (label, list, masteredSet) => {
-            const row = document.createElement('div');
-            row.style.margin = '6px 0';
-    
-            const header = document.createElement('strong');
-            const total = list.length;
-            let masteredCount = 0;
-            header.textContent = `${label}（${total}）`;
-            row.appendChild(header);
-    
-            const wrap = document.createElement('div');
-            wrap.style.display = 'flex';
-            wrap.style.flexWrap = 'wrap';
-            wrap.style.gap = '6px';
-            wrap.style.marginTop = '4px';
-    
-            list.forEach((r) => {
-              const chip = document.createElement('span');
-              const mastered = masteredSet && masteredSet.has && masteredSet.has(toHiragana(r));
-              if (mastered) masteredCount++;
-    
-              chip.textContent = mastered ? `✓ ${r}` : `○ ${r}`;
-              chip.style.display = 'inline-block';
-              chip.style.padding = '4px 8px';
-              chip.style.borderRadius = '999px';
-              chip.style.fontSize = '13px';
-    
-              if (mastered) {
-                chip.style.border = '1px solid #1f4f8d';
-                chip.style.background = '#2d6cdf';
-                chip.style.color = '#fff';
-              } else {
-                chip.style.border = '1px dashed rgba(255,255,255,0.6)';
-                chip.style.background = 'rgba(255,255,255,0.15)';
-                chip.style.color = '#fff';
-              }
-    
-              chip.title = mastered ? '読めた' : '未読';
-              wrap.appendChild(chip);
-            });
-    
-            header.textContent = `${label}（${masteredCount}/${total}）`;
-            row.appendChild(wrap);
-            return row;
-          };
-    
-          progressSection.textContent = '';
-    
-          const legend = document.createElement('div');
-      legend.style.display = 'flex';
-      legend.style.gap = '12px';
-      legend.style.alignItems = 'center';
-      legend.style.margin = '4px 0 8px';
-      const mkLegendChip = (text, mastered) => {
-        const s = document.createElement('span');
-        s.textContent = text;
-        s.style.display = 'inline-block';
-        s.style.padding = '2px 8px';
-        s.style.borderRadius = '999px';
-        s.style.fontSize = '12px';
-        if (mastered) {
-          s.style.background = '#2d6cdf'; s.style.color = '#fff'; s.style.border = '1px solid #1f4f8d';
-        } else {
-          s.style.background = 'rgba(255,255,255,0.08)'; s.style.color = '#ddd'; s.style.border = '1px solid rgba(255,255,255,0.25)';
-        }
-        return s;
-      };
-      legend.appendChild(mkLegendChip('✓ 読めた', true));
-      legend.appendChild(mkLegendChip('未読', false));
-      progressSection.appendChild(legend);
-
-      progressSection.appendChild(makeRow('音読み', toArray(k.onyomi  || []), onSet));
-      progressSection.appendChild(makeRow('訓読み', toArray(k.kunyomi || []), kunSet));
-    });
+        // 進捗・学習記録UIは非表示にする
       // 既存の詳細ブロックはここで構築（必要分のみ）
       // 例: 学年/画数/意味など…（既存の infoSection 生成コードをここに移してOK）
     
@@ -885,81 +794,29 @@ const kanjiDexScreen = {
     basicInfo.appendChild(gradeStrokesEl);
     infoSection.appendChild(basicInfo);
     
-    // 学習記録セクション
-    const statsSection = document.createElement('div');
-    statsSection.className = 'kanji-stats-section';
-    
-    const statsTitle = document.createElement('h3');
-    statsTitle.textContent = '学習記録';
-    statsSection.appendChild(statsTitle);
-    
-    const correctCount = kanjiData.correctCount || 0;
-    const incorrectCount = kanjiData.incorrectCount || 0;
-    const total = correctCount + incorrectCount;
-    const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-    
-    // 習熟度レベル
-    let masteryLevel = '初心者';
-    let masteryColor = '#8B4513';
-    if (accuracy >= 90) {
-      masteryLevel = 'マスター';
-      masteryColor = '#DAA520';
-    } else if (accuracy >= 70) {
-      masteryLevel = '上級者';
-      masteryColor = '#CD853F';
-    } else if (accuracy >= 50) {
-      masteryLevel = '中級者';
-      masteryColor = '#D2B48C';
+    // 例文を表示（あれば）
+    const example = this._getExampleSentence(k);
+    if (example) {
+      const exWrap = document.createElement('div');
+      exWrap.className = 'kanji-example-block';
+      const exTitle = document.createElement('h3');
+      exTitle.textContent = '例文';
+      const exP = document.createElement('p');
+      exP.textContent = example;
+      Object.assign(exP.style, {
+        marginTop: '6px',
+        padding: '8px 10px',
+        background: 'rgba(255,255,255,0.08)',
+        border: '1px solid rgba(255,255,255,0.2)',
+        borderRadius: '6px',
+        color: '#fff',
+        fontSize: '14px',
+        lineHeight: '1.5'
+      });
+      exWrap.appendChild(exTitle);
+      exWrap.appendChild(exP);
+      infoSection.appendChild(exWrap);
     }
-    
-    const masteryEl = document.createElement('p');
-    masteryEl.className = 'mastery-level';
-    masteryEl.innerHTML = `<strong>習熟度:</strong> <span style="color:${masteryColor}">${masteryLevel}</span>`;
-    statsSection.appendChild(masteryEl);
-    
-    if (total > 0) {
-      // 統計情報
-      const statsEl = document.createElement('div');
-      statsEl.className = 'stats-details';
-      
-      const attemptsEl = document.createElement('p');
-      attemptsEl.innerHTML = `<strong>挑戦回数:</strong> ${total}回`;
-      statsEl.appendChild(attemptsEl);
-      
-      const accuracyEl = document.createElement('p');
-      accuracyEl.innerHTML = `<strong>正答率:</strong> ${accuracy}%`;
-      statsEl.appendChild(accuracyEl);
-      
-      // グラフ
-      const graphContainer = document.createElement('div');
-      graphContainer.className = 'accuracy-graph-container';
-      
-      const graphEl = document.createElement('div');
-      graphEl.className = 'accuracy-graph';
-      
-      const correctBar = document.createElement('div');
-      correctBar.className = 'correct-bar';
-      correctBar.style.width = `${accuracy}%`;
-      correctBar.textContent = `正解: ${correctCount}`;
-      graphEl.appendChild(correctBar);
-      
-      const incorrectBar = document.createElement('div');
-      incorrectBar.className = 'incorrect-bar';
-      incorrectBar.style.width = `${100 - accuracy}%`;
-      incorrectBar.textContent = `不正解: ${incorrectCount}`;
-      graphEl.appendChild(incorrectBar);
-      
-      graphContainer.appendChild(graphEl);
-      statsEl.appendChild(graphContainer);
-      
-      statsSection.appendChild(statsEl);
-    } else {
-      const noStatsEl = document.createElement('p');
-      noStatsEl.textContent = 'まだ挑戦記録がありません';
-      statsSection.appendChild(noStatsEl);
-    }
-    
-    infoSection.appendChild(statsSection);
     modalContent.appendChild(infoSection);
     
 
