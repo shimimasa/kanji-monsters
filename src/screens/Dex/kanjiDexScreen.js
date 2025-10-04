@@ -29,12 +29,14 @@ const kanjiDexScreen = {
   _clickHandler: null,
   _keyHandler:   null,
 
-  // 新しいプロパティ
-  sortMode: 'default',
-  showCollectedOnly: false,
-  filteredList: [],
-  // ← 追加: 学年フィルタ（'all' | 1..10）
-  gradeFilter: 'all',
+    // 新しいプロパティ
+    sortMode: 'default',
+    showCollectedOnly: false,
+    // ← 追加: 誤読のみ表示フラグ
+    showWrongOnly: false,
+    filteredList: [],
+    // ← 追加: 学年フィルタ（'all' | 1..10）
+    gradeFilter: 'all',
 
   // DOM要素の参照
   container: null,
@@ -317,65 +319,94 @@ const kanjiDexScreen = {
       flex: '1'
     });
   
-    // ソートボタンを作成する関数
-    const createSortButton = (text, mode, isActive) => {
-      const btn = document.createElement('button');
-      btn.className = `btn-sort ${isActive ? 'sort-active' : ''}`;
-      btn.textContent = text;
-      
-      const baseStyle = {
-        background: isActive ? 
-          'linear-gradient(135deg, #f39c12, #e67e22)' : 
-          'linear-gradient(135deg, #ffc107, #e0a800)',
-        color: isActive ? 'white' : '#000',
-        border: isActive ? '2px solid #fff' : '1px solid rgba(255, 255, 255, 0.2)',
-        borderRadius: '8px',
-        padding: '8px 16px',
-        cursor: 'pointer',
-        fontSize: '14px',
-        fontWeight: '600',
-        transition: 'all 0.3s ease',
-        boxShadow: isActive ? 
-          '0 0 12px rgba(243, 156, 18, 0.5)' : 
-          '0 2px 4px rgba(0, 0, 0, 0.2)'
-      };
-      
-      Object.assign(btn.style, baseStyle);
-      
-      // ホバーエフェクト
-      btn.addEventListener('mouseenter', () => {
-        if (!isActive) {
-          Object.assign(btn.style, {
-            background: 'linear-gradient(135deg, #e0a800, #d39e00)',
-            transform: 'translateY(-2px)',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
-          });
-        }
-      });
-      
-      btn.addEventListener('mouseleave', () => {
-        if (!isActive) {
+        // === 中央コントロール（ソートボタン） ===
+        const centerControls = document.createElement('div');
+        centerControls.className = 'nav-controls-center';
+        Object.assign(centerControls.style, {
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          justifyContent: 'center',
+          flex: '1'
+        });
+    
+        // ソートボタンを作成する関数
+        const createSortButton = (text, mode, isActive) => {
+          const btn = document.createElement('button');
+          btn.className = `btn-sort ${isActive ? 'sort-active' : ''}`;
+          btn.textContent = text;
+          const baseStyle = {
+            background: isActive ? 
+              'linear-gradient(135deg, #f39c12, #e67e22)' : 
+              'linear-gradient(135deg, #ffc107, #e0a800)',
+            color: isActive ? 'white' : '#000',
+            border: isActive ? '2px solid #fff' : '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600',
+            transition: 'all 0.3s ease',
+            boxShadow: isActive ? 
+              '0 0 12px rgba(243, 156, 18, 0.5)' : 
+              '0 2px 4px rgba(0, 0, 0, 0.2)'
+          };
           Object.assign(btn.style, baseStyle);
-        }
-      });
-      
-      btn.addEventListener('click', () => {
-        this.sortList(mode);
-        this.updateNavigationButtons();
-        this.renderKanjiCards();
-        publish('playSE', 'decide');
-      });
-      
-      return btn;
-    };
-  
-    const sortByGradeBtn = createSortButton('📊 学年順', 'grade', this.sortMode === 'grade');
-    const sortByStrokesBtn = createSortButton('✏️ 画数順', 'strokes', this.sortMode === 'strokes');
-    const sortByMasteryBtn = createSortButton('⭐ 習熟度順', 'mastery', this.sortMode === 'mastery');
-  
-    centerControls.appendChild(sortByGradeBtn);
-    centerControls.appendChild(sortByStrokesBtn);
-    centerControls.appendChild(sortByMasteryBtn);
+          btn.addEventListener('mouseenter', () => {
+            if (!isActive) {
+              Object.assign(btn.style, {
+                background: 'linear-gradient(135deg, #e0a800, #d39e00)',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+              });
+            }
+          });
+          btn.addEventListener('mouseleave', () => {
+            if (!isActive) {
+              Object.assign(btn.style, baseStyle);
+            }
+          });
+          btn.addEventListener('click', () => {
+            this.sortList(mode);
+            this.updateNavigationButtons();
+            this.renderKanjiCards();
+            publish('playSE', 'decide');
+          });
+          return btn;
+        };
+    
+        const sortByGradeBtn   = createSortButton('📊 学年順',  'grade',   this.sortMode === 'grade');
+        const sortByStrokesBtn = createSortButton('✏️ 画数順', 'strokes', this.sortMode === 'strokes');
+    
+        // ← 追加: 誤読のみトグルボタン
+        const wrongOnlyBtn = document.createElement('button');
+        wrongOnlyBtn.id = 'btnWrongOnly';
+        wrongOnlyBtn.textContent = '❗ 誤読のみ';
+        const wrongBase = {
+          background: this.showWrongOnly ? 'linear-gradient(135deg, #f39c12, #e67e22)' : 'linear-gradient(135deg, #ffc107, #e0a800)',
+          color: this.showWrongOnly ? 'white' : '#000',
+          border: this.showWrongOnly ? '2px solid #fff' : '1px solid rgba(255,255,255,0.2)',
+          borderRadius: '8px',
+          padding: '8px 16px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: '600',
+          transition: 'all 0.3s ease',
+          boxShadow: this.showWrongOnly ? '0 0 12px rgba(243,156,18,0.5)' : '0 2px 4px rgba(0,0,0,0.2)'
+        };
+        Object.assign(wrongOnlyBtn.style, wrongBase);
+        wrongOnlyBtn.addEventListener('click', () => {
+          this.showWrongOnly = !this.showWrongOnly;
+          publish('playSE', 'decide');
+          this.scroll = 0;
+          this.updateFilteredList();
+          this.updateNavigationButtons();
+          this.renderKanjiCards();
+        });
+    
+        centerControls.appendChild(sortByGradeBtn);
+        centerControls.appendChild(sortByStrokesBtn);
+        centerControls.appendChild(wrongOnlyBtn);
   
     // === 右側コントロール ===
     const rightControls = document.createElement('div');
@@ -658,47 +689,33 @@ const kanjiDexScreen = {
       readingEl.textContent = readings.join(' ');
       infoContainer.appendChild(readingEl);
       
-      // 画数
-      const strokesEl = document.createElement('p');
-      strokesEl.className = 'kanji-strokes';
-      strokesEl.textContent = `${kanjiData.strokes}画`;
-      infoContainer.appendChild(strokesEl);
+            // 画数
+            const strokesEl = document.createElement('p');
+            strokesEl.className = 'kanji-strokes';
+            strokesEl.textContent = `${kanjiData.strokes}画`;
+            infoContainer.appendChild(strokesEl);
       
-      // 習熟度
-      const masteryEl = document.createElement('div');
-      masteryEl.className = 'kanji-mastery';
+            // ← 追加: 例文表示（安全に抽出）
+            const example = this._getExampleSentence(kanjiData);
+            if (example) {
+              const exEl = document.createElement('p');
+              exEl.className = 'kanji-example';
+              exEl.textContent = example;
+              Object.assign(exEl.style, {
+                marginTop: '6px',
+                padding: '6px 8px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '6px',
+                color: '#fff',
+                fontSize: '12px',
+                lineHeight: '1.4'
+              });
+              infoContainer.appendChild(exEl);
+            }
       
-      const correctCount = kanjiData.correctCount || 0;
-      const incorrectCount = kanjiData.incorrectCount || 0;
-      const totalAttempts = correctCount + incorrectCount;
-      
-      if (totalAttempts > 0) {
-        const accuracy = correctCount / totalAttempts;
-        const accuracyPercent = Math.round(accuracy * 100);
-        
-        // 星の数を決定
-        let starCount = 1;
-        if (accuracy >= 0.9) starCount = 3;
-        else if (accuracy >= 0.7) starCount = 2;
-        
-        // 星アイコンを追加
-        for (let i = 0; i < starCount; i++) {
-          const star = document.createElement('span');
-          star.className = 'mastery-star';
-          star.textContent = '⭐';
-          masteryEl.appendChild(star);
-        }
-        
-        // 正答率
-        const accuracyEl = document.createElement('span');
-        accuracyEl.className = 'mastery-accuracy';
-        accuracyEl.textContent = `${accuracyPercent}%`;
-        masteryEl.appendChild(accuracyEl);
-      } else {
-        masteryEl.textContent = '未挑戦';
-      }
-      
-      infoContainer.appendChild(masteryEl);
+            // 学習記録UIは非表示（星/正答率などを削除）
+            /* （削除）習熟度ブロック */
     } else {
       // 未収集の場合
       const lockedEl = document.createElement('p');
@@ -1070,20 +1087,32 @@ const kanjiDexScreen = {
     });
   }
   
-    // 収集率統計を更新
-    const statsText = this.container.querySelector('.kanji-stats-text');
-    const progressFill = this.container.querySelector('.kanji-progress-fill');
-  
-    if (statsText && progressFill) {
-      const collectedCount = this._effectiveCollectedCount(); // ← 変更
-      const collectionRate = Math.floor((collectedCount / this.allList.length) * 100); // ← 変更
-      if (this.showCollectedOnly) {
-        statsText.textContent = `表示中: ${this.filteredList.length} / 収集済: ${collectedCount} (${collectionRate}%)`;
-      } else {
-        statsText.textContent = `漢字収集率: ${collectedCount}/${this.allList.length} (${collectionRate}%)`;
-      }
-      progressFill.style.width = `${collectionRate}%`;
+      // 収集率統計を更新
+  const statsText = this.container.querySelector('.kanji-stats-text');
+  const progressFill = this.container.querySelector('.kanji-progress-fill');
+
+  if (statsText && progressFill) {
+    const collectedCount = this._effectiveCollectedCount(); // ← 変更
+    const collectionRate = Math.floor((collectedCount / this.allList.length) * 100); // ← 変更
+    if (this.showCollectedOnly) {
+      statsText.textContent = `表示中: ${this.filteredList.length} / 収集済: ${collectedCount} (${collectionRate}%)`;
+    } else {
+      statsText.textContent = `漢字収集率: ${collectedCount}/${this.allList.length} (${collectionRate}%)`;
     }
+    progressFill.style.width = `${collectionRate}%`;
+  }
+
+  // ← 追加: 誤読のみボタンの見た目更新
+  const wrongBtn = this.container.querySelector('#btnWrongOnly');
+  if (wrongBtn) {
+    const active = this.showWrongOnly;
+    Object.assign(wrongBtn.style, {
+      background: active ? 'linear-gradient(135deg, #f39c12, #e67e22)' : 'linear-gradient(135deg, #ffc107, #e0a800)',
+      color: active ? 'white' : '#000',
+      border: active ? '2px solid #fff' : '1px solid rgba(255,255,255,0.2)',
+      boxShadow: active ? '0 0 12px rgba(243,156,18,0.5)' : '0 2px 4px rgba(0,0,0,0.2)'
+    });
+  }
 },
 
   /** update：毎フレーム描画 */
@@ -1187,21 +1216,25 @@ const kanjiDexScreen = {
     this.updateFilteredList();
   },
 
-  /** フィルタリング機能を実装 */
-  updateFilteredList() {
-    if (this.showCollectedOnly) {
-      this.filteredList = this.allList.filter(id => this._isCollected(id)); // ← 変更
-    } else {
-      this.filteredList = [...this.allList];
-    }
-    // ← 学年フィルタは既存のまま
-    if (this.gradeFilter !== 'all') {
-      this.filteredList = this.filteredList.filter(id => {
-        const k = getKanjiById(id);
-        return k && k.grade === this.gradeFilter;
-      });
-    }
-  },
+    /** フィルタリング機能を実装 */
+    updateFilteredList() {
+      if (this.showCollectedOnly) {
+        this.filteredList = this.allList.filter(id => this._isCollected(id)); // ← 変更
+      } else {
+        this.filteredList = [...this.allList];
+      }
+      // ← 学年フィルタ
+      if (this.gradeFilter !== 'all') {
+        this.filteredList = this.filteredList.filter(id => {
+          const k = getKanjiById(id);
+          return k && k.grade === this.gradeFilter;
+        });
+      }
+      // ← 追加: 誤読のみ
+      if (this.showWrongOnly) {
+        this.filteredList = this.filteredList.filter(id => this._isWrongEver(id));
+      }
+    },
   /** フィルタリング状態を切り替え */
   toggleFilter() {
     this.showCollectedOnly = !this.showCollectedOnly;
@@ -1235,6 +1268,42 @@ const kanjiDexScreen = {
         this.dexSet = merged;
       }
     } catch {}
+  },
+
+  // ← 追加: 誤読判定（永続化があればlocalStorageも参照）
+  _isWrongEver(id) {
+    try {
+      const k = getKanjiById(id);
+      if (k && (k.incorrectCount || 0) > 0) return true;
+
+      // 追加で localStorage の補助セットを参照（存在すれば）
+      try {
+        const raw = localStorage.getItem('krb_wrong_kanji');
+        if (raw) {
+          const arr = JSON.parse(raw);
+          if (Array.isArray(arr) && arr.includes(id)) return true;
+        }
+      } catch {}
+
+      // 直近セッションの誤答リストも補助的に参照
+      const w = Array.isArray(gameState.wrongKanjiList) ? gameState.wrongKanjiList : [];
+      if (w.some(e => (typeof e === 'object' && e && e.id === id))) return true;
+
+      return false;
+    } catch { return false; }
+  },
+
+  // ← 追加: 例文抽出（学年差分を吸収）
+  _getExampleSentence(k) {
+    if (!k) return '';
+    if (Array.isArray(k.examples) && k.examples.length > 0) {
+      const e = k.examples[0];
+      return (typeof e === 'string') ? e : (e?.sentence || '');
+    }
+    if (typeof k.exampleSentence === 'string' && k.exampleSentence.trim()) {
+      return k.exampleSentence;
+    }
+    return '';
   }
 };
 
