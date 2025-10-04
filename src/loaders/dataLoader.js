@@ -602,3 +602,32 @@ export function getUnmasteredKanjiForStage(stageId) {
   const kanjiList = getKanjiByStageId(stageId);
   return kanjiList.filter(kanji => !isKanjiMastered(kanji.id));
 }
+
+export async function loadKanjiGradesPhased({ eager = [1,2], lazy = [3,4,5,6], idle = [7,8,9,10] } = {}) {
+  await _loadGrades(eager);
+  setTimeout(() => { _loadGrades(lazy).catch(() => {}); }, 0);
+  const idleLoader = () => _loadGrades(idle).catch(() => {});
+  if (typeof requestIdleCallback === 'function') {
+    try { requestIdleCallback(idleLoader, { timeout: 4000 }); } catch { setTimeout(idleLoader, 1500); }
+  } else {
+    setTimeout(idleLoader, 1500);
+  }
+}
+
+async function _loadGrades(grades) {
+  if (!Array.isArray(grades) || grades.length === 0) return;
+  const tasks = grades.map(async g => {
+    try {
+      const r = await fetch(`/data/kanji_g${g}_proto.json`).catch(() => null);
+      if (!r || !r.ok) return;
+      const arr = await r.json();
+      kanjiByGrade[g] = Array.isArray(arr) ? arr : [];
+      // 重複を避けつつ kanjiData に統合
+      const exist = new Set(kanjiData.map(k => k.id));
+      for (const k of kanjiByGrade[g]) {
+        if (k && !exist.has(k.id)) { kanjiData.push(k); exist.add(k.id); }
+      }
+    } catch {}
+  });
+  await Promise.all(tasks);
+}
