@@ -42,7 +42,14 @@ export function getDefaultSave() {
       lang: 'ja',
       gameMode: 'jikkuri',
       maxHealCount: 3,
-      enemyAttackMode: 'onMistakeOnly'
+      enemyAttackMode: 'onMistakeOnly',
+      // ▼ 追加: バックアップ対象に含める設定類
+      showTimer: false,
+      healMode: 'noAttack',
+      autosaveEnabled: true,
+      autosaveMinutes: 5,
+      cbMode: false,
+      bigFont: false
     },
     flags: {
       bonusUnlocked: {}
@@ -168,6 +175,25 @@ function mergeAmbientKeys(saveObj) {
   if (!Number.isNaN(mh)) saveObj.settings.maxHealCount = Math.max(1, Math.min(5, mh));
   const eam = localStorage.getItem('enemyAttackMode');
   if (eam) saveObj.settings.enemyAttackMode = eam;
+
+  // ▼ 追加: 表示・オートセーブ・アクセシビリティ
+  const st = localStorage.getItem('showTimer');
+  if (st !== null) saveObj.settings.showTimer = st === '1';
+
+  const hm = localStorage.getItem('healMode');
+  if (hm) saveObj.settings.healMode = hm;
+
+  const ase = localStorage.getItem('autosaveEnabled');
+  if (ase !== null) saveObj.settings.autosaveEnabled = ase === '1';
+
+  const asm = parseInt(localStorage.getItem('autosaveMinutes') || '', 10);
+  if (!Number.isNaN(asm)) saveObj.settings.autosaveMinutes = Math.max(1, asm);
+
+  const cb = localStorage.getItem('cbMode');
+  if (cb !== null) saveObj.settings.cbMode = cb === '1';
+
+  const bf = localStorage.getItem('bigFont');
+  if (bf !== null) saveObj.settings.bigFont = bf === '1';
 
   // 最終プレイステージ
   const last = localStorage.getItem('lastPlayedStage');

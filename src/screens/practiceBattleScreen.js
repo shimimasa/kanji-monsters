@@ -5,6 +5,8 @@ import { gameState, battleState, saveGameData } from '../core/gameState.js';
 import { getKanjiByStageId, isKanjiMastered } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
 import { images, loadBgImage } from '../loaders/assetsLoader.js';
+import { stageData } from '../loaders/dataLoader.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 // 練習バトル画面状態
 const practiceBattleScreenState = {
   // 既存のbattleScreenStateの全機能を継承
@@ -80,6 +82,14 @@ wrongTargets: { ids: new Set(), texts: new Set() },
       this.onPracticeComplete = onComplete;
       gameState.gameMode = 'practice';
 
+      // ← 追加: ボーナス練習は必ず世界編に戻れるように補強
+      try {
+        const sid = String(gameState.currentStageId || '');
+        if (/^bonus_g\d+$/i.test(sid)) {
+          gameState.previousScreen = 'worldStageSelect';
+        }
+      } catch {}
+
 // 1分復習（誤答限定）を検出（最優先）
 try {
   const qr = gameState.quickReviewTargets;
@@ -93,12 +103,34 @@ try {
   }
 } catch {}
 
-// ボーナスは即レビュー解放（ただし誤答限定中は適用しない）
-const isBonus = /^bonus_g\d+$/i.test(String(gameState.currentStageId || ''));
-if (isBonus && !this.wrongOnlyMode) {
-  if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
-  gameState.stageReviewUnlocked[gameState.currentStageId] = true;
-  this.reviewMode = true;
+// 学年ボーナス時の背景/BGM候補を事前選定し、背景は確実にロードして適用
+{
+  const sid = String(gameState.currentStageId || '');
+  const m = /^bonus_g(\d+)$/i.exec(sid);
+  this._preselectedBonusBg = null;
+  this._preselectedBonusBgmKey = null;
+  this._candidateStageForBonus = null;
+
+  if (m) {
+    const g = parseInt(m[1], 10);
+    const candidates = (stageData || []).filter(s => s.grade === g && !/^bonus_/i.test(String(s.stageId || '')));
+    if (candidates.length > 0) {
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      this._candidateStageForBonus = pick;
+      // 画像が未キャッシュでも確実にロードして適用
+      loadBgImage(pick.stageId).then(img => {
+        if (img) this.stageBgImage = img;
+      });
+      // BGMキー（親のロジックで候補IDから算出）
+      if (typeof battleScreenState.getBGMKeyForStage === 'function') {
+        this._preselectedBonusBgmKey = battleScreenState.getBGMKeyForStage.call(this, pick.stageId);
+      }
+    }
+    // 学年専用ボーナス背景があれば最優先
+    if (images && images[`bg_bonus_g${g}`]) {
+      this.stageBgImage = images[`bg_bonus_g${g}`];
+    }
+  }
 }
       
       import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('practiceBattle', { canvas: canvasEl }));
@@ -115,6 +147,7 @@ if (isBonus && !this.wrongOnlyMode) {
             // 通常のバトル画面初期化を実行
             battleScreenState.enter.call(this, canvasEl);
 
+            this._setupGlobalBackHandler();
                   // 画面固定（vh-lock）を有効化
       try {
         requestAnimationFrame(() => {
@@ -125,12 +158,15 @@ if (isBonus && !this.wrongOnlyMode) {
       } catch {}
 
       // 背景画像を必ずステージのものに
-      try {
-        this.stageBgImage = (images && images[`bg_${gameState.currentStageId}`]) || this.stageBgImage || null;
-        if (!this.stageBgImage) {
-          loadBgImage(gameState.currentStageId).then(img => { this.stageBgImage = img; });
-        }
-      } catch {}
+try {
+  const isBonus = /^bonus_g\d+$/i.test(String(gameState.currentStageId || ''));
+  if (!isBonus) {
+    this.stageBgImage = (images && images[`bg_${gameState.currentStageId}`]) || this.stageBgImage || null;
+    if (!this.stageBgImage) {
+      loadBgImage(gameState.currentStageId).then(img => { this.stageBgImage = img; });
+    }
+  }
+} catch {}
 
       // マスターモード専用のキーハンドラを設定
       this._setupPracticeKeyHandler();
@@ -177,6 +213,30 @@ if (isBonus && !this.wrongOnlyMode) {
     }
   },
 
+  // practiceBattleScreen.js のオブジェクト内に追加
+  getBGMKeyForStage(stageId) {
+    try {
+      const id = String(stageId || '');
+      // 小1総復習のみ固定BGM
+      if (/^bonus_g1$/i.test(id)) {
+        return 'hokkaido_area1_a';
+      }
+      if (!/^bonus_g\d+$/i.test(id)) {
+        return (typeof battleScreenState.getBGMKeyForStage === 'function')
+          ? battleScreenState.getBGMKeyForStage.call(this, stageId)
+          : null;
+      }
+      if (this._preselectedBonusBgmKey) return this._preselectedBonusBgmKey;
+      if (this._candidateStageForBonus && typeof battleScreenState.getBGMKeyForStage === 'function') {
+        return battleScreenState.getBGMKeyForStage.call(this, this._candidateStageForBonus.stageId);
+      }
+      return (typeof battleScreenState.getBGMKeyForStage === 'function')
+        ? battleScreenState.getBGMKeyForStage.call(this, stageId)
+        : null;
+    } catch {
+      return null;
+    }
+  },
   /**
    * 今日の練習回数を更新
    */
@@ -508,6 +568,20 @@ _buildUnmasteredKanjiList() {
   }
 },
 
+  // ← 追加: quick review 完了ハンドラ（緊急退避もあり）
+  _completeQuickReview() {
+    try {
+      // まずは通常レビューへ移行して継続
+      this.reviewMode = true;
+      if (typeof this._pickNextReviewQuestion === 'function') {
+        this._pickNextReviewQuestion();
+        return;
+      }
+    } catch {}
+    // どうしても続行できない場合は安全に戻る
+    const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+    publish('changeScreen', target);
+  },
   /**
    * 次の未マスター漢字を出題
    */
@@ -932,9 +1006,6 @@ if (this.unmasteredKanji.length === 0) {
     }
   },
 
-  /**
-   * マウスクリック処理（マスターモード専用にオーバーライド）
-   */
   handleClick(e) {
     console.log('🖱️ マスターモードクリック処理');
 
@@ -953,33 +1024,37 @@ if (this.unmasteredKanji.length === 0) {
       const rect = this.canvas.getBoundingClientRect();
       const scaleX = this.canvas.width / rect.width;
       const scaleY = this.canvas.height / rect.height;
-      const x = (eventX - rect.left) * scaleX;
-      const y = (eventY - rect.top) * scaleY;
+      
+      const coords = getGameCoordinates(e, this.canvas);
+      if (!isValidCoordinates(coords)) return false;
+      const x = coords.x, y = coords.y;
 
-      const BTN = {
-        stage:  { x: 140, y: 20,  w: 120, h: 30 },
-      };
+      const topMargin = 20;
+      const bx = topMargin, by = topMargin, bw = 120, bh = 36;
+      const SLOP = 16;
 
-      const isMouseOverRect = (mx, my, rect) => {
-        return mx >= rect.x && mx <= rect.x + rect.w && 
-               my >= rect.y && my <= rect.y + rect.h;
-      };
-
-      if (isMouseOverRect(x, y, BTN.stage)) {
-        console.log('🗺️ ステージ選択へ');
-        publish('playBGM', 'title');
-        const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-        publish('changeScreen', targetScreen);
-        return true;
-      }
+      const hitBack = (x >= bx - SLOP && x <= bx + bw + SLOP &&
+                       y >= by - SLOP && y <= by + bh + SLOP);
+                       if (hitBack) {
+                        console.log('🗺️ ステージ選択へ');
+                        publish('playBGM', 'title');
+                        if (/^bonus_g\d+$/i.test(String(gameState.currentStageId || ''))) {
+                          gameState._returnToWorld = { kanken_level: 'review' };
+                          publish('changeScreen', 'worldStageSelect', { kanken_level: 'review' });
+                        } else {
+                          const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+                          publish('changeScreen', targetScreen);
+                        }
+                        return true;
+                      }
 
       return false;
-      
     } catch (error) {
       console.error('❌ クリック処理エラー:', error);
       return false;
     }
   },
+  
 
   /**
    * 画面の描画更新（ボタンなし版）
@@ -993,14 +1068,17 @@ if (this.unmasteredKanji.length === 0) {
       gameState.enemies = [];
       
       // 最小限のバトルUI描画
-      this._drawMinimalBattleUI(dt);
-      
-      // 🎨 改善されたUIを描画
-      this._hideEnemyAndPlayerUIAreas();
-      this._drawImprovedPracticeUI();
-      
-      gameState.currentEnemy = originalEnemy;
-      gameState.enemies = originalEnemies;
+this._drawMinimalBattleUI(dt);
+
+// 🎨 改善されたUIを描画
+this._hideEnemyAndPlayerUIAreas();
+this._drawImprovedPracticeUI();
+
+// ← 追加: 漢字パネル＋エフェクトを最前面に再描画（上書きで見切れ防止）
+this._drawKanjiBoxWithEffects();
+
+gameState.currentEnemy = originalEnemy;
+gameState.enemies = originalEnemies;
       
     } catch (error) {
       console.error('❌ 描画更新エラー:', error);
@@ -1024,24 +1102,53 @@ if (this.unmasteredKanji.length === 0) {
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-        // ② 上部ボタン描画（ステージ選択のみ）
-        const BTN = {
-          stage:  { x: 40, y: 20,  w: 220, h: 30,  label: 'ステージ選択（もどる）' },
-        };
-        [BTN.stage].forEach(b => {
-          const isHovered = this.mouseX && this.mouseY ? 
-            (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h) : false;
-          this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
-          this.ctx.fillRect(b.x, b.y, b.w, b.h);
-          this.ctx.fillStyle = 'white';
-          this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
-          this.ctx.textAlign = 'center';
-          this.ctx.textBaseline = 'middle';
-          this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
-          this.ctx.strokeStyle = 'white';
-          this.ctx.lineWidth = 2;
-          this.ctx.strokeRect(b.x, b.y, b.w, b.h);
-        });
+// ② 上部ボタン描画（左上「もどる」）
+const topMargin = 20;
+const BTN = {
+  stage: { x: topMargin, y: topMargin, w: 120, h: 36, label: 'もどる' },
+};
+
+[BTN.stage].forEach(b => {
+  const isHovered = this.mouseX && this.mouseY
+    ? (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h)
+    : false;
+  if (typeof drawStoneButton === 'function') {
+    // 修正: ボタン情報をオブジェクトで渡す
+    drawStoneButton(this.ctx, { x: b.x, y: b.y, w: b.w, h: b.h, label: b.label }, isHovered, false);
+  } else {
+    this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
+    this.ctx.fillRect(b.x, b.y, b.w, b.h);
+    this.ctx.fillStyle = 'white';
+    this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
+    this.ctx.strokeStyle = 'white';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(b.x, b.y, b.w, b.h);
+  }
+  // ← 追加: 現在ステージ名ラベル
+  try {
+    const st = stageData.find(s => s.stageId === gameState.currentStageId);
+    const title = st?.name;
+    if (title) {
+      const tx = b.x + b.w + 12;
+      const ty = b.y;
+      this.ctx.font = '14px "UDデジタル教科書体", sans-serif';
+      const tw = Math.ceil(this.ctx.measureText(title).width) + 16;
+      const th = b.h;
+      this.ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      this.ctx.fillRect(tx, ty, tw, th);
+      this.ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeRect(tx, ty, tw, th);
+      this.ctx.fillStyle = '#fff';
+      this.ctx.textAlign = 'left';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(title, tx + 8, ty + th / 2);
+    }
+  } catch {}
+});
 
     // ③ 漢字ボックス描画
     this._drawKanjiBoxWithEffects();
@@ -1098,40 +1205,83 @@ if (this.unmasteredKanji.length === 0) {
     const adjustedX = kanjiX - (scaledW / 2) + offsetX;
     const adjustedY = kanjiY - (scaledH / 2) + offsetY;
 
-    // 石版パネル描画
-    if (typeof drawStonePanel === 'function') {
-      drawStonePanel(this.ctx, adjustedX, adjustedY, scaledW, scaledH);
-    } else {
-      this.ctx.fillStyle = 'rgba(50, 50, 60, 0.85)';
-      this.ctx.fillRect(adjustedX, adjustedY, scaledW, scaledH);
-      this.ctx.strokeStyle = borderColor;
-      this.ctx.lineWidth = borderWidth;
-      this.ctx.strokeRect(adjustedX, adjustedY, scaledW, scaledH);
-    }
+    // ← サブピクセル誤差を排除してスナップした値を実際の描画に使用
+const ax = Math.round(adjustedX);
+const ay = Math.round(adjustedY);
+const sw = Math.round(scaledW);
+const sh = Math.round(scaledH);
 
-    // 漢字表示
-    if (gameState.currentKanji) {
-      this.ctx.font = `${80 * boxScale}px serif`;
-      this.ctx.fillStyle = 'white';
-      this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'middle';
-      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-      this.ctx.shadowBlur = 5;
-      this.ctx.shadowOffsetX = 3 * boxScale;
-      this.ctx.shadowOffsetY = 3 * boxScale;
-      this.ctx.fillText(gameState.currentKanji.text, adjustedX + scaledW / 2, adjustedY + scaledH / 2);
-      this.ctx.shadowColor = 'transparent';
-      this.ctx.shadowBlur = 0;
-      this.ctx.shadowOffsetX = 0;
-      this.ctx.shadowOffsetY = 0;
-    }
+// 石版パネル描画（スナップ後の矩形で描画）
+if (typeof drawStonePanel === 'function') {
+  drawStonePanel(this.ctx, ax, ay, sw, sh);
+} else {
+  this.ctx.fillStyle = 'rgba(50, 50, 60, 0.85)';
+  this.ctx.fillRect(ax, ay, sw, sh);
+  this.ctx.strokeStyle = borderColor;
+  this.ctx.lineWidth = borderWidth;
+  this.ctx.strokeRect(ax, ay, sw, sh);
+}
 
-    // 石版攻撃エフェクト
-    if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
-      this.drawStoneAttackEffect(adjustedX, adjustedY, scaledW, scaledH);
-    }
+// 漢字表示（中央座標もスナップ矩形に合わせる）
+if (gameState.currentKanji) {
+  this.ctx.font = `${80 * boxScale}px serif`;
+  this.ctx.fillStyle = 'white';
+  this.ctx.textAlign = 'center';
+  this.ctx.textBaseline = 'middle';
+  this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+  this.ctx.shadowBlur = 5;
+  this.ctx.shadowOffsetX = 3 * boxScale;
+  this.ctx.shadowOffsetY = 3 * boxScale;
+  this.ctx.fillText(gameState.currentKanji.text, ax + sw / 2, ay + sh / 2);
+  this.ctx.shadowColor = 'transparent';
+  this.ctx.shadowBlur = 0;
+  this.ctx.shadowOffsetX = 0;
+  this.ctx.shadowOffsetY = 0;
+}
+
+// 石版攻撃エフェクト（同じ矩形で）
+if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
+  this.drawStoneAttackEffect(ax, ay, sw, sh);
+}
   },
-
+  _setupGlobalBackHandler() {
+    try {
+      if (!this.canvas) return;
+      const handler = (e) => {
+        try {
+          const coords = getGameCoordinates(e, this.canvas);
+          if (!isValidCoordinates(coords)) return;
+          const x = coords.x, y = coords.y;
+          const topMargin = 20, bx = topMargin, by = topMargin, bw = 120, bh = 36, SLOP = 16;
+          if (x >= bx - SLOP && x <= bx + bw + SLOP && y >= by - SLOP && y <= by + bh + SLOP) {
+            e.preventDefault(); e.stopPropagation();
+            publish('playBGM', 'title');
+            if (/^bonus_g\d+$/i.test(String(gameState.currentStageId || ''))) {
+              gameState._returnToWorld = { kanken_level: 'review' };
+              publish('changeScreen', 'worldStageSelect', { kanken_level: 'review' });
+            } else {
+              const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+              publish('changeScreen', target);
+            }
+          }
+        } catch {}
+      };
+      document.addEventListener('pointerdown', handler, { passive: false, capture: true });
+      document.addEventListener('mousedown',  handler, true);
+      document.addEventListener('touchstart', handler, { passive: false, capture: true });
+      this._globalBackHandler = handler;
+    } catch {}
+  },
+_teardownGlobalBackHandler() {
+  try {
+    if (this._globalBackHandler) {
+      document.removeEventListener('pointerdown', this._globalBackHandler, true);
+      document.removeEventListener('mousedown',  this._globalBackHandler, true);
+      document.removeEventListener('touchstart', this._globalBackHandler, true);
+      this._globalBackHandler = null;
+    }
+  } catch {}
+},
   /**
    * エフェクトの更新
    */
@@ -2336,7 +2486,9 @@ if (this.wrongOnlyMode) {
       this.wrongTargets = { ids: new Set(), texts: new Set() };
       try { delete gameState.quickReviewTargets; } catch {}
     }
-    }
+    this._teardownGlobalBackHandler();  
+  }
+    
 };
 
 export default practiceBattleScreenState;

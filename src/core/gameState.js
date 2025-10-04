@@ -276,41 +276,56 @@ function incrementStageClearCount(stageId) {
           }
         }
 
-        // 音量・設定
-        const bgm = parseFloat(localStorage.getItem('bgmVolume') || `${base.settings?.bgmVolume ?? 0.7}`);
-        const se  = parseFloat(localStorage.getItem('seVolume')  || `${base.settings?.seVolume  ?? 0.8}`);
-        const gameMode = localStorage.getItem('gameMode') || base.settings?.gameMode || 'jikkuri';
-        const maxHealCount = parseInt(localStorage.getItem('maxHealCount') || `${base.settings?.maxHealCount ?? 3}`, 10);
-        const enemyAttackMode = localStorage.getItem('enemyAttackMode') || base.settings?.enemyAttackMode || 'onMistakeOnly';
-
-        // 新スキーマを更新
-        const save = base || getDefaultSave();
-        save.player = save.player || {};
-        save.player.name = gameState.playerName || save.player.name || '';
-        save.player.coreStats = Object.assign({}, save.player.coreStats || {}, gameState.playerStats || {});
-        save.player.progress = Object.assign({}, save.player.progress || {}, {
-          currentStage: gameState.currentStageId || save.player?.progress?.currentStage || null,
-          clearedStages: Array.from(cleared),
-          stageBestTimes: Object.assign({}, save.player?.progress?.stageBestTimes, gameState.stageBestTimes || {})
-        });
-        save.player.collection = Object.assign({}, save.player.collection || {}, {
-          gotomonIds
-        });
-        save.player.study = Object.assign({}, save.player.study || {}, {
-          practiceProgress: gameState.practiceProgress || {},
-          kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress || {}),
-          reviewQueue: reviewIds,
-          // 追加: ステージのレビュー解放状況を永続化
-          stageReviewUnlocked: gameState.stageReviewUnlocked || {}
-        });
-        save.settings = Object.assign({}, save.settings || {}, {
-          bgmVolume: Number.isFinite(bgm) ? Math.max(0, Math.min(1, bgm)) : 0.7,
-          seVolume:  Number.isFinite(se)  ? Math.max(0, Math.min(1, se )) : 0.8,
-          lang: save.settings?.lang || 'ja',
-          gameMode,
-          maxHealCount: Number.isFinite(maxHealCount) ? Math.max(1, Math.min(5, maxHealCount)) : 3,
-          enemyAttackMode
-        });
+                // 音量・設定
+                const bgm = parseFloat(localStorage.getItem('bgmVolume') || `${base.settings?.bgmVolume ?? 0.7}`);
+                const se  = parseFloat(localStorage.getItem('seVolume')  || `${base.settings?.seVolume  ?? 0.8}`);
+                const gameMode = localStorage.getItem('gameMode') || base.settings?.gameMode || 'jikkuri';
+                const maxHealCount = parseInt(localStorage.getItem('maxHealCount') || `${base.settings?.maxHealCount ?? 3}`, 10);
+                const enemyAttackMode = localStorage.getItem('enemyAttackMode') || base.settings?.enemyAttackMode || 'onMistakeOnly';
+        
+                // ▼ 追加: 表示/回復後行動/オートセーブ/アクセシビリティ
+                const showTimer = (localStorage.getItem('showTimer') ?? `${base.settings?.showTimer ? '1' : '0'}`) === '1';
+                const healMode  = localStorage.getItem('healMode') || base.settings?.healMode || 'noAttack';
+                const autosaveEnabled = (localStorage.getItem('autosaveEnabled') ?? `${base.settings?.autosaveEnabled ? '1' : '0'}`) === '1';
+                const autosaveMinutes = parseInt(localStorage.getItem('autosaveMinutes') || `${base.settings?.autosaveMinutes ?? 5}`, 10);
+                const cbMode = (localStorage.getItem('cbMode') ?? `${base.settings?.cbMode ? '1' : '0'}`) === '1';
+                const bigFont = (localStorage.getItem('bigFont') ?? `${base.settings?.bigFont ? '1' : '0'}`) === '1';
+        
+                // 新スキーマを更新
+                const save = base || getDefaultSave();
+                save.player = save.player || {};
+                save.player.name = gameState.playerName || save.player.name || '';
+                save.player.coreStats = Object.assign({}, save.player.coreStats || {}, gameState.playerStats || {});
+                save.player.progress = Object.assign({}, save.player.progress || {}, {
+                  currentStage: gameState.currentStageId || save.player?.progress?.currentStage || null,
+                  clearedStages: Array.from(cleared),
+                  stageBestTimes: Object.assign({}, save.player?.progress?.stageBestTimes, gameState.stageBestTimes || {})
+                });
+                save.player.collection = Object.assign({}, save.player.collection || {}, {
+                  gotomonIds
+                });
+                save.player.study = Object.assign({}, save.player.study || {}, {
+                  practiceProgress: gameState.practiceProgress || {},
+                  kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress || {}),
+                  reviewQueue: reviewIds,
+                  // 追加: ステージのレビュー解放状況を永続化
+                  stageReviewUnlocked: gameState.stageReviewUnlocked || {}
+                });
+                save.settings = Object.assign({}, save.settings || {}, {
+                  bgmVolume: Number.isFinite(bgm) ? Math.max(0, Math.min(1, bgm)) : 0.7,
+                  seVolume:  Number.isFinite(se)  ? Math.max(0, Math.min(1, se )) : 0.8,
+                  lang: save.settings?.lang || 'ja',
+                  gameMode,
+                  maxHealCount: Number.isFinite(maxHealCount) ? Math.max(1, Math.min(5, maxHealCount)) : 3,
+                  enemyAttackMode,
+                  // ▼ 追加設定
+                  showTimer,
+                  healMode,
+                  autosaveEnabled,
+                  autosaveMinutes: Number.isFinite(autosaveMinutes) ? Math.max(1, autosaveMinutes) : 5,
+                  cbMode,
+                  bigFont
+                });
         
         // 実績（v1）を保存
         save.flags = Object.assign({}, save.flags || {}, {
@@ -347,15 +362,34 @@ function incrementStageClearCount(stageId) {
         if (save.player?.study?.practiceProgress) {
           gameState.practiceProgress = save.player.study.practiceProgress || {};
         }
-        if (save.player?.study?.kanjiReadProgress) {
-          gameState.kanjiReadProgress = deserializeKanjiReadProgress(save.player.study.kanjiReadProgress || {});
+        // ▼ kanjiReadProgress 反映＋図鑑を復元
+        const rawKRP = save.player?.study?.kanjiReadProgress || {};
+        if (rawKRP) {
+          gameState.kanjiReadProgress = deserializeKanjiReadProgress(rawKRP || {});
+          try {
+            const ids = [];
+            for (const [id, prog] of Object.entries(rawKRP)) {
+              const onLen  = Array.isArray(prog?.onyomi) ? prog.onyomi.length : 0;
+              const kunLen = Array.isArray(prog?.kunyomi) ? prog.kunyomi.length : 0;
+              if (prog?.mastered || onLen > 0 || kunLen > 0) ids.push(id);
+            }
+            if (ids.length > 0) localStorage.setItem('krb_kanji_dex', JSON.stringify(ids));
+          } catch {}
         }
         // 追加: レビュー解放のロード
         if (save.player?.study?.stageReviewUnlocked) {
           gameState.stageReviewUnlocked = save.player.study.stageReviewUnlocked || {};
         }
+        
         if (save.player?.progress?.stageBestTimes) {
           gameState.stageBestTimes = Object.assign({}, save.player.progress.stageBestTimes);
+        }
+
+        // ▼ 追加: ゴトモン図鑑（krb_monster_dex）を localStorage に復元
+        if (Array.isArray(save.player?.collection?.gotomonIds)) {
+          try {
+            localStorage.setItem('krb_monster_dex', JSON.stringify(save.player.collection.gotomonIds));
+          } catch {}
         }
 
         // ステージ進捗（軽量反映）
@@ -371,10 +405,10 @@ function incrementStageClearCount(stageId) {
           try { localStorage.setItem('lastPlayedStage', gameState.currentStageId); } catch {}
         }
 
-                // 実績（v1）読込
-                if (Array.isArray(save.flags?.achievementsUnlocked)) {
-                  gameState.unlockedAchievements = new Set(save.flags.achievementsUnlocked);
-                }
+        // 実績（v1）読込
+        if (Array.isArray(save.flags?.achievementsUnlocked)) {
+          gameState.unlockedAchievements = new Set(save.flags.achievementsUnlocked);
+        }
         // 音量等は AudioManager が localStorage から起動時読込するためここでは保存のみ（整合性確保）
         if (save.settings) {
           try {
@@ -383,6 +417,12 @@ function incrementStageClearCount(stageId) {
             if (save.settings.gameMode)      localStorage.setItem('gameMode', save.settings.gameMode);
             if (save.settings.maxHealCount)  localStorage.setItem('maxHealCount', `${save.settings.maxHealCount}`);
             if (save.settings.enemyAttackMode) localStorage.setItem('enemyAttackMode', save.settings.enemyAttackMode);
+            if ('showTimer' in save.settings) localStorage.setItem('showTimer', save.settings.showTimer ? '1' : '0');
+            if (save.settings.healMode) localStorage.setItem('healMode', save.settings.healMode);
+            if ('autosaveEnabled' in save.settings) localStorage.setItem('autosaveEnabled', save.settings.autosaveEnabled ? '1' : '0');
+            if ('autosaveMinutes' in save.settings) localStorage.setItem('autosaveMinutes', `${save.settings.autosaveMinutes}`);
+            if ('cbMode' in save.settings) localStorage.setItem('cbMode', save.settings.cbMode ? '1' : '0');
+            if ('bigFont' in save.settings) localStorage.setItem('bigFont', save.settings.bigFont ? '1' : '0');
           } catch {}
         }
 

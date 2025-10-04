@@ -1,8 +1,8 @@
 /* ----------------------------- 依存モジュール ----------------------------- */
 import { gameState, updatePlayerName, saveGameData } from './core/gameState.js';
 import { setCanvas, update as updateScreen, render as renderScreen } from './core/screenManager.js';
-import { initAssets } from './loaders/assetsLoader.js';
-import { loadAllGameData } from './loaders/dataLoader.js';
+import { loadAll as loadUIImages } from './loaders/assetsLoader.js';
+import { loadKanjiGradesPhased } from './loaders/dataLoader.js';
 import {
   initializeFirebaseServices,
   signInAnonymouslyIfNeeded,
@@ -11,6 +11,7 @@ import {
   initializeNewPlayerData,
   loadPlayerData
 } from './services/firebase/firebaseController.js';
+import { showBootProgress, updateBootProgress, hideBootProgress } from './ui/bootProgress.js';
 import { AudioManager } from './audio/audioManager.js';
 import reviewQueue from './models/reviewQueue.js';
 import DataSync from './services/firebase/dataSync.js';
@@ -168,8 +169,13 @@ function drawAchievementNotifications(ctx) {
 (async function initGame() {
   console.log('🔧 Init start');
   // 1) 画像 & JSON プリロード
-  await initAssets();
-
+  // await initAssets();
+  showBootProgress();
+  await loadUIImages((n, total) => updateBootProgress(n, total, '画像を読み込み中…'));
+  updateBootProgress(0, 1, 'データを準備中…');
+  await loadKanjiGradesPhased({ eager: [1,2], lazy: [3,4,5,6], idle: [7,8,9,10] });
+  updateBootProgress(1, 1, 'データを準備中…');
+  hideBootProgress();
   // ▼ FSM の初期化を切り出し
   window.fsm = await setupFSM();
 

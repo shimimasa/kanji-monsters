@@ -9,10 +9,10 @@ const sharp = require('sharp');
 tinify.key = process.env.TINYPNG_API_KEY || "1j0HmzgJmytMSb9g9kH3F80xr5dKrKQv";
 
 // 入力ディレクトリ（引数で上書き可）
-const INPUT_DIR = path.resolve(process.argv[2] || path.resolve(__dirname, '../public/assets/大分'));
+const INPUT_DIR = path.resolve(process.argv[2] || path.resolve(__dirname, '../public/assets/残ゴトモン'));
 
 // 中間出力（TinyPNG圧縮後）と最終出力
-const COMP_DIR  = path.resolve(__dirname, 'compressed/大分');
+const COMP_DIR  = path.resolve(__dirname, 'compressed/残ゴトモン');
 const OUT_FULL  = path.resolve(__dirname, 'output/full');
 const OUT_THUMB = path.resolve(__dirname, 'output/thumb');
 

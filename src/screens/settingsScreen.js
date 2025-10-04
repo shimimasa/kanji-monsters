@@ -817,6 +817,10 @@ const settingsScreenState = {
       btnExport.addEventListener('click', async () => {
         publish('playSE', 'decide');
         try {
+          // ▼ 追加: 事前に現在の状態をセーブ
+          try { saveGameData(); } catch {}
+          await new Promise(r => setTimeout(r, 100));
+
           const mod = await import('../core/saveData.js');
           const data = mod.loadSave();
           const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });

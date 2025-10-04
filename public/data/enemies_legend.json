@@ -239,6 +239,7 @@
       "thumb": "TOH-F01_thumb",
       "image": "TOH-F01.webp",
       "isBoss": true,
+      "weakness": "onyomi",
         "rarity": "幻",
         "category": "自然・天象",
         "habitat": "蔵王の樹氷原",

@@ -88,6 +88,20 @@ const quickReviewPracticeScreen = {
         this.pendingReviewIds = idSet;
         this.originalReviewIds = new Set(idSet);
         this.masteredThisSession = new Set();
+
+        // 10問に制限（同日固定セット前提）
+        try {
+          if (this.pendingReviewIds.size > 10) {
+            const arr = Array.from(this.pendingReviewIds);
+            for (let i = arr.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            const top10 = arr.slice(0, 10);
+            this.pendingReviewIds = new Set(top10);
+            this.originalReviewIds = new Set(top10);
+          }
+        } catch {}
       } catch (e) {
         console.error('❌ 復習対象ID構築エラー:', e);
         this.pendingReviewIds = new Set();

@@ -4,11 +4,13 @@ import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
 import ReviewQueue from '../models/reviewQueue.js';
-import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
+import { getKanjiByGrade, getKanjiById, getKanjiByStageId } from '../loaders/dataLoader.js';
 import { isBonusUnlocked } from '../core/bonusManager.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
-
+import { getEnemiesByStageId } from '../loaders/dataLoader.js';
+import { loadDex } from '../models/monsterDex.js';
 // === 1. importの後に共通関数を追加 ===
+
 
 /** 角丸矩形を描画するヘルパー関数 */
 function drawRoundedRect(ctx, x, y, width, height, radius) {
@@ -381,6 +383,8 @@ const worldStageSelectScreen = {
   ctx: null,
   stages: [],
   stageButtons: [],
+  // 学年別総復習ボタン
+  reviewButtons: [],
   _clickHandler: null,
   _mousemoveHandler: null,
   mouseX: 0,
@@ -392,6 +396,9 @@ const worldStageSelectScreen = {
   selectedGrade: 7, // デフォルトは7（4級）
   continentInfo: null, // 選択された大陸の情報
   _inputLocked: false, // 二重発火防止の簡易ロック
+  // 総復習モード用
+  reviewButtons: [],
+  selectedReviewGrade: null, // ← 追加: 総復習用の選択中学年
   // 総復習モード用の大ボタン
   reviewChallengeButton: {
     x: 50,
@@ -404,22 +411,51 @@ const worldStageSelectScreen = {
   isReviewMode: false,
 
   /** 画面表示時の初期化 */
-  enter(arg) {
-    // BGM 再生
-    // publish('playBGM', 'title');
-    // 引数が Canvas の場合と props の場合の両方に対応
-    const isCanvasArg = arg && typeof arg.getContext === 'function';
-    this.canvas = isCanvasArg ? arg : document.getElementById('gameCanvas');
-    this.ctx = this.canvas.getContext('2d');
+enter(arg) {
+  // BGM 再生
+  // publish('playBGM', 'title');
+  // 引数が Canvas の場合と props の場合の両方に対応
+  const isCanvasArg = arg && typeof arg.getContext === 'function';
+  this.canvas = isCanvasArg ? arg : document.getElementById('gameCanvas');
+  this.ctx = this.canvas.getContext('2d');
 
-    // continentSelect からは props オブジェクトがそのまま渡ってくる
-    // stageLoading 等から Canvas が来るケースでは props は空
-    this.continentInfo = (!isCanvasArg && arg && typeof arg === 'object') ? arg : {};
-    console.log("受け取った大陸情報:", JSON.stringify(this.continentInfo));
+  // ← 追加: 入場タイムスタンプ（残留クリック抑止に使用）
+  try {
+    this._enterTS = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  } catch { this._enterTS = Date.now(); }
+
+  // continentSelect からは props オブジェクトがそのまま渡ってくる
+  // stageLoading 等から Canvas が来るケースでは props は空
+  this.continentInfo = (!isCanvasArg && arg && typeof arg === 'object') ? arg : {};
+  console.log("受け取った大陸情報:", JSON.stringify(this.continentInfo));
+
+        // 初期値を設定
+        this.selectedTabLevel = "4"; // デフォルトは4級
+        this.selectedGrade = 7;     // デフォルトは7（4級）
     
-    // 初期値を設定
-    this.selectedTabLevel = "4"; // デフォルトは4級
-    this.selectedGrade = 7;     // デフォルトは7（4級）
+        // ← 追加: gameState 経由の戻り先（最優先）
+        try {
+          const ret = gameState && gameState._returnToWorld;
+          if (ret && ret.kanken_level) {
+            const lvl = String(ret.kanken_level);
+            if (lvl === 'review') {
+              this.selectedTabLevel = 'review';
+              this.selectedGrade = 0;
+            } else {
+              for (const tab of tabs) {
+                if (String(tab.kanken_level) === lvl) {
+                  this.selectedTabLevel = tab.kanken_level;
+                  this.selectedGrade = tab.grade;
+                  break;
+                }
+              }
+            }
+          }
+        } catch {}
+        try { if (gameState && gameState._returnToWorld) delete gameState._returnToWorld; } catch {}
+        // 適切な初期化箇所で
+        this._uncaughtCache = new Map();
+this._dex = loadDex();
 
     // デフォルトの漢検レベルを設定（大陸情報から取得）
     if (this.continentInfo && this.continentInfo.kanken_level) {
@@ -461,14 +497,60 @@ const worldStageSelectScreen = {
   /** ステージリストを更新する（漢検レベル切り替え時に呼ばれる） */
   updateStageList() {
     // 総復習モードの切替
-    this.isReviewMode = (this.selectedTabLevel === "review" || this.selectedGrade === 0);
-    if (this.isReviewMode) {
-      this.stages = [];
-      this.stageButtons = [];      // ← 直前の級のボタンを消す
-      this.selectedStage = null;   // ← 選択状態もリセット
-      this.hoveredStage = null;    // ← ホバー情報もリセット
-      return;
-    }
+this.isReviewMode = (this.selectedTabLevel === "review" || this.selectedGrade === 0);
+if (this.isReviewMode) {
+  this.stages = [];
+  this.stageButtons = [];
+  this.selectedStage = null;
+  this.hoveredStage = null;
+
+  // 左パネルのレイアウト（stageButtonsと同ロジック）
+  const cw = this.canvas ? this.canvas.width : 800;
+  const ch = this.canvas ? this.canvas.height : 600;
+  const panelX = 10;
+  const panelY = 60;
+  const panelW = cw / 2 - 20;
+  const panelH = ch - 140;
+  const listStartY = panelY + 60;         // タイトル分の余白
+  const listBottom = panelY + panelH - 12;
+
+  const count = 10;                        // 小1〜高1
+  let buttonMargin = 6;
+  let buttonHeight = 50;
+  const totalAvail = Math.max(0, listBottom - listStartY);
+  const fitted = Math.floor((totalAvail - (count - 1) * buttonMargin) / count);
+  buttonHeight = Math.max(26, Math.min(50, fitted));
+  if (buttonHeight <= 30) buttonMargin = 4;
+
+  const fontSize = Math.max(12, Math.min(20, Math.floor(buttonHeight * 0.42)));
+  const buttonX = panelX + 20;
+  const buttonWidth = Math.max(100, panelW - 40);
+
+  const gradeLabel = (g) => {
+    if (g >= 1 && g <= 6) return `小${g} 総復習`;
+    if (g === 7) return '中1 総復習';
+    if (g === 8) return '中2 総復習';
+    if (g === 9) return '中3 総復習';
+    if (g === 10) return '高1 総復習';
+    return `g${g} 総復習`;
+  };
+
+  this.reviewButtons = Array.from({ length: 10 }).map((_, i) => {
+    const g = i + 1;
+    return {
+      id: `review_g${g}`,
+      text: gradeLabel(g),
+      x: buttonX,
+      y: listStartY + i * (buttonHeight + buttonMargin),
+      width: buttonWidth,
+      height: buttonHeight,
+      fontSize,
+      grade: g
+    };
+  });
+  this.selectedReviewGrade = null;  // ← 追加
+  return;
+}
     // 選択された大陸と学年（grade）でフィルタリング
     console.log(`ステージリスト更新: grade=${this.selectedGrade}, continent=${this.continentInfo.continent}, region=${this.continentInfo.region}`);
     
@@ -835,8 +917,41 @@ const worldStageSelectScreen = {
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, cw, ch);
 
-    // ── 総復習モード専用UI ──
     if (this.isReviewMode) {
+      // 左パネル
+      const cw = this.canvas.width, ch = this.canvas.height;
+      const panelX = 10, panelY = 60, panelW = cw / 2 - 20, panelH = ch - 140;
+      this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
+    
+      // タイトル
+      ctx.fillStyle = 'white';
+      ctx.font = '20px "UDデジタル教科書体", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('総復習（学年別）', panelX + panelW / 2, panelY + 16);
+    
+      // ボタン群
+      if (this.reviewButtons && this.reviewButtons.length) {
+        this.reviewButtons.forEach(btn => {
+          const isHovered = isMouseOverRect(this.mouseX, this.mouseY, btn);
+          const isSelected = (this.selectedReviewGrade === btn.grade); // ← 追加
+          const unlocked = isBonusUnlocked(btn.grade);
+          let color = unlocked ? '#4CAF50' : '#666';
+          this.drawRichButton(ctx, btn.x, btn.y, btn.width, btn.height, btn.text, color, isHovered, isSelected); // ← 第4引数 isSelected
+    
+          if (!unlocked) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(0,0,0,0.45)';
+            ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
+            ctx.fillStyle = '#FFD700';
+            ctx.font = `${Math.max(12, Math.floor(btn.height * 0.4))}px sans-serif`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🔒', btn.x + 10, btn.y + btn.height / 2);
+            ctx.restore();
+          }
+        });
+      }
       // 右側に世界地図（既存の worldMap を使用）
       const mapX = cw / 2;
       const mapY = 60;
@@ -849,35 +964,6 @@ const worldStageSelectScreen = {
         ctx.fillStyle = '#1a365d';
         ctx.fillRect(mapX, mapY, mapWidth, mapHeight);
       }
-
-      // 左側パネル
-      const panelX = 10;
-      const panelY = 60;
-      const panelW = cw / 2 - 20;
-      const panelH = ch - 140;
-      this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
-
-      // タイトル
-      ctx.fillStyle = 'white';
-      ctx.font = '24px "UDデジタル教科書体", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText('総復習モード', panelX + panelW / 2, panelY + 20);
-
-      // 説明
-      ctx.font = '14px "UDデジタル教科書体", sans-serif';
-      ctx.fillStyle = '#ccc';
-      ctx.fillText('あなたに最適なステージを自動選択します', panelX + panelW / 2, panelY + 55);
-
-      // 大ボタン
-      const btn = this.reviewChallengeButton;
-      const isHovered = isMouseOverRect(this.mouseX, this.mouseY, btn);
-      // 少し動きのある配色
-      const pulse = Math.sin(this.animationTime * 0.003) * 0.2 + 0.8;
-      const buttonColor = `hsl(${200 + Math.sin(this.animationTime * 0.002) * 30}, 70%, ${50 + pulse * 10}%)`;
-      this.drawRichButton(ctx, btn.x, btn.y, btn.width, btn.height, btn.text, buttonColor, isHovered);
-      // 総復習モードではステージボタン/マーカーは描画しないが、
-      // この後のフッター描画処理は引き続き実行する（returnしない）
     }
 
     // 右側の大陸地図を描画（総復習モードではスキップ）
@@ -981,43 +1067,40 @@ const worldStageSelectScreen = {
       ctx.shadowOffsetY = 0;
     }
 
-    // ステージボタンの描画（総復習モードでは表示しない）
     if (!this.isReviewMode && this.stageButtons && this.stageButtons.length > 0) {
       this.stageButtons.forEach(button => {
         const stage = button.stage;
         const isCleared = this.isStageCleared(stage.stageId);
-        const isNext = false; // 自動点滅を無効化
+        const isNext = false;
         const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
 
-        // ボタンの色を決定
-        let buttonColor = '#2980b9'; // デフォルト青
-        if (isCleared) {
-          buttonColor = '#27ae60'; // クリア済みは緑
-        } else if (isNext) {
-          buttonColor = '#e74c3c'; // 次に挑戦すべきは赤
-        }
+        // ボタンの色
+        let buttonColor = '#2980b9';
+        if (isCleared) buttonColor = '#27ae60';
+        else if (isNext) buttonColor = '#e74c3c';
 
-        // 選択中のボタンは目立つ色に変更
         const isSelected = this.selectedStage && this.selectedStage.stageId === stage.stageId;
-        if (isSelected) {
-          buttonColor = '#FF8C00'; // 選択中は鮮やかなオレンジ色
-        }
+        if (isSelected) buttonColor = '#FF8C00';
 
-        // リッチなボタンを描画
+        // 先にボタンを描く
         this.drawRichButton(ctx, button.x, button.y, button.width, button.height, button.text, buttonColor, isHovered, isSelected);
 
-        // 追加情報の描画
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.font = '12px sans-serif';
-
-        // 選択中のボタンには特別なマーク（チェックマーク）を表示
-        if (isSelected) {
-          ctx.fillStyle = '#FFFFFF';
-          ctx.font = '16px sans-serif';
-          ctx.fillText('✓', button.x + 10, button.y + 5);
-        }
-
+        // ボタンの左側に未捕獲数バッジを表示（右側のレビュー表示と重ならないように）
+const uncaught = this._getUncaughtCount(stage.stageId);
+const badgeX = button.x + 12;
+const badgeY = button.y + 5;
+this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
+                // 追加情報の描画
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.font = '12px sans-serif';
+        
+                if (isSelected) {
+                  ctx.fillStyle = '#FFFFFF';
+                  ctx.font = '16px sans-serif';
+                  ctx.fillText('✓', button.x + 10, button.y + 5);
+                }
+        
                 // クリア状況（星アイコン）
                 if (isCleared) {
                   ctx.fillStyle = '#FFD700';
@@ -1179,19 +1262,24 @@ const worldStageSelectScreen = {
   },
 
   /** クリックイベント処理 */
-  handleClick(e) {
-    // モバイルの二重発火ガード（タップ直後のclickを無視）
-    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-    if (e.type === 'touchstart') {
-      this._lastTouchTime = now;
-      if (e.cancelable) e.preventDefault();
-    } else if (e.type === 'click') {
-      if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
-    }
-    if (this._inputLocked) return;
-    this._inputLocked = true;
-    setTimeout(() => { this._inputLocked = false; }, 250);
+handleClick(e) {
+  // モバイルの二重発火ガード（タップ直後のclickを無視）
+  const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  if (e.type === 'touchstart') {
+    this._lastTouchTime = now;
+    if (e.cancelable) e.preventDefault();
+  } else if (e.type === 'click') {
+    if (this._lastTouchTime && (now - this._lastTouchTime) < 700) return;
+  }
+  if (this._inputLocked) return;
+  this._inputLocked = true;
+  setTimeout(() => { this._inputLocked = false; }, 250);
 
+  // ← 追加: 直後クリック抑止（入場から700msは無視）
+  try {
+    const ts = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (this._enterTS && (ts - this._enterTS) < 700) return;
+  } catch {}
     if (this.isZooming) return; // ズーム中はクリックを無効化
     
     const coords = getGameCoordinates(e, this.canvas);
@@ -1202,33 +1290,45 @@ const worldStageSelectScreen = {
     const x = coords.x;
     const y = coords.y;
 
-       // 総復習モードのクリック（大ボタン）
-       const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
-       if (isReview) {
-         const btn = this.reviewChallengeButton;
-         if (isMouseOverRect(x, y, btn)) {
-           publish('playSE', 'decide');
-           if (ReviewQueue.size() > 0) {
-             publish('changeScreen', 'reviewStage');
-           } else {
-             const g = this.selectedGrade || 7; // 既定は4級相当
-             const bonusId = `bonus_g${g}`;
-             // 解放判定を追加
-             if (!isBonusUnlocked(g)) {
-               publish('playSE', 'wrong');
-               alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
-               return;
-             }
-             // 戻り先を世界編に固定
-             gameState.previousScreen = 'worldStageSelect';
-             gameState.currentStageId = bonusId;
-             resetStageProgress(bonusId);
-             publish('changeScreen', 'stageLoading');
-           }
-           return;
-         }
-         // タブ／フッターはこの後も処理する。ステージボタン／マーカーは後段で無効化する。
-       }
+            // 総復習モードのクリック
+            const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
+            if (isReview) {
+              if (this.reviewButtons && this.reviewButtons.length) {
+                for (const btn of this.reviewButtons) {
+                  if (isMouseOverRect(x, y, btn)) {
+                    if (!isBonusUnlocked(btn.grade)) {
+                      publish('playSE', 'wrong');
+                      alert('この学年の総復習はまだ解放されていません。\n同学年のボーナスを解放してください。');
+                      return;
+                    }
+            
+                    // 2回クリック方式
+                    if (this.selectedReviewGrade === btn.grade) {
+                      const grade = btn.grade;
+                      const bonusId = `bonus_g${grade}`;
+            
+                      if (!gameState.stageReviewUnlocked) gameState.stageReviewUnlocked = {};
+                      gameState.stageReviewUnlocked[bonusId] = true;
+            
+                      try { delete gameState.quickReviewTargets; } catch {}
+                      gameState.previousScreen = 'worldStageSelect';
+                      gameState.currentStageId = bonusId;
+                      gameState.gameMode = 'practice';
+            
+                      publish('playSE', 'decide');
+                      publish('changeScreen', 'practiceBattle');
+                    } else {
+                      this.selectedReviewGrade = btn.grade;
+                      publish('playSE', 'decide'); // 選択音のみ
+                    }
+                    return;
+                  }
+                }
+              }
+              // 総復習モードでも、レビュー学年以外のクリック（タブ/フッター等）を処理できるように、ここで打ち切らない
+            }
+  
+
 
     // タブクリック判定
     const tabCount = tabs.length;
@@ -1318,6 +1418,73 @@ const worldStageSelectScreen = {
     }
   },  
 
+  // ファイル内どこか（methods領域）
+_getUncaughtCount(stageId) {
+  try {
+    this._uncaughtCache = this._uncaughtCache || new Map();
+    if (this._uncaughtCache.has(stageId)) return this._uncaughtCache.get(stageId);
+    const dex = this._dex || loadDex();
+    const enemies = getEnemiesByStageId(stageId) || [];
+    const ids = enemies.map(e => String(e.id));
+    const cnt = ids.filter(id => !dex.has(id)).length;
+    this._uncaughtCache.set(stageId, cnt);
+    return cnt;
+  } catch { return 0; }
+},
+
+_drawUncaughtBadge(ctx, x, y, count) {
+  if (!count || count <= 0) return;
+  const label = `あと ${count} たい！`;
+  ctx.save();
+  ctx.font = '12px "UDデジタル教科書体", sans-serif';
+  const tw = Math.ceil(ctx.measureText(label).width);
+  const w = tw + 16, h = 18;
+  const r = h / 2;
+  ctx.fillStyle = '#f39c12';
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#8e4400';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + w / 2, y + h / 2);
+  ctx.restore();
+},
+
+// 全捕獲マーク（緑のピル型バッジ）
+_drawAllCaughtMark(ctx, x, y) {
+  const label = 'コンプ!';
+  ctx.save();
+  ctx.font = '12px "UDデジタル教科書体", sans-serif';
+  const tw = Math.ceil(ctx.measureText(label).width);
+  const w = tw + 16, h = 18;
+  const r = h / 2;
+  ctx.fillStyle = '#27ae60';
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#145a32';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + w / 2, y + h / 2);
+  ctx.restore();
+},
   // ★★★ マスターモード開始処理を追加 ★★★
   /**
    * マスターモードを開始する（worldStageSelect版）
