@@ -11,7 +11,6 @@ import {
   initializeNewPlayerData,
   loadPlayerData
 } from './services/firebase/firebaseController.js';
-import { AudioManager } from './audio/audioManager.js';
 import { showBootProgress, updateBootProgress, hideBootProgress } from './ui/bootProgress.js';
 import { AudioManager } from './audio/audioManager.js';
 import reviewQueue from './models/reviewQueue.js';
