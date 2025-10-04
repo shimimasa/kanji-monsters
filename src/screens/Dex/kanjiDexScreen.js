@@ -571,43 +571,66 @@ const kanjiDexScreen = {
     }
   },
 
-    /** 漢字カードを生成 */
-    _createKanjiCard(kanjiData) {
-      const collected = this.dexSet.has(kanjiData.id);
-      const prog = (gameState && gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiData.id]) || null;
-      const isMastered = !!(prog && prog.mastered);
-      
-      // カード要素を作成
-      const card = document.createElement('div');
-      card.className = 'kanji-card';
-      if (!collected) {
-        card.classList.add('locked');
-      }
-      
-      // 枠線のスタイルを直接設定
-      card.style.border = '1px solid #8B4513';
-      card.style.boxShadow = '3px 3px 5px rgba(0, 0, 0, 0.3)';
-      card.style.position = 'relative';
-      
-      if (isMastered) {
-        card.style.border = '2px solid #DAA520';
-        const badge = document.createElement('div');
-        badge.textContent = 'MASTER';
-        Object.assign(badge.style, {
-          position: 'absolute',
-          top: '6px',
-          right: '6px',
-          padding: '2px 6px',
-          fontSize: '11px',
-          fontWeight: '700',
-          color: '#fff',
-          background: 'linear-gradient(135deg, #e1b12c, #d4a017)',
-          border: '1px solid rgba(0,0,0,0.3)',
-          borderRadius: '6px',
-          letterSpacing: '0.5px'
-        });
-        card.appendChild(badge);
-      }
+      /** 漢字カードを生成 */
+  _createKanjiCard(kanjiData) {
+    const collected = this.dexSet.has(kanjiData.id);
+    const prog = (gameState && gameState.kanjiReadProgress && gameState.kanjiReadProgress[kanjiData.id]) || null;
+
+    // mastered が保存されていないバックアップでも、読み達成状況から派生判定
+    const isMastered = (() => {
+      if (!prog) return false;
+      if (prog.mastered) return true;
+
+      const hiraShift = ch => String.fromCharCode(ch.charCodeAt(0) - 0x60);
+      const toHiragana = (s) => String(s || '').replace(/[\u30a1-\u30f6]/g, hiraShift);
+      const toArray = v => Array.isArray(v) ? v : (typeof v === 'string' ? v.split(' ').filter(Boolean) : []);
+
+      const reqOn  = toArray(kanjiData.onyomi).map(toHiragana);
+      const reqKun = toArray(kanjiData.kunyomi).map(toHiragana);
+
+      // prog.onyomi/kunyomi は Set を想定。配列で来た旧データにも対応
+      const progOn  = (prog.onyomi && typeof prog.onyomi.has === 'function') ? prog.onyomi : new Set(Array.isArray(prog?.onyomi) ? prog.onyomi : []);
+      const progKun = (prog.kunyomi && typeof prog.kunyomi.has === 'function') ? prog.kunyomi : new Set(Array.isArray(prog?.kunyomi) ? prog.kunyomi : []);
+
+      // 全読み（存在する場合）を満たしていればマスター扱い
+      const allOn  = reqOn.length  === 0 ? true : reqOn.every(r => progOn.has(toHiragana(r)));
+      const allKun = reqKun.length === 0 ? true : reqKun.every(r => progKun.has(toHiragana(r)));
+
+      return (reqOn.length + reqKun.length) === 0 ? false : (allOn && allKun);
+    })();
+
+    // カード要素を作成
+    const card = document.createElement('div');
+    card.className = 'kanji-card';
+    if (!collected) {
+      card.classList.add('locked');
+    }
+
+    // 枠線のスタイルを直接設定
+    card.style.border = '1px solid #8B4513';
+    card.style.boxShadow = '3px 3px 5px rgba(0, 0, 0, 0.3)';
+    card.style.position = 'relative';
+
+    if (isMastered) {
+      card.style.border = '2px solid #DAA520';
+      const badge = document.createElement('div');
+      badge.textContent = 'MASTER';
+      Object.assign(badge.style, {
+        position: 'absolute',
+        top: '6px',
+        right: '6px',
+        padding: '2px 6px',
+        fontSize: '11px',
+        fontWeight: '700',
+        color: '#fff',
+        background: 'linear-gradient(135deg, #e1b12c, #d4a017)',
+        border: '1px solid rgba(0,0,0,0.3)',
+        borderRadius: '6px',
+        letterSpacing: '0.5px'
+      });
+      card.appendChild(badge);
+    }
+    
     // 漢字を表示
     const kanjiEl = document.createElement('h2');
     kanjiEl.className = 'kanji-character';
