@@ -396,16 +396,15 @@ export async function loadAllGameData() {
  * @returns {Promise<void>}
  */
 export async function loadAll(onProgress) {
-  // UI_IMAGE_PATHS は既存で定義済み
   const entries = Object.entries(UI_IMAGE_PATHS);
   const total = entries.length;
   let loadedCount = 0;
-  // 初期進捗レポート (0/total)
   onProgress?.(loadedCount, total);
 
   for (const [key, src] of entries) {
     try {
-      const img = await loadImage(src);
+      const needsTransparency = ['panelStone', 'panelPlayer', 'panelEnemy','iconOnyomi','iconKunyomi'].includes(key);
+      const img = await (needsTransparency ? loadImageWithTransparency(src) : loadImage(src));
       images[key] = img;
     } catch {
       console.warn(`⚠️ ${src} の読み込み失敗`);
