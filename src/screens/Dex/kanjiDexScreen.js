@@ -1,12 +1,10 @@
 // src/kanjiDexScreen.js
 // 漢字図鑑画面：コレクションされた漢字をスクロール表示
-
 import { publish } from '../../core/eventBus.js';
 import { loadDex } from '../../models/kanjiDex.js';
-import { getKanjiById, kanjiData, getKanjiByGrade } from '../../loaders/dataLoader.js';
+import { getKanjiById, kanjiData, getKanjiByGrade, isKanjiMastered } from '../../loaders/dataLoader.js';
 import { gameState } from '../../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../../ui/uiRenderer.js';
-
 
 const BTN = {
   back: { x: 20, y: 20, w: 100, h: 30, label: 'ステージ選択へ' },
@@ -84,12 +82,12 @@ const kanjiDexScreen = {
     }
     this.scroll  = 0;
     this.selectedKanjiId = null;
-    
+
     // 初期化処理
     this.sortMode = 'default';
     this.showCollectedOnly = false;
+    this._autofixDexFromProgress();   // ← 追加（mastered を dex に補完）
     this.updateFilteredList();
-    
     // DOMヘッダーを作成
     this.createDOMHeader();
     
@@ -163,8 +161,9 @@ const kanjiDexScreen = {
       fontWeight: '600',
       marginBottom: '8px'
     });
-    const collectionRate = Math.round((this.dexSet.size / this.allList.length) * 100);
-    statsText.textContent = `漢字収集率: ${this.dexSet.size}/${this.allList.length} (${collectionRate}%)`;
+    const collectedCount = this._effectiveCollectedCount(); // ← 変更
+    const collectionRate = Math.floor((collectedCount / this.allList.length) * 100); // ← 変更
+    statsText.textContent = `漢字収集率: ${collectedCount}/${this.allList.length} (${collectionRate}%)`;
     
     const progressBar = document.createElement('div');
     progressBar.className = 'kanji-progress-bar';
@@ -181,7 +180,7 @@ const kanjiDexScreen = {
     Object.assign(progressFill.style, {
       background: 'linear-gradient(90deg, #28a745, #20c997)',
       height: '100%',
-      width: `${collectionRate}%`,
+      width: `${collectionRate}%`,            // ← 実効収集率で幅を更新
       transition: 'width 0.6s ease',
       borderRadius: '10px'
     });
@@ -1071,19 +1070,20 @@ const kanjiDexScreen = {
     });
   }
   
-  // 収集率統計を更新
-  const statsText = this.container.querySelector('.kanji-stats-text');
-  const progressFill = this.container.querySelector('.kanji-progress-fill');
+    // 収集率統計を更新
+    const statsText = this.container.querySelector('.kanji-stats-text');
+    const progressFill = this.container.querySelector('.kanji-progress-fill');
   
-  if (statsText && progressFill) {
-    const collectionRate = Math.round((this.dexSet.size / this.allList.length) * 100);
-    if (this.showCollectedOnly) {
-      statsText.textContent = `表示中: ${this.filteredList.length} / 収集済: ${this.dexSet.size} (${collectionRate}%)`;
-    } else {
-      statsText.textContent = `漢字収集率: ${this.dexSet.size}/${this.allList.length} (${collectionRate}%)`;
+    if (statsText && progressFill) {
+      const collectedCount = this._effectiveCollectedCount(); // ← 変更
+      const collectionRate = Math.floor((collectedCount / this.allList.length) * 100); // ← 変更
+      if (this.showCollectedOnly) {
+        statsText.textContent = `表示中: ${this.filteredList.length} / 収集済: ${collectedCount} (${collectionRate}%)`;
+      } else {
+        statsText.textContent = `漢字収集率: ${collectedCount}/${this.allList.length} (${collectionRate}%)`;
+      }
+      progressFill.style.width = `${collectionRate}%`;
     }
-    progressFill.style.width = `${collectionRate}%`;
-  }
 },
 
   /** update：毎フレーム描画 */
@@ -1190,11 +1190,11 @@ const kanjiDexScreen = {
   /** フィルタリング機能を実装 */
   updateFilteredList() {
     if (this.showCollectedOnly) {
-      this.filteredList = this.allList.filter(id => this.dexSet.has(id));
+      this.filteredList = this.allList.filter(id => this._isCollected(id)); // ← 変更
     } else {
       this.filteredList = [...this.allList];
     }
-    // ← 追加: 学年フィルタ
+    // ← 学年フィルタは既存のまま
     if (this.gradeFilter !== 'all') {
       this.filteredList = this.filteredList.filter(id => {
         const k = getKanjiById(id);
@@ -1207,6 +1207,34 @@ const kanjiDexScreen = {
     this.showCollectedOnly = !this.showCollectedOnly;
     this.scroll = 0;
     this.updateFilteredList();
+  },
+
+  
+  _isCollected(id) {
+    try {
+      return (this.dexSet && this.dexSet.has(id)) || !!isKanjiMastered(id);
+    } catch { return this.dexSet && this.dexSet.has(id); }
+  },
+
+  _effectiveCollectedCount() {
+    try {
+      return this.allList.reduce((n, id) => n + (this._isCollected(id) ? 1 : 0), 0);
+    } catch { return this.dexSet ? this.dexSet.size : 0; }
+  },
+
+  _autofixDexFromProgress() {
+    try {
+      const missing = [];
+      for (const id of this.allList) {
+        if (!this.dexSet.has(id) && isKanjiMastered(id)) missing.push(id);
+      }
+      if (missing.length > 0) {
+        const merged = new Set(this.dexSet);
+        missing.forEach(id => merged.add(id));
+        localStorage.setItem('krb_kanji_dex', JSON.stringify([...merged]));
+        this.dexSet = merged;
+      }
+    } catch {}
   }
 };
 
