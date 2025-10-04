@@ -89,9 +89,36 @@ export function getStepsFor(screenId, ctx = {}) {
     
           case 'settings':
             return [
-              { title: 'BGMおんりょう', text: 'ここで おんがくの おおきさを かえられるよ。', anchor: () => domRect('#bgmVolumeSlider', 20) },
-              { title: 'SEおんりょう', text: 'こうかおんの おおきさを ちょうせい！', anchor: () => domRect('#seVolumeSlider', 20) },
-              { title: 'バトルせってい', text: 'かいふく回数や 行動タイミングを えらべるよ。', anchor: () => domRect('#healCountSlider', 20) }
+              {
+                title: 'プレイヤー名',
+                text: 'なまえを いれて「変更する」を おそう！\nゲーム内の なまえが かわるよ。',
+                anchor: () => domRect('#settingsContainer > .settings-panel:nth-of-type(1) .inline-controls', 20)
+              },
+              {
+                title: '表示設定',
+                text: 'タイマーの 表示/非表示を きりかえられるよ。',
+                anchor: () => domRect('#settingsContainer > .settings-panel:nth-of-type(2)', 20)
+              },
+              {
+                title: 'BGMおんりょう',
+                text: 'ここで おんがくの おおきさを かえられるよ。',
+                anchor: () => domRect('#bgmVolumeSlider', 20)
+              },
+              {
+                title: 'SEおんりょう',
+                text: 'こうかおんの おおきさを ちょうせい！',
+                anchor: () => domRect('#seVolumeSlider', 20)
+              },
+              {
+                title: 'セーブとバックアップ',
+                text: '「かんたんセーブ」で いまの つづきを まもれるよ。\nくわしいメニューから バックアップの さくせい/よみこみ もOK！',
+                anchor: () => domRect('#settingsContainer > .settings-panel:nth-of-type(4) .settings-button.primary.big', 20)
+              },
+              {
+                title: 'バトルせってい',
+                text: 'かいふく回数や 行動タイミングを えらべるよ。',
+                anchor: () => domRect('#healCountSlider', 20)
+              }
             ];
     
           case 'practiceBattle':
