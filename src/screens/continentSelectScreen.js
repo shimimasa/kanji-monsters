@@ -10,7 +10,9 @@ const continentMarkers = [
   { name: 'アジア', kanken_level: "4", x: 300, y: 250, color: '#7ED321', region: 'アジア' },
   { name: 'ヨーロッパ', kanken_level: "3", x: 200, y: 230, color: '#4169e1', region: 'ヨーロッパ' },
   { name: 'アメリカ大陸', kanken_level: "準2", x: 550, y: 250, color: '#F5A623', region: 'アメリカ大陸' },
-  { name: 'アフリカ', kanken_level: "2", x: 150, y: 300, color: '#ff7f50', region: 'アフリカ大陸' } // regionを「アフリカ大陸」に修正
+  { name: 'アフリカ', kanken_level: "2", x: 150, y: 300, color: '#ff7f50', region: 'アフリカ大陸' }, // regionを「アフリカ大陸」に修正
+  // 総復習タブへ直接遷移するためのマーカーを追加
+  { name: '総復習', kanken_level: "review", x: 650, y: 180, color: '#FFD700', region: 'review' }
 ];
 
 const backButton = { x: 10, y: 540, width: 120, height: 40, text: '戻る' };
@@ -424,18 +426,19 @@ drawProgressBar(x, y, progress, isHovered = false) {
             this.ctx.ellipse(marker.x, marker.y, 8 * scale, 8 * scale, 0, 0, 2 * Math.PI);
             this.ctx.fill();
       
-            // 進捗バーと%表示（regionSelectと同仕様）
+      // 進捗バーと%表示（総復習は非表示）
             const grade = this._kankenToGrade(String(marker.kanken_level));
-            const progress = this.calculateContinentProgress(grade);
-            this.drawProgressBar(marker.x, marker.y + 40 * scale, progress, isHovered);
-      
-            this.ctx.fillStyle = '#FFFFFF';
-            this.ctx.strokeStyle = '#000000';
-            this.ctx.lineWidth = 1;
-            this.ctx.textAlign = 'center';
-            this.ctx.font = `bold ${12 * (isHovered ? 1.1 : 1)}px sans-serif`;
-            this.ctx.strokeText(`${progress}%`, marker.x, marker.y + 65 * scale);
-            this.ctx.fillText(`${progress}%`, marker.x, marker.y + 65 * scale);
+            if (String(marker.kanken_level) !== 'review') {
+              const progress = this.calculateContinentProgress(grade);
+              this.drawProgressBar(marker.x, marker.y + 40 * scale, progress, isHovered);
+              this.ctx.fillStyle = '#FFFFFF';
+              this.ctx.strokeStyle = '#000000';
+              this.ctx.lineWidth = 1;
+              this.ctx.textAlign = 'center';
+              this.ctx.font = `bold ${12 * (isHovered ? 1.1 : 1)}px sans-serif`;
+              this.ctx.strokeText(`${progress}%`, marker.x, marker.y + 65 * scale);
+              this.ctx.fillText(`${progress}%`, marker.x, marker.y + 65 * scale);
+            }
 
             // 漢検レベル表示
             this.ctx.fillStyle = '#FFFFFF';
@@ -444,15 +447,16 @@ drawProgressBar(x, y, progress, isHovered = false) {
             this.ctx.textAlign = 'center';
             this.ctx.font = `bold ${16 * scale}px sans-serif`;
       
-            const levelText = (typeof marker.kanken_level === 'number')
-              ? `${marker.kanken_level}級`
-              : `${marker.kanken_level}`;
+            const levelText = (String(marker.kanken_level) === 'review')
+              ? '総復習'
+              : ((typeof marker.kanken_level === 'number') ? `${marker.kanken_level}級` : `${marker.kanken_level}`);
             this.ctx.strokeText(levelText, marker.x, marker.y + 5);
             this.ctx.fillText(levelText, marker.x, marker.y + 5);
       
             // --- 学年目安バッジ（4級〜2級のみ） -----------------------
             const schoolHint = (() => {
               const lv = String(marker.kanken_level);
+              if (lv === 'review') return '';
               if (lv === '4') return '中1目安';
               if (lv === '3') return '中2目安';
               if (lv === '準2' || lv === '准2' || lv === '準２') return '中3目安';
@@ -576,14 +580,19 @@ drawProgressBar(x, y, progress, isHovered = false) {
         this.ctx.font = 'bold 16px sans-serif';
         this.ctx.fillText(`${marker.name}`, tooltipX + 10, tooltipY + 25);
     
-        // 漢検レベル情報
-        this.ctx.font = '14px sans-serif';
-        this.ctx.fillStyle = '#FFD700';
-    
-        const levelText = (typeof marker.kanken_level === 'number')
-          ? `漢検 ${marker.kanken_level}級 相当`
-          : `漢検 ${marker.kanken_level} 相当`;
-        this.ctx.fillText(levelText, tooltipX + 10, tooltipY + 50);
+        // レベル/モード情報
+        if (String(marker.kanken_level) === 'review') {
+          this.ctx.font = '14px sans-serif';
+          this.ctx.fillStyle = '#FFD700';
+          this.ctx.fillText('総復習モード', tooltipX + 10, tooltipY + 50);
+        } else {
+          this.ctx.font = '14px sans-serif';
+          this.ctx.fillStyle = '#FFD700';
+          const levelText = (typeof marker.kanken_level === 'number')
+            ? `漢検 ${marker.kanken_level}級 相当`
+            : `漢検 ${marker.kanken_level} 相当`;
+          this.ctx.fillText(levelText, tooltipX + 10, tooltipY + 50);
+        }
     
         // 学年目安（補足）
         const schoolHint = (() => {
