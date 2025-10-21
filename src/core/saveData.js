@@ -229,3 +229,32 @@ function mergeAmbientKeys(saveObj) {
 }
 
 function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+
+export function hardResetAllLocalData() {
+  try {
+    const targets = new Set([
+      'krb_save', 'kanjiGameSave',
+      'bgmVolume','seVolume','gameMode','maxHealCount','enemyAttackMode',
+      'showTimer','healMode','autosaveEnabled','autosaveMinutes',
+      'cbMode','bigFont','lastPlayedStage','playerStats','unlockedStages',
+      'kanjiBattleScores','quickReviewBuffer','dailyPracticeStats','bs_blockHistory'
+    ]);
+    const toDelete = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k) continue;
+      if (
+        targets.has(k) ||
+        k.startsWith('krb_') ||
+        k.startsWith('clear_') ||
+        k.startsWith('stage_clear_')
+      ) {
+        toDelete.push(k);
+      }
+    }
+    toDelete.forEach(k => { try { localStorage.removeItem(k); } catch {} });
+    console.log(`LocalStorage hard reset: ${toDelete.length} keys removed`);
+  } catch (e) {
+    console.error('hardResetAllLocalData failed:', e);
+  }
+}
