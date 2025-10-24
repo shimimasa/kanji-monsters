@@ -4,7 +4,7 @@ import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState, updatePlayerName, clearSaveData } from '../core/gameState.js';
 import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
-
+import { hardResetAllLocalData } from '../core/saveData.js';
 const titleState = {
   /** 画面表示時の初期化 */
   enter(canvas) {
@@ -500,19 +500,19 @@ _startGame() {
         return;
       }
 
-      // 第3段階: 実際のデータ削除処理
-      console.log('データリセット処理を開始します...');
+            // 第3段階: 実際のデータ削除処理
+            console.log('データリセット処理を開始します...');
       
-      try {
-        // 1. ゲームデータのクリア
-        clearSaveData();
-        
-        // 2. Firebase関連データのクリア（必要に応じて）
-        const user = getCurrentUser();
-        if (user?.uid) {
-          // Firebase側のデータも削除（具体的な実装はfirebaseControllerに依存）
-          // await clearFirebaseUserData(user.uid);
-        }
+            try {
+              // 1. ゲームデータのクリア（完全削除）
+              hardResetAllLocalData();
+              
+              // 2. Firebase関連データのクリア（必要に応じて）
+              const user = getCurrentUser();
+              if (user?.uid) {
+                // Firebase側のデータも削除（具体的な実装はfirebaseControllerに依存）
+                // await clearFirebaseUserData(user.uid);
+              }
         
         console.log('データリセット処理が完了しました');
         

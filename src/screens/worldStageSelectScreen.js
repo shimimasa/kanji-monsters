@@ -413,7 +413,7 @@ const worldStageSelectScreen = {
   /** 画面表示時の初期化 */
 enter(arg) {
   // BGM 再生
-  // publish('playBGM', 'title');
+  publish('playBGM', 'title');
   // 引数が Canvas の場合と props の場合の両方に対応
   const isCanvasArg = arg && typeof arg.getContext === 'function';
   this.canvas = isCanvasArg ? arg : document.getElementById('gameCanvas');

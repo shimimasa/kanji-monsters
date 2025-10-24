@@ -3,6 +3,7 @@ import { gameState, saveGameData, loadGameData, clearSaveData, updatePlayerName 
 import { drawButton, isMouseOverRect, drawThemeBackground, drawPanelBackground } from '../ui/uiRenderer.js';
 import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
 import { publish } from '../core/eventBus.js';
+import { hardResetAllLocalData } from '../core/saveData.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -1567,7 +1568,7 @@ const settingsScreenState = {
       
       try {
         // 1. LocalStorageの全関連データを削除
-        this._clearLocalStorageData();
+        hardResetAllLocalData();
         
         // 2. Firebase Firestoreのユーザーデータを削除
         if (user?.uid) {

@@ -982,7 +982,6 @@ const kanjiDexScreen = {
 
   /** exit：画面離脱時のクリーンアップ */
   exit() {
-    publish('stopBGM', 0.2);
     // DOM要素を削除
     if (this.container) {
       this.container.remove();
