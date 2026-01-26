@@ -95,7 +95,7 @@ const regionSelectState = {
     if (regionStages.length === 0) return 0;
     // クリア済みステージ数を計算
     const clearedStages = regionStages.filter(stage => {
-      const localStorageCleared = localStorage.getItem(`clear_${stage.stageId}`);
+      const localStorageCleared = isStageCleared(stage.stageId); // P0-2 StepB-2(中影響/最小差分): clear_* 直読を集約関数へ
       const gameStateCleared = gameState.stageProgress && gameState.stageProgress[stage.stageId]?.cleared;
       return localStorageCleared || gameStateCleared;
     });
