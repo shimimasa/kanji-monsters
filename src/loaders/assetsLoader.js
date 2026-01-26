@@ -127,6 +127,9 @@ export async function loadBgImage(stageId) {
   const timestamp = Date.now();
 
   // 候補ID: canonical のみを基本にし、最低限の互換だけ残す（アセット命名は変更しないため）
+  // P1-2 方針: 例外（互換候補の追加）は **この2種類まで** とする（これ以上増やさない）。
+  //  1) 世界背景ファイルが先頭大文字(Asia_*)で存在する互換
+  //  2) kanto_bonus のみ kantou_bonus が既存アセットとして存在する互換
   const candidates = new Set();
   if (id) candidates.add(id);
   // 念のため呼び出し元が未正規化だった場合に備え、raw も試す
@@ -135,7 +138,8 @@ export async function loadBgImage(stageId) {
   for (const s of Array.from(candidates)) {
     if (s && !s.endsWith('_area')) candidates.add(`${s}_area`);
   }
-  // 互換: 世界背景ファイルは先頭大文字(Asia_*)で存在するため、その候補も試す
+  // 互換(例外1): 世界背景ファイルは先頭大文字(Asia_*)で存在するため、その候補も試す
+  const __exceptionTags = [];
   for (const s of Array.from(candidates)) {
     const m = /^(asia|europe|america|africa)_(.+)$/i.exec(String(s || ''));
     if (!m) continue;
@@ -144,11 +148,17 @@ export async function loadBgImage(stageId) {
     if (!String(m[2]).endsWith('_area') && !String(s).endsWith('_area')) {
       candidates.add(`${cap}_${m[2]}_area`);
     }
+    if (!__exceptionTags.includes('world-capitalized')) __exceptionTags.push('world-capitalized');
   }
-  // 互換: 既存アセットに kantou_bonus_area があるため、kanto_bonus はそれも試す
+  // 互換(例外2): 既存アセットに kantou_bonus_area があるため、kanto_bonus はそれも試す
   if (id === 'kanto_bonus' || id === 'kanto_bonus_area') {
     candidates.add('kantou_bonus');
     candidates.add('kantou_bonus_area');
+    if (!__exceptionTags.includes('kanto_bonus->kantou_bonus')) __exceptionTags.push('kanto_bonus->kantou_bonus');
+  }
+  // 過剰ログ禁止: 例外が発動した場合のみ 1回だけ warn
+  if (__exceptionTags.length > 0) {
+    console.warn(`[P1] loadBgImage candidates: applied exceptions = ${__exceptionTags.join(', ')}`);
   }
 
   // 地域名抽出（フォールバック用）
