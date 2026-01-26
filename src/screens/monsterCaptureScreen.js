@@ -257,7 +257,8 @@ const monsterCaptureScreen = {
         }
         // P0-2 StepA(例外A): stage_first_clear_at_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
         try { saveGameData(); } catch {}
-        localStorage.setItem(`stage_first_clear_at_${stageId}`, String(firstClearAt)); // 互換ミラー（旧参照箇所向け）
+        // P0-2 StepC-2: stage_first_clear_at_* 互換ミラー書き込みを停止（読み取り互換は saveData.getStageFirstClearAt の legacy fallback で維持）
+        // localStorage.setItem(`stage_first_clear_at_${stageId}`, String(firstClearAt));
       } catch {}
     }
     localStorage.setItem(key, String(current + 1));
