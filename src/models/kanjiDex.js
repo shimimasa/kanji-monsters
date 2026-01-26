@@ -3,8 +3,6 @@
 // localStorage に Set<string> 形式で永続化
 // 使用キー: 'krb_kanji_dex'
 
-import DataSync from '../services/firebase/dataSync.js';
-
 const STORAGE_KEY = 'krb_kanji_dex';
 
 /**
@@ -42,7 +40,9 @@ export function saveDex(dex) {
     const dataToSave = [...dex];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
     console.log('【図鑑】データを保存しました。収集数:', dex.size);
-    DataSync.syncAll();
+    import('../services/firebase/firebaseController.js')
+      .then(m => m.syncAllCaches?.())
+      .catch(() => {});
   } catch (e) {
     console.error('kanjiDex: 図鑑の保存に失敗しました', e);
   }
