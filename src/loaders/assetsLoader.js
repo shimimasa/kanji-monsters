@@ -569,25 +569,27 @@ export function drawStoneButton(ctx, button, isHovered, isPressed) {
 
 // ステージIDから学年を取得するヘルパー関数
 function getGradeFromStageId(stageId) {
+  // P1-2 Step4: 表記揺れ吸収は canonicalizeStageId に集約し、ここは canonical 前提で判定する
+  const id = canonicalizeStageId(String(stageId || '')) || String(stageId || '');
   // 世界
-  if (stageId.startsWith('Asia_') || stageId.startsWith('asia_')) return 12; // 4級
-  if (stageId.startsWith('Europe_') || stageId.startsWith('europe_')) return 13; // 3級
-  if (stageId.startsWith('America_') || stageId.startsWith('america_')) return 14; // 準2級
-  if (stageId.startsWith('Africa_') || stageId.startsWith('africa_')) return 15; // 2級
+  if (id.startsWith('asia_')) return 12; // 4級
+  if (id.startsWith('europe_')) return 13; // 3級
+  if (id.startsWith('america_')) return 14; // 準2級
+  if (id.startsWith('africa_')) return 15; // 2級
   
   // 日本（_area / _bonus ともに対応）
   const gradeMapping = {
     hokkaido_: 1,
     tohoku_: 2,
-    kanto_: 3, kantou_: 3,
-    chubu_: 4, chuubu_: 4,
+    kanto_: 3,
+    chubu_: 4,
     kinki_: 5,
-    chugoku_: 6, chuugoku_: 6, cyuugoku_: 6,
+    chugoku_: 6,
     shikoku_: 11,     // 追加
     kyushu_: 12,      // 追加
   };
   for (const prefix in gradeMapping) {
-    if (stageId.startsWith(prefix)) return gradeMapping[prefix];
+    if (id.startsWith(prefix)) return gradeMapping[prefix];
   }
   return '';
 }
