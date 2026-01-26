@@ -174,13 +174,7 @@ export function getStageClearCount(stageId) {
   const id = String(stageId || '');
   if (!id) return 0;
 
-  const save = __readKrbSaveNoWrite();
-  // v1 正史には「クリア回数」フィールドが定義されていないため、存在する場合のみ参照する（新設計は禁止）
-  const counts = save?.player?.progress?.stageClearCounts;
-  const v = (counts && typeof counts === 'object') ? counts[id] : undefined;
-  if (typeof v === 'number' && Number.isFinite(v)) return v;
-
-  // fallback: legacy
+  // StepB-1: クリア回数は現状 krb_save 正史に保持されていないため、legacy(localStorage) のみを参照する（read-only）
   try {
     const raw = localStorage.getItem(`stage_clear_${id}`);
     const n = parseInt(raw || '0', 10);
@@ -193,13 +187,7 @@ export function getStageFirstClearAt(stageId) {
   const id = String(stageId || '');
   if (!id) return null;
 
-  const save = __readKrbSaveNoWrite();
-  // v1 正史には「初回クリア日時」フィールドが定義されていないため、存在する場合のみ参照する（新設計は禁止）
-  const map = save?.player?.progress?.stageFirstClearAt;
-  const v = (map && typeof map === 'object') ? map[id] : undefined;
-  if (typeof v === 'number' && Number.isFinite(v)) return v;
-
-  // fallback: legacy
+  // StepB-1: 初回クリア日時は現状 krb_save 正史に保持されていないため、legacy(localStorage) のみを参照する（read-only）
   try {
     const raw = localStorage.getItem(`stage_first_clear_at_${id}`);
     const n = parseInt(raw || '', 10);
