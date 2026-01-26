@@ -118,8 +118,10 @@ export async function setupFSM() {
   }
   subscribe('changeScreen', __normalizeChangeScreenPayload);
 
-  // デバッグ用にグローバル公開
-  window.switchScreen = switchScreen;
+  // P0-1 Step5(設計憲法A): window.switchScreen は開発/デバッグ用途限定（production では露出しない）
+  if (import.meta?.env?.DEV) {
+    window.switchScreen = switchScreen;
+  }
 
   return fsm;
 }
