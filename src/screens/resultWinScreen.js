@@ -52,7 +52,8 @@ const resultWinState = {
       try {
         // P0-2 StepA(例外A): clear_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
         try { saveGameData(); } catch {}
-        localStorage.setItem(`clear_${stageId}`, '1'); // 互換ミラー（旧参照箇所向け）
+        // P0-2 StepC-1: clear_* 互換ミラー書き込みを停止（読み取り互換は saveData.isStageCleared の legacy fallback で維持）
+        // localStorage.setItem(`clear_${stageId}`, '1');
         if (!gameState.stageProgress) gameState.stageProgress = {};
         gameState.stageProgress[stageId] = { cleared: true };
       } catch (e) {
