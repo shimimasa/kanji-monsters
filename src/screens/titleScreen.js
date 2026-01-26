@@ -2,7 +2,7 @@ import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState, updatePlayerName, clearSaveData } from '../core/gameState.js';
-import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
+import { getCurrentUser } from '../services/firebase/firebaseController.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { hardResetAllLocalData } from '../core/saveData.js';
 const titleState = {
