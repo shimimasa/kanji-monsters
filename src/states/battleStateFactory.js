@@ -2,7 +2,7 @@
 import { getEnemiesByStageId, getKanjiByStageId } from '../loaders/dataLoader.js';
 import battleScreenState from '../screens/battleScreen.js';
 import { publish } from '../core/eventBus.js';
-import { gameState, battleState, resetStageProgress } from '../core/gameState.js';
+import { gameState, battleState, resetStageProgress, saveGameData } from '../core/gameState.js';
 
 export default function createBattleState(stageId){
   let enemies, kanjiPool;
@@ -37,7 +37,9 @@ export default function createBattleState(stageId){
       
       battleScreenState.enter(canvas, () => {
         // ステージクリア後の処理
-        // クリアしたらローカル保存
+        // P0-2 StepA(例外A): clear_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
+        try { saveGameData(); } catch {}
+        // 互換ミラー（旧参照箇所向け）
         localStorage.setItem(`clear_${currentStageId}`, '1');
         // 新しい勝利画面に遷移（データ付き）
         const resultData = {
