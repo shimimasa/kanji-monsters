@@ -392,7 +392,8 @@ function incrementStageClearCount(stageId) {
           gameState.stageProgress = gameState.stageProgress || {};
           save.player.progress.clearedStages.forEach(id => {
             gameState.stageProgress[id] = { cleared: true };
-            try { localStorage.setItem(`clear_${id}`, '1'); } catch {}
+            // P0-2 StepC-1: clear_* 互換ミラー書き込みを停止（読み取り互換は saveData.isStageCleared の legacy fallback で維持）
+            // try { localStorage.setItem(`clear_${id}`, '1'); } catch {}
           });
         }
         if (save.player?.progress?.currentStage) {
