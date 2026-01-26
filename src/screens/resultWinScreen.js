@@ -3,7 +3,7 @@
 
 import { publish } from '../core/eventBus.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
-import { gameState, battleState, recordStageCleared } from '../core/gameState.js';
+import { gameState, battleState, recordStageCleared, saveGameData } from '../core/gameState.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { calcBonusReward, isFirstClear, markBonusFirstClear } from '../core/bonusManager.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
@@ -50,7 +50,9 @@ const resultWinState = {
     const stageId = this.resultData.stageId || gameState.currentStageId;
     if (stageId) {
       try {
-        localStorage.setItem(`clear_${stageId}`, '1');
+        // P0-2 StepA(例外A): clear_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
+        try { saveGameData(); } catch {}
+        localStorage.setItem(`clear_${stageId}`, '1'); // 互換ミラー（旧参照箇所向け）
         if (!gameState.stageProgress) gameState.stageProgress = {};
         gameState.stageProgress[stageId] = { cleared: true };
       } catch (e) {
