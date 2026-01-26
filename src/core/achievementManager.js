@@ -6,6 +6,7 @@ import { publish } from './eventBus.js';
 import { loadDex as loadKanjiDex } from '../models/kanjiDex.js';
 import { loadDex as loadMonsterDex } from '../models/monsterDex.js';
 import { stageData, kanjiData } from '../loaders/dataLoader.js';
+import { isStageCleared } from './saveData.js';
 
 let achievementsData = null;
 
@@ -51,7 +52,7 @@ function checkCondition(achievement, playerStats) {
       return playerStats.stagesCleared >= value;
     case 'stageCleared': {
       const id = value;
-      const ls = typeof localStorage !== 'undefined' && localStorage.getItem(`clear_${id}`) === '1';
+      const ls = isStageCleared(id); // P0-2 StepB-2(高影響/最小差分): clear_* 直読を集約関数へ
       const gs = gameState.stageProgress?.[id]?.cleared;
       return !!(ls || gs);
     }
