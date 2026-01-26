@@ -1,5 +1,6 @@
 import { gameState } from '../core/gameState.js';
 import { publish } from '../core/eventBus.js';
+import { isStageCleared } from '../core/saveData.js';
 
 // タブ定義：1〜6年 と 総復習（総復習は grade=0）
 const tabs = [
@@ -101,7 +102,7 @@ const gradeSelectState = {
       : stageIds.filter(id => id.startsWith(`${grade}_`));
     const total   = list.length;
     if (total === 0) return 0;
-    const cleared = list.filter(id => localStorage.getItem(`clear_${id}`)).length;
+    const cleared = list.filter(id => isStageCleared(id)).length; // P0-2 StepB-2(最小差分): clear_* 直読を集約関数へ
     return Math.round((cleared / total) * 100);
   }
 };
