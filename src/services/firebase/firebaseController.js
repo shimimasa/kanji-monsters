@@ -448,8 +448,6 @@ export async function deleteUserData(uid) {
  * @returns {Promise<any>} DataSync.initialize() の戻り値をそのまま返す
  */
 export async function startDataSync() {
-  // StepD Step2-Download: krb_save がある間は Firestore → localStorage の監視（download）を開始しない
-  if (__hasUsableKrbSave()) return;
   const mod = await import('./dataSync.js');
   const DataSync = mod?.default;
   return DataSync.initialize();

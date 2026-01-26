@@ -1,5 +1,5 @@
 /* ----------------------------- 依存モジュール ----------------------------- */
-import { gameState, updatePlayerName, saveGameData } from './core/gameState.js';
+import { gameState, updatePlayerName, saveGameData, loadGameData } from './core/gameState.js';
 import { setCanvas, update as updateScreen, render as renderScreen } from './core/screenManager.js';
 import { loadAll as loadUIImages } from './loaders/assetsLoader.js';
 import { loadKanjiGradesPhased } from './loaders/dataLoader.js';
@@ -185,11 +185,9 @@ function drawAchievementNotifications(ctx) {
   
   // StepD Step2-Download: Firestore からの読み取りは「krb_save が無い/破損」時のみ復旧用途で行う
   const recovered = await recoverKrbSaveFromFirestoreIfMissing();
-  if (recovered) {
-    // 復旧後はローカル（krb_save / キャッシュキー）を正史として再起動する
-    window.location.reload();
-    return;
-  }
+  console.log('[StepD Step2-Download] recovered krb_save from Firestore:', recovered);
+  // リロードは禁止：FirestoreでgameStateを上書きせず、ローカル(krb_save)を読み直して反映する
+  try { loadGameData(); } catch {}
 
   // セーブデータ読み込み完了後に実績チェックを実行（プレイ時間や累計系実績のチェック）
   try {
