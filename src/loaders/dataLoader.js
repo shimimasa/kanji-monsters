@@ -120,9 +120,10 @@ export async function loadAllGameData() {
                     const more = await legendResp.json();
                     // 学年推定: stageId / id プレフィックス
                     const stageIdToGrade = {
-                      hokkaido_bonus: 1, tohoku_bonus: 2, kanto_bonus: 3, kantou_bonus: 3, chubu_bonus: 4, chuubu_bonus: 4,
+                      // P1-2: canonicalizeStageId 前提で、辞書キーは正史（小文字）に寄せる
+                      hokkaido_bonus: 1, tohoku_bonus: 2, kanto_bonus: 3, chubu_bonus: 4,
                       kinki_bonus: 5,
-                      chugoku_bonus: 6, chuugoku_bonus: 6, cyuugoku_bonus: 6,
+                      chugoku_bonus: 6,
                       kyushu_bonus: 6, shikoku_bonus: 6, // 便宜的に6に寄せる（後段のステージ定義で正しく補完）
                       asia_bonus: 7, europe_bonus: 8, america_bonus: 9, africa_bonus: 10,
                     };
@@ -428,10 +429,11 @@ export function setStageKanjiMap(map) {
 
 // getKanjiByStageId関数を修正
 export function getKanjiByStageId(stageId) {
-  // ステージIDを正規化（大文字小文字を区別しない）
-  const normalizedId = stageId.toLowerCase();
+  // P1-2: 表記揺れ吸収は canonicalizeStageId に集約し、dataLoader は canonical ID で参照する
+  const rawId = String(stageId || '');
+  const canonId = __canon(rawId);
   // 学年ボーナス: 学年の全漢字を出題
-  const bonusM = /^bonus_g(\d+)$/i.exec(stageId);
+  const bonusM = /^bonus_g(\d+)$/i.exec(rawId);
   if (bonusM) {
     const g = parseInt(bonusM[1], 10);
     console.log(`bonus_g${g}: 学年全漢字プールを使用します`);
@@ -439,27 +441,31 @@ export function getKanjiByStageId(stageId) {
   }
   
   // 中学生ステージの場合、学年に基づいて漢字プールを取得
-  if (normalizedId.startsWith('asia_')) {
+  if (canonId.startsWith('asia_')) {
     console.log('4級（grade 7）の漢字プールを使用します');
     return getKanjiByGrade(7);
-  } else if (normalizedId.startsWith('europe_')) {
+  } else if (canonId.startsWith('europe_')) {
     console.log('3級（grade 8）の漢字プールを使用します');
     return getKanjiByGrade(8);
-  } else if (normalizedId.startsWith('america_')) {
+  } else if (canonId.startsWith('america_')) {
     console.log('準2級（grade 9）の漢字プールを使用します');
     return getKanjiByGrade(9);
-  } else if (normalizedId.startsWith('africa_')) {
+  } else if (canonId.startsWith('africa_')) {
     console.log('2級（grade 10）の漢字プールを使用します');
     return getKanjiByGrade(10);
   }
   
-  // 既存のロジック + 追加フォールバック
-  if (!stageKanjiMap[normalizedId]) {
-    console.log(`stageKanjiMap[${normalizedId}] が見つかりません。正規化されたID: ${normalizedId}`);
+  // canonical で参照
+  if (!stageKanjiMap[canonId]) {
+    // フォールバックは 1回だけ（raw で試す）
+    if (rawId && rawId !== canonId && stageKanjiMap[rawId]) return stageKanjiMap[rawId];
+    console.log(`stageKanjiMap[${canonId}] が見つかりません。canonical ID: ${canonId}`);
 
     // 追加: ステージ定義にある kanjiPoolIdList を直接参照
     try {
-      const st = stageData.find(s => String(s.stageId).toLowerCase() === normalizedId);
+      const st =
+        stageData.find(s => String(s.stageId || '') === canonId) ||
+        (rawId && rawId !== canonId ? stageData.find(s => String(s.stageId || '') === rawId) : null);
       if (st && Array.isArray(st.kanjiPoolIdList) && st.kanjiPoolIdList.length > 0) {
         const pool = st.kanjiPoolIdList.map(id => getKanjiById(id)).filter(Boolean);
         if (pool.length > 0) {
@@ -470,7 +476,7 @@ export function getKanjiByStageId(stageId) {
     } catch {}
 
     // ステージIDから学年を推測
-    const grade = getGradeFromStageId(normalizedId);
+    const grade = getGradeFromStageId(canonId);
     if (grade) {
       console.log(`代替として学年${grade}の漢字 ${kanjiByGrade[grade]?.length || 0}件を使用します。`);
       return kanjiByGrade[grade] || [];
@@ -479,7 +485,7 @@ export function getKanjiByStageId(stageId) {
     return [];
   }
   
-  return stageKanjiMap[normalizedId];
+  return stageKanjiMap[canonId];
 }
 
 // ステージIDから学年を推測するヘルパー関数
