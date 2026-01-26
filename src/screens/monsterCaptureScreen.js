@@ -1,6 +1,6 @@
 // src/screens/monsterCaptureScreen.js
 import { publish } from '../core/eventBus.js';
-import { gameState } from '../core/gameState.js';
+import { gameState, saveGameData } from '../core/gameState.js';
 import { addMonster, loadDex } from '../models/monsterDex.js';
 
 import { getAllMonsterIds, getMonsterById, stageData } from '../loaders/dataLoader.js';
@@ -243,7 +243,7 @@ const monsterCaptureScreen = {
       try {
         const mg = /^bonus_g(\d+)$/i.exec(String(stageId));
         const g = parseInt(mg[1], 10);
-        localStorage.setItem(`stage_first_clear_at_${stageId}`, String(Date.now()));
+        const firstClearAt = Date.now();
         if (!gameState.practiceProgress) gameState.practiceProgress = {};
         const targets = Array.isArray(stageData) ? stageData.filter(s => s && s.grade === g) : [];
         for (const stg of targets) {
@@ -255,9 +255,13 @@ const monsterCaptureScreen = {
             gameState.practiceProgress[sid] = entry;
           }
         }
-        try { if (typeof saveGameData === 'function') saveGameData(); } catch {}
+        // P0-2 StepA(例外A): stage_first_clear_at_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
+        try { saveGameData(); } catch {}
+        localStorage.setItem(`stage_first_clear_at_${stageId}`, String(firstClearAt)); // 互換ミラー（旧参照箇所向け）
       } catch {}
     }
+    // P0-2 StepA(例外A): stage_clear_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
+    try { saveGameData(); } catch {}
     localStorage.setItem(key, String(current + 1));
   },
 
