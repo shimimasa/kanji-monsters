@@ -9,6 +9,7 @@ import {
   getCurrentUser,
   initializeNewPlayerData,
   recoverKrbSaveFromFirestoreIfMissing,
+  syncAllCaches,
   startDataSync
 } from './services/firebase/firebaseController.js';
 import { showBootProgress, updateBootProgress, hideBootProgress } from './ui/bootProgress.js';
@@ -217,6 +218,12 @@ function drawAchievementNotifications(ctx) {
 
   // DataSync 初期化（Firestore → localStorage のマージ監視開始）
   startDataSync();
+  // StepD Step3-2A: キャッシュ用途の任意同期トリガ（失敗してもゲーム進行は継続）
+  try {
+    syncAllCaches()
+      .then(() => console.log('[StepD Step3-2A] syncAllCaches done'))
+      .catch(() => {});
+  } catch {}
 
    // 4) FSMは既に初期状態で'title'画面を設定済みのため、追加の画面遷移は不要
 
