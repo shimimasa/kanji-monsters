@@ -137,6 +137,77 @@ export function clearSave() {
   try { localStorage.removeItem(STORAGE_KEY); } catch {}
 }
 
+// ---------- StepB-1: 読み取り入口の集約（SSoT=krb_save 優先） ----------
+//
+// 目的: clear_* / stage_clear_* / stage_first_clear_at_* の読み取りを 1箇所に集約する。
+// - 新しい保存キー/スキーマは作らない（read-only）
+// - 既存挙動は fallback(localStorage) で維持する
+// - 注意: loadSave() は migrate に伴い saveNow() を呼び得るため、ここでは「読み取り専用」で krb_save を読む。
+
+function __readKrbSaveNoWrite() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return migrateSave(parsed);
+  } catch {
+    return null;
+  }
+}
+
+export function isStageCleared(stageId) {
+  const id = String(stageId || '');
+  if (!id) return false;
+
+  const save = __readKrbSaveNoWrite();
+  const clearedStages = save?.player?.progress?.clearedStages;
+  if (Array.isArray(clearedStages)) {
+    return clearedStages.includes(id);
+  }
+
+  // fallback: legacy
+  try { return localStorage.getItem(`clear_${id}`) === '1'; } catch {}
+  return false;
+}
+
+export function getStageClearCount(stageId) {
+  const id = String(stageId || '');
+  if (!id) return 0;
+
+  const save = __readKrbSaveNoWrite();
+  // v1 正史には「クリア回数」フィールドが定義されていないため、存在する場合のみ参照する（新設計は禁止）
+  const counts = save?.player?.progress?.stageClearCounts;
+  const v = (counts && typeof counts === 'object') ? counts[id] : undefined;
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+
+  // fallback: legacy
+  try {
+    const raw = localStorage.getItem(`stage_clear_${id}`);
+    const n = parseInt(raw || '0', 10);
+    return Number.isFinite(n) ? n : 0;
+  } catch {}
+  return 0;
+}
+
+export function getStageFirstClearAt(stageId) {
+  const id = String(stageId || '');
+  if (!id) return null;
+
+  const save = __readKrbSaveNoWrite();
+  // v1 正史には「初回クリア日時」フィールドが定義されていないため、存在する場合のみ参照する（新設計は禁止）
+  const map = save?.player?.progress?.stageFirstClearAt;
+  const v = (map && typeof map === 'object') ? map[id] : undefined;
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+
+  // fallback: legacy
+  try {
+    const raw = localStorage.getItem(`stage_first_clear_at_${id}`);
+    const n = parseInt(raw || '', 10);
+    return Number.isFinite(n) ? n : null;
+  } catch {}
+  return null;
+}
+
 // ---------- 内部: レガシー取り込み ----------
 
 function migrateFromLegacyOrEmpty() {
