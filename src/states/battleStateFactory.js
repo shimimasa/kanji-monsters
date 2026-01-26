@@ -39,8 +39,8 @@ export default function createBattleState(stageId){
         // ステージクリア後の処理
         // P0-2 StepA(例外A): clear_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
         try { saveGameData(); } catch {}
-        // 互換ミラー（旧参照箇所向け）
-        localStorage.setItem(`clear_${currentStageId}`, '1');
+        // P0-2 StepC-1: clear_* 互換ミラー書き込みを停止（読み取り互換は saveData.isStageCleared の legacy fallback で維持）
+        // localStorage.setItem(`clear_${currentStageId}`, '1');
         // 新しい勝利画面に遷移（データ付き）
         const resultData = {
           stageId: gameState.currentStageId,
