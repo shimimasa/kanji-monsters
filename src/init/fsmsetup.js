@@ -1,5 +1,6 @@
 // src/init/fsmSetup.js
-import { FSM } from '../core/stateMachine.js';
+// P0-1 Step3-2: FSM実装の正史を core/fsm.js に統一（互換挙動は core/fsm.js 側で担保）
+import { FSM } from '../core/fsm.js';
 import { gameState } from '../core/gameState.js';
 import battleFactory       from '../states/battleStateFactory.js';
 import gradeSelectState    from '../states/gradeSelectState.js';
