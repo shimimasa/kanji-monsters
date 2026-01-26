@@ -261,7 +261,8 @@ const monsterCaptureScreen = {
         // localStorage.setItem(`stage_first_clear_at_${stageId}`, String(firstClearAt));
       } catch {}
     }
-    localStorage.setItem(key, String(current + 1));
+    // P0-2 StepC-3: stage_clear_* 互換ミラー書き込みを停止（読み取り互換は saveData.getStageClearCount の legacy fallback で維持）
+    // localStorage.setItem(key, String(current + 1));
   },
 
   _goResultWin() {
