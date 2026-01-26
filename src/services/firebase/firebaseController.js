@@ -279,3 +279,29 @@ export async function deleteUserData(uid) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// StepD Step1-1: Firestore アクセス口の一本化（dataSync.js を外部から触らせない）
+// - dataSync.js 自体は変更しない
+// - 循環依存を避けるため動的 import を使用
+// - 例外は握りつぶさず、DataSync 側の戻り値/Promise をそのまま返す
+// ---------------------------------------------------------------------------
+
+/**
+ * Firestore → localStorage の監視を開始（旧 DataSync.initialize）
+ * @returns {Promise<any>} DataSync.initialize() の戻り値をそのまま返す
+ */
+export async function startDataSync() {
+  const mod = await import('./dataSync.js');
+  const DataSync = mod?.default;
+  return DataSync.initialize();
+}
+
+/**
+ * localStorage のキャッシュを Firestore に同期（旧 DataSync.syncAll）
+ * @returns {Promise<any>} DataSync.syncAll() の戻り値をそのまま返す
+ */
+export async function syncAllCaches() {
+  const mod = await import('./dataSync.js');
+  const DataSync = mod?.default;
+  return DataSync.syncAll();
+}
