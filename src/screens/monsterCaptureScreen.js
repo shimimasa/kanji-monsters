@@ -2,6 +2,7 @@
 import { publish } from '../core/eventBus.js';
 import { gameState, saveGameData } from '../core/gameState.js';
 import { addMonster, loadDex } from '../models/monsterDex.js';
+import { getStageClearCount } from '../core/saveData.js';
 
 import { getAllMonsterIds, getMonsterById, stageData } from '../loaders/dataLoader.js';
 const monsterCaptureScreen = {
@@ -229,9 +230,8 @@ const monsterCaptureScreen = {
   },
 
   _getStageClearCount(stageId) {
-    if (!stageId) return 0;
-    const key = `stage_clear_${stageId}`;
-    return parseInt(localStorage.getItem(key) || '0');
+    // P0-2 StepB-2(最小差分): 読み取り入口を saveData.getStageClearCount() に寄せる（現状は legacy 読みなので挙動は同等）
+    return getStageClearCount(stageId);
   },
 
   _incrementStageClearCount(stageId) {
