@@ -1,5 +1,6 @@
 // js/dataLoader.js
 import { gameState } from '../core/gameState.js';
+import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 
 export let stageData = [];
 let enemyData = [];
@@ -11,6 +12,17 @@ let kanjiByGrade = {};
 export async function loadAllGameData() {
   try {
     console.log("外部JSONファイルの読み込みを開始します...");
+    const __canonWarned = new Set();
+    const __canon = (raw) => {
+      const canon = canonicalizeStageId(raw);
+      const r = (raw === null || raw === undefined) ? '' : String(raw);
+      if (r && canon && canon !== r && !__canonWarned.has(r)) {
+        __canonWarned.add(r);
+        // P1(ID規約): 表記揺れ吸収は canonicalizeStageId に集約（当面はログのみで可視化）
+        console.warn(`[P1] canonicalizeStageId: ${r} -> ${canon}`);
+      }
+      return canon || r;
+    };
 
     // 複数学年の漢字データをまとめて読み込む
     const grades = [1, 2, 3, 4, 5, 6];
@@ -23,6 +35,7 @@ export async function loadAllGameData() {
     const kanjiArrays = await Promise.all(kanjiPromises);
     kanjiData = kanjiArrays.flat().map(k => ({
       ...k,
+      stageId: Array.isArray(k?.stageId) ? k.stageId.map(__canon) : __canon(k?.stageId),
       incorrectCount: k.incorrectCount ?? 0
     }));
     console.log("漢字データ読み込み完了");
@@ -97,7 +110,7 @@ export async function loadAllGameData() {
         const enemyPath = '/data/enemies_proto.json';
         const enemyResponse = await fetch(enemyPath);
         if (!enemyResponse.ok) throw new Error(`敵データの読み込みに失敗: ${enemyResponse.statusText}`);
-        enemyData = await enemyResponse.json();
+        enemyData = (await enemyResponse.json()).map(e => e && e.stageId ? ({ ...e, stageId: __canon(e.stageId) }) : e);
         console.log("敵データ読み込み完了");
     
                 // 追加: 伝説/幻ゴトモンの読み込みをマージ
@@ -117,14 +130,15 @@ export async function loadAllGameData() {
                       if (!e || !e.id) continue;
                       if (typeof e.grade !== 'number') {
                         let g = null;
-                        if (e.stageId && stageIdToGrade[e.stageId]) g = stageIdToGrade[e.stageId];
+                        const sid = e.stageId ? __canon(e.stageId) : '';
+                        if (sid && stageIdToGrade[sid]) g = stageIdToGrade[sid];
                         else if (String(e.id).startsWith('AS-')) g = 7;
                         else if (String(e.id).startsWith('EUR-')) g = 8;
                         else if (String(e.id).startsWith('AME-')) g = 9;
                         else if (String(e.id).startsWith('AFR-')) g = 10;
                         if (g) e.grade = g;
                       }
-                      enemyData.push(e);
+                      enemyData.push(e && e.stageId ? ({ ...e, stageId: __canon(e.stageId) }) : e);
                     }
                     console.log(`伝説/幻ゴトモン: 追加 ${more.length} 件`);
                   }
@@ -136,7 +150,7 @@ export async function loadAllGameData() {
         const stagePath = '/data/stages_proto.json';
         const stageResponse = await fetch(stagePath);
         if (!stageResponse.ok) throw new Error(`ステージデータの読み込みに失敗: ${stageResponse.statusText}`);
-        stageData = await stageResponse.json();
+        stageData = (await stageResponse.json()).map(s => s && s.stageId ? ({ ...s, stageId: __canon(s.stageId) }) : s);
         console.log("ステージデータ読み込み完了");
     
         // 追加: ボーナスステージ定義のマージ（存在時のみ）
@@ -144,13 +158,14 @@ export async function loadAllGameData() {
           const bonusResp = await fetch('/data/stages.bonus.json').catch(() => null);
           if (bonusResp && bonusResp.ok) {
             const bonusStages = await bonusResp.json();
-            const exists = new Set(stageData.map(s => s.stageId));
+            const exists = new Set(stageData.map(s => s?.stageId).filter(Boolean));
             let added = 0;
             for (const s of bonusStages) {
               if (!s || !s.stageId) continue;
-              if (!exists.has(s.stageId)) {
-                stageData.push(s);
-                exists.add(s.stageId);
+              const sid = __canon(s.stageId);
+              if (!exists.has(sid)) {
+                stageData.push({ ...s, stageId: sid });
+                exists.add(sid);
                 added++;
               }
             }
