@@ -1,5 +1,6 @@
 import { publish } from '../core/eventBus.js';
 import { gameState } from '../core/gameState.js';
+import { isStageCleared } from '../core/saveData.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { images } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
@@ -245,7 +246,7 @@ calculateContinentProgress(grade) {
     const stages = stageData.filter(s => s.grade === grade && this.isNormalStage(s));
     if (stages.length === 0) return 0;
     const cleared = stages.filter(s => {
-      const ls = localStorage.getItem(`clear_${s.stageId}`);
+      const ls = isStageCleared(s.stageId);
       const gs = gameState.stageProgress && gameState.stageProgress[s.stageId]?.cleared;
       return !!ls || !!gs;
     });
