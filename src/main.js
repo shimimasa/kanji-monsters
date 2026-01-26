@@ -187,7 +187,9 @@ function drawAchievementNotifications(ctx) {
   const recovered = await recoverKrbSaveFromFirestoreIfMissing();
   console.log('[StepD Step2-Download] recovered krb_save from Firestore:', recovered);
   // リロードは禁止：FirestoreでgameStateを上書きせず、ローカル(krb_save)を読み直して反映する
-  try { loadGameData(); } catch {}
+  if (recovered) {
+    try { await loadGameData(); } catch {}
+  }
 
   // セーブデータ読み込み完了後に実績チェックを実行（プレイ時間や累計系実績のチェック）
   try {

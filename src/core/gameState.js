@@ -346,7 +346,7 @@ function incrementStageClearCount(stageId) {
 
   export function loadGameData() {
     try {
-      import('./saveData.js').then(mod => {
+      return import('./saveData.js').then(mod => {
         const save = mod.loadSave();
         if (!save) return false;
 
@@ -430,7 +430,7 @@ function incrementStageClearCount(stageId) {
       });
     } catch (error) {
       console.error('❌ ゲームデータの読み込みに失敗しました:', error);
-      return false;
+      return Promise.resolve(false);
     }
   }
 
