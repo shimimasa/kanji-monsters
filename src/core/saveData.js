@@ -113,6 +113,18 @@ export function migrateSave(save) {
     save.player.study = Object.assign({}, d.player.study, save.player.study || {});
     save.settings = Object.assign({}, d.settings, save.settings || {});
     save.flags = Object.assign({}, d.flags, save.flags || {});
+
+    // StepB-3: 旧クリアキー（clear_* / stage_clear_*）との差を縮めるため、
+    // 既存 krb_save(v1) に対しても「1回だけ」legacy進捗を取り込む。
+    // これにより、clearedStages が空（または欠損補完で空）でも legacy fallback が無視され続ける事故を防ぐ。
+    let changed = false;
+    if (!save.meta.legacyStageProgressMerged) {
+      mergeLegacyStageProgressKeys(save);
+      save.meta.legacyStageProgressMerged = true;
+      changed = true;
+    }
+    if (changed) return Object.assign({}, save); // loadSave 側で saveNow されるよう参照を変える
+
     return save;
   }
 
@@ -259,20 +271,7 @@ function mergeAmbientKeys(saveObj) {
   if (last) saveObj.player.progress.currentStage = last;
 
   // ステージクリア（clear_*, stage_clear_* 両対応）
-  const cleared = new Set(Array.isArray(saveObj.player.progress.clearedStages) ? saveObj.player.progress.clearedStages : []);
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (!k) continue;
-    if (k.startsWith('clear_') && localStorage.getItem(k) === '1') {
-      cleared.add(k.replace(/^clear_/, ''));
-    }
-    if (k.startsWith('stage_clear_')) {
-      const id = k.replace(/^stage_clear_/, '');
-      const v = parseInt(localStorage.getItem(k) || '0', 10);
-      if (v > 0) cleared.add(id);
-    }
-  }
-  saveObj.player.progress.clearedStages = Array.from(cleared);
+  mergeLegacyStageProgressKeys(saveObj);
 
   // 図鑑
   try {
@@ -284,6 +283,27 @@ function mergeAmbientKeys(saveObj) {
   try {
     const rq = JSON.parse(localStorage.getItem('krb_review_queue') || '[]');
     if (Array.isArray(rq)) saveObj.player.study.reviewQueue = rq.map(e => e?.id).filter(Boolean);
+  } catch {}
+}
+
+function mergeLegacyStageProgressKeys(saveObj) {
+  try {
+    const cleared = new Set(Array.isArray(saveObj.player?.progress?.clearedStages) ? saveObj.player.progress.clearedStages : []);
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k) continue;
+      if (k.startsWith('clear_') && localStorage.getItem(k) === '1') {
+        cleared.add(k.replace(/^clear_/, ''));
+      }
+      if (k.startsWith('stage_clear_')) {
+        const id = k.replace(/^stage_clear_/, '');
+        const v = parseInt(localStorage.getItem(k) || '0', 10);
+        if (v > 0) cleared.add(id);
+      }
+    }
+    if (!saveObj.player) saveObj.player = getDefaultSave().player;
+    if (!saveObj.player.progress) saveObj.player.progress = getDefaultSave().player.progress;
+    saveObj.player.progress.clearedStages = Array.from(cleared);
   } catch {}
 }
 
