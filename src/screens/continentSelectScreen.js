@@ -148,8 +148,8 @@ const continentSelectState = {
         // 'worldStageSelect'という文字列を直接使用して、ステージIDとの混同を防ぐ
         console.log("遷移時のprops:", props);
         
-        // 強制的にworldStageSelectに遷移
-        window.switchScreen('worldStageSelect', props);
+        // P0-1(設計憲法A): 画面遷移の入口を統一するため、window.switchScreen の直呼びを廃止し changeScreen 経由に寄せる
+        publish('changeScreen', { name: 'worldStageSelect', props });
       }, 200);
     }
   },
