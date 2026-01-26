@@ -3,6 +3,7 @@ import { gameState, unlockAchievement } from './gameState.js';
 import { getKanjiByGrade } from '../loaders/dataLoader.js';
 import { publish } from './eventBus.js';
 import { getAchievementById } from './achievementManager.js';
+import { isStageCleared } from './saveData.js';
 
 const TITLE_THRESHOLDS = { conqueror: 3, guardian: 5, champion: 10 }; // 征服者/守護者/覇者
 const RANK_THRESHOLDS = { S: 85, A: 70 }; // S>=85, A>=70, B<70
@@ -21,7 +22,7 @@ export function isBonusUnlocked(grade) {
 
   // 1) 全通常ステージクリア
   const allCleared = targets.every(s => {
-    const ls = localStorage.getItem(`clear_${s.stageId}`) === '1';
+    const ls = isStageCleared(s.stageId); // P0-2 StepB-2(高影響/最小差分): clear_* 直読を集約関数へ
     const gs = gameState.stageProgress?.[s.stageId]?.cleared;
     return !!(ls || gs);
   });
