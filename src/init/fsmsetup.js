@@ -109,7 +109,13 @@ export async function setupFSM() {
     // その他の画面への遷移
     fsm.change(name, props);
   }
-  subscribe('changeScreen', switchScreen);
+  // P0-1(設計憲法A): changeScreen payload（string / {name,props} / [name,props]）を setupFSM 側で正規化し、遷移入口をここに集約する
+  function __normalizeChangeScreenPayload(payload) {
+    if (Array.isArray(payload)) return switchScreen(payload[0], payload[1]);
+    if (payload && typeof payload === 'object' && 'name' in payload) return switchScreen(payload.name, payload.props);
+    return switchScreen(payload);
+  }
+  subscribe('changeScreen', __normalizeChangeScreenPayload);
 
   // デバッグ用にグローバル公開
   window.switchScreen = switchScreen;
