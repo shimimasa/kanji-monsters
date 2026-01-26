@@ -1,0 +1,19 @@
+1) 画面遷移の正史（唯一の入口）
+Issue（短い名前）	症状（いま起きていること）	影響（ユーザー体験/データ破損/保守性）	原因（構造上の理由）	解決の方針（正史をどれにするか、選択肢A/B/C）	優先度	対象ファイル（列挙）
+遷移入口が複数	changeScreen が screenManager 側でも setupFSM 側でも購読され、さらに window.switchScreen も露出している	- 遷移が二重発火/順序揺れ（UI消し込みや入力欄の残存などが偶発）<br>- デバッグ困難（ログは出るが原因箇所が特定しづらい）	- Pub/Subを「入口」として使いながら、実装都合で windowに正史が逃げている<br>- FSMが2実装（core/stateMachine.js と core/fsm.js）で思想が割れている	- A: setupFSM.switchScreen を唯一の入口（changeScreen→ここに集約、window.switchScreen はデバッグ用に限定）【推奨】<br>- B: screenManager を唯一の入口（screenManager がFSMを内包し、setupFSM は登録だけ）<br>- C: 入口はEventBusのみ、ただし購読者は1つに制限（内部でルーティング）	P0	src/main.js, src/core/screenManager.js, src/init/fsmsetup.js, src/core/stateMachine.js, src/core/fsm.js, src/core/eventBus.js
+2) 永続化の正史（旧新スキーマ、Firebase同期）
+Issue（短い名前）	症状（いま起きていること）	影響（ユーザー体験/データ破損/保守性）	原因（構造上の理由）	解決の方針（正史をどれにするか、選択肢A/B/C）	優先度	対象ファイル（列挙）
+セーブ正史が多元	krb_save（新）と kanjiGameSave（旧）と個別キー（clear_*等）が混在し、さらにFirestoreにも別スキーマで保存される	- 端末間/再起動で進捗がズレる（どれが採用されたかで結果が変わる）<br>- 復旧不能な“正しそうに見える不整合”が起きやすい（クラウドとローカルが違う）	- 「移行期間」扱いが長期化し、読み取り/書き込みの真実が一本化されていない<br>- Firebaseは profile/playerStats と progress/* と progress/state に分散	- A: 正史=ローカル krb_save、Firebaseは“同期キャッシュ”（アップロード/ダウンロードは krb_save を起点）【推奨】<br>- B: 正史=Firestore、ローカルはキャッシュ（オフライン含め最終的にFirestore準拠）<br>- C: 正史=ローカル（旧含む）を当面維持し、Firebaseは図鑑/復習のみ（最小同期）	P0	src/core/gameState.js（saveGameData/loadGameData）, src/core/saveData.js（krb_save）, src/services/firebase/firebaseController.js, src/services/firebase/dataSync.js, src/models/reviewQueue.js, src/models/kanjiDex.js, src/models/monsterDex.js
+3) ID規約の正史（stageId/grade/表記揺れ）
+Issue（短い名前）	症状（いま起きていること）	影響（ユーザー体験/データ破損/保守性）	原因（構造上の理由）	解決の方針（正史をどれにするか、選択肢A/B/C）	優先度	対象ファイル（列挙）
+表記揺れ吸収が散在	kanto/kantou, chubu/chuubu, chugoku/chuugoku/cyuugoku、_area有無、世界の大文字小文字等を 各所が独自に吸収している	- 背景/敵/漢字の紐づけ失敗が“静かに”起きる（代替で動いてしまう）<br>- データ更新のたびに例外が増え、仕様がコードに埋まる	- 正史IDが不明確で、フォールバックが“仕様”化している<br>- grade が「学年」「漢検級相当」「UI用番号」など複数意味で使われている	- A: 正史=データファイルの stageId（コード側は 1箇所で正規化し、それ以外は例外禁止）【推奨】<br>- B: 正史=正規化後ID（canonical）を導入し、データを全てcanonicalで揃える<br>- C: 正史=現状維持（吸収継続）だが、吸収はユーティリティ1箇所に限定	P1	src/loaders/dataLoader.js, src/loaders/assetsLoader.js（背景/フォルダ/ID吸収）, src/screens/stageSelectScreen.js, src/screens/worldStageSelectScreen.js, public/data/*.json（stages_proto.json, enemies_*.json, kanji_g*_proto.json）
+4) “バトル”の定義（戦闘UI vs 学習ドリル基盤）
+Issue（短い名前）	症状（いま起きていること）	影響（ユーザー体験/データ破損/保守性）	原因（構造上の理由）	解決の方針（正史をどれにするか、選択肢A/B/C）	優先度	対象ファイル（列挙）
+battleの責務肥大	practiceBattleScreen が battleScreen を“継承”しつつ敵要素だけ無効化し、さらにクイック復習など学習モードが増築されている	- 仕様追加が“戦闘UIの副作用”として増える（バグの温床）<br>- プレイヤーから見ると「戦闘と練習の境界」が曖昧になりやすい	- 「バトルUI＝入力/出題/判定の基盤」を流用した結果、戦闘ロジックと学習ロジックが分離されていない	- A: 正史=battleは戦闘、practiceは別の“学習セッション”（UIは共有しても意味論は分離）【推奨】<br>- B: 正史=battleは“学習セッション基盤”、戦闘はその一形態（命名とデータモデルを合わせる）<br>- C: 正史を分けない（現状路線）だが“モード”を明確に仕様化し、依存方向を固定	P1	src/screens/battleScreen.js, src/screens/practiceBattleScreen.js, src/screens/quickReviewPracticeScreen.js, src/screens/reviewStage.js, src/states/battleStateFactory.js, src/core/gameState.js
+5) リポジトリの正史（my-app / image-pipeline / dist/public）
+Issue（短い名前）	症状（いま起きていること）	影響（ユーザー体験/データ破損/保守性）	原因（構造上の理由）	解決の方針（正史をどれにするか、選択肢A/B/C）	優先度	対象ファイル（列挙）
+成果物/試作/素材生成が同居	ルートに dist/ と public/、別アプリっぽい my-app/、素材加工の image-pipeline/ が同列に存在	- 新規参加者が どれを起動/デプロイすべきか迷う<br>- 誤って成果物を編集/コミットしやすい	- “プロダクト”と“制作パイプライン”と“試作”の境界が repo 上で未定義	- A: 正史=ルート（Vite）をプロダクト、image-pipeline はツール、my-app はアーカイブ/実験扱い【推奨】<br>- B: 正史=モノレポ化（apps/toolsを明示し、ビルド/デプロイを分離）<br>- C: 正史=別リポジトリへ分割（プロダクトとパイプラインを切り離す）	P2	package.json, vite.config.js, firebase.json, vercel.json, workbox-config.js, my-app/package.json, image‐pipeline/package.json, dist/, public/
+優先度のまとめ（意思決定単位）
+P0: 1) 画面遷移の正史、2) 永続化の正史（ここが揺れると以後の議論が全部不安定）
+P1: 3) ID規約の正史、4) “バトル”の定義（機能拡張の方向性を固定）
+P2: 5) リポジトリの正史（開発体験/運用の摩擦を下げるが、ゲーム挙動の正しさには直結しにくい）
