@@ -9,12 +9,12 @@ import {
   loadAllStageClearStatus,
   getCurrentUser,
   initializeNewPlayerData,
-  loadPlayerData
+  loadPlayerData,
+  startDataSync
 } from './services/firebase/firebaseController.js';
 import { showBootProgress, updateBootProgress, hideBootProgress } from './ui/bootProgress.js';
 import { AudioManager } from './audio/audioManager.js';
 import reviewQueue from './models/reviewQueue.js';
-import DataSync from './services/firebase/dataSync.js';
 import { FSM } from './core/stateMachine.js';
 import { setupFSM } from './init/fsmsetup.js';
 import { checkAchievements } from './core/achievementManager.js';
@@ -217,7 +217,7 @@ function drawAchievementNotifications(ctx) {
   gameState.currentStageId = 'hokkaido_area1';
 
   // DataSync 初期化（Firestore → localStorage のマージ監視開始）
-  DataSync.initialize();
+  startDataSync();
 
    // 4) FSMは既に初期状態で'title'画面を設定済みのため、追加の画面遷移は不要
 
