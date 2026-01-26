@@ -19,6 +19,9 @@ const profileScreen = {
       canvas.style.pointerEvents = 'none';
     }
 
+    // プロフィールは汎用メニューBGM
+    publish('playBGM', 'title');
+
     // コンテナ生成
     this.container = document.createElement('div');
     this.container.id = 'profileScreenContainer';
