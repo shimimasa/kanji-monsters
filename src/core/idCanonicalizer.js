@@ -17,10 +17,11 @@ const REGION_ALIASES = {
 };
 
 const WORLD_CANON = {
-  asia: 'Asia',
-  europe: 'Europe',
-  america: 'America',
-  africa: 'Africa',
+  // 世界ステージはコード側の正史として先頭小文字に統一する
+  asia: 'asia',
+  europe: 'europe',
+  america: 'america',
+  africa: 'africa',
 };
 
 /**
@@ -31,7 +32,7 @@ const WORLD_CANON = {
  *   - trim
  *   - bonus の区切りゆれ: bonus-g1 / BONUS_G1 -> bonus_g1
  *   - 先頭トークン（region）だけ表記ゆれ辞書で正規化
- *   - 世界ステージは先頭を TitleCase（Asia/Europe/America/Africa）へ寄せる（stages_proto.json に合わせる）
+ *   - 世界ステージは先頭小文字（asia/europe/america/africa）へ寄せる（コード側の正史）
  *   - 不明IDは例外にせず、可能な範囲で整形して返す
  */
 export function canonicalizeStageId(raw) {
@@ -51,7 +52,7 @@ export function canonicalizeStageId(raw) {
 
   let head = headRaw;
   if (headLower in WORLD_CANON) {
-    head = WORLD_CANON[headLower]; // 正史（stages_proto）に合わせる
+    head = WORLD_CANON[headLower]; // 正史（コード側の小文字）に合わせる
   } else if (headLower in REGION_ALIASES) {
     head = REGION_ALIASES[headLower];
   } else {
@@ -61,11 +62,9 @@ export function canonicalizeStageId(raw) {
 
   if (parts.length === 1) return head;
 
-  // area の大小だけ整える（例: Area1 -> area1）
+  // area の大小ゆれをすべて小文字へ（例: Area1 / AREA1 -> area1）
   let rest = parts.slice(1).join('_');
-  rest = rest.replace(/^Area/i, 'area');
-  // 世界は stages_proto の形式（Asia_areaN）に寄せる
-  if (head in WORLD_CANON) rest = rest.replace(/^area/i, 'area');
+  rest = rest.toLowerCase().replace(/^area/i, 'area');
 
   return `${head}_${rest}`;
 }
