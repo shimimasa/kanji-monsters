@@ -233,8 +233,10 @@ function getStageClearCount(stageId) {
 
 function incrementStageClearCount(stageId) {
   const key = `stage_clear_${stageId}`;
-  const current = getStageClearCount(stageId);
-  localStorage.setItem(key, String(current + 1));
+  // P0-2 StepA: stage_clear_* はレガシー互換キー。正史(krb_save)以外への新規書き込みを停止する。
+  // 読み取り互換（ambient merge等）は維持するため、ここでは no-op とする。
+  // const current = getStageClearCount(stageId);
+  // localStorage.setItem(key, String(current + 1));
 }
   /**
    * ゲームデータをlocalStorageに保存する
@@ -334,14 +336,7 @@ function incrementStageClearCount(stageId) {
         
         saveNow(save);
 
-        // 旧フォーマットも当面残しておく（後方互換）
-        localStorage.setItem('kanjiGameSave', JSON.stringify({
-          playerName: gameState.playerName,
-          playerStats: gameState.playerStats,
-          unlockedAchievements: Array.from(gameState.unlockedAchievements),
-          practiceProgress: gameState.practiceProgress,
-          kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress)
-        }));
+        // P0-2 StepA: 旧フォーマット（kanjiGameSave）への新規書き込みを停止（読み取り互換は saveData 側のマイグレーションで維持）
         console.log('💾 ゲームデータを保存しました');
       }).catch(e => console.warn('saveData import failed:', e));
     } catch (error) {
