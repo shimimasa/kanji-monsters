@@ -1,6 +1,6 @@
 // js/firebaseController.js
 import { gameState } from '../../core/gameState.js'; // ★★★ この行が必須 ★★★
-import { migrateSave } from '../../core/saveData.js';
+import { getDefaultSave, migrateSave } from '../../core/saveData.js';
 import { firebaseConfig } from './firebaseConfig.js';   // ← 追加
 
 // ---------------------------------------------------------------------------
@@ -25,6 +25,11 @@ function __readKrbSaveNoWrite() {
   } catch {
     return null;
   }
+}
+
+function __hasUsableKrbSave() {
+  const save = __readKrbSaveNoWrite();
+  return !!(save && save.meta && typeof save.meta.version === 'number');
 }
 
 function buildProfileSummaryFromSave(save) {
@@ -124,7 +129,6 @@ export async function signInAnonymouslyIfNeeded() {
     if (auth.currentUser) {
         currentUser = auth.currentUser;
         console.log("User already signed in (from auth.currentUser):", currentUser.uid);
-        await loadPlayerData(); // 既存ユーザーのデータをロード試行
         return currentUser;
     }
 
@@ -134,7 +138,6 @@ export async function signInAnonymouslyIfNeeded() {
             .then(async (userCredential) => {
                 currentUser = userCredential.user;
                 console.log("New anonymous user signed in:", currentUser.uid);
-                await loadPlayerData(); // 新規ユーザーでもデータをロード試行 (なければ作成)
                 resolve(currentUser);
             })
             .catch((error) => {
@@ -312,6 +315,88 @@ export async function loadAllStageClearStatus() {
     }
 }
 
+// ---------------------------------------------------------------------------
+// StepD Step2-Download: Firestore → krb_save 復旧（krb_save が無い/破損のときのみ）
+// - gameState へ直流ししない
+// - Firestore はあくまで復旧用の同期キャッシュ
+// ---------------------------------------------------------------------------
+export async function recoverKrbSaveFromFirestoreIfMissing() {
+  // krb_save が既にあれば復旧不要
+  if (__hasUsableKrbSave()) return false;
+
+  if (!db || !currentUser || !currentUser.uid) {
+    console.warn('recoverKrbSaveFromFirestoreIfMissing: Firestore or User not signed in.');
+    return false;
+  }
+
+  try {
+    const uid = currentUser.uid;
+    const playerProfileRef = db.collection('users').doc(uid).collection('profile').doc('playerStats');
+    const progressStateRef = db.collection('users').doc(uid).collection('progress').doc('state');
+
+    const [profileSnap, stateSnap] = await Promise.all([playerProfileRef.get(), progressStateRef.get()]);
+    const profile = profileSnap?.exists ? (profileSnap.data() || {}) : {};
+    const state = stateSnap?.exists ? (stateSnap.data() || {}) : {};
+
+    // --- krb_save を生成 ---
+    const base = getDefaultSave();
+    const save = migrateSave(base);
+
+    // profile/playerStats → krb_save.player.*
+    if (typeof profile.name === 'string') save.player.name = profile.name;
+    if (save.player && save.player.coreStats && typeof save.player.coreStats === 'object') {
+      const cs = save.player.coreStats;
+      const level = parseInt(profile.level, 10);
+      const exp = parseInt(profile.currentExp, 10);
+      const maxHp = parseInt(profile.maxHp, 10);
+      const attack = parseInt(profile.attack, 10);
+      const nextLevelExp = parseInt(profile.nextLevelExp, 10);
+      if (Number.isFinite(level)) cs.level = level;
+      if (Number.isFinite(exp)) cs.exp = exp;
+      if (Number.isFinite(maxHp)) cs.maxHp = maxHp;
+      if (Number.isFinite(attack)) cs.attack = attack;
+      if (Number.isFinite(nextLevelExp)) cs.nextLevelExp = nextLevelExp;
+    }
+
+    // progress/state → 可能な範囲で krb_save とローカルキャッシュへ
+    // monsterDex
+    if (Array.isArray(state.monsterDex)) {
+      const ids = state.monsterDex.filter(x => typeof x === 'string');
+      save.player.collection.gotomonIds = ids;
+      try { localStorage.setItem('krb_monster_dex', JSON.stringify(ids)); } catch {}
+    }
+
+    // reviewQueue（Firestore側はオブジェクト配列想定。krb_save には id 配列として取り込む）
+    if (Array.isArray(state.reviewQueue)) {
+      try { localStorage.setItem('krb_review_queue', JSON.stringify(state.reviewQueue)); } catch {}
+      const ids = state.reviewQueue
+        .map(e => (e && typeof e === 'object' ? e.id : e))
+        .filter(Boolean)
+        .map(x => String(x));
+      save.player.study.reviewQueue = ids;
+    }
+
+    // kanjiDex（krb_save の正史スキーマに無いので、現状はキャッシュキーとしてのみ復旧）
+    if (Array.isArray(state.kanjiDex)) {
+      try { localStorage.setItem('krb_kanji_dex', JSON.stringify(state.kanjiDex)); } catch {}
+    }
+
+    save.meta.lastSavedAt = Date.now();
+
+    try {
+      localStorage.setItem(KRB_SAVE_STORAGE_KEY, JSON.stringify(save));
+      console.log('Recovered krb_save from Firestore (missing/invalid local krb_save).');
+      return true;
+    } catch (e) {
+      console.error('Failed to write recovered krb_save:', e);
+      return false;
+    }
+  } catch (e) {
+    console.error('recoverKrbSaveFromFirestoreIfMissing failed:', e);
+    return false;
+  }
+}
+
 export async function deleteUserData(uid) {
   if (!db || !uid) {
     console.warn('deleteUserData: db or uid missing');
@@ -363,6 +448,8 @@ export async function deleteUserData(uid) {
  * @returns {Promise<any>} DataSync.initialize() の戻り値をそのまま返す
  */
 export async function startDataSync() {
+  // StepD Step2-Download: krb_save がある間は Firestore → localStorage の監視（download）を開始しない
+  if (__hasUsableKrbSave()) return;
   const mod = await import('./dataSync.js');
   const DataSync = mod?.default;
   return DataSync.initialize();

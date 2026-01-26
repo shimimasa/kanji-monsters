@@ -6,10 +6,9 @@ import { loadKanjiGradesPhased } from './loaders/dataLoader.js';
 import {
   initializeFirebaseServices,
   signInAnonymouslyIfNeeded,
-  loadAllStageClearStatus,
   getCurrentUser,
   initializeNewPlayerData,
-  loadPlayerData,
+  recoverKrbSaveFromFirestoreIfMissing,
   startDataSync
 } from './services/firebase/firebaseController.js';
 import { showBootProgress, updateBootProgress, hideBootProgress } from './ui/bootProgress.js';
@@ -184,10 +183,13 @@ function drawAchievementNotifications(ctx) {
   const user = await signInAnonymouslyIfNeeded();
   console.log('UID:', user?.uid);
   
-  // loadPlayerData()はsignInAnonymouslyIfNeeded()内で既に呼び出されているため、
-  // ここでの重複呼び出しは不要です
-  
-  await loadAllStageClearStatus();
+  // StepD Step2-Download: Firestore からの読み取りは「krb_save が無い/破損」時のみ復旧用途で行う
+  const recovered = await recoverKrbSaveFromFirestoreIfMissing();
+  if (recovered) {
+    // 復旧後はローカル（krb_save / キャッシュキー）を正史として再起動する
+    window.location.reload();
+    return;
+  }
 
   // セーブデータ読み込み完了後に実績チェックを実行（プレイ時間や累計系実績のチェック）
   try {
@@ -196,9 +198,6 @@ function drawAchievementNotifications(ctx) {
   } catch (error) {
     console.error('❌ ゲーム起動時の実績チェックでエラー:', error);
   }
-
-  // プレイヤーデータを読み込む処理を追加
-  await loadPlayerData();
 
   // ─────────── プレイヤー名自動入力 ───────────
   // データ未設定時に名前を聞いて gameState にセット、Firestore に書き込む
