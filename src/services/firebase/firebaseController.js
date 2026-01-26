@@ -1,5 +1,6 @@
 // js/firebaseController.js
 import { gameState } from '../../core/gameState.js'; // ★★★ この行が必須 ★★★
+import { migrateSave } from '../../core/saveData.js';
 import { firebaseConfig } from './firebaseConfig.js';   // ← 追加
 
 // ---------------------------------------------------------------------------
@@ -18,7 +19,9 @@ function __readKrbSaveNoWrite() {
   try {
     const raw = localStorage.getItem(KRB_SAVE_STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    // StepD Step2-Upload(安全性): krb_save は migrateSave を通した構造を前提に読む（saveNow は呼ばない）
+    return migrateSave(parsed);
   } catch {
     return null;
   }
