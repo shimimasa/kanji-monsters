@@ -119,9 +119,11 @@ export function migrateSave(save) {
     // これにより、clearedStages が空（または欠損補完で空）でも legacy fallback が無視され続ける事故を防ぐ。
     let changed = false;
     if (!save.meta.legacyStageProgressMerged) {
-      mergeLegacyStageProgressKeys(save);
-      save.meta.legacyStageProgressMerged = true;
-      changed = true;
+      const ok = mergeLegacyStageProgressKeys(save);
+      if (ok) {
+        save.meta.legacyStageProgressMerged = true;
+        changed = true;
+      }
     }
     if (changed) return Object.assign({}, save); // loadSave 側で saveNow されるよう参照を変える
 
@@ -304,7 +306,10 @@ function mergeLegacyStageProgressKeys(saveObj) {
     if (!saveObj.player) saveObj.player = getDefaultSave().player;
     if (!saveObj.player.progress) saveObj.player.progress = getDefaultSave().player.progress;
     saveObj.player.progress.clearedStages = Array.from(cleared);
-  } catch {}
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function clamp01(v) { return Math.max(0, Math.min(1, v)); }
