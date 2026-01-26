@@ -260,8 +260,6 @@ const monsterCaptureScreen = {
         localStorage.setItem(`stage_first_clear_at_${stageId}`, String(firstClearAt)); // 互換ミラー（旧参照箇所向け）
       } catch {}
     }
-    // P0-2 StepA(例外A): stage_clear_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
-    try { saveGameData(); } catch {}
     localStorage.setItem(key, String(current + 1));
   },
 
