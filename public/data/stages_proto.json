@@ -504,7 +504,6 @@
       "g3-034",
       "g3-035"
     ],
-    
     "recommendedLevel": 6
   },
   {
@@ -627,7 +626,6 @@
       "g3-104",
       "g3-105"
     ],
-    
     "recommendedLevel": 7
   },
   {
@@ -684,7 +682,6 @@
       "g3-134",
       "g3-135"
     ],
-    
     "recommendedLevel": 8
   },
   {
@@ -746,7 +743,6 @@
       "g3-169",
       "g3-170"
     ],
-    
     "recommendedLevel": 9
   },
   {
@@ -803,7 +799,6 @@
       "g3-199",
       "g3-200"
     ],
-
     "recommendedLevel": 9
   },
   {
@@ -925,7 +920,6 @@
       "g3-199",
       "g3-200"
     ],
-    
     "recommendedLevel": 10
   },
   {
@@ -972,7 +966,6 @@
       "g4-019",
       "g4-020"
     ],
-    
     "recommendedLevel": 11
   },
   {
@@ -1019,7 +1012,6 @@
       "g4-039",
       "g4-040"
     ],
-    
     "recommendedLevel": 11
   },
   {
@@ -1066,7 +1058,6 @@
       "g4-059",
       "g4-060"
     ],
-    
     "recommendedLevel": 12
   },
   {
@@ -1113,7 +1104,6 @@
       "g4-079",
       "g4-080"
     ],
-
     "recommendedLevel": 13
   },
   {
@@ -1160,7 +1150,6 @@
       "g4-099",
       "g4-100"
     ],
-    
     "recommendedLevel": 13
   },
   {
@@ -1207,7 +1196,6 @@
       "g4-119",
       "g4-120"
     ],
-    
     "recommendedLevel": 14
   },
   {
@@ -1254,7 +1242,6 @@
       "g4-139",
       "g4-140"
     ],
-    
     "recommendedLevel": 15
   },
   {
@@ -1306,7 +1293,6 @@
       "g4-164",
       "g4-165"
     ],
-    
     "recommendedLevel": 15
   },
   {
@@ -1370,7 +1356,6 @@
       "g4-201",
       "g4-202"
     ],
-    
     "recommendedLevel": 16
   },
   {
@@ -1422,7 +1407,6 @@
       "g5-024",
       "g5-025"
     ],
-
     "recommendedLevel": 17
   },
   {
@@ -1474,7 +1458,6 @@
       "g5-049",
       "g5-050"
     ],
-    
     "recommendedLevel": 17
   },
   {
@@ -1526,7 +1509,6 @@
       "g5-074",
       "g5-075"
     ],
-    
     "recommendedLevel": 18
   },
   {
@@ -1578,7 +1560,6 @@
       "g5-099",
       "g5-100"
     ],
-    
     "recommendedLevel": 19
   },
   {
@@ -1630,7 +1611,6 @@
       "g5-124",
       "g5-125"
     ],
-    
     "recommendedLevel": 19
   },
   {
@@ -1687,7 +1667,6 @@
       "g5-154",
       "g5-155"
     ],
-
     "recommendedLevel": 20
   },
   {
@@ -1753,7 +1732,6 @@
       "g5-193",
       "g5-194"
     ],
-    
     "recommendedLevel": 21
   },
   {
@@ -1815,7 +1793,6 @@
       "g6-034",
       "g6-035"
     ],
-    
     "recommendedLevel": 21
   },
   {
@@ -1882,7 +1859,6 @@
       "g6-074",
       "g6-075"
     ],
-    
     "recommendedLevel": 22
   },
   {
@@ -1949,7 +1925,6 @@
       "g6-114",
       "g6-115"
     ],
-
     "recommendedLevel": 23
   },
   {
@@ -2016,7 +1991,6 @@
       "g6-154",
       "g6-155"
     ],
-    
     "recommendedLevel": 23
   },
   {
@@ -2078,7 +2052,6 @@
       "g6-189",
       "g6-190"
     ],
-    
     "recommendedLevel": 24
   },
   {
@@ -2089,7 +2062,7 @@
       "x": 600,
       "y": 200
     },
-    "stageId": "Asia_area1",
+    "stageId": "asia_area1",
     "name": "中国",
     "enemyIdList": [
       "CHN-E001",
@@ -2135,7 +2108,6 @@
       "g7-029",
       "g7-030"
     ],
-    
     "recommendedLevel": 24
   },
   {
@@ -2146,7 +2118,7 @@
       "x": 450,
       "y": 300
     },
-    "stageId": "Asia_area2",
+    "stageId": "asia_area2",
     "name": "インド",
     "enemyIdList": [
       "IND-E001",
@@ -2192,10 +2164,8 @@
       "g7-059",
       "g7-060"
     ],
-    
     "recommendedLevel": 24
   },
-  
   {
     "grade": 7,
     "region": "アジア",
@@ -2204,7 +2174,7 @@
       "x": 570,
       "y": 450
     },
-    "stageId": "Asia_area3",
+    "stageId": "asia_area3",
     "name": "インドネシア",
     "enemyIdList": [
       "INDN-E001",
@@ -2250,10 +2220,8 @@
       "g7-089",
       "g7-090"
     ],
-
     "recommendedLevel": 24
   },
-  
   {
     "grade": 7,
     "region": "アジア",
@@ -2262,7 +2230,7 @@
       "x": 420,
       "y": 250
     },
-    "stageId": "Asia_area4",
+    "stageId": "asia_area4",
     "name": "パキスタン",
     "enemyIdList": [
       "PKS-E001",
@@ -2308,10 +2276,8 @@
       "g7-119",
       "g7-120"
     ],
-        
     "recommendedLevel": 24
   },
-  
   {
     "grade": 7,
     "region": "アジア",
@@ -2320,7 +2286,7 @@
       "x": 640,
       "y": 150
     },
-    "stageId": "Asia_area5",
+    "stageId": "asia_area5",
     "name": "韓国",
     "enemyIdList": [
       "KNK-E001",
@@ -2366,10 +2332,8 @@
       "g7-149",
       "g7-150"
     ],
-        
     "recommendedLevel": 24
   },
-  
   {
     "grade": 7,
     "region": "アジア",
@@ -2378,7 +2342,7 @@
       "x": 560,
       "y": 370
     },
-    "stageId": "Asia_area6",
+    "stageId": "asia_area6",
     "name": "タイ",
     "enemyIdList": [
       "TAI-E001",
@@ -2424,7 +2388,6 @@
       "g7-179",
       "g7-180"
     ],
-        
     "recommendedLevel": 24
   },
   {
@@ -2435,7 +2398,7 @@
       "x": 600,
       "y": 350
     },
-    "stageId": "Asia_area7",
+    "stageId": "asia_area7",
     "name": "ベトナム",
     "enemyIdList": [
       "BTN-E001",
@@ -2481,7 +2444,6 @@
       "g7-209",
       "g7-210"
     ],
-        
     "recommendedLevel": 24
   },
   {
@@ -2492,7 +2454,7 @@
       "x": 650,
       "y": 350
     },
-    "stageId": "Asia_area8",
+    "stageId": "asia_area8",
     "name": "フィリピン",
     "enemyIdList": [
       "FIP-E001",
@@ -2541,7 +2503,6 @@
       "g7-239",
       "g7-240"
     ],
-
     "recommendedLevel": 24
   },
   {
@@ -2552,7 +2513,7 @@
       "x": 540,
       "y": 330
     },
-    "stageId": "Asia_area9",
+    "stageId": "asia_area9",
     "name": "ミャンマー",
     "enemyIdList": [
       "MYM-E001",
@@ -2598,7 +2559,6 @@
       "g7-269",
       "g7-270"
     ],
-    
     "recommendedLevel": 24
   },
   {
@@ -2609,7 +2569,7 @@
       "x": 550,
       "y": 150
     },
-    "stageId": "Asia_area10",
+    "stageId": "asia_area10",
     "name": "モンゴル",
     "enemyIdList": [
       "MNG-E001",
@@ -2667,8 +2627,7 @@
       "g7-311",
       "g7-312",
       "g7-313"
-        ],
-    
+    ],
     "recommendedLevel": 24
   },
   {
@@ -2679,7 +2638,7 @@
       "x": 450,
       "y": 360
     },
-    "stageId": "Europe_area1",
+    "stageId": "europe_area1",
     "name": "フランス",
     "enemyIdList": [
       "FRA-E001",
@@ -2725,7 +2684,6 @@
       "g8-029",
       "g8-030"
     ],
-    
     "recommendedLevel": 24
   },
   {
@@ -2736,7 +2694,7 @@
       "x": 480,
       "y": 300
     },
-    "stageId": "Europe_area2",
+    "stageId": "europe_area2",
     "name": "ドイツ",
     "enemyIdList": [
       "DEU-E001",
@@ -2782,10 +2740,8 @@
       "g8-059",
       "g8-060"
     ],
-    
     "recommendedLevel": 24
   },
-  
   {
     "grade": 8,
     "region": "ヨーロッパ",
@@ -2794,7 +2750,7 @@
       "x": 490,
       "y": 380
     },
-    "stageId": "Europe_area3",
+    "stageId": "europe_area3",
     "name": "イタリア",
     "enemyIdList": [
       "ITA-E001",
@@ -2840,7 +2796,6 @@
       "g8-089",
       "g8-090"
     ],
-
     "recommendedLevel": 24
   },
   {
@@ -2851,7 +2806,7 @@
       "x": 430,
       "y": 290
     },
-    "stageId": "Europe_area4",
+    "stageId": "europe_area4",
     "name": "イギリス",
     "enemyIdList": [
       "GBR-E001",
@@ -2897,10 +2852,8 @@
       "g8-119",
       "g8-120"
     ],
-    
     "recommendedLevel": 24
   },
-  
   {
     "grade": 8,
     "region": "ヨーロッパ",
@@ -2909,7 +2862,7 @@
       "x": 430,
       "y": 380
     },
-    "stageId": "Europe_area5",
+    "stageId": "europe_area5",
     "name": "スペイン",
     "enemyIdList": [
       "ESP-E001",
@@ -2955,10 +2908,8 @@
       "g8-149",
       "g8-150"
     ],
-    
     "recommendedLevel": 24
   },
-  
   {
     "grade": 8,
     "region": "ヨーロッパ",
@@ -2967,7 +2918,7 @@
       "x": 650,
       "y": 250
     },
-    "stageId": "Europe_area6",
+    "stageId": "europe_area6",
     "name": "ロシア",
     "enemyIdList": [
       "RUS-E001",
@@ -3013,10 +2964,8 @@
       "g8-179",
       "g8-180"
     ],
-    
     "recommendedLevel": 24
   },
-  
   {
     "grade": 8,
     "region": "ヨーロッパ",
@@ -3025,7 +2974,7 @@
       "x": 550,
       "y": 180
     },
-    "stageId": "Europe_area7",
+    "stageId": "europe_area7",
     "name": "フィンランド",
     "enemyIdList": [
       "FIN-E001",
@@ -3071,10 +3020,8 @@
       "g8-209",
       "g8-210"
     ],
-    
     "recommendedLevel": 24
   },
-  
   {
     "grade": 8,
     "region": "ヨーロッパ",
@@ -3083,7 +3030,7 @@
       "x": 570,
       "y": 330
     },
-    "stageId": "Europe_area8",
+    "stageId": "europe_area8",
     "name": "ウクライナ",
     "enemyIdList": [
       "UKR-E001",
@@ -3129,10 +3076,8 @@
       "g8-239",
       "g8-240"
     ],
-
     "recommendedLevel": 24
   },
-  
   {
     "grade": 8,
     "region": "ヨーロッパ",
@@ -3141,7 +3086,7 @@
       "x": 660,
       "y": 320
     },
-    "stageId": "Europe_area9",
+    "stageId": "europe_area9",
     "name": "カザフスタン",
     "enemyIdList": [
       "KAZ-E001",
@@ -3187,7 +3132,6 @@
       "g8-269",
       "g8-270"
     ],
-        
     "recommendedLevel": 24
   },
   {
@@ -3198,7 +3142,7 @@
       "x": 510,
       "y": 300
     },
-    "stageId": "Europe_area10",
+    "stageId": "europe_area10",
     "name": "ポーランド",
     "enemyIdList": [
       "POL-E001",
@@ -3228,10 +3172,8 @@
       "g8-283",
       "g8-284"
     ],
-        
     "recommendedLevel": 24
   },
-  
   {
     "grade": 9,
     "region": "アメリカ大陸",
@@ -3240,7 +3182,7 @@
       "x": 550,
       "y": 150
     },
-    "stageId": "America_area1",
+    "stageId": "america_area1",
     "name": "カナダ",
     "enemyIdList": [
       "CAN-E001",
@@ -3286,10 +3228,8 @@
       "g9-029",
       "g9-030"
     ],
-        
     "recommendedLevel": 24
   },
-  
   {
     "grade": 9,
     "region": "アメリカ大陸",
@@ -3298,7 +3238,7 @@
       "x": 600,
       "y": 200
     },
-    "stageId": "America_area2",
+    "stageId": "america_area2",
     "name": "アメリカ合衆国",
     "enemyIdList": [
       "USA-E001",
@@ -3344,7 +3284,6 @@
       "g9-059",
       "g9-060"
     ],
-        
     "recommendedLevel": 24
   },
   {
@@ -3355,7 +3294,7 @@
       "x": 520,
       "y": 300
     },
-    "stageId": "America_area3",
+    "stageId": "america_area3",
     "name": "メキシコ",
     "enemyIdList": [
       "MEX-E001",
@@ -3401,7 +3340,6 @@
       "g9-089",
       "g9-090"
     ],
-
     "recommendedLevel": 24
   },
   {
@@ -3412,7 +3350,7 @@
       "x": 550,
       "y": 300
     },
-    "stageId": "America_area4",
+    "stageId": "america_area4",
     "name": "キューバ",
     "enemyIdList": [
       "CUB-E001",
@@ -3458,7 +3396,6 @@
       "g9-119",
       "g9-120"
     ],
-    
     "recommendedLevel": 24
   },
   {
@@ -3469,7 +3406,7 @@
       "x": 600,
       "y": 320
     },
-    "stageId": "America_area5",
+    "stageId": "america_area5",
     "name": "ベネズエラ",
     "enemyIdList": [
       "VEN-E001",
@@ -3515,7 +3452,6 @@
       "g9-149",
       "g9-150"
     ],
-    
     "recommendedLevel": 24
   },
   {
@@ -3526,7 +3462,7 @@
       "x": 600,
       "y": 400
     },
-    "stageId": "America_area6",
+    "stageId": "america_area6",
     "name": "ボリビア",
     "enemyIdList": [
       "BOL-E001",
@@ -3572,7 +3508,6 @@
       "g9-179",
       "g9-180"
     ],
-    
     "recommendedLevel": 24
   },
   {
@@ -3583,7 +3518,7 @@
       "x": 580,
       "y": 330
     },
-    "stageId": "America_area7",
+    "stageId": "america_area7",
     "name": "コロンビア",
     "enemyIdList": [
       "COL-E001",
@@ -3629,7 +3564,6 @@
       "g9-209",
       "g9-210"
     ],
-    
     "recommendedLevel": 24
   },
   {
@@ -3640,7 +3574,7 @@
       "x": 590,
       "y": 430
     },
-    "stageId": "America_area8",
+    "stageId": "america_area8",
     "name": "チリ",
     "enemyIdList": [
       "CHL-E001",
@@ -3684,7 +3618,6 @@
       "g9-239",
       "g9-240"
     ],
-
     "recommendedLevel": 24
   },
   {
@@ -3695,7 +3628,7 @@
       "x": 650,
       "y": 400
     },
-    "stageId": "America_area9",
+    "stageId": "america_area9",
     "name": "ブラジル",
     "enemyIdList": [
       "BRA-E001",
@@ -3741,10 +3674,8 @@
       "g9-269",
       "g9-270"
     ],
-    
     "recommendedLevel": 24
   },
-  
   {
     "grade": 9,
     "region": "アメリカ大陸",
@@ -3753,7 +3684,7 @@
       "x": 600,
       "y": 460
     },
-    "stageId": "America_area10",
+    "stageId": "america_area10",
     "name": "アルゼンチン",
     "enemyIdList": [
       "ARG-E001",
@@ -3827,10 +3758,8 @@
       "g9-327",
       "g9-328"
     ],
-    
     "recommendedLevel": 24
   },
-  
   {
     "grade": 10,
     "region": "アフリカ大陸",
@@ -3839,7 +3768,7 @@
       "x": 630,
       "y": 130
     },
-    "stageId": "Africa_area1",
+    "stageId": "africa_area1",
     "name": "エジプト",
     "enemyIdList": [
       "EGY-E001",
@@ -3875,10 +3804,8 @@
       "g10-019",
       "g10-020"
     ],
-    
     "recommendedLevel": 24
   },
-
   {
     "grade": 10,
     "region": "アフリカ大陸",
@@ -3887,7 +3814,7 @@
       "x": 530,
       "y": 250
     },
-    "stageId": "Africa_area2",
+    "stageId": "africa_area2",
     "name": "ナイジェリア",
     "enemyIdList": [
       "NGA-E001",
@@ -3923,7 +3850,6 @@
       "g10-039",
       "g10-040"
     ],
-    
     "recommendedLevel": 24
   },
   {
@@ -3934,7 +3860,7 @@
       "x": 600,
       "y": 150
     },
-    "stageId": "Africa_area3",
+    "stageId": "africa_area3",
     "name": "リビア",
     "enemyIdList": [
       "LBA-E001",
@@ -3956,7 +3882,7 @@
       "g10-045",
       "g10-046",
       "g10-047",
-      "g10-048",  
+      "g10-048",
       "g10-049",
       "g10-050",
       "g10-051",
@@ -3970,10 +3896,8 @@
       "g10-059",
       "g10-060"
     ],
-
     "recommendedLevel": 24
   },
-  
   {
     "grade": 10,
     "region": "アフリカ大陸",
@@ -3982,7 +3906,7 @@
       "x": 530,
       "y": 160
     },
-    "stageId": "Africa_area4",
+    "stageId": "africa_area4",
     "name": "アルジェリア",
     "enemyIdList": [
       "ALG-E001",
@@ -4018,10 +3942,8 @@
       "g10-079",
       "g10-080"
     ],
-        
     "recommendedLevel": 24
   },
-  
   {
     "grade": 10,
     "region": "アフリカ大陸",
@@ -4030,7 +3952,7 @@
       "x": 570,
       "y": 390
     },
-    "stageId": "Africa_area5",
+    "stageId": "africa_area5",
     "name": "アンゴラ",
     "enemyIdList": [
       "AGO-E001",
@@ -4066,10 +3988,8 @@
       "g10-099",
       "g10-100"
     ],
-        
     "recommendedLevel": 24
   },
-
   {
     "grade": 10,
     "region": "アフリカ大陸",
@@ -4078,7 +3998,7 @@
       "x": 680,
       "y": 310
     },
-    "stageId": "Africa_area6",
+    "stageId": "africa_area6",
     "name": "ケニア",
     "enemyIdList": [
       "KEN-E001",
@@ -4100,7 +4020,7 @@
       "g10-105",
       "g10-106",
       "g10-107",
-      "g10-108",  
+      "g10-108",
       "g10-109",
       "g10-110",
       "g10-111",
@@ -4114,10 +4034,8 @@
       "g10-119",
       "g10-120"
     ],
-        
     "recommendedLevel": 24
   },
-  
   {
     "grade": 10,
     "region": "アフリカ大陸",
@@ -4126,7 +4044,7 @@
       "x": 460,
       "y": 130
     },
-    "stageId": "Africa_area7",
+    "stageId": "africa_area7",
     "name": "モロッコ",
     "enemyIdList": [
       "MOR-E001",
@@ -4162,11 +4080,8 @@
       "g10-139",
       "g10-140"
     ],
-        
     "recommendedLevel": 24
   },
-
-  
   {
     "grade": 10,
     "region": "アフリカ大陸",
@@ -4175,7 +4090,7 @@
       "x": 620,
       "y": 320
     },
-    "stageId": "Africa_area8",
+    "stageId": "africa_area8",
     "name": "コンゴ民主共和国",
     "enemyIdList": [
       "DRC-E001",
@@ -4190,7 +4105,7 @@
       "DRC-E010"
     ],
     "kanjiPoolIdList": [
-      "g10-141",  
+      "g10-141",
       "g10-142",
       "g10-143",
       "g10-144",
@@ -4211,11 +4126,8 @@
       "g10-159",
       "g10-160"
     ],
-
     "recommendedLevel": 24
   },
-
-  
   {
     "grade": 10,
     "region": "アフリカ大陸",
@@ -4224,7 +4136,7 @@
       "x": 720,
       "y": 420
     },
-    "stageId": "Africa_area9",
+    "stageId": "africa_area9",
     "name": "マダガスカル",
     "enemyIdList": [
       "MAD-E001",
@@ -4260,10 +4172,8 @@
       "g10-179",
       "g10-180"
     ],
-            
     "recommendedLevel": 24
   },
-
   {
     "grade": 10,
     "region": "アフリカ大陸",
@@ -4272,7 +4182,7 @@
       "x": 600,
       "y": 480
     },
-    "stageId": "Africa_area10",
+    "stageId": "africa_area10",
     "name": "南アフリカ",
     "enemyIdList": [
       "ZAF-E001",
@@ -4308,10 +4218,8 @@
       "g10-015",
       "g10-016"
     ],
-            
     "recommendedLevel": 24
   },
-
   {
     "grade": 11,
     "region": "四国",
@@ -4968,7 +4876,7 @@
       "g3-125",
       "g3-126",
       "g3-127",
-      "g3-128", 
+      "g3-128",
       "g3-129",
       "g3-130",
       "g3-131",
@@ -5463,7 +5371,6 @@
     ],
     "recommendedLevel": 24
   },
-
   {
     "grade": 11,
     "region": "四国",
@@ -5918,7 +5825,7 @@
       "g6-036",
       "g6-037",
       "g6-038",
-      "g6-039", 
+      "g6-039",
       "g6-040",
       "g6-041",
       "g6-042",
@@ -6071,32 +5978,31 @@
       "g6-189",
       "g6-190"
     ],
-      "recommendedLevel": 24
+    "recommendedLevel": 24
+  },
+  {
+    "grade": 12,
+    "region": "九州",
+    "pref": "福岡県",
+    "pos": {
+      "x": 550,
+      "y": 50
     },
-
-    {
-      "grade": 12,
-      "region": "九州",
-      "pref": "福岡県",
-      "pos": {
-        "x": 550,
-        "y": 50
-      },
-      "stageId": "kyushu_area1",
-      "name": "福岡県(中1~中2)",
-      "enemyIdList": [
-        "FUK-E01",
-        "FUK-E02",
-        "FUK-E03",
-        "FUK-E04",
-        "FUK-E05",
-        "FUK-E06",
-        "FUK-E07",
-        "FUK-E08",
-        "FUK-E09",
-        "FUK-E10"
-      ],
-      "kanjiPoolIdList": [
+    "stageId": "kyushu_area1",
+    "name": "福岡県(中1~中2)",
+    "enemyIdList": [
+      "FUK-E01",
+      "FUK-E02",
+      "FUK-E03",
+      "FUK-E04",
+      "FUK-E05",
+      "FUK-E06",
+      "FUK-E07",
+      "FUK-E08",
+      "FUK-E09",
+      "FUK-E10"
+    ],
+    "kanjiPoolIdList": [
       "g7-001",
       "g7-002",
       "g7-003",
@@ -6694,34 +6600,33 @@
       "g8-282",
       "g8-283",
       "g8-284"
-      ],
-        "recommendedLevel": 24
-      },
-
-      {
-        "grade": 12,
-        "region": "九州",
-        "pref": "佐賀県",
-        "pos": {
-          "x": 500,
-          "y": 100
-        },
-        "stageId": "kyushu_area2",
-        "name": "佐賀県(中2~中3)",
-        "enemyIdList": [
-          "SAGA-E01",
-          "SAGA-E02",
-          "SAGA-E03",
-          "SAGA-E04",
-          "SAGA-E05",
-          "SAGA-E06",
-          "SAGA-E07",
-          "SAGA-E08",
-          "SAGA-E09",
-          "SAGA-E10"
-        ],
-        "kanjiPoolIdList": [
-          "g8-001",
+    ],
+    "recommendedLevel": 24
+  },
+  {
+    "grade": 12,
+    "region": "九州",
+    "pref": "佐賀県",
+    "pos": {
+      "x": 500,
+      "y": 100
+    },
+    "stageId": "kyushu_area2",
+    "name": "佐賀県(中2~中3)",
+    "enemyIdList": [
+      "SAGA-E01",
+      "SAGA-E02",
+      "SAGA-E03",
+      "SAGA-E04",
+      "SAGA-E05",
+      "SAGA-E06",
+      "SAGA-E07",
+      "SAGA-E08",
+      "SAGA-E09",
+      "SAGA-E10"
+    ],
+    "kanjiPoolIdList": [
+      "g8-001",
       "g8-002",
       "g8-003",
       "g8-004",
@@ -7333,33 +7238,33 @@
       "g9-326",
       "g9-327",
       "g9-328"
-        ],
-        "recommendedLevel": 24
-      },
-      {
-        "grade": 12,
-        "region": "九州",
-        "pref": "長崎県",
-        "pos": {
-          "x": 480,
-          "y": 150
-        },
-        "stageId": "kyushu_area3",
-        "name": "長崎県(中1~中3)",
-        "enemyIdList": [
-          "NAGA-E01",
-          "NAGA-E02",
-          "NAGA-E03",
-          "NAGA-E04",
-          "NAGA-E05",
-          "NAGA-E06",
-          "NAGA-E07",
-          "NAGA-E08",
-          "NAGA-E09",
-          "NAGA-E10"
-        ],
-        "kanjiPoolIdList": [
-          "g7-001",
+    ],
+    "recommendedLevel": 24
+  },
+  {
+    "grade": 12,
+    "region": "九州",
+    "pref": "長崎県",
+    "pos": {
+      "x": 480,
+      "y": 150
+    },
+    "stageId": "kyushu_area3",
+    "name": "長崎県(中1~中3)",
+    "enemyIdList": [
+      "NAGA-E01",
+      "NAGA-E02",
+      "NAGA-E03",
+      "NAGA-E04",
+      "NAGA-E05",
+      "NAGA-E06",
+      "NAGA-E07",
+      "NAGA-E08",
+      "NAGA-E09",
+      "NAGA-E10"
+    ],
+    "kanjiPoolIdList": [
+      "g7-001",
       "g7-002",
       "g7-003",
       "g7-004",
@@ -8284,34 +8189,33 @@
       "g9-326",
       "g9-327",
       "g9-328"
-        ],
-        "recommendedLevel": 24
-
-      },
-      {
-        "grade": 12,
-        "region": "九州",
-        "pref": "大分県",
-        "pos": {
-          "x": 620,
-          "y": 130
-        },
-        "stageId": "kyushu_area4",
-        "name": "大分県(中3~高1)",
-        "enemyIdList": [
-          "OITA-E01",
-          "OITA-E02",
-          "OITA-E03",
-          "OITA-E04",
-          "OITA-E05",
-          "OITA-E06",
-          "OITA-E07",
-          "OITA-E08",
-          "OITA-E09",
-          "OITA-E10"
-        ],
-        "kanjiPoolIdList": [
-          "g9-001",
+    ],
+    "recommendedLevel": 24
+  },
+  {
+    "grade": 12,
+    "region": "九州",
+    "pref": "大分県",
+    "pos": {
+      "x": 620,
+      "y": 130
+    },
+    "stageId": "kyushu_area4",
+    "name": "大分県(中3~高1)",
+    "enemyIdList": [
+      "OITA-E01",
+      "OITA-E02",
+      "OITA-E03",
+      "OITA-E04",
+      "OITA-E05",
+      "OITA-E06",
+      "OITA-E07",
+      "OITA-E08",
+      "OITA-E09",
+      "OITA-E10"
+    ],
+    "kanjiPoolIdList": [
+      "g9-001",
       "g9-002",
       "g9-003",
       "g9-004",
@@ -8822,33 +8726,33 @@
       "g10-181",
       "g10-182",
       "g10-183"
-        ],
-        "recommendedLevel": 24
-      },
-      {
-        "grade": 12,
-        "region": "九州",
-        "pref": "熊本県",
-        "pos": {
-          "x": 570,
-          "y": 230
-        },
-        "stageId": "kyushu_area5",
-        "name": "熊本県(中1~高1)",
-        "enemyIdList": [
-          "KUMA-E01",
-          "KUMA-E02",
-          "KUMA-E03",
-          "KUMA-E04",
-          "KUMA-E05",
-          "KUMA-E06",
-          "KUMA-E07",
-          "KUMA-E08",
-          "KUMA-E09",
-          "KUMA-E10"
-        ],
-        "kanjiPoolIdList": [
-          "g7-001",
+    ],
+    "recommendedLevel": 24
+  },
+  {
+    "grade": 12,
+    "region": "九州",
+    "pref": "熊本県",
+    "pos": {
+      "x": 570,
+      "y": 230
+    },
+    "stageId": "kyushu_area5",
+    "name": "熊本県(中1~高1)",
+    "enemyIdList": [
+      "KUMA-E01",
+      "KUMA-E02",
+      "KUMA-E03",
+      "KUMA-E04",
+      "KUMA-E05",
+      "KUMA-E06",
+      "KUMA-E07",
+      "KUMA-E08",
+      "KUMA-E09",
+      "KUMA-E10"
+    ],
+    "kanjiPoolIdList": [
+      "g7-001",
       "g7-002",
       "g7-003",
       "g7-004",
@@ -9956,33 +9860,33 @@
       "g10-181",
       "g10-182",
       "g10-183"
-        ],
-        "recommendedLevel": 24
-      },
-      {
-        "grade": 12,
-        "region": "九州",
-        "pref": "宮崎県",
-        "pos": {
-          "x": 600,
-          "y": 280
-        },
-        "stageId": "kyushu_area6",
-        "name": "宮崎県(小1~中1)",
-        "enemyIdList": [
-          "MIYA-E01",
-          "MIYA-E02",
-          "MIYA-E03",
-          "MIYA-E04",
-          "MIYA-E05",
-          "MIYA-E06",
-          "MIYA-E07",
-          "MIYA-E08",
-          "MIYA-E09",
-          "MIYA-E10"
-        ],
-        "kanjiPoolIdList": [
-"g1-001",
+    ],
+    "recommendedLevel": 24
+  },
+  {
+    "grade": 12,
+    "region": "九州",
+    "pref": "宮崎県",
+    "pos": {
+      "x": 600,
+      "y": 280
+    },
+    "stageId": "kyushu_area6",
+    "name": "宮崎県(小1~中1)",
+    "enemyIdList": [
+      "MIYA-E01",
+      "MIYA-E02",
+      "MIYA-E03",
+      "MIYA-E04",
+      "MIYA-E05",
+      "MIYA-E06",
+      "MIYA-E07",
+      "MIYA-E08",
+      "MIYA-E09",
+      "MIYA-E10"
+    ],
+    "kanjiPoolIdList": [
+      "g1-001",
       "g1-002",
       "g1-003",
       "g1-004",
@@ -11308,33 +11212,33 @@
       "g7-311",
       "g7-312",
       "g7-313"
-        ],
-        "recommendedLevel": 24
-      },
-    {
-      "grade": 12,
-      "region": "九州",
-      "pref": "鹿児島県",
-      "pos": {
-        "x": 550,
-        "y": 320
-      },
-      "stageId": "kyushu_area7",
-      "name": "鹿児島県（小1~中2）",
-      "enemyIdList": [
-        "KAGO-E01",
-        "KAGO-E02",
-        "KAGO-E03",
-        "KAGO-E04",
-        "KAGO-E05",
-        "KAGO-E06",
-        "KAGO-E07",
-        "KAGO-E08",
-        "KAGO-E09",
-        "KAGO-E10"
-      ],
-      "kanjiPoolIdList": [
-        "g1-001",
+    ],
+    "recommendedLevel": 24
+  },
+  {
+    "grade": 12,
+    "region": "九州",
+    "pref": "鹿児島県",
+    "pos": {
+      "x": 550,
+      "y": 320
+    },
+    "stageId": "kyushu_area7",
+    "name": "鹿児島県（小1~中2）",
+    "enemyIdList": [
+      "KAGO-E01",
+      "KAGO-E02",
+      "KAGO-E03",
+      "KAGO-E04",
+      "KAGO-E05",
+      "KAGO-E06",
+      "KAGO-E07",
+      "KAGO-E08",
+      "KAGO-E09",
+      "KAGO-E10"
+    ],
+    "kanjiPoolIdList": [
+      "g1-001",
       "g1-002",
       "g1-003",
       "g1-004",
@@ -12660,7 +12564,7 @@
       "g7-311",
       "g7-312",
       "g7-313",
-        "g8-001",
+      "g8-001",
       "g8-002",
       "g8-003",
       "g8-004",
@@ -12944,33 +12848,33 @@
       "g8-282",
       "g8-283",
       "g8-284"
-      ],
-      "recommendedLevel": 24
+    ],
+    "recommendedLevel": 24
+  },
+  {
+    "grade": 12,
+    "region": "九州",
+    "pref": "沖縄県",
+    "pos": {
+      "x": 710,
+      "y": 390
     },
-    {
-      "grade": 12,
-      "region": "九州",
-      "pref": "沖縄県",
-      "pos": {
-        "x": 710,
-        "y": 390
-      },
-      "stageId": "kyushu_area8",
-      "name": "沖縄県（小1~中3）",
-      "enemyIdList": [
-        "OKI-E01",
-        "OKI-E02",
-        "OKI-E03",
-        "OKI-E04",
-        "OKI-E05",
-        "OKI-E06",
-        "OKI-E07",
-        "OKI-E08",
-        "OKI-E09",
-        "OKI-E10"
-      ],
-      "kanjiPoolIdList": [
-        "g1-001",
+    "stageId": "kyushu_area8",
+    "name": "沖縄県（小1~中3）",
+    "enemyIdList": [
+      "OKI-E01",
+      "OKI-E02",
+      "OKI-E03",
+      "OKI-E04",
+      "OKI-E05",
+      "OKI-E06",
+      "OKI-E07",
+      "OKI-E08",
+      "OKI-E09",
+      "OKI-E10"
+    ],
+    "kanjiPoolIdList": [
+      "g1-001",
       "g1-002",
       "g1-003",
       "g1-004",
@@ -14296,7 +14200,7 @@
       "g7-311",
       "g7-312",
       "g7-313",
-        "g8-001",
+      "g8-001",
       "g8-002",
       "g8-003",
       "g8-004",
@@ -14908,11 +14812,7 @@
       "g9-326",
       "g9-327",
       "g9-328"
-      ],
-      "recommendedLevel": 24
-    }
-  
-    
-    
-
-  ]
+    ],
+    "recommendedLevel": 24
+  }
+]

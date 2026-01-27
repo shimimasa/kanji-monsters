@@ -1,7 +1,9 @@
 [
   {
     "id": "g7-001",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "握",
     "grade": 7,
     "strokes": 12,
@@ -23,7 +25,9 @@
   },
   {
     "id": "g7-002",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "扱",
     "grade": 7,
     "strokes": 6,
@@ -43,7 +47,9 @@
   },
   {
     "id": "g7-003",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "依",
     "grade": 7,
     "strokes": 8,
@@ -64,7 +70,9 @@
   },
   {
     "id": "g7-004",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "威",
     "grade": 7,
     "strokes": 9,
@@ -84,7 +92,9 @@
   },
   {
     "id": "g7-005",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "為",
     "grade": 7,
     "strokes": 9,
@@ -104,7 +114,9 @@
   },
   {
     "id": "g7-006",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "偉",
     "grade": 7,
     "strokes": 12,
@@ -126,7 +138,9 @@
   },
   {
     "id": "g7-007",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "違",
     "grade": 7,
     "strokes": 13,
@@ -148,7 +162,9 @@
   },
   {
     "id": "g7-008",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "維",
     "grade": 7,
     "strokes": 14,
@@ -168,7 +184,9 @@
   },
   {
     "id": "g7-009",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "緯",
     "grade": 7,
     "strokes": 16,
@@ -188,7 +206,9 @@
   },
   {
     "id": "g7-010",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "壱",
     "grade": 7,
     "strokes": 7,
@@ -208,7 +228,9 @@
   },
   {
     "id": "g7-011",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "芋",
     "grade": 7,
     "strokes": 6,
@@ -228,7 +250,9 @@
   },
   {
     "id": "g7-012",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "陰",
     "grade": 7,
     "strokes": 11,
@@ -250,7 +274,9 @@
   },
   {
     "id": "g7-013",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "隠",
     "grade": 7,
     "strokes": 14,
@@ -272,7 +298,9 @@
   },
   {
     "id": "g7-014",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "影",
     "grade": 7,
     "strokes": 15,
@@ -294,7 +322,9 @@
   },
   {
     "id": "g7-015",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "鋭",
     "grade": 7,
     "strokes": 15,
@@ -316,7 +346,9 @@
   },
   {
     "id": "g7-016",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "越",
     "grade": 7,
     "strokes": 12,
@@ -338,7 +370,9 @@
   },
   {
     "id": "g7-017",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "援",
     "grade": 7,
     "strokes": 12,
@@ -358,7 +392,9 @@
   },
   {
     "id": "g7-018",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "煙",
     "grade": 7,
     "strokes": 13,
@@ -381,7 +417,9 @@
   },
   {
     "id": "g7-019",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "鉛",
     "grade": 7,
     "strokes": 13,
@@ -403,7 +441,9 @@
   },
   {
     "id": "g7-020",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "縁",
     "grade": 7,
     "strokes": 15,
@@ -425,7 +465,9 @@
   },
   {
     "id": "g7-021",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "汚",
     "grade": 7,
     "strokes": 6,
@@ -449,7 +491,9 @@
   },
   {
     "id": "g7-022",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "押",
     "grade": 7,
     "strokes": 8,
@@ -471,7 +515,9 @@
   },
   {
     "id": "g7-023",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "奥",
     "grade": 7,
     "strokes": 12,
@@ -493,7 +539,9 @@
   },
   {
     "id": "g7-024",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "憶",
     "grade": 7,
     "strokes": 16,
@@ -513,7 +561,9 @@
   },
   {
     "id": "g7-025",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "菓",
     "grade": 7,
     "strokes": 11,
@@ -533,7 +583,9 @@
   },
   {
     "id": "g7-026",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "暇",
     "grade": 7,
     "strokes": 13,
@@ -555,7 +607,9 @@
   },
   {
     "id": "g7-027",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "箇",
     "grade": 7,
     "strokes": 14,
@@ -575,7 +629,9 @@
   },
   {
     "id": "g7-028",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "雅",
     "grade": 7,
     "strokes": 13,
@@ -595,7 +651,9 @@
   },
   {
     "id": "g7-029",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "介",
     "grade": 7,
     "strokes": 4,
@@ -615,7 +673,9 @@
   },
   {
     "id": "g7-030",
-    "stageId": ["Asia_area1"],
+    "stageId": [
+      "asia_area1"
+    ],
     "kanji": "戒",
     "grade": 7,
     "strokes": 7,
@@ -637,7 +697,9 @@
   },
   {
     "id": "g7-031",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "皆",
     "grade": 7,
     "strokes": 9,
@@ -657,10 +719,11 @@
     "masteryLevel": 0,
     "tags": []
   },
-
   {
     "id": "g7-032",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "壊",
     "grade": 7,
     "strokes": 16,
@@ -682,7 +745,9 @@
   },
   {
     "id": "g7-033",
-    "stageId": ["Asia_area2"]         ,
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "較",
     "grade": 7,
     "strokes": 13,
@@ -702,7 +767,9 @@
   },
   {
     "id": "g7-034",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "獲",
     "grade": 7,
     "strokes": 16,
@@ -724,7 +791,9 @@
   },
   {
     "id": "g7-035",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "刈",
     "grade": 7,
     "strokes": 4,
@@ -744,7 +813,9 @@
   },
   {
     "id": "g7-036",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "甘",
     "grade": 7,
     "strokes": 5,
@@ -766,7 +837,9 @@
   },
   {
     "id": "g7-037",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "汗",
     "grade": 7,
     "strokes": 6,
@@ -788,7 +861,9 @@
   },
   {
     "id": "g7-038",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "乾",
     "grade": 7,
     "strokes": 11,
@@ -810,7 +885,9 @@
   },
   {
     "id": "g7-039",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "勧",
     "grade": 7,
     "strokes": 13,
@@ -832,7 +909,9 @@
   },
   {
     "id": "g7-040",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "歓",
     "grade": 7,
     "strokes": 15,
@@ -852,7 +931,9 @@
   },
   {
     "id": "g7-041",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "監",
     "grade": 7,
     "strokes": 15,
@@ -872,7 +953,9 @@
   },
   {
     "id": "g7-042",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "環",
     "grade": 7,
     "strokes": 17,
@@ -892,7 +975,9 @@
   },
   {
     "id": "g7-043",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "鑑",
     "grade": 7,
     "strokes": 23,
@@ -914,7 +999,9 @@
   },
   {
     "id": "g7-044",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "含",
     "grade": 7,
     "strokes": 7,
@@ -936,7 +1023,9 @@
   },
   {
     "id": "g7-045",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "奇",
     "grade": 7,
     "strokes": 8,
@@ -956,7 +1045,9 @@
   },
   {
     "id": "g7-046",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "祈",
     "grade": 7,
     "strokes": 8,
@@ -978,7 +1069,9 @@
   },
   {
     "id": "g7-047",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "鬼",
     "grade": 7,
     "strokes": 10,
@@ -1000,7 +1093,9 @@
   },
   {
     "id": "g7-048",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "幾",
     "grade": 7,
     "strokes": 12,
@@ -1022,7 +1117,9 @@
   },
   {
     "id": "g7-049",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "輝",
     "grade": 7,
     "strokes": 15,
@@ -1044,7 +1141,9 @@
   },
   {
     "id": "g7-050",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "儀",
     "grade": 7,
     "strokes": 15,
@@ -1064,7 +1163,9 @@
   },
   {
     "id": "g7-051",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "戯",
     "grade": 7,
     "strokes": 15,
@@ -1086,7 +1187,9 @@
   },
   {
     "id": "g7-052",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "詰",
     "grade": 7,
     "strokes": 13,
@@ -1108,7 +1211,9 @@
   },
   {
     "id": "g7-053",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "却",
     "grade": 7,
     "strokes": 7,
@@ -1128,7 +1233,9 @@
   },
   {
     "id": "g7-054",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "脚",
     "grade": 7,
     "strokes": 11,
@@ -1151,7 +1258,9 @@
   },
   {
     "id": "g7-055",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "及",
     "grade": 7,
     "strokes": 3,
@@ -1173,7 +1282,9 @@
   },
   {
     "id": "g7-056",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "丘",
     "grade": 7,
     "strokes": 5,
@@ -1195,7 +1306,9 @@
   },
   {
     "id": "g7-057",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "朽",
     "grade": 7,
     "strokes": 6,
@@ -1217,7 +1330,9 @@
   },
   {
     "id": "g7-058",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "巨",
     "grade": 7,
     "strokes": 5,
@@ -1237,7 +1352,9 @@
   },
   {
     "id": "g7-059",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "拠",
     "grade": 7,
     "strokes": 8,
@@ -1258,7 +1375,9 @@
   },
   {
     "id": "g7-060",
-    "stageId": ["Asia_area2"],
+    "stageId": [
+      "asia_area2"
+    ],
     "kanji": "距",
     "grade": 7,
     "strokes": 12,
@@ -1278,7 +1397,9 @@
   },
   {
     "id": "g7-061",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "御",
     "grade": 7,
     "strokes": 12,
@@ -1301,7 +1422,9 @@
   },
   {
     "id": "g7-062",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "凶",
     "grade": 7,
     "strokes": 4,
@@ -1321,7 +1444,9 @@
   },
   {
     "id": "g7-062",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "叫",
     "grade": 7,
     "strokes": 6,
@@ -1343,7 +1468,9 @@
   },
   {
     "id": "g7-064",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "狂",
     "grade": 7,
     "strokes": 7,
@@ -1365,7 +1492,9 @@
   },
   {
     "id": "g7-065",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "況",
     "grade": 7,
     "strokes": 8,
@@ -1385,7 +1514,9 @@
   },
   {
     "id": "g7-066",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "狭",
     "grade": 7,
     "strokes": 9,
@@ -1408,7 +1539,9 @@
   },
   {
     "id": "g7-067",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "恐",
     "grade": 7,
     "strokes": 10,
@@ -1430,7 +1563,9 @@
   },
   {
     "id": "g7-068",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "響",
     "grade": 7,
     "strokes": 20,
@@ -1452,7 +1587,9 @@
   },
   {
     "id": "g7-069",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "驚",
     "grade": 7,
     "strokes": 22,
@@ -1474,7 +1611,9 @@
   },
   {
     "id": "g7-070",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "仰",
     "grade": 7,
     "strokes": 6,
@@ -1498,7 +1637,9 @@
   },
   {
     "id": "g7-071",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "駆",
     "grade": 7,
     "strokes": 10,
@@ -1520,7 +1661,9 @@
   },
   {
     "id": "g7-072",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "屈",
     "grade": 7,
     "strokes": 8,
@@ -1540,7 +1683,9 @@
   },
   {
     "id": "g7-073",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "掘",
     "grade": 7,
     "strokes": 11,
@@ -1562,7 +1707,9 @@
   },
   {
     "id": "g7-074",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "繰",
     "grade": 7,
     "strokes": 19,
@@ -1582,7 +1729,9 @@
   },
   {
     "id": "g7-075",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "恵",
     "grade": 7,
     "strokes": 10,
@@ -1605,7 +1754,9 @@
   },
   {
     "id": "g7-076",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "傾",
     "grade": 7,
     "strokes": 13,
@@ -1627,7 +1778,9 @@
   },
   {
     "id": "g7-077",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "継",
     "grade": 7,
     "strokes": 13,
@@ -1649,7 +1802,9 @@
   },
   {
     "id": "g7-078",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "迎",
     "grade": 7,
     "strokes": 10,
@@ -1671,7 +1826,9 @@
   },
   {
     "id": "g7-079",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "撃",
     "grade": 7,
     "strokes": 15,
@@ -1693,7 +1850,9 @@
   },
   {
     "id": "g7-080",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "肩",
     "grade": 7,
     "strokes": 8,
@@ -1715,7 +1874,9 @@
   },
   {
     "id": "g7-081",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "兼",
     "grade": 7,
     "strokes": 10,
@@ -1737,7 +1898,9 @@
   },
   {
     "id": "g7-082",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "剣",
     "grade": 7,
     "strokes": 10,
@@ -1759,7 +1922,9 @@
   },
   {
     "id": "g7-083",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "軒",
     "grade": 7,
     "strokes": 10,
@@ -1781,7 +1946,9 @@
   },
   {
     "id": "g7-084",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "圏",
     "grade": 7,
     "strokes": 12,
@@ -1801,7 +1968,9 @@
   },
   {
     "id": "g7-085",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "堅",
     "grade": 7,
     "strokes": 12,
@@ -1823,7 +1992,9 @@
   },
   {
     "id": "g7-086",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "遣",
     "grade": 7,
     "strokes": 13,
@@ -1845,7 +2016,9 @@
   },
   {
     "id": "g7-087",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "玄",
     "grade": 7,
     "strokes": 5,
@@ -1865,7 +2038,9 @@
   },
   {
     "id": "g7-088",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "枯",
     "grade": 7,
     "strokes": 9,
@@ -1887,7 +2062,9 @@
   },
   {
     "id": "g7-089",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "誇",
     "grade": 7,
     "strokes": 13,
@@ -1909,7 +2086,9 @@
   },
   {
     "id": "g7-090",
-    "stageId": ["Asia_area3"],
+    "stageId": [
+      "asia_area3"
+    ],
     "kanji": "鼓",
     "grade": 7,
     "strokes": 13,
@@ -1931,7 +2110,9 @@
   },
   {
     "id": "g7-091",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "互",
     "grade": 7,
     "strokes": 4,
@@ -1953,7 +2134,9 @@
   },
   {
     "id": "g7-092",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "抗",
     "grade": 7,
     "strokes": 7,
@@ -1973,7 +2156,9 @@
   },
   {
     "id": "g7-093",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "攻",
     "grade": 7,
     "strokes": 7,
@@ -1995,7 +2180,9 @@
   },
   {
     "id": "g7-094",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "更",
     "grade": 7,
     "strokes": 7,
@@ -2018,7 +2205,9 @@
   },
   {
     "id": "g7-095",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "恒",
     "grade": 7,
     "strokes": 9,
@@ -2038,7 +2227,9 @@
   },
   {
     "id": "g7-096",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "荒",
     "grade": 7,
     "strokes": 9,
@@ -2061,7 +2252,9 @@
   },
   {
     "id": "g7-097",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "項",
     "grade": 7,
     "strokes": 12,
@@ -2081,7 +2274,9 @@
   },
   {
     "id": "g7-098",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "稿",
     "grade": 7,
     "strokes": 15,
@@ -2101,7 +2296,9 @@
   },
   {
     "id": "g7-099",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "豪",
     "grade": 7,
     "strokes": 14,
@@ -2119,11 +2316,11 @@
     "masteryLevel": 0,
     "tags": []
   },
-
-  
   {
     "id": "g7-100",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "込",
     "grade": 7,
     "strokes": 5,
@@ -2132,12 +2329,13 @@
       "こ"
     ],
     "meaning": "中にはいる。また、ものがたくさん集まること。",
-  "exampleSentence": "夕方の電車はとても込（こ）む。"
+    "exampleSentence": "夕方の電車はとても込（こ）む。"
   },
-
   {
     "id": "g7-101",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "婚",
     "grade": 7,
     "strokes": 11,
@@ -2157,7 +2355,9 @@
   },
   {
     "id": "g7-102",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "鎖",
     "grade": 7,
     "strokes": 18,
@@ -2179,7 +2379,9 @@
   },
   {
     "id": "g7-103",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "彩",
     "grade": 7,
     "strokes": 11,
@@ -2201,7 +2403,9 @@
   },
   {
     "id": "g7-104",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "歳",
     "grade": 7,
     "strokes": 13,
@@ -2222,7 +2426,9 @@
   },
   {
     "id": "g7-105",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "載",
     "grade": 7,
     "strokes": 13,
@@ -2233,7 +2439,7 @@
       "の"
     ],
     "meaning": "物の上にのせる。書物などにしるすこと。",
-  "exampleSentence": "新聞に自分の写真が載（の）る。",
+    "exampleSentence": "新聞に自分の写真が載（の）る。",
     "continent": "アメリカ大陸",
     "originalGrade": 7,
     "correctCount": 0,
@@ -2244,7 +2450,9 @@
   },
   {
     "id": "g7-106",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "剤",
     "grade": 7,
     "strokes": 10,
@@ -2262,10 +2470,11 @@
     "masteryLevel": 0,
     "tags": []
   },
-  
   {
     "id": "g7-107",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "咲",
     "grade": 7,
     "strokes": 9,
@@ -2274,8 +2483,8 @@
       "さ"
     ],
     "meaning": "花のつぼみがひらくこと。",
-  "exampleSentence": "春になると桜の花が咲（さ）く。",
-  "continent": "アジア大陸",
+    "exampleSentence": "春になると桜の花が咲（さ）く。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -2283,10 +2492,11 @@
     "masteryLevel": 0,
     "tags": []
   },
-
   {
     "id": "g7-108",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "惨",
     "grade": 7,
     "strokes": 11,
@@ -2307,10 +2517,11 @@
     "masteryLevel": 0,
     "tags": []
   },
-
   {
     "id": "g7-109",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "旨",
     "grade": 7,
     "strokes": 6,
@@ -2321,8 +2532,8 @@
       "むね"
     ],
     "meaning": "中心となる大切なことがら。また、おいしいこと。",
-  "exampleSentence": "会議の要（よう）旨（し）をまとめる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "会議の要（よう）旨（し）をまとめる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -2332,7 +2543,9 @@
   },
   {
     "id": "g7-110",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "伺",
     "grade": 7,
     "strokes": 7,
@@ -2343,8 +2556,8 @@
       "うかが"
     ],
     "meaning": "「聞く」や「訪ねる」の、へりくだった言い方。",
-  "exampleSentence": "先生のご意見を伺（うかが）う。",
-  "continent": "アジア大陸",
+    "exampleSentence": "先生のご意見を伺（うかが）う。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -2354,7 +2567,9 @@
   },
   {
     "id": "g7-111",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "刺",
     "grade": 7,
     "strokes": 8,
@@ -2364,9 +2579,9 @@
     "kunyomi": [
       "さ"
     ],
-  "meaning": "先のするどいもので、つきさすこと。とげ。",
-  "exampleSentence": "指にとげが刺（さ）さった。",
-  "continent": "アジア大陸",
+    "meaning": "先のするどいもので、つきさすこと。とげ。",
+    "exampleSentence": "指にとげが刺（さ）さった。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -2376,7 +2591,9 @@
   },
   {
     "id": "g7-112",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "脂",
     "grade": 7,
     "strokes": 10,
@@ -2398,7 +2615,9 @@
   },
   {
     "id": "g7-113",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "紫",
     "grade": 7,
     "strokes": 12,
@@ -2420,7 +2639,9 @@
   },
   {
     "id": "g7-114",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "雌",
     "grade": 7,
     "strokes": 14,
@@ -2443,7 +2664,9 @@
   },
   {
     "id": "g7-115",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "執",
     "grade": 7,
     "strokes": 11,
@@ -2467,7 +2690,9 @@
   },
   {
     "id": "g7-116",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "芝",
     "grade": 7,
     "strokes": 6,
@@ -2487,7 +2712,9 @@
   },
   {
     "id": "g7-117",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "斜",
     "grade": 7,
     "strokes": 11,
@@ -2509,7 +2736,9 @@
   },
   {
     "id": "g7-118",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "煮",
     "grade": 7,
     "strokes": 12,
@@ -2531,7 +2760,9 @@
   },
   {
     "id": "g7-119",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "釈",
     "grade": 7,
     "strokes": 11,
@@ -2551,7 +2782,9 @@
   },
   {
     "id": "g7-120",
-    "stageId": ["Asia_area4"],
+    "stageId": [
+      "asia_area4"
+    ],
     "kanji": "寂",
     "grade": 7,
     "strokes": 11,
@@ -2574,7 +2807,9 @@
   },
   {
     "id": "g7-121",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "朱",
     "grade": 7,
     "strokes": 6,
@@ -2594,7 +2829,9 @@
   },
   {
     "id": "g7-122",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "狩",
     "grade": 7,
     "strokes": 9,
@@ -2616,7 +2853,9 @@
   },
   {
     "id": "g7-123",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "趣",
     "grade": 7,
     "strokes": 15,
@@ -2638,7 +2877,9 @@
   },
   {
     "id": "g7-124",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "需",
     "grade": 7,
     "strokes": 14,
@@ -2658,7 +2899,9 @@
   },
   {
     "id": "g7-125",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "舟",
     "grade": 7,
     "strokes": 6,
@@ -2681,7 +2924,9 @@
   },
   {
     "id": "g7-126",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "秀",
     "grade": 7,
     "strokes": 7,
@@ -2703,7 +2948,9 @@
   },
   {
     "id": "g7-127",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "襲",
     "grade": 7,
     "strokes": 22,
@@ -2725,7 +2972,9 @@
   },
   {
     "id": "g7-128",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "柔",
     "grade": 7,
     "strokes": 9,
@@ -2748,7 +2997,9 @@
   },
   {
     "id": "g7-129",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "獣",
     "grade": 7,
     "strokes": 16,
@@ -2770,7 +3021,9 @@
   },
   {
     "id": "g7-130",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "瞬",
     "grade": 7,
     "strokes": 18,
@@ -2792,7 +3045,9 @@
   },
   {
     "id": "g7-131",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "旬",
     "grade": 7,
     "strokes": 6,
@@ -2813,7 +3068,9 @@
   },
   {
     "id": "g7-132",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "巡",
     "grade": 7,
     "strokes": 6,
@@ -2835,7 +3092,9 @@
   },
   {
     "id": "g7-133",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "盾",
     "grade": 7,
     "strokes": 9,
@@ -2857,7 +3116,9 @@
   },
   {
     "id": "g7-134",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "召",
     "grade": 7,
     "strokes": 5,
@@ -2879,7 +3140,9 @@
   },
   {
     "id": "g7-135",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "床",
     "grade": 7,
     "strokes": 7,
@@ -2891,8 +3154,8 @@
       "ゆか"
     ],
     "meaning": "いえのゆか。また、ねるためのとこ。",
-  "exampleSentence": "部屋の床（ゆか）をぞうきんでふく。",
-  "continent": "アジア大陸",
+    "exampleSentence": "部屋の床（ゆか）をぞうきんでふく。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -2901,8 +3164,10 @@
     "tags": []
   },
   {
-      "id": "g7-136",
-    "stageId": ["Asia_area5"],
+    "id": "g7-136",
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "沼",
     "grade": 7,
     "strokes": 8,
@@ -2924,7 +3189,9 @@
   },
   {
     "id": "g7-137",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "称",
     "grade": 7,
     "strokes": 10,
@@ -2944,7 +3211,9 @@
   },
   {
     "id": "g7-138",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "紹",
     "grade": 7,
     "strokes": 11,
@@ -2964,7 +3233,9 @@
   },
   {
     "id": "g7-139",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "詳",
     "grade": 7,
     "strokes": 13,
@@ -2986,7 +3257,9 @@
   },
   {
     "id": "g7-140",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "丈",
     "grade": 7,
     "strokes": 3,
@@ -3008,7 +3281,9 @@
   },
   {
     "id": "g7-141",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "畳",
     "grade": 7,
     "strokes": 12,
@@ -3031,7 +3306,9 @@
   },
   {
     "id": "g7-142",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "殖",
     "grade": 7,
     "strokes": 12,
@@ -3053,7 +3330,9 @@
   },
   {
     "id": "g7-143",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "飾",
     "grade": 7,
     "strokes": 13,
@@ -3064,11 +3343,13 @@
       "かざ"
     ],
     "meaning": "美しくみせるためにつけるもの。かざる。",
-  "exampleSentence": "クリスマスツリーに飾（かざ）りをつける。"
+    "exampleSentence": "クリスマスツリーに飾（かざ）りをつける。"
   },
   {
     "id": "g7-144",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "触",
     "grade": 7,
     "strokes": 13,
@@ -3080,8 +3361,8 @@
       "さわ"
     ],
     "meaning": "さわること。ふれること。",
-  "exampleSentence": "展示品に手で触（ふ）れないでください。",
-  "continent": "アジア大陸",
+    "exampleSentence": "展示品に手で触（ふ）れないでください。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -3091,7 +3372,9 @@
   },
   {
     "id": "g7-145",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "侵",
     "grade": 7,
     "strokes": 9,
@@ -3102,8 +3385,8 @@
       "おか"
     ],
     "meaning": "他人の領分に無理やり入りこむこと。",
-  "exampleSentence": "プライバシーを侵（しん）害する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "プライバシーを侵（しん）害する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -3113,7 +3396,9 @@
   },
   {
     "id": "g7-146",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "振",
     "grade": 7,
     "strokes": 10,
@@ -3135,7 +3420,9 @@
   },
   {
     "id": "g7-147",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "浸",
     "grade": 7,
     "strokes": 10,
@@ -3157,7 +3444,9 @@
   },
   {
     "id": "g7-148",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "寝",
     "grade": 7,
     "strokes": 13,
@@ -3177,10 +3466,11 @@
     "masteryLevel": 0,
     "tags": []
   },
-  
   {
     "id": "g7-149",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "慎",
     "grade": 7,
     "strokes": 13,
@@ -3202,7 +3492,9 @@
   },
   {
     "id": "g7-150",
-    "stageId": ["Asia_area5"],
+    "stageId": [
+      "asia_area5"
+    ],
     "kanji": "震",
     "grade": 7,
     "strokes": 15,
@@ -3224,7 +3516,9 @@
   },
   {
     "id": "g7-151",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "薪",
     "grade": 7,
     "strokes": 16,
@@ -3235,8 +3529,8 @@
       "たきぎ"
     ],
     "meaning": "燃料にするための木。たきぎ。",
-  "exampleSentence": "お風呂をわかすために薪（まき）をわる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "お風呂をわかすために薪（まき）をわる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -3244,10 +3538,11 @@
     "masteryLevel": 0,
     "tags": []
   },
-  
   {
     "id": "g7-152",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "尽",
     "grade": 7,
     "strokes": 6,
@@ -3269,7 +3564,9 @@
   },
   {
     "id": "g7-153",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "陣",
     "grade": 7,
     "strokes": 10,
@@ -3289,7 +3586,9 @@
   },
   {
     "id": "g7-154",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "尋",
     "grade": 7,
     "strokes": 12,
@@ -3311,7 +3610,9 @@
   },
   {
     "id": "g7-155",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "吹",
     "grade": 7,
     "strokes": 7,
@@ -3333,7 +3634,9 @@
   },
   {
     "id": "g7-156",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "是",
     "grade": 7,
     "strokes": 9,
@@ -3353,7 +3656,9 @@
   },
   {
     "id": "g7-157",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "姓",
     "grade": 7,
     "strokes": 8,
@@ -3374,7 +3679,9 @@
   },
   {
     "id": "g7-158",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "征",
     "grade": 7,
     "strokes": 8,
@@ -3394,7 +3701,9 @@
   },
   {
     "id": "g7-159",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "跡",
     "grade": 7,
     "strokes": 13,
@@ -3416,7 +3725,9 @@
   },
   {
     "id": "g7-160",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "占",
     "grade": 7,
     "strokes": 5,
@@ -3439,7 +3750,9 @@
   },
   {
     "id": "g7-161",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "扇",
     "grade": 7,
     "strokes": 10,
@@ -3461,7 +3774,9 @@
   },
   {
     "id": "g7-162",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "鮮",
     "grade": 7,
     "strokes": 17,
@@ -3483,7 +3798,9 @@
   },
   {
     "id": "g7-163",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "訴",
     "grade": 7,
     "strokes": 12,
@@ -3505,7 +3822,9 @@
   },
   {
     "id": "g7-164",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "僧",
     "grade": 7,
     "strokes": 13,
@@ -3525,7 +3844,9 @@
   },
   {
     "id": "g7-165",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "燥",
     "grade": 7,
     "strokes": 17,
@@ -3545,7 +3866,9 @@
   },
   {
     "id": "g7-166",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "騒",
     "grade": 7,
     "strokes": 18,
@@ -3567,7 +3890,9 @@
   },
   {
     "id": "g7-167",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "贈",
     "grade": 7,
     "strokes": 18,
@@ -3590,7 +3915,9 @@
   },
   {
     "id": "g7-168",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "即",
     "grade": 7,
     "strokes": 7,
@@ -3610,7 +3937,9 @@
   },
   {
     "id": "g7-169",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "俗",
     "grade": 7,
     "strokes": 9,
@@ -3630,7 +3959,9 @@
   },
   {
     "id": "g7-170",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "耐",
     "grade": 7,
     "strokes": 9,
@@ -3652,7 +3983,9 @@
   },
   {
     "id": "g7-171",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "替",
     "grade": 7,
     "strokes": 12,
@@ -3674,7 +4007,9 @@
   },
   {
     "id": "g7-172",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "沢",
     "grade": 7,
     "strokes": 7,
@@ -3696,7 +4031,9 @@
   },
   {
     "id": "g7-173",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "拓",
     "grade": 7,
     "strokes": 8,
@@ -3716,7 +4053,9 @@
   },
   {
     "id": "g7-174",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "濁",
     "grade": 7,
     "strokes": 16,
@@ -3738,7 +4077,9 @@
   },
   {
     "id": "g7-175",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "脱",
     "grade": 7,
     "strokes": 11,
@@ -3760,7 +4101,9 @@
   },
   {
     "id": "g7-176",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "丹",
     "grade": 7,
     "strokes": 4,
@@ -3780,7 +4123,9 @@
   },
   {
     "id": "g7-177",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "淡",
     "grade": 7,
     "strokes": 11,
@@ -3802,7 +4147,9 @@
   },
   {
     "id": "g7-178",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "嘆",
     "grade": 7,
     "strokes": 13,
@@ -3824,7 +4171,9 @@
   },
   {
     "id": "g7-179",
-    "stageId": ["Asia_area6"],
+    "stageId": [
+      "asia_area6"
+    ],
     "kanji": "端",
     "grade": 7,
     "strokes": 10,
@@ -3848,7 +4197,9 @@
   },
   {
     "id": "g7-180",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "弾",
     "grade": 7,
     "strokes": 12,
@@ -3872,7 +4223,9 @@
   },
   {
     "id": "g7-181",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "恥",
     "grade": 7,
     "strokes": 10,
@@ -3894,7 +4247,9 @@
   },
   {
     "id": "g7-182",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "致",
     "grade": 7,
     "strokes": 10,
@@ -3916,7 +4271,9 @@
   },
   {
     "id": "g7-183",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "遅",
     "grade": 7,
     "strokes": 12,
@@ -3939,7 +4296,9 @@
   },
   {
     "id": "g7-184",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "蓄",
     "grade": 7,
     "strokes": 13,
@@ -3961,7 +4320,9 @@
   },
   {
     "id": "g7-185",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "跳",
     "grade": 7,
     "strokes": 13,
@@ -3984,7 +4345,9 @@
   },
   {
     "id": "g7-186",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "徴",
     "grade": 7,
     "strokes": 14,
@@ -4004,7 +4367,9 @@
   },
   {
     "id": "g7-187",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "澄",
     "grade": 7,
     "strokes": 15,
@@ -4026,7 +4391,9 @@
   },
   {
     "id": "g7-188",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "沈",
     "grade": 7,
     "strokes": 7,
@@ -4048,7 +4415,9 @@
   },
   {
     "id": "g7-189",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "珍",
     "grade": 7,
     "strokes": 9,
@@ -4070,7 +4439,9 @@
   },
   {
     "id": "g7-190",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "抵",
     "grade": 7,
     "strokes": 8,
@@ -4090,7 +4461,9 @@
   },
   {
     "id": "g7-191",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "堤",
     "grade": 7,
     "strokes": 12,
@@ -4112,7 +4485,9 @@
   },
   {
     "id": "g7-192",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "摘",
     "grade": 7,
     "strokes": 14,
@@ -4134,7 +4509,9 @@
   },
   {
     "id": "g7-193",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "滴",
     "grade": 7,
     "strokes": 14,
@@ -4157,7 +4534,9 @@
   },
   {
     "id": "g7-194",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "添",
     "grade": 7,
     "strokes": 11,
@@ -4179,7 +4558,9 @@
   },
   {
     "id": "g7-195",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "殿",
     "grade": 7,
     "strokes": 13,
@@ -4203,7 +4584,9 @@
   },
   {
     "id": "g7-196",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "吐",
     "grade": 7,
     "strokes": 6,
@@ -4225,7 +4608,9 @@
   },
   {
     "id": "g7-197",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "途",
     "grade": 7,
     "strokes": 10,
@@ -4245,7 +4630,9 @@
   },
   {
     "id": "g7-198",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "渡",
     "grade": 7,
     "strokes": 12,
@@ -4267,7 +4654,9 @@
   },
   {
     "id": "g7-199",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "奴",
     "grade": 7,
     "strokes": 5,
@@ -4287,7 +4676,9 @@
   },
   {
     "id": "g7-200",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "怒",
     "grade": 7,
     "strokes": 9,
@@ -4310,7 +4701,9 @@
   },
   {
     "id": "g7-201",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "到",
     "grade": 7,
     "strokes": 8,
@@ -4330,7 +4723,9 @@
   },
   {
     "id": "g7-202",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "逃",
     "grade": 7,
     "strokes": 9,
@@ -4353,7 +4748,9 @@
   },
   {
     "id": "g7-203",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "倒",
     "grade": 7,
     "strokes": 10,
@@ -4375,7 +4772,9 @@
   },
   {
     "id": "g7-204",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "唐",
     "grade": 7,
     "strokes": 10,
@@ -4397,7 +4796,9 @@
   },
   {
     "id": "g7-205",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "桃",
     "grade": 7,
     "strokes": 10,
@@ -4419,7 +4820,9 @@
   },
   {
     "id": "g7-206",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "透",
     "grade": 7,
     "strokes": 10,
@@ -4441,7 +4844,9 @@
   },
   {
     "id": "g7-207",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "盗",
     "grade": 7,
     "strokes": 11,
@@ -4463,7 +4868,9 @@
   },
   {
     "id": "g7-208",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "塔",
     "grade": 7,
     "strokes": 12,
@@ -4483,7 +4890,9 @@
   },
   {
     "id": "g7-209",
-    "stageId": ["Asia_area7"],
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "稲",
     "grade": 7,
     "strokes": 14,
@@ -4506,7 +4915,9 @@
   },
   {
     "id": "g7-210",
-    "stageId": ["Asia_area7"]       ,
+    "stageId": [
+      "asia_area7"
+    ],
     "kanji": "踏",
     "grade": 7,
     "strokes": 15,
@@ -4528,7 +4939,9 @@
   },
   {
     "id": "g7-211",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "闘",
     "grade": 7,
     "strokes": 18,
@@ -4550,7 +4963,9 @@
   },
   {
     "id": "g7-212",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "胴",
     "grade": 7,
     "strokes": 10,
@@ -4570,7 +4985,9 @@
   },
   {
     "id": "g7-213",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "峠",
     "grade": 7,
     "strokes": 9,
@@ -4590,7 +5007,9 @@
   },
   {
     "id": "g7-214",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "突",
     "grade": 7,
     "strokes": 8,
@@ -4612,7 +5031,9 @@
   },
   {
     "id": "g7-215",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "鈍",
     "grade": 7,
     "strokes": 12,
@@ -4634,7 +5055,9 @@
   },
   {
     "id": "g7-216",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "曇",
     "grade": 7,
     "strokes": 16,
@@ -4656,7 +5079,9 @@
   },
   {
     "id": "g7-217",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "弐",
     "grade": 7,
     "strokes": 6,
@@ -4676,7 +5101,9 @@
   },
   {
     "id": "g7-218",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "悩",
     "grade": 7,
     "strokes": 10,
@@ -4698,7 +5125,9 @@
   },
   {
     "id": "g7-219",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "濃",
     "grade": 7,
     "strokes": 16,
@@ -4720,7 +5149,9 @@
   },
   {
     "id": "g7-220",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "杯",
     "grade": 7,
     "strokes": 8,
@@ -4742,7 +5173,9 @@
   },
   {
     "id": "g7-221",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "輩",
     "grade": 7,
     "strokes": 15,
@@ -4762,7 +5195,9 @@
   },
   {
     "id": "g7-222",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "拍",
     "grade": 7,
     "strokes": 8,
@@ -4783,7 +5218,9 @@
   },
   {
     "id": "g7-223",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "泊",
     "grade": 7,
     "strokes": 8,
@@ -4805,7 +5242,9 @@
   },
   {
     "id": "g7-224",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "追",
     "grade": 7,
     "strokes": 10,
@@ -4827,7 +5266,9 @@
   },
   {
     "id": "g7-225",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "薄",
     "grade": 7,
     "strokes": 16,
@@ -4849,7 +5290,9 @@
   },
   {
     "id": "g7-226",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "爆",
     "grade": 7,
     "strokes": 19,
@@ -4869,7 +5312,9 @@
   },
   {
     "id": "g7-227",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "髪",
     "grade": 7,
     "strokes": 14,
@@ -4891,7 +5336,9 @@
   },
   {
     "id": "g7-228",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "抜",
     "grade": 7,
     "strokes": 7,
@@ -4913,7 +5360,9 @@
   },
   {
     "id": "g7-229",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "罰",
     "grade": 7,
     "strokes": 14,
@@ -4934,7 +5383,9 @@
   },
   {
     "id": "g7-230",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "般",
     "grade": 7,
     "strokes": 10,
@@ -4952,10 +5403,11 @@
     "masteryLevel": 0,
     "tags": []
   },
-
   {
     "id": "g7-231",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "販",
     "grade": 7,
     "strokes": 11,
@@ -4975,7 +5427,9 @@
   },
   {
     "id": "g7-232",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "搬",
     "grade": 7,
     "strokes": 13,
@@ -4995,7 +5449,9 @@
   },
   {
     "id": "g7-233",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "範",
     "grade": 7,
     "strokes": 15,
@@ -5015,7 +5471,9 @@
   },
   {
     "id": "g7-234",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "繁",
     "grade": 7,
     "strokes": 16,
@@ -5035,7 +5493,9 @@
   },
   {
     "id": "g7-235",
-    "stageId": ["Asia_area8"]       ,
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "盤",
     "grade": 7,
     "strokes": 15,
@@ -5055,7 +5515,9 @@
   },
   {
     "id": "g7-236",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "彼",
     "grade": 7,
     "strokes": 8,
@@ -5078,7 +5540,9 @@
   },
   {
     "id": "g7-237",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "疲",
     "grade": 7,
     "strokes": 10,
@@ -5100,7 +5564,9 @@
   },
   {
     "id": "g7-238",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "被",
     "grade": 7,
     "strokes": 10,
@@ -5122,7 +5588,9 @@
   },
   {
     "id": "g7-239",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "避",
     "grade": 7,
     "strokes": 16,
@@ -5144,7 +5612,9 @@
   },
   {
     "id": "g7-240",
-    "stageId": ["Asia_area8"],
+    "stageId": [
+      "asia_area8"
+    ],
     "kanji": "尾",
     "grade": 7,
     "strokes": 7,
@@ -5166,7 +5636,9 @@
   },
   {
     "id": "g7-241",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "微",
     "grade": 7,
     "strokes": 13,
@@ -5186,7 +5658,9 @@
   },
   {
     "id": "g7-242",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "匹",
     "grade": 7,
     "strokes": 4,
@@ -5197,8 +5671,8 @@
       "ひき"
     ],
     "meaning": "動物などをかぞえる語。",
-  "exampleSentence": "犬が三匹（さんぴき）いる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "犬が三匹（さんぴき）いる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5208,7 +5682,9 @@
   },
   {
     "id": "g7-243",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "描",
     "grade": 7,
     "strokes": 11,
@@ -5220,8 +5696,8 @@
       "か"
     ],
     "meaning": "絵や図をかく。心に思い浮かべること。",
-  "exampleSentence": "夢に描（えが）いた通りの家。",
-  "continent": "アジア大陸",
+    "exampleSentence": "夢に描（えが）いた通りの家。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5231,7 +5707,9 @@
   },
   {
     "id": "g7-244",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "浜",
     "grade": 7,
     "strokes": 10,
@@ -5242,8 +5720,8 @@
       "はま"
     ],
     "meaning": "海や湖の、岸べの平らな所。",
-  "exampleSentence": "浜（はま）辺で貝がらを拾った。",
-  "continent": "アジア大陸",
+    "exampleSentence": "浜（はま）辺で貝がらを拾った。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5253,7 +5731,9 @@
   },
   {
     "id": "g7-245",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "敏",
     "grade": 7,
     "strokes": 10,
@@ -5262,8 +5742,8 @@
     ],
     "kunyomi": [],
     "meaning": "頭の働きや動作がはやいこと。さとい。",
-  "exampleSentence": "猫は敏（びん）捷な動きで獲物を捕る。",
-  "continent": "アジア大陸",
+    "exampleSentence": "猫は敏（びん）捷な動きで獲物を捕る。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5273,7 +5753,9 @@
   },
   {
     "id": "g7-246",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "怖",
     "grade": 7,
     "strokes": 8,
@@ -5284,8 +5766,8 @@
       "こわ"
     ],
     "meaning": "おそろしいと感じること。こわい。",
-  "exampleSentence": "夜中の一人歩きは怖（こわ）い。",
-  "continent": "アジア大陸",
+    "exampleSentence": "夜中の一人歩きは怖（こわ）い。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5295,7 +5777,9 @@
   },
   {
     "id": "g7-247",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "浮",
     "grade": 7,
     "strokes": 10,
@@ -5306,8 +5790,8 @@
       "う"
     ],
     "meaning": "水面などにうかぶ。心に思いあがること。",
-  "exampleSentence": "良い考えが心に浮（う）かんだ。",
-  "continent": "アジア大陸",
+    "exampleSentence": "良い考えが心に浮（う）かんだ。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5317,7 +5801,9 @@
   },
   {
     "id": "g7-248",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "普",
     "grade": 7,
     "strokes": 12,
@@ -5326,8 +5812,8 @@
     ],
     "kunyomi": [],
     "meaning": "ひろくゆきわたること。ありふれていること。",
-  "exampleSentence": "休みの日は普（ふ）通に家で過ごす。",
-  "continent": "アジア大陸",
+    "exampleSentence": "休みの日は普（ふ）通に家で過ごす。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5337,7 +5823,9 @@
   },
   {
     "id": "g7-249",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "腐",
     "grade": 7,
     "strokes": 14,
@@ -5348,8 +5836,8 @@
       "くさ"
     ],
     "meaning": "物がくさること。いたんでだめになること。",
-  "exampleSentence": "夏の生ごみは腐（くさ）りやすい。",
-  "continent": "アジア大陸",
+    "exampleSentence": "夏の生ごみは腐（くさ）りやすい。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5359,7 +5847,9 @@
   },
   {
     "id": "g7-250",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "敷",
     "grade": 7,
     "strokes": 15,
@@ -5370,8 +5860,8 @@
       "し"
     ],
     "meaning": "一面にひろげること。ひろくゆきわたらせる。",
-  "exampleSentence": "客のために布（ふ）団を敷（し）く。",
-  "continent": "アジア大陸",
+    "exampleSentence": "客のために布（ふ）団を敷（し）く。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5381,7 +5871,9 @@
   },
   {
     "id": "g7-251",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "膚",
     "grade": 7,
     "strokes": 15,
@@ -5390,8 +5882,8 @@
     ],
     "kunyomi": [],
     "meaning": "からだをおおうかわ。はだ。",
-  "exampleSentence": "冬は皮（ひ）膚（ふ）が乾燥しやすい。",
-  "continent": "アジア大陸",
+    "exampleSentence": "冬は皮（ひ）膚（ふ）が乾燥しやすい。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5401,7 +5893,9 @@
   },
   {
     "id": "g7-252",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "賦",
     "grade": 7,
     "strokes": 15,
@@ -5410,8 +5904,8 @@
     ],
     "kunyomi": [],
     "meaning": "割り当てること。年貢などを取り立てること。",
-  "exampleSentence": "生まれつきの天（てん）賦（ぷ）の才。",
-  "continent": "アジア大陸",
+    "exampleSentence": "生まれつきの天（てん）賦（ぷ）の才。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5421,7 +5915,9 @@
   },
   {
     "id": "g7-253",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "舞",
     "grade": 7,
     "strokes": 15,
@@ -5433,8 +5929,8 @@
       "ま"
     ],
     "meaning": "おどること。くるくる回るように飛ぶこと。",
-  "exampleSentence": "舞（ぶ）台の上でバレエをおどる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "舞（ぶ）台の上でバレエをおどる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5444,7 +5940,9 @@
   },
   {
     "id": "g7-254",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "幅",
     "grade": 7,
     "strokes": 12,
@@ -5455,8 +5953,8 @@
       "はば"
     ],
     "meaning": "横の長さ。はば。物事のひろがり。",
-  "exampleSentence": "値上げの幅（はば）が大きい。",
-  "continent": "アジア大陸",
+    "exampleSentence": "値上げの幅（はば）が大きい。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5466,7 +5964,9 @@
   },
   {
     "id": "g7-255",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "払",
     "grade": 7,
     "strokes": 5,
@@ -5477,8 +5977,8 @@
       "はら"
     ],
     "meaning": "お金をわたすこと。また、手ではらってのけること。",
-  "exampleSentence": "お店で食事代を払（はら）う。",
-  "continent": "アジア大陸",
+    "exampleSentence": "お店で食事代を払（はら）う。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5488,7 +5988,9 @@
   },
   {
     "id": "g7-256",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "噴",
     "grade": 7,
     "strokes": 15,
@@ -5499,8 +6001,8 @@
       "ふ"
     ],
     "meaning": "内部からいきおいよくふきだすこと。",
-  "exampleSentence": "公園の噴（ふん）水の前で待ち合わせる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "公園の噴（ふん）水の前で待ち合わせる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5510,7 +6012,9 @@
   },
   {
     "id": "g7-257",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "柄",
     "grade": 7,
     "strokes": 9,
@@ -5522,8 +6026,8 @@
       "え"
     ],
     "meaning": "布などのもよう。道具の、手でにぎる部分。",
-  "exampleSentence": "花（はな）柄（がら）のワンピースを着る。",
-  "continent": "アジア大陸",
+    "exampleSentence": "花（はな）柄（がら）のワンピースを着る。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5533,7 +6037,9 @@
   },
   {
     "id": "g7-258",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "壁",
     "grade": 7,
     "strokes": 16,
@@ -5544,8 +6050,8 @@
       "かべ"
     ],
     "meaning": "へやなどをしきるかべ。行く手をはばむもの。",
-  "exampleSentence": "困難の壁（かべ）を乗りこえる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "困難の壁（かべ）を乗りこえる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5555,7 +6061,9 @@
   },
   {
     "id": "g7-259",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "捕",
     "grade": 7,
     "strokes": 10,
@@ -5567,8 +6075,8 @@
       "つか"
     ],
     "meaning": "つかまえること。とらえること。",
-  "exampleSentence": "虫捕り網で蝶（ちょう）を捕（つか）まえる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "虫捕り網で蝶（ちょう）を捕（つか）まえる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5578,7 +6086,9 @@
   },
   {
     "id": "g7-260",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "舗",
     "grade": 7,
     "strokes": 15,
@@ -5587,8 +6097,8 @@
     ],
     "kunyomi": [],
     "meaning": "みせ。また、道にしきつめること。",
-  "exampleSentence": "新しい道路を舗（ほ）装する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "新しい道路を舗（ほ）装する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5598,7 +6108,9 @@
   },
   {
     "id": "g7-261",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "抱",
     "grade": 7,
     "strokes": 8,
@@ -5611,8 +6123,8 @@
       "かか"
     ],
     "meaning": "うででかかえること。心にもつこと。",
-  "exampleSentence": "大きな夢を胸に抱（いだ）く。",
-  "continent": "アジア大陸",
+    "exampleSentence": "大きな夢を胸に抱（いだ）く。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5622,7 +6134,9 @@
   },
   {
     "id": "g7-262",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "峰",
     "grade": 7,
     "strokes": 10,
@@ -5633,8 +6147,8 @@
       "みね"
     ],
     "meaning": "山のいちばん高い所。みね。",
-  "exampleSentence": "富士山の最（さい）高（こう）峰（ほう）に立つ。",
-  "continent": "アジア大陸",
+    "exampleSentence": "富士山の最（さい）高（こう）峰（ほう）に立つ。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5644,7 +6158,9 @@
   },
   {
     "id": "g7-263",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "砲",
     "grade": 7,
     "strokes": 10,
@@ -5653,8 +6169,8 @@
     ],
     "kunyomi": [],
     "meaning": "大きな弾を撃ち出す武器。大砲。",
-  "exampleSentence": "野球で鉄（てっ）砲（ぽう）肩の選手が活躍する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "野球で鉄（てっ）砲（ぽう）肩の選手が活躍する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5664,7 +6180,9 @@
   },
   {
     "id": "g7-264",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "忙",
     "grade": 7,
     "strokes": 6,
@@ -5675,8 +6193,8 @@
       "いそが"
     ],
     "meaning": "することが多くてひまがない。いそがしい。",
-  "exampleSentence": "毎日、宿題や部活で忙（いそが）しい。",
-  "continent": "アジア大陸",
+    "exampleSentence": "毎日、宿題や部活で忙（いそが）しい。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5686,7 +6204,9 @@
   },
   {
     "id": "g7-265",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "坊",
     "grade": 7,
     "strokes": 7,
@@ -5696,8 +6216,8 @@
     ],
     "kunyomi": [],
     "meaning": "男の子。また、僧の住む所。",
-  "exampleSentence": "休みの日に朝寝（ね）坊（ぼう）する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "休みの日に朝寝（ね）坊（ぼう）する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5707,7 +6227,9 @@
   },
   {
     "id": "g7-266",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "肪",
     "grade": 7,
     "strokes": 8,
@@ -5716,8 +6238,8 @@
     ],
     "kunyomi": [],
     "meaning": "動物のからだにあるあぶら。",
-  "exampleSentence": "運動して体脂（しん）肪（ぼう）を燃やす。",
-  "continent": "アジア大陸",
+    "exampleSentence": "運動して体脂（しん）肪（ぼう）を燃やす。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5727,7 +6249,9 @@
   },
   {
     "id": "g7-267",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "冒",
     "grade": 7,
     "strokes": 9,
@@ -5738,8 +6262,8 @@
       "おか"
     ],
     "meaning": "危険を気にせず、思いきって行うこと。",
-  "exampleSentence": "仲間と未知の世界を冒（ぼう）険する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "仲間と未知の世界を冒（ぼう）険する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5749,7 +6273,9 @@
   },
   {
     "id": "g7-268",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "傍",
     "grade": 7,
     "strokes": 12,
@@ -5760,8 +6286,8 @@
       "かたわ"
     ],
     "meaning": "すぐ近く。そば。わき。",
-  "exampleSentence": "話の傍（ぼう）線部を要約する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "話の傍（ぼう）線部を要約する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5771,7 +6297,9 @@
   },
   {
     "id": "g7-269",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "帽",
     "grade": 7,
     "strokes": 12,
@@ -5780,8 +6308,8 @@
     ],
     "kunyomi": [],
     "meaning": "頭にかぶるもの。ぼうし。",
-  "exampleSentence": "日差しが強いので帽（ぼう）子をかぶる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "日差しが強いので帽（ぼう）子をかぶる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5791,7 +6319,9 @@
   },
   {
     "id": "g7-270",
-    "stageId": ["Asia_area9"],
+    "stageId": [
+      "asia_area9"
+    ],
     "kanji": "凡",
     "grade": 7,
     "strokes": 3,
@@ -5801,11 +6331,13 @@
     ],
     "kunyomi": [],
     "meaning": "なみなみ。すぐれても劣ってもいないこと。",
-  "exampleSentence": "試合で凡（ぼん）ミスをしてしまった。"
+    "exampleSentence": "試合で凡（ぼん）ミスをしてしまった。"
   },
   {
     "id": "g7-271",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "盆",
     "grade": 7,
     "strokes": 9,
@@ -5814,8 +6346,8 @@
     ],
     "kunyomi": [],
     "meaning": "平たくて浅い器。先祖の霊をまつる行事。",
-  "exampleSentence": "お盆（ぼん）には、田舎に帰省する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "お盆（ぼん）には、田舎に帰省する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5825,7 +6357,9 @@
   },
   {
     "id": "g7-272",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "慢",
     "grade": 7,
     "strokes": 14,
@@ -5834,8 +6368,8 @@
     ],
     "kunyomi": [],
     "meaning": "おこたること。いばること。あなどること。",
-  "exampleSentence": "自分の知識を自（じ）慢（まん）する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "自分の知識を自（じ）慢（まん）する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5845,7 +6379,9 @@
   },
   {
     "id": "g7-273",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "漫",
     "grade": 7,
     "strokes": 14,
@@ -5854,8 +6390,8 @@
     ],
     "kunyomi": [],
     "meaning": "しまりがないこと。とりとめがないこと。",
-  "exampleSentence": "休みの日は一日中、漫（まん）画を読んでいた。",
-  "continent": "アジア大陸",
+    "exampleSentence": "休みの日は一日中、漫（まん）画を読んでいた。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5865,7 +6401,9 @@
   },
   {
     "id": "g7-274",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "妙",
     "grade": 7,
     "strokes": 7,
@@ -5874,8 +6412,8 @@
     ],
     "kunyomi": [],
     "meaning": "何とも言えずすぐれていること。不思議なこと。",
-  "exampleSentence": "絶（ぜつ）妙（みょう）なタイミングで助けが来た。",
-  "continent": "アジア大陸",
+    "exampleSentence": "絶（ぜつ）妙（みょう）なタイミングで助けが来た。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5885,7 +6423,9 @@
   },
   {
     "id": "g7-275",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "眠",
     "grade": 7,
     "strokes": 10,
@@ -5896,8 +6436,8 @@
       "ねむ"
     ],
     "meaning": "ねむること。ねむいこと。",
-  "exampleSentence": "授業中に眠（ねむ）くなってしまった。",
-  "continent": "アジア大陸",
+    "exampleSentence": "授業中に眠（ねむ）くなってしまった。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5907,7 +6447,9 @@
   },
   {
     "id": "g7-276",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "矛",
     "grade": 7,
     "strokes": 5,
@@ -5918,8 +6460,8 @@
       "ほこ"
     ],
     "meaning": "長い柄の先に刃をつけた武器。ほこ。",
-  "exampleSentence": "彼の話は、矛（む）盾（じゅん）している。",
-  "continent": "アジア大陸",
+    "exampleSentence": "彼の話は、矛（む）盾（じゅん）している。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5929,7 +6471,9 @@
   },
   {
     "id": "g7-277",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "霧",
     "grade": 7,
     "strokes": 19,
@@ -5940,20 +6484,20 @@
       "きり"
     ],
     "meaning": "地表近くに、こまかい水てきがただよう現象。",
-  "exampleSentence": "朝、深い霧（きり）で周りがよく見えない。",
-  "continent": "アジア大陸",
+    "exampleSentence": "朝、深い霧（きり）で周りがよく見えない。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
     "lastReviewDate": null,
     "masteryLevel": 0,
     "tags": []
-
-
   },
   {
     "id": "g7-278",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "娘",
     "grade": 7,
     "strokes": 10,
@@ -5962,18 +6506,20 @@
       "むすめ"
     ],
     "meaning": "自分の女の子ども。むすめ。",
-  "exampleSentence": "一人（ひとり）娘（むすめ）を大切に育てる。",
-      "continent": "アジア大陸",
-        "originalGrade": 7,
-        "correctCount": 0,
-        "incorrectCount": 0,
-        "lastReviewDate": null,
-        "masteryLevel": 0,
-        "tags": []
+    "exampleSentence": "一人（ひとり）娘（むすめ）を大切に育てる。",
+    "continent": "アジア大陸",
+    "originalGrade": 7,
+    "correctCount": 0,
+    "incorrectCount": 0,
+    "lastReviewDate": null,
+    "masteryLevel": 0,
+    "tags": []
   },
   {
     "id": "g7-279",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "茂",
     "grade": 7,
     "strokes": 8,
@@ -5984,8 +6530,8 @@
       "しげ"
     ],
     "meaning": "草や木がたくさん生えて、おいしげること。",
-  "exampleSentence": "夏の野山は、草木が青々と茂（しげ）っている。",
-  "continent": "アジア大陸",
+    "exampleSentence": "夏の野山は、草木が青々と茂（しげ）っている。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -5995,7 +6541,9 @@
   },
   {
     "id": "g7-280",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "猛",
     "grade": 7,
     "strokes": 11,
@@ -6004,8 +6552,8 @@
     ],
     "kunyomi": [],
     "meaning": "たけく、あらあらしいこと。勢いがはげしい。",
-  "exampleSentence": "夏休みに水泳の猛（もう）練習をする。",
-  "continent": "アジア大陸",
+    "exampleSentence": "夏休みに水泳の猛（もう）練習をする。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6015,7 +6563,9 @@
   },
   {
     "id": "g7-281",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "網",
     "grade": 7,
     "strokes": 14,
@@ -6026,8 +6576,8 @@
       "あみ"
     ],
     "meaning": "糸などを格子状に編んだもの。あみ。",
-  "exampleSentence": "日本中に通信（つうしん）網（もう）が広がっている。",
-  "continent": "アジア大陸",
+    "exampleSentence": "日本中に通信（つうしん）網（もう）が広がっている。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6037,7 +6587,9 @@
   },
   {
     "id": "g7-282",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "黙",
     "grade": 7,
     "strokes": 15,
@@ -6048,8 +6600,8 @@
       "だま"
     ],
     "meaning": "何も言わないこと。だまること。",
-  "exampleSentence": "全員で一分間の黙（もく）とうをささげる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "全員で一分間の黙（もく）とうをささげる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6059,7 +6611,9 @@
   },
   {
     "id": "g7-283",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "紋",
     "grade": 7,
     "strokes": 10,
@@ -6068,8 +6622,8 @@
     ],
     "kunyomi": [],
     "meaning": "いえいえに伝わるしるし。もよう。",
-  "exampleSentence": "犯人の指（し）紋（もん）を採取する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "犯人の指（し）紋（もん）を採取する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6079,7 +6633,9 @@
   },
   {
     "id": "g7-284",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "躍",
     "grade": 7,
     "strokes": 21,
@@ -6090,8 +6646,8 @@
       "おど"
     ],
     "meaning": "おどりあがること。いきいきと活動すること。",
-  "exampleSentence": "若者が世界を舞台に活（かつ）躍（やく）する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "若者が世界を舞台に活（かつ）躍（やく）する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6101,7 +6657,9 @@
   },
   {
     "id": "g7-285",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "雄",
     "grade": 7,
     "strokes": 12,
@@ -6113,8 +6671,8 @@
       "おす"
     ],
     "meaning": "おす。また、いさましく、すぐれていること。",
-  "exampleSentence": "彼は、戦国の英（えい）雄（ゆう）として有名だ。",
-  "continent": "アジア大陸",
+    "exampleSentence": "彼は、戦国の英（えい）雄（ゆう）として有名だ。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6124,7 +6682,9 @@
   },
   {
     "id": "g7-286",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "与",
     "grade": 7,
     "strokes": 3,
@@ -6135,8 +6695,8 @@
       "あた"
     ],
     "meaning": "相手にものをあたえること。",
-  "exampleSentence": "動物にえさを与（あた）える。",
-  "continent": "アジア大陸",
+    "exampleSentence": "動物にえさを与（あた）える。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6146,7 +6706,9 @@
   },
   {
     "id": "g7-287",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "誉",
     "grade": 7,
     "strokes": 13,
@@ -6157,8 +6719,8 @@
       "ほま"
     ],
     "meaning": "ほめたたえられること。よい評判。ほまれ。",
-  "exampleSentence": "一位になったことを、名（めい）誉（よ）に思う。",
-  "continent": "アジア大陸",
+    "exampleSentence": "一位になったことを、名（めい）誉（よ）に思う。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6168,7 +6730,9 @@
   },
   {
     "id": "g7-288",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "溶",
     "grade": 7,
     "strokes": 13,
@@ -6179,8 +6743,8 @@
       "と"
     ],
     "meaning": "液体の中に、他のものがまじり合う。とける。",
-  "exampleSentence": "砂糖は、お湯に入れるとすぐに溶（と）ける。",
-  "continent": "アジア大陸",
+    "exampleSentence": "砂糖は、お湯に入れるとすぐに溶（と）ける。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6190,7 +6754,9 @@
   },
   {
     "id": "g7-289",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "腰",
     "grade": 7,
     "strokes": 13,
@@ -6201,8 +6767,8 @@
       "こし"
     ],
     "meaning": "からだの、あばら骨とつき骨の間の部分。",
-  "exampleSentence": "彼はとても腰（こし）が低い人だ。",
-  "continent": "アジア大陸",
+    "exampleSentence": "彼はとても腰（こし）が低い人だ。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6212,7 +6778,9 @@
   },
   {
     "id": "g7-290",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "踊",
     "grade": 7,
     "strokes": 14,
@@ -6223,8 +6791,8 @@
       "おど"
     ],
     "meaning": "音楽などに合わせて、体を動かすこと。",
-  "exampleSentence": "お祭りで、盆（ぼん）踊（おど）りを踊（おど）る。",
-  "continent": "アジア大陸",
+    "exampleSentence": "お祭りで、盆（ぼん）踊（おど）りを踊（おど）る。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6234,7 +6802,9 @@
   },
   {
     "id": "g7-291",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "謡",
     "grade": 7,
     "strokes": 16,
@@ -6246,8 +6816,8 @@
       "うた"
     ],
     "meaning": "節をつけてうたう歌。特に、能の文句。",
-  "exampleSentence": "昔から伝わる民（みん）謡（よう）を歌う。",
-  "continent": "アジア大陸",
+    "exampleSentence": "昔から伝わる民（みん）謡（よう）を歌う。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6257,7 +6827,9 @@
   },
   {
     "id": "g7-292",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "翼",
     "grade": 7,
     "strokes": 17,
@@ -6268,8 +6840,8 @@
       "つばさ"
     ],
     "meaning": "鳥や飛行機が、空を飛ぶための部分。つばさ。",
-  "exampleSentence": "鳥が大きな翼（つばさ）を広げて、空を飛ぶ。",
-  "continent": "アジア大陸",
+    "exampleSentence": "鳥が大きな翼（つばさ）を広げて、空を飛ぶ。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6279,7 +6851,9 @@
   },
   {
     "id": "g7-293",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "雷",
     "grade": 7,
     "strokes": 13,
@@ -6290,8 +6864,8 @@
       "かみなり"
     ],
     "meaning": "空の電気。ゴロゴロとなる音や、光るいなずま。",
-  "exampleSentence": "遠くで雷（かみなり）の音が聞こえる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "遠くで雷（かみなり）の音が聞こえる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6301,7 +6875,9 @@
   },
   {
     "id": "g7-294",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "頼",
     "grade": 7,
     "strokes": 16,
@@ -6313,8 +6889,8 @@
       "たの"
     ],
     "meaning": "人に何かをしてくれるように願う。あてにする。",
-  "exampleSentence": "彼は、とても頼（たよ）りになる人だ。",
-  "continent": "アジア大陸",
+    "exampleSentence": "彼は、とても頼（たよ）りになる人だ。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6324,7 +6900,9 @@
   },
   {
     "id": "g7-295",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "絡",
     "grade": 7,
     "strokes": 12,
@@ -6335,8 +6913,8 @@
       "から"
     ],
     "meaning": "からみつくこと。また、つながりをつけること。",
-  "exampleSentence": "友達に、こまめに連（れん）絡（らく）をとる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "友達に、こまめに連（れん）絡（らく）をとる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6346,7 +6924,9 @@
   },
   {
     "id": "g7-296",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "欄",
     "grade": 7,
     "strokes": 20,
@@ -6355,11 +6935,13 @@
     ],
     "kunyomi": [],
     "meaning": "わくでかこんだ部分。てすり。",
-  "exampleSentence": "書類の空（くう）欄（らん）に、名前を記入する。"
+    "exampleSentence": "書類の空（くう）欄（らん）に、名前を記入する。"
   },
   {
     "id": "g7-297",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "離",
     "grade": 7,
     "strokes": 18,
@@ -6370,8 +6952,8 @@
       "はな"
     ],
     "meaning": "二つのものを遠くへだてること。はなれる。",
-  "exampleSentence": "駅と家は、少し距（きょ）離（り）がある。",
-  "continent": "アジア大陸",
+    "exampleSentence": "駅と家は、少し距（きょ）離（り）がある。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6381,7 +6963,9 @@
   },
   {
     "id": "g7-298",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "粒",
     "grade": 7,
     "strokes": 11,
@@ -6390,10 +6974,10 @@
     ],
     "kunyomi": [
       "つぶ"
-        ],
+    ],
     "meaning": "まるくて小さいもの。つぶ。",
-  "exampleSentence": "お米を、一（ひと）粒（つぶ）も残さず食べる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "お米を、一（ひと）粒（つぶ）も残さず食べる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6403,7 +6987,9 @@
   },
   {
     "id": "g7-299",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "慮",
     "grade": 7,
     "strokes": 15,
@@ -6412,8 +6998,8 @@
     ],
     "kunyomi": [],
     "meaning": "よく考えをめぐらすこと。おもんぱかり。",
-  "exampleSentence": "遠（えん）慮（りょ）なく、何でも質問してください。",
-  "continent": "アジア大陸",
+    "exampleSentence": "遠（えん）慮（りょ）なく、何でも質問してください。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6423,7 +7009,9 @@
   },
   {
     "id": "g7-300",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "療",
     "grade": 7,
     "strokes": 17,
@@ -6432,8 +7020,8 @@
     ],
     "kunyomi": [],
     "meaning": "病気やけがをなおすこと。",
-  "exampleSentence": "病院で、病気の治（ち）療（りょう）を受ける。",
-  "continent": "アジア大陸",
+    "exampleSentence": "病院で、病気の治（ち）療（りょう）を受ける。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6443,7 +7031,9 @@
   },
   {
     "id": "g7-301",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "隣",
     "grade": 7,
     "strokes": 16,
@@ -6455,8 +7045,8 @@
       "となり"
     ],
     "meaning": "すぐそば。となり。",
-  "exampleSentence": "私の席の隣（となり）は、佐藤さんです。",
-  "continent": "アジア大陸",
+    "exampleSentence": "私の席の隣（となり）は、佐藤さんです。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6466,7 +7056,9 @@
   },
   {
     "id": "g7-302",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "涙",
     "grade": 7,
     "strokes": 10,
@@ -6477,8 +7069,8 @@
       "なみだ"
     ],
     "meaning": "悲しい時やうれしい時に、目から出るしずく。",
-  "exampleSentence": "悔し涙（なみだ）をこらえて、前を向く。",
-  "continent": "アジア大陸",
+    "exampleSentence": "悔し涙（なみだ）をこらえて、前を向く。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6488,7 +7080,9 @@
   },
   {
     "id": "g7-303",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "隷",
     "grade": 7,
     "strokes": 16,
@@ -6497,8 +7091,8 @@
     ],
     "kunyomi": [],
     "meaning": "支配されて、自由をうばわれた人。しもべ。",
-  "exampleSentence": "歴史の授業で、奴（ど）隷（れい）の制度を学ぶ。",
-  "continent": "アジア大陸",
+    "exampleSentence": "歴史の授業で、奴（ど）隷（れい）の制度を学ぶ。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6508,7 +7102,9 @@
   },
   {
     "id": "g7-304",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "齢",
     "grade": 7,
     "strokes": 17,
@@ -6517,8 +7113,8 @@
     ],
     "kunyomi": [],
     "meaning": "生まれてからの年数。年齢。",
-  "exampleSentence": "対象年（ねん）齢（れい）が、十歳以上のゲーム。",
-  "continent": "アジア大陸",
+    "exampleSentence": "対象年（ねん）齢（れい）が、十歳以上のゲーム。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6528,7 +7124,9 @@
   },
   {
     "id": "g7-305",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "麗",
     "grade": 7,
     "strokes": 19,
@@ -6539,8 +7137,8 @@
       "うるわ"
     ],
     "meaning": "形がととのっていて、うつくしいこと。",
-  "exampleSentence": "麗（うら）らかな春の日に、散歩する。",
-  "continent": "アジア大陸",
+    "exampleSentence": "麗（うら）らかな春の日に、散歩する。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6550,7 +7148,9 @@
   },
   {
     "id": "g7-306",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "暦",
     "grade": 7,
     "strokes": 14,
@@ -6561,8 +7161,8 @@
       "こよみ"
     ],
     "meaning": "一年間の月日や季節などを記したもの。こよみ。",
-  "exampleSentence": "日本の今の暦（こよみ）は、西（せい）暦（れき）だ。",
-  "continent": "アジア大陸",
+    "exampleSentence": "日本の今の暦（こよみ）は、西（せい）暦（れき）だ。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6572,7 +7172,9 @@
   },
   {
     "id": "g7-307",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "劣",
     "grade": 7,
     "strokes": 6,
@@ -6583,8 +7185,8 @@
       "おと"
     ],
     "meaning": "他と比べて、質や能力が下であること。",
-  "exampleSentence": "彼は、体力では誰にも劣（おと）らない。",
-  "continent": "アジア大陸",
+    "exampleSentence": "彼は、体力では誰にも劣（おと）らない。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6594,7 +7196,9 @@
   },
   {
     "id": "g7-308",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "烈",
     "grade": 7,
     "strokes": 10,
@@ -6603,8 +7207,8 @@
     ],
     "kunyomi": [],
     "meaning": "勢いがはげしいこと。きびしいこと。",
-  "exampleSentence": "夏の強（きょう）烈（れつ）な日差しを、帽子でさける。",
-  "continent": "アジア大陸",
+    "exampleSentence": "夏の強（きょう）烈（れつ）な日差しを、帽子でさける。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6614,7 +7218,9 @@
   },
   {
     "id": "g7-309",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "恋",
     "grade": 7,
     "strokes": 10,
@@ -6626,8 +7232,8 @@
       "こ"
     ],
     "meaning": "特定の人を好きになり、会いたいと思う気持ち。",
-  "exampleSentence": "初めて恋（こい）をしたのは、小学生の時だ。",
-  "continent": "アジア大陸",
+    "exampleSentence": "初めて恋（こい）をしたのは、小学生の時だ。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6637,7 +7243,9 @@
   },
   {
     "id": "g7-310",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "露",
     "grade": 7,
     "strokes": 21,
@@ -6649,8 +7257,8 @@
       "つゆ"
     ],
     "meaning": "草の葉などにつく水てき。外にあらわれること。",
-  "exampleSentence": "朝、葉の上にきれいな露（つゆ）が光る。",
-  "continent": "アジア大陸",
+    "exampleSentence": "朝、葉の上にきれいな露（つゆ）が光る。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6660,7 +7268,9 @@
   },
   {
     "id": "g7-311",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "郎",
     "grade": 7,
     "strokes": 9,
@@ -6669,8 +7279,8 @@
     ],
     "kunyomi": [],
     "meaning": "おとこの人。また、おとこの人の名前に使う。",
-  "exampleSentence": "私の名前は、山田太（た）郎（ろう）です。",
-  "continent": "アジア大陸",
+    "exampleSentence": "私の名前は、山田太（た）郎（ろう）です。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6680,7 +7290,9 @@
   },
   {
     "id": "g7-312",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "惑",
     "grade": 7,
     "strokes": 12,
@@ -6691,8 +7303,8 @@
       "まど"
     ],
     "meaning": "どうしたらよいか、判断にまようこと。",
-  "exampleSentence": "うわさ話に、人々が惑（まど）わされる。",
-  "continent": "アジア大陸",
+    "exampleSentence": "うわさ話に、人々が惑（まど）わされる。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
@@ -6702,7 +7314,9 @@
   },
   {
     "id": "g7-313",
-    "stageId": ["Asia_area10"],
+    "stageId": [
+      "asia_area10"
+    ],
     "kanji": "腕",
     "grade": 7,
     "strokes": 12,
@@ -6713,8 +7327,8 @@
       "うで"
     ],
     "meaning": "かたから手首までの部分。また、うでまえや能力。",
-  "exampleSentence": "彼は、料理の腕（うで）をみがいている。",
-  "continent": "アジア大陸",
+    "exampleSentence": "彼は、料理の腕（うで）をみがいている。",
+    "continent": "アジア大陸",
     "originalGrade": 7,
     "correctCount": 0,
     "incorrectCount": 0,
