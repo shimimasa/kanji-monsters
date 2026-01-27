@@ -139,6 +139,10 @@ grade:
 
 フォールバック規則の分散実装
 
+例外（アセット互換）：
+src/loaders/assetsLoader.js は、既存アセット命名の都合で 世界背景のみ Asia_* 等の先頭大文字ファイル名を追加候補として許容する（正史IDは常に小文字）。
+画像フォルダ/既存パスの都合で grade*-(kantou|chuubu|chuugoku) 等の フォルダ名文字列は互換として残存しうる（これは stageId 正規化とは別問題で、将来アセット整理（P2）で解消する）。
+
 F. モード定義（Battle / Practice / Review）
 正史
 
