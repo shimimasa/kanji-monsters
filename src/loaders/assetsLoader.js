@@ -260,10 +260,11 @@ const gradeFolderMap = {
     pathsToTry.push(
       // 1. WebP形式の画像（monsters/full/フォルダ内）
       `${ASSET_PATHS.MONSTER_FULL_PRIMARY}/${enemyId}.webp`,
-      // 2. image-pipeline内のWebP画像
-      `${ASSET_PATHS.MONSTER_FULL_PIPELINE}/${enemyId}.webp`,
-      // 3. PNG形式の代替
-      `${ASSET_PATHS.MONSTER_PNG_PIPELINE}/monster_${enemyId.replace('PRV-E', '')}.png`
+      // NOTE(P2): PRV は今後使わない方針のため、image-pipeline 参照は無害化（候補から除外）
+      // // 2. image-pipeline内のWebP画像
+      // `${ASSET_PATHS.MONSTER_FULL_PIPELINE}/${enemyId}.webp`,
+      // // 3. PNG形式の代替
+      // `${ASSET_PATHS.MONSTER_PNG_PIPELINE}/monster_${enemyId.replace('PRV-E', '')}.png`
     );
     // 文字列の最終出力は旧コードと完全一致（パス/順序/候補数は不変）
   } else {
