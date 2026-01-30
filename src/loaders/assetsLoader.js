@@ -345,12 +345,37 @@ const gradeFolderMap = {
 /*  汎用ロードユーティリティ                                           */
 /* ------------------------------------------------------------------ */
 
+// P3-2: 調査可能化のみ（挙動は変えない）
+// 画像ロード失敗時に「SPAリライトでHTMLが返っている」ケースを特定できるログを1行だけ出す（URLごとに1回）
+const __assetHtmlWarnedUrls = new Set();
+function __warnIfHtmlAssetResponse(src) {
+  try {
+    // 失敗時のみ、追加コスト最小で判定する（成功パスは一切変更しない）
+    fetch(src, { method: 'GET', cache: 'no-store' })
+      .then(res => {
+        const ct = res?.headers?.get?.('content-type') || '';
+        if (typeof ct === 'string' && ct.includes('text/html')) {
+          if (!__assetHtmlWarnedUrls.has(src)) {
+            __assetHtmlWarnedUrls.add(src);
+            console.warn(`[ASSET] got HTML for asset url (SPA rewrite?): ${src}`);
+          }
+        }
+      })
+      .catch(() => {});
+  } catch {
+    // no-op（元のonerror挙動は維持）
+  }
+}
+
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'Anonymous'; // CORS対応
     img.onload = () => resolve(img);
-    img.onerror = (e) => reject(new Error(`画像の読み込みに失敗: ${src}`));
+    img.onerror = () => {
+      __warnIfHtmlAssetResponse(src);
+      reject(new Error(`画像の読み込みに失敗: ${src}`));
+    };
     img.src = src;
   });
 }
@@ -404,7 +429,10 @@ function loadImageWithTransparency(src) {
       processedImg.src = canvas.toDataURL('image/png');
     };
     
-    img.onerror = (e) => reject(new Error(`画像の読み込みに失敗: ${src}`));
+    img.onerror = () => {
+      __warnIfHtmlAssetResponse(src);
+      reject(new Error(`画像の読み込みに失敗: ${src}`));
+    };
     img.src = src;
   });
 }
