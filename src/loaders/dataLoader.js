@@ -9,20 +9,22 @@ let stageKanjiMap = {};
 // 学年別の漢字データを保持するオブジェクトを追加
 let kanjiByGrade = {};
 
+// P1(ID規約): 表記揺れ吸収は canonicalizeStageId に集約（ログで可視化）
+// NOTE: getKanjiByStageId など他の関数からも使うため、module scope に置く（ReferenceError防止）
+const __canonWarned = new Set();
+const __canon = (raw) => {
+  const canon = canonicalizeStageId(raw);
+  const r = (raw === null || raw === undefined) ? '' : String(raw);
+  if (r && canon && canon !== r && !__canonWarned.has(r)) {
+    __canonWarned.add(r);
+    console.warn(`[P1] canonicalizeStageId: ${r} -> ${canon}`);
+  }
+  return canon || r;
+};
+
 export async function loadAllGameData() {
   try {
     console.log("外部JSONファイルの読み込みを開始します...");
-    const __canonWarned = new Set();
-    const __canon = (raw) => {
-      const canon = canonicalizeStageId(raw);
-      const r = (raw === null || raw === undefined) ? '' : String(raw);
-      if (r && canon && canon !== r && !__canonWarned.has(r)) {
-        __canonWarned.add(r);
-        // P1(ID規約): 表記揺れ吸収は canonicalizeStageId に集約（当面はログのみで可視化）
-        console.warn(`[P1] canonicalizeStageId: ${r} -> ${canon}`);
-      }
-      return canon || r;
-    };
 
     // 複数学年の漢字データをまとめて読み込む
     const grades = [1, 2, 3, 4, 5, 6];
