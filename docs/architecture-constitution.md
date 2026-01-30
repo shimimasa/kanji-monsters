@@ -169,7 +169,7 @@ G. リポジトリ構成（Repository）
 
 image-pipeline/ = 開発用ツール
 
-my-app/ = 試作・アーカイブ
+archive/my-app/ = 試作・アーカイブ
 
 運用方針
 

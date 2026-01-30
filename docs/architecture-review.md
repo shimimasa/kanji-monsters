@@ -10,9 +10,9 @@ Issue（短い名前）	症状（いま起きていること）	影響（ユー�
 4) “バトル”の定義（戦闘UI vs 学習ドリル基盤）
 Issue（短い名前）	症状（いま起きていること）	影響（ユーザー体験/データ破損/保守性）	原因（構造上の理由）	解決の方針（正史をどれにするか、選択肢A/B/C）	優先度	対象ファイル（列挙）
 battleの責務肥大	practiceBattleScreen が battleScreen を“継承”しつつ敵要素だけ無効化し、さらにクイック復習など学習モードが増築されている	- 仕様追加が“戦闘UIの副作用”として増える（バグの温床）<br>- プレイヤーから見ると「戦闘と練習の境界」が曖昧になりやすい	- 「バトルUI＝入力/出題/判定の基盤」を流用した結果、戦闘ロジックと学習ロジックが分離されていない	- A: 正史=battleは戦闘、practiceは別の“学習セッション”（UIは共有しても意味論は分離）【推奨】<br>- B: 正史=battleは“学習セッション基盤”、戦闘はその一形態（命名とデータモデルを合わせる）<br>- C: 正史を分けない（現状路線）だが“モード”を明確に仕様化し、依存方向を固定	P1	src/screens/battleScreen.js, src/screens/practiceBattleScreen.js, src/screens/quickReviewPracticeScreen.js, src/screens/reviewStage.js, src/states/battleStateFactory.js, src/core/gameState.js
-5) リポジトリの正史（my-app / image-pipeline / dist/public）
+5) リポジトリの正史（archive/my-app / image-pipeline / dist/public）
 Issue（短い名前）	症状（いま起きていること）	影響（ユーザー体験/データ破損/保守性）	原因（構造上の理由）	解決の方針（正史をどれにするか、選択肢A/B/C）	優先度	対象ファイル（列挙）
-成果物/試作/素材生成が同居	ルートに dist/ と public/、別アプリっぽい my-app/、素材加工の image-pipeline/ が同列に存在	- 新規参加者が どれを起動/デプロイすべきか迷う<br>- 誤って成果物を編集/コミットしやすい	- “プロダクト”と“制作パイプライン”と“試作”の境界が repo 上で未定義	- A: 正史=ルート（Vite）をプロダクト、image-pipeline はツール、my-app はアーカイブ/実験扱い【推奨】<br>- B: 正史=モノレポ化（apps/toolsを明示し、ビルド/デプロイを分離）<br>- C: 正史=別リポジトリへ分割（プロダクトとパイプラインを切り離す）	P2	package.json, vite.config.js, firebase.json, vercel.json, workbox-config.js, my-app/package.json, image‐pipeline/package.json, dist/, public/
+成果物/試作/素材生成が同居	ルートに dist/ と public/、別アプリっぽい archive/my-app/、素材加工の image-pipeline/ が同列に存在	- 新規参加者が どれを起動/デプロイすべきか迷う<br>- 誤って成果物を編集/コミットしやすい	- “プロダクト”と“制作パイプライン”と“試作”の境界が repo 上で未定義	- A: 正史=ルート（Vite）をプロダクト、image-pipeline はツール、archive/my-app はアーカイブ/実験扱い【推奨】<br>- B: 正史=モノレポ化（apps/toolsを明示し、ビルド/デプロイを分離）<br>- C: 正史=別リポジトリへ分割（プロダクトとパイプラインを切り離す）	P2	package.json, vite.config.js, firebase.json, vercel.json, workbox-config.js, archive/my-app/package.json, image‐pipeline/package.json, dist/, public/
 優先度のまとめ（意思決定単位）
 P0: 1) 画面遷移の正史、2) 永続化の正史（ここが揺れると以後の議論が全部不安定）
 P1: 3) ID規約の正史、4) “バトル”の定義（機能拡張の方向性を固定）
