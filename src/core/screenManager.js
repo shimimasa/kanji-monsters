@@ -1,8 +1,6 @@
 // src/core/screenManager.js
 // グローバル FSM への委譲ラッパーモジュール
 
-import { subscribe } from './eventBus.js';
-
 let canvas = null;
 
 /**
@@ -13,21 +11,10 @@ export function setCanvas(c) {
 }
 
 /**
- * changeScreen イベントをグローバル FSM の switchScreen に委譲
- * payload は
- *  - string           → name
- *  - { name, props }  → name, props
- *  - [name, props]    → array 解釈
+ * P0-1(設計憲法A): 画面遷移の入口は setupFSM に一本化する。
+ * screenManager は遷移（changeScreen）の購読や payload 解釈を持たず、
+ * update/render などの画面ライフサイクル委譲のみに責務を限定する。
  */
-subscribe('changeScreen', payload => {
-  if (Array.isArray(payload)) {
-    window.switchScreen(payload[0], payload[1]);
-  } else if (payload && typeof payload === 'object' && 'name' in payload) {
-    window.switchScreen(payload.name, payload.props);
-  } else {
-    window.switchScreen(payload);
-  }
-});
 
 /**
  * 毎フレーム呼び出すロジック更新

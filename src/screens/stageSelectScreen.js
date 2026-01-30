@@ -9,6 +9,7 @@ import { calcBonusReward, isFirstClear, markBonusFirstClear, isBonusUnlocked } f
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { getEnemiesByStageId } from '../loaders/dataLoader.js';
 import { loadDex } from '../models/monsterDex.js';
+import { isStageCleared as isStageClearedSSoT } from '../core/saveData.js';
 
 /** 角丸矩形を描画するヘルパー関数 */
 function drawRoundedRect(ctx, x, y, width, height, radius) {
@@ -530,7 +531,7 @@ this._dex = loadDex();
   
   /** ステージのクリア状況を確認 */
   isStageCleared(stageId) {
-    const localStorageCleared = localStorage.getItem(`clear_${stageId}`);
+    const localStorageCleared = isStageClearedSSoT(stageId); // P0-2 StepB-2(中影響/最小差分): clear_* 直読を集約関数へ
     const gameStateCleared = gameState.stageProgress && gameState.stageProgress[stageId]?.cleared;
     return localStorageCleared || gameStateCleared;
   },

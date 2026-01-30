@@ -140,24 +140,7 @@ export const gameState = {
     const result = checkLevelUp();
     // 統計データが変更されたのでセーブ
     saveGameData();
-    
-    // ▼▼▼ 追加：Firestoreにも保存 ▼▼▼
-    // Firebaseサービスが利用可能な場合はFirestoreにも保存
-    import('../services/firebase/firebaseController.js').then(firebase => {
-      firebase.savePlayerData({
-        name: gameState.playerName,
-        level: gameState.playerStats.level,
-        exp: gameState.playerStats.exp,
-        maxHp: gameState.playerStats.maxHp,
-        attack: gameState.playerStats.attack,
-        nextLevelExp: gameState.playerStats.nextLevelExp
-      }).catch(error => {
-        console.warn('Firestoreへのプレイヤーデータ保存に失敗:', error);
-      });
-    }).catch(error => {
-      console.warn('Firebase controller読み込み失敗:', error);
-    });
-    // ▲▲▲ 追加終了 ▲▲▲
+    // StepD Step3-1: gameState から Firebase/Firestore を直接呼ばない（同期は別レイヤで実施）
     
     return result;
   }
@@ -233,8 +216,10 @@ function getStageClearCount(stageId) {
 
 function incrementStageClearCount(stageId) {
   const key = `stage_clear_${stageId}`;
-  const current = getStageClearCount(stageId);
-  localStorage.setItem(key, String(current + 1));
+  // P0-2 StepA: stage_clear_* はレガシー互換キー。正史(krb_save)以外への新規書き込みを停止する。
+  // 読み取り互換（ambient merge等）は維持するため、ここでは no-op とする。
+  // const current = getStageClearCount(stageId);
+  // localStorage.setItem(key, String(current + 1));
 }
   /**
    * ゲームデータをlocalStorageに保存する
@@ -334,14 +319,7 @@ function incrementStageClearCount(stageId) {
         
         saveNow(save);
 
-        // 旧フォーマットも当面残しておく（後方互換）
-        localStorage.setItem('kanjiGameSave', JSON.stringify({
-          playerName: gameState.playerName,
-          playerStats: gameState.playerStats,
-          unlockedAchievements: Array.from(gameState.unlockedAchievements),
-          practiceProgress: gameState.practiceProgress,
-          kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress)
-        }));
+        // P0-2 StepA: 旧フォーマット（kanjiGameSave）への新規書き込みを停止（読み取り互換は saveData 側のマイグレーションで維持）
         console.log('💾 ゲームデータを保存しました');
       }).catch(e => console.warn('saveData import failed:', e));
     } catch (error) {
@@ -351,7 +329,7 @@ function incrementStageClearCount(stageId) {
 
   export function loadGameData() {
     try {
-      import('./saveData.js').then(mod => {
+      return import('./saveData.js').then(mod => {
         const save = mod.loadSave();
         if (!save) return false;
 
@@ -397,7 +375,8 @@ function incrementStageClearCount(stageId) {
           gameState.stageProgress = gameState.stageProgress || {};
           save.player.progress.clearedStages.forEach(id => {
             gameState.stageProgress[id] = { cleared: true };
-            try { localStorage.setItem(`clear_${id}`, '1'); } catch {}
+            // P0-2 StepC-1: clear_* 互換ミラー書き込みを停止（読み取り互換は saveData.isStageCleared の legacy fallback で維持）
+            // try { localStorage.setItem(`clear_${id}`, '1'); } catch {}
           });
         }
         if (save.player?.progress?.currentStage) {
@@ -434,7 +413,7 @@ function incrementStageClearCount(stageId) {
       });
     } catch (error) {
       console.error('❌ ゲームデータの読み込みに失敗しました:', error);
-      return false;
+      return Promise.resolve(false);
     }
   }
 

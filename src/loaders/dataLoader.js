@@ -1,5 +1,6 @@
 // js/dataLoader.js
 import { gameState } from '../core/gameState.js';
+import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 
 export let stageData = [];
 let enemyData = [];
@@ -7,6 +8,19 @@ export let kanjiData = [];
 let stageKanjiMap = {};
 // 学年別の漢字データを保持するオブジェクトを追加
 let kanjiByGrade = {};
+
+// P1(ID規約): 表記揺れ吸収は canonicalizeStageId に集約（ログで可視化）
+// NOTE: getKanjiByStageId など他の関数からも使うため、module scope に置く（ReferenceError防止）
+const __canonWarned = new Set();
+const __canon = (raw) => {
+  const canon = canonicalizeStageId(raw);
+  const r = (raw === null || raw === undefined) ? '' : String(raw);
+  if (r && canon && canon !== r && !__canonWarned.has(r)) {
+    __canonWarned.add(r);
+    console.warn(`[P1] canonicalizeStageId: ${r} -> ${canon}`);
+  }
+  return canon || r;
+};
 
 export async function loadAllGameData() {
   try {
@@ -23,6 +37,7 @@ export async function loadAllGameData() {
     const kanjiArrays = await Promise.all(kanjiPromises);
     kanjiData = kanjiArrays.flat().map(k => ({
       ...k,
+      stageId: Array.isArray(k?.stageId) ? k.stageId.map(__canon) : __canon(k?.stageId),
       incorrectCount: k.incorrectCount ?? 0
     }));
     console.log("漢字データ読み込み完了");
@@ -97,7 +112,7 @@ export async function loadAllGameData() {
         const enemyPath = '/data/enemies_proto.json';
         const enemyResponse = await fetch(enemyPath);
         if (!enemyResponse.ok) throw new Error(`敵データの読み込みに失敗: ${enemyResponse.statusText}`);
-        enemyData = await enemyResponse.json();
+        enemyData = (await enemyResponse.json()).map(e => e && e.stageId ? ({ ...e, stageId: __canon(e.stageId) }) : e);
         console.log("敵データ読み込み完了");
     
                 // 追加: 伝説/幻ゴトモンの読み込みをマージ
@@ -107,9 +122,10 @@ export async function loadAllGameData() {
                     const more = await legendResp.json();
                     // 学年推定: stageId / id プレフィックス
                     const stageIdToGrade = {
-                      hokkaido_bonus: 1, tohoku_bonus: 2, kanto_bonus: 3, kantou_bonus: 3, chubu_bonus: 4, chuubu_bonus: 4,
+                      // P1-2: canonicalizeStageId 前提で、辞書キーは正史（小文字）に寄せる
+                      hokkaido_bonus: 1, tohoku_bonus: 2, kanto_bonus: 3, chubu_bonus: 4,
                       kinki_bonus: 5,
-                      chugoku_bonus: 6, chuugoku_bonus: 6, cyuugoku_bonus: 6,
+                      chugoku_bonus: 6,
                       kyushu_bonus: 6, shikoku_bonus: 6, // 便宜的に6に寄せる（後段のステージ定義で正しく補完）
                       asia_bonus: 7, europe_bonus: 8, america_bonus: 9, africa_bonus: 10,
                     };
@@ -117,14 +133,15 @@ export async function loadAllGameData() {
                       if (!e || !e.id) continue;
                       if (typeof e.grade !== 'number') {
                         let g = null;
-                        if (e.stageId && stageIdToGrade[e.stageId]) g = stageIdToGrade[e.stageId];
+                        const sid = e.stageId ? __canon(e.stageId) : '';
+                        if (sid && stageIdToGrade[sid]) g = stageIdToGrade[sid];
                         else if (String(e.id).startsWith('AS-')) g = 7;
                         else if (String(e.id).startsWith('EUR-')) g = 8;
                         else if (String(e.id).startsWith('AME-')) g = 9;
                         else if (String(e.id).startsWith('AFR-')) g = 10;
                         if (g) e.grade = g;
                       }
-                      enemyData.push(e);
+                      enemyData.push(e && e.stageId ? ({ ...e, stageId: __canon(e.stageId) }) : e);
                     }
                     console.log(`伝説/幻ゴトモン: 追加 ${more.length} 件`);
                   }
@@ -136,7 +153,7 @@ export async function loadAllGameData() {
         const stagePath = '/data/stages_proto.json';
         const stageResponse = await fetch(stagePath);
         if (!stageResponse.ok) throw new Error(`ステージデータの読み込みに失敗: ${stageResponse.statusText}`);
-        stageData = await stageResponse.json();
+        stageData = (await stageResponse.json()).map(s => s && s.stageId ? ({ ...s, stageId: __canon(s.stageId) }) : s);
         console.log("ステージデータ読み込み完了");
     
         // 追加: ボーナスステージ定義のマージ（存在時のみ）
@@ -144,13 +161,14 @@ export async function loadAllGameData() {
           const bonusResp = await fetch('/data/stages.bonus.json').catch(() => null);
           if (bonusResp && bonusResp.ok) {
             const bonusStages = await bonusResp.json();
-            const exists = new Set(stageData.map(s => s.stageId));
+            const exists = new Set(stageData.map(s => s?.stageId).filter(Boolean));
             let added = 0;
             for (const s of bonusStages) {
               if (!s || !s.stageId) continue;
-              if (!exists.has(s.stageId)) {
-                stageData.push(s);
-                exists.add(s.stageId);
+              const sid = __canon(s.stageId);
+              if (!exists.has(sid)) {
+                stageData.push({ ...s, stageId: sid });
+                exists.add(sid);
                 added++;
               }
             }
@@ -413,10 +431,11 @@ export function setStageKanjiMap(map) {
 
 // getKanjiByStageId関数を修正
 export function getKanjiByStageId(stageId) {
-  // ステージIDを正規化（大文字小文字を区別しない）
-  const normalizedId = stageId.toLowerCase();
+  // P1-2: 表記揺れ吸収は canonicalizeStageId に集約し、dataLoader は canonical ID で参照する
+  const rawId = String(stageId || '');
+  const canonId = __canon(rawId);
   // 学年ボーナス: 学年の全漢字を出題
-  const bonusM = /^bonus_g(\d+)$/i.exec(stageId);
+  const bonusM = /^bonus_g(\d+)$/i.exec(rawId);
   if (bonusM) {
     const g = parseInt(bonusM[1], 10);
     console.log(`bonus_g${g}: 学年全漢字プールを使用します`);
@@ -424,27 +443,31 @@ export function getKanjiByStageId(stageId) {
   }
   
   // 中学生ステージの場合、学年に基づいて漢字プールを取得
-  if (normalizedId.startsWith('asia_')) {
+  if (canonId.startsWith('asia_')) {
     console.log('4級（grade 7）の漢字プールを使用します');
     return getKanjiByGrade(7);
-  } else if (normalizedId.startsWith('europe_')) {
+  } else if (canonId.startsWith('europe_')) {
     console.log('3級（grade 8）の漢字プールを使用します');
     return getKanjiByGrade(8);
-  } else if (normalizedId.startsWith('america_')) {
+  } else if (canonId.startsWith('america_')) {
     console.log('準2級（grade 9）の漢字プールを使用します');
     return getKanjiByGrade(9);
-  } else if (normalizedId.startsWith('africa_')) {
+  } else if (canonId.startsWith('africa_')) {
     console.log('2級（grade 10）の漢字プールを使用します');
     return getKanjiByGrade(10);
   }
   
-  // 既存のロジック + 追加フォールバック
-  if (!stageKanjiMap[normalizedId]) {
-    console.log(`stageKanjiMap[${normalizedId}] が見つかりません。正規化されたID: ${normalizedId}`);
+  // canonical で参照
+  if (!stageKanjiMap[canonId]) {
+    // フォールバックは 1回だけ（raw で試す）
+    if (rawId && rawId !== canonId && stageKanjiMap[rawId]) return stageKanjiMap[rawId];
+    console.log(`stageKanjiMap[${canonId}] が見つかりません。canonical ID: ${canonId}`);
 
     // 追加: ステージ定義にある kanjiPoolIdList を直接参照
     try {
-      const st = stageData.find(s => String(s.stageId).toLowerCase() === normalizedId);
+      const st =
+        stageData.find(s => String(s.stageId || '') === canonId) ||
+        (rawId && rawId !== canonId ? stageData.find(s => String(s.stageId || '') === rawId) : null);
       if (st && Array.isArray(st.kanjiPoolIdList) && st.kanjiPoolIdList.length > 0) {
         const pool = st.kanjiPoolIdList.map(id => getKanjiById(id)).filter(Boolean);
         if (pool.length > 0) {
@@ -455,7 +478,7 @@ export function getKanjiByStageId(stageId) {
     } catch {}
 
     // ステージIDから学年を推測
-    const grade = getGradeFromStageId(normalizedId);
+    const grade = getGradeFromStageId(canonId);
     if (grade) {
       console.log(`代替として学年${grade}の漢字 ${kanjiByGrade[grade]?.length || 0}件を使用します。`);
       return kanjiByGrade[grade] || [];
@@ -464,7 +487,7 @@ export function getKanjiByStageId(stageId) {
     return [];
   }
   
-  return stageKanjiMap[normalizedId];
+  return stageKanjiMap[canonId];
 }
 
 // ステージIDから学年を推測するヘルパー関数

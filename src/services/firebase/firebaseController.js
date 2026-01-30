@@ -1,5 +1,6 @@
 // js/firebaseController.js
 import { gameState } from '../../core/gameState.js'; // ★★★ この行が必須 ★★★
+import { getDefaultSave, migrateSave } from '../../core/saveData.js';
 import { firebaseConfig } from './firebaseConfig.js';   // ← 追加
 
 // ---------------------------------------------------------------------------
@@ -10,6 +11,77 @@ import { firebaseConfig } from './firebaseConfig.js';   // ← 追加
 let auth  = null;
 let db    = null;
 let currentUser = null;
+
+// P0-? StepD Step2(Upload): krb_save を起点に Firestore 送信payloadを組み立てる
+const KRB_SAVE_STORAGE_KEY = 'krb_save';
+
+function __readKrbSaveNoWrite() {
+  try {
+    const raw = localStorage.getItem(KRB_SAVE_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // StepD Step2-Upload(安全性): krb_save は migrateSave を通した構造を前提に読む（saveNow は呼ばない）
+    return migrateSave(parsed);
+  } catch {
+    return null;
+  }
+}
+
+function __hasUsableKrbSave() {
+  const save = __readKrbSaveNoWrite();
+  return !!(save && save.meta && typeof save.meta.version === 'number');
+}
+
+function buildProfileSummaryFromSave(save) {
+  const name = save?.player?.name;
+  const stats = save?.player?.coreStats;
+  if (!stats || typeof stats !== 'object') return null;
+
+  return {
+    name: typeof name === 'string' ? name : '',
+    level: stats.level,
+    currentExp: stats.exp,
+    maxHp: stats.maxHp,
+    attack: stats.attack,
+    nextLevelExp: stats.nextLevelExp
+  };
+}
+
+function buildProgressStateSummaryFromSave(save) {
+  // Firestore(progress/state) の既存payload形（DataSync.syncAll と同等）を維持する
+  // - kanjiDex / reviewQueue は現状 krb_save に完全な形で保持されていないため、挙動維持のため既存ローカルキーへフォールバックする
+  const payload = { kanjiDex: null, monsterDex: null, reviewQueue: null };
+
+  // monsterDex: krb_save.player.collection.gotomonIds があればそれを優先
+  const gotomonIds = save?.player?.collection?.gotomonIds;
+  if (Array.isArray(gotomonIds)) {
+    payload.monsterDex = gotomonIds;
+  } else {
+    try {
+      const raw = localStorage.getItem('krb_monster_dex');
+      payload.monsterDex = raw ? JSON.parse(raw) : null;
+    } catch {}
+  }
+
+  // reviewQueue: 互換のためまず既存ローカルキー形（配列オブジェクト）を維持。krb_save 側に同形があれば優先。
+  const rq = save?.player?.study?.reviewQueue;
+  if (Array.isArray(rq) && rq.length > 0 && typeof rq[0] === 'object') {
+    payload.reviewQueue = rq;
+  } else {
+    try {
+      const raw = localStorage.getItem('krb_review_queue');
+      payload.reviewQueue = raw ? JSON.parse(raw) : null;
+    } catch {}
+  }
+
+  // kanjiDex: 既存ローカルキー形（配列）を維持
+  try {
+    const raw = localStorage.getItem('krb_kanji_dex');
+    payload.kanjiDex = raw ? JSON.parse(raw) : null;
+  } catch {}
+
+  return payload;
+}
 
 export function initializeFirebaseServices() {
       try {
@@ -57,7 +129,6 @@ export async function signInAnonymouslyIfNeeded() {
     if (auth.currentUser) {
         currentUser = auth.currentUser;
         console.log("User already signed in (from auth.currentUser):", currentUser.uid);
-        await loadPlayerData(); // 既存ユーザーのデータをロード試行
         return currentUser;
     }
 
@@ -67,7 +138,6 @@ export async function signInAnonymouslyIfNeeded() {
             .then(async (userCredential) => {
                 currentUser = userCredential.user;
                 console.log("New anonymous user signed in:", currentUser.uid);
-                await loadPlayerData(); // 新規ユーザーでもデータをロード試行 (なければ作成)
                 resolve(currentUser);
             })
             .catch((error) => {
@@ -129,21 +199,26 @@ export async function initializeNewPlayerData(uid, playerName = "ななしのご
 
 
 export async function savePlayerData(playerDataToSave) {
-    if (!db || !currentUser || !currentUser.uid || !playerDataToSave) {
-        console.warn("Cannot save player data: Firestore, User not signed in, or playerData is missing.");
+    if (!db || !currentUser || !currentUser.uid) {
+        console.warn("Cannot save player data: Firestore or User not signed in.");
         return;
     }
     const playerProfileRef = db.collection('users').doc(currentUser.uid).collection('profile').doc('playerStats');
-    const dataForFirestore = { // 保存するフィールドを明示
-        name: playerDataToSave.name,
-        level: playerDataToSave.level,
-        currentExp: playerDataToSave.exp, // gameState.playerStats.exp とキー名を合わせる
-        maxHp: playerDataToSave.maxHp,
-        attack: playerDataToSave.attack,
-        nextLevelExp: playerDataToSave.nextLevelExp,
-        // healCount はバトル開始時にリセットされるので、ここでは保存しないか、設計次第
-        lastUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
+    const save = __readKrbSaveNoWrite();
+    const summaryFromSave = buildProfileSummaryFromSave(save);
+    const dataForFirestore = summaryFromSave || (playerDataToSave ? { // 互換fallback（既存呼び出しを壊さない）
+      name: playerDataToSave.name,
+      level: playerDataToSave.level,
+      currentExp: playerDataToSave.exp, // gameState.playerStats.exp とキー名を合わせる
+      maxHp: playerDataToSave.maxHp,
+      attack: playerDataToSave.attack,
+      nextLevelExp: playerDataToSave.nextLevelExp
+    } : null);
+    if (!dataForFirestore) {
+      console.warn("Cannot save player data: payload is missing.");
+      return;
+    }
+    dataForFirestore.lastUpdatedAt = firebase.firestore.FieldValue.serverTimestamp();
     try {
         await playerProfileRef.set(dataForFirestore, { merge: true }); // merge: true で既存フィールドを保持
         console.log("Player data saved to Firestore:", dataForFirestore);
@@ -240,6 +315,88 @@ export async function loadAllStageClearStatus() {
     }
 }
 
+// ---------------------------------------------------------------------------
+// StepD Step2-Download: Firestore → krb_save 復旧（krb_save が無い/破損のときのみ）
+// - gameState へ直流ししない
+// - Firestore はあくまで復旧用の同期キャッシュ
+// ---------------------------------------------------------------------------
+export async function recoverKrbSaveFromFirestoreIfMissing() {
+  // krb_save が既にあれば復旧不要
+  if (__hasUsableKrbSave()) return false;
+
+  if (!db || !currentUser || !currentUser.uid) {
+    console.warn('recoverKrbSaveFromFirestoreIfMissing: Firestore or User not signed in.');
+    return false;
+  }
+
+  try {
+    const uid = currentUser.uid;
+    const playerProfileRef = db.collection('users').doc(uid).collection('profile').doc('playerStats');
+    const progressStateRef = db.collection('users').doc(uid).collection('progress').doc('state');
+
+    const [profileSnap, stateSnap] = await Promise.all([playerProfileRef.get(), progressStateRef.get()]);
+    const profile = profileSnap?.exists ? (profileSnap.data() || {}) : {};
+    const state = stateSnap?.exists ? (stateSnap.data() || {}) : {};
+
+    // --- krb_save を生成 ---
+    const base = getDefaultSave();
+    const save = migrateSave(base);
+
+    // profile/playerStats → krb_save.player.*
+    if (typeof profile.name === 'string') save.player.name = profile.name;
+    if (save.player && save.player.coreStats && typeof save.player.coreStats === 'object') {
+      const cs = save.player.coreStats;
+      const level = parseInt(profile.level, 10);
+      const exp = parseInt(profile.currentExp, 10);
+      const maxHp = parseInt(profile.maxHp, 10);
+      const attack = parseInt(profile.attack, 10);
+      const nextLevelExp = parseInt(profile.nextLevelExp, 10);
+      if (Number.isFinite(level)) cs.level = level;
+      if (Number.isFinite(exp)) cs.exp = exp;
+      if (Number.isFinite(maxHp)) cs.maxHp = maxHp;
+      if (Number.isFinite(attack)) cs.attack = attack;
+      if (Number.isFinite(nextLevelExp)) cs.nextLevelExp = nextLevelExp;
+    }
+
+    // progress/state → 可能な範囲で krb_save とローカルキャッシュへ
+    // monsterDex
+    if (Array.isArray(state.monsterDex)) {
+      const ids = state.monsterDex.filter(x => typeof x === 'string');
+      save.player.collection.gotomonIds = ids;
+      try { localStorage.setItem('krb_monster_dex', JSON.stringify(ids)); } catch {}
+    }
+
+    // reviewQueue（Firestore側はオブジェクト配列想定。krb_save には id 配列として取り込む）
+    if (Array.isArray(state.reviewQueue)) {
+      try { localStorage.setItem('krb_review_queue', JSON.stringify(state.reviewQueue)); } catch {}
+      const ids = state.reviewQueue
+        .map(e => (e && typeof e === 'object' ? e.id : e))
+        .filter(Boolean)
+        .map(x => String(x));
+      save.player.study.reviewQueue = ids;
+    }
+
+    // kanjiDex（krb_save の正史スキーマに無いので、現状はキャッシュキーとしてのみ復旧）
+    if (Array.isArray(state.kanjiDex)) {
+      try { localStorage.setItem('krb_kanji_dex', JSON.stringify(state.kanjiDex)); } catch {}
+    }
+
+    save.meta.lastSavedAt = Date.now();
+
+    try {
+      localStorage.setItem(KRB_SAVE_STORAGE_KEY, JSON.stringify(save));
+      console.log('Recovered krb_save from Firestore (missing/invalid local krb_save).');
+      return true;
+    } catch (e) {
+      console.error('Failed to write recovered krb_save:', e);
+      return false;
+    }
+  } catch (e) {
+    console.error('recoverKrbSaveFromFirestoreIfMissing failed:', e);
+    return false;
+  }
+}
+
 export async function deleteUserData(uid) {
   if (!db || !uid) {
     console.warn('deleteUserData: db or uid missing');
@@ -279,3 +436,39 @@ export async function deleteUserData(uid) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// StepD Step1-1: Firestore アクセス口の一本化（dataSync.js を外部から触らせない）
+// - dataSync.js 自体は変更しない
+// - 循環依存を避けるため動的 import を使用
+// - 例外は握りつぶさず、DataSync 側の戻り値/Promise をそのまま返す
+// ---------------------------------------------------------------------------
+
+/**
+ * Firestore → localStorage の監視を開始（旧 DataSync.initialize）
+ * @returns {Promise<any>} DataSync.initialize() の戻り値をそのまま返す
+ */
+export async function startDataSync() {
+  const mod = await import('./dataSync.js');
+  const DataSync = mod?.default;
+  return DataSync.initialize();
+}
+
+/**
+ * localStorage のキャッシュを Firestore に同期（旧 DataSync.syncAll）
+ * @returns {Promise<any>} DataSync.syncAll() の戻り値をそのまま返す
+ */
+export async function syncAllCaches() {
+  if (!db || !currentUser || !currentUser.uid) {
+    console.warn('syncAllCaches: Firestore or User not signed in.');
+    return;
+  }
+  const ref = db.collection('users').doc(currentUser.uid).collection('progress').doc('state');
+  const save = __readKrbSaveNoWrite();
+  const payload = buildProgressStateSummaryFromSave(save);
+  try {
+    return await ref.set(payload, { merge: true });
+  } catch (e) {
+    // 既存(DataSync.syncAll)と同様に、同期失敗は警告ログに留める（例外はここで完結）
+    console.warn('syncAllCaches error:', e);
+  }
+}

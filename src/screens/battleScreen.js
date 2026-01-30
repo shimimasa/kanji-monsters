@@ -6,6 +6,7 @@ import { publish } from '../core/eventBus.js';
 import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
 import { checkAchievements } from '../core/achievementManager.js';
+import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
@@ -76,6 +77,17 @@ function clearManagedTimeout(id) {
     if (idx !== -1) arr.splice(idx, 1);
   }
 }
+// gameOver 遷移予約を 1系統に統一し、exit/cleanup で必ずキャンセルできるようにする
+function cancelGameOverTransition() {
+  const id = battleScreenState._gameOverTimeoutId;
+  if (id) clearManagedTimeout(id);
+  battleScreenState._gameOverTimeoutId = null;
+}
+function scheduleGameOverTransition(delayMs = 1500) {
+  cancelGameOverTransition(); // 二重予約を防止
+  battleScreenState._gameOverTimeoutId = setManagedTimeout(() => publish('changeScreen', 'gameOver'), delayMs);
+  return battleScreenState._gameOverTimeoutId;
+}
 
 const battleScreenState = {
   canvas: null,
@@ -90,6 +102,7 @@ const battleScreenState = {
   logOffset: 0,
   timerId: null,
   _timeouts: [],
+  _gameOverTimeoutId: null, // gameOver 遷移予約（setManagedTimeout）
   _focusScrollTimers: [], // フォーカス時の再補正タイマー
 
   // ストップウォッチ用
@@ -1084,6 +1097,8 @@ getMaxHealCountFromSettings() {
    */
   getBGMKeyForStage(stageId) {
     const id = String(stageId || '');
+    const canon = canonicalizeStageId(id) || id;
+    const canonLower = canon.toLowerCase();
 
     // ボス
     if (id.includes('boss')) return 'boss';
@@ -1097,34 +1112,30 @@ getMaxHealCountFromSettings() {
     }
 
     // 地域ボーナス: *_bonus を含む すべて
-    if (/_bonus/i.test(id)) {
-      const norm = id.toLowerCase();
-      const fix = { kantou:'kanto', chuubu:'chubu', chuugoku:'chugoku', cyuugoku:'chugoku' };
-      const tokens = ['hokkaido','tohoku','kanto','kantou','chubu','chuubu','kinki','chugoku','chuugoku','cyuugoku','asia','europe','america','africa'];
-      let region = null;
-      for (const t of tokens) {
-        if (norm.includes(t)) { region = fix[t] || t; break; }
-      }
-      // 先頭接頭辞でも推定（hokkaido_* など）
+    if (/_bonus/i.test(canonLower)) {
+      // P1-2: 表記揺れ吸収は canonicalizeStageId に集約し、ここでは canonical から地域を推定する
+      const known = ['hokkaido','tohoku','kanto','chubu','kinki','chugoku','asia','europe','america','africa'];
+      const head = canonLower.split(/[_-]/)[0];
+      let region = known.includes(head) ? head : null;
+      // 念のため: head以外に地域トークンが含まれる場合（互換）
       if (!region) {
-        const head = norm.split(/[_-]/)[0];
-        region = fix[head] || head;
+        for (const t of known) {
+          if (canonLower.includes(t)) { region = t; break; }
+        }
       }
       return this._pickRegionBgm(region);
     }
 
     // 通常: _areaN は a/b からランダム
-    if (/_area\d+$/i.test(id)) {
+    if (/_area\d+$/i.test(canonLower)) {
       const ab = Math.random() < 0.5 ? 'a' : 'b';
-      return `${id}_${ab}`;
+      return `${canon}_${ab}`;
     }
 
     // フォールバック: 既知接頭辞→地域BGM
     {
-      const norm = id.toLowerCase();
-      const fix = { kantou:'kanto', chuubu:'chubu', chuugoku:'chugoku', cyuugoku:'chugoku' };
-      const head = norm.split(/[_-]/)[0];
-      const region = fix[head] || head;
+      const head = canonLower.split(/[_-]/)[0];
+      const region = head;
       const known = ['hokkaido','tohoku','kanto','chubu','kinki','chugoku','asia','europe','america','africa'];
       if (known.includes(region)) return this._pickRegionBgm(region);
     }
@@ -3312,6 +3323,9 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
 }
   },
   exit() {
+    // 画面離脱後に遅延遷移が走らないよう、予約を必ず解除
+    cancelGameOverTransition();
+
     // 入力欄を非表示＆キーイベント解除
     if (this.inputEl) {
       try { this.inputEl.blur(); } catch {}
@@ -5200,7 +5214,7 @@ gameState.playerStats.healsSuccessful++;
       gameState.playerStats.hp = Math.max(0, gameState.playerStats.hp - atk);
       if (gameState.playerStats.hp === 0) {
         if (battleScreenState.timerId) { clearInterval(battleScreenState.timerId); battleScreenState.timerId = null; }
-        return setManagedTimeout(() => publish('changeScreen', 'gameOver'), 1500);
+        return scheduleGameOverTransition(1500);
       }
     }
   }
@@ -5326,7 +5340,7 @@ function enemyTurn() {
       clearInterval(battleScreenState.timerId);
       battleScreenState.timerId = null;
     }
-    return setTimeout(() => publish('changeScreen', 'gameOver'), 1500);
+    return scheduleGameOverTransition(1500);
   }
 }
 
@@ -5490,6 +5504,9 @@ export function cleanup() {
 
   // チャレンジタイマー停止
   if (battleScreenState.timerId) { clearInterval(battleScreenState.timerId); battleScreenState.timerId = null; }
+
+  // 画面離脱後に遅延遷移が走らないよう、予約を必ず解除
+  cancelGameOverTransition();
 
   // ペンディング中のタイムアウト解除
   if (Array.isArray(battleScreenState._timeouts)) {

@@ -4,7 +4,19 @@
 // ◆loadEnemyImage(id)   … 敵スプライトをステージ開始時にプリロード
 // ◆images               … すべての Image オブジェクトをキャッシュ保持
 
+import { canonicalizeStageId } from '../core/idCanonicalizer.js';
+
 export const images = {};                // key → HTMLImageElement
+
+// P2-1: image-pipeline 参照の間接化（将来の移設に備えてパスを定数へ集約）
+// NOTE: 文字列（特にハイフンの種類）が現行と完全一致するように維持すること。
+const ASSET_PATHS = {
+  MONSTER_FULL_PRIMARY: '/assets/images/monsters/full',
+  // NOTE: ここは ASCII ハイフン "-"（/image-pipeline/）が現行
+  MONSTER_FULL_PIPELINE: '/image-pipeline/output/monsters/full',
+  // NOTE: ここは特殊ハイフン "‐"（/image‐pipeline/）が現行
+  MONSTER_PNG_PIPELINE: '/image‐pipeline/monsters',
+};
 
 /* ------------------------------------------------------------------ */
 /*  共通 UI 画像のプリロード                                           */
@@ -113,55 +125,75 @@ export async function loadEnemyImage(enemyImageName) {
  * @returns {Promise<HTMLImageElement|null>}
  */
 export async function loadBgImage(stageId) {
+  // P1-2: 表記揺れ吸収は idCanonicalizer に集約（ここでは最初に canonicalize する）
+  const rawId = (stageId === null || stageId === undefined) ? '' : String(stageId);
+  const canonId = canonicalizeStageId(rawId);
+  const id = canonId || rawId;
+
   // キャッシュ済みならそれを返す
-  const cacheKey = `bg_${stageId}`;
+  const cacheKey = `bg_${id}`;
   if (images[cacheKey]) return images[cacheKey];
   
   const timestamp = Date.now();
 
-  // 補助: 表記ゆれ対応（kanto→kantou, chubu→chuubu, chugoku→cyuugoku, 世界系の頭大文字）
-  const altSpellings = (id) => {
-    const alts = new Set();
-    alts.add(id);
-    // _bonus → _bonus_area も試す
-    if (!id.endsWith('_area')) alts.add(`${id}_area`);
-
-    const repl = (s, a, b) => s.includes(a) ? s.replace(a, b) : null;
-    const v1 = repl(id, 'kanto', 'kantou');        if (v1) { alts.add(v1); alts.add(`${v1}_area`); }
-    const v2 = repl(id, 'chubu', 'chuubu');         if (v2) { alts.add(v2); alts.add(`${v2}_area`); }
-    const v3 = repl(id, 'chugoku', 'cyuugoku');     if (v3) { alts.add(v3); alts.add(`${v3}_area`); }
-    const v4 = repl(id, 'shikoku', 'shikoku');     if (v4) { alts.add(v4); alts.add(`${v4}_area`); }
-    const v5 = repl(id, 'kyushu', 'kyushu');       if (v5) { alts.add(v5); alts.add(`${v5}_area`); }
-
-    // 世界系
-    const world = ['asia','europe','america','africa'];
-    for (const w of world) {
-      if (id.startsWith(`${w}_`)) {
-        const cap = w[0].toUpperCase() + w.slice(1);
-        const wid = id.replace(w, cap);
-        alts.add(wid);
-        alts.add(`${wid}_area`);
-      }
+  // 候補ID: canonical のみを基本にし、最低限の互換だけ残す（アセット命名は変更しないため）
+  // P1-2 方針: 例外（互換候補の追加）は **この2種類まで** とする（これ以上増やさない）。
+  //  1) 世界背景ファイルが先頭大文字(Asia_*)で存在する互換
+  //  2) kanto_bonus のみ kantou_bonus が既存アセットとして存在する互換
+  const candidates = new Set();
+  if (id) candidates.add(id);
+  // 念のため呼び出し元が未正規化だった場合に備え、raw も試す
+  if (rawId && rawId !== id) candidates.add(rawId);
+  // _area 付与（例: *_bonus → *_bonus_area）
+  for (const s of Array.from(candidates)) {
+    if (s && !s.endsWith('_area')) candidates.add(`${s}_area`);
+  }
+  // 互換(例外1): 世界背景ファイルは先頭大文字(Asia_*)で存在するため、その候補も試す
+  const __exceptionTags = [];
+  for (const s of Array.from(candidates)) {
+    const m = /^(asia|europe|america|africa)_(.+)$/i.exec(String(s || ''));
+    if (!m) continue;
+    const cap = m[1][0].toUpperCase() + m[1].slice(1).toLowerCase();
+    candidates.add(`${cap}_${m[2]}`);
+    if (!String(m[2]).endsWith('_area') && !String(s).endsWith('_area')) {
+      candidates.add(`${cap}_${m[2]}_area`);
     }
-    return Array.from(alts);
-  };
+    if (!__exceptionTags.includes('world-capitalized')) __exceptionTags.push('world-capitalized');
+  }
+  // 互換(例外2): 既存アセットに kantou_bonus_area があるため、kanto_bonus はそれも試す
+  if (id === 'kanto_bonus' || id === 'kanto_bonus_area') {
+    candidates.add('kantou_bonus');
+    candidates.add('kantou_bonus_area');
+    if (!__exceptionTags.includes('kanto_bonus->kantou_bonus')) __exceptionTags.push('kanto_bonus->kantou_bonus');
+  }
+  // 過剰ログ禁止: 例外が発動した場合のみ 1回だけ warn
+  if (__exceptionTags.length > 0) {
+    console.warn(`[P1] loadBgImage candidates: applied exceptions = ${__exceptionTags.join(', ')}`);
+  }
 
   // 地域名抽出（フォールバック用）
-  const regionName = stageId.split('_')[0];
+  const regionName = String(id || '').split('_')[0];
+  const worldCapRegionName = ['asia','europe','america','africa'].includes(regionName)
+    ? (regionName[0].toUpperCase() + regionName.slice(1))
+    : null;
 
   // 試行パスを列挙
   const pathsToTry = [];
   // 1) そのまま
-  pathsToTry.push(`/assets/images/backgrounds/${stageId}.webp?v=${timestamp}`);
-  // 2) 表記ゆれ・_area などの候補
-  for (const a of altSpellings(stageId)) {
+  pathsToTry.push(`/assets/images/backgrounds/${id}.webp?v=${timestamp}`);
+  // 2) 最小限の候補
+  for (const a of candidates) {
     pathsToTry.push(`/assets/images/backgrounds/${a}.webp?v=${timestamp}`);
   }
   // 3) 地域 area1 の汎用フォールバック（webp → png の順）
   pathsToTry.push(`/assets/images/backgrounds/${regionName}_area1.webp?v=${timestamp}`);
   pathsToTry.push(`/assets/images/backgrounds/${regionName}_area1.png?v=${timestamp}`);
+  if (worldCapRegionName) {
+    pathsToTry.push(`/assets/images/backgrounds/${worldCapRegionName}_area1.webp?v=${timestamp}`);
+    pathsToTry.push(`/assets/images/backgrounds/${worldCapRegionName}_area1.png?v=${timestamp}`);
+  }
   // 4) 学年別のステージ選択画像（最終フォールバック）
-  pathsToTry.push(`/assets/images/stage.select/stage.select${getGradeFromStageId(stageId)}.png?v=${timestamp}`);
+  pathsToTry.push(`/assets/images/stage.select/stage.select${getGradeFromStageId(id)}.png?v=${timestamp}`);
 
   for (const path of pathsToTry) {
     try {
@@ -182,7 +214,7 @@ export async function loadBgImage(stageId) {
     images[cacheKey] = fallbackImg;
     return fallbackImg;
   } catch {
-    console.error(`すべての背景画像読み込みに失敗: ${stageId}`);
+    console.error(`すべての背景画像読み込みに失敗: ${id || stageId}`);
     return null;
   }
 }
@@ -227,12 +259,14 @@ const gradeFolderMap = {
   if (enemyId.startsWith('PRV-')) {
     pathsToTry.push(
       // 1. WebP形式の画像（monsters/full/フォルダ内）
-      `/assets/images/monsters/full/${enemyId}.webp`,
-      // 2. image-pipeline内のWebP画像
-      `/image-pipeline/output/monsters/full/${enemyId}.webp`,
-      // 3. PNG形式の代替
-      `/image‐pipeline/monsters/monster_${enemyId.replace('PRV-E', '')}.png`
+      `${ASSET_PATHS.MONSTER_FULL_PRIMARY}/${enemyId}.webp`,
+      // NOTE(P2): PRV は今後使わない方針のため、image-pipeline 参照は無害化（候補から除外）
+      // // 2. image-pipeline内のWebP画像
+      // `${ASSET_PATHS.MONSTER_FULL_PIPELINE}/${enemyId}.webp`,
+      // // 3. PNG形式の代替
+      // `${ASSET_PATHS.MONSTER_PNG_PIPELINE}/monster_${enemyId.replace('PRV-E', '')}.png`
     );
+    // 文字列の最終出力は旧コードと完全一致（パス/順序/候補数は不変）
   } else {
     // 小学生ステージ用の既存のパス
     pathsToTry.push(
@@ -311,12 +345,37 @@ const gradeFolderMap = {
 /*  汎用ロードユーティリティ                                           */
 /* ------------------------------------------------------------------ */
 
+// P3-2: 調査可能化のみ（挙動は変えない）
+// 画像ロード失敗時に「SPAリライトでHTMLが返っている」ケースを特定できるログを1行だけ出す（URLごとに1回）
+const __assetHtmlWarnedUrls = new Set();
+function __warnIfHtmlAssetResponse(src) {
+  try {
+    // 失敗時のみ、追加コスト最小で判定する（成功パスは一切変更しない）
+    fetch(src, { method: 'GET', cache: 'no-store' })
+      .then(res => {
+        const ct = res?.headers?.get?.('content-type') || '';
+        if (typeof ct === 'string' && ct.includes('text/html')) {
+          if (!__assetHtmlWarnedUrls.has(src)) {
+            __assetHtmlWarnedUrls.add(src);
+            console.warn(`[ASSET] got HTML for asset url (SPA rewrite?): ${src}`);
+          }
+        }
+      })
+      .catch(() => {});
+  } catch {
+    // no-op（元のonerror挙動は維持）
+  }
+}
+
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'Anonymous'; // CORS対応
     img.onload = () => resolve(img);
-    img.onerror = (e) => reject(new Error(`画像の読み込みに失敗: ${src}`));
+    img.onerror = () => {
+      __warnIfHtmlAssetResponse(src);
+      reject(new Error(`画像の読み込みに失敗: ${src}`));
+    };
     img.src = src;
   });
 }
@@ -370,7 +429,10 @@ function loadImageWithTransparency(src) {
       processedImg.src = canvas.toDataURL('image/png');
     };
     
-    img.onerror = (e) => reject(new Error(`画像の読み込みに失敗: ${src}`));
+    img.onerror = () => {
+      __warnIfHtmlAssetResponse(src);
+      reject(new Error(`画像の読み込みに失敗: ${src}`));
+    };
     img.src = src;
   });
 }
@@ -547,25 +609,27 @@ export function drawStoneButton(ctx, button, isHovered, isPressed) {
 
 // ステージIDから学年を取得するヘルパー関数
 function getGradeFromStageId(stageId) {
+  // P1-2 Step4: 表記揺れ吸収は canonicalizeStageId に集約し、ここは canonical 前提で判定する
+  const id = canonicalizeStageId(String(stageId || '')) || String(stageId || '');
   // 世界
-  if (stageId.startsWith('Asia_') || stageId.startsWith('asia_')) return 12; // 4級
-  if (stageId.startsWith('Europe_') || stageId.startsWith('europe_')) return 13; // 3級
-  if (stageId.startsWith('America_') || stageId.startsWith('america_')) return 14; // 準2級
-  if (stageId.startsWith('Africa_') || stageId.startsWith('africa_')) return 15; // 2級
+  if (id.startsWith('asia_')) return 12; // 4級
+  if (id.startsWith('europe_')) return 13; // 3級
+  if (id.startsWith('america_')) return 14; // 準2級
+  if (id.startsWith('africa_')) return 15; // 2級
   
   // 日本（_area / _bonus ともに対応）
   const gradeMapping = {
     hokkaido_: 1,
     tohoku_: 2,
-    kanto_: 3, kantou_: 3,
-    chubu_: 4, chuubu_: 4,
+    kanto_: 3,
+    chubu_: 4,
     kinki_: 5,
-    chugoku_: 6, chuugoku_: 6, cyuugoku_: 6,
+    chugoku_: 6,
     shikoku_: 11,     // 追加
     kyushu_: 12,      // 追加
   };
   for (const prefix in gradeMapping) {
-    if (stageId.startsWith(prefix)) return gradeMapping[prefix];
+    if (id.startsWith(prefix)) return gradeMapping[prefix];
   }
   return '';
 }

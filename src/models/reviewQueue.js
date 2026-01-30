@@ -2,8 +2,6 @@
 // localStorage に SM-2 用のレビューキューを永続化
 // 格納データ例：{ id, repetition, interval, eFactor, nextReviewAt }
 
-import DataSync from '../services/firebase/dataSync.js';
-
 const reviewQueue = (() => {
   const STORAGE_KEY = 'krb_review_queue';
   /** @type {Array<{id:string, repetition:number, interval:number, eFactor:number, nextReviewAt:number}>} */
@@ -28,7 +26,9 @@ const reviewQueue = (() => {
     } catch (e) {
       console.error('ReviewQueue の保存に失敗しました:', e);
     }
-    DataSync.syncAll();
+    import('../services/firebase/firebaseController.js')
+      .then(m => m.syncAllCaches?.())
+      .catch(() => {});
   };
 
   load();

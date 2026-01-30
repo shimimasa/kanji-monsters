@@ -1,7 +1,8 @@
 // src/screens/monsterCaptureScreen.js
 import { publish } from '../core/eventBus.js';
-import { gameState } from '../core/gameState.js';
+import { gameState, saveGameData } from '../core/gameState.js';
 import { addMonster, loadDex } from '../models/monsterDex.js';
+import { getStageClearCount } from '../core/saveData.js';
 
 import { getAllMonsterIds, getMonsterById, stageData } from '../loaders/dataLoader.js';
 const monsterCaptureScreen = {
@@ -229,9 +230,8 @@ const monsterCaptureScreen = {
   },
 
   _getStageClearCount(stageId) {
-    if (!stageId) return 0;
-    const key = `stage_clear_${stageId}`;
-    return parseInt(localStorage.getItem(key) || '0');
+    // P0-2 StepB-2(最小差分): 読み取り入口を saveData.getStageClearCount() に寄せる（現状は legacy 読みなので挙動は同等）
+    return getStageClearCount(stageId);
   },
 
   _incrementStageClearCount(stageId) {
@@ -243,7 +243,7 @@ const monsterCaptureScreen = {
       try {
         const mg = /^bonus_g(\d+)$/i.exec(String(stageId));
         const g = parseInt(mg[1], 10);
-        localStorage.setItem(`stage_first_clear_at_${stageId}`, String(Date.now()));
+        const firstClearAt = Date.now();
         if (!gameState.practiceProgress) gameState.practiceProgress = {};
         const targets = Array.isArray(stageData) ? stageData.filter(s => s && s.grade === g) : [];
         for (const stg of targets) {
@@ -255,10 +255,14 @@ const monsterCaptureScreen = {
             gameState.practiceProgress[sid] = entry;
           }
         }
-        try { if (typeof saveGameData === 'function') saveGameData(); } catch {}
+        // P0-2 StepA(例外A): stage_first_clear_at_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
+        try { saveGameData(); } catch {}
+        // P0-2 StepC-2: stage_first_clear_at_* 互換ミラー書き込みを停止（読み取り互換は saveData.getStageFirstClearAt の legacy fallback で維持）
+        // localStorage.setItem(`stage_first_clear_at_${stageId}`, String(firstClearAt));
       } catch {}
     }
-    localStorage.setItem(key, String(current + 1));
+    // P0-2 StepC-3: stage_clear_* 互換ミラー書き込みを停止（読み取り互換は saveData.getStageClearCount の legacy fallback で維持）
+    // localStorage.setItem(key, String(current + 1));
   },
 
   _goResultWin() {

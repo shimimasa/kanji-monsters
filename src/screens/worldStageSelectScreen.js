@@ -9,6 +9,7 @@ import { isBonusUnlocked } from '../core/bonusManager.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { getEnemiesByStageId } from '../loaders/dataLoader.js';
 import { loadDex } from '../models/monsterDex.js';
+import { isStageCleared as isStageClearedSSoT } from '../core/saveData.js';
 // === 1. importの後に共通関数を追加 ===
 
 
@@ -665,7 +666,7 @@ if (this.isReviewMode) {
 
   /** ステージのクリア状況を確認 */
   isStageCleared(stageId) {
-    const localStorageCleared = localStorage.getItem(`clear_${stageId}`);
+    const localStorageCleared = isStageClearedSSoT(stageId); // P0-2 StepB-2(中影響/最小差分): clear_* 直読を集約関数へ
     const gameStateCleared = gameState.stageProgress && gameState.stageProgress[stageId]?.cleared;
     return localStorageCleared || gameStateCleared;
   },

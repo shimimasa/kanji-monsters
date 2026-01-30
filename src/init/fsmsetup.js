@@ -1,5 +1,6 @@
 // src/init/fsmSetup.js
-import { FSM } from '../core/stateMachine.js';
+// P0-1 Step3-2: FSM実装の正史を core/fsm.js に統一（互換挙動は core/fsm.js 側で担保）
+import { FSM } from '../core/fsm.js';
 import { gameState } from '../core/gameState.js';
 import battleFactory       from '../states/battleStateFactory.js';
 import gradeSelectState    from '../states/gradeSelectState.js';
@@ -109,10 +110,18 @@ export async function setupFSM() {
     // その他の画面への遷移
     fsm.change(name, props);
   }
-  subscribe('changeScreen', switchScreen);
+  // P0-1(設計憲法A): changeScreen payload（string / {name,props} / [name,props]）を setupFSM 側で正規化し、遷移入口をここに集約する
+  function __normalizeChangeScreenPayload(payload) {
+    if (Array.isArray(payload)) return switchScreen(payload[0], payload[1]);
+    if (payload && typeof payload === 'object' && 'name' in payload) return switchScreen(payload.name, payload.props);
+    return switchScreen(payload);
+  }
+  subscribe('changeScreen', __normalizeChangeScreenPayload);
 
-  // デバッグ用にグローバル公開
-  window.switchScreen = switchScreen;
+  // P0-1 Step5(設計憲法A): window.switchScreen は開発/デバッグ用途限定（production では露出しない）
+  if (import.meta?.env?.DEV) {
+    window.switchScreen = switchScreen;
+  }
 
   return fsm;
 }

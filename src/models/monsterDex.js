@@ -3,8 +3,6 @@
 // localStorage に Set<string> 形式で永続化
 // 使用キー: 'krb_monster_dex', 'krb_seen_monsters'
 
-import DataSync from '../services/firebase/dataSync.js';
-
 const STORAGE_KEY = 'krb_monster_dex';
 const SEEN_STORAGE_KEY = 'krb_seen_monsters';
 
@@ -35,7 +33,9 @@ export function loadFavorites() {
 export function saveFavorites(favSet) {
   try {
     localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favSet]));
-    DataSync.syncAll();
+    import('../services/firebase/firebaseController.js')
+      .then(m => m.syncAllCaches?.())
+      .catch(() => {});
   } catch (e) {
     console.error('monsterDex: お気に入りの保存に失敗しました', e);
   }
@@ -84,7 +84,9 @@ export function loadSeenMonsters() {
 export function saveDex(dex) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...dex]));
-    DataSync.syncAll();
+    import('../services/firebase/firebaseController.js')
+      .then(m => m.syncAllCaches?.())
+      .catch(() => {});
   } catch (e) {
     console.error('monsterDex: 図鑑の保存に失敗しました', e);
   }
@@ -97,7 +99,9 @@ export function saveDex(dex) {
 export function saveSeenMonsters(seenSet) {
   try {
     localStorage.setItem(SEEN_STORAGE_KEY, JSON.stringify([...seenSet]));
-    DataSync.syncAll();
+    import('../services/firebase/firebaseController.js')
+      .then(m => m.syncAllCaches?.())
+      .catch(() => {});
   } catch (e) {
     console.error('monsterDex: 確認済みモンスターの保存に失敗しました', e);
   }

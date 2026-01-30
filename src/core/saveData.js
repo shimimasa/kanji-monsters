@@ -113,6 +113,20 @@ export function migrateSave(save) {
     save.player.study = Object.assign({}, d.player.study, save.player.study || {});
     save.settings = Object.assign({}, d.settings, save.settings || {});
     save.flags = Object.assign({}, d.flags, save.flags || {});
+
+    // StepB-3: 旧クリアキー（clear_* / stage_clear_*）との差を縮めるため、
+    // 既存 krb_save(v1) に対しても「1回だけ」legacy進捗を取り込む。
+    // これにより、clearedStages が空（または欠損補完で空）でも legacy fallback が無視され続ける事故を防ぐ。
+    let changed = false;
+    if (!save.meta.legacyStageProgressMerged) {
+      const ok = mergeLegacyStageProgressKeys(save);
+      if (ok) {
+        save.meta.legacyStageProgressMerged = true;
+        changed = true;
+      }
+    }
+    if (changed) return Object.assign({}, save); // loadSave 側で saveNow されるよう参照を変える
+
     return save;
   }
 
@@ -135,6 +149,65 @@ export function saveNow(save) {
 
 export function clearSave() {
   try { localStorage.removeItem(STORAGE_KEY); } catch {}
+}
+
+// ---------- StepB-1: 読み取り入口の集約（SSoT=krb_save 優先） ----------
+//
+// 目的: clear_* / stage_clear_* / stage_first_clear_at_* の読み取りを 1箇所に集約する。
+// - 新しい保存キー/スキーマは作らない（read-only）
+// - 既存挙動は fallback(localStorage) で維持する
+// - 注意: loadSave() は migrate に伴い saveNow() を呼び得るため、ここでは「読み取り専用」で krb_save を読む。
+
+function __readKrbSaveNoWrite() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return migrateSave(parsed);
+  } catch {
+    return null;
+  }
+}
+
+export function isStageCleared(stageId) {
+  const id = String(stageId || '');
+  if (!id) return false;
+
+  const save = __readKrbSaveNoWrite();
+  const clearedStages = save?.player?.progress?.clearedStages;
+  if (Array.isArray(clearedStages)) {
+    return clearedStages.includes(id);
+  }
+
+  // fallback: legacy
+  try { return localStorage.getItem(`clear_${id}`) === '1'; } catch {}
+  return false;
+}
+
+export function getStageClearCount(stageId) {
+  const id = String(stageId || '');
+  if (!id) return 0;
+
+  // StepB-1: クリア回数は現状 krb_save 正史に保持されていないため、legacy(localStorage) のみを参照する（read-only）
+  try {
+    const raw = localStorage.getItem(`stage_clear_${id}`);
+    const n = parseInt(raw || '0', 10);
+    return Number.isFinite(n) ? n : 0;
+  } catch {}
+  return 0;
+}
+
+export function getStageFirstClearAt(stageId) {
+  const id = String(stageId || '');
+  if (!id) return null;
+
+  // StepB-1: 初回クリア日時は現状 krb_save 正史に保持されていないため、legacy(localStorage) のみを参照する（read-only）
+  try {
+    const raw = localStorage.getItem(`stage_first_clear_at_${id}`);
+    const n = parseInt(raw || '', 10);
+    return Number.isFinite(n) ? n : null;
+  } catch {}
+  return null;
 }
 
 // ---------- 内部: レガシー取り込み ----------
@@ -200,20 +273,7 @@ function mergeAmbientKeys(saveObj) {
   if (last) saveObj.player.progress.currentStage = last;
 
   // ステージクリア（clear_*, stage_clear_* 両対応）
-  const cleared = new Set(Array.isArray(saveObj.player.progress.clearedStages) ? saveObj.player.progress.clearedStages : []);
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (!k) continue;
-    if (k.startsWith('clear_') && localStorage.getItem(k) === '1') {
-      cleared.add(k.replace(/^clear_/, ''));
-    }
-    if (k.startsWith('stage_clear_')) {
-      const id = k.replace(/^stage_clear_/, '');
-      const v = parseInt(localStorage.getItem(k) || '0', 10);
-      if (v > 0) cleared.add(id);
-    }
-  }
-  saveObj.player.progress.clearedStages = Array.from(cleared);
+  mergeLegacyStageProgressKeys(saveObj);
 
   // 図鑑
   try {
@@ -226,6 +286,30 @@ function mergeAmbientKeys(saveObj) {
     const rq = JSON.parse(localStorage.getItem('krb_review_queue') || '[]');
     if (Array.isArray(rq)) saveObj.player.study.reviewQueue = rq.map(e => e?.id).filter(Boolean);
   } catch {}
+}
+
+function mergeLegacyStageProgressKeys(saveObj) {
+  try {
+    const cleared = new Set(Array.isArray(saveObj.player?.progress?.clearedStages) ? saveObj.player.progress.clearedStages : []);
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k) continue;
+      if (k.startsWith('clear_') && localStorage.getItem(k) === '1') {
+        cleared.add(k.replace(/^clear_/, ''));
+      }
+      if (k.startsWith('stage_clear_')) {
+        const id = k.replace(/^stage_clear_/, '');
+        const v = parseInt(localStorage.getItem(k) || '0', 10);
+        if (v > 0) cleared.add(id);
+      }
+    }
+    if (!saveObj.player) saveObj.player = getDefaultSave().player;
+    if (!saveObj.player.progress) saveObj.player.progress = getDefaultSave().player.progress;
+    saveObj.player.progress.clearedStages = Array.from(cleared);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function clamp01(v) { return Math.max(0, Math.min(1, v)); }

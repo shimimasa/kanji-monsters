@@ -1,20 +1,20 @@
 /* ----------------------------- 依存モジュール ----------------------------- */
-import { gameState, updatePlayerName, saveGameData } from './core/gameState.js';
+import { gameState, updatePlayerName, saveGameData, loadGameData } from './core/gameState.js';
 import { setCanvas, update as updateScreen, render as renderScreen } from './core/screenManager.js';
 import { loadAll as loadUIImages } from './loaders/assetsLoader.js';
 import { loadKanjiGradesPhased } from './loaders/dataLoader.js';
 import {
   initializeFirebaseServices,
   signInAnonymouslyIfNeeded,
-  loadAllStageClearStatus,
   getCurrentUser,
   initializeNewPlayerData,
-  loadPlayerData
+  recoverKrbSaveFromFirestoreIfMissing,
+  syncAllCaches,
+  startDataSync
 } from './services/firebase/firebaseController.js';
 import { showBootProgress, updateBootProgress, hideBootProgress } from './ui/bootProgress.js';
 import { AudioManager } from './audio/audioManager.js';
 import reviewQueue from './models/reviewQueue.js';
-import DataSync from './services/firebase/dataSync.js';
 import { FSM } from './core/stateMachine.js';
 import { setupFSM } from './init/fsmsetup.js';
 import { checkAchievements } from './core/achievementManager.js';
@@ -184,10 +184,13 @@ function drawAchievementNotifications(ctx) {
   const user = await signInAnonymouslyIfNeeded();
   console.log('UID:', user?.uid);
   
-  // loadPlayerData()はsignInAnonymouslyIfNeeded()内で既に呼び出されているため、
-  // ここでの重複呼び出しは不要です
-  
-  await loadAllStageClearStatus();
+  // StepD Step2-Download: Firestore からの読み取りは「krb_save が無い/破損」時のみ復旧用途で行う
+  const recovered = await recoverKrbSaveFromFirestoreIfMissing();
+  console.log('[StepD Step2-Download] recovered krb_save from Firestore:', recovered);
+  // リロードは禁止：FirestoreでgameStateを上書きせず、ローカル(krb_save)を読み直して反映する
+  if (recovered) {
+    try { await loadGameData(); } catch {}
+  }
 
   // セーブデータ読み込み完了後に実績チェックを実行（プレイ時間や累計系実績のチェック）
   try {
@@ -196,9 +199,6 @@ function drawAchievementNotifications(ctx) {
   } catch (error) {
     console.error('❌ ゲーム起動時の実績チェックでエラー:', error);
   }
-
-  // プレイヤーデータを読み込む処理を追加
-  await loadPlayerData();
 
   // ─────────── プレイヤー名自動入力 ───────────
   // データ未設定時に名前を聞いて gameState にセット、Firestore に書き込む
@@ -217,7 +217,13 @@ function drawAchievementNotifications(ctx) {
   gameState.currentStageId = 'hokkaido_area1';
 
   // DataSync 初期化（Firestore → localStorage のマージ監視開始）
-  DataSync.initialize();
+  startDataSync();
+  // StepD Step3-2A: キャッシュ用途の任意同期トリガ（失敗してもゲーム進行は継続）
+  try {
+    syncAllCaches()
+      .then(() => console.log('[StepD Step3-2A] syncAllCaches done'))
+      .catch(() => {});
+  } catch {}
 
    // 4) FSMは既に初期状態で'title'画面を設定済みのため、追加の画面遷移は不要
 

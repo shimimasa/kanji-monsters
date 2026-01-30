@@ -1,6 +1,7 @@
 // js/screens/regionSelectScreen.js
 import { publish } from '../core/eventBus.js';
 import { gameState } from '../core/gameState.js';
+import { isStageCleared } from '../core/saveData.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { images } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
@@ -94,7 +95,7 @@ const regionSelectState = {
     if (regionStages.length === 0) return 0;
     // クリア済みステージ数を計算
     const clearedStages = regionStages.filter(stage => {
-      const localStorageCleared = localStorage.getItem(`clear_${stage.stageId}`);
+      const localStorageCleared = isStageCleared(stage.stageId); // P0-2 StepB-2(中影響/最小差分): clear_* 直読を集約関数へ
       const gameStateCleared = gameState.stageProgress && gameState.stageProgress[stage.stageId]?.cleared;
       return localStorageCleared || gameStateCleared;
     });
@@ -704,7 +705,7 @@ const regionSelectState = {
     const progress = this.calculateRegionProgress(marker.grade);
     const regionStages = stageData.filter(stage => stage.grade === marker.grade && this.isNormalStage(stage));
     const clearedStages = regionStages.filter(stage => {
-      const localStorageCleared = localStorage.getItem(`clear_${stage.stageId}`);
+      const localStorageCleared = isStageCleared(stage.stageId); // P0-2 StepB-2(最小差分): clear_* 直読を集約関数へ（表示用の達成率計算のみ）
       const gameStateCleared = gameState.stageProgress && gameState.stageProgress[stage.stageId]?.cleared;
       return localStorageCleared || gameStateCleared;
     });
