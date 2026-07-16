@@ -3,21 +3,9 @@ import ReviewQueue from '../models/reviewQueue.js';
 import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
 import { gameState } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
+import { toHiragana, getReadings } from '../utils/readings.js';
 
-// 文字正規化（reviewStage と同仕様）
-function hiraShift(ch) { return String.fromCharCode(ch.charCodeAt(0) - 0x60); }
-function toHiragana(input) {
-  return (input || '')
-    .trim()
-    .replace(/\s+/g, '')
-    .replace(/[\u30a1-\u30f6]/g, hiraShift);
-}
-function getReadings(kanji) {
-  const set = new Set();
-  if (kanji?.kunyomi) kanji.kunyomi.split(' ').forEach(r => r && set.add(toHiragana(r.trim())));
-  if (kanji?.onyomi)  kanji.onyomi.split(' ').forEach(r => r && set.add(toHiragana(r.trim())));
-  return [...set];
-}
+// 読みの正規化・取得は共通実装を使用（配列/文字列データ両対応）
 
 const BTN = {
   back:   { x: 20, y: 20, w: 120, h: 36, label: 'ステージ選択' },

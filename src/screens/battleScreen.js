@@ -7,6 +7,7 @@ import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
 import reviewQueue from '../models/reviewQueue.js';
 import { drawRoundedRect as traceRoundedRect } from '../ui/canvasUtils.js';
+import { toHiragana, getReadings } from '../utils/readings.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
@@ -5580,59 +5581,7 @@ function waitForDefeatAnimationThen(callback) {
 }
 
 /* ---------- ユーティリティ ---------- */
-const hiraShift = ch => String.fromCharCode(ch.charCodeAt(0) - 0x60);
-const toHira = s => s.replace(/[\u30a1-\u30f6]/g, hiraShift).trim();
-
-// getReadings 関数を修正
-function getReadings(k) {
-  const set = new Set();
-  
-  // kunyomiの処理：配列か文字列かをチェック
-  if (k.kunyomi) {
-    if (Array.isArray(k.kunyomi)) {
-      // 既に配列の場合
-      k.kunyomi.forEach(r => {
-        if (r && typeof r === 'string') {
-          set.add(toHira(r.trim()));
-        }
-      });
-    } else if (typeof k.kunyomi === 'string') {
-      // 文字列の場合
-      k.kunyomi.split(' ').forEach(r => {
-        if (r) set.add(toHira(r.trim()));
-      });
-    }
-  }
-  
-  // onyomiの処理：配列か文字列かをチェック
-  if (k.onyomi) {
-    if (Array.isArray(k.onyomi)) {
-      // 既に配列の場合
-      k.onyomi.forEach(r => {
-        if (r && typeof r === 'string') {
-          set.add(toHira(r.trim()));
-        }
-      });
-    } else if (typeof k.onyomi === 'string') {
-      // 文字列の場合
-      k.onyomi.split(' ').forEach(r => {
-        if (r) set.add(toHira(r.trim()));
-      });
-    }
-  }
-  
-  return [...set].filter(Boolean); // undefined や空文字を除外
-}
-
-// battleScreen.js の normalizeReading 関数を改善
-function toHiragana(input) {
-  if (!input) return '';
-  // 全角スペース、半角スペースをトリム
-  let normalized = input.trim().replace(/\s+/g, '');
-  // カタカナをひらがなに変換
-  normalized = toHira(normalized);
-  return normalized;
-}
+// 読みの正規化・取得は src/utils/readings.js に集約（toHiragana / getReadings を import）
 
 /**
  * 経験値バーを描画する関数（改良版）

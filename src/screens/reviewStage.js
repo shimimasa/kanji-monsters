@@ -2,31 +2,9 @@ import { publish } from '../core/eventBus.js';
 import ReviewQueue   from '../models/reviewQueue.js';
 import { getKanjiById } from '../loaders/dataLoader.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
+import { toHiragana, getReadings } from '../utils/readings.js';
 
-// 追加：バトル画面と同じ読み判定ロジックを再現するユーティリティ
-function hiraShift(ch) {
-  return String.fromCharCode(ch.charCodeAt(0) - 0x60);
-}
-function toHiragana(input) {
-  return input
-    .trim()
-    .replace(/\s+/g, '')
-    .replace(/[\u30a1-\u30f6]/g, hiraShift);
-}
-function getReadings(data) {
-  const set = new Set();
-  if (data.kunyomi) {
-    data.kunyomi.split(' ').forEach(r => {
-      if (r) set.add(toHiragana(r.trim()));
-    });
-  }
-  if (data.onyomi) {
-    data.onyomi.split(' ').forEach(r => {
-      if (r) set.add(toHiragana(r.trim()));
-    });
-  }
-  return [...set];
-}
+// 読みの正規化・取得は共通実装を使用（配列/文字列データ両対応）
 
 const reviewStage = {
   canvas: null,
