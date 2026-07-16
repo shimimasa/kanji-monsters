@@ -170,7 +170,31 @@ const profileScreen = {
     barsCard.appendChild(makeBar('モンスター収集', summary.collection.monsterCount, summary.collection.monsterCount));
     barsCard.appendChild(makeBar('マスター漢字（セッション）', summary.collection.masteredCount, summary.collection.kanjiCount || 1));
 
-    statsTop.append(infoCard, barsCard);
+    // こんしゅうのがんばり（週次の成長を見せる）
+    const weeklyCard = document.createElement('div');
+    weeklyCard.style.background = 'rgba(0,0,0,0.35)';
+    weeklyCard.style.border = '1px solid #8B4513';
+    weeklyCard.style.padding = '12px';
+    weeklyCard.style.borderRadius = '10px';
+    const weekly = summary.weekly || { thisWeek: 0, lastWeek: 0, diff: 0 };
+    let weeklyMessage;
+    if (weekly.thisWeek === 0 && weekly.lastWeek === 0) {
+      weeklyMessage = 'こんしゅうから きろくがはじまるよ！';
+    } else if (weekly.diff > 0) {
+      weeklyMessage = `先週より +${weekly.diff}回 よめた！`;
+    } else if (weekly.diff === 0) {
+      weeklyMessage = '先週とおなじペースだよ';
+    } else {
+      weeklyMessage = `先週のペースまで あと${-weekly.diff}回`;
+    }
+    weeklyCard.innerHTML = `
+      <h3 style="margin:0 0 8px; font-size:16px;">こんしゅうのがんばり</h3>
+      <div style="font-size:24px; font-weight:700;">${weekly.thisWeek}回 よめた</div>
+      <div style="opacity:0.85;">先週: ${weekly.lastWeek}回</div>
+      <div style="color:#7CFC9A; margin-top:6px; font-weight:700;">${weeklyMessage}</div>
+    `;
+
+    statsTop.append(infoCard, barsCard, weeklyCard);
     statsDiv.appendChild(statsTop);
 
 

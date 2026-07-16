@@ -5,7 +5,7 @@
 
 import { publish } from '../core/eventBus.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
-import { gameState } from '../core/gameState.js';
+import { gameState, saveGameData } from '../core/gameState.js';
 import { calcFailXP } from '../core/bonusManager.js';
 import { addPlayerExp } from '../core/gameState.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
@@ -62,6 +62,9 @@ const gameOverState = {
 
     // アニメーションタイマーを初期化
     this.animationTime = 0;
+
+    // 敗北時にもここまでの学習記録（正答・日別カウンタ等）を保存する
+    try { saveGameData(); } catch {}
 
     // イベントハンドラ登録
     this.registerHandlers();
