@@ -25,13 +25,6 @@ export class AudioManager {
       this.loadVolumeSettings();
     }
 
-    setMasterVolume(value) {
-      this.#masterVolume = Math.max(0, Math.min(1, value));
-      if (this.#currentBGM) {
-        this.#currentBGM.volume = this.#masterVolume * this.#bgmVolume;
-      }
-    }
-  
   /**
     * 現在のマスターボリュームを返す
     */

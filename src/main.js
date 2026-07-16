@@ -21,6 +21,15 @@ import { addKanji } from './models/kanjiDex.js';
 import practiceBattleScreen from './screens/practiceBattleScreen.js';
 
 
+/* ----------------------------- ログ静音化 ----------------------------- */
+// 本番ビルドでは冗長ログ（log/debug/info）を黙らせる。
+// console.log 447箇所の logger（src/utils/logger.js）移行が完了するまでの暫定措置。
+if (!import.meta.env.DEV) {
+  console.log = () => {};
+  console.debug = () => {};
+  console.info = () => {};
+}
+
 /* ----------------------------- 実績通知システム ----------------------------- */
 const achievementNotificationQueue = [];
 
