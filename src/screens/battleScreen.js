@@ -50,6 +50,7 @@ const RECENT_QUESTIONS_BUFFER_SIZE = 5; // 直近5問は出題しない
 const BTN = {
   back:   { x: 20,  y: 20,  w: 100, h: 30,  label: 'タイトルへ' },
   stage:  { x: 40,  y: 20,  w: 120, h: 36,  label: 'もどる' }, // ← 名称・サイズ更新
+  practice: { x: 20, y: 64, w: 120, h: 32,  label: 'れんしゅうへ' }, // バトルが怖いときの1タップ避難先
   attack: { x: 230, y: 380, w: 110, h: 50,  label: 'こうげき' },
   heal:   { x: 350, y: 380, w: 110, h: 50,  label: 'かいふく' },
   hint:   { x: 470, y: 380, w: 110, h: 50,  label: 'ヒント' },
@@ -1211,6 +1212,25 @@ if (typeof drawStoneButton === 'function') {
   this.ctx.fillText(BTN.stage.label, BTN.stage.x + BTN.stage.w / 2, BTN.stage.y + BTN.stage.h / 2);
 }
 
+// ②' 「れんしゅうへ」ボタン（もどるの直下・同スタイル）
+BTN.practice.x = topMargin;
+BTN.practice.y = BTN.stage.y + BTN.stage.h + 8;
+const practiceHovered = isMouseOverRect(this.mouseX, this.mouseY, BTN.practice);
+if (typeof drawStoneButton === 'function') {
+  drawStoneButton(this.ctx, BTN.practice.x, BTN.practice.y, BTN.practice.w, BTN.practice.h, BTN.practice.label, practiceHovered, false);
+} else {
+  this.ctx.fillStyle = practiceHovered ? '#4e8c6d' : '#345e49';
+  this.ctx.fillRect(BTN.practice.x, BTN.practice.y, BTN.practice.w, BTN.practice.h);
+  this.ctx.strokeStyle = 'white';
+  this.ctx.lineWidth = 2;
+  this.ctx.strokeRect(BTN.practice.x, BTN.practice.y, BTN.practice.w, BTN.practice.h);
+  this.ctx.fillStyle = 'white';
+  this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
+  this.ctx.textAlign = 'center';
+  this.ctx.textBaseline = 'middle';
+  this.ctx.fillText(BTN.practice.label, BTN.practice.x + BTN.practice.w / 2, BTN.practice.y + BTN.practice.h / 2);
+}
+
 // ← ステージ名を視認性高く（非ボタン風のタイトルチップ）
 try {
   const st = stageData.find(s => s.stageId === gameState.currentStageId);
@@ -1589,17 +1609,17 @@ nextY = drawWrappedTokens('訓読み: ', (battleState.lastAnswered.kunyomi || []
 this.ctx.fillStyle = 'white';
 this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY);
 
-      // 間違った答え表示（既存）
+      // さっきためした読みの表示（次のヒントとして中立色で示す）
       if (this.lastIncorrectAnswer) {
-        this.ctx.fillStyle = 'rgba(231, 76, 60, 0.2)';
+        this.ctx.fillStyle = 'rgba(52, 152, 219, 0.15)';
         this.ctx.fillRect(bx + 10, nextY + 10, bw - 20, 22);
-        this.ctx.strokeStyle = 'rgba(231, 76, 60, 0.8)';
+        this.ctx.strokeStyle = 'rgba(52, 152, 219, 0.6)';
         this.ctx.lineWidth = 1;
         this.ctx.strokeRect(bx + 10, nextY + 10, bw - 20, 22);
-        this.ctx.fillStyle = '#e74c3c';
+        this.ctx.fillStyle = '#d6eaf8';
         this.ctx.font = 'bold 12px "UDデジタル教科書体",sans-serif';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(`あなたの答え: ${this.lastIncorrectAnswer}`, bx + bw/2, nextY + 21);
+        this.ctx.fillText(`さっきためしたよみ: ${this.lastIncorrectAnswer}`, bx + bw/2, nextY + 21);
       }
     }
     // ← ここまで追加
@@ -2970,10 +2990,10 @@ const rect = this.canvas.getBoundingClientRect?.();
       return '#f1c40f'; // 黄色
     }
     
-    // 否定的なメッセージ（失敗・ダメージ系）
-    if (message.includes('こうげきしっぱい！') || 
-        message.includes('かいふくしっぱい！') || 
-        message.includes('のこうげき！') || 
+    // おしらせメッセージ（読みちがい・ダメージ系）
+    if (message.includes('おしい！') ||
+        message.includes('読みがちがったみたい') ||
+        message.includes('のこうげき！') ||
         message.includes('のダメージ！')) {
       return '#ff6b9d'; // ピンク色
     }
@@ -3621,6 +3641,16 @@ if (e.type === 'touchstart') {
           publish('playBGM', 'title'); // メニュー共通BGMへ
           const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
           publish('changeScreen', targetScreen);
+          return true;
+        }
+
+        // 「れんしゅうへ」ボタン押下時（同じステージの練習モードに1タップで切替）
+        if (isMouseOverRect(x, y, BTN.practice)) {
+          console.log('「れんしゅうへ」ボタンがクリックされました');
+          publish('playSE', 'decide');
+          publish('playBGM', 'title'); // 練習モードはメニュー共通BGM
+          gameState.gameMode = 'practice';
+          publish('changeScreen', 'practiceBattle');
           return true;
         }
   
@@ -4951,9 +4981,9 @@ setManagedTimeout(() => {
     }
     
   } else {
-    // 不正解時の入力欄フィードバック
-    inputEl.style.borderColor = 'red';
-    inputEl.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+    // 読みちがい時の入力欄フィードバック（責める赤ではなく、やわらかい琥珀色）
+    inputEl.style.borderColor = '#f0ad4e';
+    inputEl.style.backgroundColor = 'rgba(240, 173, 78, 0.12)';
     setTimeout(() => {
       inputEl.style.borderColor = '#ccc';
       inputEl.style.backgroundColor = 'white';
@@ -4967,9 +4997,9 @@ setManagedTimeout(() => {
     gameState.wrongKanjiList.push({ ...gameState.currentKanji });
     publish('addToReview', gameState.currentKanji.id);
     publish('playSE', 'wrong');
-    addToLog(`こうげきしっぱい！${readingMsg}`);
+    addToLog(`おしい！${readingMsg}`);
     battleScreenState.showLogBlock([
-      'こうげきしっぱい！',
+      'おしい！もうすこし！',
       readingMsg
     ]);
     
@@ -5090,7 +5120,12 @@ function onHeal() {
   console.log(`🔍 回復回数チェック: 残り${remainingHeals}回 (上限: ${maxHealCount}回)`);
   
   if (remainingHeals <= 0) {
-    alert(`このステージでの回復はもう使えません！（上限: ${maxHealCount}回）`);
+    // ネイティブalertは世界観を壊すため、ゲーム内ログで知らせる
+    addToLog(`かいふくはこのステージではもう使えないよ（上限: ${maxHealCount}回）`);
+    battleScreenState.showLogBlock([
+      'かいふくはもう使えないよ',
+      `このステージでは ${maxHealCount}回まで`
+    ]);
     // 入力を再度有効にする
     battleState.inputEnabled = true;
     return;
@@ -5197,9 +5232,9 @@ gameState.playerStats.healsSuccessful++;
     gameState.wrongKanjiList.push({ ...gameState.currentKanji });
     publish('addToReview', gameState.currentKanji.id);
     publish('playSE', 'wrong');
-    addToLog(`かいふくしっぱい！${readingMsg}`);
+    addToLog(`読みがちがったみたい。${readingMsg}`);
     battleScreenState.showLogBlock([
-      'かいふくしっぱい！',
+      '読みがちがったみたい',
       readingMsg
     ]);
 
