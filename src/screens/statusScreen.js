@@ -170,9 +170,9 @@ const statusScreenState = {
       return;
     }
 
-    // 戻るボタン
+    // 戻るボタン（プロフィール画面から入るのが正規動線）
     if (isMouseOverRect(x, y, this.backButton)) {
-      publish('changeScreen', 'menu');
+      publish('changeScreen', 'profile');
       return;
     }
   },

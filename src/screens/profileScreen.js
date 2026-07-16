@@ -95,8 +95,32 @@ const profileScreen = {
         toMonsterDexBtn.style.padding = '8px 12px';
         toMonsterDexBtn.style.cursor = 'pointer';
         toMonsterDexBtn.onclick = () => publish('changeScreen', 'monsterDex');
-    
-        header.append(backBtn, title, toKanjiDexBtn, toMonsterDexBtn);
+
+        // ステータス（スキルポイントを振る唯一の画面。未使用SPがあればバッジで知らせる）
+        const skillPoints = gameState.playerStats?.skillPoints || 0;
+        const toStatusBtn = document.createElement('button');
+        toStatusBtn.textContent = skillPoints > 0 ? `ステータス (+${skillPoints})` : 'ステータス';
+        toStatusBtn.style.background = skillPoints > 0
+          ? 'linear-gradient(135deg, #f39c12, #d68910)'
+          : 'linear-gradient(135deg, #6c757d, #5a6268)';
+        toStatusBtn.style.color = 'white';
+        toStatusBtn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        toStatusBtn.style.borderRadius = '8px';
+        toStatusBtn.style.padding = '8px 12px';
+        toStatusBtn.style.cursor = 'pointer';
+        toStatusBtn.onclick = () => publish('changeScreen', 'status');
+
+        const toAchievementsBtn = document.createElement('button');
+        toAchievementsBtn.textContent = 'トロフィー';
+        toAchievementsBtn.style.background = 'linear-gradient(135deg, #6c757d, #5a6268)';
+        toAchievementsBtn.style.color = 'white';
+        toAchievementsBtn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        toAchievementsBtn.style.borderRadius = '8px';
+        toAchievementsBtn.style.padding = '8px 12px';
+        toAchievementsBtn.style.cursor = 'pointer';
+        toAchievementsBtn.onclick = () => publish('changeScreen', 'achievements');
+
+        header.append(backBtn, title, toStatusBtn, toAchievementsBtn, toKanjiDexBtn, toMonsterDexBtn);
 
         const summary = loadProfileSummary();
 
