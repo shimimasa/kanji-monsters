@@ -1,9 +1,10 @@
 // 練習バトル画面 - UI改善版（ボタンレス・統計強化・フィードバック改善）
 
 import battleScreenState from './battleScreen.js';
-import { gameState, battleState, saveGameData } from '../core/gameState.js';
+import { gameState, battleState, saveGameData, recordKanjiAnswer } from '../core/gameState.js';
 import { getKanjiByStageId, isKanjiMastered } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
+import reviewQueue from '../models/reviewQueue.js';
 import { images, loadBgImage } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
@@ -893,6 +894,10 @@ if (this.unmasteredKanji.length === 0) {
             // ← 追加: 正解時に図鑑へ登録（重複は内部で無視される）
             publish('addToKanjiDex', gameState.currentKanji.id);
 
+            // 学習データ記録＋SM-2キューの前進（キュー登録済みの漢字のみ間隔が伸びる）
+            recordKanjiAnswer(gameState.currentKanji.id, true);
+            reviewQueue.updateReview(gameState.currentKanji.id, 5);
+
              // レビュー回数カウント（ボーナスのみ）
     try {
       if (this.reviewMode && /^bonus_g(\d+)$/i.test(String(gameState.currentStageId || ''))) {
@@ -963,7 +968,11 @@ if (this.unmasteredKanji.length === 0) {
       };
       
       publish('playSE', 'wrong');
-      
+
+      // 学習データ記録＋復習キューへ登録（バトルの読みちがいと同じ扱い）
+      recordKanjiAnswer(gameState.currentKanji.id, false);
+      publish('addToReview', gameState.currentKanji.id);
+
       console.log(`❌ 不正解: ${gameState.currentKanji.text} ≠ ${answer}`);
       
       setTimeout(() => {
