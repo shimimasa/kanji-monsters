@@ -1,5 +1,7 @@
 // src/screens/gameOverScreen.js
 // プレイヤー敗北時の画面（Game Over Screen）
+// トーン方針: 敗北を「失敗」ではなく「旅の休憩」として描く。
+// 絶望的な演出（嵐・ひび割れ・灰）は使わず、夕暮れの休憩所で次の出発に備えるイメージ。
 
 import { publish } from '../core/eventBus.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
@@ -13,7 +15,7 @@ const retryButton = {
   y: 420,
   width: 140,
   height: 50,
-  text: 'リトライ'
+  text: 'もういちど！'
 };
 
 const stageSelectButton = {
@@ -21,7 +23,7 @@ const stageSelectButton = {
   y: 420,
   width: 140,
   height: 50,
-  text: 'ステージ選択へ'
+  text: 'ちずにもどる'
 };
 
 const titleButton = {
@@ -40,27 +42,27 @@ const gameOverState = {
   mouseX: 0,
   mouseY: 0,
   animationTime: 0, // アニメーション用タイマー
-  
+
   /** 画面表示時の初期化 */
   enter() {
     // ゲームオーバー画面に入ったらBGMを変更
     publish('playBGM', 'gameover');
-    
+
     // キャンバスを取得
     this.canvas = document.getElementById('gameCanvas');
     if (!this.canvas) {
       console.error('キャンバス要素が見つかりません');
       return;
     }
-    
+
     this.ctx = this.canvas.getContext('2d');
-    
-    // 失敗SEを再生
+
+    // 画面切替のSEを再生
     publish('playSE', 'gameover');
-    
+
     // アニメーションタイマーを初期化
     this.animationTime = 0;
-    
+
     // イベントハンドラ登録
     this.registerHandlers();
 
@@ -74,373 +76,345 @@ const gameOverState = {
       // if (failXP > 0) { addPlayerExp(failXP); }
     }
   },
-  
+
   /** 毎フレーム呼び出し（描画） */
   update(dt) {
     if (!this.ctx || !this.canvas) return;
-    
+
     const { ctx, canvas } = this;
     this.animationTime += 16; // 約60FPSでアニメーション
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // 1. 嵐の空と石板風背景を描画
-    this.drawStormyBackground(ctx, canvas.width, canvas.height);
-    
-    // 2. ひび割れたタイトルを描画
-    this.drawCrackedTitle(ctx, canvas.width / 2, 120);
-    
-    // 3. 風化した石板の結果パネル
-    this.drawWeatheredResultPanel(ctx, canvas.width / 2 - 150, 220, 300, 160);
-    
-    // 4. 重厚なボタン群
+
+    // 1. 夕暮れの休憩所の背景を描画
+    this.drawSunsetBackground(ctx, canvas.width, canvas.height);
+
+    // 2. 「今回はここまで！」タイトルを描画
+    this.drawRestTitle(ctx, canvas.width / 2, 120);
+
+    // 3. 旅のきろくパネル
+    this.drawTravelLogPanel(ctx, canvas.width / 2 - 150, 220, 300, 160);
+
+    // 4. ボタン群
     const isRetryHovered = isMouseOverRect(this.mouseX, this.mouseY, retryButton);
     const isStageSelectHovered = isMouseOverRect(this.mouseX, this.mouseY, stageSelectButton);
     const isTitleHovered = isMouseOverRect(this.mouseX, this.mouseY, titleButton);
-    
-    this.drawSomberButton(ctx, retryButton, isRetryHovered, 'retry');
-    this.drawSomberButton(ctx, stageSelectButton, isStageSelectHovered, 'stageSelect');
-    this.drawSomberButton(ctx, titleButton, isTitleHovered, 'title');
-    
-    // 5. 絶望的な雰囲気の装飾要素
-    this.drawDespairEffects(ctx, canvas.width, canvas.height);
+
+    this.drawJourneyButton(ctx, retryButton, isRetryHovered, 'retry');
+    this.drawJourneyButton(ctx, stageSelectButton, isStageSelectHovered, 'stageSelect');
+    this.drawJourneyButton(ctx, titleButton, isTitleHovered, 'title');
+
+    // 5. 穏やかな夕暮れの装飾要素
+    this.drawEveningEffects(ctx, canvas.width, canvas.height);
   },
 
   /**
-   * 嵐の空と石板風の背景を描画
+   * 夕暮れの空と休憩所の背景を描画
    */
-  drawStormyBackground(ctx, width, height) {
+  drawSunsetBackground(ctx, width, height) {
     ctx.save();
-    
-    // ベースの暗い背景グラデーション（嵐の空）
+
+    // 夕暮れの空グラデーション
     const skyGradient = ctx.createLinearGradient(0, 0, 0, height);
-    skyGradient.addColorStop(0, '#2C3E50'); // 暗い青灰色
-    skyGradient.addColorStop(0.3, '#34495E'); // スレートグレー
-    skyGradient.addColorStop(0.7, '#1C2833'); // より暗い青
-    skyGradient.addColorStop(1, '#17202A'); // 最も暗い青
-    
+    skyGradient.addColorStop(0, '#2E3A67');   // 宵の藍色
+    skyGradient.addColorStop(0.45, '#7A5C99'); // 薄紫
+    skyGradient.addColorStop(0.75, '#E8927C'); // やわらかい茜色
+    skyGradient.addColorStop(1, '#F4C27A');    // 地平線の琥珀色
+
     ctx.fillStyle = skyGradient;
     ctx.fillRect(0, 0, width, height);
-    
-    // 雲の効果（動的な暗い雲）
-    const cloudOffset = (this.animationTime * 0.001) % (width + 100);
-    ctx.fillStyle = 'rgba(44, 62, 80, 0.3)';
+
+    // 沈む夕日（やわらかい光）
+    const sunX = width * 0.72;
+    const sunY = height * 0.60;
+    const sunGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 90);
+    sunGlow.addColorStop(0, 'rgba(255, 236, 179, 0.9)');
+    sunGlow.addColorStop(0.4, 'rgba(255, 200, 120, 0.5)');
+    sunGlow.addColorStop(1, 'rgba(255, 180, 100, 0)');
+    ctx.fillStyle = sunGlow;
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, 90, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ゆっくり流れる夕焼け雲
+    const cloudOffset = (this.animationTime * 0.0006) % (width + 200);
+    ctx.fillStyle = 'rgba(255, 220, 190, 0.22)';
     for (let i = 0; i < 5; i++) {
       const x = (cloudOffset + i * 200 - 100) % (width + 200) - 100;
-      const y = 50 + i * 30;
+      const y = 60 + i * 28;
       const radius = 40 + i * 10;
-      
+
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.arc(x + 30, y, radius * 0.8, 0, Math.PI * 2);
       ctx.arc(x + 60, y, radius * 0.6, 0, Math.PI * 2);
       ctx.fill();
     }
-    
-    // 石板のテクスチャ効果
-    ctx.fillStyle = 'rgba(85, 85, 85, 0.4)';
-    for (let i = 0; i < 300; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const size = Math.random() * 2 + 0.5;
+
+    // 空にまたたく一番星たち（位置は固定・明るさだけ揺らす）
+    for (let i = 0; i < 12; i++) {
+      const x = ((i * 173 + 60) % (width - 80)) + 40;
+      const y = ((i * 97 + 20) % (height * 0.35)) + 15;
+      const twinkle = 0.4 + 0.35 * Math.sin(this.animationTime * 0.002 + i * 1.7);
+      ctx.fillStyle = `rgba(255, 245, 210, ${twinkle})`;
       ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.arc(x, y, 1.6, 0, Math.PI * 2);
       ctx.fill();
     }
-    
-    // ひび割れ効果
-    ctx.strokeStyle = 'rgba(169, 169, 169, 0.3)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 8; i++) {
-      ctx.beginPath();
-      const startX = Math.random() * width;
-      const startY = Math.random() * height;
-      let currentX = startX;
-      let currentY = startY;
-      
-      ctx.moveTo(currentX, currentY);
-      for (let j = 0; j < 5; j++) {
-        currentX += (Math.random() - 0.5) * 100;
-        currentY += (Math.random() - 0.5) * 100;
-        ctx.lineTo(currentX, currentY);
-      }
-      ctx.stroke();
+
+    // 遠くの山なみ（シルエット・2層）
+    ctx.fillStyle = '#4A3A5E';
+    ctx.beginPath();
+    ctx.moveTo(0, height * 0.78);
+    for (let x = 0; x <= width; x += 20) {
+      const y = height * 0.78 - Math.sin(x * 0.008) * 28 - Math.sin(x * 0.021 + 2) * 12;
+      ctx.lineTo(x, y);
     }
-    
-    // 縁の装飾（風化した境界線）
-    ctx.strokeStyle = 'rgba(105, 105, 105, 0.5)';
+    ctx.lineTo(width, height);
+    ctx.lineTo(0, height);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#352A47';
+    ctx.beginPath();
+    ctx.moveTo(0, height * 0.88);
+    for (let x = 0; x <= width; x += 20) {
+      const y = height * 0.88 - Math.sin(x * 0.011 + 5) * 20 - Math.sin(x * 0.03) * 8;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(width, height);
+    ctx.lineTo(0, height);
+    ctx.closePath();
+    ctx.fill();
+
+    // 縁の装飾（あたたかい色の枠）
+    ctx.strokeStyle = 'rgba(244, 194, 122, 0.4)';
     ctx.lineWidth = 6;
     ctx.strokeRect(8, 8, width - 16, height - 16);
-    
-    ctx.strokeStyle = 'rgba(128, 128, 128, 0.3)';
+
+    ctx.strokeStyle = 'rgba(255, 228, 181, 0.25)';
     ctx.lineWidth = 3;
     ctx.strokeRect(12, 12, width - 24, height - 24);
-    
+
     ctx.restore();
   },
 
   /**
-   * ひび割れたタイトルを描画
+   * 「今回はここまで！」タイトルを描画
    */
-  drawCrackedTitle(ctx, centerX, centerY) {
+  drawRestTitle(ctx, centerX, centerY) {
     ctx.save();
-    
-    // タイトルの影（深い絶望感）
+
+    // タイトルのやわらかい影
     ctx.font = 'bold 48px "UDデジタル教科書体", serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.fillText('ゲームオーバー', centerX + 4, centerY + 4);
-    
-    // メインタイトル（深い赤色のグラデーション）
-    const titleGradient = ctx.createLinearGradient(centerX - 150, centerY - 25, centerX + 150, centerY + 25);
-    titleGradient.addColorStop(0, '#8B0000'); // ダークレッド
-    titleGradient.addColorStop(0.5, '#DC143C'); // クリムゾン
-    titleGradient.addColorStop(1, '#B22222'); // ファイアブリック
-    
+    ctx.fillStyle = 'rgba(60, 40, 20, 0.45)';
+    ctx.fillText('今回はここまで！', centerX + 3, centerY + 3);
+
+    // メインタイトル（あたたかい琥珀色のグラデーション）
+    const titleGradient = ctx.createLinearGradient(centerX - 180, centerY - 25, centerX + 180, centerY + 25);
+    titleGradient.addColorStop(0, '#FFD98E');  // 淡い金色
+    titleGradient.addColorStop(0.5, '#FFB25E'); // 夕焼けのオレンジ
+    titleGradient.addColorStop(1, '#FF9A6B');   // やわらかい茜
+
     ctx.fillStyle = titleGradient;
-    ctx.fillText('ゲームオーバー', centerX, centerY);
-    
-    // タイトルの縁取り（かすれ効果）
-    ctx.strokeStyle = '#2F4F4F';
+    ctx.fillText('今回はここまで！', centerX, centerY);
+
+    // タイトルの縁取り
+    ctx.strokeStyle = '#7A4A2B';
     ctx.lineWidth = 2;
-    ctx.strokeText('ゲームオーバー', centerX, centerY);
-    
-    // ひび割れ効果をタイトルに追加
-    ctx.strokeStyle = 'rgba(105, 105, 105, 0.6)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    // タイトル文字の上にひび割れ線を描画
-    ctx.moveTo(centerX - 120, centerY - 10);
-    ctx.lineTo(centerX - 80, centerY + 5);
-    ctx.lineTo(centerX - 40, centerY - 8);
-    ctx.moveTo(centerX + 20, centerY + 8);
-    ctx.lineTo(centerX + 60, centerY - 5);
-    ctx.lineTo(centerX + 100, centerY + 10);
-    ctx.stroke();
-    
+    ctx.strokeText('今回はここまで！', centerX, centerY);
+
     // サブタイトル
     ctx.font = '24px "UDデジタル教科書体", sans-serif';
-    ctx.fillStyle = '#696969'; // ダークグレー
-    ctx.fillText('チャレンジ失敗...', centerX, centerY + 50);
-    
-    // 絶望的な装飾（破片効果）
-    ctx.fillStyle = 'rgba(169, 169, 169, 0.4)';
-    for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI * 2 * i) / 6;
-      const distance = 80 + Math.sin(this.animationTime * 0.003 + i) * 10;
-      const x = centerX + Math.cos(angle) * distance;
-      const y = centerY + Math.sin(angle) * distance;
-      const size = 3 + Math.random() * 2;
-      
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    
+    ctx.fillStyle = '#FFE9C9';
+    ctx.fillText('やすんで、つぎの旅にそなえよう', centerX, centerY + 50);
+
     ctx.restore();
   },
 
   /**
-   * 風化した石板の結果パネルを描画
+   * 旅のきろくパネル（木の立て看板風）を描画
    */
-  drawWeatheredResultPanel(ctx, x, y, width, height) {
+  drawTravelLogPanel(ctx, x, y, width, height) {
     ctx.save();
-    
-    // パネルの深い影
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-    ctx.fillRect(x + 6, y + 6, width, height);
-    
-    // 石板背景（風化した石の質感）
-    const stoneGradient = ctx.createLinearGradient(x, y, x, y + height);
-    stoneGradient.addColorStop(0, '#708090'); // スレートグレー
-    stoneGradient.addColorStop(0.3, '#696969'); // ダークグレー
-    stoneGradient.addColorStop(0.7, '#556B2F'); // ダークオリーブグリーン
-    stoneGradient.addColorStop(1, '#2F4F4F'); // ダークスレートグレー
-    
-    ctx.fillStyle = stoneGradient;
+
+    // パネルのやわらかい影
+    ctx.fillStyle = 'rgba(50, 30, 20, 0.4)';
+    ctx.fillRect(x + 5, y + 5, width, height);
+
+    // 木の看板風の背景
+    const woodGradient = ctx.createLinearGradient(x, y, x, y + height);
+    woodGradient.addColorStop(0, '#8B5A2B');  // 明るい木肌
+    woodGradient.addColorStop(0.5, '#7A4E26');
+    woodGradient.addColorStop(1, '#6B4423');  // 濃い木肌
+
+    ctx.fillStyle = woodGradient;
     ctx.fillRect(x, y, width, height);
-    
-    // 石板の深い縁取り
-    ctx.strokeStyle = '#2F2F2F';
+
+    // 看板の縁取り
+    ctx.strokeStyle = '#4A2F1B';
     ctx.lineWidth = 4;
     ctx.strokeRect(x, y, width, height);
-    
-    // 内側の装飾線（風化効果）
-    ctx.strokeStyle = '#A9A9A9';
+
+    // 内側の装飾線
+    ctx.strokeStyle = 'rgba(255, 235, 205, 0.35)';
     ctx.lineWidth = 1;
     ctx.strokeRect(x + 8, y + 8, width - 16, height - 16);
-    
-    // 石板のひび割れ
-    ctx.strokeStyle = 'rgba(169, 169, 169, 0.5)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x + 20, y + height * 0.3);
-    ctx.lineTo(x + width - 30, y + height * 0.7);
-    ctx.moveTo(x + width * 0.7, y + 15);
-    ctx.lineTo(x + width * 0.3, y + height - 20);
-    ctx.stroke();
-    
+
     // パネルタイトル
     ctx.font = 'bold 22px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#F5F5DC'; // ベージュ
-    ctx.fillText('戦績', x + width/2, y + 35);
-    
-    // 結果データ
+    ctx.fillStyle = '#FFF3DC';
+    ctx.fillText('たびのきろく', x + width/2, y + 35);
+
+    // 結果データ（間違い数の突きつけはせず、出会いとして数える）
     const results = [
-      `正解した漢字: ${gameState.correctKanjiList.length}個`,
-      `間違えた漢字: ${gameState.wrongKanjiList.length}個`,
-      `現在レベル: ${gameState.playerStats.level}`,
-      `挑戦回数: ${gameState.playerStats.totalAttempts || 1}`
+      `読めた漢字: ${gameState.correctKanjiList.length}個`,
+      `出会った漢字: ${gameState.wrongKanjiList.length}個`,
+      `いまのレベル: ${gameState.playerStats.level}`
     ];
-    
+
     ctx.font = '16px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#DCDCDC'; // ガインズボロ
-    
+    ctx.fillStyle = '#FFE9C9';
+
     results.forEach((text, index) => {
-      ctx.fillText(text, x + 20, y + 70 + index * 22);
+      ctx.fillText(text, x + 20, y + 70 + index * 24);
     });
-    
-    // 敗北メッセージ
-    ctx.font = 'italic 14px "UDデジタル教科書体", sans-serif';
-    ctx.fillStyle = '#CD5C5C'; // インディアンレッド
+
+    // 再出発メッセージ
+    ctx.font = '14px "UDデジタル教科書体", sans-serif';
+    ctx.fillStyle = '#FFDFA8';
     ctx.textAlign = 'center';
-    ctx.fillText('次こそは勝利を掴もう...', x + width/2, y + height - 15);
-    
+    ctx.fillText('またここから しゅっぱつしよう！', x + width/2, y + height - 15);
+
     ctx.restore();
   },
 
   /**
-   * 重厚で暗いトーンのボタンを描画
+   * 旅の雰囲気に合わせたボタンを描画
    */
-  drawSomberButton(ctx, button, isHovered, type) {
+  drawJourneyButton(ctx, button, isHovered, type) {
     ctx.save();
-    
+
     const { x, y, width, height, text } = button;
     const scale = isHovered ? 1.05 : 1.0;
-    
+
     // ホバー時のスケール調整
     const scaledWidth = width * scale;
     const scaledHeight = height * scale;
     const scaledX = x + (width - scaledWidth) / 2;
     const scaledY = y + (height - scaledHeight) / 2;
-    
-    // ボタンの深い影
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.fillRect(scaledX + 5, scaledY + 5, scaledWidth, scaledHeight);
-    
-    // ボタン背景のグラデーション（暗いトーン）
+
+    // ボタンの影
+    ctx.fillStyle = 'rgba(50, 30, 20, 0.5)';
+    ctx.fillRect(scaledX + 4, scaledY + 4, scaledWidth, scaledHeight);
+
+    // ボタン背景のグラデーション
     const buttonGradient = ctx.createLinearGradient(scaledX, scaledY, scaledX, scaledY + scaledHeight);
-    
+
     if (type === 'retry') {
-      // リトライボタン（暗い青系）
+      // もういちどボタン（元気の出るオレンジ系）
       if (isHovered) {
-        buttonGradient.addColorStop(0, '#4682B4'); // スチールブルー
-        buttonGradient.addColorStop(0.5, '#2F4F4F'); // ダークスレートグレー
-        buttonGradient.addColorStop(1, '#191970'); // ミッドナイトブルー
+        buttonGradient.addColorStop(0, '#FFB25E');
+        buttonGradient.addColorStop(0.5, '#F09040');
+        buttonGradient.addColorStop(1, '#D9762B');
       } else {
-        buttonGradient.addColorStop(0, '#2F4F4F'); // ダークスレートグレー
-        buttonGradient.addColorStop(0.5, '#191970'); // ミッドナイトブルー
-        buttonGradient.addColorStop(1, '#0F0F23'); // より暗い青
+        buttonGradient.addColorStop(0, '#F09040');
+        buttonGradient.addColorStop(0.5, '#D9762B');
+        buttonGradient.addColorStop(1, '#B85E1F');
       }
     } else if (type === 'stageSelect') {
-      // ステージ選択ボタン（緑系）
+      // ちずにもどるボタン（緑系）
       if (isHovered) {
-        buttonGradient.addColorStop(0, '#32CD32'); // ライムグリーン
-        buttonGradient.addColorStop(0.5, '#228B22'); // フォレストグリーン
-        buttonGradient.addColorStop(1, '#006400'); // ダークグリーン
+        buttonGradient.addColorStop(0, '#5CB85C');
+        buttonGradient.addColorStop(0.5, '#3E8E41');
+        buttonGradient.addColorStop(1, '#2E6B31');
       } else {
-        buttonGradient.addColorStop(0, '#228B22'); // フォレストグリーン
-        buttonGradient.addColorStop(0.5, '#006400'); // ダークグリーン
-        buttonGradient.addColorStop(1, '#004000'); // より暗いグリーン
+        buttonGradient.addColorStop(0, '#3E8E41');
+        buttonGradient.addColorStop(0.5, '#2E6B31');
+        buttonGradient.addColorStop(1, '#1F4A22');
       }
-    } else { // タイトルボタン（暗い赤系）
+    } else { // タイトルボタン（落ち着いた青系）
       if (isHovered) {
-        buttonGradient.addColorStop(0, '#A0522D'); // シエナ
-        buttonGradient.addColorStop(0.5, '#8B4513'); // サドルブラウン
-        buttonGradient.addColorStop(1, '#654321'); // ダークブラウン
+        buttonGradient.addColorStop(0, '#5B9BD5');
+        buttonGradient.addColorStop(0.5, '#3D6FA5');
+        buttonGradient.addColorStop(1, '#2C5282');
       } else {
-        buttonGradient.addColorStop(0, '#8B4513'); // サドルブラウン
-        buttonGradient.addColorStop(0.5, '#654321'); // ダークブラウン
-        buttonGradient.addColorStop(1, '#2F1B14'); // より暗いブラウン
+        buttonGradient.addColorStop(0, '#3D6FA5');
+        buttonGradient.addColorStop(0.5, '#2C5282');
+        buttonGradient.addColorStop(1, '#1F3A5F');
       }
     }
-    
+
     ctx.fillStyle = buttonGradient;
     ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight);
-    
+
     // ボタンの縁取り
-    ctx.strokeStyle = isHovered ? '#696969' : '#2F2F2F';
+    ctx.strokeStyle = isHovered ? '#FFE9C9' : 'rgba(60, 40, 20, 0.6)';
     ctx.lineWidth = isHovered ? 3 : 2;
     ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
-    
-    // 風化効果（ボタンにもひび）
-    if (!isHovered) {
-      ctx.strokeStyle = 'rgba(169, 169, 169, 0.3)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(scaledX + 10, scaledY + scaledHeight * 0.3);
-      ctx.lineTo(scaledX + scaledWidth - 10, scaledY + scaledHeight * 0.7);
-      ctx.stroke();
-    }
-    
+
     // ハイライト効果（控えめ）
     const highlightGradient = ctx.createLinearGradient(scaledX, scaledY, scaledX, scaledY + scaledHeight * 0.3);
-    highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+    highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
     highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
     ctx.fillStyle = highlightGradient;
     ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight * 0.3);
-    
+
     // ボタンテキスト
     ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    
+
     // テキストの影
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillStyle = 'rgba(60, 40, 20, 0.6)';
     ctx.fillText(text, scaledX + scaledWidth/2 + 2, scaledY + scaledHeight/2 + 2);
-    
+
     // テキスト本体
-    ctx.fillStyle = isHovered ? '#F5F5DC' : '#DCDCDC'; // ベージュまたはガインズボロ
+    ctx.fillStyle = '#FFF8E7';
     ctx.fillText(text, scaledX + scaledWidth/2, scaledY + scaledHeight/2);
-    
+
     ctx.restore();
   },
 
   /**
-   * 絶望的な雰囲気の装飾要素を描画
+   * 穏やかな夕暮れの装飾要素を描画
    */
-  drawDespairEffects(ctx, width, height) {
+  drawEveningEffects(ctx, width, height) {
     ctx.save();
-    
-    // 落下する灰のような粒子
-    ctx.fillStyle = 'rgba(169, 169, 169, 0.3)';
-    for (let i = 0; i < 20; i++) {
-      const x = (this.animationTime * 0.02 + i * 40) % width;
-      const y = (this.animationTime * 0.05 + i * 30) % height;
-      const size = 1 + Math.random() * 2;
-      
+
+    // ゆっくり舞い上がるほたるの光
+    for (let i = 0; i < 14; i++) {
+      const baseX = (i * 61 + 30) % width;
+      const sway = Math.sin(this.animationTime * 0.0012 + i * 2.1) * 24;
+      const x = baseX + sway;
+      const y = height - ((this.animationTime * 0.018 + i * 47) % (height * 0.9));
+      const glow = 0.25 + 0.25 * Math.sin(this.animationTime * 0.003 + i);
+      const size = 1.5 + (i % 3);
+
+      ctx.fillStyle = `rgba(255, 230, 150, ${glow})`;
       ctx.beginPath();
       ctx.arc(x, y, size, 0, Math.PI * 2);
       ctx.fill();
     }
-    
-    // 画面四隅の暗いビネット効果
+
+    // 画面のふちをやさしく落ち着かせるビネット
     const vignetteGradient = ctx.createRadialGradient(
       width/2, height/2, 0,
-      width/2, height/2, Math.max(width, height) * 0.7
+      width/2, height/2, Math.max(width, height) * 0.75
     );
-    vignetteGradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-    vignetteGradient.addColorStop(1, 'rgba(0, 0, 0, 0.4)');
-    
+    vignetteGradient.addColorStop(0, 'rgba(40, 25, 50, 0)');
+    vignetteGradient.addColorStop(1, 'rgba(40, 25, 50, 0.25)');
+
     ctx.fillStyle = vignetteGradient;
     ctx.fillRect(0, 0, width, height);
-    
+
     ctx.restore();
   },
-  
+
   /** 画面離脱時のクリーンアップ */
   exit() {
     if (this.canvas) {
@@ -449,23 +423,23 @@ const gameOverState = {
     this.canvas = null;
     this.ctx = null;
   },
-  
+
   /** イベントハンドラ登録 */
   registerHandlers() {
     if (!this.canvas) return;
-    
+
     this._clickHandler = this.handleClick.bind(this);
     this._mousemoveHandler = this.handleMouseMove.bind(this);
-    
+
     this.canvas.addEventListener('click', this._clickHandler);
     this.canvas.addEventListener('touchstart', this._clickHandler);
     this.canvas.addEventListener('mousemove', this._mousemoveHandler);
   },
-  
+
   /** イベントハンドラ解除 */
   unregisterHandlers() {
     if (!this.canvas) return;
-    
+
     if (this._clickHandler) {
       this.canvas.removeEventListener('click', this._clickHandler);
       this.canvas.removeEventListener('touchstart', this._clickHandler);
@@ -473,7 +447,7 @@ const gameOverState = {
     if (this._mousemoveHandler) {
       this.canvas.removeEventListener('mousemove', this._mousemoveHandler);
     }
-    
+
     this._clickHandler = null;
     this._mousemoveHandler = null;
   },
@@ -481,15 +455,15 @@ const gameOverState = {
   /** マウス移動処理 */
   handleMouseMove(e) {
     if (!this.canvas) return;
-    
+
     const rect = this.canvas.getBoundingClientRect();
     const scaleX = this.canvas.width / rect.width;
     const scaleY = this.canvas.height / rect.height;
-    
+
     this.mouseX = (e.clientX - rect.left) * scaleX;
     this.mouseY = (e.clientY - rect.top) * scaleY;
   },
-  
+
 
 
   handleClick(e) {
@@ -509,10 +483,10 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
     if (!isValidCoordinates(coords)) {
       return false; // 黒帯エリアのクリックは無視
     }
-    
+
     const x = coords.x;
     const y = coords.y;
-    
+
         // リトライボタン
         if (isMouseOverRect(x, y, retryButton)) {
           publish('playSE', 'decide');
@@ -521,7 +495,7 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
           // 同じステージを再挑戦
           publish('changeScreen', gameState.currentStageId);
         }
-        
+
         // タイトルへボタン
         if (isMouseOverRect(x, y, titleButton)) {
           publish('playSE', 'decide');
@@ -530,19 +504,19 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
           // タイトル画面へ戻る
           publish('changeScreen', 'title');
         }
-    
+
         // ステージ選択へボタン
         if (isMouseOverRect(x, y, stageSelectButton)) {
           publish('playSE', 'decide');
           // 画面遷移前にメニューBGMへ切替
           publish('playBGM', 'title');
           // previousScreenに基づいて適切な画面に戻る
-          const targetScreen = gameState.previousScreen === 'worldStageSelect' ? 
+          const targetScreen = gameState.previousScreen === 'worldStageSelect' ?
             'worldStageSelect' : 'stageSelect';
           publish('changeScreen', targetScreen);
         }
   },
-  
+
   render() {
     this.update(0);
   }
