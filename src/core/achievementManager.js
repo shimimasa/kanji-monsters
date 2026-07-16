@@ -91,6 +91,16 @@ function checkCondition(achievement, playerStats) {
       const kanjiDex = loadKanjiDex();
       return gradeKanji.every(k => kanjiDex.has(k.id));
     }
+    case 'manual': {
+      // 学年ボーナス称号（title_*_gX）は bonusManager が解除の正史。
+      // ここは取り逃し補完の安全網として、同じカウンタ（bonus_X_clearCount）を再判定する。
+      // しきい値は bonusManager.TITLE_THRESHOLDS と一致させること（循環importを避けるため直書き）。
+      const m = /^title_(conqueror|guardian|champion)_g(\d+)$/.exec(achievement.id);
+      if (!m) return false;
+      const thresholds = { conqueror: 3, guardian: 5, champion: 10 };
+      const clearCount = parseInt(localStorage.getItem(`bonus_${m[2]}_clearCount`) || '0', 10);
+      return clearCount >= thresholds[m[1]];
+    }
     default:
       return false;
   }
