@@ -105,6 +105,42 @@ export function getGameCoordinates(event, canvas) {
   export function isValidCoordinates(coords) {
     return coords.x >= 0 && coords.y >= 0;
   }
+
+  /**
+   * ゲーム内座標を画面（クライアント）座標に変換する
+   * getGameCoordinates の逆変換。DOM要素をCanvas上の描画位置に重ねる際に使う。
+   * @param {number} gameX
+   * @param {number} gameY
+   * @param {HTMLCanvasElement} canvas
+   * @returns {{x: number, y: number, scale: number}} 画面座標と表示スケール
+   */
+  export function gameToScreenCoordinates(gameX, gameY, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const internalAspect = canvas.width / canvas.height;
+    const displayAspect = rect.width / rect.height;
+
+    let contentLeft = rect.left;
+    let contentTop = rect.top;
+    let contentWidth = rect.width;
+    let contentHeight = rect.height;
+
+    // object-fit: contain による黒帯を除いた実コンテンツ領域を求める
+    if (Math.abs(internalAspect - displayAspect) > 0.001) {
+      if (displayAspect > internalAspect) {
+        contentWidth = rect.height * internalAspect;
+        contentLeft = rect.left + (rect.width - contentWidth) / 2;
+      } else {
+        contentHeight = rect.width / internalAspect;
+        contentTop = rect.top + (rect.height - contentHeight) / 2;
+      }
+    }
+
+    return {
+      x: contentLeft + (gameX / canvas.width) * contentWidth,
+      y: contentTop + (gameY / canvas.height) * contentHeight,
+      scale: contentWidth / canvas.width
+    };
+  }
   
   /**
    * Canvas要素を全画面表示に最適化（安全なCSS設定）

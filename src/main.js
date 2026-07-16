@@ -1,5 +1,5 @@
 /* ----------------------------- 依存モジュール ----------------------------- */
-import { gameState, updatePlayerName, saveGameData, loadGameData } from './core/gameState.js';
+import { gameState, saveGameData, loadGameData } from './core/gameState.js';
 import { setCanvas, update as updateScreen, render as renderScreen } from './core/screenManager.js';
 import { loadAll as loadUIImages } from './loaders/assetsLoader.js';
 import { loadKanjiGradesPhased } from './loaders/dataLoader.js';
@@ -7,7 +7,6 @@ import {
   initializeFirebaseServices,
   signInAnonymouslyIfNeeded,
   getCurrentUser,
-  initializeNewPlayerData,
   recoverKrbSaveFromFirestoreIfMissing,
   syncAllCaches,
   startDataSync
@@ -200,18 +199,8 @@ function drawAchievementNotifications(ctx) {
     console.error('❌ ゲーム起動時の実績チェックでエラー:', error);
   }
 
-  // ─────────── プレイヤー名自動入力 ───────────
-  // データ未設定時に名前を聞いて gameState にセット、Firestore に書き込む
-  if (!gameState.playerName || ['ゲスト', 'ななしのごんべえ', '新規プレイヤー'].includes(gameState.playerName)) {
-    const inputName = prompt('プレイヤー名を入力してください（5文字以内）', '');
-    if (inputName) {
-      const name = inputName.trim().slice(0, 5);
-      updatePlayerName(name);
-      if (user && user.uid) {
-          await initializeNewPlayerData(user.uid, name);
-        }
-      }
-    }
+  // プレイヤー名が未設定の場合は、タイトルの「スタート」から
+  // playerNameInput 画面（ゲーム内UI）で入力してもらう（起動時のネイティブpromptは廃止）
   // 3) BattleScreen 側のセットアップ
    // 🔽 ここでステージ ID を仮にセット
   gameState.currentStageId = 'hokkaido_area1';
