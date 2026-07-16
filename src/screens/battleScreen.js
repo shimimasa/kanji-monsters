@@ -4630,8 +4630,14 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
       gameState.newlyReadKanjiList.push({ ...gameState.currentKanji });
     }
     recordKanjiAnswer(gameState.currentKanji.id, true);
-    // SM-2キューの前進（復習対象だった漢字を読めたら間隔が伸びる）
-    reviewQueue.updateReview(gameState.currentKanji.id, 5);
+    if (Number(gameState.hintLevel || 0) >= 4) {
+      // ヒントで答えを見てから正解した場合は「おぼえたて」扱い:
+      // ペナルティにはせず、復習キューに登録して後日もう一度出会わせる（SM-2間隔は進めない）
+      publish('addToReview', gameState.currentKanji.id);
+    } else {
+      // SM-2キューの前進（復習対象だった漢字を自力で読めたら間隔が伸びる）
+      reviewQueue.updateReview(gameState.currentKanji.id, 5);
+    }
     
     // チャレンジモードの時間加算は廃止（ストップウォッチ化）
     
@@ -5173,8 +5179,14 @@ function onHeal() {
       gameState.newlyReadKanjiList.push({ ...gameState.currentKanji });
     }
     recordKanjiAnswer(gameState.currentKanji.id, true);
-    // SM-2キューの前進（復習対象だった漢字を読めたら間隔が伸びる）
-    reviewQueue.updateReview(gameState.currentKanji.id, 5);
+    if (Number(gameState.hintLevel || 0) >= 4) {
+      // ヒントで答えを見てから正解した場合は「おぼえたて」扱い:
+      // ペナルティにはせず、復習キューに登録して後日もう一度出会わせる（SM-2間隔は進めない）
+      publish('addToReview', gameState.currentKanji.id);
+    } else {
+      // SM-2キューの前進（復習対象だった漢字を自力で読めたら間隔が伸びる）
+      reviewQueue.updateReview(gameState.currentKanji.id, 5);
+    }
 
     // ★★★ 追加: 読み進捗更新・マスター判定 ★★★
     updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);

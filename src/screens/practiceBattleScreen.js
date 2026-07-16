@@ -896,7 +896,12 @@ if (this.unmasteredKanji.length === 0) {
 
             // 学習データ記録＋SM-2キューの前進（キュー登録済みの漢字のみ間隔が伸びる）
             recordKanjiAnswer(gameState.currentKanji.id, true);
-            reviewQueue.updateReview(gameState.currentKanji.id, 5);
+            if (Number(gameState.hintLevel || 0) >= 4) {
+              // ヒントで答えを見てから正解した場合は「おぼえたて」扱い（間隔は進めず再登録）
+              publish('addToReview', gameState.currentKanji.id);
+            } else {
+              reviewQueue.updateReview(gameState.currentKanji.id, 5);
+            }
 
              // レビュー回数カウント（ボーナスのみ）
     try {
