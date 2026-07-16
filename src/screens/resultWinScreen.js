@@ -21,7 +21,7 @@ const quickReviewButton = {
   y: 480,
   width: 220,
   height: 50,
-  text: '復習'
+  text: 'いま おぼえちゃう！'
 };
 
 const resultWinState = {
@@ -599,9 +599,9 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#8B4513';
-    ctx.fillText('復習が必要な漢字:', x + 10, y + 25);
-    
-    // 間違えた漢字リスト
+    ctx.fillText('つぎの旅でまた会う漢字:', x + 10, y + 25);
+
+    // また会う漢字リスト
     ctx.font = '14px "UDデジタル教科書体", sans-serif';
     ctx.fillStyle = '#654321';
     
