@@ -1,7 +1,7 @@
 import { publish } from '../core/eventBus.js';
 import ReviewQueue from '../models/reviewQueue.js';
 import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
-import { gameState } from '../core/gameState.js';
+import { gameState, recordKanjiAnswer } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { toHiragana, getReadings } from '../utils/readings.js';
 
@@ -129,7 +129,8 @@ const gradeQuizScreen = {
       userAnswer: user,
       correctReadings: this.current.readings,
     });
-    // 不正解は復習キューへ
+    // 学習記録（正史）へ加算し、不正解は復習キューへ
+    recordKanjiAnswer(this.current.id, ok);
     if (!ok) ReviewQueue.add(this.current.id);
 
     // 次の問題へ

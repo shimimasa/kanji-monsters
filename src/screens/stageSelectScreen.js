@@ -73,14 +73,14 @@ const getUiRoot = () => {
 
 // フッターボタンを画面下部に水平一列に配置
 const BUTTON_CONFIG = {
-  width: 140,  // 幅を少し縮小（5ボタン対応）
+  width: 120,  // 幅を縮小（6ボタン対応）
   height: 40,
-  gap: 15,     // 間隔を少し縮小
+  gap: 12,     // 間隔を縮小
   y: 540
 };
 
-// 合計幅を計算（5ボタンに変更）
-const totalWidth = (BUTTON_CONFIG.width * 5) + (BUTTON_CONFIG.gap * 4);
+// 合計幅を計算（6ボタン）
+const totalWidth = (BUTTON_CONFIG.width * 6) + (BUTTON_CONFIG.gap * 5);
 // 開始X座標を計算（中央揃え）
 const startX = (800 - totalWidth) / 2; // キャンバス幅800pxを想定
 
@@ -104,29 +104,39 @@ const practiceButton = {
   icon: '📝'
 };
 
-const dexButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
-  y: BUTTON_CONFIG.y, 
-  width: BUTTON_CONFIG.width, 
-  height: BUTTON_CONFIG.height, 
+// ★★★ 力だめし（学年まとめテスト）ボタン ★★★
+const quizButton = {
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2,
+  y: BUTTON_CONFIG.y,
+  width: BUTTON_CONFIG.width,
+  height: BUTTON_CONFIG.height,
+  text: '力だめし',
+  icon: '💪'
+};
+
+const dexButton = {
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3,
+  y: BUTTON_CONFIG.y,
+  width: BUTTON_CONFIG.width,
+  height: BUTTON_CONFIG.height,
   text: '漢字図鑑',
   icon: '📚'
 };
 
-const monsterButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
-  y: BUTTON_CONFIG.y, 
-  width: BUTTON_CONFIG.width, 
-  height: BUTTON_CONFIG.height, 
+const monsterButton = {
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 4,
+  y: BUTTON_CONFIG.y,
+  width: BUTTON_CONFIG.width,
+  height: BUTTON_CONFIG.height,
   text: '全国ゴトモン',
   icon: '👾'
 };
 
-const profileButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 4, 
-  y: BUTTON_CONFIG.y, 
-  width: BUTTON_CONFIG.width, 
-  height: BUTTON_CONFIG.height, 
+const profileButton = {
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 5,
+  y: BUTTON_CONFIG.y,
+  width: BUTTON_CONFIG.width,
+  height: BUTTON_CONFIG.height,
   text: 'プロフィール',
   icon: '🏆'
 };
@@ -1105,6 +1115,7 @@ update(dt) {
     // ★★★ ホバー判定に練習ボタンを追加 ★★★
     const isBackHovered = isMouseOverRect(this.mouseX, this.mouseY, backButton);
     const isPracticeHovered = isMouseOverRect(this.mouseX, this.mouseY, practiceButton);
+    const isQuizHovered = isMouseOverRect(this.mouseX, this.mouseY, quizButton);
     const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
     const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
     const isProfileHovered = isMouseOverRect(this.mouseX, this.mouseY, profileButton);
@@ -1112,6 +1123,9 @@ update(dt) {
     // リッチボタンで描画
     this._drawRichFooterButton(ctx, backButton, '#808080', isBackHovered); // グレー系
     this._drawRichFooterButton(ctx, practiceButton, '#4CAF50', isPracticeHovered); // 緑系（練習用）
+    // 力だめしは学年タブ（1〜6年）選択時のみ有効。無効時はグレー表示
+    const quizEnabled = gameState.currentGrade >= 1 && gameState.currentGrade <= 6;
+    this._drawRichFooterButton(ctx, quizButton, quizEnabled ? '#e67e22' : '#a0a0a0', quizEnabled && isQuizHovered); // 橙系（テスト用）
     this._drawRichFooterButton(ctx, dexButton, '#2980b9', isDexHovered);   // 青系
     this._drawRichFooterButton(ctx, monsterButton, '#2980b9', isMonsterHovered); // 青系
     this._drawRichFooterButton(ctx, profileButton, '#2980b9', isProfileHovered); // 青系
@@ -1381,6 +1395,17 @@ update(dt) {
     if (isMouseOverRect(x, y, practiceButton)) {
       publish('playSE', 'decide');
       this._startPracticeMode();
+      return;
+    }
+
+    // 力だめし（学年まとめテスト）ボタン
+    if (isMouseOverRect(x, y, quizButton)) {
+      if (gameState.currentGrade >= 1 && gameState.currentGrade <= 6) {
+        publish('playSE', 'decide');
+        publish('changeScreen', 'gradeQuiz');
+      } else {
+        publish('playSE', 'wrong'); // 学年タブ未選択（総復習・四国九州）では無効
+      }
       return;
     }
 
