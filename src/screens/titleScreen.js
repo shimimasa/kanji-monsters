@@ -5,6 +5,7 @@ import { gameState, updatePlayerName, clearSaveData } from '../core/gameState.js
 import { getCurrentUser } from '../services/firebase/firebaseController.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { hardResetAllLocalData } from '../core/saveData.js';
+import { stageData } from '../loaders/dataLoader.js';
 const titleState = {
   /** 画面表示時の初期化 */
   enter(canvas) {
@@ -28,19 +29,27 @@ const titleState = {
     if (isReturnPlayer) {
       // リピートプレイヤー用のボタン配置（モード統一）
       this.playButton = { x: cx - 150, y: 350, width: 300, height: 50, text: 'つづきから' };
-      this.settingsButton = { x: cx - 80, y: 420, width: 160, height: 50, text: 'せってい' };
-      
+
+      // 前回あそんだステージの地図へ1タップで戻るクイック再開（特定できる場合のみ表示）
+      const resumableStageId = this._getResumableStageId();
+      this.continueButton = resumableStageId
+        ? { x: cx - 150, y: 408, width: 300, height: 40, text: 'まえの場所から すぐ再開', stageId: resumableStageId }
+        : null;
+
+      this.settingsButton = { x: cx - 80, y: 460, width: 160, height: 50, text: 'せってい' };
+
       // リセットボタンは誤タップ防止のため、小さく、離れた位置に配置
-      this.resetButton = { 
-        x: cx - 90, 
-        y: 490, 
-        width: 180, 
-        height: 35, 
-        text: 'はじめから' 
+      this.resetButton = {
+        x: cx - 90,
+        y: 522,
+        width: 180,
+        height: 35,
+        text: 'はじめから'
       };
     } else {
       // 新規プレイヤー用のボタン配置（モード統一）
       this.playButton = { x: cx - 150, y: 380, width: 300, height: 50, text: 'スタート' };
+      this.continueButton = null;
       this.resetButton = null; // リセットボタンは表示しない
       this.settingsButton = { x: cx - 80, y: 450, width: 160, height: 50, text: 'せってい' };
     }
@@ -297,6 +306,9 @@ const titleState = {
   _drawFantasyButtons(ctx) {
     // メインボタン
     this._drawStyledButton(ctx, this.playButton, 'primary');
+    if (this.continueButton) {
+      this._drawStyledButton(ctx, this.continueButton, 'secondary');
+    }
     this._drawStyledButton(ctx, this.settingsButton, 'secondary');
     
     // リセットボタン（危険な操作用）
@@ -469,6 +481,34 @@ _startGame() {
   publish('changeScreen', 'courseSelect');
 },
 
+  /** 前回あそんだステージのID（stageDataで実在確認できたもののみ） */
+  _getResumableStageId() {
+    try {
+      const id = localStorage.getItem('lastPlayedStage');
+      if (!id) return null;
+      const stage = Array.isArray(stageData) ? stageData.find(s => s.stageId === id) : null;
+      return stage ? id : null;
+    } catch {
+      return null;
+    }
+  },
+
+  /** クイック再開: 前回ステージの地図（ステージ選択画面）へ直行する */
+  _quickResume() {
+    const id = this.continueButton?.stageId;
+    const stage = Array.isArray(stageData) ? stageData.find(s => s.stageId === id) : null;
+    if (!stage) {
+      this._startGame();
+      return;
+    }
+    gameState.currentStageId = id;
+    gameState.currentGrade = stage.grade;
+    // 世界編（漢検級 = grade 7〜10）は世界ステージ選択へ、それ以外は日本のステージ選択へ
+    const target = (stage.grade >= 7 && stage.grade <= 10) ? 'worldStageSelect' : 'stageSelect';
+    gameState.previousScreen = target;
+    publish('changeScreen', target);
+  },
+
   /** データリセット処理 */
   async _resetGameData() {
     try {
@@ -556,6 +596,14 @@ _startGame() {
     if (isMouseOverRect(x, y, this.playButton)) {
       publish('playSE', 'decide');
       this._startGame();
+      return;
+    }
+
+    // クイック再開ボタン（前回の地図へ直行）
+    if (this.continueButton && isMouseOverRect(x, y, this.continueButton)) {
+      publish('playSE', 'decide');
+      publish('playBGM', 'title');
+      this._quickResume();
       return;
     }
 

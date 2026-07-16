@@ -211,8 +211,10 @@ function drawAchievementNotifications(ctx) {
   // プレイヤー名が未設定の場合は、タイトルの「スタート」から
   // playerNameInput 画面（ゲーム内UI）で入力してもらう（起動時のネイティブpromptは廃止）
   // 3) BattleScreen 側のセットアップ
-   // 🔽 ここでステージ ID を仮にセット
-  gameState.currentStageId = 'hokkaido_area1';
+  // ステージIDのフォールバック（セーブから復元済みの「前回のステージ」は上書きしない）
+  if (!gameState.currentStageId) {
+    gameState.currentStageId = 'hokkaido_area1';
+  }
 
   // DataSync 初期化（Firestore → localStorage のマージ監視開始）
   startDataSync();
