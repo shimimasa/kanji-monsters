@@ -11,15 +11,19 @@ import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import {
+  ENEMY_FRAME_CONFIG,
+  RECENT_QUESTIONS_BUFFER_SIZE,
+  BTN,
+  ENEMY_DAMAGE_ANIM_DURATION,
+  ENEMY_ATTACK_ANIM_DURATION,
+  ENEMY_DEFEAT_ANIM_DURATION,
+  PLAYER_HP_ANIM_SPEED,
+  DEBUG,
+} from './battle/theme.js';
 
 // battleStateに残り時間プロパティを追加
 battleState.timeRemaining = 60;
-
-const ENEMY_FRAME_CONFIG = {
-  normal: { min: 1, max: 6 },    // 1-6体目
-  elite: { min: 7, max: 9 },     // 7-9体目
-  boss: { min: 10, max: Infinity } // 10体目以降
-};
 
 // プレイヤーに進行状況を示すUI追加も可能
 function getProgressInfo() {
@@ -46,24 +50,7 @@ function getFrameStyleByOrderConfigurable(enemyIndex, isBoss = false) {
   return 'boss'; // フォールバック
 }
 
-// 直近に出題された問題を避けるための設定値
-const RECENT_QUESTIONS_BUFFER_SIZE = 5; // 直近5問は出題しない
-
-const BTN = {
-  back:   { x: 20,  y: 20,  w: 100, h: 30,  label: 'タイトルへ' },
-  stage:  { x: 40,  y: 20,  w: 120, h: 36,  label: 'もどる' }, // ← 名称・サイズ更新
-  practice: { x: 20, y: 64, w: 120, h: 32,  label: 'れんしゅうへ' }, // バトルが怖いときの1タップ避難先
-  attack: { x: 230, y: 380, w: 110, h: 50,  label: 'こうげき' },
-  heal:   { x: 350, y: 380, w: 110, h: 50,  label: 'かいふく' },
-  hint:   { x: 470, y: 380, w: 110, h: 50,  label: 'ヒント' },
-};
-
-
-const ENEMY_DAMAGE_ANIM_DURATION = 30; // 約0.5秒（攻撃ヒット演出: 400〜600ms）
-const ENEMY_ATTACK_ANIM_DURATION = 45; // 約0.75秒（敵の突進/被ダメ: 600〜800ms）
-const ENEMY_DEFEAT_ANIM_DURATION = 60; // 約1.0秒（撃破演出: 800〜1000ms）
-const PLAYER_HP_ANIM_SPEED = 2;
-const DEBUG = false; // 高頻度ログを抑制するトグル
+// UI定数・調整値は ./battle/theme.js に集約（Phase 5-1）
 
 // タイムアウト（setTimeout）を一括管理する簡単ユーティリティ
 function setManagedTimeout(fn, ms) {
