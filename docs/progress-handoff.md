@@ -1,0 +1,104 @@
+# 作業引き継ぎ / 再開ガイド
+
+最終更新: 2026-07-16
+ブランチ: `リファクタリング`（main ではない・origin と同期済み）
+最新コミット: `53d0e4f`
+
+このドキュメントは、セッションが切れた後に**ここだけ読めば作業を再開できる**ことを目的とする。
+関連文書: `consulting-review-20260716.md`（診断と戦略）/ `refactoring-plan.md`（技術負債の計画）/ `smoke-test-checklist.md`（動作確認手順）/ `claude Opus4.6-review.md`（心理的安全性の設計思想＝正史）
+
+---
+
+## 1. 前提（必ず守る）
+
+| 項目 | 内容 |
+|---|---|
+| **対象ユーザー** | 漢字が苦手・自尊心が脆弱な小学生。開発者は小学校教員 |
+| **設計の基準** | 「できなかった瞬間に子どもが傷つかないか」。ポジティブフレーミング必須（「しっぱい」等の語は使わない、間違い数を突きつけない） |
+| **ブランチ** | 作業は `リファクタリング`。main に直接コミットしない |
+| **依存追加** | npm パッケージの追加（Vitest 等）は**事前に承認を得る**。現状 devDependencies は vite のみ |
+| **push** | **明示的な指示があった時のみ**。1回の承認は次回に持ち越さない |
+| **検証** | `npm run build` が通ること。既知の警告（動的import の注意）は無視してよい |
+| **コミット粒度** | 1コミット = 1つの意味のある変更。機能追加とリファクタを混ぜない |
+
+---
+
+## 2. これまでの経緯（3行）
+
+1. コンサル診断の結果、**コンテンツは十分**（漢字2,136字・約100ステージ・敵約990体）で、問題は「失敗体験の設計」と「壊れた配線」だった。
+2. v1.0 を **「やさしく、正直で、成長が見えるゲーム」** と定義し、Sprint 1〜6 を実装（27コミット）。
+3. 大型リファクタ（選択画面共通化・battleScreen分割）の**手前まで**進んでいる。
+
+---
+
+## 3. 完了済み（Sprint 1〜6 / 27コミット）
+
+- **Sprint 1「やさしさ」**: ゲームオーバー画面を絶望演出→夕暮れの休憩所に全面再設計。「しっぱい」文言→情報型（「おしい！」）。赤字誤答→中立色の「さっきためしたよみ」。勝利画面→「つぎの旅でまた会う漢字」。回復切れ alert()→ゲーム内ログ。バトルに「れんしゅうへ」1タップ避難ボタン追加。
+- **Sprint 2「正直さ」**: 名前入力のソフトロック修理（入力欄の動的生成＋座標逆変換）。壊れた sw.js 削除＋SW登録解除（PWA撤退）。reviewQueue.getAll() バグ修正。捕獲仕様を「常に4体・未収集優先」に確定。実績 manual型に補完の安全網。
+- **Sprint 3「成長が見える」**: 漢字別正答数を `krb_save` に永続化（従来は毎回消失）。図鑑に「がくしゅうのきろく」復活。勝利画面に「はじめて読めた漢字」。復習2系統を SM-2 に統合。プロフィールに「こんしゅうのがんばり」（週次比較）。
+- **Sprint 4「土台」** = refactoring-plan Phase 0〜2: タグ設定、スモークテスト表作成、不要ディレクトリ削除（追跡ファイル 16,109→8,573）、デッドコード削除、logger 新設＋本番ログ静音化。
+- **Sprint 5「導線」**: status/achievements を profile から再接続（**SP振り不能の解消**）。ヒントLv4正解を「おぼえたて」扱いで復習キューへ。チュートリアルに弱点説明追加。タイトルに「まえの場所から すぐ再開」。
+- **Sprint 6「共通化」**: `src/ui/canvasUtils.js` 抽出（316行削減）。`src/screens/battle/theme.js` 抽出。`src/utils/readings.js` 統合（**復習画面クラッシュ修正**）。「力だめし」（学年まとめテスト）を公開。
+
+### 途中で発見・修正した隠れバグ（すべて修正済み）
+- 北海道ステージのBGMが無音（参照ファイルが存在しなかった）
+- スキルポイントが一切使えない（status画面が孤立クラスタ内）
+- 「今日の復習」画面が TypeError でクラッシュ（読みデータの配列/文字列不一致）
+- 起動時に前回ステージが `hokkaido_area1` で上書きされる
+- 名前入力画面のソフトロック、reviewQueue.getAll() 例外
+
+---
+
+## 4. 次にやること（優先順）
+
+### A. ユーザーの確認待ち（作業前に確認する）
+1. **スモークテストの一巡**（`docs/smoke-test-checklist.md`）。特に「今日の復習」「力だめし」「プロフィール→ステータスでSP消費」「タイトルのすぐ再開」は新規/修正動線。
+2. **Firestoreセキュリティルールの確認**（Firebaseコンソール）。匿名ユーザーが自分の `users/{uid}` 以外に書けないこと。
+3. **北海道用BGM音源の用意**（現在は汎用バトルBGMで暫定代替中。`src/audio/audioManager.js` の hokkaido/hokkaido_a/hokkaido_b）。
+
+### B. すぐ着手できる安全な作業
+- `console.log` 447箇所の `src/utils/logger.js` への段階移行（現在は main.js で本番のみ握りつぶす暫定措置）。
+- `docs/refactoring-plan.md` が**未追跡のまま**。コミットするか要判断。
+- 企画書・仕様書（`0619企画書＋仕様書.md` 等）を実装の現状に合わせて改訂（色弱モード/フォントサイズ/じっくり・チャレンジは実装が無いか到達不能）。
+
+### C. 大型リファクタ（着手にテスト基盤の判断が必要）
+- **Phase 4-2**: `SelectScreenBase` で選択画面4種（stage/worldStage/region/continent、約4,900行・コピペ率65〜75%）を config駆動に統合。**進め方の鉄則: 一気に4画面やらない。最小の continentSelectScreen(707行)→regionSelect→残り2つ。1画面ごとに確認**。canvasUtils.js（Phase 4-1 完了済み）が土台。
+- **Phase 5-2以降**: battleScreen.js（6,240行）を `src/screens/battle/` へ分割（theme.js は完了）。次は engine.js（純ロジック）を抽出し**ここで初めて単体テストを書く**想定 → Vitest の導入可否をユーザーに要相談。practiceBattleScreen(2,493行) の危険な継承（`{...battleScreenState}` + `.call()`）の解消も同フェーズ。
+
+---
+
+## 5. 未決定事項（ユーザーの判断が必要）
+
+| 決定事項 | 選択肢 | 推奨 |
+|---|---|---|
+| デプロイ先 | Firebase / Vercel（両方の設定ファイルが並存、CNAMEもある） | package.json の deploy は firebase 指向。実績を確認して一本化 |
+| チャレンジモード | 復活 / 削除 | 死にコード削除を推奨（設定UIが未マウント、タイマーはストップウォッチ化済みで思想が変わっている） |
+| 色弱モード・フォントサイズ | 実装 / 仕様から削除 | 企画書に記載があるが実装は残骸のみ。アクセシビリティ上は実装したい |
+| git履歴書き換え | 実施 / 見送り | `.git` 6.7GB。単独開発なら推奨。**実施前に音楽/の原本をクラウドへ退避**（削除済みだが履歴には残っている） |
+| menu画面（旧クラスタ） | 再接続 / 削除 | status/achievements は profile 経由で再接続済み。menuScreen 自体は孤立したまま |
+
+---
+
+## 6. 主要ファイルの地図
+
+```
+src/
+├── core/        gameState.js（揮発状態＋学習記録の正史）/ saveData.js（krb_save v1）/ fsm.js（正史のFSM）
+├── screens/     battleScreen.js(6,240行・最大の負債) / practiceBattleScreen.js(2,493行・危険な継承)
+│   └── battle/  theme.js（Phase 5-1で抽出済み。今後 engine/renderer/effects/input を追加）
+├── ui/          canvasUtils.js（Phase 4-1で抽出。drawRoundedRect / drawEnhancedTabs）
+├── utils/       readings.js（読み判定の正史）/ coordinateUtils.js / logger.js
+└── models/      reviewQueue.js（SM-2・復習の正史）/ kanjiDex.js / monsterDex.js
+```
+
+**学習記録の正史**: `gameState.kanjiAnswerStats`（漢字別 correct/incorrect）と `gameState.dailyAnswerStats`（日別）。どちらも `krb_save.player.study` に永続化。加算は `recordKanjiAnswer()` 経由のみ。
+
+---
+
+## 7. 再開時の最初の1コマンド
+
+```bash
+cd C:/kanji-game-latest && git log --oneline -5 && git status --short && npm run build
+```
+
+これで「どこまで進んでいるか」「壊れていないか」が分かる。
