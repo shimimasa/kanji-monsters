@@ -1,10 +1,11 @@
-import { gameState, battleState, addPlayerExp, recordEnemyDefeated, saveGameData } from '../core/gameState.js';
+import { gameState, battleState, addPlayerExp, recordEnemyDefeated, saveGameData, recordKanjiAnswer, getKanjiAnswerStats } from '../core/gameState.js';
 import { drawButton, isMouseOverRect, drawStoneButton } from '../ui/uiRenderer.js';
 import { loadMonsterImage, loadBgImage, images, clearImageCache, drawStonePanel } from '../loaders/assetsLoader.js';
 import { getEnemiesByStageId, getKanjiByStageId, kanjiData, stageData } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
 import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
+import reviewQueue from '../models/reviewQueue.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
@@ -899,6 +900,7 @@ updateShieldBreakEffect() {
       // 各リストを初期化
       gameState.correctKanjiList = [];
       gameState.wrongKanjiList = [];
+      gameState.newlyReadKanjiList = [];
 
       // 追加: バトル開始時にログを初期化（漢字切替時にはリセットしない）
       battleState.log = [];
@@ -4622,12 +4624,14 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
     gameState.playerStats.totalCorrect++;
     gameState.playerStats.comboCount++;
     
-    // ← 学習データ記録を追加（正解）
-    const kanjiItem = kanjiData.find(k => k.id === gameState.currentKanji.id);
-    if (kanjiItem) {
-      kanjiItem.correctCount = (kanjiItem.correctCount || 0) + 1;
-      if (DEBUG) console.log(`📈 漢字ID:${gameState.currentKanji.id} の正解カウント: ${kanjiItem.correctCount}`);
+    // ← 学習データ記録（正解・永続化される正史へ）
+    // 初めて読めた漢字なら「あたらしく読めた」リストに積む（勝利画面で祝う）
+    if (getKanjiAnswerStats(gameState.currentKanji.id).correct === 0) {
+      gameState.newlyReadKanjiList.push({ ...gameState.currentKanji });
     }
+    recordKanjiAnswer(gameState.currentKanji.id, true);
+    // SM-2キューの前進（復習対象だった漢字を読めたら間隔が伸びる）
+    reviewQueue.updateReview(gameState.currentKanji.id, 5);
     
     // チャレンジモードの時間加算は廃止（ストップウォッチ化）
     
@@ -5008,12 +5012,8 @@ setManagedTimeout(() => {
     battleState.mistakesThisStage++;
     gameState.playerStats.comboCount = 0; // プレイヤー統計のコンボリセット
     
-    // ← 学習データ記録を追加（不正解）
-    const kanjiItem = kanjiData.find(k => k.id === gameState.currentKanji.id);
-    if (kanjiItem) {
-      kanjiItem.incorrectCount = (kanjiItem.incorrectCount || 0) + 1;
-      if (DEBUG) console.log(`📉 漢字ID:${gameState.currentKanji.id} の不正解カウント: ${kanjiItem.incorrectCount}`);
-    }
+    // ← 学習データ記録（不正解・永続化される正史へ）
+    recordKanjiAnswer(gameState.currentKanji.id, false);
     
     // ★ コンボカウントを確実にリセット ★
     battleState.comboCount = 0;
@@ -5168,6 +5168,14 @@ function onHeal() {
     gameState.playerStats.totalCorrect++;
     gameState.playerStats.comboCount++;
 
+    // 学習データ記録（かいふくでの正解も読めた実績として数える）
+    if (getKanjiAnswerStats(gameState.currentKanji.id).correct === 0) {
+      gameState.newlyReadKanjiList.push({ ...gameState.currentKanji });
+    }
+    recordKanjiAnswer(gameState.currentKanji.id, true);
+    // SM-2キューの前進（復習対象だった漢字を読めたら間隔が伸びる）
+    reviewQueue.updateReview(gameState.currentKanji.id, 5);
+
     // ★★★ 追加: 読み進捗更新・マスター判定 ★★★
     updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
 
@@ -5242,6 +5250,9 @@ gameState.playerStats.healsSuccessful++;
     gameState.playerStats.totalIncorrect++;
     battleState.mistakesThisStage++;
     gameState.playerStats.comboCount = 0; // コンボカウントをリセット
+
+    // 学習データ記録（かいふくでの読みちがいも記録する）
+    recordKanjiAnswer(gameState.currentKanji.id, false);
 
     // チャレンジモードの時だけダメージを受ける
     if (gameState.gameMode === 'challenge') {

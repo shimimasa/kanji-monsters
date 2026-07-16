@@ -60,6 +60,7 @@ export const gameState = {
     showHint: false,
     correctKanjiList: [],   // 正解した漢字をためる
     wrongKanjiList: [],     // 間違えた漢字をためる
+    newlyReadKanjiList: [], // このバトルで初めて読めた漢字（勝利画面で祝う）
 
     /* 実績システム --------------------------------------------------------- */
     unlockedAchievements: new Set(),  // 解除した実績のIDを保存
@@ -72,6 +73,16 @@ export const gameState = {
     /* ★★★ 漢字マスター状況管理 ★★★ */
     kanjiReadProgress: {
       // kanjiId: { onyomi: Set, kunyomi: Set, mastered: boolean }
+    },
+
+    /* ★★★ 漢字別の正答/誤答の累計（永続化対象・学習記録の正史） ★★★ */
+    kanjiAnswerStats: {
+      // kanjiId: { correct: number, incorrect: number }
+    },
+
+    /* ★★★ 日別の解答数（週次の成長表示用・永続化対象） ★★★ */
+    dailyAnswerStats: {
+      // 'YYYY-MM-DD': { correct: number, total: number }
     },
 
     /* ★★★ バトルベストタイム管理 ★★★ */
@@ -127,6 +138,73 @@ export const gameState = {
    */
   export function isAchievementUnlocked(achievementId) {
     return gameState.unlockedAchievements.has(achievementId);
+  }
+
+  /** ローカル日付キー（YYYY-MM-DD） */
+  function localDateKey(d = new Date()) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  /**
+   * 漢字1問の正誤を学習記録（正史）に加算する
+   * 保存は既存のセーブ契機（ステージクリア・EXP加算等）に相乗りする
+   * @param {string|number} kanjiId
+   * @param {boolean} isCorrect
+   */
+  export function recordKanjiAnswer(kanjiId, isCorrect) {
+    if (kanjiId === null || kanjiId === undefined || kanjiId === '') return;
+    if (!gameState.kanjiAnswerStats) gameState.kanjiAnswerStats = {};
+    const key = String(kanjiId);
+    const stats = gameState.kanjiAnswerStats[key] || (gameState.kanjiAnswerStats[key] = { correct: 0, incorrect: 0 });
+    if (isCorrect) stats.correct++;
+    else stats.incorrect++;
+
+    // 日別カウンタ（週次の成長表示用）
+    if (!gameState.dailyAnswerStats) gameState.dailyAnswerStats = {};
+    const dayKey = localDateKey();
+    const day = gameState.dailyAnswerStats[dayKey] || (gameState.dailyAnswerStats[dayKey] = { correct: 0, total: 0 });
+    day.total++;
+    if (isCorrect) day.correct++;
+
+    // 古い日別記録は60日で間引く（肥大化防止）
+    const keys = Object.keys(gameState.dailyAnswerStats);
+    if (keys.length > 60) {
+      keys.sort();
+      for (const k of keys.slice(0, keys.length - 60)) {
+        delete gameState.dailyAnswerStats[k];
+      }
+    }
+  }
+
+  /**
+   * 直近7日と、その前7日の「読めた回数」を集計する（週次の成長表示用）
+   * @returns {{thisWeek: number, lastWeek: number, diff: number}}
+   */
+  export function getWeeklyAnswerSummary() {
+    const stats = gameState.dailyAnswerStats || {};
+    const now = new Date();
+    let thisWeek = 0, lastWeek = 0;
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const entry = stats[localDateKey(d)];
+      const c = entry?.correct || 0;
+      if (i < 7) thisWeek += c;
+      else lastWeek += c;
+    }
+    return { thisWeek, lastWeek, diff: thisWeek - lastWeek };
+  }
+
+  /**
+   * 漢字1文字分の学習記録を取得する（未記録なら0埋め）
+   * @param {string|number} kanjiId
+   * @returns {{correct: number, incorrect: number}}
+   */
+  export function getKanjiAnswerStats(kanjiId) {
+    const stats = gameState.kanjiAnswerStats?.[String(kanjiId)];
+    return { correct: stats?.correct || 0, incorrect: stats?.incorrect || 0 };
   }
   
   /**
@@ -293,6 +371,10 @@ function incrementStageClearCount(stageId) {
                   practiceProgress: gameState.practiceProgress || {},
                   kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress || {}),
                   reviewQueue: reviewIds,
+                  // 漢字別の正答/誤答の累計（{ [kanjiId]: { correct, incorrect } }）
+                  answers: gameState.kanjiAnswerStats || {},
+                  // 日別の解答数（{ 'YYYY-MM-DD': { correct, total } }）
+                  dailyAnswerStats: gameState.dailyAnswerStats || {},
                   // 追加: ステージのレビュー解放状況を永続化
                   stageReviewUnlocked: gameState.stageReviewUnlocked || {}
                 });
@@ -357,6 +439,16 @@ function incrementStageClearCount(stageId) {
         // 追加: レビュー解放のロード
         if (save.player?.study?.stageReviewUnlocked) {
           gameState.stageReviewUnlocked = save.player.study.stageReviewUnlocked || {};
+        }
+        // 漢字別の正答/誤答の累計（旧スキーマの配列は捨ててマップのみ受け入れる）
+        const rawAnswers = save.player?.study?.answers;
+        if (rawAnswers && typeof rawAnswers === 'object' && !Array.isArray(rawAnswers)) {
+          gameState.kanjiAnswerStats = rawAnswers;
+        }
+        // 日別の解答数
+        const rawDaily = save.player?.study?.dailyAnswerStats;
+        if (rawDaily && typeof rawDaily === 'object' && !Array.isArray(rawDaily)) {
+          gameState.dailyAnswerStats = rawDaily;
         }
         
         if (save.player?.progress?.stageBestTimes) {
