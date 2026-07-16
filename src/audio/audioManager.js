@@ -52,9 +52,11 @@ export class AudioManager {
         yomitomo: '/assets/audio/bgm_yomitomo.mp3',
 
         // ステージ別BGMを追加
-        hokkaido: '/assets/audio/北海道A.mp3',
-        hokkaido_a: '/assets/audio/北海道A.mp3',
-        hokkaido_b: '/assets/audio/北海道B.mp3',
+        // NOTE: 北海道A/B.mp3 はリポジトリに存在せず無音になっていたため、
+        // 専用曲が用意されるまで汎用バトルBGMを暫定割当（要: 北海道用音源の追加）
+        hokkaido: '/assets/audio/bgm_battle.mp3',
+        hokkaido_a: '/assets/audio/bgm_battle.mp3',
+        hokkaido_b: '/assets/audio/bgm_battle.mp3',
             
         tohoku_a: '/assets/audio/東北A.mp3',
         tohoku_b: '/assets/audio/東北B.mp3',
@@ -78,7 +80,8 @@ export class AudioManager {
         europe_b: '/assets/audio/ヨーロッパB.mp3',
     
         america_a: '/assets/audio/アメリカA.mp3',
-        america_a2: '/assets/audio/アメリカA2.mp3',
+        // NOTE: アメリカA2.mp3 は存在しないため実在するBに暫定割当
+        america_a2: '/assets/audio/アメリカB.mp3',
     
         africa_a: '/assets/audio/アフリカ大陸A.mp3',
         africa_b: '/assets/audio/アフリカ大陸B.mp3',
