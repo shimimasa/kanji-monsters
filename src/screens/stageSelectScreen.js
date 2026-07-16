@@ -577,8 +577,8 @@ this._dex = loadDex();
 
     // 2. 全てクリア済みの場合は、復習キューにあるステージを選択
     if (reviewQueue.size() > 0) {
-      // 復習キューから漢字を取得し、その漢字が含まれるステージを探す
-      const reviewKanjiIds = Array.from(reviewQueue.getAll());
+      // 復習キューから期限が来ている漢字を取得し、その漢字が含まれるステージを探す
+      const reviewKanjiIds = reviewQueue.getDueReviews().map(item => item.id);
       for (const stage of stageData) {
         if (stage.kanjiPoolIdList && stage.kanjiPoolIdList.some(id => reviewKanjiIds.includes(id))) {
           return stage;
