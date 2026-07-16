@@ -412,20 +412,28 @@ if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
     ctx.fillStyle = '#8B4513';
     ctx.fillText('戦績', x + width/2, y + 30);
     
-    // 結果データ
+    // 結果データ（間違い数の対比表示はやめ、成長が見える並びにする）
+    const newlyReadCount = gameState.newlyReadKanjiList ? gameState.newlyReadKanjiList.length : 0;
     const results = [
       `正解数: ${gameState.correctKanjiList ? gameState.correctKanjiList.length : 0}`,
-      `間違い: ${gameState.wrongKanjiList ? gameState.wrongKanjiList.length : 0}`,
+      `はじめて読めた漢字: ${newlyReadCount}個`,
       `現在レベル: ${gameState.playerStats.level}`,
       `総ステージクリア: ${gameState.playerStats.stagesCleared}`
     ];
-    
-    ctx.font = '18px "UDデジタル教科書体", sans-serif';
+
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#654321';
-    
+
     results.forEach((text, index) => {
-      ctx.fillText(text, x + 20, y + 70 + index * 25);
+      // はじめて読めた漢字がある時は、その行をお祝い色で強調する
+      if (index === 1 && newlyReadCount > 0) {
+        ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+        ctx.fillStyle = '#1e8449';
+        ctx.fillText(`✨ ${text}`, x + 20, y + 70 + index * 25);
+      } else {
+        ctx.font = '18px "UDデジタル教科書体", sans-serif';
+        ctx.fillStyle = '#654321';
+        ctx.fillText(text, x + 20, y + 70 + index * 25);
+      }
     });
     
     // パーフェクトクリアの場合の特別表示
