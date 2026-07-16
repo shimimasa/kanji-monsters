@@ -6,6 +6,7 @@ import { publish } from '../core/eventBus.js';
 import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
 import reviewQueue from '../models/reviewQueue.js';
+import { drawRoundedRect as traceRoundedRect } from '../ui/canvasUtils.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
@@ -6244,18 +6245,7 @@ function drawCornerDecorations(ctx, x, y, width, height, color, frameStyle) {
  * 角丸矩形を描画するヘルパー関数
  */
 function drawRoundedRect(ctx, x, y, width, height, radius, strokeOnly = false) {
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();
-  
+  traceRoundedRect(ctx, x, y, width, height, radius);
   if (strokeOnly) {
     ctx.stroke();
   } else {
