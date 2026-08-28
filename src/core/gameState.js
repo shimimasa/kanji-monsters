@@ -323,8 +323,13 @@ function incrementStageClearCount(stageId) {
 
         // ステージクリアの統合
         const cleared = new Set(base?.player?.progress?.clearedStages || []);
-        if (typeof window !== 'undefined' && window.gameState?.stageProgress) {
-          Object.entries(window.gameState.stageProgress).forEach(([sid, v]) => {
+        // NOTE: 以前は window.gameState を読んでいたが、window.gameState への代入は
+        // コードベースのどこにも存在せず（読み取り2箇所のみ）、この分岐は常に false だった。
+        // その結果、clear_* 互換ミラーの書き込み停止(StepC-1)以降、新規クリアが
+        // krb_save に一切保存されず、リロードで巻き戻っていた。
+        // 同一モジュールの gameState（正史）を直接参照する。
+        if (gameState.stageProgress) {
+          Object.entries(gameState.stageProgress).forEach(([sid, v]) => {
             if (v && v.cleared) cleared.add(sid);
           });
         }

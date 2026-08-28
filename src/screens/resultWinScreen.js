@@ -50,12 +50,14 @@ const resultWinState = {
     const stageId = this.resultData.stageId || gameState.currentStageId;
     if (stageId) {
       try {
-        // P0-2 StepA(例外A): clear_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
-        try { saveGameData(); } catch {}
         // P0-2 StepC-1: clear_* 互換ミラー書き込みを停止（読み取り互換は saveData.isStageCleared の legacy fallback で維持）
         // localStorage.setItem(`clear_${stageId}`, '1');
+        // NOTE: saveGameData() は gameState.stageProgress を読んで krb_save へ統合するため、
+        // 必ず「クリア印を立ててから」保存する。順序を逆にすると、今クリアしたステージが
+        // 保存対象に入らない（この順序ミスが実際に事故になっていた）。
         if (!gameState.stageProgress) gameState.stageProgress = {};
         gameState.stageProgress[stageId] = { cleared: true };
+        try { saveGameData(); } catch {}
       } catch (e) {
         console.warn('ステージクリア反映に失敗:', e);
       }
