@@ -1487,45 +1487,12 @@ if (gameState.currentEnemy && gameState.currentEnemy.weakness) {
       this.drawComboIndicator(this.ctx);
     }
 
-                // ヒントを表示（ヒントレベルに応じて表示内容を変更）
-                if (gameState.hintLevel > 0) {
-                  let hintText = '';
-                  let hintColor = 'yellow';
-                  
-                  switch(gameState.hintLevel) {
-                    case 1:
-                      hintText = `ヒント（基本）: 画数は${gameState.currentKanji.strokes}`;
-                      hintColor = '#3498db'; // 青色
-                      break;
-                    case 2:
-                      // 音読みと訓読みのどちらかをランダムに選ぶ（ただし毎回同じになるよう固定する）
-                      const kanjiId = gameState.currentKanji.id;
-                      const isOnyomi = (kanjiId % 2 === 0); // IDの偶数奇数で固定
-                      const readings = isOnyomi ? gameState.currentKanji.onyomi : gameState.currentKanji.kunyomi;
-                      
-                      if (readings && readings.length > 0) {
-                        const firstReading = readings[0];
-                        const hintText2 = firstReading.substring(0, 1) + '○○';
-                        hintText = `ヒント（読み）: ${isOnyomi ? '音読み' : '訓読み'}は「${hintText2}」から始まる`;
-                      } else {
-                        hintText = `ヒント（読み）: ${isOnyomi ? '訓読み' : '音読み'}で読むことが多い`;
-                      }
-                      hintColor = '#f39c12'; // オレンジ色
-                      break;
-                    case 3:
-                      hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
-                      hintColor = '#e74c3c'; // 赤色
-                      break;
-                    case 4:
-                      // 最終ヒント：描画のみ。ここでreturn/状態変更はしない
-                      hintText = `ヒント（意味）: ${gameState.currentKanji.meaning}`;
-                      hintColor = '#e74c3c'; // 赤色
-                      break;
-                  }
-                  
-                  // 上部のヒントバナーで描画するため、テキストだけ保持
-                  this.currentHintText = hintText;
-                }
+                // ヒントの文言は onHint() が押された時に1回だけ組み立て、
+                // currentHintText に入れる。ここで毎フレーム組み直していたため、
+                // 音訓の選び方が onHint() 側（Math.random）と食い違い、ログとバナーに
+                // 「音読みは…」「訓読みは…」が同時に出ることがあった。
+                // さらに kanjiId % 2 は ID が 'g1-001' のような文字列なので常に
+                // NaN === 0 → false となり、バナーは必ず訓読みを出していた。
 
     // ← ここから追加：前回解答表示エリア（左側）
     if (battleState.lastAnswered) {
@@ -5323,11 +5290,18 @@ function onHint() {
   const onyomi = Array.isArray(k.onyomi) ? k.onyomi : [];
   const kunyomi = Array.isArray(k.kunyomi) ? k.kunyomi : [];
 
+  // ログ・ログブロック・上部バナーに同じ文言を配る。
+  // 音訓をどちらにするかはここで1回だけ決める（描画側で決め直さない）
+  const show = (text) => {
+    addToLog(text);
+    battleScreenState.showLogBlock([text]);
+    battleScreenState.currentHintText = text;
+  };
+
   switch (level) {
     case 1: {
       const strokes = k.strokes ?? '?';
-      addToLog(`ヒント（基本）: 画数は${strokes}`);
-      battleScreenState.showLogBlock([`ヒント（基本）: 画数は${strokes}`]);
+      show(`ヒント（基本）: 画数は${strokes}`);
       break;
     }
     case 2: {
@@ -5335,25 +5309,21 @@ function onHint() {
       const list = useOn ? onyomi : kunyomi;
       const first = list[0] || '';
       const masked = first ? first.substring(0, 1) + '○○' : '不明';
-      addToLog(`ヒント（読み）: ${useOn ? '音読み' : '訓読み'}は「${masked}」から始まる`);
-      battleScreenState.showLogBlock([`ヒント（読み）: ${useOn ? '音読み' : '訓読み'}は「${masked}」から始まる`]);
+      show(`ヒント（読み）: ${useOn ? '音読み' : '訓読み'}は「${masked}」から始まる`);
       break;
     }
     case 3: {
-        addToLog(`ヒント（意味）: ${k.meaning ?? '（準備中）'}`);
-        battleScreenState.showLogBlock([`ヒント（意味）: ${k.meaning ?? '（準備中）'}`]);
-        break;
+      show(`ヒント（意味）: ${k.meaning ?? '（準備中）'}`);
+      break;
     }
     case 4: {
       // 最終ヒント: 読みのどちらかをフル提示
       if (onyomi.length > 0 || kunyomi.length > 0) {
         const useOn = onyomi.length > 0 ? (Math.random() >= 0.5 || kunyomi.length === 0) : false;
         const list = useOn ? onyomi : kunyomi;
-        addToLog(`ヒント（決め手）: ${useOn ? '音読み' : '訓読み'}は「${list[0]}」`);
-        battleScreenState.showLogBlock([`ヒント（決め手）: ${useOn ? '音読み' : '訓読み'}は「${list[0]}」`]);
+        show(`ヒント（決め手）: ${useOn ? '音読み' : '訓読み'}は「${list[0]}」`);
       } else {
-        addToLog('ヒント（決め手）: データがありません');
-        battleScreenState.showLogBlock(['ヒント（決め手）: データがありません']);
+        show('ヒント（決め手）: データがありません');
       }
       break;
     }
