@@ -320,9 +320,37 @@ function incrementStageClearCount(stageId) {
           if (Array.isArray(dex)) gotomonIds = dex.filter(x => typeof x === 'string');
         } catch {}
         let reviewIds = [];
+        // NOTE: reviewQueue は id 配列としてしか保存しておらず、しかも読み戻す処理が
+        // どこにも無かったため、ファイル経由のバックアップで「今日の復習」が空になっていた。
+        // 互換のため id 配列（reviewQueue）はそのまま残し、SM-2 の間隔まで含めた
+        // 全項目を reviewQueueDetail として併せて保存する。
+        let reviewDetail = [];
         try {
           const rq = JSON.parse(localStorage.getItem('krb_review_queue') || '[]');
-          if (Array.isArray(rq)) reviewIds = rq.map(e => e?.id).filter(Boolean);
+          if (Array.isArray(rq)) {
+            reviewIds = rq.map(e => e?.id).filter(Boolean);
+            reviewDetail = rq.filter(e => e && e.id);
+          }
+        } catch {}
+
+        // ボーナスの称号カウント（bonus_{grade}_clearCount / _firstClear）も
+        // localStorage にしかなく、バックアップで失われていた。
+        const bonusCounters = {};
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (!k) continue;
+            const m = /^bonus_(\d+)_(clearCount|firstClear)$/.exec(k);
+            if (!m) continue;
+            const g = m[1];
+            bonusCounters[g] = bonusCounters[g] || {};
+            if (m[2] === 'clearCount') {
+              const n = parseInt(localStorage.getItem(k) || '0', 10);
+              bonusCounters[g].clearCount = Number.isFinite(n) ? n : 0;
+            } else {
+              bonusCounters[g].firstClear = localStorage.getItem(k) === '1';
+            }
+          }
         } catch {}
 
         // ステージクリアの統合
@@ -371,6 +399,7 @@ function incrementStageClearCount(stageId) {
                 save.player.progress = Object.assign({}, save.player.progress || {}, {
                   currentStage: gameState.currentStageId || save.player?.progress?.currentStage || null,
                   clearedStages: Array.from(cleared),
+                  bonusCounters,
                   stageBestTimes: Object.assign({}, save.player?.progress?.stageBestTimes, gameState.stageBestTimes || {})
                 });
                 save.player.collection = Object.assign({}, save.player.collection || {}, {
@@ -380,6 +409,7 @@ function incrementStageClearCount(stageId) {
                   practiceProgress: gameState.practiceProgress || {},
                   kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress || {}),
                   reviewQueue: reviewIds,
+                  reviewQueueDetail: reviewDetail,
                   // 漢字別の正答/誤答の累計（{ [kanjiId]: { correct, incorrect } }）
                   answers: gameState.kanjiAnswerStats || {},
                   // 日別の解答数（{ 'YYYY-MM-DD': { correct, total } }）
@@ -445,6 +475,36 @@ function incrementStageClearCount(stageId) {
             if (ids.length > 0) localStorage.setItem('krb_kanji_dex', JSON.stringify(ids));
           } catch {}
         }
+        // 復習キュー（krb_review_queue）を復元する。
+        // reviewQueueDetail があれば SM-2 の間隔ごと戻し、無ければ id 配列から
+        // 「すぐ復習対象」の最小エントリを組み立てる（古いバックアップとの互換）。
+        try {
+          const detail = save.player?.study?.reviewQueueDetail;
+          const ids = save.player?.study?.reviewQueue;
+          if (Array.isArray(detail) && detail.length > 0) {
+            localStorage.setItem('krb_review_queue', JSON.stringify(detail.filter(e => e && e.id)));
+          } else if (Array.isArray(ids) && ids.length > 0) {
+            const rebuilt = ids.filter(Boolean).map(id => ({
+              id: String(id), repetition: 0, interval: 0, eFactor: 2.5, nextReviewAt: Date.now()
+            }));
+            localStorage.setItem('krb_review_queue', JSON.stringify(rebuilt));
+          }
+        } catch {}
+
+        // ボーナスの称号カウントを復元する
+        try {
+          const counters = save.player?.progress?.bonusCounters;
+          if (counters && typeof counters === 'object') {
+            for (const [g, v] of Object.entries(counters)) {
+              if (!v || typeof v !== 'object') continue;
+              if (Number.isFinite(v.clearCount)) {
+                localStorage.setItem(`bonus_${g}_clearCount`, String(v.clearCount));
+              }
+              if (v.firstClear) localStorage.setItem(`bonus_${g}_firstClear`, '1');
+            }
+          }
+        } catch {}
+
         // 追加: レビュー解放のロード
         if (save.player?.study?.stageReviewUnlocked) {
           gameState.stageReviewUnlocked = save.player.study.stageReviewUnlocked || {};
