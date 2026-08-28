@@ -596,8 +596,12 @@ function findBonusBossForGrade(grade, allEnemies) {
  */
 export function isKanjiMastered(kanjiId) {
   try {
-    const gs = (typeof window !== 'undefined' && window.gameState) ? window.gameState : null;
-    const progress = gs?.kanjiReadProgress?.[kanjiId];
+    // NOTE: 以前は window.gameState を見ていたが、window.gameState への代入は
+    // コードベースに存在せず、この関数は常に false を返していた。
+    // その結果、漢字図鑑の「マスター済みを図鑑へ補完する」安全網が一度も発火しなかった。
+    // gameState はこのモジュールの先頭で import 済み（gameState.js はトップレベル import を
+    // 持たないため循環参照にならない）。
+    const progress = gameState?.kanjiReadProgress?.[kanjiId];
     return !!(progress && progress.mastered);
   } catch (e) {
     return false;
