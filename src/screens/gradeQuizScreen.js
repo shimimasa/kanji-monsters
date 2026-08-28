@@ -1,7 +1,7 @@
 import { publish } from '../core/eventBus.js';
 import ReviewQueue from '../models/reviewQueue.js';
 import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
-import { gameState, recordKanjiAnswer } from '../core/gameState.js';
+import { gameState, recordKanjiAnswer, saveGameData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { toHiragana, getReadings } from '../utils/readings.js';
 
@@ -140,6 +140,10 @@ const gradeQuizScreen = {
       this.phase = 'result';
       // 入力欄は隠す
       if (this.inputEl) this.inputEl.style.display = 'none';
+      // NOTE: recordKanjiAnswer はメモリ上の学習記録を増やすだけで、保存は
+      // 既存のセーブ契機に相乗りする設計。力だめしにはその契機が無く、
+      // 結果画面で閉じると1回分まるごと消えていたのでここで確定させる。
+      try { saveGameData(); } catch {}
       return;
     }
     if (this.inputEl) this.inputEl.value = '';
@@ -219,6 +223,8 @@ const gradeQuizScreen = {
   },
 
   exit() {
+    // 途中でやめた場合も、そこまでの学習記録を残す
+    try { saveGameData(); } catch {}
     if (this.inputEl && this._keydownHandler) {
       this.inputEl.removeEventListener('keydown', this._keydownHandler);
       this.inputEl.style.display = 'none';

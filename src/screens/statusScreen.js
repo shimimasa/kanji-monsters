@@ -1,4 +1,4 @@
-import { gameState } from '../core/gameState.js';
+import { gameState, saveGameData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
@@ -195,6 +195,11 @@ const statusScreenState = {
       player.hp += button.increase;
     }
     
+    // NOTE: SPの消費とステータス上昇は gameState 上の変更だけで、保存契機が
+    // 無かった（実績が新規解除された時に間接的に保存されるのみ）。
+    // 振り直しの利かない操作なので、ここで確定させる。
+    try { saveGameData(); } catch {}
+
     // スキルポイント振り分け直後に実績チェック
     checkAchievements().catch(error => {
       console.error('実績チェック中にエラーが発生しました:', error);
