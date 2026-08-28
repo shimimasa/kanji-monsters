@@ -222,14 +222,19 @@ const gradeQuizScreen = {
 
       const total = this.order.length;
       const correct = this.stats.correct;
-      const pass = correct >= Math.ceil(total * 0.8);
+      // 合否ではなく到達度で伝える。届いていない時も「あと何問で届くか」と
+      // 上向きに数え、「不合格」に相当する表示は出さない
+      const need = Math.ceil(total * 0.8);
+      const reached = correct >= need;
       ctx.font = '18px "UDデジタル教科書体",sans-serif';
-      ctx.fillStyle = pass ? '#2ecc71' : '#f1c40f';
-      ctx.fillText(`正解: ${correct} / ${total}（${pass ? '合格' : '再挑戦推奨'}）`, centerX, 160);
+      ctx.fillStyle = reached ? '#2ecc71' : '#f1c40f';
+      ctx.fillText(`よめた: ${correct} / ${total}`, centerX, 160);
+
+      ctx.font = '16px "UDデジタル教科書体",sans-serif';
+      ctx.fillText(reached ? 'この学年は バッチリ！' : `あと ${need - correct} もんで バッチリ！`, centerX, 188);
 
       ctx.fillStyle = 'white';
-      ctx.font = '16px "UDデジタル教科書体",sans-serif';
-      ctx.fillText('不正解は復習キューに追加されました', centerX, 190);
+      ctx.fillText('まちがえた漢字は「きょうのふくしゅう」に いれておいたよ', centerX, 216);
 
       // ボタン
       drawButton(ctx, BTN.again.x, BTN.again.y, BTN.again.w, BTN.again.h, BTN.again.label);
