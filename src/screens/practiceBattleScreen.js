@@ -555,8 +555,12 @@ _buildUnmasteredKanjiList() {
       return;
     }
 
+    // ここが空になるとレビューモードへ移行し、stageReviewUnlocked が立つ＝
+    // 学年ボーナス（伝説・幻120体）の解禁条件になる。全読み制覇を要求すると
+    // 「生」8読み・小1の46/80字が3読み以上という壁で導線が塞がるため、
+    // ゲートは読み2種で通す。全読み制覇は図鑑の★として残る。
     this.unmasteredKanji = stageKanji.filter(kanji => {
-      try { return !this._isKanjiMastered(kanji.id); } catch { return true; }
+      try { return !this._isKanjiGateCleared(kanji); } catch { return true; }
     });
 
     console.log(`📚 未マスター漢字: ${this.unmasteredKanji.length}件 / 全${stageKanji.length}件`);
@@ -2351,6 +2355,35 @@ if (this.wrongOnlyMode) {
           return false;
         }
       },
+
+    /**
+     * ボーナス解禁・レビューモード移行のためのゲート判定。
+     * 図鑑の★（_isKanjiMastered ＝ 全読み制覇）とは別基準で、
+     * 「読み2種（もともと1種しかない字はその1種）」で通す。
+     * 「生」の8読みのような字が伝説・幻120体への導線を塞いでいたため。
+     */
+    _isKanjiGateCleared(kanji) {
+      try {
+        if (this._isKanjiMastered(kanji.id)) return true;
+        const count = (v) => {
+          if (!v) return 0;
+          if (v instanceof Set) return v.size;
+          if (Array.isArray(v)) return v.length;
+          if (typeof v === 'string') return v.trim() ? v.trim().split(/\s+/).length : 0;
+          return 0;
+        };
+        const prog = gameState?.kanjiReadProgress?.[kanji.id]
+                  || gameState?.kanjiReadProgress?.[String(kanji.id)];
+        if (!prog) return false;
+        const done  = count(prog.kunyomi) + count(prog.onyomi);
+        const total = count(kanji.kunyomi) + count(kanji.onyomi);
+        if (total === 0) return true;
+        return done >= Math.min(2, total);
+      } catch {
+        return false;
+      }
+    },
+
   _toHiragana(input) {
     try {
       if (!input) return '';
