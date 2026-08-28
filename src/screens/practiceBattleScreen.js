@@ -1515,17 +1515,18 @@ _teardownGlobalBackHandler() {
         this.ctx.textAlign = 'center';
         this.ctx.fillText(`あなたの答え: ${battleState.lastAnswered.correctAnswer}`, x + w/2, y + h - 16);
       } else if (this.lastIncorrectAnswer) {
-        // 不正解した場合
-        this.ctx.fillStyle = 'rgba(231, 76, 60, 0.3)';
+        // さっきためした読み（次のヒントとして中立色で示す）
+        // battleScreen と同じ扱いにする。逃げ込む先である練習画面で赤ペンを入れない
+        this.ctx.fillStyle = 'rgba(52, 152, 219, 0.15)';
         this.ctx.fillRect(x + 8, y + h - 30, w - 16, 22);
-        this.ctx.strokeStyle = '#e74c3c';
+        this.ctx.strokeStyle = 'rgba(52, 152, 219, 0.6)';
         this.ctx.lineWidth = 1;
         this.ctx.strokeRect(x + 8, y + h - 30, w - 16, 22);
-        
-        this.ctx.fillStyle = '#e74c3c';
+
+        this.ctx.fillStyle = '#d6eaf8';
         this.ctx.font = 'bold 11px "UDデジタル教科書体",sans-serif';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(`あなたの答え: ${this.lastIncorrectAnswer}`, x + w/2, y + h - 16);
+        this.ctx.fillText(`さっきためしたよみ: ${this.lastIncorrectAnswer}`, x + w/2, y + h - 16);
       }
 
 
