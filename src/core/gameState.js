@@ -25,7 +25,11 @@ export const gameState = {
             // 'title' | 'menu' | 'battle' | 'stageClear' ...
     currentStageId: null,
     // ★★★ マスターモードを追加 ★★★
-    gameMode: 'challenge', // 'jikkuri', 'challenge', 'practice'
+    // 現在のバトル文脈を表す一時値。'practice' は練習・復習中を意味する。
+    // 永続する設定（じっくり/チャレンジ）は localStorage の 'gameMode' が正史で、
+    // saveData の既定・loadGameData のフォールバック・設定画面の既定はいずれも 'jikkuri'。
+    // ここだけ 'challenge' だったため、起動直後は設定と無関係に罰ありで始まっていた。
+    gameMode: 'jikkuri', // 'jikkuri' | 'challenge' | 'practice'
     previousScreen: null, // 遷移元の画面を保存
   
     /* プレイヤー ----------------------------------------------------------- */

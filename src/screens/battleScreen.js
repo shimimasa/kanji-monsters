@@ -5255,8 +5255,17 @@ gameState.playerStats.healsSuccessful++;
     // 学習データ記録（かいふくでの読みちがいも記録する）
     recordKanjiAnswer(gameState.currentKanji.id, false);
 
-    // チャレンジモードの時だけダメージを受ける
-    if (gameState.gameMode === 'challenge') {
+    // チャレンジモードの時だけダメージを受ける。
+    // NOTE: 設定の正史は localStorage（healMode / enemyAttackMode と同じ扱い）。
+    // 以前は gameState.gameMode を見ていたが、この値を設定画面から書き込む経路が無く、
+    // 起動直後の既定 'challenge' のまま常に罰が有効になっていた。さらに練習画面を一度通ると
+    // 'normal' に書き換わって罰が消えるため、同じ操作でも挙動が変わっていた。
+    // 練習・復習中（gameMode === 'practice'）は設定によらずダメージを与えない。
+    const isPracticeContext = gameState.gameMode === 'practice';
+    const persistedGameMode = (() => {
+      try { return localStorage.getItem('gameMode') || 'jikkuri'; } catch { return 'jikkuri'; }
+    })();
+    if (!isPracticeContext && persistedGameMode === 'challenge') {
       const atk = gameState.currentEnemy.atk || 5;
       gameState.playerStats.hp = Math.max(0, gameState.playerStats.hp - atk);
       if (gameState.playerStats.hp === 0) {
