@@ -1,6 +1,7 @@
 import { publish } from '../core/eventBus.js';
 import ReviewQueue   from '../models/reviewQueue.js';
 import { getKanjiById } from '../loaders/dataLoader.js';
+import { recordKanjiAnswer, saveGameData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { toHiragana, getReadings } from '../utils/readings.js';
 
@@ -25,8 +26,14 @@ const reviewStage = {
       : document.getElementById('gameCanvas');
     this.ctx    = this.canvas.getContext('2d');
 
-    // 1) 復習対象をポップ
-    this.kanjiIds = ReviewQueue.popBatch(5)
+    // 1) 復習対象を取り出す（キューからは消さない）
+    //    popBatch() は splice で項目を消してから ID を返すため、直後の
+    //    updateReview() が items.find に失敗して黙って return し、SM-2 の
+    //    間隔延長も「読めなかった字を翌日に再出題」も一度も動いていなかった。
+    //    間隔の管理は updateReview に任せ、ここでは due な先頭5件を見るだけにする。
+    this.kanjiIds = ReviewQueue.getDueReviews()
+      .slice(0, 5)
+      .map(e => e.id)
       // null, undefined な ID を除外
       .filter(id => id != null);
 
@@ -82,6 +89,10 @@ const reviewStage = {
     // バトル画面と同じ normalize + 完全一致判定
     const answer = toHiragana(this.inputEl.value);
     const ok = this.currentKanji.readings.includes(answer);
+
+    // 学習記録（正史）へ加算。ここが抜けていたため、復習だけやった日は
+    // 「こんしゅうのがんばり」が 0回 のままだった
+    recordKanjiAnswer(this.currentKanji.id, ok);
 
     if (ok) {
       publish('playSE', 'correct');
@@ -149,6 +160,9 @@ const reviewStage = {
 
   /** exit: クリーンアップ */
   exit() {
+    // 復習でためた学習記録を確定させる（力だめしと同じ理由。
+    // recordKanjiAnswer はメモリ上を増やすだけで、保存契機が無いと消える）
+    try { saveGameData(); } catch {}
     // 入力欄イベント解除
     this.inputEl?.removeEventListener('keydown', this._keydownHandler);
     if (this.inputEl) this.inputEl.style.display = 'none';

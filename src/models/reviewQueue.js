@@ -93,20 +93,10 @@ const reviewQueue = (() => {
       );
     },
 
-    /**
-     * due なものから先頭 n 件の ID 配列を返し、キューから除去
-     * @param {number} [n=5]
-     * @returns {Array<string|number>}
-     */
-    popBatch(n = 5) {
-      const due = this.getDueReviews().slice(0, n);
-      due.forEach(d => {
-        const idx = items.findIndex(i => i.id === d.id);
-        if (idx >= 0) items.splice(idx, 1);
-      });
-      save();
-      return due.map(d => d.id);
-    },
+    // NOTE: かつて popBatch(n) があったが、項目を splice で消してから ID を返すため、
+    //       呼び出し側が直後に updateReview() を呼んでも items.find に失敗して
+    //       黙って return し、SM-2 が一度も動いていなかった。取り出しは
+    //       getDueReviews() を使い、間隔の管理は updateReview に任せること。
 
     /** due 項目の数 */
     size() {
