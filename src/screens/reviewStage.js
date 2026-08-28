@@ -17,6 +17,8 @@ const reviewStage = {
   currentIndex: 0,
   currentKanji: null,
   message:     '',
+  emptyMessage: null,   // きょうの分が無い時に出すひと言
+  _emptyTimer:  null,
 
   /** enter: 初期化 */
   enter(arg) {
@@ -25,6 +27,10 @@ const reviewStage = {
       ? arg
       : document.getElementById('gameCanvas');
     this.ctx    = this.canvas.getContext('2d');
+
+    // 前回の空振り案内を持ち越さない
+    this.emptyMessage = null;
+    if (this._emptyTimer) { clearTimeout(this._emptyTimer); this._emptyTimer = null; }
 
     // 1) 復習対象を取り出す（キューからは消さない）
     //    popBatch() は splice で項目を消してから ID を返すため、直後の
@@ -38,8 +44,13 @@ const reviewStage = {
       .filter(id => id != null);
 
     if (this.kanjiIds.length === 0) {
-      // publish('changeScreen', 'gradeQuiz', { grade: gameState.currentGrade ?? 0 });
-      publish('changeScreen', 'stageSelect'); // まずは現状維持でもOK
+      // 無言で戻ると「押しても何も起きない」ように見える。
+      // 初回の復習予定を翌朝にしたので、ここに来る子は今後もっと増える。
+      this.emptyMessage = ['きょうの ぶんは ぜんぶ おわったよ！', 'また あした ここで まってるね'];
+      this._emptyTimer = setTimeout(() => {
+        this._emptyTimer = null;
+        publish('changeScreen', 'stageSelect');
+      }, 1800);
       return;
     }
 
@@ -123,6 +134,20 @@ const reviewStage = {
   /** 毎フレーム描画 */
   update(dt) {
     const { ctx, canvas } = this;
+    // きょうの分が無い時は、ひと言だけ出してから戻る
+    if (this.emptyMessage) {
+      ctx.fillStyle = '#1e3c72';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'white';
+      ctx.font = '22px "UDデジタル教科書体",sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      this.emptyMessage.forEach((line, i) => {
+        ctx.fillText(line, canvas.width / 2, canvas.height / 2 - 16 + i * 34);
+      });
+      ctx.textAlign = 'left';
+      return;
+    }
     // currentKanji が未設定であればスキップ
     if (!this.currentKanji) return;
 
@@ -160,6 +185,9 @@ const reviewStage = {
 
   /** exit: クリーンアップ */
   exit() {
+    // 空振り案内のタイマーが、片付けた後に遷移を起こさないようにする
+    if (this._emptyTimer) { clearTimeout(this._emptyTimer); this._emptyTimer = null; }
+    this.emptyMessage = null;
     // 復習でためた学習記録を確定させる（力だめしと同じ理由。
     // recordKanjiAnswer はメモリ上を増やすだけで、保存契機が無いと消える）
     try { saveGameData(); } catch {}
