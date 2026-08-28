@@ -52,6 +52,23 @@
   - 対処: `audioManager.js` に `DISK_PREFIXES`（小文字→実ファイル表記）と `resolveBgmBases()`（候補URLを優先順に試すフォールバック列）を追加。あわせて `canPlayType` による拡張子順の最適化（iPad/Safari は ogg 非対応のため m4a を先に試す）と、再生に失敗した Audio 要素を作り直す修正
   - **音源を追加する時の注意**: ファイル名は stageId と同じ小文字で置くこと。大文字で置く場合は `AudioManager.DISK_PREFIXES` に地域を登録する
 
+### 監査①（2026-08-28）で発見・修正した隠れバグ
+
+`docs/audit-prompts.md` の①を実行して洗い出したもの。すべて `fix:` コミット1件ずつで修正済み。
+
+| 症状 | 原因 | コミット |
+|---|---|---|
+| **ステージクリアが保存されず、リロードで全部巻き戻る** | 保存処理が代入されたことのない `window.gameState` を読んでいた＋クリア印を立てる前に保存していた | `85d9faf` |
+| ボーナスの伝説/幻110体中100体が北海道の姿で表示（図鑑では画像が壊れる） | 画像は `full/日本`・`full/海外` にあるのに学年フォルダから組み立てていた。四国は接頭辞ゆれ（SHK→SKG）で敵が10体とも解決できず北海道の通常敵にすり替わっていた | `2f41e6b` |
+| 効果音7種13箇所が無音（実績解除音を含む） | `FILES.se` に未登録で実ファイルも無い | `8edf014` |
+| かいふくの読みちがいで罰を受ける挙動が設定と無関係に常時ON | `gameState.gameMode` の既定値だけ `challenge`。設定の localStorage を誰も読んでいなかった | `5980bee` |
+| `isKanjiMastered` が常に false（図鑑の補完が動かない） | 同じく `window.gameState` 参照 | `6401947` |
+| 力だめしの学習記録・SP振り分けが保存されない | 保存契機が1つも無かった（5分オートセーブ頼み） | `bc03248` |
+| 四国・九州の称号が永久に付与されない | `achievements.json` に g11/g12 の定義が無い（3種×2学年=6件） | `f92c8c7` |
+| バックアップ読み込みで復習キューと称号カウントが消える | `reviewQueue` を読み戻す処理が無い。`bonus_*` が krb_save に載っていない | `dc92c7d` |
+| 力だめしの「もう一度」が効かない | `publish()` が第3引数を捨てるため grade/問題数が渡らず、ステージ選択へ戻されていた | `a15a7d2` |
+| Firestore同期で図鑑が縮む可能性 | `onSnapshot` がマージ無しで上書き | `a15a7d2` |
+
 ---
 
 ## 4. 次にやること（優先順）
@@ -60,6 +77,11 @@
 1. **スモークテストの一巡**（`docs/smoke-test-checklist.md`）。特に「今日の復習」「力だめし」「プロフィール→ステータスでSP消費」「タイトルのすぐ再開」は新規/修正動線。
 2. **Firestoreセキュリティルールの確認**（Firebaseコンソール）。匿名ユーザーが自分の `users/{uid}` 以外に書けないこと。
 3. **北海道用BGM音源の用意**（現在は汎用バトルBGMで暫定代替中。`src/audio/audioManager.js` の hokkaido/hokkaido_a/hokkaido_b）。
+4. **監査①の積み残し（下記4件）の判断**。詳細は `docs/audit-prompts.md` の実行ログ。
+   - **四国・九州の伝説モンスター10体**（SKG-L01〜05 / KYU-L01〜05）: 画像は full/thumb とも用意済みだが `enemies_legend.json` にレコードが無い。現状この2ステージは5体構成。名前・説明の作成は内容の判断が必要
+   - **到達不能画面の削除**（`result` / `gradeSelect` / `prefSelect` と、import ゼロの `loadingScreen.js` / `tutorialScreen.js` / `tutorialBattle.js` / `states/regionSelectState.js`）: 実害なしのデッドコード。menu 画面と同じ「再接続 or 削除」の判断
+   - **力だめしの「不正解…」赤字表示**（`gradeQuizScreen.js`）: Sprint 1 で決めた「赤字誤答→中立色」「しっぱい系の語を使わない」方針と矛盾。監査②の管轄
+   - **未登録のままにした効果音3種**（gameover / hover / expGain）: 既存音を当てると体験が悪くなるため保留。専用音源が要る
 
 ### B. すぐ着手できる安全な作業
 - `console.log` 447箇所の `src/utils/logger.js` への段階移行（現在は main.js で本番のみ握りつぶす暫定措置）。
