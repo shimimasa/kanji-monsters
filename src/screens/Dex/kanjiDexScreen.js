@@ -370,7 +370,7 @@ const kanjiDexScreen = {
         // ← 追加: 誤読のみトグルボタン
         const wrongOnlyBtn = document.createElement('button');
         wrongOnlyBtn.id = 'btnWrongOnly';
-        wrongOnlyBtn.textContent = '❗ 誤読のみ';
+        wrongOnlyBtn.textContent = '🔁 もういちど よむ漢字';
         const wrongBase = {
           background: this.showWrongOnly ? 'linear-gradient(135deg, #f39c12, #e67e22)' : 'linear-gradient(135deg, #ffc107, #e0a800)',
           color: this.showWrongOnly ? 'white' : '#000',

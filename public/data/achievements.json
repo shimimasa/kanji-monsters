@@ -199,8 +199,8 @@
   },
   {
     "id": "no_mistakes_stage",
-    "title": "完璧主義者",
-    "description": "1つのステージを間違いなしでクリアした",
+    "title": "いっぱつクリア！",
+    "description": "1つのステージを ぜんぶ いちどで 読みきった",
     "condition": {
       "type": "perfectStage",
       "value": 1

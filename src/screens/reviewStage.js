@@ -89,9 +89,10 @@ const reviewStage = {
       // 正解の場合：品質5（完璧に正解）でSM-2アルゴリズムに記録
       ReviewQueue.updateReview(this.currentKanji.id, 5);
     } else {
-      publish('playSE', 'wrong');
-      // 正答リストを表示
-      this.message = `不正解…正答: ${this.currentKanji.readings.join('、')}`;
+      // 「今日の復習」は過去に間違えた漢字と向き合う場面。ここで誤答音を重ねると
+      // 追い打ちになるため鳴らさない（ゲームオーバー画面を無音にしたのと同じ理由）
+      // 正しい読みをその場で示す
+      this.message = `おしい！ こたえは「${this.currentKanji.readings.join('、')}」`;
       // 不正解の場合：品質1（間違えた）でSM-2アルゴリズムに記録
       ReviewQueue.updateReview(this.currentKanji.id, 1);
     }

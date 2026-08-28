@@ -659,7 +659,7 @@ const settingsScreenState = {
     // ツールチップとイベントリスナーを設定
     this._setupTooltipEvents(
       healModeTooltipTrigger,
-      '回復成功後に敵の攻撃があるかどうかを設定します。「攻撃なし」は初心者向け、「攻撃あり」は戦略性が高まります。'
+      '回復成功後に敵の攻撃があるかどうかを設定します。「攻撃なし」は ゆっくりあそびたい人むけ、「攻撃あり」は 手ごたえのある たたかいになります。'
     );
     this.setupHealModeEvents();
     
@@ -711,7 +711,7 @@ const settingsScreenState = {
 
     this._setupTooltipEvents(
       tip,
-      '敵の攻撃タイミングを切り替えます。\n「通常」は毎ターン攻撃、「ミス時のみ」は不正解の時だけ敵が攻撃します。'
+      '敵の攻撃タイミングを切り替えます。\n「通常」は毎ターン攻撃、「ミス時のみ」は よみが ちがったときだけ 敵がうごきます。'
     );
     this.setupEnemyAttackModeEvents();
 
