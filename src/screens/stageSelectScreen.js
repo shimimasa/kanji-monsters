@@ -1279,7 +1279,7 @@ update(dt) {
 
         // ← 追加: 四国/九州の未解放ブロック
         if ((tab.grade === 11 || tab.grade === 12) && !this.isRegionUnlocked(tab.grade)) {
-          publish('playSE', 'wrong');
+          publish('playSE', 'cancel');
           alert(tab.grade === 11
             ? '四国地方はまだ解放されていません。\n解放条件: 1〜6年の通常ステージを全てクリア'
             : '九州地方はまだ解放されていません。\n解放条件: 1〜11年の通常ステージを全てクリア');
@@ -1332,7 +1332,7 @@ update(dt) {
                 return m ? parseInt(m[1], 10) : null;
               })();
               if (!g || !isBonusUnlocked(g)) {
-                 publish('playSE', 'wrong');
+                 publish('playSE', 'cancel');
                  alert('この学年ボーナスはまだ解放されていません。\n同学年の通常ステージを全てクリアし、学年の漢字を全てマスターすると解放されます。');
                  return;
                }
@@ -1365,7 +1365,7 @@ update(dt) {
                     return m ? parseInt(m[1], 10) : null;
                   })();
                   if (!g || !isBonusUnlocked(g)) {
-                     publish('playSE', 'wrong');
+                     publish('playSE', 'cancel');
                      alert('この学年ボーナスはまだ解放されていません。\n通常ステージをすべてクリアすると解放されます。');
                      return;
                    }
@@ -1404,7 +1404,7 @@ update(dt) {
         publish('playSE', 'decide');
         publish('changeScreen', 'gradeQuiz');
       } else {
-        publish('playSE', 'wrong'); // 学年タブ未選択（総復習・四国九州）では無効
+        publish('playSE', 'cancel'); // 学年タブ未選択（総復習・四国九州）では無効
       }
       return;
     }

@@ -160,7 +160,7 @@ const monsterCaptureScreen = {
       card.addEventListener('click', () => {
         // ← 追加：捕獲済みは選択不可
         if (already) {
-          try { publish('playSE', 'wrong'); } catch {}
+          try { publish('playSE', 'cancel'); } catch {}
           return;
         }
         if (this.selected.has(id)) {

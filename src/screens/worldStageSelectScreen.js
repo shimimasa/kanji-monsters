@@ -1142,7 +1142,7 @@ handleClick(e) {
                 for (const btn of this.reviewButtons) {
                   if (isMouseOverRect(x, y, btn)) {
                     if (!isBonusUnlocked(btn.grade)) {
-                      publish('playSE', 'wrong');
+                      publish('playSE', 'cancel');
                       alert('この学年の総復習はまだ解放されていません。\n同学年のボーナスを解放してください。');
                       return;
                     }
@@ -1204,7 +1204,7 @@ handleClick(e) {
             if (m) {
               const g = parseInt(m[1], 10);
               if (!isBonusUnlocked(g)) {
-                publish('playSE', 'wrong');
+                publish('playSE', 'cancel');
                 alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
                 return;
               }

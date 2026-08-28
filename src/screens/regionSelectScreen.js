@@ -875,7 +875,7 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       if (distance <= 35) {
         // ← 追加: ロック中は弾く
         if (!this.isRegionUnlocked(marker.grade)) {
-          publish('playSE', 'wrong');
+          publish('playSE', 'cancel');
           alert(marker.grade === 11
             ? '四国地方はまだ解放されていません。\n解放条件: 1〜6年の通常ステージを全てクリア'
             : '九州地方はまだ解放されていません。\n解放条件: 1〜11年の通常ステージを全てクリア');
