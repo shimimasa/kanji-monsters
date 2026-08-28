@@ -19,6 +19,8 @@ export class AudioManager {
     #bgmVolume = 0.2; // デフォルト値を0.7に設定
     /** @type {number} 0.0–1.0 のSE個別音量 */
     #seVolume  = 0.2; // デフォルト値を0.7に設定
+    /** @type {string[]|null} このブラウザで再生できる拡張子の優先順（初回に判定してキャッシュ） */
+    #extOrderCache = null;
 
     constructor() {
       // 初期化時にローカルストレージから音量設定を読み込む
@@ -73,6 +75,7 @@ export class AudioManager {
         europe_b: '/assets/audio/ヨーロッパB.mp3',
     
         america_a: '/assets/audio/アメリカA.mp3',
+        america_b: '/assets/audio/アメリカB.mp3',
         // NOTE: アメリカA2.mp3 は存在しないため実在するBに暫定割当
         america_a2: '/assets/audio/アメリカB.mp3',
     
@@ -103,6 +106,23 @@ export class AudioManager {
         levelUp: '/assets/audio/se_level.mp3'
       }
     };
+
+    /** ─────────────────────
+     *  ステージBGMの「実ファイル名の先頭表記」対応表
+     *
+     *  stageId の正史は小文字（asia_area1）だが、世界編の音源ファイルだけは
+     *  先頭大文字（Asia_area1_a.ogg）で保存されている。
+     *  本番ホスティング（Vercel / Firebase）も vite preview も大文字小文字を区別するため、
+     *  小文字のまま組み立てると世界ステージの音源だけが見つからず、
+     *  SPA の rewrite で index.html が返って無音になっていた。
+     *  ここで canonical(小文字) → 実ファイル表記 を橋渡しする。
+     *  ───────────────────── */
+    static DISK_PREFIXES = {
+      asia:    'Asia',
+      europe:  'Europe',
+      america: 'America',
+      africa:  'Africa',
+    };
   
     /*───────────────────────
       BGM 再生
@@ -113,11 +133,12 @@ export class AudioManager {
      * @param {boolean} [loop=true]
      */
     playBGM(key, loop = true) {
-      const base = this.resolveBgmBase(key); // 拡張子なしのベースURLを取得
-      if (!base) return console.warn(`BGM "${key}" は定義されていません`);
+      const bases = this.resolveBgmBases(key); // 拡張子なしのベースURL候補（優先順）
+      if (!bases.length) return console.warn(`BGM "${key}" は定義されていません`);
 
-      // 既存BGMと同じキーかつ再生中であればスキップ、停止中なら再開のみ
-      if (this.#currentBGM?.dataset?.key === key && this.#currentBGM.src && this.#currentBGM.src.includes(base)) {
+      // 既存BGMと同じキーで「再生に成功済み」ならスキップ、停止中なら再開のみ
+      // （再生できないままの要素は、同じキーでも作り直す）
+      if (this.#currentBGM?.dataset?.key === key && this.#currentBGM.dataset.resolved === '1') {
         if (this.#currentBGM.paused) {
           this.#currentBGM.loop = loop;
           this.#currentBGM.volume = this.#masterVolume * this.#bgmVolume;
@@ -133,29 +154,61 @@ export class AudioManager {
       }
 
       // 実ファイルを順に試して再生
-      const order = ['ogg','m4a','mp3'];
       const bgm = new Audio();
       bgm.dataset.key = key;
       bgm.loop = loop;
       bgm.volume = this.#masterVolume * this.#bgmVolume;
 
       this.#currentBGM = bgm;
-      this.#playWithExtFallback(bgm, base, order);
+      this.#playWithFallback(bgm, bases);
     }
 
-    async #playWithExtFallback(audioEl, baseNoExt, order) {
-      for (const ext of order) {
-        const src = encodeURI(`${baseNoExt}.${ext}`);
-        try {
-          audioEl.src = src;
-          await audioEl.play();
-          return; // 再生開始に成功
-        } catch (err) {
-          if (err?.name === 'AbortError') return; // 他のBGM切替で中断された場合は終了
-          // 次の拡張子へ
+    /**
+     * ベースURL候補 × 拡張子候補 を順に試して再生する。
+     * 最初に再生できたものを採用し、その要素に resolved マークを付ける。
+     */
+    async #playWithFallback(audioEl, bases) {
+      const order = this.#extOrder();
+      for (const base of bases) {
+        for (const ext of order) {
+          const src = encodeURI(`${base}.${ext}`);
+          try {
+            audioEl.src = src;
+            await audioEl.play();
+            audioEl.dataset.resolved = '1'; // 再生開始に成功
+            return;
+          } catch (err) {
+            if (err?.name === 'AbortError') return;      // 他の曲へ切替済み
+            if (err?.name === 'NotAllowedError') return; // 自動再生ブロック（src は保持して待つ）
+            // 次の候補へ
+          }
         }
       }
-      console.warn('BGMの再生に失敗しました:', baseNoExt, order);
+      console.warn('音声の再生に失敗しました:', bases, order);
+    }
+
+    /**
+     * このブラウザで再生できる拡張子の優先順を返す（初回のみ判定してキャッシュ）。
+     * iPad/Safari は ogg 非対応なので m4a を先に試す。
+     */
+    #extOrder() {
+      if (this.#extOrderCache) return this.#extOrderCache;
+      const order = ['ogg', 'm4a', 'mp3'];
+      try {
+        const probe = document.createElement('audio');
+        const mime = {
+          ogg: 'audio/ogg; codecs="vorbis"',
+          m4a: 'audio/mp4; codecs="mp4a.40.2"',
+          mp3: 'audio/mpeg',
+        };
+        const score = ext => {
+          const s = probe.canPlayType(mime[ext]);
+          return s === 'probably' ? 2 : s === 'maybe' ? 1 : 0;
+        };
+        order.sort((a, b) => score(b) - score(a)); // 同点なら元の順序を維持（安定ソート）
+      } catch {}
+      this.#extOrderCache = order;
+      return order;
     }
     /**
      * BGM 停止
@@ -179,10 +232,9 @@ export class AudioManager {
     playSE(key) {
       const base = this.resolveSeBase(key);
       if (!base) return console.warn(`SE "${key}" は定義されていません`);
-      const order = ['ogg','m4a','mp3'];
       const se = new Audio();
       se.volume = this.#masterVolume * this.#seVolume;
-      this.#playWithExtFallback(se, base, order);
+      this.#playWithFallback(se, [base]);
     }
   
     /*───────────────────────
@@ -231,23 +283,56 @@ export class AudioManager {
           });
         }
     
-        resolveBgmBase(key) {
+        /**
+         * BGMキーから「拡張子なしのベースURL」の候補を優先順に返す。
+         * 実ファイルの表記ゆれ（世界編は先頭大文字）と、専用音源が無い地域の
+         * どちらも無音にせず吸収するためのフォールバック列。
+         * @returns {string[]}
+         */
+        resolveBgmBases(key) {
+          const bases = [];
+          const push = (value) => {
+            if (!value) return;
+            const base = value.replace(/\.(ogg|mp3|m4a)$/i, '');
+            if (!bases.includes(base)) bases.push(base);
+          };
+
           const map = (AudioManager.FILES && AudioManager.FILES.bgm) || {};
-          const mapped = map[key];
-          if (mapped) {
-            return mapped.replace(/\.(ogg|mp3|m4a)$/i, '');
+          if (map[key]) {
+            push(map[key]);
+            return bases;
           }
-          // area系: xxx_areaN_(a|b) はそのまま
-          if (/_area\d+_(a|b)$/i.test(key)) {
-            return `/assets/audio/${key}`;
+
+          // area系: xxx_areaN[_a|_b]
+          const m = /^(.+?)_(area\d+)(?:_(a|b))?$/i.exec(String(key || ''));
+          if (m) {
+            const regionRaw = m[1];
+            const region    = regionRaw.toLowerCase();
+            const area      = m[2].toLowerCase();
+            // a/b 指定が無ければ毎回ランダム（従来どおり）
+            const ab = (m[3] || (Math.random() < 0.5 ? 'a' : 'b')).toLowerCase();
+
+            // ① 実ファイル表記（世界編は先頭大文字）
+            const disk = AudioManager.DISK_PREFIXES[region];
+            if (disk) push(`/assets/audio/${disk}_${area}_${ab}`);
+            // ② 渡されたままの表記 / ③ 全部小文字
+            push(`/assets/audio/${regionRaw}_${area}_${ab}`);
+            push(`/assets/audio/${region}_${area}_${ab}`);
+            // ④ ステージ個別の曲が無い地域は、地域の汎用BGMへ
+            push(map[`${region}_${ab}`] || map[`${region}_a`]);
+            // ⑤ 最後の砦（必ず存在する汎用バトルBGM）
+            push(map.battle);
+            return bases;
           }
-          // area系: xxx_areaN は毎回 a/b ランダム
-          if (/_area\d+$/i.test(key)) {
-            const pick = Math.random() < 0.5 ? 'a' : 'b';
-            return `/assets/audio/${key}_${pick}`;
-          }
+
           // その他はキー名そのまま（例: title → /assets/audio/bgm_title）
-          return `/assets/audio/${key}`;
+          push(`/assets/audio/${key}`);
+          return bases;
+        }
+
+        /** 後方互換: 最優先の候補だけを返す */
+        resolveBgmBase(key) {
+          return this.resolveBgmBases(key)[0] || '';
         }
 
         resolveSeBase(key) {
@@ -259,23 +344,6 @@ export class AudioManager {
           return `/assets/audio/${key}`;
         }  
 
-             #resolveDynamicSrc(basePathNoExt) {
-               try {
-                 const a = document.createElement('audio');
-                 const order = [
-                   { ext: 'ogg', mime: 'audio/ogg; codecs="vorbis"' },
-                   { ext: 'mp3', mime: 'audio/mpeg' },
-                   { ext: 'm4a', mime: 'audio/mp4; codecs="mp4a.40.2"' }
-                 ];
-                 for (const cand of order) {
-                   const support = a.canPlayType(cand.mime);
-                   if (support === 'probably' || support === 'maybe') {
-                     return `${basePathNoExt}.${cand.ext}`;
-                   }
-                 }
-               } catch {}
-               return `${basePathNoExt}.mp3`;
-             }
 
      /*───────────────────────
       BGM音量を設定 (0–1)

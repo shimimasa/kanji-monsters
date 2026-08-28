@@ -1,6 +1,6 @@
 # 作業引き継ぎ / 再開ガイド
 
-最終更新: 2026-07-16
+最終更新: 2026-08-28
 ブランチ: `リファクタリング`（main ではない・origin と同期済み）
 最新コミット: `53d0e4f`
 
@@ -46,6 +46,11 @@
 - 「今日の復習」画面が TypeError でクラッシュ（読みデータの配列/文字列不一致）
 - 起動時に前回ステージが `hokkaido_area1` で上書きされる
 - 名前入力画面のソフトロック、reviewQueue.getAll() 例外
+- **世界ステージ（アジア/ヨーロッパ/アメリカ/アフリカ）のBGMが全て無音**（2026-08-28 修正）
+  - 原因: 音源ファイルだけ先頭大文字（`Asia_area1_a.ogg`）なのに、canonical な stageId（小文字 `asia_area1`）からそのままURLを組み立てていた。日本編は元から小文字なので鳴っていた
+  - SPA の rewrite により 404 ではなく index.html が 200 で返るため、コンソールに何も出ず気づきにくい（`vite preview` でも再現する）
+  - 対処: `audioManager.js` に `DISK_PREFIXES`（小文字→実ファイル表記）と `resolveBgmBases()`（候補URLを優先順に試すフォールバック列）を追加。あわせて `canPlayType` による拡張子順の最適化（iPad/Safari は ogg 非対応のため m4a を先に試す）と、再生に失敗した Audio 要素を作り直す修正
+  - **音源を追加する時の注意**: ファイル名は stageId と同じ小文字で置くこと。大文字で置く場合は `AudioManager.DISK_PREFIXES` に地域を登録する
 
 ---
 
