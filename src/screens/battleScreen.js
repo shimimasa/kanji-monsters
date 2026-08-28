@@ -4600,8 +4600,11 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
       // ペナルティにはせず、復習キューに登録して後日もう一度出会わせる（SM-2間隔は進めない）
       publish('addToReview', gameState.currentKanji.id);
     } else {
-      // SM-2キューの前進（復習対象だった漢字を自力で読めたら間隔が伸びる）
-      reviewQueue.updateReview(gameState.currentKanji.id, 5);
+      // SM-2キューの前進（復習対象だった漢字を自力で読めたら間隔が伸びる）。
+      // ヒントを見ての正解は「自力」ではないので品質を下げ、間隔を伸ばしすぎない
+      // （ヒント無し→5 / Lv1→4 / Lv2・Lv3→3。3以上なので正解扱いは保つ）
+      const hintLv = Number(gameState.hintLevel || 0);
+      reviewQueue.updateReview(gameState.currentKanji.id, hintLv === 0 ? 5 : (hintLv === 1 ? 4 : 3));
     }
     
     // チャレンジモードの時間加算は廃止（ストップウォッチ化）
@@ -5166,8 +5169,11 @@ function onHeal() {
       // ペナルティにはせず、復習キューに登録して後日もう一度出会わせる（SM-2間隔は進めない）
       publish('addToReview', gameState.currentKanji.id);
     } else {
-      // SM-2キューの前進（復習対象だった漢字を自力で読めたら間隔が伸びる）
-      reviewQueue.updateReview(gameState.currentKanji.id, 5);
+      // SM-2キューの前進（復習対象だった漢字を自力で読めたら間隔が伸びる）。
+      // ヒントを見ての正解は「自力」ではないので品質を下げ、間隔を伸ばしすぎない
+      // （ヒント無し→5 / Lv1→4 / Lv2・Lv3→3。3以上なので正解扱いは保つ）
+      const hintLv = Number(gameState.hintLevel || 0);
+      reviewQueue.updateReview(gameState.currentKanji.id, hintLv === 0 ? 5 : (hintLv === 1 ? 4 : 3));
     }
 
     // ★★★ 追加: 読み進捗更新・マスター判定 ★★★

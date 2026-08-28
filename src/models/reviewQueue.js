@@ -40,10 +40,22 @@ const reviewQueue = (() => {
     return Math.max(1.3, newEF);
   };
 
+  /**
+   * 次に来る午前4時。初回の復習予定に使う。
+   * 以前は登録時刻そのもの（＝即 due）で、1分前に間違えた字がその場で
+   * 「復習待ち」に並び、同じ日のうちに詰め込む形になっていた。
+   */
+  const nextMorning = () => {
+    const d = new Date();
+    d.setHours(4, 0, 0, 0);
+    if (Date.now() >= d.getTime()) d.setDate(d.getDate() + 1);
+    return d.getTime();
+  };
+
   return {
     /**
      * 新規にキューへ登録。存在する場合はスキップ。
-     * repetition=0, interval=0, eFactor=2.5, nextReviewAt=now で初期化
+     * repetition=0, interval=0, eFactor=2.5, nextReviewAt=次の午前4時 で初期化
      */
     add(id) {
       if (items.some(i => i.id === id)) return;
@@ -52,7 +64,7 @@ const reviewQueue = (() => {
         repetition: 0,
         interval:   0,
         eFactor:    2.5,
-        nextReviewAt: Date.now()
+        nextReviewAt: nextMorning()
       });
       save();
     },
