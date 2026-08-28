@@ -208,12 +208,21 @@ const profileScreen = {
       weeklyMessage = `先週より +${weekly.diff}回 よめた！`;
     } else if (weekly.diff === 0) {
       weeklyMessage = '先週とおなじペースだよ';
-    } else {
+    } else if (weekly.thisWeek === 0) {
+      // 週のはじめ。0 を数えて見せない
+      weeklyMessage = 'つづきは いつでも まってるよ';
+    } else if (-weekly.diff <= 20) {
       weeklyMessage = `先週のペースまで あと${-weekly.diff}回`;
+    } else {
+      // 1ステージで30〜50回よむので、週の回数が落ちると差が60〜100になり得る。
+      // 向きが前向きでも量が絶望的なので、その時は差を見せず今週の数を数える
+      weeklyMessage = `こんしゅうも ${weekly.thisWeek}回 よめたよ`;
     }
     weeklyCard.innerHTML = `
       <h3 style="margin:0 0 8px; font-size:16px;">こんしゅうのがんばり</h3>
-      <div style="font-size:24px; font-weight:700;">${weekly.thisWeek}回 よめた</div>
+      <div style="font-size:${weekly.thisWeek === 0 ? 18 : 24}px; font-weight:700;">${
+        weekly.thisWeek === 0 ? 'きょう よんだら ここが ふえるよ' : `${weekly.thisWeek}回 よめた`
+      }</div>
       <div style="opacity:0.85;">先週: ${weekly.lastWeek}回</div>
       <div style="color:#7CFC9A; margin-top:6px; font-weight:700;">${weeklyMessage}</div>
     `;

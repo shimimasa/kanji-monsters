@@ -421,9 +421,15 @@ if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
     
     // 結果データ（間違い数の対比表示はやめ、成長が見える並びにする）
     const newlyReadCount = gameState.newlyReadKanjiList ? gameState.newlyReadKanjiList.length : 0;
+    // 同じステージを周回する子（＝伸びのゆっくりな子ほど多い）は、はじめて読めた漢字が
+    // 永久に 0個 になる。0個のときは「0」を見せず、絶対に減らない累計に差し替える
+    const readSoFar = Object.values(gameState.kanjiAnswerStats || {})
+      .filter(v => (v?.correct || 0) > 0).length;
     const results = [
       `正解数: ${gameState.correctKanjiList ? gameState.correctKanjiList.length : 0}`,
-      `はじめて読めた漢字: ${newlyReadCount}個`,
+      newlyReadCount > 0
+        ? `はじめて読めた漢字: ${newlyReadCount}個`
+        : `いままでに読めた漢字: ${readSoFar}字`,
       `現在レベル: ${gameState.playerStats.level}`,
       `総ステージクリア: ${gameState.playerStats.stagesCleared}`
     ];
