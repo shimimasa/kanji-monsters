@@ -5,6 +5,7 @@
 // ◆images               … すべての Image オブジェクトをキャッシュ保持
 
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
+import { getBonusMonsterFolder } from '../utils/monsterImagePaths.js';
 
 export const images = {};                // key → HTMLImageElement
 
@@ -241,7 +242,10 @@ const gradeFolderMap = {
 };
   
   // 学年に基づいてフォルダを決定
-  const folder = gradeFolderMap[enemy.grade] || gradeFolderMap[1];
+  // NOTE: ボーナスの伝説(*-L0n)/幻(*-F0n) は学年フォルダではなく full/日本・full/海外 に置かれている。
+  // enemies_legend.json の大半に grade が無く、以前はここで grade1-hokkaido に落ちて
+  // 「北海道のモンスターの絵」が代替表示されていた。
+  const folder = getBonusMonsterFolder(enemy.id) || gradeFolderMap[enemy.grade] || gradeFolderMap[1];
   
   // 画像ファイル名を取得（ID部分のみ）
   const enemyId = enemy.id;

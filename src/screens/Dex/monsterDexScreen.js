@@ -7,6 +7,8 @@ import { gameState } from '../../core/gameState.js';
 // --- グローバルスコープにあったヘルパー関数を、このファイル内に移動 ---
 
 // 学年別フォルダマッピング（世界 7-10 を追加）
+import { getBonusMonsterFolder } from '../../utils/monsterImagePaths.js';
+
 const gradeFolderMap = {
   1: 'grade1-hokkaido',
   2: 'grade2-touhoku',
@@ -81,7 +83,8 @@ function createCard(monster, { showUncollected = false, isFavorite = false, onTo
   });
 
   const img = document.createElement('img');
-  const folder = gradeFolderMap[monster.grade] || gradeFolderMap[1];
+  // ボーナスの伝説/幻は thumb/日本・thumb/海外 に置かれている
+  const folder = getBonusMonsterFolder(monster.id) || gradeFolderMap[monster.grade] || gradeFolderMap[1];
   const thumbPath = `/assets/images/monsters/thumb/${folder}/${monster.id}.webp`;
   img.dataset.thumb = thumbPath;
   img.alt = monster.name;
@@ -194,7 +197,8 @@ function showMonsterModal(monster) {
 
   // モンスター画像（フル画像を表示）
   const img = document.createElement('img');
-  const folder = gradeFolderMap[monster.grade] || gradeFolderMap[1];
+  // ボーナスの伝説/幻は full/日本・full/海外 に置かれている
+  const folder = getBonusMonsterFolder(monster.id) || gradeFolderMap[monster.grade] || gradeFolderMap[1];
   img.src = `/assets/images/monsters/full/${folder}/${monster.id}.webp`;
   img.alt = monster.name;
   img.classList.add('modal-monster-image');
