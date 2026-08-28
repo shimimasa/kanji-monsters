@@ -21,6 +21,8 @@ export class AudioManager {
     #seVolume  = 0.2; // デフォルト値を0.7に設定
     /** @type {string[]|null} このブラウザで再生できる拡張子の優先順（初回に判定してキャッシュ） */
     #extOrderCache = null;
+    /** @type {Set<string>} 未登録SEの警告を1キーにつき1回だけ出すための記録 */
+    #warnedSeKeys = new Set();
 
     constructor() {
       // 初期化時にローカルストレージから音量設定を読み込む
@@ -103,7 +105,21 @@ export class AudioManager {
         shield1: '/assets/audio/se_shield1.mp3',
         shield2: '/assets/audio/se_shield2.mp3',
         shield3: '/assets/audio/se_shield3.mp3',
-        levelUp: '/assets/audio/se_level.mp3'
+        levelUp: '/assets/audio/se_level.mp3',
+
+        // NOTE: 以下は呼び出しはあったが未登録で、ずっと無音だったもの。
+        // 専用音源が用意されるまで、意味の近い既存音を暫定割当する
+        // （専用ファイルを置いたらこの行を差し替えるだけでよい）。
+        achievement: '/assets/audio/se_master.mp3',  // 実績解除（要: 専用ファンファーレ）
+        victory:     '/assets/audio/se_level.mp3',   // 勝利画面の入場（要: 専用ジングル）
+        cancel:      '/assets/audio/se_decide.mp3',  // モーダルを閉じる（要: 専用キャンセル音）
+        shieldBreak: '/assets/audio/se_shield3.mp3'  // シールド破壊（要: 専用の破壊音）
+
+        // 意図的に未登録のまま残しているキー（既存音を当てると体験が悪くなるため）:
+        //   gameover … 「今回はここまで！」画面。静かなBGMが担う場面なので、
+        //               派手な音は入れない。入れるなら やさしい音を新規に用意する
+        //   hover    … 地図マーカーのホバー。決定音を流用すると地図が騒がしくなる
+        //   expGain  … 経験値パーティクルの着弾ごとに鳴るため、既存音だと連打音になる
       }
     };
 
@@ -231,7 +247,16 @@ export class AudioManager {
      */
     playSE(key) {
       const base = this.resolveSeBase(key);
-      if (!base) return console.warn(`SE "${key}" は定義されていません`);
+      if (!base) {
+        // NOTE: 以前は未登録キーでも /assets/audio/{key} を投機的に叩いていたが、
+        // SPA の rewrite により 404 ではなく index.html が 200 で返るため、
+        // 鳴らないうえに呼ばれるたび HTML をダウンロードしていた。ここで打ち切る。
+        if (!this.#warnedSeKeys.has(key)) {
+          this.#warnedSeKeys.add(key);
+          console.warn(`SE "${key}" は未登録のため再生しません（AudioManager.FILES.se に追加してください）`);
+        }
+        return;
+      }
       const se = new Audio();
       se.volume = this.#masterVolume * this.#seVolume;
       this.#playWithFallback(se, [base]);
@@ -341,7 +366,8 @@ export class AudioManager {
           if (mapped) {
             return mapped.replace(/\.(ogg|mp3|m4a)$/i, '');
           }
-          return `/assets/audio/${key}`;
+          // 未登録キーは推測でパスを組み立てない（呼び出し側で打ち切る）
+          return '';
         }  
 
 
