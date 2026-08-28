@@ -32,6 +32,8 @@ const gradeQuizScreen = {
   current: null,
   feedback: '',
   feedbackColor: 'white',
+  locked: false,        // フィードバック表示中は次の解答を受け付けない
+  _advanceTimer: null,
   phase: 'quiz', // 'quiz' | 'result'
   stats: {
     correct: 0,
@@ -64,6 +66,8 @@ const gradeQuizScreen = {
     this.index = 0;
     this.stats = { correct: 0, wrong: 0, answers: [] };
     this.phase = 'quiz';
+    this.locked = false;
+    if (this._advanceTimer) { clearTimeout(this._advanceTimer); this._advanceTimer = null; }
     this._loadCurrent();
 
     // 入力欄
@@ -119,13 +123,14 @@ const gradeQuizScreen = {
   },
 
   _checkAnswer(raw) {
-    if (!this.current) return;
+    if (!this.current || this.locked) return;
     const user = toHiragana(raw);
     const ok = this.current.readings.includes(user);
 
     // フィードバック・記録
-    this.feedback = ok ? '正解！' : `不正解… 正答: ${this.current.readings.join('、')}`;
-    this.feedbackColor = ok ? '#2ecc71' : '#e74c3c';
+    this.feedback = ok ? 'せいかい！' : `おしい！ こたえは「${this.current.readings.join('、')}」`;
+    // 読みちがいは責めない中立色（琥珀）。赤 #e74c3c は使わない
+    this.feedbackColor = ok ? '#2ecc71' : '#f1c40f';
     this.stats[ok ? 'correct' : 'wrong']++;
     this.stats.answers.push({
       id: this.current.id,
@@ -137,21 +142,28 @@ const gradeQuizScreen = {
     recordKanjiAnswer(this.current.id, ok);
     if (!ok) ReviewQueue.add(this.current.id);
 
-    // 次の問題へ
-    this.index++;
-    if (this.index >= this.order.length) {
-      // 終了
-      this.phase = 'result';
-      // 入力欄は隠す
-      if (this.inputEl) this.inputEl.style.display = 'none';
-      // NOTE: recordKanjiAnswer はメモリ上の学習記録を増やすだけで、保存は
-      // 既存のセーブ契機に相乗りする設計。力だめしにはその契機が無く、
-      // 結果画面で閉じると1回分まるごと消えていたのでここで確定させる。
-      try { saveGameData(); } catch {}
-      return;
-    }
+    // フィードバックを1秒見せてから次へ進む。
+    // 以前はここで同期的に _loadCurrent() を呼んでいたため、直前に入れた
+    // this.feedback が1フレームも描画されず、答えても無反応に見えていた。
+    this.locked = true;
     if (this.inputEl) this.inputEl.value = '';
-    this._loadCurrent();
+    this._advanceTimer = setTimeout(() => {
+      this._advanceTimer = null;
+      this.locked = false;
+      this.index++;
+      if (this.index >= this.order.length) {
+        // 終了
+        this.phase = 'result';
+        // 入力欄は隠す
+        if (this.inputEl) this.inputEl.style.display = 'none';
+        // NOTE: recordKanjiAnswer はメモリ上の学習記録を増やすだけで、保存は
+        // 既存のセーブ契機に相乗りする設計。力だめしにはその契機が無く、
+        // 結果画面で閉じると1回分まるごと消えていたのでここで確定させる。
+        try { saveGameData(); } catch {}
+        return;
+      }
+      this._loadCurrent();
+    }, 1000);
   },
 
   update(dt) {
@@ -227,6 +239,9 @@ const gradeQuizScreen = {
   },
 
   exit() {
+    // 画面を離れた後にタイマーが発火して、片付け済みの参照を触らないようにする
+    if (this._advanceTimer) { clearTimeout(this._advanceTimer); this._advanceTimer = null; }
+    this.locked = false;
     // 途中でやめた場合も、そこまでの学習記録を残す
     try { saveGameData(); } catch {}
     if (this.inputEl && this._keydownHandler) {
