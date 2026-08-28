@@ -89,7 +89,11 @@ const gradeQuizScreen = {
       }
       if (this.phase === 'result') {
         if (isMouseOverRect(x, y, BTN.again)) {
-          publish('changeScreen', 'gradeQuiz', { grade: this.grade, numQuestions: this.numQuestions });
+          // NOTE: publish(event, payload) は第3引数を捨てるため、以前は grade も
+          // numQuestions も渡らず、enter() が gameState.currentGrade（多くの場合 0）に
+          // フォールバックして、そのまま ステージ選択へ戻されていた。
+          // changeScreen の正規化が対応している [name, props] 形式で渡す。
+          publish('changeScreen', ['gradeQuiz', { grade: this.grade, numQuestions: this.numQuestions }]);
           return;
         }
         if (isMouseOverRect(x, y, BTN.review)) {
