@@ -27,6 +27,9 @@ import {
 battleState.timeRemaining = 60;
 
 // プレイヤーに進行状況を示すUI追加も可能
+// ステージの途中に立てる旗の位置（この数だけ倒したら、力尽きても次はここから）
+const BATTLE_CHECKPOINT_AT = 5;
+
 function getProgressInfo() {
   const order = gameState.currentEnemyIndex + 1;
   if (order <= 6) return `ノーマル戦 ${order}/6`;
@@ -988,7 +991,13 @@ updateShieldBreakEffect() {
       battleState.kanjiPool_onyomi = gameState.kanjiPool.filter(k => hasAny(k.onyomi));
       battleState.kanjiPool_kunyomi = gameState.kanjiPool.filter(k => hasAny(k.kunyomi));
 
-      gameState.currentEnemyIndex = 0;
+      // 途中で力尽きても、5体目までの進みは残す（チェックポイント）。
+      // ステージをクリアすると resultWinScreen が stageProgress を
+      // { cleared: true } で置き換えるため、旗は自動的に外れる＝
+      // クリア済みステージを遊び直す時は1体目から始まる。
+      const savedCheckpoint = Number(gameState.stageProgress?.[gameState.currentStageId]?.checkpoint || 0);
+      const lastEnemyIndex  = Math.max(0, (gameState.enemies?.length || 1) - 1);
+      gameState.currentEnemyIndex = Math.min(savedCheckpoint, lastEnemyIndex);
       battleState.recentKanjiIds = [];
       battleState.shuffledKanjiList = [...gameState.kanjiPool].sort(() => Math.random() - 0.5);
       battleState.currentKanjiIndex = 0;
@@ -4864,6 +4873,23 @@ setManagedTimeout(() => {
                          const inputEl = battleScreenState.inputEl;
                          if (inputEl) inputEl.value = '';
                          gameState.currentEnemyIndex++;
+
+                         // 5体倒したら旗を立てる。力尽きても6体目から再開でき、
+                         // 15分ぶんの進みがまるごと消えることがなくなる
+                         if (gameState.currentEnemyIndex === BATTLE_CHECKPOINT_AT) {
+                           try {
+                             const sid = gameState.currentStageId;
+                             if (sid) {
+                               gameState.stageProgress = gameState.stageProgress || {};
+                               const prog = gameState.stageProgress[sid] || (gameState.stageProgress[sid] = {});
+                               if (!prog.cleared && prog.checkpoint !== BATTLE_CHECKPOINT_AT) {
+                                 prog.checkpoint = BATTLE_CHECKPOINT_AT;
+                                 saveGameData();
+                               }
+                             }
+                           } catch {}
+                         }
+
                          spawnEnemy();
                          pickNextKanji();
                          battleState.turn = 'player';
