@@ -111,7 +111,6 @@ export class AudioManager {
         // 専用音源が用意されるまで、意味の近い既存音を暫定割当する
         // （専用ファイルを置いたらこの行を差し替えるだけでよい）。
         achievement: '/assets/audio/se_master.mp3',  // 実績解除（要: 専用ファンファーレ）
-        victory:     '/assets/audio/se_level.mp3',   // 勝利画面の入場（要: 専用ジングル）
         cancel:      '/assets/audio/se_decide.mp3',  // モーダルを閉じる（要: 専用キャンセル音）
         shieldBreak: '/assets/audio/se_shield3.mp3'  // シールド破壊（要: 専用の破壊音）
 
@@ -120,6 +119,9 @@ export class AudioManager {
         //               派手な音は入れない。入れるなら やさしい音を新規に用意する
         //   hover    … 地図マーカーのホバー。決定音を流用すると地図が騒がしくなる
         //   expGain  … 経験値パーティクルの着弾ごとに鳴るため、既存音だと連打音になる
+        //   victory  … 勝利画面の入場。se_level を流用していたが、バトル中の
+        //               レベルアップ音と同一ファイルで、勝利のたび「レベルが上がった?」と
+        //               誤って覚えさせるため外した。静かな bgm_victory に任せる。要: 専用ジングル
       }
     };
 

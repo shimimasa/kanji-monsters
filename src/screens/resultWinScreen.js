@@ -96,8 +96,10 @@ if (!this._countCommitted) {
     
     this.ctx = this.canvas.getContext('2d');
     
-    // 勝利SEを再生
-    publish('playSE', 'victory');
+    // 勝利画面の入場SEは鳴らさない。流用していた se_level はバトル中の
+    // レベルアップ音と同一ファイルで、画面に入るたび「レベルが上がった?」と
+    // 誤って覚えさせるうえ、bgm_victory と実績音に重なっていた。
+    // ここは静かな勝利BGMに任せる（専用ジングルが用意できたら復活させる）
     
     // アニメーションタイマーを初期化
     this.animationTime = 0;
