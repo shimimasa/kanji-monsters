@@ -1957,22 +1957,17 @@ _teardownGlobalBackHandler() {
       let statY = y + 35;
       
       const { totalPracticed, correctCount, correctStreak, maxStreak } = this.practiceStats;
-      const accuracy = totalPracticed > 0 ? Math.round((correctCount / totalPracticed) * 100) : 0;
       
-      this.ctx.fillText(`正答率: ${accuracy}% (${correctCount}/${totalPracticed})`, x + 10, statY);
+      // 練習は避難先なので評価メーター（正答率・平均秒数）は出さない。
+      // 積み上げ型の「よめた数」と連続記録だけを見せる
+      this.ctx.fillText(`よめた数: ${correctCount}（ためした数: ${totalPracticed}）`, x + 10, statY);
       statY += 15;
       this.ctx.fillText(`現在の連続: ${correctStreak}問`, x + 10, statY);
       statY += 15;
       this.ctx.fillText(`最高連続: ${maxStreak}問`, x + 10, statY);
       
-      if (this.practiceStats.timePerQuestion.length > 0) {
-        const avgTime = Math.round(
-          this.practiceStats.timePerQuestion.reduce((a, b) => a + b, 0) /
-          this.practiceStats.timePerQuestion.length / 1000
-        );
-        this.ctx.textAlign = 'right';
-        this.ctx.fillText(`平均: ${avgTime}秒`, x + w - 10, statY);
-      }
+      // 平均秒数の表示は廃止（速さの評価につながるため）。
+      // 計測自体は practiceStats.timePerQuestion に残している
       
     } catch (error) {
       console.error('❌ 詳細統計描画エラー:', error);

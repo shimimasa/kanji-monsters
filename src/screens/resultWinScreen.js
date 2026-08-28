@@ -120,7 +120,10 @@ if (!this._countCommitted) {
       // ステージクリア時のEXP付与は行わない（表示のみ）
       if (firstClear) markBonusFirstClear(grade);
 
-      this.bonusSummary = { grade, fights, accuracyPct, remHpPct, ...result, xp: 0 };
+      // accuracyPct はランク計算にだけ使う内部値。画面には出さず、
+      // 「よめた漢字: X / Y」という数え上げで見せる
+      const correctCount = this.resultData.correct?.length || 0;
+      this.bonusSummary = { grade, fights, accuracyPct, remHpPct, correctCount, totalAsked: total, ...result, xp: 0 };
     }
     
     // イベントハンドラ登録
@@ -489,7 +492,7 @@ drawBonusResultPanel(ctx, x, y, width, height) {
 
   const lines = [
     `連戦数: ${s.fights}`,
-    `正答率: ${s.accuracyPct}% / 残HP: ${s.remHpPct}%`,
+    `よめた漢字: ${s.correctCount} / ${s.totalAsked} ／ 残りHP: ${s.remHpPct}%`,
     `ランク: ${s.rank}（倍率 x${s.multiplier}）`,
     `ステージクリア時のEXP付与: なし`
   ];
