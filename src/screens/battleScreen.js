@@ -10,6 +10,7 @@ import { drawRoundedRect as traceRoundedRect } from '../ui/canvasUtils.js';
 import { toHiragana, getReadings, findNearMiss, getNearMissLines } from '../utils/readings.js';
 import Speech from '../audio/speech.js';
 import { gaugeColor, availabilityColor } from '../ui/palette.js';
+import SessionTimer from '../core/sessionTimer.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
@@ -778,6 +779,9 @@ updateShieldBreakEffect() {
   /** 画面がアクティブになったときの初期化 */
   enter(canvasEl, onVictory) {
     try {
+      // 「きょうは ○ふん」はバトルに入ってから数える（地図を見ている時間は数えない）
+      SessionTimer.startIfNeeded();
+
       // デバッグ情報
       console.log("🧪 battleScreen.enter() 実行", {
         canvasEl: canvasEl,
@@ -4599,6 +4603,30 @@ function spawnEnemy() {
 }
 
 /**
+ * 「きょうは ○ふん」の時間が来たので、区切りのいいところで今日を終える。
+ *
+ * 途中でやめた形にしないことが肝心なので、いま倒したところまでを保存し、
+ * その日に読めた数を添えてから地図へ戻す。
+ * 進みは既にあるチェックポイント（5体で旗）で残るので、次はそこから始められる。
+ */
+function finishSessionForToday() {
+  SessionTimer.reset();
+  try { saveGameData(); } catch {}
+
+  const readToday = (gameState.correctKanjiList || []).length;
+  const lines = ['じかんに なったよ！', 'きょうは ここまで！'];
+  if (readToday > 0) lines.push(`きょうは ${readToday}こ よめたね`);
+  addToLog(lines.join(' '));
+  battleScreenState.showLogBlock(lines);
+
+  setManagedTimeout(() => {
+    publish('playBGM', 'title');
+    const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
+    publish('changeScreen', targetScreen);
+  }, 2600);
+}
+
+/**
  * 「読みとしては合っているのに、書き方だけがずれた入力」を拾う。
  *
  * このゲームは読めるようになることを目指す場なので、きよう／きょう や
@@ -5006,6 +5034,13 @@ setManagedTimeout(() => {
                                }
                              }
                            } catch {}
+                         }
+
+                         // 「きょうは ○ふん」で区切る設定なら、ここで終わりにする。
+                         // 切るのは敵と敵の間だけ。問題の途中では止めない。
+                         if (SessionTimer.isOver()) {
+                           finishSessionForToday();
+                           return;
                          }
 
                          spawnEnemy();

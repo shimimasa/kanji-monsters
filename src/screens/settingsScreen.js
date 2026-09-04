@@ -8,6 +8,7 @@ import KanaPad from '../ui/kanaPad.js';
 import Speech from '../audio/speech.js';
 import TextScale from '../ui/textScale.js';
 import Palette from '../ui/palette.js';
+import SessionTimer from '../core/sessionTimer.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -191,9 +192,79 @@ const settingsScreenState = {
   panel.appendChild(this._createSpeechGroup());
   panel.appendChild(this._createBigFontGroup());
   panel.appendChild(this._createColorModeGroup());
+  panel.appendChild(this._createSessionLengthGroup());
 
   return panel;
 },
+
+  /**
+   * 「きょうは ○ふん」で区切る設定。
+   * 授業の残り時間で切り上げると、子どもの側には「途中でやめた」形しか残らない。
+   * はじめに時間を決めておけば、区切りのいいところで終われる。
+   */
+  _createSessionLengthGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'きょうの じかん';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const select = document.createElement('select');
+    select.style.maxWidth = '180px';
+    select.style.marginRight = '8px';
+    const labelOf = (m) => (m === 0 ? 'くぎらない' : `${m}ぷん`);
+    SessionTimer.SESSION_CHOICES.forEach(minutes => {
+      const opt = document.createElement('option');
+      opt.value = String(minutes);
+      opt.textContent = labelOf(minutes);
+      select.appendChild(opt);
+    });
+    select.value = String(SessionTimer.getMinutes());
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    status.textContent = `（いまは: ${labelOf(SessionTimer.getMinutes())}）`;
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const minutes = parseInt(select.value, 10) || 0;
+      SessionTimer.setMinutes(minutes);
+      status.textContent = `（いまは: ${labelOf(minutes)}）`;
+      this._showSaveToast('きょうの じかんを 更新しました');
+    });
+
+    row.appendChild(select);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      '決めた時間がすぎたら、敵と敵の間で「きょうは ここまで！」と終わります。' +
+      '問題の途中では止まりません。地図を見ている時間は数えません。'
+    );
+
+    return group;
+  },
 
   /**
    * 見分けやすい配色に切り替える。
