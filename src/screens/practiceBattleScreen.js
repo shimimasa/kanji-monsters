@@ -350,7 +350,8 @@ try {
       this.inputEl.addEventListener('keydown', this._practiceKeydownHandler);
 
       // モバイル入力最適化（iOS向け）
-      this.inputEl.setAttribute('inputmode', 'kana');
+      this.inputEl.setAttribute('lang', 'ja'); // NOTE: inputmode の 'kana' はHTML仕様に無い値でブラウザに無視される。
+        // 端末のキーボードを使う設定の時に、せめて日本語入力が選ばれやすくなるようにしておく
       this.inputEl.setAttribute('autocapitalize', 'off');
       this.inputEl.setAttribute('autocorrect', 'off');
       this.inputEl.setAttribute('spellcheck', 'false');

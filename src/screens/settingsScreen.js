@@ -4,6 +4,7 @@ import { drawButton, isMouseOverRect, drawThemeBackground, drawPanelBackground }
 import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
 import { publish } from '../core/eventBus.js';
 import { hardResetAllLocalData } from '../core/saveData.js';
+import KanaPad from '../ui/kanaPad.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -183,8 +184,84 @@ const settingsScreenState = {
     'タイマーは内部でいつも計測されます。ここでは画面に表示するかどうかだけを切り替えます。'
   );
 
+  panel.appendChild(this._createInputMethodGroup());
+
   return panel;
 },
+
+  /**
+   * よみの入れかた（ゲーム内の50音表／端末のキーボード）を選ぶ。
+   * 既定はゲーム内の50音表。端末のキーボードは、その端末で最後に使われた
+   * ものが出るため、ローマ字入力に当たった子がそこで手が止まる。
+   */
+  _createInputMethodGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'よみの いれかた';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const select = document.createElement('select');
+    [
+      ['kanaPad', 'がめんの 50おんひょう'],
+      ['device', 'たんまつの キーボード']
+    ].forEach(([value, text]) => {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = text;
+      select.appendChild(opt);
+    });
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+
+    const labelOf = (v) => (v === 'device' ? 'たんまつの キーボード' : 'がめんの 50おんひょう');
+    let current = 'kanaPad';
+    try { current = localStorage.getItem('inputMethod') || 'kanaPad'; } catch {}
+    select.value = current;
+    status.textContent = `（いまは: ${labelOf(current)}）`;
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const value = select.value === 'device' ? 'device' : 'kanaPad';
+      try { localStorage.setItem('inputMethod', value); } catch {}
+      status.textContent = `（いまは: ${labelOf(value)}）`;
+      KanaPad.sync();
+      this._showSaveToast('よみの いれかたを 更新しました');
+    });
+
+    row.appendChild(select);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'がめんの50おんひょうなら、学校で見なれた並びのまま指1本で読みを書けます。' +
+      'ローマ字入力に慣れている子は、たんまつのキーボードも選べます。'
+    );
+
+    return group;
+  },
 
 
 

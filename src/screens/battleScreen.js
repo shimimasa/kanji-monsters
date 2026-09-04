@@ -877,7 +877,8 @@ updateShieldBreakEffect() {
         this.inputEl.addEventListener('keydown', this._keydownHandler);
 
         // モバイル入力最適化＆キーボード追従
-        this.inputEl.setAttribute('inputmode', 'kana');
+        this.inputEl.setAttribute('lang', 'ja'); // NOTE: inputmode の 'kana' はHTML仕様に無い値でブラウザに無視される。
+        // 端末のキーボードを使う設定の時に、せめて日本語入力が選ばれやすくなるようにしておく
         this.inputEl.setAttribute('autocapitalize', 'off');
         this.inputEl.setAttribute('autocorrect', 'off');
         this.inputEl.setAttribute('spellcheck', 'false');
@@ -2522,6 +2523,18 @@ _setupMobileViewportWorkarounds() {
     
         this._vvResizeHandler = () => { applyByViewport(); };
         this._vvScrollHandler = () => { if (this.keyboardState.open) scrollCanvasTopIntoView(); };
+
+        // ゲーム内の50音パッドは端末のキーボードではないので visualViewport が動かない。
+        // 盤面を詰める処理はキーボード用のものが既にあるので、そこへ合流させる。
+        this._kanaPadLayoutHandler = (e) => {
+          const detail = (e && e.detail) || {};
+          this.keyboardState.open = !!detail.open;
+          this.keyboardState.bottomInset = detail.open ? (detail.height || 0) : 0;
+          setScrollPadding(!!detail.open);
+          this._adjustInputPosition();
+          if (detail.open) scrollCanvasTopIntoView();
+        };
+        window.addEventListener('kanapad:layout', this._kanaPadLayoutHandler);
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', this._vvResizeHandler);
       window.visualViewport.addEventListener('scroll', this._vvScrollHandler);
@@ -2564,7 +2577,8 @@ _adjustInputPosition() {
       el.autocomplete = 'off';
       document.body.appendChild(el);
       this.inputEl = el;
-      this.inputEl.setAttribute('inputmode', 'kana');
+      this.inputEl.setAttribute('lang', 'ja'); // NOTE: inputmode の 'kana' はHTML仕様に無い値でブラウザに無視される。
+        // 端末のキーボードを使う設定の時に、せめて日本語入力が選ばれやすくなるようにしておく
       this.inputEl.setAttribute('autocapitalize', 'off');
       this.inputEl.setAttribute('autocorrect', 'off');
       this.inputEl.setAttribute('spellcheck', 'false');
@@ -3341,6 +3355,10 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
     if (this._vkGeometryHandler && navigator.virtualKeyboard) {
       navigator.virtualKeyboard.removeEventListener('geometrychange', this._vkGeometryHandler);
       this._vkGeometryHandler = null;
+    }
+    if (this._kanaPadLayoutHandler) {
+      window.removeEventListener('kanapad:layout', this._kanaPadLayoutHandler);
+      this._kanaPadLayoutHandler = null;
     }
     if (Array.isArray(this._focusScrollTimers)) {
       this._focusScrollTimers.forEach(id => { try { clearTimeout(id); } catch {} });

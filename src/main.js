@@ -19,6 +19,7 @@ import { setupFSM } from './init/fsmsetup.js';
 import { checkAchievements } from './core/achievementManager.js';
 import { addKanji } from './models/kanjiDex.js';
 import practiceBattleScreen from './screens/practiceBattleScreen.js';
+import KanaPad from './ui/kanaPad.js';
 
 
 /* ----------------------------- ログ静音化 ----------------------------- */
@@ -176,6 +177,9 @@ function drawAchievementNotifications(ctx) {
 
 (async function initGame() {
   console.log('🔧 Init start');
+  // ゲーム内の50音パッドを用意する。入力欄は index.html に静的に置いてあるので、
+  // ここで捕まえておけば、どの画面が入力欄を出しても自分で追従できる。
+  KanaPad.install();
   // 1) 画像 & JSON プリロード
   // await initAssets();
   showBootProgress();
