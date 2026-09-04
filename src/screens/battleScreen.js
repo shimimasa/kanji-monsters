@@ -9,6 +9,7 @@ import reviewQueue from '../models/reviewQueue.js';
 import { drawRoundedRect as traceRoundedRect } from '../ui/canvasUtils.js';
 import { toHiragana, getReadings, findNearMiss, getNearMissLines } from '../utils/readings.js';
 import Speech from '../audio/speech.js';
+import { gaugeColor, availabilityColor } from '../ui/palette.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
@@ -3080,7 +3081,7 @@ const rect = this.canvas.getBoundingClientRect?.();
     ctx.fillRect(contentX, barY, contentW, barH);
   
     const hpRatio = gameState.playerStats.hp / gameState.playerStats.maxHp;
-    ctx.fillStyle = hpRatio > 0.5 ? '#2ecc71' : (hpRatio > 0.2 ? '#f39c12' : '#e74c3c');
+    ctx.fillStyle = gaugeColor(hpRatio);
     ctx.fillRect(contentX, barY, contentW * hpRatio, barH);
     this.drawTextWithOutline(
       `${gameState.playerStats.hp} / ${gameState.playerStats.maxHp}`,
@@ -3116,7 +3117,7 @@ const rect = this.canvas.getBoundingClientRect?.();
     this.drawTextWithOutline(
       `回復: ${healCount}/${maxHealCount}回`,
       contentX + contentW, statsY,
-      healCount > 0 ? '#2ecc71' : '#e74c3c',
+      availabilityColor(healCount > 0),
       '#F5DEB3', '14px "UDデジタル教科書体", sans-serif',
       'right', 'top', 2
     );
@@ -4395,7 +4396,7 @@ const comboY = kanjiY;
       ctx.fillRect(comboX - timerBarWidth/2, comboY + 45, timerBarWidth, timerBarHeight);
       
       // タイマーバー（残り時間）
-      const timerColor = timerRatio > 0.3 ? '#2ecc71' : '#e74c3c';
+      const timerColor = gaugeColor(timerRatio, 0.3, 0.3);
       ctx.fillStyle = timerColor;
       ctx.fillRect(comboX - timerBarWidth/2, comboY + 45, timerBarWidth * timerRatio, timerBarHeight);
     }

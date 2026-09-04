@@ -7,6 +7,7 @@ import { hardResetAllLocalData } from '../core/saveData.js';
 import KanaPad from '../ui/kanaPad.js';
 import Speech from '../audio/speech.js';
 import TextScale from '../ui/textScale.js';
+import Palette from '../ui/palette.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -189,9 +190,74 @@ const settingsScreenState = {
   panel.appendChild(this._createInputMethodGroup());
   panel.appendChild(this._createSpeechGroup());
   panel.appendChild(this._createBigFontGroup());
+  panel.appendChild(this._createColorModeGroup());
 
   return panel;
 },
+
+  /**
+   * 見分けやすい配色に切り替える。
+   * HPバーの 緑→橙→赤 や、かいふくの残り回数の 緑／赤 は、赤と緑の区別が
+   * つきにくい子には同じに見える。器（settings.cbMode）は前からあったが、
+   * 切り替える場所も効き目も無かった。
+   */
+  _createColorModeGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'いろの みえかた';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = Palette.isColorBlindMode();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    const describe = (on) => `（いまは: ${on ? 'みわけやすい いろ' : 'ふつうの いろ'}）`;
+    status.textContent = describe(toggle.checked);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      Palette.setColorBlindMode(on);
+      status.textContent = describe(on);
+      try { saveGameData(); } catch {}
+      this._showSaveToast('いろの みえかたを 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'ちからのバーや かいふくの のこり回数の色を、赤と緑を使わない組み合わせに変えます。' +
+      '（空色・橙・赤紫）'
+    );
+
+    return group;
+  },
 
   /**
    * 文字を大きくする設定。
@@ -352,6 +418,9 @@ const settingsScreenState = {
     row.className = 'inline-controls';
 
     const select = document.createElement('select');
+    // 幅を抑えないと、隣の「適用」に重なる（.inline-controls は横並び）
+    select.style.maxWidth = '180px';
+    select.style.marginRight = '8px';
     [
       ['kanaPad', 'がめんの 50おんひょう'],
       ['device', 'たんまつの キーボード']
