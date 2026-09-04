@@ -5817,14 +5817,35 @@ export function cleanup() {
 
 // 敵撃破アニメ（battleState.enemyAction === 'defeat'）の終了を待ってから callback を実行
 function waitForDefeatAnimationThen(callback) {
+  // 撃破演出（約1秒）が終わってから次の敵へ進む。
+  //
+  // 待ちは requestAnimationFrame に頼っているが、ブラウザは画面が見えていない間
+  // （タブが裏に回る・別のアプリに切り替える・端末がスリープする）フレームを止める。
+  // 倒した直後にそうなると演出が終わらず、次の敵がいつまでも出てこない。
+  // 子どもから見れば「倒したのに何も起きない」という止まった画面になる。
+  // 実時間の締め切りを置いて、フレームが来なくても必ず先へ進むようにする。
+  const DEADLINE_MS = 2000; // 演出は約1秒。その倍を上限にする
+  let fallbackId = null;
+  let done = false;
+
+  const run = () => {
+    if (done) return;
+    done = true;
+    if (fallbackId !== null) clearManagedTimeout(fallbackId);
+    callback();
+  };
+
   const check = () => {
+    if (done) return;
     if (battleState.enemyAction === 'defeat' && battleState.enemyActionTimer > 0) {
       requestAnimationFrame(check);
     } else {
-      // 念のため次フレームで実行
-      requestAnimationFrame(() => callback());
+      // 念のため次フレームで実行（フレームが来なければ締め切りが拾う）
+      requestAnimationFrame(run);
     }
   };
+
+  fallbackId = setManagedTimeout(run, DEADLINE_MS);
   check();
 }
 
