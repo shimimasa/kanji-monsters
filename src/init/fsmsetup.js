@@ -15,6 +15,7 @@ import settingsState       from '../screens/settingsScreen.js';
 import reviewStage         from '../screens/reviewStage.js';
 import kanjiDexScreen      from '../screens/Dex/kanjiDexScreen.js';
 import monsterDexState     from '../screens/Dex/monsterDexScreen.js';
+import proverbDexScreen    from '../screens/Dex/proverbDexScreen.js';
 import resultWinState      from '../screens/resultWinScreen.js';
 import gameOverState       from '../screens/gameOverScreen.js';
 import resultScreenState   from '../screens/resultScreen.js';
@@ -25,7 +26,6 @@ import stageLoadingState   from '../screens/stageLoadingScreen.js';
 import courseSelectScreen from '../screens/courseSelectScreen.js';
 import continentSelectScreen from '../screens/continentSelectScreen.js';
 import worldStageSelectScreen from '../screens/worldStageSelectScreen.js';
-// import proverbMonsterDexState from '../screens/Dex/proverbMonsterDexScreen.js'; // ← 削除
 // 追加
 import profileScreen       from '../screens/profileScreen.js';
 import gradeQuizScreen     from '../screens/gradeQuizScreen.js';
@@ -52,6 +52,7 @@ export async function setupFSM() {
     reviewStage:      reviewStage,
     kanjiDex:         kanjiDexScreen,
     monsterDex:       monsterDexState,
+    proverbDex:       proverbDexScreen,
     resultWin:        resultWinState,
     result:           resultScreenState,
     gameOver:         gameOverState,
@@ -59,7 +60,6 @@ export async function setupFSM() {
     courseSelect:     courseSelectScreen,
     continentSelect:  continentSelectScreen,
     worldStageSelect: worldStageSelectScreen,
-    // proverbMonsterDex: proverbMonsterDexState, // ← 削除
     gradeQuiz:        gradeQuizScreen,
     // 追加
     profile:          profileScreen,

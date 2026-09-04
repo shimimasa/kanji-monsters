@@ -20,12 +20,37 @@ html.vh-lock, body.vh-lock { height: 100dvh; overflow: hidden; }
   <meta name="theme-color" content="#1e90ff" />
 </head>
 <script>
+  // PWAは一旦撤退（sw.jsが不正な内容のまま配布されていたため）。
+  // 過去に登録されたService Workerが残っている端末があれば解除する。
+  //
+  // NOTE: 以前は load 後に unregister するだけだった。しかしその時点では
+  // HTML もモジュールも「古いSWのキャッシュから」配られ終わっている。
+  // さらに unregister しても、いま開いているページの controller は生きたままで、
+  // Cache Storage（learning-platform-v1 など）も残る。
+  // その結果、古い端末では直したはずの版がいつまでも出てこない
+  // （＝教室で「直したのに反映されない」が起きる）。実際にキャッシュから
+  // 古い main.js が配られている状態を確認した。
+  // そこで「SWに配られている時だけ、掃除して1回だけ読み直す」ようにする。
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('SW registered:', reg))
-        .catch(err => console.error('SW registration failed:', err));
-    });
+    (async () => {
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        const controlled = !!navigator.serviceWorker.controller;
+        if (!regs.length && !controlled) return;
+
+        await Promise.all(regs.map(r => r.unregister().catch(() => {})));
+        if (window.caches) {
+          const names = await caches.keys();
+          await Promise.all(names.map(n => caches.delete(n).catch(() => {})));
+        }
+
+        // 読み直しは1回だけ。ループにならないようセッションに印を置く。
+        if (controlled && !sessionStorage.getItem('swCleanupReloaded')) {
+          sessionStorage.setItem('swCleanupReloaded', '1');
+          location.reload();
+        }
+      } catch {}
+    })();
   }
 </script>
 <body>

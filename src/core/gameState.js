@@ -11,6 +11,15 @@ export const battleState = {
   recentKanjiIds: [], // 漢字の重複出題防止用（念のため復活）
   currentKanjiIndex: 0,  // 現在の問題インデックス
   mistakesThisStage: 0,  // ステージごとのミス回数
+
+  // 「読めてはいるが書き方だけずれた入力」を、この問題で何回したか。
+  // 罰にはせず、2回目からは正しい書き方を見せるための回数。問題ごとに 0 に戻す。
+  nearMissCount: 0,
+
+  // 「さっき読めなかった字」を数問あとにもう一度出すための予約。
+  // 翌日以降のSM-2（reviewQueue）とは別に、その場での取り返しの機会を作る。
+  // [{ id, waitTurns }]。ステージを始めるたびに空にする。
+  retryQueue: [],
   
   // コンボタイマー関連のプロパティを追加
   comboTimer: 0,         // コンボの残り時間（フレーム数）
@@ -25,7 +34,11 @@ export const gameState = {
             // 'title' | 'menu' | 'battle' | 'stageClear' ...
     currentStageId: null,
     // ★★★ マスターモードを追加 ★★★
-    gameMode: 'challenge', // 'jikkuri', 'challenge', 'practice'
+    // 現在のバトル文脈を表す一時値。'practice' は練習・復習中を意味する。
+    // 永続する設定（じっくり/チャレンジ）は localStorage の 'gameMode' が正史で、
+    // saveData の既定・loadGameData のフォールバック・設定画面の既定はいずれも 'jikkuri'。
+    // ここだけ 'challenge' だったため、起動直後は設定と無関係に罰ありで始まっていた。
+    gameMode: 'jikkuri', // 'jikkuri' | 'challenge' | 'practice'
     previousScreen: null, // 遷移元の画面を保存
   
     /* プレイヤー ----------------------------------------------------------- */
@@ -60,6 +73,7 @@ export const gameState = {
     showHint: false,
     correctKanjiList: [],   // 正解した漢字をためる
     wrongKanjiList: [],     // 間違えた漢字をためる
+    newlyReadKanjiList: [], // このバトルで初めて読めた漢字（勝利画面で祝う）
 
     /* 実績システム --------------------------------------------------------- */
     unlockedAchievements: new Set(),  // 解除した実績のIDを保存
@@ -72,6 +86,16 @@ export const gameState = {
     /* ★★★ 漢字マスター状況管理 ★★★ */
     kanjiReadProgress: {
       // kanjiId: { onyomi: Set, kunyomi: Set, mastered: boolean }
+    },
+
+    /* ★★★ 漢字別の正答/誤答の累計（永続化対象・学習記録の正史） ★★★ */
+    kanjiAnswerStats: {
+      // kanjiId: { correct: number, incorrect: number }
+    },
+
+    /* ★★★ 日別の解答数（週次の成長表示用・永続化対象） ★★★ */
+    dailyAnswerStats: {
+      // 'YYYY-MM-DD': { correct: number, total: number }
     },
 
     /* ★★★ バトルベストタイム管理 ★★★ */
@@ -127,6 +151,73 @@ export const gameState = {
    */
   export function isAchievementUnlocked(achievementId) {
     return gameState.unlockedAchievements.has(achievementId);
+  }
+
+  /** ローカル日付キー（YYYY-MM-DD） */
+  function localDateKey(d = new Date()) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  /**
+   * 漢字1問の正誤を学習記録（正史）に加算する
+   * 保存は既存のセーブ契機（ステージクリア・EXP加算等）に相乗りする
+   * @param {string|number} kanjiId
+   * @param {boolean} isCorrect
+   */
+  export function recordKanjiAnswer(kanjiId, isCorrect) {
+    if (kanjiId === null || kanjiId === undefined || kanjiId === '') return;
+    if (!gameState.kanjiAnswerStats) gameState.kanjiAnswerStats = {};
+    const key = String(kanjiId);
+    const stats = gameState.kanjiAnswerStats[key] || (gameState.kanjiAnswerStats[key] = { correct: 0, incorrect: 0 });
+    if (isCorrect) stats.correct++;
+    else stats.incorrect++;
+
+    // 日別カウンタ（週次の成長表示用）
+    if (!gameState.dailyAnswerStats) gameState.dailyAnswerStats = {};
+    const dayKey = localDateKey();
+    const day = gameState.dailyAnswerStats[dayKey] || (gameState.dailyAnswerStats[dayKey] = { correct: 0, total: 0 });
+    day.total++;
+    if (isCorrect) day.correct++;
+
+    // 古い日別記録は60日で間引く（肥大化防止）
+    const keys = Object.keys(gameState.dailyAnswerStats);
+    if (keys.length > 60) {
+      keys.sort();
+      for (const k of keys.slice(0, keys.length - 60)) {
+        delete gameState.dailyAnswerStats[k];
+      }
+    }
+  }
+
+  /**
+   * 直近7日と、その前7日の「読めた回数」を集計する（週次の成長表示用）
+   * @returns {{thisWeek: number, lastWeek: number, diff: number}}
+   */
+  export function getWeeklyAnswerSummary() {
+    const stats = gameState.dailyAnswerStats || {};
+    const now = new Date();
+    let thisWeek = 0, lastWeek = 0;
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const entry = stats[localDateKey(d)];
+      const c = entry?.correct || 0;
+      if (i < 7) thisWeek += c;
+      else lastWeek += c;
+    }
+    return { thisWeek, lastWeek, diff: thisWeek - lastWeek };
+  }
+
+  /**
+   * 漢字1文字分の学習記録を取得する（未記録なら0埋め）
+   * @param {string|number} kanjiId
+   * @returns {{correct: number, incorrect: number}}
+   */
+  export function getKanjiAnswerStats(kanjiId) {
+    const stats = gameState.kanjiAnswerStats?.[String(kanjiId)];
+    return { correct: stats?.correct || 0, incorrect: stats?.incorrect || 0 };
   }
   
   /**
@@ -238,15 +329,48 @@ function incrementStageClearCount(stageId) {
           if (Array.isArray(dex)) gotomonIds = dex.filter(x => typeof x === 'string');
         } catch {}
         let reviewIds = [];
+        // NOTE: reviewQueue は id 配列としてしか保存しておらず、しかも読み戻す処理が
+        // どこにも無かったため、ファイル経由のバックアップで「今日の復習」が空になっていた。
+        // 互換のため id 配列（reviewQueue）はそのまま残し、SM-2 の間隔まで含めた
+        // 全項目を reviewQueueDetail として併せて保存する。
+        let reviewDetail = [];
         try {
           const rq = JSON.parse(localStorage.getItem('krb_review_queue') || '[]');
-          if (Array.isArray(rq)) reviewIds = rq.map(e => e?.id).filter(Boolean);
+          if (Array.isArray(rq)) {
+            reviewIds = rq.map(e => e?.id).filter(Boolean);
+            reviewDetail = rq.filter(e => e && e.id);
+          }
+        } catch {}
+
+        // ボーナスの称号カウント（bonus_{grade}_clearCount / _firstClear）も
+        // localStorage にしかなく、バックアップで失われていた。
+        const bonusCounters = {};
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (!k) continue;
+            const m = /^bonus_(\d+)_(clearCount|firstClear)$/.exec(k);
+            if (!m) continue;
+            const g = m[1];
+            bonusCounters[g] = bonusCounters[g] || {};
+            if (m[2] === 'clearCount') {
+              const n = parseInt(localStorage.getItem(k) || '0', 10);
+              bonusCounters[g].clearCount = Number.isFinite(n) ? n : 0;
+            } else {
+              bonusCounters[g].firstClear = localStorage.getItem(k) === '1';
+            }
+          }
         } catch {}
 
         // ステージクリアの統合
         const cleared = new Set(base?.player?.progress?.clearedStages || []);
-        if (typeof window !== 'undefined' && window.gameState?.stageProgress) {
-          Object.entries(window.gameState.stageProgress).forEach(([sid, v]) => {
+        // NOTE: 以前は window.gameState を読んでいたが、window.gameState への代入は
+        // コードベースのどこにも存在せず（読み取り2箇所のみ）、この分岐は常に false だった。
+        // その結果、clear_* 互換ミラーの書き込み停止(StepC-1)以降、新規クリアが
+        // krb_save に一切保存されず、リロードで巻き戻っていた。
+        // 同一モジュールの gameState（正史）を直接参照する。
+        if (gameState.stageProgress) {
+          Object.entries(gameState.stageProgress).forEach(([sid, v]) => {
             if (v && v.cleared) cleared.add(sid);
           });
         }
@@ -275,6 +399,12 @@ function incrementStageClearCount(stageId) {
                 const autosaveMinutes = parseInt(localStorage.getItem('autosaveMinutes') || `${base.settings?.autosaveMinutes ?? 5}`, 10);
                 const cbMode = (localStorage.getItem('cbMode') ?? `${base.settings?.cbMode ? '1' : '0'}`) === '1';
                 const bigFont = (localStorage.getItem('bigFont') ?? `${base.settings?.bigFont ? '1' : '0'}`) === '1';
+                // 弱点の読み系統だけを正解にするか（既定は ON）
+                const weaknessScope = (localStorage.getItem('weaknessScope') ?? `${base.settings?.weaknessScope === false ? '0' : '1'}`) === '1';
+                // 例文の中で読ませるモード（既定は OFF）
+                const exampleMode = (localStorage.getItem('exampleMode') ?? `${base.settings?.exampleMode ? '1' : '0'}`) === '1';
+                // 画面の漢字にふりがなを振るか（既定は OFF）
+                const rubyMode = (localStorage.getItem('rubyMode') ?? `${base.settings?.rubyMode ? '1' : '0'}`) === '1';
         
                 // 新スキーマを更新
                 const save = base || getDefaultSave();
@@ -284,6 +414,7 @@ function incrementStageClearCount(stageId) {
                 save.player.progress = Object.assign({}, save.player.progress || {}, {
                   currentStage: gameState.currentStageId || save.player?.progress?.currentStage || null,
                   clearedStages: Array.from(cleared),
+                  bonusCounters,
                   stageBestTimes: Object.assign({}, save.player?.progress?.stageBestTimes, gameState.stageBestTimes || {})
                 });
                 save.player.collection = Object.assign({}, save.player.collection || {}, {
@@ -293,6 +424,11 @@ function incrementStageClearCount(stageId) {
                   practiceProgress: gameState.practiceProgress || {},
                   kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress || {}),
                   reviewQueue: reviewIds,
+                  reviewQueueDetail: reviewDetail,
+                  // 漢字別の正答/誤答の累計（{ [kanjiId]: { correct, incorrect } }）
+                  answers: gameState.kanjiAnswerStats || {},
+                  // 日別の解答数（{ 'YYYY-MM-DD': { correct, total } }）
+                  dailyAnswerStats: gameState.dailyAnswerStats || {},
                   // 追加: ステージのレビュー解放状況を永続化
                   stageReviewUnlocked: gameState.stageReviewUnlocked || {}
                 });
@@ -309,7 +445,10 @@ function incrementStageClearCount(stageId) {
                   autosaveEnabled,
                   autosaveMinutes: Number.isFinite(autosaveMinutes) ? Math.max(1, autosaveMinutes) : 5,
                   cbMode,
-                  bigFont
+                  bigFont,
+                  weaknessScope,
+                  exampleMode,
+                  rubyMode
                 });
         
         // 実績（v1）を保存
@@ -354,9 +493,49 @@ function incrementStageClearCount(stageId) {
             if (ids.length > 0) localStorage.setItem('krb_kanji_dex', JSON.stringify(ids));
           } catch {}
         }
+        // 復習キュー（krb_review_queue）を復元する。
+        // reviewQueueDetail があれば SM-2 の間隔ごと戻し、無ければ id 配列から
+        // 「すぐ復習対象」の最小エントリを組み立てる（古いバックアップとの互換）。
+        try {
+          const detail = save.player?.study?.reviewQueueDetail;
+          const ids = save.player?.study?.reviewQueue;
+          if (Array.isArray(detail) && detail.length > 0) {
+            localStorage.setItem('krb_review_queue', JSON.stringify(detail.filter(e => e && e.id)));
+          } else if (Array.isArray(ids) && ids.length > 0) {
+            const rebuilt = ids.filter(Boolean).map(id => ({
+              id: String(id), repetition: 0, interval: 0, eFactor: 2.5, nextReviewAt: Date.now()
+            }));
+            localStorage.setItem('krb_review_queue', JSON.stringify(rebuilt));
+          }
+        } catch {}
+
+        // ボーナスの称号カウントを復元する
+        try {
+          const counters = save.player?.progress?.bonusCounters;
+          if (counters && typeof counters === 'object') {
+            for (const [g, v] of Object.entries(counters)) {
+              if (!v || typeof v !== 'object') continue;
+              if (Number.isFinite(v.clearCount)) {
+                localStorage.setItem(`bonus_${g}_clearCount`, String(v.clearCount));
+              }
+              if (v.firstClear) localStorage.setItem(`bonus_${g}_firstClear`, '1');
+            }
+          }
+        } catch {}
+
         // 追加: レビュー解放のロード
         if (save.player?.study?.stageReviewUnlocked) {
           gameState.stageReviewUnlocked = save.player.study.stageReviewUnlocked || {};
+        }
+        // 漢字別の正答/誤答の累計（旧スキーマの配列は捨ててマップのみ受け入れる）
+        const rawAnswers = save.player?.study?.answers;
+        if (rawAnswers && typeof rawAnswers === 'object' && !Array.isArray(rawAnswers)) {
+          gameState.kanjiAnswerStats = rawAnswers;
+        }
+        // 日別の解答数
+        const rawDaily = save.player?.study?.dailyAnswerStats;
+        if (rawDaily && typeof rawDaily === 'object' && !Array.isArray(rawDaily)) {
+          gameState.dailyAnswerStats = rawDaily;
         }
         
         if (save.player?.progress?.stageBestTimes) {
@@ -402,6 +581,16 @@ function incrementStageClearCount(stageId) {
             if ('autosaveMinutes' in save.settings) localStorage.setItem('autosaveMinutes', `${save.settings.autosaveMinutes}`);
             if ('cbMode' in save.settings) localStorage.setItem('cbMode', save.settings.cbMode ? '1' : '0');
             if ('bigFont' in save.settings) localStorage.setItem('bigFont', save.settings.bigFont ? '1' : '0');
+            if ('weaknessScope' in save.settings) localStorage.setItem('weaknessScope', save.settings.weaknessScope ? '1' : '0');
+            if ('exampleMode' in save.settings) localStorage.setItem('exampleMode', save.settings.exampleMode ? '1' : '0');
+            if ('rubyMode' in save.settings) localStorage.setItem('rubyMode', save.settings.rubyMode ? '1' : '0');
+            // 文字サイズと配色は描画のたびに参照するので localStorage を読み直させない。
+            // セーブから書き戻した時だけ、判定用の値を取り直す。
+            import('../ui/textScale.js').then(m => m.refresh()).catch(() => {});
+            import('../ui/palette.js').then(m => m.refresh()).catch(() => {});
+            import('./readingScope.js').then(m => m.refresh()).catch(() => {});
+            import('./exampleMode.js').then(m => m.refresh()).catch(() => {});
+            import('../ui/ruby.js').then(m => m.refresh()).catch(() => {});
           } catch {}
         }
 

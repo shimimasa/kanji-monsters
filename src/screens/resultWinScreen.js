@@ -21,7 +21,7 @@ const quickReviewButton = {
   y: 480,
   width: 220,
   height: 50,
-  text: '復習'
+  text: 'いま おぼえちゃう！'
 };
 
 const resultWinState = {
@@ -50,12 +50,14 @@ const resultWinState = {
     const stageId = this.resultData.stageId || gameState.currentStageId;
     if (stageId) {
       try {
-        // P0-2 StepA(例外A): clear_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
-        try { saveGameData(); } catch {}
         // P0-2 StepC-1: clear_* 互換ミラー書き込みを停止（読み取り互換は saveData.isStageCleared の legacy fallback で維持）
         // localStorage.setItem(`clear_${stageId}`, '1');
+        // NOTE: saveGameData() は gameState.stageProgress を読んで krb_save へ統合するため、
+        // 必ず「クリア印を立ててから」保存する。順序を逆にすると、今クリアしたステージが
+        // 保存対象に入らない（この順序ミスが実際に事故になっていた）。
         if (!gameState.stageProgress) gameState.stageProgress = {};
         gameState.stageProgress[stageId] = { cleared: true };
+        try { saveGameData(); } catch {}
       } catch (e) {
         console.warn('ステージクリア反映に失敗:', e);
       }
@@ -94,8 +96,10 @@ if (!this._countCommitted) {
     
     this.ctx = this.canvas.getContext('2d');
     
-    // 勝利SEを再生
-    publish('playSE', 'victory');
+    // 勝利画面の入場SEは鳴らさない。流用していた se_level はバトル中の
+    // レベルアップ音と同一ファイルで、画面に入るたび「レベルが上がった?」と
+    // 誤って覚えさせるうえ、bgm_victory と実績音に重なっていた。
+    // ここは静かな勝利BGMに任せる（専用ジングルが用意できたら復活させる）
     
     // アニメーションタイマーを初期化
     this.animationTime = 0;
@@ -118,7 +122,10 @@ if (!this._countCommitted) {
       // ステージクリア時のEXP付与は行わない（表示のみ）
       if (firstClear) markBonusFirstClear(grade);
 
-      this.bonusSummary = { grade, fights, accuracyPct, remHpPct, ...result, xp: 0 };
+      // accuracyPct はランク計算にだけ使う内部値。画面には出さず、
+      // 「よめた漢字: X / Y」という数え上げで見せる
+      const correctCount = this.resultData.correct?.length || 0;
+      this.bonusSummary = { grade, fights, accuracyPct, remHpPct, correctCount, totalAsked: total, ...result, xp: 0 };
     }
     
     // イベントハンドラ登録
@@ -412,20 +419,34 @@ if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
     ctx.fillStyle = '#8B4513';
     ctx.fillText('戦績', x + width/2, y + 30);
     
-    // 結果データ
+    // 結果データ（間違い数の対比表示はやめ、成長が見える並びにする）
+    const newlyReadCount = gameState.newlyReadKanjiList ? gameState.newlyReadKanjiList.length : 0;
+    // 同じステージを周回する子（＝伸びのゆっくりな子ほど多い）は、はじめて読めた漢字が
+    // 永久に 0個 になる。0個のときは「0」を見せず、絶対に減らない累計に差し替える
+    const readSoFar = Object.values(gameState.kanjiAnswerStats || {})
+      .filter(v => (v?.correct || 0) > 0).length;
     const results = [
       `正解数: ${gameState.correctKanjiList ? gameState.correctKanjiList.length : 0}`,
-      `間違い: ${gameState.wrongKanjiList ? gameState.wrongKanjiList.length : 0}`,
+      newlyReadCount > 0
+        ? `はじめて読めた漢字: ${newlyReadCount}個`
+        : `いままでに読めた漢字: ${readSoFar}字`,
       `現在レベル: ${gameState.playerStats.level}`,
       `総ステージクリア: ${gameState.playerStats.stagesCleared}`
     ];
-    
-    ctx.font = '18px "UDデジタル教科書体", sans-serif';
+
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#654321';
-    
+
     results.forEach((text, index) => {
-      ctx.fillText(text, x + 20, y + 70 + index * 25);
+      // はじめて読めた漢字がある時は、その行をお祝い色で強調する
+      if (index === 1 && newlyReadCount > 0) {
+        ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
+        ctx.fillStyle = '#1e8449';
+        ctx.fillText(`✨ ${text}`, x + 20, y + 70 + index * 25);
+      } else {
+        ctx.font = '18px "UDデジタル教科書体", sans-serif';
+        ctx.fillStyle = '#654321';
+        ctx.fillText(text, x + 20, y + 70 + index * 25);
+      }
     });
     
     // パーフェクトクリアの場合の特別表示
@@ -479,7 +500,7 @@ drawBonusResultPanel(ctx, x, y, width, height) {
 
   const lines = [
     `連戦数: ${s.fights}`,
-    `正答率: ${s.accuracyPct}% / 残HP: ${s.remHpPct}%`,
+    `よめた漢字: ${s.correctCount} / ${s.totalAsked} ／ 残りHP: ${s.remHpPct}%`,
     `ランク: ${s.rank}（倍率 x${s.multiplier}）`,
     `ステージクリア時のEXP付与: なし`
   ];
@@ -599,9 +620,9 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#8B4513';
-    ctx.fillText('復習が必要な漢字:', x + 10, y + 25);
-    
-    // 間違えた漢字リスト
+    ctx.fillText('つぎの旅でまた会う漢字:', x + 10, y + 25);
+
+    // また会う漢字リスト
     ctx.font = '14px "UDデジタル教科書体", sans-serif';
     ctx.fillStyle = '#654321';
     

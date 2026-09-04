@@ -1,12 +1,15 @@
 // 練習バトル画面 - UI改善版（ボタンレス・統計強化・フィードバック改善）
 
 import battleScreenState from './battleScreen.js';
-import { gameState, battleState, saveGameData } from '../core/gameState.js';
+import { gameState, battleState, saveGameData, recordKanjiAnswer } from '../core/gameState.js';
 import { getKanjiByStageId, isKanjiMastered } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
+import reviewQueue from '../models/reviewQueue.js';
 import { images, loadBgImage } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import { findNearMiss, getNearMissLines } from '../utils/readings.js';
+import Speech from '../audio/speech.js';
 // 練習バトル画面状態
 const practiceBattleScreenState = {
   // 既存のbattleScreenStateの全機能を継承
@@ -17,6 +20,8 @@ practiceMode: true,
 onPracticeComplete: null,
 unmasteredKanji: [],
 lastIncorrectAnswer: null,
+// 読めてはいるが書き方だけずれた入力への案内 { lines: string[], until: number }
+nearMissNotice: null,
 recentHistory: [], // 最近の学習履歴（最大10件）
 reviewMode: false,
 reviewTargetReading: null,
@@ -346,7 +351,8 @@ try {
       this.inputEl.addEventListener('keydown', this._practiceKeydownHandler);
 
       // モバイル入力最適化（iOS向け）
-      this.inputEl.setAttribute('inputmode', 'kana');
+      this.inputEl.setAttribute('lang', 'ja'); // NOTE: inputmode の 'kana' はHTML仕様に無い値でブラウザに無視される。
+        // 端末のキーボードを使う設定の時に、せめて日本語入力が選ばれやすくなるようにしておく
       this.inputEl.setAttribute('autocapitalize', 'off');
       this.inputEl.setAttribute('autocorrect', 'off');
       this.inputEl.setAttribute('spellcheck', 'false');
@@ -554,8 +560,12 @@ _buildUnmasteredKanjiList() {
       return;
     }
 
+    // ここが空になるとレビューモードへ移行し、stageReviewUnlocked が立つ＝
+    // 学年ボーナス（伝説・幻120体）の解禁条件になる。全読み制覇を要求すると
+    // 「生」8読み・小1の46/80字が3読み以上という壁で導線が塞がるため、
+    // ゲートは読み2種で通す。全読み制覇は図鑑の★として残る。
     this.unmasteredKanji = stageKanji.filter(kanji => {
-      try { return !this._isKanjiMastered(kanji.id); } catch { return true; }
+      try { return !this._isKanjiGateCleared(kanji); } catch { return true; }
     });
 
     console.log(`📚 未マスター漢字: ${this.unmasteredKanji.length}件 / 全${stageKanji.length}件`);
@@ -587,6 +597,7 @@ _buildUnmasteredKanjiList() {
    */
   _pickNextUnmasteredKanji() {
     try {
+      this._resetNearMissForNewQuestion();
       // ここで未マスターリストを再構築しない（進捗が0に戻るのを防止）
 if (this.unmasteredKanji.length === 0) {
   // 誤答限定完了 → 自動レビューへ移行せず選択ダイアログ
@@ -681,6 +692,7 @@ if (this.unmasteredKanji.length === 0) {
      */
     _pickNextReviewQuestion() {
       try {
+        this._resetNearMissForNewQuestion();
         const stageKanji = getKanjiByStageId(gameState.currentStageId) || [];
         if (stageKanji.length === 0) {
           console.warn('⚠️ このステージに漢字がありません');
@@ -789,7 +801,14 @@ if (this.unmasteredKanji.length === 0) {
       
       console.log('📚 正解読み:', correctReadings);
       console.log('🎯 判定:', isCorrect ? '✅正解' : '❌不正解');
-      
+
+      // 読めているのに書き方だけずれた入力は、練習の回数にも履歴にも数えず書き直させる。
+      // レビュー中は特定の読みを問うているので、その読みだけを比較の相手にする。
+      if (!isCorrect) {
+        const targets = this.reviewMode ? [this.reviewTargetReading] : correctReadings;
+        if (this._handleNearMiss(answer, targets.filter(Boolean))) return;
+      }
+
       this.practiceStats.totalPracticed++;
       this._updateTodaysPracticeCount();
       inputEl.value = '';
@@ -890,8 +909,19 @@ if (this.unmasteredKanji.length === 0) {
             }
             
             publish('playSE', 'correct');
+            // 読めた読みを音でも返す
+            Speech.speak(answer);
             // ← 追加: 正解時に図鑑へ登録（重複は内部で無視される）
             publish('addToKanjiDex', gameState.currentKanji.id);
+
+            // 学習データ記録＋SM-2キューの前進（キュー登録済みの漢字のみ間隔が伸びる）
+            recordKanjiAnswer(gameState.currentKanji.id, true);
+            if (Number(gameState.hintLevel || 0) >= 4) {
+              // ヒントで答えを見てから正解した場合は「おぼえたて」扱い（間隔は進めず再登録）
+              publish('addToReview', gameState.currentKanji.id);
+            } else {
+              reviewQueue.updateReview(gameState.currentKanji.id, 5);
+            }
 
              // レビュー回数カウント（ボーナスのみ）
     try {
@@ -950,6 +980,73 @@ if (this.unmasteredKanji.length === 0) {
   /**
    * 練習での不正解処理
    */
+  /** 新しい問題に移るとき、「おしい」の回数と案内をたたむ */
+  _resetNearMissForNewQuestion() {
+    battleState.nearMissCount = 0;
+    this.nearMissNotice = null;
+  },
+
+  /**
+   * 「読みとしては合っているのに、書き方だけがずれた入力」を拾う。
+   * battleScreen の handleNearMiss と同じ考え方（傷も記録も残さず書き直させる）。
+   * @returns {boolean} near-miss として処理したら true
+   */
+  _handleNearMiss(answer, targetReadings) {
+    const nearMiss = findNearMiss(answer, targetReadings);
+    if (!nearMiss) return false;
+
+    battleState.nearMissCount = (battleState.nearMissCount || 0) + 1;
+    this.nearMissNotice = {
+      lines: getNearMissLines(nearMiss, battleState.nearMissCount),
+      until: Date.now() + 2600
+    };
+    // 正しい書き方を見せる回（2回目以降）は、音でも渡す
+    if (battleState.nearMissCount >= 2) Speech.speak(nearMiss.reading);
+
+    // se_wrong は鳴らさない（読みちがいと同じ音にすると案内の意味が消える）
+    publish('playSE', 'cancel');
+
+    if (this.inputEl) this.inputEl.value = '';
+    battleState.turn = 'player';
+    battleState.inputEnabled = true;
+    return true;
+  },
+
+  /** near-miss の案内を漢字ボックスの下に出す */
+  _drawNearMissNotice() {
+    const notice = this.nearMissNotice;
+    if (!notice) return;
+    if (Date.now() > notice.until) { this.nearMissNotice = null; return; }
+
+    try {
+      const ctx = this.ctx;
+      const isKbOpen = !!(this.keyboardState && this.keyboardState.open);
+      const cx = this.canvas.width / 2;
+      const top = (isKbOpen ? 120 + 70 : 200 + 80) + 14;
+      const lineH = 20;
+      const w = Math.min(this.canvas.width - 32, 340);
+      const h = notice.lines.length * lineH + 16;
+
+      ctx.save();
+      // 読みちがいの琥珀ではなく、続けてよいことが伝わる色にする
+      ctx.fillStyle = 'rgba(52, 152, 219, 0.18)';
+      ctx.fillRect(cx - w / 2, top, w, h);
+      ctx.strokeStyle = 'rgba(91, 192, 222, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(cx - w / 2, top, w, h);
+
+      ctx.fillStyle = '#eaf6fd';
+      ctx.font = 'bold 14px "UDデジタル教科書体",sans-serif';
+      ctx.textAlign = 'center';
+      notice.lines.forEach((line, i) => {
+        ctx.fillText(line, cx, top + 22 + i * lineH);
+      });
+      ctx.restore();
+    } catch (error) {
+      console.error('❌ おしい案内の描画エラー:', error);
+    }
+  },
+
   _handlePracticeIncorrect(answer) {
     console.log('❌ 不正解処理開始');
     
@@ -963,7 +1060,11 @@ if (this.unmasteredKanji.length === 0) {
       };
       
       publish('playSE', 'wrong');
-      
+
+      // 学習データ記録＋復習キューへ登録（バトルの読みちがいと同じ扱い）
+      recordKanjiAnswer(gameState.currentKanji.id, false);
+      publish('addToReview', gameState.currentKanji.id);
+
       console.log(`❌ 不正解: ${gameState.currentKanji.text} ≠ ${answer}`);
       
       setTimeout(() => {
@@ -1076,6 +1177,7 @@ this._drawImprovedPracticeUI();
 
 // ← 追加: 漢字パネル＋エフェクトを最前面に再描画（上書きで見切れ防止）
 this._drawKanjiBoxWithEffects();
+this._drawNearMissNotice();
 
 gameState.currentEnemy = originalEnemy;
 gameState.enemies = originalEnemies;
@@ -1501,17 +1603,18 @@ _teardownGlobalBackHandler() {
         this.ctx.textAlign = 'center';
         this.ctx.fillText(`あなたの答え: ${battleState.lastAnswered.correctAnswer}`, x + w/2, y + h - 16);
       } else if (this.lastIncorrectAnswer) {
-        // 不正解した場合
-        this.ctx.fillStyle = 'rgba(231, 76, 60, 0.3)';
+        // さっきためした読み（次のヒントとして中立色で示す）
+        // battleScreen と同じ扱いにする。逃げ込む先である練習画面で赤ペンを入れない
+        this.ctx.fillStyle = 'rgba(52, 152, 219, 0.15)';
         this.ctx.fillRect(x + 8, y + h - 30, w - 16, 22);
-        this.ctx.strokeStyle = '#e74c3c';
+        this.ctx.strokeStyle = 'rgba(52, 152, 219, 0.6)';
         this.ctx.lineWidth = 1;
         this.ctx.strokeRect(x + 8, y + h - 30, w - 16, 22);
-        
-        this.ctx.fillStyle = '#e74c3c';
+
+        this.ctx.fillStyle = '#d6eaf8';
         this.ctx.font = 'bold 11px "UDデジタル教科書体",sans-serif';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(`あなたの答え: ${this.lastIncorrectAnswer}`, x + w/2, y + h - 16);
+        this.ctx.fillText(`さっきためしたよみ: ${this.lastIncorrectAnswer}`, x + w/2, y + h - 16);
       }
 
 
@@ -1942,22 +2045,17 @@ _teardownGlobalBackHandler() {
       let statY = y + 35;
       
       const { totalPracticed, correctCount, correctStreak, maxStreak } = this.practiceStats;
-      const accuracy = totalPracticed > 0 ? Math.round((correctCount / totalPracticed) * 100) : 0;
       
-      this.ctx.fillText(`正答率: ${accuracy}% (${correctCount}/${totalPracticed})`, x + 10, statY);
+      // 練習は避難先なので評価メーター（正答率・平均秒数）は出さない。
+      // 積み上げ型の「よめた数」と連続記録だけを見せる
+      this.ctx.fillText(`よめた数: ${correctCount}（ためした数: ${totalPracticed}）`, x + 10, statY);
       statY += 15;
       this.ctx.fillText(`現在の連続: ${correctStreak}問`, x + 10, statY);
       statY += 15;
       this.ctx.fillText(`最高連続: ${maxStreak}問`, x + 10, statY);
       
-      if (this.practiceStats.timePerQuestion.length > 0) {
-        const avgTime = Math.round(
-          this.practiceStats.timePerQuestion.reduce((a, b) => a + b, 0) /
-          this.practiceStats.timePerQuestion.length / 1000
-        );
-        this.ctx.textAlign = 'right';
-        this.ctx.fillText(`平均: ${avgTime}秒`, x + w - 10, statY);
-      }
+      // 平均秒数の表示は廃止（速さの評価につながるため）。
+      // 計測自体は practiceStats.timePerQuestion に残している
       
     } catch (error) {
       console.error('❌ 詳細統計描画エラー:', error);
@@ -2341,6 +2439,35 @@ if (this.wrongOnlyMode) {
           return false;
         }
       },
+
+    /**
+     * ボーナス解禁・レビューモード移行のためのゲート判定。
+     * 図鑑の★（_isKanjiMastered ＝ 全読み制覇）とは別基準で、
+     * 「読み2種（もともと1種しかない字はその1種）」で通す。
+     * 「生」の8読みのような字が伝説・幻120体への導線を塞いでいたため。
+     */
+    _isKanjiGateCleared(kanji) {
+      try {
+        if (this._isKanjiMastered(kanji.id)) return true;
+        const count = (v) => {
+          if (!v) return 0;
+          if (v instanceof Set) return v.size;
+          if (Array.isArray(v)) return v.length;
+          if (typeof v === 'string') return v.trim() ? v.trim().split(/\s+/).length : 0;
+          return 0;
+        };
+        const prog = gameState?.kanjiReadProgress?.[kanji.id]
+                  || gameState?.kanjiReadProgress?.[String(kanji.id)];
+        if (!prog) return false;
+        const done  = count(prog.kunyomi) + count(prog.onyomi);
+        const total = count(kanji.kunyomi) + count(kanji.onyomi);
+        if (total === 0) return true;
+        return done >= Math.min(2, total);
+      } catch {
+        return false;
+      }
+    },
+
   _toHiragana(input) {
     try {
       if (!input) return '';

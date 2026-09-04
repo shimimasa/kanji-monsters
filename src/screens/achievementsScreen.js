@@ -39,10 +39,10 @@ const achievementsScreen = {
       const r = this.canvas.getBoundingClientRect();
       const x = e.clientX - r.left, y = e.clientY - r.top;
       
-      // 戻るボタン
+      // 戻るボタン（プロフィール画面から入るのが正規動線）
       if (isMouseOverRect(x, y, BTN.back)) {
         publish('playSE', 'decide');
-        publish('changeScreen', 'menu');
+        publish('changeScreen', 'profile');
         return;
       }
       

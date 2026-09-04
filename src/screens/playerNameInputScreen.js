@@ -4,7 +4,7 @@ import { images } from '../loaders/assetsLoader.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState, updatePlayerName } from '../core/gameState.js';
 import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
-import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import { getGameCoordinates, isValidCoordinates, gameToScreenCoordinates } from '../utils/coordinateUtils.js';
 
 const playerNameInputState = {
   /** 画面表示時の初期化 */
@@ -12,26 +12,53 @@ const playerNameInputState = {
     // canvas が未渡しの場合は DOM から取得
     this.canvas = canvas || document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
-    
+
     const cx = this.canvas.width / 2;
     this.confirmButton = { x: cx - 100, y: 400, width: 200, height: 50, text: 'けってい' };
-    
-    // HTML入力欄をセットアップ
+    this.validationMessage = '';
+
+    // HTML入力欄をセットアップ（存在しなければ動的に生成する）
     this.nameInputElement = document.getElementById('playerNameInputField');
-    if (this.nameInputElement) {
-      this.nameInputElement.style.display = 'block';
-      this.nameInputElement.value = "";
-      this.nameInputElement.maxLength = 5;
-      
-      // 位置調整
-      const canvasRect = this.canvas.getBoundingClientRect();
-      this.nameInputElement.style.left = `${canvasRect.left + cx - this.nameInputElement.offsetWidth / 2}px`;
-      this.nameInputElement.style.top = `${canvasRect.top + 300}px`;
-      
-      this.nameInputElement.focus();
+    if (!this.nameInputElement) {
+      this.nameInputElement = document.createElement('input');
+      this.nameInputElement.id = 'playerNameInputField';
+      this.nameInputElement.type = 'text';
+      this.nameInputElement.autocomplete = 'off';
+      this.nameInputElement.setAttribute('autocapitalize', 'off');
+      this.nameInputElement.setAttribute('autocorrect', 'off');
+      this.nameInputElement.spellcheck = false;
+      this.nameInputElement.placeholder = 'なまえ';
+      this.nameInputElement.style.position = 'absolute';
+      this.nameInputElement.style.textAlign = 'center';
+      this.nameInputElement.style.zIndex = '1001';
+      document.body.appendChild(this.nameInputElement);
     }
-    
+    this.nameInputElement.style.display = 'block';
+    this.nameInputElement.value = "";
+    this.nameInputElement.maxLength = 5;
+
+    // 描画している枠（ゲーム座標: 中央x, y=280, 300x40）に重ねて配置
+    this._positionInputElement();
+    this._resizeHandler = () => this._positionInputElement();
+    window.addEventListener('resize', this._resizeHandler);
+
+    this.nameInputElement.focus();
+
     this.registerHandlers();
+  },
+
+  /** 入力欄をCanvas上の枠位置に合わせて配置する */
+  _positionInputElement() {
+    if (!this.nameInputElement || !this.canvas) return;
+    const cx = this.canvas.width / 2;
+    const frame = { x: cx - 150, y: 280, w: 300, h: 40 };
+    const topLeft = gameToScreenCoordinates(frame.x, frame.y, this.canvas);
+    const scale = topLeft.scale;
+    this.nameInputElement.style.left = `${topLeft.x + 4 * scale}px`;
+    this.nameInputElement.style.top = `${topLeft.y + 4 * scale}px`;
+    this.nameInputElement.style.width = `${(frame.w - 8) * scale}px`;
+    this.nameInputElement.style.height = `${(frame.h - 8) * scale}px`;
+    this.nameInputElement.style.fontSize = `${Math.max(14, Math.round(22 * scale))}px`;
   },
 
   /** 毎フレーム呼び出し（描画） */
@@ -58,6 +85,13 @@ const playerNameInputState = {
     ctx.lineWidth = 2;
     ctx.strokeRect(cw / 2 - 150, 280, 300, 40);
 
+    // 入力チェックのメッセージ（alertの代わりにゲーム内で表示）
+    if (this.validationMessage) {
+      ctx.fillStyle = '#FFD98E';
+      ctx.font = '18px "UDデジタル教科書体",sans-serif';
+      ctx.fillText(this.validationMessage, cw / 2, 355);
+    }
+
     // 決定ボタン
     if (images.buttonNormal) {
       ctx.drawImage(images.buttonNormal,
@@ -70,6 +104,10 @@ const playerNameInputState = {
   /** 画面離脱時のクリーンアップ */
   exit() {
     this.unregisterHandlers();
+    if (this._resizeHandler) {
+      window.removeEventListener('resize', this._resizeHandler);
+      this._resizeHandler = null;
+    }
     if (this.nameInputElement) {
       this.nameInputElement.style.display = 'none';
       this.nameInputElement.onkeydown = null;
@@ -137,8 +175,8 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
     if (!this.nameInputElement) return;
     
     const trimmedName = this.nameInputElement.value.trim();
-    
-    // 入力値の検証
+
+    // 入力値の検証（alertではなく画面内メッセージで知らせる）
     if (
       trimmedName === "" ||
       trimmedName.length > 5 ||                     // ← 5文字超は不可
@@ -146,11 +184,12 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       trimmedName === "ゲスト" ||
       trimmedName === "新規プレイヤー"
     ) {
-      alert("有効な なまえを いれてください。（5もじまで）");
+      this.validationMessage = 'なまえを 1〜5もじで いれてね';
       this.nameInputElement.value = "";
       this.nameInputElement.focus();
       return;
     }
+    this.validationMessage = '';
 
     // プレイヤー名を更新
     updatePlayerName(trimmedName);
@@ -173,10 +212,10 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       gameState.gameMode = gameState.pendingGameMode;
       gameState.pendingGameMode = null;
     }
-    
-    // 地方選択画面へ遷移
+
+    // 通常フローと同じくコース選択画面へ遷移
     gameState.currentGrade = 0;
-    publish('changeScreen', 'regionSelect');
+    publish('changeScreen', 'courseSelect');
   },
 
   render() {

@@ -2,6 +2,7 @@
 import { gameState } from '../../core/gameState.js'; // ★★★ この行が必須 ★★★
 import { getDefaultSave, migrateSave } from '../../core/saveData.js';
 import { firebaseConfig } from './firebaseConfig.js';   // ← 追加
+import { userRootRef } from '../../core/saveSlots.js';
 
 // ---------------------------------------------------------------------------
 //  このモジュールが初回呼び出し時に:
@@ -159,7 +160,7 @@ export async function initializeNewPlayerData(uid, playerName = "ななしのご
         return null;
     }
     console.log(`Initializing new player data in Firestore for UID: ${uid} with name: ${playerName}`);
-    const playerProfileRef = db.collection('users').doc(uid).collection('profile').doc('playerStats');
+    const playerProfileRef = userRootRef(db, uid).collection('profile').doc('playerStats');
 
     const initialStats = {
         name: playerName.trim(), // ★引数のplayerNameを使用
@@ -203,7 +204,7 @@ export async function savePlayerData(playerDataToSave) {
         console.warn("Cannot save player data: Firestore or User not signed in.");
         return;
     }
-    const playerProfileRef = db.collection('users').doc(currentUser.uid).collection('profile').doc('playerStats');
+    const playerProfileRef = userRootRef(db, currentUser.uid).collection('profile').doc('playerStats');
     const save = __readKrbSaveNoWrite();
     const summaryFromSave = buildProfileSummaryFromSave(save);
     const dataForFirestore = summaryFromSave || (playerDataToSave ? { // 互換fallback（既存呼び出しを壊さない）
@@ -235,7 +236,7 @@ export async function loadPlayerData() {
         gameState.playerName = "ゲスト";
         return;
     }
-    const playerProfileRef = db.collection('users').doc(currentUser.uid).collection('profile').doc('playerStats');
+    const playerProfileRef = userRootRef(db, currentUser.uid).collection('profile').doc('playerStats');
     try {
         console.log(`Loading player data for UID: ${currentUser.uid}`);
         const docSnap = await playerProfileRef.get();
@@ -277,7 +278,7 @@ export async function saveStageClearStatus(stageId) {
         console.warn("Cannot save stage clear status: Firestore, User not signed in, or stageId is missing.");
         return;
     }
-    const stageProgressRef = db.collection('users').doc(currentUser.uid).collection('progress').doc(stageId);
+    const stageProgressRef = userRootRef(db, currentUser.uid).collection('progress').doc(stageId);
     try {
         await stageProgressRef.set({
             cleared: true,
@@ -298,7 +299,7 @@ export async function loadAllStageClearStatus() {
         gameState.stageProgress = {}; // 空のオブジェクトで初期化
         return null;
     }
-    const progressCollectionRef = db.collection('users').doc(currentUser.uid).collection('progress');
+    const progressCollectionRef = userRootRef(db, currentUser.uid).collection('progress');
     try {
         const querySnapshot = await progressCollectionRef.get();
         const allProgress = {};
@@ -331,8 +332,8 @@ export async function recoverKrbSaveFromFirestoreIfMissing() {
 
   try {
     const uid = currentUser.uid;
-    const playerProfileRef = db.collection('users').doc(uid).collection('profile').doc('playerStats');
-    const progressStateRef = db.collection('users').doc(uid).collection('progress').doc('state');
+    const playerProfileRef = userRootRef(db, uid).collection('profile').doc('playerStats');
+    const progressStateRef = userRootRef(db, uid).collection('progress').doc('state');
 
     const [profileSnap, stateSnap] = await Promise.all([playerProfileRef.get(), progressStateRef.get()]);
     const profile = profileSnap?.exists ? (profileSnap.data() || {}) : {};
@@ -403,7 +404,7 @@ export async function deleteUserData(uid) {
     return false;
   }
   try {
-    const userRef = db.collection('users').doc(uid);
+    const userRef = userRootRef(db, uid);
 
     // profile/playerStats を削除
     try {
@@ -462,7 +463,7 @@ export async function syncAllCaches() {
     console.warn('syncAllCaches: Firestore or User not signed in.');
     return;
   }
-  const ref = db.collection('users').doc(currentUser.uid).collection('progress').doc('state');
+  const ref = userRootRef(db, currentUser.uid).collection('progress').doc('state');
   const save = __readKrbSaveNoWrite();
   const payload = buildProgressStateSummaryFromSave(save);
   try {

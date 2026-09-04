@@ -95,8 +95,32 @@ const profileScreen = {
         toMonsterDexBtn.style.padding = '8px 12px';
         toMonsterDexBtn.style.cursor = 'pointer';
         toMonsterDexBtn.onclick = () => publish('changeScreen', 'monsterDex');
-    
-        header.append(backBtn, title, toKanjiDexBtn, toMonsterDexBtn);
+
+        // ステータス（スキルポイントを振る唯一の画面。未使用SPがあればバッジで知らせる）
+        const skillPoints = gameState.playerStats?.skillPoints || 0;
+        const toStatusBtn = document.createElement('button');
+        toStatusBtn.textContent = skillPoints > 0 ? `ステータス (+${skillPoints})` : 'ステータス';
+        toStatusBtn.style.background = skillPoints > 0
+          ? 'linear-gradient(135deg, #f39c12, #d68910)'
+          : 'linear-gradient(135deg, #6c757d, #5a6268)';
+        toStatusBtn.style.color = 'white';
+        toStatusBtn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        toStatusBtn.style.borderRadius = '8px';
+        toStatusBtn.style.padding = '8px 12px';
+        toStatusBtn.style.cursor = 'pointer';
+        toStatusBtn.onclick = () => publish('changeScreen', 'status');
+
+        const toAchievementsBtn = document.createElement('button');
+        toAchievementsBtn.textContent = 'トロフィー';
+        toAchievementsBtn.style.background = 'linear-gradient(135deg, #6c757d, #5a6268)';
+        toAchievementsBtn.style.color = 'white';
+        toAchievementsBtn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        toAchievementsBtn.style.borderRadius = '8px';
+        toAchievementsBtn.style.padding = '8px 12px';
+        toAchievementsBtn.style.cursor = 'pointer';
+        toAchievementsBtn.onclick = () => publish('changeScreen', 'achievements');
+
+        header.append(backBtn, title, toStatusBtn, toAchievementsBtn, toKanjiDexBtn, toMonsterDexBtn);
 
         const summary = loadProfileSummary();
 
@@ -170,7 +194,40 @@ const profileScreen = {
     barsCard.appendChild(makeBar('モンスター収集', summary.collection.monsterCount, summary.collection.monsterCount));
     barsCard.appendChild(makeBar('マスター漢字（セッション）', summary.collection.masteredCount, summary.collection.kanjiCount || 1));
 
-    statsTop.append(infoCard, barsCard);
+    // こんしゅうのがんばり（週次の成長を見せる）
+    const weeklyCard = document.createElement('div');
+    weeklyCard.style.background = 'rgba(0,0,0,0.35)';
+    weeklyCard.style.border = '1px solid #8B4513';
+    weeklyCard.style.padding = '12px';
+    weeklyCard.style.borderRadius = '10px';
+    const weekly = summary.weekly || { thisWeek: 0, lastWeek: 0, diff: 0 };
+    let weeklyMessage;
+    if (weekly.thisWeek === 0 && weekly.lastWeek === 0) {
+      weeklyMessage = 'こんしゅうから きろくがはじまるよ！';
+    } else if (weekly.diff > 0) {
+      weeklyMessage = `先週より +${weekly.diff}回 よめた！`;
+    } else if (weekly.diff === 0) {
+      weeklyMessage = '先週とおなじペースだよ';
+    } else if (weekly.thisWeek === 0) {
+      // 週のはじめ。0 を数えて見せない
+      weeklyMessage = 'つづきは いつでも まってるよ';
+    } else if (-weekly.diff <= 20) {
+      weeklyMessage = `先週のペースまで あと${-weekly.diff}回`;
+    } else {
+      // 1ステージで30〜50回よむので、週の回数が落ちると差が60〜100になり得る。
+      // 向きが前向きでも量が絶望的なので、その時は差を見せず今週の数を数える
+      weeklyMessage = `こんしゅうも ${weekly.thisWeek}回 よめたよ`;
+    }
+    weeklyCard.innerHTML = `
+      <h3 style="margin:0 0 8px; font-size:16px;">こんしゅうのがんばり</h3>
+      <div style="font-size:${weekly.thisWeek === 0 ? 18 : 24}px; font-weight:700;">${
+        weekly.thisWeek === 0 ? 'きょう よんだら ここが ふえるよ' : `${weekly.thisWeek}回 よめた`
+      }</div>
+      <div style="opacity:0.85;">先週: ${weekly.lastWeek}回</div>
+      <div style="color:#7CFC9A; margin-top:6px; font-weight:700;">${weeklyMessage}</div>
+    `;
+
+    statsTop.append(infoCard, barsCard, weeklyCard);
     statsDiv.appendChild(statsTop);
 
 

@@ -1,5 +1,5 @@
 /* ----------------------------- 依存モジュール ----------------------------- */
-import { gameState, updatePlayerName, saveGameData, loadGameData } from './core/gameState.js';
+import { gameState, saveGameData, loadGameData } from './core/gameState.js';
 import { setCanvas, update as updateScreen, render as renderScreen } from './core/screenManager.js';
 import { loadAll as loadUIImages } from './loaders/assetsLoader.js';
 import { loadKanjiGradesPhased } from './loaders/dataLoader.js';
@@ -7,7 +7,6 @@ import {
   initializeFirebaseServices,
   signInAnonymouslyIfNeeded,
   getCurrentUser,
-  initializeNewPlayerData,
   recoverKrbSaveFromFirestoreIfMissing,
   syncAllCaches,
   startDataSync
@@ -20,7 +19,20 @@ import { setupFSM } from './init/fsmsetup.js';
 import { checkAchievements } from './core/achievementManager.js';
 import { addKanji } from './models/kanjiDex.js';
 import practiceBattleScreen from './screens/practiceBattleScreen.js';
+import KanaPad from './ui/kanaPad.js';
+import TextScale from './ui/textScale.js';
+import Ruby from './ui/ruby.js';
+import Speech from './audio/speech.js';
 
+
+/* ----------------------------- ログ静音化 ----------------------------- */
+// 本番ビルドでは冗長ログ（log/debug/info）を黙らせる。
+// console.log 447箇所の logger（src/utils/logger.js）移行が完了するまでの暫定措置。
+if (!import.meta.env.DEV) {
+  console.log = () => {};
+  console.debug = () => {};
+  console.info = () => {};
+}
 
 /* ----------------------------- 実績通知システム ----------------------------- */
 const achievementNotificationQueue = [];
@@ -51,6 +63,8 @@ document.body.addEventListener(
   'pointerdown',
   () => {
     publish('playBGM', 'title');   // ここは publish のままでOK（購読が先にある）
+    // 音声合成も同じ「最初のタップ」で解錠しておく（外から呼ぶと鳴らない端末があるため）
+    Speech.unlock();
   },
   { once: true }
 );
@@ -168,6 +182,14 @@ function drawAchievementNotifications(ctx) {
 
 (async function initGame() {
   console.log('🔧 Init start');
+  // ゲーム内の50音パッドを用意する。入力欄は index.html に静的に置いてあるので、
+  // ここで捕まえておけば、どの画面が入力欄を出しても自分で追従できる。
+  // 文字サイズの設定は、どこかが描き始める前に入れておく（描画は canvas 一本）
+  TextScale.install();
+  Ruby.install();
+  KanaPad.install();
+  // 日本語の声は非同期に届く端末があるので、先に選んでおく
+  Speech.warmUp();
   // 1) 画像 & JSON プリロード
   // await initAssets();
   showBootProgress();
@@ -200,21 +222,13 @@ function drawAchievementNotifications(ctx) {
     console.error('❌ ゲーム起動時の実績チェックでエラー:', error);
   }
 
-  // ─────────── プレイヤー名自動入力 ───────────
-  // データ未設定時に名前を聞いて gameState にセット、Firestore に書き込む
-  if (!gameState.playerName || ['ゲスト', 'ななしのごんべえ', '新規プレイヤー'].includes(gameState.playerName)) {
-    const inputName = prompt('プレイヤー名を入力してください（5文字以内）', '');
-    if (inputName) {
-      const name = inputName.trim().slice(0, 5);
-      updatePlayerName(name);
-      if (user && user.uid) {
-          await initializeNewPlayerData(user.uid, name);
-        }
-      }
-    }
+  // プレイヤー名が未設定の場合は、タイトルの「スタート」から
+  // playerNameInput 画面（ゲーム内UI）で入力してもらう（起動時のネイティブpromptは廃止）
   // 3) BattleScreen 側のセットアップ
-   // 🔽 ここでステージ ID を仮にセット
-  gameState.currentStageId = 'hokkaido_area1';
+  // ステージIDのフォールバック（セーブから復元済みの「前回のステージ」は上書きしない）
+  if (!gameState.currentStageId) {
+    gameState.currentStageId = 'hokkaido_area1';
+  }
 
   // DataSync 初期化（Firestore → localStorage のマージ監視開始）
   startDataSync();

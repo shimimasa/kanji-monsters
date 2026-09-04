@@ -29,7 +29,7 @@ export function getDefaultSave() {
         phantomUnlocked: {}
       },
       study: {
-        answers: [],       // {id, correct, ts}
+        answers: {},       // { [kanjiId]: { correct, incorrect } }
         reviewQueue: [],   // krb_review_queue から id の配列に縮約
         practiceProgress: {}, // gameState.practiceProgress
         kanjiReadProgress: {}, // serialize された形

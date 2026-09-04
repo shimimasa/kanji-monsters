@@ -1,32 +1,11 @@
 import { publish } from '../core/eventBus.js';
 import ReviewQueue   from '../models/reviewQueue.js';
 import { getKanjiById } from '../loaders/dataLoader.js';
+import { recordKanjiAnswer, saveGameData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
+import { toHiragana, getReadings } from '../utils/readings.js';
 
-// 追加：バトル画面と同じ読み判定ロジックを再現するユーティリティ
-function hiraShift(ch) {
-  return String.fromCharCode(ch.charCodeAt(0) - 0x60);
-}
-function toHiragana(input) {
-  return input
-    .trim()
-    .replace(/\s+/g, '')
-    .replace(/[\u30a1-\u30f6]/g, hiraShift);
-}
-function getReadings(data) {
-  const set = new Set();
-  if (data.kunyomi) {
-    data.kunyomi.split(' ').forEach(r => {
-      if (r) set.add(toHiragana(r.trim()));
-    });
-  }
-  if (data.onyomi) {
-    data.onyomi.split(' ').forEach(r => {
-      if (r) set.add(toHiragana(r.trim()));
-    });
-  }
-  return [...set];
-}
+// 読みの正規化・取得は共通実装を使用（配列/文字列データ両対応）
 
 const reviewStage = {
   canvas: null,
@@ -38,6 +17,8 @@ const reviewStage = {
   currentIndex: 0,
   currentKanji: null,
   message:     '',
+  emptyMessage: null,   // きょうの分が無い時に出すひと言
+  _emptyTimer:  null,
 
   /** enter: 初期化 */
   enter(arg) {
@@ -47,14 +28,29 @@ const reviewStage = {
       : document.getElementById('gameCanvas');
     this.ctx    = this.canvas.getContext('2d');
 
-    // 1) 復習対象をポップ
-    this.kanjiIds = ReviewQueue.popBatch(5)
+    // 前回の空振り案内を持ち越さない
+    this.emptyMessage = null;
+    if (this._emptyTimer) { clearTimeout(this._emptyTimer); this._emptyTimer = null; }
+
+    // 1) 復習対象を取り出す（キューからは消さない）
+    //    popBatch() は splice で項目を消してから ID を返すため、直後の
+    //    updateReview() が items.find に失敗して黙って return し、SM-2 の
+    //    間隔延長も「読めなかった字を翌日に再出題」も一度も動いていなかった。
+    //    間隔の管理は updateReview に任せ、ここでは due な先頭5件を見るだけにする。
+    this.kanjiIds = ReviewQueue.getDueReviews()
+      .slice(0, 5)
+      .map(e => e.id)
       // null, undefined な ID を除外
       .filter(id => id != null);
 
     if (this.kanjiIds.length === 0) {
-      // publish('changeScreen', 'gradeQuiz', { grade: gameState.currentGrade ?? 0 });
-      publish('changeScreen', 'stageSelect'); // まずは現状維持でもOK
+      // 無言で戻ると「押しても何も起きない」ように見える。
+      // 初回の復習予定を翌朝にしたので、ここに来る子は今後もっと増える。
+      this.emptyMessage = ['きょうの ぶんは ぜんぶ おわったよ！', 'また あした ここで まってるね'];
+      this._emptyTimer = setTimeout(() => {
+        this._emptyTimer = null;
+        publish('changeScreen', 'stageSelect');
+      }, 1800);
       return;
     }
 
@@ -105,15 +101,20 @@ const reviewStage = {
     const answer = toHiragana(this.inputEl.value);
     const ok = this.currentKanji.readings.includes(answer);
 
+    // 学習記録（正史）へ加算。ここが抜けていたため、復習だけやった日は
+    // 「こんしゅうのがんばり」が 0回 のままだった
+    recordKanjiAnswer(this.currentKanji.id, ok);
+
     if (ok) {
       publish('playSE', 'correct');
       this.message = '正解！';
       // 正解の場合：品質5（完璧に正解）でSM-2アルゴリズムに記録
       ReviewQueue.updateReview(this.currentKanji.id, 5);
     } else {
-      publish('playSE', 'wrong');
-      // 正答リストを表示
-      this.message = `不正解…正答: ${this.currentKanji.readings.join('、')}`;
+      // 「今日の復習」は過去に間違えた漢字と向き合う場面。ここで誤答音を重ねると
+      // 追い打ちになるため鳴らさない（ゲームオーバー画面を無音にしたのと同じ理由）
+      // 正しい読みをその場で示す
+      this.message = `おしい！ こたえは「${this.currentKanji.readings.join('、')}」`;
       // 不正解の場合：品質1（間違えた）でSM-2アルゴリズムに記録
       ReviewQueue.updateReview(this.currentKanji.id, 1);
     }
@@ -133,6 +134,20 @@ const reviewStage = {
   /** 毎フレーム描画 */
   update(dt) {
     const { ctx, canvas } = this;
+    // きょうの分が無い時は、ひと言だけ出してから戻る
+    if (this.emptyMessage) {
+      ctx.fillStyle = '#1e3c72';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'white';
+      ctx.font = '22px "UDデジタル教科書体",sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      this.emptyMessage.forEach((line, i) => {
+        ctx.fillText(line, canvas.width / 2, canvas.height / 2 - 16 + i * 34);
+      });
+      ctx.textAlign = 'left';
+      return;
+    }
     // currentKanji が未設定であればスキップ
     if (!this.currentKanji) return;
 
@@ -170,6 +185,12 @@ const reviewStage = {
 
   /** exit: クリーンアップ */
   exit() {
+    // 空振り案内のタイマーが、片付けた後に遷移を起こさないようにする
+    if (this._emptyTimer) { clearTimeout(this._emptyTimer); this._emptyTimer = null; }
+    this.emptyMessage = null;
+    // 復習でためた学習記録を確定させる（力だめしと同じ理由。
+    // recordKanjiAnswer はメモリ上を増やすだけで、保存契機が無いと消える）
+    try { saveGameData(); } catch {}
     // 入力欄イベント解除
     this.inputEl?.removeEventListener('keydown', this._keydownHandler);
     if (this.inputEl) this.inputEl.style.display = 'none';

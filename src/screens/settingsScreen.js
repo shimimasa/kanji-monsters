@@ -4,6 +4,15 @@ import { drawButton, isMouseOverRect, drawThemeBackground, drawPanelBackground }
 import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
 import { publish } from '../core/eventBus.js';
 import { hardResetAllLocalData } from '../core/saveData.js';
+import KanaPad from '../ui/kanaPad.js';
+import Speech from '../audio/speech.js';
+import TextScale from '../ui/textScale.js';
+import Palette from '../ui/palette.js';
+import SessionTimer from '../core/sessionTimer.js';
+import ReadingScope from '../core/readingScope.js';
+import ExampleMode from '../core/exampleMode.js';
+import ReviewExport from '../core/reviewExport.js';
+import Ruby from '../ui/ruby.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -183,8 +192,637 @@ const settingsScreenState = {
     'タイマーは内部でいつも計測されます。ここでは画面に表示するかどうかだけを切り替えます。'
   );
 
+  panel.appendChild(this._createInputMethodGroup());
+  panel.appendChild(this._createSpeechGroup());
+  panel.appendChild(this._createBigFontGroup());
+  panel.appendChild(this._createColorModeGroup());
+  panel.appendChild(this._createSessionLengthGroup());
+  panel.appendChild(this._createReadingScopeGroup());
+  panel.appendChild(this._createExampleModeGroup());
+  panel.appendChild(this._createRubyGroup());
+  panel.appendChild(this._createReviewExportGroup());
+
   return panel;
 },
+
+  /**
+   * 画面の漢字にふりがなを振る設定。
+   *
+   * 監査②で「UIに配当外の漢字が出ている」「図鑑の文が低学年に読めない」の2つが
+   * 挙がっていた。どちらも同じ問題なので、表示側で1本にして解く。
+   * 対象が漢字の苦手な子である以上、案内の文が読めないせいで進めないのは
+   * 設計思想と食い違う。
+   */
+  _createRubyGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'ふりがなを つける';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = Ruby.isEnabled();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    const describe = (on) => `（いまは: ${on ? 'ふりがな あり' : 'ふりがな なし'}）`;
+    status.textContent = describe(toggle.checked);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      Ruby.setEnabled(on);
+      status.textContent = describe(on);
+      try { saveGameData(); } catch {}
+      this._showSaveToast('ふりがなを 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      '画面の むずかしい ことばに ふりがなを つけます（「復習」→ ふくしゅう など）。' +
+      'まちがった ふりがなを 出さないよう、あらかじめ用意した ことばだけに つけます。' +
+      'バトルの問題（漢字1文字）には つきません。'
+    );
+
+    return group;
+  },
+
+  /**
+   * 先生が持ち帰れる「ふりかえり」の書き出し。
+   *
+   * 漢字ごとの正誤は kanjiAnswerStats に全部あるのに、外に出す手段が無かった。
+   * どの子がどの字でつまずいているかは次の授業を組み立てる材料そのものなので、
+   * 端末の中に閉じたままでは使えない。CSV にして持ち帰れるようにする。
+   */
+  _createReviewExportGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'ふりかえりを もちかえる';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+
+    const save = (kind, build) => {
+      publish('playSE', 'decide');
+      if (!ReviewExport.hasAnything()) {
+        // 空のファイルを渡しても先生が困るだけなので、理由を出して止める
+        status.textContent = '（まだ きろくが ありません）';
+        return;
+      }
+      const fileName = ReviewExport.buildFileName(kind);
+      const ok = ReviewExport.downloadCsv(build(), fileName);
+      status.textContent = ok ? `（${fileName} を ほぞんしました）` : '（ほぞんできませんでした）';
+      if (ok) this._showSaveToast('ふりかえりを 書き出しました');
+    };
+
+    const kanjiBtn = document.createElement('button');
+    kanjiBtn.className = 'settings-button';
+    kanjiBtn.textContent = 'かんじごと（CSV）';
+    kanjiBtn.addEventListener('click', () => save('かんじごと', () => ReviewExport.buildKanjiCsv()));
+
+    const dailyBtn = document.createElement('button');
+    dailyBtn.className = 'settings-button';
+    dailyBtn.style.marginLeft = '8px';
+    dailyBtn.textContent = 'ひごと（CSV）';
+    dailyBtn.addEventListener('click', () => save('ひごと', () => ReviewExport.buildDailyCsv()));
+
+    row.appendChild(kanjiBtn);
+    row.appendChild(dailyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'いま えらんでいる子の きろくを CSV で保存します。ExcelやGoogleスプレッドシートで開けます。' +
+      '「かんじごと」は 漢字1字ずつの よめた回数・まだの回数・つぎに であう予定。' +
+      '「ひごと」は 日づけごとの といた回数です。' +
+      '子どもを 切り替える（だれが あそぶ？）と、その子の きろくが出ます。'
+    );
+
+    return group;
+  },
+
+  /**
+   * 例文の中で読ませるモード。
+   *
+   * 単漢字だけを見せて読ませると、「読める」が字と読みの1対1の記憶で止まりやすい。
+   * 文の中に置かれた時にどう読むかは別の力で、そこが本を読む力につながる。
+   * ただし例文データを持つのは1年の80字だけなので、既定は OFF にしてある。
+   */
+  _createExampleModeGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'ぶんの なかで よむ';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = ExampleMode.isEnabled();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    const describe = (on) => `（いまは: ${on ? 'ぶんの なかで よむ' : 'かんじ 1もじで よむ'}）`;
+    status.textContent = describe(toggle.checked);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      ExampleMode.setEnabled(on);
+      status.textContent = describe(on);
+      try { saveGameData(); } catch {}
+      this._showSaveToast('よみかたを 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'ONにすると、漢字を1文字で出すかわりに「りんごが 一（？）つ ある。」のような文で出して、' +
+      '（？）のところを読んでもらいます。' +
+      '例文があるのは1年生の80字だけです。ほかの漢字は今までどおり1文字で出ます。'
+    );
+
+    return group;
+  },
+
+  /**
+   * 弱点の読み系統だけを正解にするか。
+   *
+   * これまでは単漢字を出して、どの読みでも正解にしていた。「生」なら
+   * せい／しょう／なま／き のどれでも通るので、知っている読みを1つ持っていれば
+   * 最後まで進めてしまう。画面に「弱点は音読み！」と出ているのだから、
+   * そこを合わせてもらうほうが、示していることとも合う。
+   *
+   * 系統ちがいは まちがい 扱いにしない（傷も記録も残さず書き直させる）ので、
+   * ONでも「読めたのに減点された」形にはならない。
+   */
+  _createReadingScopeGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'よわてんの よみで こたえる';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = ReadingScope.isEnabled();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    const describe = (on) => `（いまは: ${on ? 'よわてんの よみだけ' : 'どの よみでも いい'}）`;
+    status.textContent = describe(toggle.checked);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      ReadingScope.setEnabled(on);
+      status.textContent = describe(on);
+      try { saveGameData(); } catch {}
+      this._showSaveToast('よみの きまりを 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'ONにすると、「弱点は音読み！」と出ている敵には音読みで答えてもらいます。' +
+      'ちがう系統で答えても まちがいにはならず、「よめてるよ。いまは おんよみで」と伝えて' +
+      'もう一度書けます（ダメージも学習記録も動きません）。' +
+      'その系統の読みを持たない漢字では、今までどおりどの読みでも正解です。'
+    );
+
+    return group;
+  },
+
+  /**
+   * 「きょうは ○ふん」で区切る設定。
+   * 授業の残り時間で切り上げると、子どもの側には「途中でやめた」形しか残らない。
+   * はじめに時間を決めておけば、区切りのいいところで終われる。
+   */
+  _createSessionLengthGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'きょうの じかん';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const select = document.createElement('select');
+    select.style.maxWidth = '180px';
+    select.style.marginRight = '8px';
+    const labelOf = (m) => (m === 0 ? 'くぎらない' : `${m}ぷん`);
+    SessionTimer.SESSION_CHOICES.forEach(minutes => {
+      const opt = document.createElement('option');
+      opt.value = String(minutes);
+      opt.textContent = labelOf(minutes);
+      select.appendChild(opt);
+    });
+    select.value = String(SessionTimer.getMinutes());
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    status.textContent = `（いまは: ${labelOf(SessionTimer.getMinutes())}）`;
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const minutes = parseInt(select.value, 10) || 0;
+      SessionTimer.setMinutes(minutes);
+      status.textContent = `（いまは: ${labelOf(minutes)}）`;
+      this._showSaveToast('きょうの じかんを 更新しました');
+    });
+
+    row.appendChild(select);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      '決めた時間がすぎたら、敵と敵の間で「きょうは ここまで！」と終わります。' +
+      '問題の途中では止まりません。地図を見ている時間は数えません。'
+    );
+
+    return group;
+  },
+
+  /**
+   * 見分けやすい配色に切り替える。
+   * HPバーの 緑→橙→赤 や、かいふくの残り回数の 緑／赤 は、赤と緑の区別が
+   * つきにくい子には同じに見える。器（settings.cbMode）は前からあったが、
+   * 切り替える場所も効き目も無かった。
+   */
+  _createColorModeGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'いろの みえかた';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = Palette.isColorBlindMode();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    const describe = (on) => `（いまは: ${on ? 'みわけやすい いろ' : 'ふつうの いろ'}）`;
+    status.textContent = describe(toggle.checked);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      Palette.setColorBlindMode(on);
+      status.textContent = describe(on);
+      try { saveGameData(); } catch {}
+      this._showSaveToast('いろの みえかたを 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'ちからのバーや かいふくの のこり回数の色を、赤と緑を使わない組み合わせに変えます。' +
+      '（空色・橙・赤紫）'
+    );
+
+    return group;
+  },
+
+  /**
+   * 文字を大きくする設定。
+   * 保存の器（krb_save の settings.bigFont）は前からあったが、切り替える場所も
+   * 効き目も無かった。見えづらさで弾かれる子を作らないために要る。
+   */
+  _createBigFontGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'もじの おおきさ';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = TextScale.isBigFont();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    const describe = (on) => `（いまは: ${on ? 'おおきい' : 'ふつう'}）`;
+    status.textContent = describe(toggle.checked);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      TextScale.setBigFont(on);
+      status.textContent = describe(on);
+      try { saveGameData(); } catch {}
+      this._showSaveToast('もじの おおきさを 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'ゲームの中の文字を大きくします。ボタンから溢れないよう、' +
+      'もともと大きい文字は少しだけ大きくなります。'
+    );
+
+    return group;
+  },
+
+  /**
+   * 読みを声で確かめられるようにするかどうか。
+   * 漢字が苦手な子ほど耳から入れる経路が要るので既定はON。
+   * 端末に日本語の声が無い場合は、その旨をここに出す。
+   */
+  _createSpeechGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'よみを 音で きく';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = Speech.isEnabled();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+
+    const supported = Speech.isSupported();
+    const describe = (on) => (!supported
+      ? '（この端末では 音が でません）'
+      : `（いまは: ${on ? 'きこえる' : 'きこえない'}）`);
+    status.textContent = describe(toggle.checked);
+    toggle.disabled = !supported;
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.disabled = !supported;
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      Speech.setEnabled(on);
+      status.textContent = describe(on);
+      if (on) Speech.speak('よめたね');
+      this._showSaveToast('よみの 音を 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      '読めた時と、ヒントで答えを見た時に、その読みを声で返します。' +
+      '字と音の両方で覚えられるようにするためのものです。'
+    );
+
+    return group;
+  },
+
+  /**
+   * よみの入れかた（ゲーム内の50音表／端末のキーボード）を選ぶ。
+   * 既定はゲーム内の50音表。端末のキーボードは、その端末で最後に使われた
+   * ものが出るため、ローマ字入力に当たった子がそこで手が止まる。
+   */
+  _createInputMethodGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'よみの いれかた';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const select = document.createElement('select');
+    // 幅を抑えないと、隣の「適用」に重なる（.inline-controls は横並び）
+    select.style.maxWidth = '180px';
+    select.style.marginRight = '8px';
+    [
+      ['kanaPad', 'がめんの 50おんひょう'],
+      ['device', 'たんまつの キーボード']
+    ].forEach(([value, text]) => {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = text;
+      select.appendChild(opt);
+    });
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+
+    const labelOf = (v) => (v === 'device' ? 'たんまつの キーボード' : 'がめんの 50おんひょう');
+    let current = 'kanaPad';
+    try { current = localStorage.getItem('inputMethod') || 'kanaPad'; } catch {}
+    select.value = current;
+    status.textContent = `（いまは: ${labelOf(current)}）`;
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const value = select.value === 'device' ? 'device' : 'kanaPad';
+      try { localStorage.setItem('inputMethod', value); } catch {}
+      status.textContent = `（いまは: ${labelOf(value)}）`;
+      KanaPad.sync();
+      this._showSaveToast('よみの いれかたを 更新しました');
+    });
+
+    row.appendChild(select);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'がめんの50おんひょうなら、学校で見なれた並びのまま指1本で読みを書けます。' +
+      'ローマ字入力に慣れている子は、たんまつのキーボードも選べます。'
+    );
+
+    return group;
+  },
 
 
 
@@ -659,7 +1297,7 @@ const settingsScreenState = {
     // ツールチップとイベントリスナーを設定
     this._setupTooltipEvents(
       healModeTooltipTrigger,
-      '回復成功後に敵の攻撃があるかどうかを設定します。「攻撃なし」は初心者向け、「攻撃あり」は戦略性が高まります。'
+      '回復成功後に敵の攻撃があるかどうかを設定します。「攻撃なし」は ゆっくりあそびたい人むけ、「攻撃あり」は 手ごたえのある たたかいになります。'
     );
     this.setupHealModeEvents();
     
@@ -711,7 +1349,7 @@ const settingsScreenState = {
 
     this._setupTooltipEvents(
       tip,
-      '敵の攻撃タイミングを切り替えます。\n「通常」は毎ターン攻撃、「ミス時のみ」は不正解の時だけ敵が攻撃します。'
+      '敵の攻撃タイミングを切り替えます。\n「通常」は毎ターン攻撃、「ミス時のみ」は よみが ちがったときだけ 敵がうごきます。'
     );
     this.setupEnemyAttackModeEvents();
 

@@ -596,8 +596,12 @@ function findBonusBossForGrade(grade, allEnemies) {
  */
 export function isKanjiMastered(kanjiId) {
   try {
-    const gs = (typeof window !== 'undefined' && window.gameState) ? window.gameState : null;
-    const progress = gs?.kanjiReadProgress?.[kanjiId];
+    // NOTE: 以前は window.gameState を見ていたが、window.gameState への代入は
+    // コードベースに存在せず、この関数は常に false を返していた。
+    // その結果、漢字図鑑の「マスター済みを図鑑へ補完する」安全網が一度も発火しなかった。
+    // gameState はこのモジュールの先頭で import 済み（gameState.js はトップレベル import を
+    // 持たないため循環参照にならない）。
+    const progress = gameState?.kanjiReadProgress?.[kanjiId];
     return !!(progress && progress.mastered);
   } catch (e) {
     return false;
@@ -653,4 +657,45 @@ async function _loadGrades(grades) {
     } catch {}
   });
   await Promise.all(tasks);
+}
+
+/* ------------------------------------------------------------------ */
+/*  ことわざ                                                           */
+/* ------------------------------------------------------------------ */
+//
+// 400件（読み・意味・例文・結びつくゴトモン名つき）が用意されていたのに、
+// src からは一度も参照されていなかった。図鑑の読み物として出す。
+// 起動時には読まない。182KBあるので、ことわざ図鑑を開いた時に初めて取りに行く。
+
+let proverbData = null;
+let proverbPromise = null;
+
+/**
+ * ことわざを読み込む（初回だけ取りに行き、以後は同じ配列を返す）。
+ * @returns {Promise<Array<{id:number, text:string, reading:string, meaning:string,
+ *                          difficulty:string, example_sentence:string, monsterName:string}>>}
+ */
+export async function loadProverbs() {
+  if (proverbData) return proverbData;
+  if (proverbPromise) return proverbPromise;
+
+  proverbPromise = (async () => {
+    try {
+      const res = await fetch('/data/proverbs_with_monsters.json');
+      if (!res.ok) throw new Error(`ことわざの読み込みに失敗: ${res.statusText}`);
+      const arr = await res.json();
+      proverbData = Array.isArray(arr) ? arr : [];
+    } catch (e) {
+      console.warn('ことわざを読み込めませんでした:', e);
+      proverbData = [];
+    }
+    return proverbData;
+  })();
+
+  return proverbPromise;
+}
+
+/** 読み込み済みのことわざ（まだなら空配列） */
+export function getLoadedProverbs() {
+  return proverbData || [];
 }

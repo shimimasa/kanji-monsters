@@ -5,17 +5,13 @@
 // ◆images               … すべての Image オブジェクトをキャッシュ保持
 
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
+import { getBonusMonsterFolder } from '../utils/monsterImagePaths.js';
 
 export const images = {};                // key → HTMLImageElement
 
-// P2-1: image-pipeline 参照の間接化（将来の移設に備えてパスを定数へ集約）
-// NOTE: 文字列（特にハイフンの種類）が現行と完全一致するように維持すること。
+// モンスター画像のベースパス（image-pipeline 参照は PRV 廃止に伴い削除済み）
 const ASSET_PATHS = {
   MONSTER_FULL_PRIMARY: '/assets/images/monsters/full',
-  // NOTE: ここは ASCII ハイフン "-"（/image-pipeline/）が現行
-  MONSTER_FULL_PIPELINE: '/image-pipeline/output/monsters/full',
-  // NOTE: ここは特殊ハイフン "‐"（/image‐pipeline/）が現行
-  MONSTER_PNG_PIPELINE: '/image‐pipeline/monsters',
 };
 
 /* ------------------------------------------------------------------ */
@@ -246,7 +242,10 @@ const gradeFolderMap = {
 };
   
   // 学年に基づいてフォルダを決定
-  const folder = gradeFolderMap[enemy.grade] || gradeFolderMap[1];
+  // NOTE: ボーナスの伝説(*-L0n)/幻(*-F0n) は学年フォルダではなく full/日本・full/海外 に置かれている。
+  // enemies_legend.json の大半に grade が無く、以前はここで grade1-hokkaido に落ちて
+  // 「北海道のモンスターの絵」が代替表示されていた。
+  const folder = getBonusMonsterFolder(enemy.id) || gradeFolderMap[enemy.grade] || gradeFolderMap[1];
   
   // 画像ファイル名を取得（ID部分のみ）
   const enemyId = enemy.id;
@@ -258,15 +257,9 @@ const gradeFolderMap = {
   // 中学生ステージ（PRV-Exxx形式）の場合
   if (enemyId.startsWith('PRV-')) {
     pathsToTry.push(
-      // 1. WebP形式の画像（monsters/full/フォルダ内）
-      `${ASSET_PATHS.MONSTER_FULL_PRIMARY}/${enemyId}.webp`,
-      // NOTE(P2): PRV は今後使わない方針のため、image-pipeline 参照は無害化（候補から除外）
-      // // 2. image-pipeline内のWebP画像
-      // `${ASSET_PATHS.MONSTER_FULL_PIPELINE}/${enemyId}.webp`,
-      // // 3. PNG形式の代替
-      // `${ASSET_PATHS.MONSTER_PNG_PIPELINE}/monster_${enemyId.replace('PRV-E', '')}.png`
+      // WebP形式の画像（monsters/full/フォルダ内）
+      `${ASSET_PATHS.MONSTER_FULL_PRIMARY}/${enemyId}.webp`
     );
-    // 文字列の最終出力は旧コードと完全一致（パス/順序/候補数は不変）
   } else {
     // 小学生ステージ用の既存のパス
     pathsToTry.push(

@@ -2401,16 +2401,16 @@
     "stageId": "shikoku_bonus",
     "name": "四国ボーナス（小学校漢字まとめ）",
     "enemyIdList": [
-      "SHK-L01",
-      "SHK-L02",
-      "SHK-L03",
-      "SHK-L04",
-      "SHK-L05",
-      "SHK-F01",
-      "SHK-F02",
-      "SHK-F03",
-      "SHK-F04",
-      "SHK-F05"
+      "SKG-L01",
+      "SKG-L02",
+      "SKG-L03",
+      "SKG-L04",
+      "SKG-L05",
+      "SKG-F01",
+      "SKG-F02",
+      "SKG-F03",
+      "SKG-F04",
+      "SKG-F05"
     ],
     "kanjiPoolIdList": [
       "g1-001",

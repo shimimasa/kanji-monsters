@@ -49,14 +49,24 @@ export function getStepsFor(screenId, ctx = {}) {
             anchor: () => canvasBottomCenter(ctx.canvas, 320, 80) // 入力域の下辺を目安に
           },
           {
+            title: 'てきの弱点',
+            text: 'てきには 弱点があるよ！\n「音読み」か「訓読み」…弱点のよみかたで こたえると 大ダメージ！',
+            anchor: () => { const c = ctx.canvas || document.getElementById('gameCanvas'); const cw = c?.width || 800; return canvasRect(c, cw - 320, 10, 300, 150); } // 敵パネル＋弱点表示の近辺
+          },
+          {
             title: 'ヒント',
-            text: 'わからないときは ヒントをつかってOK！',
+            text: 'わからないときは ヒントをつかってOK！\n4回おすと こたえも みられるよ。',
             anchor: () => canvasTopRight(ctx.canvas, 180, 80)
           },
           {
             title: 'HPとこうげき',
             text: 'こたえると こうげき！ まちがえると ダメージ！\nがんばって ぜんいん たおそう！',
             anchor: () => canvasTopLeft(ctx.canvas, 260, 120)
+          },
+          {
+            title: 'こわくなったら',
+            text: '「れんしゅうへ」をおすと、てきのいない\nれんしゅうモードで ゆっくり おぼえられるよ。',
+            anchor: () => canvasRect(ctx.canvas, 20, 64, 120, 32) // れんしゅうへボタン
           }
         ];
   

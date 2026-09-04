@@ -40,10 +40,22 @@ const reviewQueue = (() => {
     return Math.max(1.3, newEF);
   };
 
+  /**
+   * 次に来る午前4時。初回の復習予定に使う。
+   * 以前は登録時刻そのもの（＝即 due）で、1分前に間違えた字がその場で
+   * 「復習待ち」に並び、同じ日のうちに詰め込む形になっていた。
+   */
+  const nextMorning = () => {
+    const d = new Date();
+    d.setHours(4, 0, 0, 0);
+    if (Date.now() >= d.getTime()) d.setDate(d.getDate() + 1);
+    return d.getTime();
+  };
+
   return {
     /**
      * 新規にキューへ登録。存在する場合はスキップ。
-     * repetition=0, interval=0, eFactor=2.5, nextReviewAt=now で初期化
+     * repetition=0, interval=0, eFactor=2.5, nextReviewAt=次の午前4時 で初期化
      */
     add(id) {
       if (items.some(i => i.id === id)) return;
@@ -52,7 +64,7 @@ const reviewQueue = (() => {
         repetition: 0,
         interval:   0,
         eFactor:    2.5,
-        nextReviewAt: Date.now()
+        nextReviewAt: nextMorning()
       });
       save();
     },
@@ -93,19 +105,18 @@ const reviewQueue = (() => {
       );
     },
 
+    // NOTE: かつて popBatch(n) があったが、項目を splice で消してから ID を返すため、
+    //       呼び出し側が直後に updateReview() を呼んでも items.find に失敗して
+    //       黙って return し、SM-2 が一度も動いていなかった。取り出しは
+    //       getDueReviews() を使い、間隔の管理は updateReview に任せること。
+
     /**
-     * due なものから先頭 n 件の ID 配列を返し、キューから除去
-     * @param {number} [n=5]
-     * @returns {Array<string|number>}
+     * キュー全体の写しを返す（並べ替えや書き換えをしても中身は壊れない）。
+     * ふりかえりの書き出しで「次にいつ出会う予定か」を出すために要る。
+     * @returns Array<entry>
      */
-    popBatch(n = 5) {
-      const due = this.getDueReviews().slice(0, n);
-      due.forEach(d => {
-        const idx = items.findIndex(i => i.id === d.id);
-        if (idx >= 0) items.splice(idx, 1);
-      });
-      save();
-      return due.map(d => d.id);
+    getAll() {
+      return items.filter(Boolean).map(i => ({ ...i }));
     },
 
     /** due 項目の数 */

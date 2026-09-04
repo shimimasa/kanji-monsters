@@ -773,8 +773,8 @@ const regionSelectState = {
         this.ctx.fillStyle = '#FFB74D';
         this.ctx.font = '12px sans-serif';
         const req = (marker.grade === 11)
-        ? '解放条件: 1〜6年の通常ステージを全てクリア'
-        : (marker.grade === 12 ? '解放条件: 1〜11年の通常ステージを全てクリア' : '');
+        ? 'ひらくには: 1年〜6年の ステージを ぜんぶ クリア'
+        : (marker.grade === 12 ? 'ひらくには: 1年〜6年と 四国地方を クリア' : '');
       if (req) this.ctx.fillText(req, tooltipX + 10, tooltipY + 10);
       }
     } catch {}
@@ -875,10 +875,11 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       if (distance <= 35) {
         // ← 追加: ロック中は弾く
         if (!this.isRegionUnlocked(marker.grade)) {
-          publish('playSE', 'wrong');
+          publish('playSE', 'cancel');
+          // grade 11/12 は内部の通し番号。子どもに見せる文には出さない
           alert(marker.grade === 11
-            ? '四国地方はまだ解放されていません。\n解放条件: 1〜6年の通常ステージを全てクリア'
-            : '九州地方はまだ解放されていません。\n解放条件: 1〜11年の通常ステージを全てクリア');
+            ? 'ここは まだ とびらが しまっているよ。\n1年〜6年の ステージを ぜんぶ クリアすると ひらくよ！'
+            : 'ここは まだ とびらが しまっているよ。\n1年〜6年と 四国地方を クリアすると ひらくよ！');
           return;
         }
         this.startZoomAnimation(marker);

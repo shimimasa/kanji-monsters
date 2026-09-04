@@ -5,6 +5,8 @@ import { gameState, updatePlayerName, clearSaveData } from '../core/gameState.js
 import { getCurrentUser } from '../services/firebase/firebaseController.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { hardResetAllLocalData } from '../core/saveData.js';
+import { stageData } from '../loaders/dataLoader.js';
+import { listSlots, switchToSlot } from '../core/saveSlots.js';
 const titleState = {
   /** 画面表示時の初期化 */
   enter(canvas) {
@@ -28,21 +30,36 @@ const titleState = {
     if (isReturnPlayer) {
       // リピートプレイヤー用のボタン配置（モード統一）
       this.playButton = { x: cx - 150, y: 350, width: 300, height: 50, text: 'つづきから' };
-      this.settingsButton = { x: cx - 80, y: 420, width: 160, height: 50, text: 'せってい' };
-      
+
+      // 前回あそんだステージの地図へ1タップで戻るクイック再開（特定できる場合のみ表示）
+      const resumableStageId = this._getResumableStageId();
+      this.continueButton = resumableStageId
+        ? { x: cx - 150, y: 408, width: 300, height: 40, text: 'まえの場所から すぐ再開', stageId: resumableStageId }
+        : null;
+
+      // 共用の端末では、まず「だれが あそぶ？」を選べることが要る。
+      // 設定の奥に置くと押されず、前の子の記録の上に書かれてしまうので、
+      // せってい と並べてここに出す。
+      this.slotButton = { x: cx - 170, y: 460, width: 160, height: 50, text: 'だれが あそぶ？' };
+      this.settingsButton = { x: cx + 10, y: 460, width: 160, height: 50, text: 'せってい' };
+
       // リセットボタンは誤タップ防止のため、小さく、離れた位置に配置
-      this.resetButton = { 
-        x: cx - 90, 
-        y: 490, 
-        width: 180, 
-        height: 35, 
-        text: 'はじめから' 
+      this.resetButton = {
+        x: cx - 90,
+        y: 522,
+        width: 180,
+        height: 35,
+        text: 'はじめから'
       };
     } else {
       // 新規プレイヤー用のボタン配置（モード統一）
       this.playButton = { x: cx - 150, y: 380, width: 300, height: 50, text: 'スタート' };
+      this.continueButton = null;
       this.resetButton = null; // リセットボタンは表示しない
-      this.settingsButton = { x: cx - 80, y: 450, width: 160, height: 50, text: 'せってい' };
+      // 空きスロットに入った子も、まちがえたら元の場所に戻れる必要がある。
+      // ここに出しておかないと、名前を入れるまで戻る手段が無くなる。
+      this.slotButton = { x: cx - 170, y: 450, width: 160, height: 50, text: 'だれが あそぶ？' };
+      this.settingsButton = { x: cx + 10, y: 450, width: 160, height: 50, text: 'せってい' };
     }
     
     this.registerHandlers();
@@ -297,8 +314,14 @@ const titleState = {
   _drawFantasyButtons(ctx) {
     // メインボタン
     this._drawStyledButton(ctx, this.playButton, 'primary');
+    if (this.continueButton) {
+      this._drawStyledButton(ctx, this.continueButton, 'secondary');
+    }
+    if (this.slotButton) {
+      this._drawStyledButton(ctx, this.slotButton, 'secondary');
+    }
     this._drawStyledButton(ctx, this.settingsButton, 'secondary');
-    
+
     // リセットボタン（危険な操作用）
     if (this.resetButton) {
       this._drawStyledButton(ctx, this.resetButton, 'danger');
@@ -400,6 +423,8 @@ const titleState = {
     this.unregisterHandlers();
     const old = document.getElementById('titleSaveButton');
     if (old) old.remove();
+    const picker = document.getElementById('slotPicker');
+    if (picker) picker.remove();
     this.canvas = null;
     this.ctx    = null;
   },
@@ -468,6 +493,34 @@ _startGame() {
   gameState.currentGrade = 0;
   publish('changeScreen', 'courseSelect');
 },
+
+  /** 前回あそんだステージのID（stageDataで実在確認できたもののみ） */
+  _getResumableStageId() {
+    try {
+      const id = localStorage.getItem('lastPlayedStage');
+      if (!id) return null;
+      const stage = Array.isArray(stageData) ? stageData.find(s => s.stageId === id) : null;
+      return stage ? id : null;
+    } catch {
+      return null;
+    }
+  },
+
+  /** クイック再開: 前回ステージの地図（ステージ選択画面）へ直行する */
+  _quickResume() {
+    const id = this.continueButton?.stageId;
+    const stage = Array.isArray(stageData) ? stageData.find(s => s.stageId === id) : null;
+    if (!stage) {
+      this._startGame();
+      return;
+    }
+    gameState.currentStageId = id;
+    gameState.currentGrade = stage.grade;
+    // 世界編（漢検級 = grade 7〜10）は世界ステージ選択へ、それ以外は日本のステージ選択へ
+    const target = (stage.grade >= 7 && stage.grade <= 10) ? 'worldStageSelect' : 'stageSelect';
+    gameState.previousScreen = target;
+    publish('changeScreen', target);
+  },
 
   /** データリセット処理 */
   async _resetGameData() {
@@ -559,10 +612,25 @@ _startGame() {
       return;
     }
 
+    // クイック再開ボタン（前回の地図へ直行）
+    if (this.continueButton && isMouseOverRect(x, y, this.continueButton)) {
+      publish('playSE', 'decide');
+      publish('playBGM', 'title');
+      this._quickResume();
+      return;
+    }
+
     // はじめからボタン（リピートプレイヤーのみ）
     if (this.resetButton && isMouseOverRect(x, y, this.resetButton)) {
       publish('playSE', 'decide');
       this._resetGameData();
+      return;
+    }
+
+    // だれが あそぶ？（セーブスロットの切り替え）
+    if (this.slotButton && isMouseOverRect(x, y, this.slotButton)) {
+      publish('playSE', 'decide');
+      this._openSlotPicker();
       return;
     }
 
@@ -571,6 +639,86 @@ _startGame() {
       publish('playSE', 'decide');
       publish('changeScreen', 'settings');
     }
+  },
+
+  /**
+   * 「だれが あそぶ？」のパネルを開く。
+   *
+   * 学校の共用端末で、2人目が1人目の記録の上に書いてしまうのを防ぐためのもの。
+   * 選んだあとはページを読み込み直す。メモリ上に前の子の状態が残っていると、
+   * 次に保存した時に混ざるため、ここは確実にやり直す。
+   */
+  _openSlotPicker() {
+    if (document.getElementById('slotPicker')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'slotPicker';
+    overlay.style.cssText = [
+      'position:fixed', 'inset:0', 'z-index:2147483646',
+      'background:rgba(0,0,0,0.72)',
+      'display:flex', 'align-items:center', 'justify-content:center',
+      'font-family:"UDデジタル教科書体","Hiragino Sans",sans-serif'
+    ].join(';');
+
+    const panel = document.createElement('div');
+    panel.style.cssText = [
+      'background:#26324a', 'color:#fff', 'border-radius:14px',
+      'padding:20px', 'width:min(90vw,420px)',
+      'box-shadow:0 10px 30px rgba(0,0,0,0.5)'
+    ].join(';');
+
+    const title = document.createElement('div');
+    title.textContent = 'だれが あそぶ？';
+    title.style.cssText = 'font-size:22px;font-weight:bold;text-align:center;margin-bottom:6px;';
+    panel.appendChild(title);
+
+    const note = document.createElement('div');
+    note.textContent = 'じぶんの ばしょを えらんでね';
+    note.style.cssText = 'font-size:14px;text-align:center;opacity:0.8;margin-bottom:14px;';
+    panel.appendChild(note);
+
+    listSlots().forEach(slot => {
+      const row = document.createElement('button');
+      row.type = 'button';
+      const label = slot.name
+        ? `${slot.index}. ${slot.name}`
+        : `${slot.index}. あいてる`;
+      row.textContent = slot.isCurrent ? `${label}（いま ここ）` : label;
+      row.style.cssText = [
+        'display:block', 'width:100%', 'margin:0 0 8px',
+        'padding:14px', 'font-size:18px', 'font-family:inherit',
+        'border-radius:10px', 'border:1px solid rgba(255,255,255,0.25)',
+        `background:${slot.isCurrent ? '#3d6f4f' : '#3b4a63'}`,
+        'color:#fff', 'cursor:pointer'
+      ].join(';');
+      row.addEventListener('click', () => {
+        publish('playSE', 'decide');
+        if (slot.isCurrent) { overlay.remove(); return; }
+        if (switchToSlot(slot.index)) {
+          // 切り替えたら読み込み直す（前の子の状態を残さない）
+          location.reload();
+        }
+      });
+      panel.appendChild(row);
+    });
+
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.textContent = 'とじる';
+    close.style.cssText = [
+      'display:block', 'width:100%', 'margin-top:6px', 'padding:12px',
+      'font-size:16px', 'font-family:inherit', 'border-radius:10px',
+      'border:1px solid rgba(255,255,255,0.25)', 'background:#4a5b78',
+      'color:#fff', 'cursor:pointer'
+    ].join(';');
+    close.addEventListener('click', () => {
+      publish('playSE', 'cancel');
+      overlay.remove();
+    });
+    panel.appendChild(close);
+
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
   },
 
   render() {

@@ -3,7 +3,7 @@
 import { publish } from '../../core/eventBus.js';
 import { loadDex } from '../../models/kanjiDex.js';
 import { getKanjiById, kanjiData, getKanjiByGrade, isKanjiMastered } from '../../loaders/dataLoader.js';
-import { gameState } from '../../core/gameState.js';
+import { gameState, getKanjiAnswerStats } from '../../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../../ui/uiRenderer.js';
 
 const BTN = {
@@ -261,7 +261,45 @@ const kanjiDexScreen = {
       publish('changeScreen', targetScreen);
     });
     leftControls.appendChild(backButton);
-  
+
+    // ことわざ図鑑へ
+    // 400件の ことわざ（読み・意味・例文つき）が用意されていたのに、
+    // これまで src から一度も参照されていなかった。図鑑の隣に読み物として置く。
+    const proverbButton = document.createElement('button');
+    proverbButton.className = 'btn-proverb';
+    proverbButton.textContent = '🗣 ことわざ図鑑';
+    Object.assign(proverbButton.style, {
+      background: 'linear-gradient(135deg, #8d6e63, #6d4c41)',
+      color: 'white',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      borderRadius: '8px',
+      padding: '8px 16px',
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: '500',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+    });
+    proverbButton.addEventListener('mouseenter', () => {
+      Object.assign(proverbButton.style, {
+        background: 'linear-gradient(135deg, #6d4c41, #5d4037)',
+        transform: 'translateY(-2px)',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+      });
+    });
+    proverbButton.addEventListener('mouseleave', () => {
+      Object.assign(proverbButton.style, {
+        background: 'linear-gradient(135deg, #8d6e63, #6d4c41)',
+        transform: 'translateY(0)',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+      });
+    });
+    proverbButton.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      publish('changeScreen', 'proverbDex');
+    });
+    leftControls.appendChild(proverbButton);
+
     // 学年セレクト
     const gradeLabel = document.createElement('span');
     gradeLabel.className = 'kanji-grade-label';
@@ -370,7 +408,7 @@ const kanjiDexScreen = {
         // ← 追加: 誤読のみトグルボタン
         const wrongOnlyBtn = document.createElement('button');
         wrongOnlyBtn.id = 'btnWrongOnly';
-        wrongOnlyBtn.textContent = '❗ 誤読のみ';
+        wrongOnlyBtn.textContent = '🔁 もういちど よむ漢字';
         const wrongBase = {
           background: this.showWrongOnly ? 'linear-gradient(135deg, #f39c12, #e67e22)' : 'linear-gradient(135deg, #ffc107, #e0a800)',
           color: this.showWrongOnly ? 'white' : '#000',
@@ -727,6 +765,92 @@ const kanjiDexScreen = {
     return card;
   },
 
+  /**
+   * がくしゅうのきろくセクションを構築する
+   * 音読み/訓読みごとの「よめるようになった読み」と正答記録をポジティブ表記で見せる
+   */
+  _buildLearningRecordSection(k) {
+    const wrap = document.createElement('div');
+    wrap.className = 'kanji-learning-record';
+    Object.assign(wrap.style, {
+      marginTop: '10px',
+      padding: '10px 12px',
+      background: 'rgba(255, 255, 255, 0.35)',
+      border: '1px solid rgba(139, 69, 19, 0.4)',
+      borderRadius: '8px'
+    });
+
+    const title = document.createElement('h3');
+    title.textContent = 'がくしゅうのきろく';
+    Object.assign(title.style, { margin: '0 0 6px', fontSize: '16px' });
+    wrap.appendChild(title);
+
+    const prog = gameState.kanjiReadProgress?.[k.id];
+    const onyomiSet = prog?.onyomi instanceof Set ? prog.onyomi : new Set(prog?.onyomi || []);
+    const kunyomiSet = prog?.kunyomi instanceof Set ? prog.kunyomi : new Set(prog?.kunyomi || []);
+
+    // よめるようになった読みは緑チェック、これからの読みはうすい丸
+    const renderReadings = (label, readings, masteredSet) => {
+      const arr = Array.isArray(readings) ? readings : (readings ? [readings] : []);
+      if (arr.length === 0) return null;
+      const p = document.createElement('p');
+      Object.assign(p.style, { margin: '2px 0', fontSize: '14px' });
+      const spans = arr.map(r => {
+        const done = masteredSet.has(r);
+        const color = done ? '#1e8449' : '#8d6e63';
+        const mark = done ? '✓' : '○';
+        return `<span style="color:${color}; font-weight:${done ? '700' : '400'}">${mark}${r}</span>`;
+      });
+      p.innerHTML = `<strong>${label}:</strong> ${spans.join('　')}`;
+      return p;
+    };
+
+    const onEl = renderReadings('音読み', k.onyomi, onyomiSet);
+    if (onEl) wrap.appendChild(onEl);
+    const kunEl = renderReadings('訓読み', k.kunyomi, kunyomiSet);
+    if (kunEl) wrap.appendChild(kunEl);
+
+    // 正答記録（「よめた回数」中心のポジティブ表記）
+    const stats = getKanjiAnswerStats(k.id);
+    const total = stats.correct + stats.incorrect;
+    const statsEl = document.createElement('p');
+    Object.assign(statsEl.style, { margin: '6px 0 2px', fontSize: '14px' });
+    if (total > 0) {
+      const pct = Math.round((stats.correct / total) * 100);
+      statsEl.innerHTML = `<strong>よめた回数:</strong> ${stats.correct}回（ちょうせん ${total}回）`;
+      wrap.appendChild(statsEl);
+
+      const barWrap = document.createElement('div');
+      Object.assign(barWrap.style, {
+        height: '8px',
+        background: 'rgba(139, 69, 19, 0.2)',
+        borderRadius: '4px',
+        overflow: 'hidden',
+        marginTop: '4px'
+      });
+      const bar = document.createElement('div');
+      Object.assign(bar.style, {
+        width: `${pct}%`,
+        height: '100%',
+        background: 'linear-gradient(90deg, #2ecc71, #27ae60)'
+      });
+      barWrap.appendChild(bar);
+      wrap.appendChild(barWrap);
+    } else {
+      statsEl.textContent = 'これから ちょうせんしよう！';
+      wrap.appendChild(statsEl);
+    }
+
+    if (prog?.mastered) {
+      const badge = document.createElement('p');
+      badge.textContent = '⭐ マスターかんじ！';
+      Object.assign(badge.style, { margin: '8px 0 0', color: '#b7950b', fontWeight: '700' });
+      wrap.appendChild(badge);
+    }
+
+    return wrap;
+  },
+
   showModal(kanjiId) {
         if (document.getElementById('kanjiModal')) return; // 多重起動防止
         const k = getKanjiById(kanjiId);
@@ -760,16 +884,6 @@ const kanjiDexScreen = {
    frag.appendChild(modalContainer);
    document.body.appendChild(frag); // 一括追加でレイアウト1回
 
-        // 進捗・学習記録UIは非表示にする
-      // 既存の詳細ブロックはここで構築（必要分のみ）
-      // 例: 学年/画数/意味など…（既存の infoSection 生成コードをここに移してOK）
-    
-    //modalContent.appendChild(progressSection);
-    
-    // 漢字情報
-    //const infoSection = document.createElement('div');
-    //infoSection.className = 'kanji-detail-info';
-    
     // 基本情報
 
     const basicInfo = document.createElement('div');
@@ -793,7 +907,10 @@ const kanjiDexScreen = {
     gradeStrokesEl.innerHTML = `<strong>学年:</strong> ${k.grade || '?'}年 <strong>画数:</strong> ${k.strokes}画`;
     basicInfo.appendChild(gradeStrokesEl);
     infoSection.appendChild(basicInfo);
-    
+
+    // がくしゅうのきろく（音訓別の習熟＋正答記録）
+    infoSection.appendChild(this._buildLearningRecordSection(k));
+
     // 例文を表示（あれば）
     const example = this._getExampleSentence(k);
     if (example) {
@@ -1035,19 +1152,16 @@ const kanjiDexScreen = {
         
       case 'mastery':
         this.allList.sort((a, b) => {
-          const kanjiA = getKanjiById(a);
-          const kanjiB = getKanjiById(b);
-          
-          const correctA = kanjiA.correctCount || 0;
-          const incorrectA = kanjiA.incorrectCount || 0;
-          const totalA = correctA + incorrectA;
-          const accuracyA = totalA > 0 ? correctA / totalA : 0;
-          
-          const correctB = kanjiB.correctCount || 0;
-          const incorrectB = kanjiB.incorrectCount || 0;
-          const totalB = correctB + incorrectB;
-          const accuracyB = totalB > 0 ? correctB / totalB : 0;
-          
+          // 学習記録の正史（gameState.kanjiAnswerStats）から正答率を算出
+          const statsA = getKanjiAnswerStats(a);
+          const statsB = getKanjiAnswerStats(b);
+
+          const totalA = statsA.correct + statsA.incorrect;
+          const accuracyA = totalA > 0 ? statsA.correct / totalA : 0;
+
+          const totalB = statsB.correct + statsB.incorrect;
+          const accuracyB = totalB > 0 ? statsB.correct / totalB : 0;
+
           return accuracyB - accuracyA;
         });
         break;
@@ -1118,8 +1232,7 @@ const kanjiDexScreen = {
   // ← 追加: 誤読判定（永続化があればlocalStorageも参照）
   _isWrongEver(id) {
     try {
-      const k = getKanjiById(id);
-      if (k && (k.incorrectCount || 0) > 0) return true;
+      if (getKanjiAnswerStats(id).incorrect > 0) return true;
 
       // 追加で localStorage の補助セットを参照（存在すれば）
       try {

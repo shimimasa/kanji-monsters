@@ -10,21 +10,7 @@ import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils
 import { getEnemiesByStageId } from '../loaders/dataLoader.js';
 import { loadDex } from '../models/monsterDex.js';
 import { isStageCleared as isStageClearedSSoT } from '../core/saveData.js';
-
-/** 角丸矩形を描画するヘルパー関数 */
-function drawRoundedRect(ctx, x, y, width, height, radius) {
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();
-}
+import { drawRoundedRect, drawEnhancedTabs as drawEnhancedTabsShared } from '../ui/canvasUtils.js';
 
 /** 学年に応じたアイコンを返す */
 function getGradeIcon(grade) {
@@ -59,145 +45,13 @@ function getGradeRegion(grade) {
 }
 
 /** 改善されたタブを描画する関数 */
-function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime, mode = 'grade') {
-  const tabCount = tabs.length;
-  const tabW = canvasWidth / tabCount;
-  const tabH = 60; // 高さを増加
-  
-  // 背景グラデーション
-  const bgGradient = ctx.createLinearGradient(0, 0, 0, tabH);
-  bgGradient.addColorStop(0, '#2d3748');
-  bgGradient.addColorStop(1, '#1a202c');
-  ctx.fillStyle = bgGradient;
-  ctx.fillRect(0, 0, canvasWidth, tabH);
-  
-  tabs.forEach((tab, i) => {
-    const x0 = i * tabW;
-    const isSelected = (mode === 'grade') ? 
-      (tab.grade === selectedValue) : 
-      (tab.kanken_level === selectedValue);
-    
-    // タブの基本形状
-    const cornerRadius = 8;
-    const insetY = isSelected ? 0 : 8;
-    const insetH = isSelected ? tabH : tabH - 8;
-    
-    ctx.save();
-    
-    // 選択中タブの背景
-    if (isSelected) {
-      // 光るエフェクト
-      const glowGradient = ctx.createRadialGradient(
-        x0 + tabW/2, tabH/2, 0,
-        x0 + tabW/2, tabH/2, tabW/2
-      );
-      glowGradient.addColorStop(0, 'rgba(66, 153, 225, 0.3)');
-      glowGradient.addColorStop(1, 'rgba(66, 153, 225, 0)');
-      ctx.fillStyle = glowGradient;
-      ctx.fillRect(x0, 0, tabW, tabH);
-      
-      // メインの背景グラデーション
-      const selectedGradient = ctx.createLinearGradient(x0, insetY, x0, insetY + insetH);
-      selectedGradient.addColorStop(0, '#4299e1');
-      selectedGradient.addColorStop(0.5, '#3182ce');
-      selectedGradient.addColorStop(1, '#2b6cb0');
-      ctx.fillStyle = selectedGradient;
-    } else {
-      // 非選択タブの背景
-      const unselectedGradient = ctx.createLinearGradient(x0, insetY, x0, insetY + insetH);
-      unselectedGradient.addColorStop(0, '#4a5568');
-      unselectedGradient.addColorStop(1, '#2d3748');
-      ctx.fillStyle = unselectedGradient;
-    }
-    
-    // 角丸矩形を描画
-    drawRoundedRect(ctx, x0 + 2, insetY, tabW - 4, insetH, cornerRadius);
-    ctx.fill();
-    
-
-    // 枠線
-    if (isSelected) {
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      
-      // 内側の光る枠線
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.lineWidth = 1;
-      drawRoundedRect(ctx, x0 + 3, insetY + 1, tabW - 6, insetH - 2, cornerRadius - 1);
-      ctx.stroke();
-    }
-    
-    // アイコンとテキスト
-    const centerX = x0 + tabW / 2;
-    const centerY = insetY + insetH / 2;
-    
-    // アイコン（学年モード）
-    const icon = getGradeIcon(tab.grade);
-    const mainText = tab.label;
-    const subText = getGradeRegion(tab.grade);
-    
-    // アイコンの描画
-    if (icon && tab.grade !== 0) {
-      ctx.font = isSelected ? '20px sans-serif' : '16px sans-serif';
-      ctx.fillStyle = isSelected ? '#ffffff' : '#cbd5e0';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(icon, centerX, centerY - 12);
-    }
-    
-    // メインテキスト
-    ctx.font = isSelected ? 'bold 16px "UDデジタル教科書体", sans-serif' : '14px "UDデジタル教科書体", sans-serif';
-    ctx.fillStyle = isSelected ? '#ffffff' : '#e2e8f0';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    if (tab.grade === 0) {
-      // 総復習タブは特別デザイン
-      ctx.fillStyle = isSelected ? '#ffd700' : '#f7fafc';
-      ctx.fillText('🔄 ' + mainText, centerX, centerY);
-    } else {
-      ctx.fillText(mainText, centerX, centerY + 2);
-      
-      // サブテキスト
-      if (subText) {
-        ctx.font = '10px "UDデジタル教科書体", sans-serif';
-        ctx.fillStyle = isSelected ? 'rgba(255, 255, 255, 0.8)' : 'rgba(226, 232, 240, 0.7)';
-        ctx.fillText(subText, centerX, centerY + 16);
-      }
-    }
-    
-    // 選択中タブの下部ハイライト
-    if (isSelected) {
-      const highlightGradient = ctx.createLinearGradient(x0, tabH - 4, x0, tabH);
-      highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
-      highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0.2)');
-      ctx.fillStyle = highlightGradient;
-      ctx.fillRect(x0 + 2, tabH - 4, tabW - 4, 4);
-    }
-    
-    // アニメーション効果（パルス）
-    if (isSelected) {
-      const pulse = Math.sin(animationTime * 0.003) * 0.1 + 0.9;
-      ctx.globalAlpha = pulse;
-      const pulseGradient = ctx.createRadialGradient(
-        centerX, centerY, 0,
-        centerX, centerY, tabW / 3
-      );
-      pulseGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
-      pulseGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-      ctx.fillStyle = pulseGradient;
-      ctx.fillRect(x0, insetY, tabW, insetH);
-    }
-    
-    ctx.restore();
+function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime) {
+  drawEnhancedTabsShared(ctx, tabs, selectedValue, canvasWidth, animationTime, {
+    getKey: (tab) => tab.grade,
+    getIcon: (tab) => getGradeIcon(tab.grade),
+    getSubText: (tab) => getGradeRegion(tab.grade),
+    isReviewTab: (tab) => tab.grade === 0,
   });
-  
-  // 全体の影
-  ctx.save();
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-  ctx.fillRect(0, tabH, canvasWidth, 3);
-  ctx.restore();
 }
 
 
@@ -219,14 +73,14 @@ const getUiRoot = () => {
 
 // フッターボタンを画面下部に水平一列に配置
 const BUTTON_CONFIG = {
-  width: 140,  // 幅を少し縮小（5ボタン対応）
+  width: 120,  // 幅を縮小（6ボタン対応）
   height: 40,
-  gap: 15,     // 間隔を少し縮小
+  gap: 12,     // 間隔を縮小
   y: 540
 };
 
-// 合計幅を計算（5ボタンに変更）
-const totalWidth = (BUTTON_CONFIG.width * 5) + (BUTTON_CONFIG.gap * 4);
+// 合計幅を計算（6ボタン）
+const totalWidth = (BUTTON_CONFIG.width * 6) + (BUTTON_CONFIG.gap * 5);
 // 開始X座標を計算（中央揃え）
 const startX = (800 - totalWidth) / 2; // キャンバス幅800pxを想定
 
@@ -250,29 +104,39 @@ const practiceButton = {
   icon: '📝'
 };
 
-const dexButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2, 
-  y: BUTTON_CONFIG.y, 
-  width: BUTTON_CONFIG.width, 
-  height: BUTTON_CONFIG.height, 
+// ★★★ 力だめし（学年まとめテスト）ボタン ★★★
+const quizButton = {
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 2,
+  y: BUTTON_CONFIG.y,
+  width: BUTTON_CONFIG.width,
+  height: BUTTON_CONFIG.height,
+  text: '力だめし',
+  icon: '💪'
+};
+
+const dexButton = {
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3,
+  y: BUTTON_CONFIG.y,
+  width: BUTTON_CONFIG.width,
+  height: BUTTON_CONFIG.height,
   text: '漢字図鑑',
   icon: '📚'
 };
 
-const monsterButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 3, 
-  y: BUTTON_CONFIG.y, 
-  width: BUTTON_CONFIG.width, 
-  height: BUTTON_CONFIG.height, 
+const monsterButton = {
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 4,
+  y: BUTTON_CONFIG.y,
+  width: BUTTON_CONFIG.width,
+  height: BUTTON_CONFIG.height,
   text: '全国ゴトモン',
   icon: '👾'
 };
 
-const profileButton = { 
-  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 4, 
-  y: BUTTON_CONFIG.y, 
-  width: BUTTON_CONFIG.width, 
-  height: BUTTON_CONFIG.height, 
+const profileButton = {
+  x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * 5,
+  y: BUTTON_CONFIG.y,
+  width: BUTTON_CONFIG.width,
+  height: BUTTON_CONFIG.height,
   text: 'プロフィール',
   icon: '🏆'
 };
@@ -577,8 +441,8 @@ this._dex = loadDex();
 
     // 2. 全てクリア済みの場合は、復習キューにあるステージを選択
     if (reviewQueue.size() > 0) {
-      // 復習キューから漢字を取得し、その漢字が含まれるステージを探す
-      const reviewKanjiIds = Array.from(reviewQueue.getAll());
+      // 復習キューから期限が来ている漢字を取得し、その漢字が含まれるステージを探す
+      const reviewKanjiIds = reviewQueue.getDueReviews().map(item => item.id);
       for (const stage of stageData) {
         if (stage.kanjiPoolIdList && stage.kanjiPoolIdList.some(id => reviewKanjiIds.includes(id))) {
           return stage;
@@ -1251,6 +1115,7 @@ update(dt) {
     // ★★★ ホバー判定に練習ボタンを追加 ★★★
     const isBackHovered = isMouseOverRect(this.mouseX, this.mouseY, backButton);
     const isPracticeHovered = isMouseOverRect(this.mouseX, this.mouseY, practiceButton);
+    const isQuizHovered = isMouseOverRect(this.mouseX, this.mouseY, quizButton);
     const isDexHovered = isMouseOverRect(this.mouseX, this.mouseY, dexButton);
     const isMonsterHovered = isMouseOverRect(this.mouseX, this.mouseY, monsterButton);
     const isProfileHovered = isMouseOverRect(this.mouseX, this.mouseY, profileButton);
@@ -1258,6 +1123,9 @@ update(dt) {
     // リッチボタンで描画
     this._drawRichFooterButton(ctx, backButton, '#808080', isBackHovered); // グレー系
     this._drawRichFooterButton(ctx, practiceButton, '#4CAF50', isPracticeHovered); // 緑系（練習用）
+    // 力だめしは学年タブ（1〜6年）選択時のみ有効。無効時はグレー表示
+    const quizEnabled = gameState.currentGrade >= 1 && gameState.currentGrade <= 6;
+    this._drawRichFooterButton(ctx, quizButton, quizEnabled ? '#e67e22' : '#a0a0a0', quizEnabled && isQuizHovered); // 橙系（テスト用）
     this._drawRichFooterButton(ctx, dexButton, '#2980b9', isDexHovered);   // 青系
     this._drawRichFooterButton(ctx, monsterButton, '#2980b9', isMonsterHovered); // 青系
     this._drawRichFooterButton(ctx, profileButton, '#2980b9', isProfileHovered); // 青系
@@ -1411,7 +1279,7 @@ update(dt) {
 
         // ← 追加: 四国/九州の未解放ブロック
         if ((tab.grade === 11 || tab.grade === 12) && !this.isRegionUnlocked(tab.grade)) {
-          publish('playSE', 'wrong');
+          publish('playSE', 'cancel');
           alert(tab.grade === 11
             ? '四国地方はまだ解放されていません。\n解放条件: 1〜6年の通常ステージを全てクリア'
             : '九州地方はまだ解放されていません。\n解放条件: 1〜11年の通常ステージを全てクリア');
@@ -1464,7 +1332,7 @@ update(dt) {
                 return m ? parseInt(m[1], 10) : null;
               })();
               if (!g || !isBonusUnlocked(g)) {
-                 publish('playSE', 'wrong');
+                 publish('playSE', 'cancel');
                  alert('この学年ボーナスはまだ解放されていません。\n同学年の通常ステージを全てクリアし、学年の漢字を全てマスターすると解放されます。');
                  return;
                }
@@ -1497,7 +1365,7 @@ update(dt) {
                     return m ? parseInt(m[1], 10) : null;
                   })();
                   if (!g || !isBonusUnlocked(g)) {
-                     publish('playSE', 'wrong');
+                     publish('playSE', 'cancel');
                      alert('この学年ボーナスはまだ解放されていません。\n通常ステージをすべてクリアすると解放されます。');
                      return;
                    }
@@ -1527,6 +1395,17 @@ update(dt) {
     if (isMouseOverRect(x, y, practiceButton)) {
       publish('playSE', 'decide');
       this._startPracticeMode();
+      return;
+    }
+
+    // 力だめし（学年まとめテスト）ボタン
+    if (isMouseOverRect(x, y, quizButton)) {
+      if (gameState.currentGrade >= 1 && gameState.currentGrade <= 6) {
+        publish('playSE', 'decide');
+        publish('changeScreen', 'gradeQuiz');
+      } else {
+        publish('playSE', 'cancel'); // 学年タブ未選択（総復習・四国九州）では無効
+      }
       return;
     }
 

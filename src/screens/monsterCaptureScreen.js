@@ -2,14 +2,13 @@
 import { publish } from '../core/eventBus.js';
 import { gameState, saveGameData } from '../core/gameState.js';
 import { addMonster, loadDex } from '../models/monsterDex.js';
-import { getStageClearCount } from '../core/saveData.js';
 
 import { getAllMonsterIds, getMonsterById, stageData } from '../loaders/dataLoader.js';
 const monsterCaptureScreen = {
   canvas: null,
   container: null,
   candidates: [],        // 表示候補（最大10）
-  captureLimit: 1,       // 捕獲可能数（4→3→2→1）
+  captureLimit: 1,       // 捕獲可能数（通常4 / ボーナス1）
   selected: new Set(),   // 選択済み
 
   enter(defeatedMonsters) {
@@ -26,41 +25,30 @@ const monsterCaptureScreen = {
     document.body.style.overflow = 'hidden';
 
     const stageId = gameState.currentStageId;
-    const clearCount = this._getStageClearCount(stageId);
     const isBonus = /^bonus_g/i.test(String(stageId || ''));
 
-    // 捕獲可能数: 通常 4→3→2→1、ボーナスは常時1
-    this.captureLimit = isBonus ? 1 : Math.max(1, 4 - Math.min(clearCount, 3));
+    // 捕獲可能数: 通常は常に4、ボーナスは常時1（正式仕様）
+    // かつてのクリア回数による逓減(4→3→2→1)は廃止。反復による報酬減少は
+    // 再挑戦の動機を削ぐため、逓減ではなく「未収集を優先提示」で周回の意味を保つ。
+    this.captureLimit = isBonus ? 1 : 4;
 
-    // 候補生成
+    // 候補生成: このステージのモンスターのみ
     this.dex = loadDex(); // ← 修正: インスタンスに保持
     const defeatedIds = Array.isArray(defeatedMonsters)
       ? defeatedMonsters.map(m => m.id).filter(Boolean)
       : [];
 
-      if (!isBonus) {
-        // 通常: このステージのモンスターのみ
-        let stageIds = defeatedIds.length > 0
-          ? defeatedIds.slice()
-          : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
-        stageIds = Array.from(new Set(stageIds));
-        if (stageIds.length > 10) {
-          shuffle(stageIds);
-          stageIds = stageIds.slice(0, 10);
-        }
-        this.candidates = stageIds;
-      } else {
-        // ボーナス: 同じくこのステージの5体のみ提示（捕獲数は常に1）
-        let stageIds = defeatedIds.length > 0
-          ? defeatedIds.slice()
-          : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
-        stageIds = Array.from(new Set(stageIds));
-        if (stageIds.length > 10) {
-          shuffle(stageIds);
-          stageIds = stageIds.slice(0, 10);
-        }
-        this.candidates = stageIds;
-      }
+    let stageIds = defeatedIds.length > 0
+      ? defeatedIds.slice()
+      : (Array.isArray(gameState.enemies) ? gameState.enemies.map(e => e.id).filter(Boolean) : []);
+    stageIds = Array.from(new Set(stageIds));
+    if (stageIds.length > 10) {
+      shuffle(stageIds);
+    }
+    // 未収集のゴトモンを先頭に（収集済みは後ろ、枠あふれ時は未収集を優先して残す）
+    const uncollected = stageIds.filter(id => !this.dex.has(id));
+    const collected = stageIds.filter(id => this.dex.has(id));
+    this.candidates = uncollected.concat(collected).slice(0, 10);
 
     this._createDOM();
 
@@ -172,7 +160,7 @@ const monsterCaptureScreen = {
       card.addEventListener('click', () => {
         // ← 追加：捕獲済みは選択不可
         if (already) {
-          try { publish('playSE', 'wrong'); } catch {}
+          try { publish('playSE', 'cancel'); } catch {}
           return;
         }
         if (this.selected.has(id)) {
@@ -229,40 +217,27 @@ const monsterCaptureScreen = {
     document.body.appendChild(this.container);
   },
 
-  _getStageClearCount(stageId) {
-    // P0-2 StepB-2(最小差分): 読み取り入口を saveData.getStageClearCount() に寄せる（現状は legacy 読みなので挙動は同等）
-    return getStageClearCount(stageId);
-  },
-
-  _incrementStageClearCount(stageId) {
+  // 学年ボーナス初クリア時のレビュー値スナップショット保存（同学年の全ステージ）
+  // ※ かつての stage_clear_* カウンタ更新は捕獲逓減の廃止に伴い削除
+  _snapshotBonusReviewScores(stageId) {
     if (!stageId) return;
-    const key = `stage_clear_${stageId}`;
-    const current = parseInt(localStorage.getItem(key) || '0');
-    // 初クリア時にレビュー値のスナップショットを保存（同学年の全ステージ）
-    if (current <= 0 && /^bonus_g(\d+)$/i.test(String(stageId))) {
-      try {
-        const mg = /^bonus_g(\d+)$/i.exec(String(stageId));
-        const g = parseInt(mg[1], 10);
-        const firstClearAt = Date.now();
-        if (!gameState.practiceProgress) gameState.practiceProgress = {};
-        const targets = Array.isArray(stageData) ? stageData.filter(s => s && s.grade === g) : [];
-        for (const stg of targets) {
-          const sid = String(stg.stageId || '');
-          const entry = Object.assign({}, gameState.practiceProgress[sid] || {});
-          const cur = Number(entry.reviewScore || 0);
-          if (typeof entry.reviewScoreSnapshot !== 'number') {
-            entry.reviewScoreSnapshot = Math.max(0, cur);
-            gameState.practiceProgress[sid] = entry;
-          }
+    if (!/^bonus_g(\d+)$/i.test(String(stageId))) return;
+    try {
+      const mg = /^bonus_g(\d+)$/i.exec(String(stageId));
+      const g = parseInt(mg[1], 10);
+      if (!gameState.practiceProgress) gameState.practiceProgress = {};
+      const targets = Array.isArray(stageData) ? stageData.filter(s => s && s.grade === g) : [];
+      for (const stg of targets) {
+        const sid = String(stg.stageId || '');
+        const entry = Object.assign({}, gameState.practiceProgress[sid] || {});
+        const cur = Number(entry.reviewScore || 0);
+        if (typeof entry.reviewScoreSnapshot !== 'number') {
+          entry.reviewScoreSnapshot = Math.max(0, cur);
+          gameState.practiceProgress[sid] = entry;
         }
-        // P0-2 StepA(例外A): stage_first_clear_at_* は互換ミラーとして残すが、必ずSSoT(krb_save)更新を先に行う（StepBで廃止予定）
-        try { saveGameData(); } catch {}
-        // P0-2 StepC-2: stage_first_clear_at_* 互換ミラー書き込みを停止（読み取り互換は saveData.getStageFirstClearAt の legacy fallback で維持）
-        // localStorage.setItem(`stage_first_clear_at_${stageId}`, String(firstClearAt));
-      } catch {}
-    }
-    // P0-2 StepC-3: stage_clear_* 互換ミラー書き込みを停止（読み取り互換は saveData.getStageClearCount の legacy fallback で維持）
-    // localStorage.setItem(key, String(current + 1));
+      }
+      try { saveGameData(); } catch {}
+    } catch {}
   },
 
   _goResultWin() {
@@ -273,8 +248,7 @@ const monsterCaptureScreen = {
       time: gameState.timeRemaining ?? 0,
       playerHp: gameState.playerStats.hp
     };
-    // クリア回数を増加（次回以降 捕獲可能数が 4→3→2→1 と段階低下）
-    this._incrementStageClearCount(gameState?.currentStageId);
+    this._snapshotBonusReviewScores(gameState?.currentStageId);
     publish('changeScreen', 'resultWin', resultData);
   },
 

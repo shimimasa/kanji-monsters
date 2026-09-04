@@ -199,8 +199,8 @@
   },
   {
     "id": "no_mistakes_stage",
-    "title": "完璧主義者",
-    "description": "1つのステージを間違いなしでクリアした",
+    "title": "いっぱつクリア！",
+    "description": "1つのステージを ぜんぶ いちどで 読みきった",
     "condition": {
       "type": "perfectStage",
       "value": 1
@@ -317,6 +317,12 @@
   { "id": "title_conqueror_g10",  "title": "2級 征服者",  "description": "学年ボーナスをA以上で3回クリア（2級）",  "condition": { "type": "manual", "value": 1 } },
   { "id": "title_guardian_g10",   "title": "2級 守護者",  "description": "学年ボーナスをA以上で5回クリア（2級）",  "condition": { "type": "manual", "value": 1 } },
   { "id": "title_champion_g10",   "title": "2級 覇者",    "description": "学年ボーナスをA以上で10回クリア（2級）", "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_conqueror_g11", "title": "小学校漢字まとめ 征服者", "description": "学年ボーナスをA以上で3回クリア（小学校漢字まとめ）", "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g11", "title": "小学校漢字まとめ 守護者", "description": "学年ボーナスをA以上で5回クリア（小学校漢字まとめ）", "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g11", "title": "小学校漢字まとめ 覇者", "description": "学年ボーナスをA以上で10回クリア（小学校漢字まとめ）", "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_conqueror_g12", "title": "全漢字まとめ 征服者", "description": "学年ボーナスをA以上で3回クリア（全漢字まとめ）", "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_guardian_g12", "title": "全漢字まとめ 守護者", "description": "学年ボーナスをA以上で5回クリア（全漢字まとめ）", "condition": { "type": "manual", "value": 1 } },
+  { "id": "title_champion_g12", "title": "全漢字まとめ 覇者", "description": "学年ボーナスをA以上で10回クリア（全漢字まとめ）", "condition": { "type": "manual", "value": 1 } },
 
   { "id": "combo_20",           "title": "神業コンボ",     "description": "20回連続で正解した",            "condition": { "type": "comboReached",     "value": 20 } },
   { "id": "playtime_30min",     "title": "ウォームアップ", "description": "累計30分プレイした",            "condition": { "type": "playtimeMinutes",  "value": 30 } },

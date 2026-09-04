@@ -1,4 +1,4 @@
-import { gameState } from '../core/gameState.js';
+import { gameState, getWeeklyAnswerSummary } from '../core/gameState.js';
 import { loadDex as loadKanjiDex } from './kanjiDex.js';
 import { loadDex as loadMonsterDex } from './monsterDex.js';
 import { getUnlockedAchievements, getAchievementProgress } from '../core/achievementManager.js';
@@ -40,7 +40,8 @@ export function loadProfileSummary() {
       kanjiCount: kanjiDex.size,
       masteredCount: getMasteredKanjiCount(),
       monsterCount: monsterDex.size
-    }
+    },
+    weekly: getWeeklyAnswerSummary()
   };
 }
 
