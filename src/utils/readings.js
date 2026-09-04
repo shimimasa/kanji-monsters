@@ -188,7 +188,8 @@ function classifyDifference(answer, reading) {
 /** near-miss の種類ごとの、子どもに向けた案内文 */
 const NEAR_MISS_MESSAGES = {
   kogaki:    'ちいさい「ゃ・ゅ・ょ・っ」で かいてみよう',
-  dakuten:   '「゛」や「゜」が いるか みてみよう',
+  // NOTE: 「゛」「゜」は単独で置くとほとんど見えない（実機で確認）。呼び名で書く
+  dakuten:   'てんてん や まる が いるか みてみよう',
   yotsugana: '「じ」と「ぢ」、「ず」と「づ」の ちがいだよ',
   chouon:    'のばす ところを もういちど',
   other:     'もうすこしで ぴったりだよ'

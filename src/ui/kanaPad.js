@@ -101,7 +101,8 @@ const CSS = `
   font-size: clamp(15px, 3.6vw, 24px);
   font-weight: bold;
   padding: 0;
-  height: clamp(34px, 7.2vw, 46px);
+  /* 横に広い端末（iPadの横向きなど）で高くなりすぎないよう、画面の高さでも抑える */
+  height: clamp(30px, min(7.2vw, 6.2vh), 46px);
   line-height: 1;
   cursor: pointer;
 }

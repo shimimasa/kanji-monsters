@@ -1180,7 +1180,29 @@ getMaxHealCountFromSettings() {
     return this.getEnemyAttackMode() !== 'onMistakeOnly';
   },
   /** 1フレームごとの描画更新 */
+  /**
+   * ゲーム内50音パッドの高さを keyboardState に映す。
+   *
+   * パッドは端末のキーボードではないので visualViewport が動かず、
+   * kanapad:layout イベントも「この画面が購読するより先に開いた」場合には届かない。
+   * 盤面の詰め方（漢字パネルの位置やログの置き場所）はこの状態を見て決まるので、
+   * 取りこぼすと入力欄やログがパッドの下に隠れる。毎フレーム実物を見て合わせる。
+   */
+  _syncKanaPadInset() {
+    try {
+      const pad = document.getElementById('kanaPad');
+      const open = !!(pad && pad.classList.contains('kanaPad--open'));
+      if (!open) return; // 端末キーボード側の判定は既存の処理に任せる
+      const height = pad.offsetHeight || 0;
+      if (this.keyboardState.open === true && this.keyboardState.bottomInset === height) return;
+      this.keyboardState.open = true;
+      this.keyboardState.bottomInset = height;
+      this._adjustInputPosition();
+    } catch {}
+  },
+
   update(dt) {
+    this._syncKanaPadInset();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // ① 背景描画 (画像 or グラデ)
@@ -1708,7 +1730,20 @@ const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 
   
     const msgH = titleH + padBottom + logLineHeight * visibleCount;
     const msgX = this.canvas.width  - margin - msgW;
-    const msgY = this.canvas.height - margin - msgH;
+
+    // ログは画面の下端に置いているが、入力中は下からキーボード（またはゲーム内の
+    // 50音パッド）と入力欄がせり上がってきて、その裏に隠れる。
+    // 「おしい」の案内も正しい読みもここに出るので、隠れると何も伝わらない。
+    // 隠れる高さぶんだけ持ち上げて、漢字パネルと入力欄の間に収める。
+    let msgY = this.canvas.height - margin - msgH;
+    if (this.keyboardState && this.keyboardState.open) {
+      const rect = this.canvas.getBoundingClientRect?.();
+      const scaleY = (rect && rect.height) ? (this.canvas.height / rect.height) : 1;
+      const inputH = (this.inputEl && this.inputEl.offsetHeight) || 40;
+      const coveredCanvasPx = ((this.keyboardState.bottomInset || 0) + inputH + 12) * scaleY;
+      // 200 は入力中に上へ寄せた漢字パネル（中心120・高さ140）の下端
+      msgY = Math.max(200, msgY - coveredCanvasPx);
+    }
     this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
   
     // 表示準備
@@ -2653,6 +2688,17 @@ const focusDiff = Math.max(0, this._baseVH - vvH);
 
 // 通常推定
 let insetMax = Math.max(vvInset, vkInset, this.keyboardState?.bottomInset || 0);
+
+// ゲーム内の50音パッドは端末のキーボードではないので、上のどの推定にも出てこない。
+// kanapad:layout イベントでも知らせているが、この画面が購読するより先にパッドが
+// 開くことがある（その場合、入力欄がパッドに重なる位置に置かれてしまう）。
+// 順番に左右されないよう、ここでは実物の高さを直に見る。
+try {
+  const pad = document.getElementById('kanaPad');
+  if (pad && pad.classList.contains('kanaPad--open')) {
+    insetMax = Math.max(insetMax, pad.offsetHeight);
+  }
+} catch {}
 
 // iOS対策: 差分0でもフォーカス中は下限値を採用
 if (isIOS && document.activeElement === this.inputEl) {
