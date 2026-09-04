@@ -401,6 +401,8 @@ function incrementStageClearCount(stageId) {
                 const bigFont = (localStorage.getItem('bigFont') ?? `${base.settings?.bigFont ? '1' : '0'}`) === '1';
                 // 弱点の読み系統だけを正解にするか（既定は ON）
                 const weaknessScope = (localStorage.getItem('weaknessScope') ?? `${base.settings?.weaknessScope === false ? '0' : '1'}`) === '1';
+                // 例文の中で読ませるモード（既定は OFF）
+                const exampleMode = (localStorage.getItem('exampleMode') ?? `${base.settings?.exampleMode ? '1' : '0'}`) === '1';
         
                 // 新スキーマを更新
                 const save = base || getDefaultSave();
@@ -442,7 +444,8 @@ function incrementStageClearCount(stageId) {
                   autosaveMinutes: Number.isFinite(autosaveMinutes) ? Math.max(1, autosaveMinutes) : 5,
                   cbMode,
                   bigFont,
-                  weaknessScope
+                  weaknessScope,
+                  exampleMode
                 });
         
         // 実績（v1）を保存
@@ -576,11 +579,13 @@ function incrementStageClearCount(stageId) {
             if ('cbMode' in save.settings) localStorage.setItem('cbMode', save.settings.cbMode ? '1' : '0');
             if ('bigFont' in save.settings) localStorage.setItem('bigFont', save.settings.bigFont ? '1' : '0');
             if ('weaknessScope' in save.settings) localStorage.setItem('weaknessScope', save.settings.weaknessScope ? '1' : '0');
+            if ('exampleMode' in save.settings) localStorage.setItem('exampleMode', save.settings.exampleMode ? '1' : '0');
             // 文字サイズと配色は描画のたびに参照するので localStorage を読み直させない。
             // セーブから書き戻した時だけ、判定用の値を取り直す。
             import('../ui/textScale.js').then(m => m.refresh()).catch(() => {});
             import('../ui/palette.js').then(m => m.refresh()).catch(() => {});
             import('./readingScope.js').then(m => m.refresh()).catch(() => {});
+            import('./exampleMode.js').then(m => m.refresh()).catch(() => {});
           } catch {}
         }
 

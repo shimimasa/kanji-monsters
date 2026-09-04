@@ -10,6 +10,7 @@ import TextScale from '../ui/textScale.js';
 import Palette from '../ui/palette.js';
 import SessionTimer from '../core/sessionTimer.js';
 import ReadingScope from '../core/readingScope.js';
+import ExampleMode from '../core/exampleMode.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -195,9 +196,76 @@ const settingsScreenState = {
   panel.appendChild(this._createColorModeGroup());
   panel.appendChild(this._createSessionLengthGroup());
   panel.appendChild(this._createReadingScopeGroup());
+  panel.appendChild(this._createExampleModeGroup());
 
   return panel;
 },
+
+  /**
+   * 例文の中で読ませるモード。
+   *
+   * 単漢字だけを見せて読ませると、「読める」が字と読みの1対1の記憶で止まりやすい。
+   * 文の中に置かれた時にどう読むかは別の力で、そこが本を読む力につながる。
+   * ただし例文データを持つのは1年の80字だけなので、既定は OFF にしてある。
+   */
+  _createExampleModeGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'ぶんの なかで よむ';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = ExampleMode.isEnabled();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    const describe = (on) => `（いまは: ${on ? 'ぶんの なかで よむ' : 'かんじ 1もじで よむ'}）`;
+    status.textContent = describe(toggle.checked);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      ExampleMode.setEnabled(on);
+      status.textContent = describe(on);
+      try { saveGameData(); } catch {}
+      this._showSaveToast('よみかたを 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'ONにすると、漢字を1文字で出すかわりに「りんごが 一（？）つ ある。」のような文で出して、' +
+      '（？）のところを読んでもらいます。' +
+      '例文があるのは1年生の80字だけです。ほかの漢字は今までどおり1文字で出ます。'
+    );
+
+    return group;
+  },
 
   /**
    * 弱点の読み系統だけを正解にするか。

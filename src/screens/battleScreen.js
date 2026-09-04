@@ -12,6 +12,7 @@ import Speech from '../audio/speech.js';
 import { gaugeColor, availabilityColor } from '../ui/palette.js';
 import SessionTimer from '../core/sessionTimer.js';
 import ReadingScope from '../core/readingScope.js';
+import ExampleMode from '../core/exampleMode.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
@@ -1506,8 +1507,11 @@ this.drawStageRemaining(this.ctx, frameArea);
     // 問題漢字を枠付き＆拡大描画
 const { centerX: kanjiX, centerY: kanjiY, width: kanjiBoxW, height: kanjiBoxH } = this.getKanjiBoxMetrics();
 
-// 弱点表示を「テキストメッセージ」に変更
-if (gameState.currentEnemy && gameState.currentEnemy.weakness) {
+// 弱点表示を「テキストメッセージ」に変更。
+// ただし例文モードの時は出さない。答えは文の中での読みなので、
+// 「弱点は音読み！」と出しながら訓読みを求める形になって食い違う。
+if (gameState.currentEnemy && gameState.currentEnemy.weakness &&
+    !ExampleMode.getQuestion(gameState.currentKanji)) {
   const weaknessLabel = gameState.currentEnemy.weakness === 'onyomi' ? '音読み' : '訓読み';
   const message = `弱点は${weaknessLabel}！`;
 
@@ -1523,9 +1527,12 @@ if (gameState.currentEnemy && gameState.currentEnemy.weakness) {
     3
   );
 }
-    
-    
-    
+
+    // 例文モードの時は、読ませたい文を漢字の下に置く。
+    // ここに出ていないと「何を読むのか」が伝わらないので、ログ（流れていく）ではなく
+    // 問題が変わるまで残る場所に描く。
+    this.drawExampleSentence(this.ctx, kanjiX, kanjiY + kanjiBoxH / 2 + 10);
+
     // コンボ表示を描画（2コンボ以上の場合）
     // battleState.comboCountが0の場合は表示しない
     if ((battleState.comboCount >= 2 && battleState.comboCount > 0) || this.comboAnimation.active) {
@@ -4315,6 +4322,59 @@ const comboY = kanjiY;
     this.drawTextWithOutline(text, textX, y + this.UI_CONSTANTS.ICON_SIZE/2, color, 'black');
   },
 
+  /**
+   * 例文モードの読ませたい文を、漢字の枠の下に描く。
+   *
+   * 例文モードでない時・例文を持たない字の時は何も描かない。
+   * 画面の幅に収まらない時は分かち書きの区切りで折り返す（最大2行）。
+   *
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {number} centerX 漢字の枠の中心X
+   * @param {number} topY この位置から下へ描く
+   */
+  drawExampleSentence(ctx, centerX, topY) {
+    const question = ExampleMode.getQuestion(gameState.currentKanji);
+    if (!question || !question.sentence) return;
+
+    const maxWidth = Math.min(560, (this.canvas ? this.canvas.width : 800) - 40);
+    const font = 'bold 19px "UDデジタル教科書体",sans-serif';
+    const lineHeight = 26;
+
+    ctx.save();
+    ctx.font = font;
+
+    // 例文は分かち書きになっているので、空白で折り返せる
+    const words = question.sentence.split(/(?<=\s)/);
+    const lines = [];
+    let current = '';
+    for (const word of words) {
+      const candidate = current + word;
+      if (current && ctx.measureText(candidate).width > maxWidth) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = candidate;
+      }
+      if (lines.length >= 2) break;
+    }
+    if (current && lines.length < 2) lines.push(current);
+    ctx.restore();
+
+    lines.forEach((line, i) => {
+      this.drawTextWithOutline(
+        line.trim(),
+        centerX,
+        topY + lineHeight * i,
+        '#ffffff',
+        'black',
+        font,
+        'center',
+        'top',
+        4
+      );
+    });
+  },
+
   drawWeaknessIndicator(ctx, weakness, x, y) {
     const config = {
       onyomi: { icon: images.iconOnyomi },
@@ -4628,24 +4688,49 @@ function finishSessionForToday() {
 }
 
 /**
+ * いまの問題で正解にする読みを決める。
+ *
+ * 決め方は2つあり、例文モードのほうが強い（文の中での読みを問うているので、
+ * その文での読みだけが答えになる）。
+ *   ・例文モード … 例文の伏せ字にあたる読みだけ
+ *   ・弱点しぼり … 敵の弱点の読み系統だけ
+ * どちらでもなければ、今までどおりその字のすべての読み。
+ *
+ * @returns {{readings: string[], scopedTo: ('onyomi'|'kunyomi'|null), example: Object|null}}
+ */
+function getQuestionScope() {
+  const kanji = gameState.currentKanji || {};
+
+  const example = ExampleMode.getQuestion(kanji);
+  if (example) return { readings: [example.answer], scopedTo: null, example };
+
+  const scoped = ReadingScope.getAcceptedReadings(kanji, gameState.currentEnemy);
+  return { readings: scoped.readings, scopedTo: scoped.scopedTo, example: null };
+}
+
+/**
  * 「その字は読めているのに、いま求めている読み系統ではない入力」を拾う。
  *
- * 弱点が「音読み！」と出ている時に くんよみ で答えた、というような場合。
+ * 弱点が「音読み！」と出ている時に くんよみ で答えた、
+ * 例文では「は（生える）」なのに「せい」と答えた、というような場合。
  * これは まちがい ではない。字はちゃんと読めている。
- * 傷も付けず、学習記録にも残さず、どちらの読みが欲しいかだけを伝えて
+ * 傷も付けず、学習記録にも残さず、どの読みが欲しいかだけを伝えて
  * もう一度書かせる（「おしい」入力と同じ扱い）。
  *
  * @param {string} answer ひらがな正規化済みの入力
- * @param {'onyomi'|'kunyomi'|null} scopedTo しぼっている読み系統。しぼっていなければ null
+ * @param {{scopedTo: ('onyomi'|'kunyomi'|null), example: Object|null}} scope getQuestionScope() の結果
  * @param {HTMLInputElement} inputEl
  * @returns {boolean} ここで処理したら true（呼び出し側は不正解処理へ進まない）
  */
-function handleWrongReadingSystem(answer, scopedTo, inputEl) {
-  if (!scopedTo || !answer) return false;
+function handleWrongReadingSystem(answer, scope, inputEl) {
+  if (!answer || !scope) return false;
+  if (!scope.scopedTo && !scope.example) return false;
   // その字の読みではあるか（他系統も含めて照合する）
   if (!getReadings(gameState.currentKanji || {}).includes(answer)) return false;
 
-  const want = ReadingScope.labelOf(scopedTo);
+  const want = scope.example
+    ? 'この ぶんの よみかた'
+    : ReadingScope.labelOf(scope.scopedTo);
 
   // 入力欄は「読みちがい」の琥珀ではなく、続けてよいことが伝わる色にする
   if (inputEl) {
@@ -4658,10 +4743,9 @@ function handleWrongReadingSystem(answer, scopedTo, inputEl) {
     inputEl.value = '';
   }
 
-  const lines = [
-    `「${answer}」も よめてるよ！`,
-    `このモンスターには ${want} で おねがい`
-  ];
+  const lines = scope.example
+    ? [`「${answer}」も よめてるよ！`, `いまは ${want} で おねがい`]
+    : [`「${answer}」も よめてるよ！`, `このモンスターには ${want} で おねがい`];
   addToLog(lines.join(' '));
   battleScreenState.showLogBlock(lines);
   // 読みちがいと同じ音は鳴らさない。「よめてるよ」と伝えている意味が消える
@@ -4732,10 +4816,9 @@ const onyomiStr = (gameState.currentKanji.onyomi || []).join('、');
 const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
 const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」`;
 
-  // 弱点が示されている時は、その読み系統だけを正解にする（設定で切れる）。
-  // しぼれない字（その系統の読みが無い字）では今までどおり全部の読みが通る。
-  const { readings: correctReadings, scopedTo } =
-    ReadingScope.getAcceptedReadings(gameState.currentKanji, gameState.currentEnemy);
+  // 例文モード／弱点しぼりに応じて、この問題で正解にする読みを決める
+  const scope = getQuestionScope();
+  const correctReadings = scope.readings;
   const correct = correctReadings.includes(answer);
 
   if (correct) {
@@ -5174,8 +5257,8 @@ setManagedTimeout(() => {
       }, 1300);
     }
     
-  } else if (handleWrongReadingSystem(answer, scopedTo, inputEl)) {
-    // その字は読めている。欲しい読み系統だけを伝えて、無傷でもう一度書かせる
+  } else if (handleWrongReadingSystem(answer, scope, inputEl)) {
+    // その字は読めている。欲しい読みだけを伝えて、無傷でもう一度書かせる
     return;
 
   } else if (handleNearMiss(answer, correctReadings, inputEl)) {
@@ -5346,9 +5429,9 @@ function onHeal() {
   const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
   const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」`;
 
-  // 正解判定（弱点が示されている時は、その読み系統だけを正解にする）
-  const { readings: correctReadings, scopedTo } =
-    ReadingScope.getAcceptedReadings(gameState.currentKanji, gameState.currentEnemy);
+  // 正解判定（例文モード／弱点しぼりに応じて、正解にする読みが変わる）
+  const scope = getQuestionScope();
+  const correctReadings = scope.readings;
   const correct = correctReadings.includes(answer);
 
   if (correct) {
@@ -5440,8 +5523,8 @@ gameState.playerStats.healsSuccessful++;
     // ▲▲▲ ここまで修正 ▲▲▲
 
         // チャレンジモードの時間加算は廃止（ストップウォッチ化）
-  } else if (handleWrongReadingSystem(answer, scopedTo, inputEl)) {
-    // その字は読めている。かいふくの回数も減らさずに、欲しい読み系統だけを伝える
+  } else if (handleWrongReadingSystem(answer, scope, inputEl)) {
+    // その字は読めている。かいふくの回数も減らさずに、欲しい読みだけを伝える
     return;
 
   } else if (handleNearMiss(answer, correctReadings, inputEl)) {
@@ -5542,9 +5625,9 @@ function onHint() {
   const onyomi = Array.isArray(k.onyomi) ? k.onyomi : [];
   const kunyomi = Array.isArray(k.kunyomi) ? k.kunyomi : [];
 
-  // 読み系統をしぼっている時は、ヒントもその系統を見せる。
-  // 求めていない側の読みを「決め手」として渡すと、そのとおり書いても通らない
-  const { scopedTo } = ReadingScope.getAcceptedReadings(k, gameState.currentEnemy);
+  // 出題のしぼり方に、ヒントも合わせる。
+  // 求めていない読みを「決め手」として渡すと、そのとおり書いても通らない
+  const { scopedTo, example } = getQuestionScope();
 
   // ログ・ログブロック・上部バナーに同じ文言を配る。
   // 音訓をどちらにするかはここで1回だけ決める（描画側で決め直さない）
@@ -5561,6 +5644,12 @@ function onHint() {
       break;
     }
     case 2: {
+      if (example) {
+        // 例文モードでは、その文での読みの1文字目を見せる
+        const masked = example.answer.substring(0, 1) + '○○';
+        show(`ヒント（読み）: 「${masked}」から始まる`);
+        break;
+      }
       const useOn = scopedTo
         ? (scopedTo === 'onyomi')
         : (onyomi.length > 0 && (Math.random() >= 0.5 || kunyomi.length === 0));
@@ -5575,6 +5664,12 @@ function onHint() {
       break;
     }
     case 4: {
+      if (example) {
+        // 例文モードでは、その文での読みをそのまま渡す
+        show(`ヒント（決め手）: 「${example.answer}」`);
+        Speech.speak(example.answer);
+        break;
+      }
       // 最終ヒント: 読みのどちらかをフル提示
       if (onyomi.length > 0 || kunyomi.length > 0) {
         const useOn = scopedTo
@@ -5814,6 +5909,8 @@ function pickFromPool(pool, poolName) {
     readings: getReadings(selectedKanji),
     meaning: selectedKanji.meaning,
     strokes: selectedKanji.strokes,
+    // 例文モードで使う。持っているのは1年の80字だけで、他の学年は空
+    examples: selectedKanji.examples,
   };
 
   // 追加: マスター済み再出題なら、この出題中の1回だけ2倍ボーナスを有効化
@@ -5822,14 +5919,20 @@ function pickFromPool(pool, poolName) {
   gameState.showHint = false;
   battleState.nearMissCount = 0; // 「おしい」の回数は問題ごとに数え直す
   advanceKanjiRetryQueue();      // 読めなかった字の再会を1問ぶん近づける
-  addToLog(`「${gameState.currentKanji.text}」をよもう！`);
+  // 例文モードの時は、文の中で読ませていることが分かる言い方にする
+  const exampleQuestion = ExampleMode.getQuestion(gameState.currentKanji);
+  const askLine = exampleQuestion
+    ? `「${gameState.currentKanji.text}」を ぶんの なかで よもう！`
+    : `「${gameState.currentKanji.text}」をよもう！`;
+  addToLog(askLine);
   const weakLabel =
   gameState.currentKanji.weakness === 'onyomi' ? '音読み' :
   gameState.currentKanji.weakness === 'kunyomi' ? '訓読み' : '';
 battleScreenState.showLogBlock([
   'あたらしい もんだい！',
-  `「${gameState.currentKanji.text}」をよもう！`,
-  weakLabel ? `弱点は「${weakLabel}」！` : ''
+  askLine,
+  // 例文モードでは文の中の読みが答えなので、弱点の系統は案内しない（食い違うため）
+  (!exampleQuestion && weakLabel) ? `弱点は「${weakLabel}」！` : ''
 ]);
   
   if (DEBUG) console.log(`✅ ${poolName}から選択: ${selectedKanji.kanji} (ID: ${selectedKanji.id})`);
