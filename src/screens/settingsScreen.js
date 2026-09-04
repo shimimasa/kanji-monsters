@@ -6,6 +6,7 @@ import { publish } from '../core/eventBus.js';
 import { hardResetAllLocalData } from '../core/saveData.js';
 import KanaPad from '../ui/kanaPad.js';
 import Speech from '../audio/speech.js';
+import TextScale from '../ui/textScale.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -187,9 +188,73 @@ const settingsScreenState = {
 
   panel.appendChild(this._createInputMethodGroup());
   panel.appendChild(this._createSpeechGroup());
+  panel.appendChild(this._createBigFontGroup());
 
   return panel;
 },
+
+  /**
+   * 文字を大きくする設定。
+   * 保存の器（krb_save の settings.bigFont）は前からあったが、切り替える場所も
+   * 効き目も無かった。見えづらさで弾かれる子を作らないために要る。
+   */
+  _createBigFontGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'もじの おおきさ';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = TextScale.isBigFont();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    const describe = (on) => `（いまは: ${on ? 'おおきい' : 'ふつう'}）`;
+    status.textContent = describe(toggle.checked);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      TextScale.setBigFont(on);
+      status.textContent = describe(on);
+      try { saveGameData(); } catch {}
+      this._showSaveToast('もじの おおきさを 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'ゲームの中の文字を大きくします。ボタンから溢れないよう、' +
+      'もともと大きい文字は少しだけ大きくなります。'
+    );
+
+    return group;
+  },
 
   /**
    * 読みを声で確かめられるようにするかどうか。

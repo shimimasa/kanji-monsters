@@ -98,17 +98,18 @@ const CSS = `
   background: #3b4a63;
   color: #fff;
   font-family: "UDデジタル教科書体", "Hiragino Sans", sans-serif;
-  font-size: clamp(15px, 3.6vw, 24px);
+  /* 文字を大きくする設定（textScale.js）に合わせる */
+  font-size: calc(clamp(15px, 3.6vw, 24px) * var(--yomitabi-text-scale, 1));
   font-weight: bold;
   padding: 0;
   /* 横に広い端末（iPadの横向きなど）で高くなりすぎないよう、画面の高さでも抑える */
-  height: clamp(30px, min(7.2vw, 6.2vh), 46px);
+  height: calc(clamp(30px, min(7.2vw, 6.2vh), 46px) * var(--yomitabi-text-scale, 1));
   line-height: 1;
   cursor: pointer;
 }
 #${PAD_ID} button:active { background: #5a7196; transform: translateY(1px); }
 #${PAD_ID} button.kanaPad__blank { visibility: hidden; }
-#${PAD_ID} .kanaPad__tools button { background: #4a5b78; font-size: clamp(13px, 3vw, 19px); }
+#${PAD_ID} .kanaPad__tools button { background: #4a5b78; font-size: calc(clamp(13px, 3vw, 19px) * var(--yomitabi-text-scale, 1)); }
 #${PAD_ID} .kanaPad__tools button.kanaPad__submit { background: #2f8f4e; }
 #${PAD_ID} .kanaPad__tools button.kanaPad__erase { background: #6b5a3a; }
 `;

@@ -20,6 +20,7 @@ import { checkAchievements } from './core/achievementManager.js';
 import { addKanji } from './models/kanjiDex.js';
 import practiceBattleScreen from './screens/practiceBattleScreen.js';
 import KanaPad from './ui/kanaPad.js';
+import TextScale from './ui/textScale.js';
 import Speech from './audio/speech.js';
 
 
@@ -182,6 +183,8 @@ function drawAchievementNotifications(ctx) {
   console.log('🔧 Init start');
   // ゲーム内の50音パッドを用意する。入力欄は index.html に静的に置いてあるので、
   // ここで捕まえておけば、どの画面が入力欄を出しても自分で追従できる。
+  // 文字サイズの設定は、どこかが描き始める前に入れておく（描画は canvas 一本）
+  TextScale.install();
   KanaPad.install();
   // 日本語の声は非同期に届く端末があるので、先に選んでおく
   Speech.warmUp();

@@ -572,6 +572,9 @@ function incrementStageClearCount(stageId) {
             if ('autosaveMinutes' in save.settings) localStorage.setItem('autosaveMinutes', `${save.settings.autosaveMinutes}`);
             if ('cbMode' in save.settings) localStorage.setItem('cbMode', save.settings.cbMode ? '1' : '0');
             if ('bigFont' in save.settings) localStorage.setItem('bigFont', save.settings.bigFont ? '1' : '0');
+            // 文字サイズは描画のたびに参照するので localStorage を読み直させない。
+            // セーブから書き戻した時だけ、判定用の値を取り直す。
+            import('../ui/textScale.js').then(m => m.refresh()).catch(() => {});
           } catch {}
         }
 
