@@ -1,29 +1,33 @@
 # 作業引き継ぎ / 再開ガイド
 
-> ## 🔴 いちばん最初に読む（2026-09-04）
+> ## いちばん最初に読む（2026-09-04 更新）
 >
-> **バトルで敵を1体倒すと画面が止まる回帰が入っている。直すまで push もデプロイもしない。**
+> **止まっていた回帰は決着した。ブランチ `リファクタリング` に20コミットが
+> ローカルで積んである（origin には push していない）。**
 >
-> 詳細・切り分け結果・次に試す順番は **`docs/improvement-todo.md` の冒頭**にまとめてある。
-> 要点だけ:
-> - 改変前（`f06ce57`）では正常。**このセッション（13コミット）で入った回帰**
-> - C-3（`d4e513b`）は原因ではないと切り分け済み
-> - 次は `788c966`（出題の重み付け）→ `2669eda` → `0d7d08f` の順に戻して切り分ける
+> 「敵を1体倒すと画面が止まる」は、コードの誤りではなかった。撃破後の進行が
+> `requestAnimationFrame` だけで演出の終わりを待っていたため、**確認に使っていた
+> ブラウザのタブが裏に回ってフレームが止まると、そのまま進まなくなっていた**。
+> フレームが回る状態で試すと、敵を続けて2体倒しても正しく進む。
+> 念のため実時間2秒の締め切りを足してある（`c99f48e`）。
+> 経緯と「同じ落とし穴にはまらないための注意」は `docs/improvement-todo.md` の冒頭。
 >
-> このセッションでは、コード調査で見つけた改善項目を13コミット積んだ
-> （未参照素材1.95GBの退避 / 「おしい」入力の扱い / 50音パッド / 読み上げ /
-> 出題の重み付け / 古いService Workerの解除 / セーブスロット / 文字サイズ / 配色 /
-> 時間で区切るモード）。一覧と検証状況は `docs/improvement-todo.md`。
+> このセッションで積んだもの（改善TODOの A〜D は**すべて完了**）:
+> 未参照素材1.95GBの退避 / 「おしい」入力 / 50音パッド / 読み上げ /
+> 出題の重み付け / 古いSWの解除 / セーブスロット / 文字サイズ / 配色 /
+> 時間で区切るモード / 弱点の読み系統で答える / 例文の中で読ませる /
+> ふりかえりのCSV書き出し / ふりがな / ことわざ図鑑。
+> 一覧と検証状況は `docs/improvement-todo.md`。
 >
-> ブランチは `リファクタリング`。**origin には push していない**（`origin/リファクタリング`
-> は 2026-08-28 時点のまま）。
+> **次にやること**: 下の「5. 未決定事項」のバックログ。最優先は Firestore
+> セキュリティルール。
 
-最終更新: 2026-09-04（回帰の記録を追記。それ以前の本文は 2026-08-28 のまま）
+最終更新: 2026-09-04（改善TODOの A〜D 完了。回帰は決着）
 旧・最終更新: 2026-08-28
-ブランチ: `リファクタリング`（main ではない。**origin とは同期していない**＝ローカルに13コミット未push）
+ブランチ: `リファクタリング`（main ではない。**origin とは同期していない**＝ローカルに20コミット未push）
 最新コミット: `git log --oneline -1` で確認する（この欄は更新漏れが起きやすいので固定値を書かない）
-直近の作業: 監査③（学習設計）の実行・裏取り・修正7コミット。**スモークテスト通過済み**
-push状態: `origin/リファクタリング` と同期済み（2026-08-28 に21コミット push）
+直近の作業: 改善TODO（`docs/improvement-todo.md`）の A〜D を完了。20コミット
+push状態: **未push**。`origin/リファクタリング` は 2026-08-28 のまま
 
 このドキュメントは、セッションが切れた後に**ここだけ読めば作業を再開できる**ことを目的とする。
 関連文書: `consulting-review-20260716.md`（診断と戦略）/ `refactoring-plan.md`（技術負債の計画）/ `smoke-test-checklist.md`（動作確認手順）/ `claude Opus4.6-review.md`（心理的安全性の設計思想＝正史）
@@ -266,7 +270,9 @@ push状態: `origin/リファクタリング` と同期済み（2026-08-28 に21
 |---|---|---|
 | デプロイ先 | Firebase / Vercel（両方の設定ファイルが並存、CNAMEもある） | package.json の deploy は firebase 指向。実績を確認して一本化 |
 | チャレンジモード | 復活 / 削除 | 死にコード削除を推奨。監査②の実測で `createGameModePanel`（`settingsScreen.js:192`）は**どこからも呼ばれておらず**、子どもが challenge に切り替える経路が存在しない＝事実上の全員恒久オフと判明。削除するなら `battleScreen.js:5258-5275` の分岐ごと消すのが整合的 |
-| 色弱モード・フォントサイズ | 実装 / 仕様から削除 | 企画書に記載があるが実装は残骸のみ。アクセシビリティ上は実装したい |
+| ~~色弱モード・フォントサイズ~~ | — | **決着（2026-09-04）**: 実装した（`0d7d08f` / `7e1268f`）。設定は `cbMode` / `bigFont` |
+| ~~UIの配当外漢字~~ | — | **決着（2026-09-04）**: ふりがなで対処（`b059037`）。設定 `rubyMode`、既定OFF。辞書に載せた語だけに振る |
+| ~~ことわざ400件~~ | — | **決着（2026-09-04）**: 図鑑に読み物として追加（`9f66ac3`）。ユーザー判断で決定 |
 | git履歴書き換え | 実施 / 見送り | `.git` 6.7GB。単独開発なら推奨。**実施前に音楽/の原本をクラウドへ退避**（削除済みだが履歴には残っている） |
 | menu画面（旧クラスタ） | 再接続 / 削除 | status/achievements は profile 経由で再接続済み。menuScreen 自体は孤立したまま |
 
@@ -277,10 +283,17 @@ push状態: `origin/リファクタリング` と同期済み（2026-08-28 に21
 ```
 src/
 ├── core/        gameState.js（揮発状態＋学習記録の正史）/ saveData.js（krb_save v1）/ fsm.js（正史のFSM）
-├── screens/     battleScreen.js(6,240行・最大の負債) / practiceBattleScreen.js(2,493行・危険な継承)
-│   └── battle/  theme.js（Phase 5-1で抽出済み。今後 engine/renderer/effects/input を追加）
+│              saveSlots.js（3人分のセーブ）/ sessionTimer.js（きょうは○ふん）
+│              readingScope.js（弱点の読み系統で答える）/ exampleMode.js（例文の中で読ませる）
+│              reviewExport.js（ふりかえりのCSV書き出し）
+├── screens/     battleScreen.js(6,400行超・最大の負債) / practiceBattleScreen.js(2,620行・危険な継承)
+│   ├── battle/  theme.js（Phase 5-1で抽出済み。今後 engine/renderer/effects/input を追加）
+│   └── Dex/     kanjiDexScreen.js / monsterDexScreen.js / proverbDexScreen.js（ことわざ）
 ├── ui/          canvasUtils.js（Phase 4-1で抽出。drawRoundedRect / drawEnhancedTabs）
-├── utils/       readings.js（読み判定の正史）/ coordinateUtils.js / logger.js
+│              textScale.js（fontの代入を横取り）/ ruby.js（fillTextを横取り）
+│              palette.js（色が意味を担う場所）/ kanaPad.js（ゲーム内50音）
+├── utils/       readings.js（読み判定の正史）/ romaji.js（ローマ字→かな）
+│              coordinateUtils.js / logger.js
 └── models/      reviewQueue.js（SM-2・復習の正史）/ kanjiDex.js / monsterDex.js
 ```
 
