@@ -3,7 +3,7 @@ import ReviewQueue from '../models/reviewQueue.js';
 import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
 import { gameState, recordKanjiAnswer, saveGameData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
-import { toHiragana, getReadings } from '../utils/readings.js';
+import { toHiragana, getReadings, findNearMiss, getNearMissLines } from '../utils/readings.js';
 
 // 読みの正規化・取得は共通実装を使用（配列/文字列データ両対応）
 
@@ -120,12 +120,26 @@ const gradeQuizScreen = {
     this.current = data ? { ...data, readings: getReadings(data) } : null;
     this.feedback = '';
     this.feedbackColor = 'white';
+    this.nearMissCount = 0; // 「おしい」の回数は問題ごとに数え直す
   },
 
   _checkAnswer(raw) {
     if (!this.current || this.locked) return;
     const user = toHiragana(raw);
     const ok = this.current.readings.includes(user);
+
+    // 読めているのに書き方だけずれた入力は、力だめしでも「よめなかった」に数えない。
+    // 記録も残さず、同じ問題のまま書き直させる。
+    if (!ok) {
+      const nearMiss = findNearMiss(user, this.current.readings);
+      if (nearMiss) {
+        this.nearMissCount = (this.nearMissCount || 0) + 1;
+        this.feedback = getNearMissLines(nearMiss, this.nearMissCount).join('  ');
+        this.feedbackColor = '#5bc0de'; // 読みちがいの琥珀とは分ける
+        if (this.inputEl) this.inputEl.value = '';
+        return;
+      }
+    }
 
     // フィードバック・記録
     this.feedback = ok ? 'せいかい！' : `おしい！ こたえは「${this.current.readings.join('、')}」`;

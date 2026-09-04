@@ -7,7 +7,7 @@ import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
 import reviewQueue from '../models/reviewQueue.js';
 import { drawRoundedRect as traceRoundedRect } from '../ui/canvasUtils.js';
-import { toHiragana, getReadings } from '../utils/readings.js';
+import { toHiragana, getReadings, findNearMiss, getNearMissLines } from '../utils/readings.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
@@ -4526,6 +4526,45 @@ function spawnEnemy() {
   gameState.hintLevel = 0;
 }
 
+/**
+ * 「読みとしては合っているのに、書き方だけがずれた入力」を拾う。
+ *
+ * このゲームは読めるようになることを目指す場なので、きよう／きょう や
+ * かっこう／がっこう のようなずれを「読めなかった」として学習記録に残すと、
+ * 読めている子が読めない子として記録され、その字が復習キューにも積まれてしまう。
+ * ここでは傷を与えず・記録も残さず、書き方だけを教えてもう一度書かせる。
+ *
+ * @returns {boolean} near-miss として処理したら true（呼び出し側は不正解処理へ進まない）
+ */
+function handleNearMiss(answer, correctReadings, inputEl) {
+  const nearMiss = findNearMiss(answer, correctReadings);
+  if (!nearMiss) return false;
+
+  battleState.nearMissCount = (battleState.nearMissCount || 0) + 1;
+
+  // 入力欄は「読みちがい」の琥珀ではなく、続けてよいことが伝わる色にする
+  if (inputEl) {
+    inputEl.style.borderColor = '#5bc0de';
+    inputEl.style.backgroundColor = 'rgba(91, 192, 222, 0.12)';
+    setTimeout(() => {
+      inputEl.style.borderColor = '#ccc';
+      inputEl.style.backgroundColor = 'white';
+    }, 500);
+    inputEl.value = '';
+  }
+
+  const lines = getNearMissLines(nearMiss, battleState.nearMissCount);
+  addToLog(lines.join(' '));
+  battleScreenState.showLogBlock(lines);
+  // NOTE: se_wrong は鳴らさない。読みちがいと同じ音にすると、せっかく
+  // 「よめてるよ」と伝えている意味が消える。専用の やさしい音が用意できたら差し替える。
+  publish('playSE', 'cancel');
+
+  // 同じ問題のまま、もう一度書ける状態に戻す
+  battleState.inputEnabled = true;
+  return true;
+}
+
 // battleScreen.js の onAttack 関数を修正
 function onAttack() {
   if (DEBUG) console.log('🗡 onAttack() called — turn:', battleState.turn, 'inputEnabled:', battleState.inputEnabled);
@@ -4975,6 +5014,10 @@ setManagedTimeout(() => {
       }, 1300);
     }
     
+  } else if (handleNearMiss(answer, correctReadings, inputEl)) {
+    // 読めているのに書き方だけがずれた入力。無傷でもう一度書かせる（記録にも残さない）
+    return;
+
   } else {
     // 読みちがい時の入力欄フィードバック（責める赤ではなく、やわらかい琥珀色）
     inputEl.style.borderColor = '#f0ad4e';
@@ -4983,10 +5026,10 @@ setManagedTimeout(() => {
       inputEl.style.borderColor = '#ccc';
       inputEl.style.backgroundColor = 'white';
     }, 500);
-    
+
     // 不正解処理
     battleScreenState.lastIncorrectAnswer = answer;
-    
+
     // 前回の漢字として記録
     battleState.lastAnswered = { ...gameState.currentKanji };
     gameState.wrongKanjiList.push({ ...gameState.currentKanji });
@@ -5230,9 +5273,13 @@ gameState.playerStats.healsSuccessful++;
     // ▲▲▲ ここまで修正 ▲▲▲
 
         // チャレンジモードの時間加算は廃止（ストップウォッチ化）
+  } else if (handleNearMiss(answer, correctReadings, inputEl)) {
+    // 読めているのに書き方だけがずれた入力。かいふくの回数も減らさずに書き直させる
+    return;
+
   } else {
     // 不正解処理
-    
+
     // 不正解の答えを保存
     battleScreenState.lastIncorrectAnswer = answer;
     
@@ -5519,6 +5566,7 @@ function pickFromPool(pool, poolName) {
   battleState.masteryBonusActive = isKanjiMastered(selectedKanji.id);
 
   gameState.showHint = false;
+  battleState.nearMissCount = 0; // 「おしい」の回数は問題ごとに数え直す
   addToLog(`「${gameState.currentKanji.text}」をよもう！`);
   const weakLabel =
   gameState.currentKanji.weakness === 'onyomi' ? '音読み' :

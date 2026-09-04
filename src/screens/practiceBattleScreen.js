@@ -8,6 +8,7 @@ import reviewQueue from '../models/reviewQueue.js';
 import { images, loadBgImage } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import { findNearMiss, getNearMissLines } from '../utils/readings.js';
 // 練習バトル画面状態
 const practiceBattleScreenState = {
   // 既存のbattleScreenStateの全機能を継承
@@ -18,6 +19,8 @@ practiceMode: true,
 onPracticeComplete: null,
 unmasteredKanji: [],
 lastIncorrectAnswer: null,
+// 読めてはいるが書き方だけずれた入力への案内 { lines: string[], until: number }
+nearMissNotice: null,
 recentHistory: [], // 最近の学習履歴（最大10件）
 reviewMode: false,
 reviewTargetReading: null,
@@ -592,6 +595,7 @@ _buildUnmasteredKanjiList() {
    */
   _pickNextUnmasteredKanji() {
     try {
+      this._resetNearMissForNewQuestion();
       // ここで未マスターリストを再構築しない（進捗が0に戻るのを防止）
 if (this.unmasteredKanji.length === 0) {
   // 誤答限定完了 → 自動レビューへ移行せず選択ダイアログ
@@ -686,6 +690,7 @@ if (this.unmasteredKanji.length === 0) {
      */
     _pickNextReviewQuestion() {
       try {
+        this._resetNearMissForNewQuestion();
         const stageKanji = getKanjiByStageId(gameState.currentStageId) || [];
         if (stageKanji.length === 0) {
           console.warn('⚠️ このステージに漢字がありません');
@@ -794,7 +799,14 @@ if (this.unmasteredKanji.length === 0) {
       
       console.log('📚 正解読み:', correctReadings);
       console.log('🎯 判定:', isCorrect ? '✅正解' : '❌不正解');
-      
+
+      // 読めているのに書き方だけずれた入力は、練習の回数にも履歴にも数えず書き直させる。
+      // レビュー中は特定の読みを問うているので、その読みだけを比較の相手にする。
+      if (!isCorrect) {
+        const targets = this.reviewMode ? [this.reviewTargetReading] : correctReadings;
+        if (this._handleNearMiss(answer, targets.filter(Boolean))) return;
+      }
+
       this.practiceStats.totalPracticed++;
       this._updateTodaysPracticeCount();
       inputEl.value = '';
@@ -964,6 +976,71 @@ if (this.unmasteredKanji.length === 0) {
   /**
    * 練習での不正解処理
    */
+  /** 新しい問題に移るとき、「おしい」の回数と案内をたたむ */
+  _resetNearMissForNewQuestion() {
+    battleState.nearMissCount = 0;
+    this.nearMissNotice = null;
+  },
+
+  /**
+   * 「読みとしては合っているのに、書き方だけがずれた入力」を拾う。
+   * battleScreen の handleNearMiss と同じ考え方（傷も記録も残さず書き直させる）。
+   * @returns {boolean} near-miss として処理したら true
+   */
+  _handleNearMiss(answer, targetReadings) {
+    const nearMiss = findNearMiss(answer, targetReadings);
+    if (!nearMiss) return false;
+
+    battleState.nearMissCount = (battleState.nearMissCount || 0) + 1;
+    this.nearMissNotice = {
+      lines: getNearMissLines(nearMiss, battleState.nearMissCount),
+      until: Date.now() + 2600
+    };
+
+    // se_wrong は鳴らさない（読みちがいと同じ音にすると案内の意味が消える）
+    publish('playSE', 'cancel');
+
+    if (this.inputEl) this.inputEl.value = '';
+    battleState.turn = 'player';
+    battleState.inputEnabled = true;
+    return true;
+  },
+
+  /** near-miss の案内を漢字ボックスの下に出す */
+  _drawNearMissNotice() {
+    const notice = this.nearMissNotice;
+    if (!notice) return;
+    if (Date.now() > notice.until) { this.nearMissNotice = null; return; }
+
+    try {
+      const ctx = this.ctx;
+      const isKbOpen = !!(this.keyboardState && this.keyboardState.open);
+      const cx = this.canvas.width / 2;
+      const top = (isKbOpen ? 120 + 70 : 200 + 80) + 14;
+      const lineH = 20;
+      const w = Math.min(this.canvas.width - 32, 340);
+      const h = notice.lines.length * lineH + 16;
+
+      ctx.save();
+      // 読みちがいの琥珀ではなく、続けてよいことが伝わる色にする
+      ctx.fillStyle = 'rgba(52, 152, 219, 0.18)';
+      ctx.fillRect(cx - w / 2, top, w, h);
+      ctx.strokeStyle = 'rgba(91, 192, 222, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(cx - w / 2, top, w, h);
+
+      ctx.fillStyle = '#eaf6fd';
+      ctx.font = 'bold 14px "UDデジタル教科書体",sans-serif';
+      ctx.textAlign = 'center';
+      notice.lines.forEach((line, i) => {
+        ctx.fillText(line, cx, top + 22 + i * lineH);
+      });
+      ctx.restore();
+    } catch (error) {
+      console.error('❌ おしい案内の描画エラー:', error);
+    }
+  },
+
   _handlePracticeIncorrect(answer) {
     console.log('❌ 不正解処理開始');
     
@@ -1094,6 +1171,7 @@ this._drawImprovedPracticeUI();
 
 // ← 追加: 漢字パネル＋エフェクトを最前面に再描画（上書きで見切れ防止）
 this._drawKanjiBoxWithEffects();
+this._drawNearMissNotice();
 
 gameState.currentEnemy = originalEnemy;
 gameState.enemies = originalEnemies;

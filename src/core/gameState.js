@@ -11,6 +11,10 @@ export const battleState = {
   recentKanjiIds: [], // 漢字の重複出題防止用（念のため復活）
   currentKanjiIndex: 0,  // 現在の問題インデックス
   mistakesThisStage: 0,  // ステージごとのミス回数
+
+  // 「読めてはいるが書き方だけずれた入力」を、この問題で何回したか。
+  // 罰にはせず、2回目からは正しい書き方を見せるための回数。問題ごとに 0 に戻す。
+  nearMissCount: 0,
   
   // コンボタイマー関連のプロパティを追加
   comboTimer: 0,         // コンボの残り時間（フレーム数）
