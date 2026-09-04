@@ -110,6 +110,15 @@ const reviewQueue = (() => {
     //       黙って return し、SM-2 が一度も動いていなかった。取り出しは
     //       getDueReviews() を使い、間隔の管理は updateReview に任せること。
 
+    /**
+     * キュー全体の写しを返す（並べ替えや書き換えをしても中身は壊れない）。
+     * ふりかえりの書き出しで「次にいつ出会う予定か」を出すために要る。
+     * @returns Array<entry>
+     */
+    getAll() {
+      return items.filter(Boolean).map(i => ({ ...i }));
+    },
+
     /** due 項目の数 */
     size() {
       return this.getDueReviews().length;

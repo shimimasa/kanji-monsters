@@ -11,6 +11,7 @@ import Palette from '../ui/palette.js';
 import SessionTimer from '../core/sessionTimer.js';
 import ReadingScope from '../core/readingScope.js';
 import ExampleMode from '../core/exampleMode.js';
+import ReviewExport from '../core/reviewExport.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -197,9 +198,83 @@ const settingsScreenState = {
   panel.appendChild(this._createSessionLengthGroup());
   panel.appendChild(this._createReadingScopeGroup());
   panel.appendChild(this._createExampleModeGroup());
+  panel.appendChild(this._createReviewExportGroup());
 
   return panel;
 },
+
+  /**
+   * 先生が持ち帰れる「ふりかえり」の書き出し。
+   *
+   * 漢字ごとの正誤は kanjiAnswerStats に全部あるのに、外に出す手段が無かった。
+   * どの子がどの字でつまずいているかは次の授業を組み立てる材料そのものなので、
+   * 端末の中に閉じたままでは使えない。CSV にして持ち帰れるようにする。
+   */
+  _createReviewExportGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'ふりかえりを もちかえる';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+
+    const save = (kind, build) => {
+      publish('playSE', 'decide');
+      if (!ReviewExport.hasAnything()) {
+        // 空のファイルを渡しても先生が困るだけなので、理由を出して止める
+        status.textContent = '（まだ きろくが ありません）';
+        return;
+      }
+      const fileName = ReviewExport.buildFileName(kind);
+      const ok = ReviewExport.downloadCsv(build(), fileName);
+      status.textContent = ok ? `（${fileName} を ほぞんしました）` : '（ほぞんできませんでした）';
+      if (ok) this._showSaveToast('ふりかえりを 書き出しました');
+    };
+
+    const kanjiBtn = document.createElement('button');
+    kanjiBtn.className = 'settings-button';
+    kanjiBtn.textContent = 'かんじごと（CSV）';
+    kanjiBtn.addEventListener('click', () => save('かんじごと', () => ReviewExport.buildKanjiCsv()));
+
+    const dailyBtn = document.createElement('button');
+    dailyBtn.className = 'settings-button';
+    dailyBtn.style.marginLeft = '8px';
+    dailyBtn.textContent = 'ひごと（CSV）';
+    dailyBtn.addEventListener('click', () => save('ひごと', () => ReviewExport.buildDailyCsv()));
+
+    row.appendChild(kanjiBtn);
+    row.appendChild(dailyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'いま えらんでいる子の きろくを CSV で保存します。ExcelやGoogleスプレッドシートで開けます。' +
+      '「かんじごと」は 漢字1字ずつの よめた回数・まだの回数・つぎに であう予定。' +
+      '「ひごと」は 日づけごとの といた回数です。' +
+      '子どもを 切り替える（だれが あそぶ？）と、その子の きろくが出ます。'
+    );
+
+    return group;
+  },
 
   /**
    * 例文の中で読ませるモード。
