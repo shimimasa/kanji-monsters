@@ -9,6 +9,7 @@ import { images, loadBgImage } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { findNearMiss, getNearMissLines } from '../utils/readings.js';
+import Speech from '../audio/speech.js';
 // 練習バトル画面状態
 const practiceBattleScreenState = {
   // 既存のbattleScreenStateの全機能を継承
@@ -908,6 +909,8 @@ if (this.unmasteredKanji.length === 0) {
             }
             
             publish('playSE', 'correct');
+            // 読めた読みを音でも返す
+            Speech.speak(answer);
             // ← 追加: 正解時に図鑑へ登録（重複は内部で無視される）
             publish('addToKanjiDex', gameState.currentKanji.id);
 
@@ -997,6 +1000,8 @@ if (this.unmasteredKanji.length === 0) {
       lines: getNearMissLines(nearMiss, battleState.nearMissCount),
       until: Date.now() + 2600
     };
+    // 正しい書き方を見せる回（2回目以降）は、音でも渡す
+    if (battleState.nearMissCount >= 2) Speech.speak(nearMiss.reading);
 
     // se_wrong は鳴らさない（読みちがいと同じ音にすると案内の意味が消える）
     publish('playSE', 'cancel');

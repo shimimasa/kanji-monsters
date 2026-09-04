@@ -8,6 +8,7 @@ import { addMonster } from '../models/monsterDex.js';
 import reviewQueue from '../models/reviewQueue.js';
 import { drawRoundedRect as traceRoundedRect } from '../ui/canvasUtils.js';
 import { toHiragana, getReadings, findNearMiss, getNearMissLines } from '../utils/readings.js';
+import Speech from '../audio/speech.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
@@ -4574,6 +4575,8 @@ function handleNearMiss(answer, correctReadings, inputEl) {
   const lines = getNearMissLines(nearMiss, battleState.nearMissCount);
   addToLog(lines.join(' '));
   battleScreenState.showLogBlock(lines);
+  // 正しい書き方を見せる回（2回目以降）は、音でも渡す
+  if (battleState.nearMissCount >= 2) Speech.speak(nearMiss.reading);
   // NOTE: se_wrong は鳴らさない。読みちがいと同じ音にすると、せっかく
   // 「よめてるよ」と伝えている意味が消える。専用の やさしい音が用意できたら差し替える。
   publish('playSE', 'cancel');
@@ -4640,6 +4643,8 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
     battleState.lastAnswered = { ...gameState.currentKanji };
     gameState.correctKanjiList.push({ ...gameState.currentKanji });
     publish('playSE', 'correct');
+    // 読めた読みを音でも返す。字と音の両方で「読めた」が残るようにする
+    Speech.speak(answer);
     publish('addToKanjiDex', gameState.currentKanji.id);
     
     // 統計データの更新（正解）
@@ -5419,6 +5424,8 @@ function onHint() {
         const useOn = onyomi.length > 0 ? (Math.random() >= 0.5 || kunyomi.length === 0) : false;
         const list = useOn ? onyomi : kunyomi;
         show(`ヒント（決め手）: ${useOn ? '音読み' : '訓読み'}は「${list[0]}」`);
+        // 字だけでなく音でも渡す。読むのが苦手な子には耳からの経路が要る
+        Speech.speak(list[0]);
       } else {
         show('ヒント（決め手）: データがありません');
       }

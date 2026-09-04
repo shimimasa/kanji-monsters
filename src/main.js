@@ -20,6 +20,7 @@ import { checkAchievements } from './core/achievementManager.js';
 import { addKanji } from './models/kanjiDex.js';
 import practiceBattleScreen from './screens/practiceBattleScreen.js';
 import KanaPad from './ui/kanaPad.js';
+import Speech from './audio/speech.js';
 
 
 /* ----------------------------- ログ静音化 ----------------------------- */
@@ -60,6 +61,8 @@ document.body.addEventListener(
   'pointerdown',
   () => {
     publish('playBGM', 'title');   // ここは publish のままでOK（購読が先にある）
+    // 音声合成も同じ「最初のタップ」で解錠しておく（外から呼ぶと鳴らない端末があるため）
+    Speech.unlock();
   },
   { once: true }
 );
@@ -180,6 +183,8 @@ function drawAchievementNotifications(ctx) {
   // ゲーム内の50音パッドを用意する。入力欄は index.html に静的に置いてあるので、
   // ここで捕まえておけば、どの画面が入力欄を出しても自分で追従できる。
   KanaPad.install();
+  // 日本語の声は非同期に届く端末があるので、先に選んでおく
+  Speech.warmUp();
   // 1) 画像 & JSON プリロード
   // await initAssets();
   showBootProgress();

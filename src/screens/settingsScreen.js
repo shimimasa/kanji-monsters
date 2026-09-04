@@ -5,6 +5,7 @@ import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/fi
 import { publish } from '../core/eventBus.js';
 import { hardResetAllLocalData } from '../core/saveData.js';
 import KanaPad from '../ui/kanaPad.js';
+import Speech from '../audio/speech.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -185,9 +186,79 @@ const settingsScreenState = {
   );
 
   panel.appendChild(this._createInputMethodGroup());
+  panel.appendChild(this._createSpeechGroup());
 
   return panel;
 },
+
+  /**
+   * 読みを声で確かめられるようにするかどうか。
+   * 漢字が苦手な子ほど耳から入れる経路が要るので既定はON。
+   * 端末に日本語の声が無い場合は、その旨をここに出す。
+   */
+  _createSpeechGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'よみを 音で きく';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = Speech.isEnabled();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+
+    const supported = Speech.isSupported();
+    const describe = (on) => (!supported
+      ? '（この端末では 音が でません）'
+      : `（いまは: ${on ? 'きこえる' : 'きこえない'}）`);
+    status.textContent = describe(toggle.checked);
+    toggle.disabled = !supported;
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.disabled = !supported;
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      Speech.setEnabled(on);
+      status.textContent = describe(on);
+      if (on) Speech.speak('よめたね');
+      this._showSaveToast('よみの 音を 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      '読めた時と、ヒントで答えを見た時に、その読みを声で返します。' +
+      '字と音の両方で覚えられるようにするためのものです。'
+    );
+
+    return group;
+  },
 
   /**
    * よみの入れかた（ゲーム内の50音表／端末のキーボード）を選ぶ。
