@@ -12,6 +12,7 @@ import SessionTimer from '../core/sessionTimer.js';
 import ReadingScope from '../core/readingScope.js';
 import ExampleMode from '../core/exampleMode.js';
 import ReviewExport from '../core/reviewExport.js';
+import Ruby from '../ui/ruby.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -198,10 +199,78 @@ const settingsScreenState = {
   panel.appendChild(this._createSessionLengthGroup());
   panel.appendChild(this._createReadingScopeGroup());
   panel.appendChild(this._createExampleModeGroup());
+  panel.appendChild(this._createRubyGroup());
   panel.appendChild(this._createReviewExportGroup());
 
   return panel;
 },
+
+  /**
+   * 画面の漢字にふりがなを振る設定。
+   *
+   * 監査②で「UIに配当外の漢字が出ている」「図鑑の文が低学年に読めない」の2つが
+   * 挙がっていた。どちらも同じ問題なので、表示側で1本にして解く。
+   * 対象が漢字の苦手な子である以上、案内の文が読めないせいで進めないのは
+   * 設計思想と食い違う。
+   */
+  _createRubyGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'ふりがなを つける';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = Ruby.isEnabled();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    const describe = (on) => `（いまは: ${on ? 'ふりがな あり' : 'ふりがな なし'}）`;
+    status.textContent = describe(toggle.checked);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      Ruby.setEnabled(on);
+      status.textContent = describe(on);
+      try { saveGameData(); } catch {}
+      this._showSaveToast('ふりがなを 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      '画面の むずかしい ことばに ふりがなを つけます（「復習」→ ふくしゅう など）。' +
+      'まちがった ふりがなを 出さないよう、あらかじめ用意した ことばだけに つけます。' +
+      'バトルの問題（漢字1文字）には つきません。'
+    );
+
+    return group;
+  },
 
   /**
    * 先生が持ち帰れる「ふりかえり」の書き出し。

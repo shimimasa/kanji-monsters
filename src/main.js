@@ -21,6 +21,7 @@ import { addKanji } from './models/kanjiDex.js';
 import practiceBattleScreen from './screens/practiceBattleScreen.js';
 import KanaPad from './ui/kanaPad.js';
 import TextScale from './ui/textScale.js';
+import Ruby from './ui/ruby.js';
 import Speech from './audio/speech.js';
 
 
@@ -185,6 +186,7 @@ function drawAchievementNotifications(ctx) {
   // ここで捕まえておけば、どの画面が入力欄を出しても自分で追従できる。
   // 文字サイズの設定は、どこかが描き始める前に入れておく（描画は canvas 一本）
   TextScale.install();
+  Ruby.install();
   KanaPad.install();
   // 日本語の声は非同期に届く端末があるので、先に選んでおく
   Speech.warmUp();
