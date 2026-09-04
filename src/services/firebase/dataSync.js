@@ -2,6 +2,7 @@
 // import firebase from 'firebase/compat/app';
 // import 'firebase/compat/firestore';
 import { getCurrentUser } from './firebaseController.js';
+import { userRootRef } from '../../core/saveSlots.js';
 
 // コレクション名
 const COLL = 'progress';
@@ -50,7 +51,8 @@ const DataSync = {
     if (!user) return null;
     const db = getDb();
     if (!db) return null;
-    return db.collection('users').doc(user.uid).collection(COLL).doc('state');
+    // スロットで置き場所を分ける（スロット1は今までどおり users/{uid} の直下）
+    return userRootRef(db, user.uid).collection(COLL).doc('state');
   },
 
   // 初期化：Firestore から取得して localStorage に書き戻し
