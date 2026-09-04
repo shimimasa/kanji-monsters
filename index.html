@@ -14,7 +14,18 @@
 html.vh-lock, body.vh-lock { height: 100dvh; overflow: hidden; }
 @supports not (height: 100dvh) { html.vh-lock, body.vh-lock { height: 100svh; } }
 @supports not (height: 100svh) { html.vh-lock, body.vh-lock { height: 100lvh; } }
-#gameCanvas.vh-lock { position: fixed; inset: 0; width: 100vw; height: 100dvh; }
+/* 50音パッドは画面に被せるのではなく、場所を取るものとして扱う。
+   canvas をパッドの高さぶん縮めることで、こうげき・かいふく・ヒントの
+   ボタンやHPパネルがパッドの裏に入らなくなる。
+   --kanapad-height は kanaPad.js が出し入れのたびに立てる（閉じていれば 0px）。
+   bottom:auto を明示しないと inset:0 の bottom と競合する。 */
+#gameCanvas.vh-lock {
+  position: fixed;
+  inset: 0;
+  bottom: auto;
+  width: 100vw;
+  height: calc(100dvh - var(--kanapad-height, 0px));
+}
   </style>
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1e90ff" />

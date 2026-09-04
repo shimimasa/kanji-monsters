@@ -1187,29 +1187,10 @@ getMaxHealCountFromSettings() {
     return this.getEnemyAttackMode() !== 'onMistakeOnly';
   },
   /** 1フレームごとの描画更新 */
-  /**
-   * ゲーム内50音パッドの高さを keyboardState に映す。
-   *
-   * パッドは端末のキーボードではないので visualViewport が動かず、
-   * kanapad:layout イベントも「この画面が購読するより先に開いた」場合には届かない。
-   * 盤面の詰め方（漢字パネルの位置やログの置き場所）はこの状態を見て決まるので、
-   * 取りこぼすと入力欄やログがパッドの下に隠れる。毎フレーム実物を見て合わせる。
-   */
-  _syncKanaPadInset() {
-    try {
-      const pad = document.getElementById('kanaPad');
-      const open = !!(pad && pad.classList.contains('kanaPad--open'));
-      if (!open) return; // 端末キーボード側の判定は既存の処理に任せる
-      const height = pad.offsetHeight || 0;
-      if (this.keyboardState.open === true && this.keyboardState.bottomInset === height) return;
-      this.keyboardState.open = true;
-      this.keyboardState.bottomInset = height;
-      this._adjustInputPosition();
-    } catch {}
-  },
-
   update(dt) {
-    this._syncKanaPadInset();
+    // NOTE: 以前はここで50音パッドの高さを keyboardState に映していたが、
+    //       いまは canvas 自体がパッドのぶん縮む（index.html の --kanapad-height）。
+    //       映すと二重に持ち上がるので消した。keyboardState は端末キーボード専用。
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // ① 背景描画 (画像 or グラデ)
@@ -1548,7 +1529,9 @@ if (gameState.currentEnemy && gameState.currentEnemy.weakness &&
 
     // ← ここから追加：前回解答表示エリア（左側）
     if (battleState.lastAnswered) {
-      const bx = 20, by = 70, bw = 140, bh = 180; // 高さを160から180に増加
+      // by は「れんしゅうへ」ボタン（y 64〜96）の下に置く。70 だと重なって
+      // ボタンがパネルの裏に隠れ、押せているのに見えない状態だった
+      const bx = 20, by = 104, bw = 140, bh = 180;
       
       // パネル背景描画
       this.drawPanelBackground(this.ctx, bx, by, bw, bh, 'stone');
@@ -2377,7 +2360,7 @@ if (hh.visible) {
 
         // 前回漢字パネルのオーバーレイ（バッジ/フラッシュ）
     if (battleState.lastAnswered) {
-      const bx = 20, by = 70, bw = 140, bh = 180;
+      const bx = 20, by = 104, bw = 140, bh = 180; // 「れんしゅうへ」ボタンの下
 
       const lastId = battleState.lastAnswered.id;
       const progForPrev = (gameState.kanjiReadProgress && gameState.kanjiReadProgress[lastId]) || null;
@@ -2702,16 +2685,8 @@ const focusDiff = Math.max(0, this._baseVH - vvH);
 // 通常推定
 let insetMax = Math.max(vvInset, vkInset, this.keyboardState?.bottomInset || 0);
 
-// ゲーム内の50音パッドは端末のキーボードではないので、上のどの推定にも出てこない。
-// kanapad:layout イベントでも知らせているが、この画面が購読するより先にパッドが
-// 開くことがある（その場合、入力欄がパッドに重なる位置に置かれてしまう）。
-// 順番に左右されないよう、ここでは実物の高さを直に見る。
-try {
-  const pad = document.getElementById('kanaPad');
-  if (pad && pad.classList.contains('kanaPad--open')) {
-    insetMax = Math.max(insetMax, pad.offsetHeight);
-  }
-} catch {}
+// NOTE: ゲーム内50音パッドはここで足さない。canvas がパッドのぶん縮むので、
+//       canvas の下端＝パッドの上端になり、rect 基準で置けば自然に収まる。
 
 // iOS対策: 差分0でもフォーカス中は下限値を採用
 if (isIOS && document.activeElement === this.inputEl) {
@@ -2748,10 +2723,12 @@ const rect = this.canvas.getBoundingClientRect?.();
        s.top = 'auto';
        s.bottom = `${Math.round(bottomInset + 4)}px`;
      } else {
-       // 石版に重ならない下寄せ + 画面内へクランプ
+       // 漢字の石版（下端 280）と こうげき/かいふく/ヒント（上端 380）の間に置く。
+       // 以前は 460 に置いていたが、そこはコマンドボタンとHPパネルの領域で、
+       // 50音パッドを使うと（端末キーボードが開かないので）ここに来て重なっていた。
        let cssTop;
        if (rect) {
-         const targetCanvasY = Math.min(this.canvas.height - 40, 460);
+         const targetCanvasY = Math.min(this.canvas.height - 40, BTN.attack.y - 46);
          cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
        } else {
          cssTop = window.innerHeight - inputH - 24;
@@ -3058,7 +3035,9 @@ const rect = this.canvas.getBoundingClientRect?.();
     const panelW = 260;
     const panelH = 130;
     const panelX = 20;
-    const panelY = 600 - panelH - 20;
+    // 論理高さ600の直書きをやめる。canvas の高さは端末や設定で変わりうるので、
+    // 下端から測る（600固定だと、canvas が縮んだ時に画面外へ出る）
+    const panelY = (this.canvas ? this.canvas.height : 600) - panelH - 20;
   
     if (images.panelPlayer) {
       ctx.drawImage(images.panelPlayer, panelX, panelY, panelW, panelH);
