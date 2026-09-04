@@ -31,6 +31,11 @@ battleState.timeRemaining = 60;
 // ステージの途中に立てる旗の位置（この数だけ倒したら、力尽きても次はここから）
 const BATTLE_CHECKPOINT_AT = 5;
 
+// 読めなかった字を、何問あとにもう一度出すか。
+// 直近 RECENT_QUESTIONS_BUFFER_SIZE 問は候補から外れるので、
+// ちょうどそこを抜けた次の問題で戻ってくる数にしてある。
+const KANJI_RETRY_WAIT_TURNS = RECENT_QUESTIONS_BUFFER_SIZE;
+
 function getProgressInfo() {
   const order = gameState.currentEnemyIndex + 1;
   if (order <= 6) return `ノーマル戦 ${order}/6`;
@@ -1001,6 +1006,7 @@ updateShieldBreakEffect() {
       const lastEnemyIndex  = Math.max(0, (gameState.enemies?.length || 1) - 1);
       gameState.currentEnemyIndex = Math.min(savedCheckpoint, lastEnemyIndex);
       battleState.recentKanjiIds = [];
+      battleState.retryQueue = [];
       battleState.shuffledKanjiList = [...gameState.kanjiPool].sort(() => Math.random() - 0.5);
       battleState.currentKanjiIndex = 0;
 
@@ -5071,6 +5077,8 @@ setManagedTimeout(() => {
     
     // ← 学習データ記録（不正解・永続化される正史へ）
     recordKanjiAnswer(gameState.currentKanji.id, false);
+    // 翌日のSM-2とは別に、このステージの中でもう一度出会えるようにする
+    scheduleKanjiRetry(gameState.currentKanji.id);
     
     // ★ コンボカウントを確実にリセット ★
     battleState.comboCount = 0;
@@ -5323,6 +5331,8 @@ gameState.playerStats.healsSuccessful++;
 
     // 学習データ記録（かいふくでの読みちがいも記録する）
     recordKanjiAnswer(gameState.currentKanji.id, false);
+    // 翌日のSM-2とは別に、このステージの中でもう一度出会えるようにする
+    scheduleKanjiRetry(gameState.currentKanji.id);
 
     // チャレンジモードの時だけダメージを受ける。
     // NOTE: 設定の正史は localStorage（healMode / enemyAttackMode と同じ扱い）。
@@ -5529,6 +5539,76 @@ export function pickNextKanji() {
 }
 
 /**
+ * その子にとっての手ごわさで重みを付けて1問選ぶ。
+ *
+ * これまでは候補から一様ランダムに選んでいたため、さっき読めなかった字が
+ * そのステージ中に二度と出てこないことが普通に起きていた。1回15分ほど遊んで、
+ * 読めなかった字に一度も再会しないのはもったいない。
+ * 重みの材料は gameState.kanjiAnswerStats（学習記録の正史）で、データ追加は要らない。
+ *
+ * @param {Array} candidatePool 直近出題を除いた候補
+ * @returns {Object} 選ばれた漢字
+ */
+function pickWeightedKanji(candidatePool) {
+  // 1) 「さっき読めなかった字」の再会が来ていれば、それを優先する
+  const retry = battleState.retryQueue || [];
+  for (let i = 0; i < retry.length; i++) {
+    if (retry[i].waitTurns > 0) continue;
+    const found = candidatePool.find(k => k.id === retry[i].id);
+    if (found) {
+      retry.splice(i, 1);
+      return found;
+    }
+    // プールに居ない（別ステージの字など）なら、待ち続けても仕方ないので捨てる
+    retry.splice(i, 1);
+    i--;
+  }
+
+  // 2) 重み付き抽選
+  const weightOf = (kanji) => {
+    const stats = getKanjiAnswerStats(kanji.id) || { correct: 0, incorrect: 0 };
+    const correct = stats.correct || 0;
+    const incorrect = stats.incorrect || 0;
+    if (correct === 0 && incorrect === 0) return 3; // まだ出会っていない字
+    if (incorrect > correct) return 4;              // 読めなかった方が多い字
+    if (incorrect > 0) return 2;                    // 読めなかったことがある字
+    return 1;                                       // ずっと読めている字
+  };
+
+  let total = 0;
+  const weights = candidatePool.map(k => {
+    const w = weightOf(k);
+    total += w;
+    return w;
+  });
+
+  let hit = Math.random() * total;
+  for (let i = 0; i < candidatePool.length; i++) {
+    hit -= weights[i];
+    if (hit <= 0) return candidatePool[i];
+  }
+  return candidatePool[candidatePool.length - 1];
+}
+
+/**
+ * 読めなかった字を「数問あとにもう一度」出すための予約。
+ * 翌日以降のSM-2（reviewQueue）とは別に、その場での取り返しの機会を作る。
+ * @param {string} kanjiId
+ */
+function scheduleKanjiRetry(kanjiId) {
+  if (!kanjiId) return;
+  if (!Array.isArray(battleState.retryQueue)) battleState.retryQueue = [];
+  if (battleState.retryQueue.some(item => item.id === kanjiId)) return;
+  battleState.retryQueue.push({ id: kanjiId, waitTurns: KANJI_RETRY_WAIT_TURNS });
+}
+
+/** 1問進むごとに、再会までの待ち数を1つ減らす */
+function advanceKanjiRetryQueue() {
+  if (!Array.isArray(battleState.retryQueue)) return;
+  battleState.retryQueue.forEach(item => { item.waitTurns -= 1; });
+}
+
+/**
  * 指定されたプールから直近出題回避ロジックを使って漢字を選択
  * @param {Array} pool 選択対象の漢字プール
  * @param {string} poolName プール名（ログ用）
@@ -5551,9 +5631,10 @@ function pickFromPool(pool, poolName) {
     candidatePool = pool;
   }
 
-  // ランダムに1問選択
-  const selectedKanji = candidatePool[Math.floor(Math.random() * candidatePool.length)];
-  
+  // 出題は一様ランダムではなく、その子にとっての手ごわさで重みを付けて選ぶ。
+  // さらに「さっき読めなかった字」は数問あとに必ず戻ってくるようにする。
+  const selectedKanji = pickWeightedKanji(candidatePool);
+
   if (!selectedKanji) {
     console.error(`❌ ${poolName}から漢字を選択できませんでした`);
     return false;
@@ -5592,6 +5673,7 @@ function pickFromPool(pool, poolName) {
 
   gameState.showHint = false;
   battleState.nearMissCount = 0; // 「おしい」の回数は問題ごとに数え直す
+  advanceKanjiRetryQueue();      // 読めなかった字の再会を1問ぶん近づける
   addToLog(`「${gameState.currentKanji.text}」をよもう！`);
   const weakLabel =
   gameState.currentKanji.weakness === 'onyomi' ? '音読み' :
