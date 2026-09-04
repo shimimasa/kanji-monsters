@@ -261,7 +261,45 @@ const kanjiDexScreen = {
       publish('changeScreen', targetScreen);
     });
     leftControls.appendChild(backButton);
-  
+
+    // ことわざ図鑑へ
+    // 400件の ことわざ（読み・意味・例文つき）が用意されていたのに、
+    // これまで src から一度も参照されていなかった。図鑑の隣に読み物として置く。
+    const proverbButton = document.createElement('button');
+    proverbButton.className = 'btn-proverb';
+    proverbButton.textContent = '🗣 ことわざ図鑑';
+    Object.assign(proverbButton.style, {
+      background: 'linear-gradient(135deg, #8d6e63, #6d4c41)',
+      color: 'white',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      borderRadius: '8px',
+      padding: '8px 16px',
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: '500',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+    });
+    proverbButton.addEventListener('mouseenter', () => {
+      Object.assign(proverbButton.style, {
+        background: 'linear-gradient(135deg, #6d4c41, #5d4037)',
+        transform: 'translateY(-2px)',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
+      });
+    });
+    proverbButton.addEventListener('mouseleave', () => {
+      Object.assign(proverbButton.style, {
+        background: 'linear-gradient(135deg, #8d6e63, #6d4c41)',
+        transform: 'translateY(0)',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+      });
+    });
+    proverbButton.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      publish('changeScreen', 'proverbDex');
+    });
+    leftControls.appendChild(proverbButton);
+
     // 学年セレクト
     const gradeLabel = document.createElement('span');
     gradeLabel.className = 'kanji-grade-label';

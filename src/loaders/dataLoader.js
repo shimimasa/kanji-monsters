@@ -658,3 +658,44 @@ async function _loadGrades(grades) {
   });
   await Promise.all(tasks);
 }
+
+/* ------------------------------------------------------------------ */
+/*  ことわざ                                                           */
+/* ------------------------------------------------------------------ */
+//
+// 400件（読み・意味・例文・結びつくゴトモン名つき）が用意されていたのに、
+// src からは一度も参照されていなかった。図鑑の読み物として出す。
+// 起動時には読まない。182KBあるので、ことわざ図鑑を開いた時に初めて取りに行く。
+
+let proverbData = null;
+let proverbPromise = null;
+
+/**
+ * ことわざを読み込む（初回だけ取りに行き、以後は同じ配列を返す）。
+ * @returns {Promise<Array<{id:number, text:string, reading:string, meaning:string,
+ *                          difficulty:string, example_sentence:string, monsterName:string}>>}
+ */
+export async function loadProverbs() {
+  if (proverbData) return proverbData;
+  if (proverbPromise) return proverbPromise;
+
+  proverbPromise = (async () => {
+    try {
+      const res = await fetch('/data/proverbs_with_monsters.json');
+      if (!res.ok) throw new Error(`ことわざの読み込みに失敗: ${res.statusText}`);
+      const arr = await res.json();
+      proverbData = Array.isArray(arr) ? arr : [];
+    } catch (e) {
+      console.warn('ことわざを読み込めませんでした:', e);
+      proverbData = [];
+    }
+    return proverbData;
+  })();
+
+  return proverbPromise;
+}
+
+/** 読み込み済みのことわざ（まだなら空配列） */
+export function getLoadedProverbs() {
+  return proverbData || [];
+}
