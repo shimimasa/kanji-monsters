@@ -28,38 +28,42 @@ export function toHiragana(input) {
  */
 export function getReadings(k) {
   const set = new Set();
-
-  // kunyomiの処理：配列か文字列かをチェック
-  if (k.kunyomi) {
-    if (Array.isArray(k.kunyomi)) {
-      k.kunyomi.forEach(r => {
-        if (r && typeof r === 'string') {
-          set.add(toHira(r.trim()));
-        }
-      });
-    } else if (typeof k.kunyomi === 'string') {
-      k.kunyomi.split(' ').forEach(r => {
-        if (r) set.add(toHira(r.trim()));
-      });
-    }
-  }
-
-  // onyomiの処理：配列か文字列かをチェック
-  if (k.onyomi) {
-    if (Array.isArray(k.onyomi)) {
-      k.onyomi.forEach(r => {
-        if (r && typeof r === 'string') {
-          set.add(toHira(r.trim()));
-        }
-      });
-    } else if (typeof k.onyomi === 'string') {
-      k.onyomi.split(' ').forEach(r => {
-        if (r) set.add(toHira(r.trim()));
-      });
-    }
-  }
-
+  if (!k) return [];
+  getReadingsOf(k, 'kunyomi').forEach(r => set.add(r));
+  getReadingsOf(k, 'onyomi').forEach(r => set.add(r));
   return [...set].filter(Boolean); // undefined や空文字を除外
+}
+
+/**
+ * 片方の読み系統だけを、ひらがな正規化して返す。
+ *
+ * 敵の弱点（音読み／訓読み）が示されている時に、その系統だけを正解にするために要る。
+ * データは配列が正史だが、旧形式（スペース区切り文字列）も残っているので両対応する。
+ *
+ * @param {{onyomi?: string[]|string, kunyomi?: string[]|string}} k
+ * @param {'onyomi'|'kunyomi'} system
+ * @returns {string[]}
+ */
+export function getReadingsOf(k, system) {
+  if (!k || (system !== 'onyomi' && system !== 'kunyomi')) return [];
+  const value = k[system];
+  if (!value) return [];
+
+  const set = new Set();
+  const push = (r) => {
+    if (r && typeof r === 'string') {
+      const normalized = toHira(r.trim());
+      if (normalized) set.add(normalized);
+    }
+  };
+
+  if (Array.isArray(value)) {
+    value.forEach(push);
+  } else if (typeof value === 'string') {
+    value.split(' ').forEach(push);
+  }
+
+  return [...set];
 }
 
 /* ------------------------------------------------------------------ */

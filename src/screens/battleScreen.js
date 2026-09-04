@@ -11,6 +11,7 @@ import { toHiragana, getReadings, findNearMiss, getNearMissLines } from '../util
 import Speech from '../audio/speech.js';
 import { gaugeColor, availabilityColor } from '../ui/palette.js';
 import SessionTimer from '../core/sessionTimer.js';
+import ReadingScope from '../core/readingScope.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 // 1. まず、ファイル冒頭にimportを追加
@@ -4627,6 +4628,51 @@ function finishSessionForToday() {
 }
 
 /**
+ * 「その字は読めているのに、いま求めている読み系統ではない入力」を拾う。
+ *
+ * 弱点が「音読み！」と出ている時に くんよみ で答えた、というような場合。
+ * これは まちがい ではない。字はちゃんと読めている。
+ * 傷も付けず、学習記録にも残さず、どちらの読みが欲しいかだけを伝えて
+ * もう一度書かせる（「おしい」入力と同じ扱い）。
+ *
+ * @param {string} answer ひらがな正規化済みの入力
+ * @param {'onyomi'|'kunyomi'|null} scopedTo しぼっている読み系統。しぼっていなければ null
+ * @param {HTMLInputElement} inputEl
+ * @returns {boolean} ここで処理したら true（呼び出し側は不正解処理へ進まない）
+ */
+function handleWrongReadingSystem(answer, scopedTo, inputEl) {
+  if (!scopedTo || !answer) return false;
+  // その字の読みではあるか（他系統も含めて照合する）
+  if (!getReadings(gameState.currentKanji || {}).includes(answer)) return false;
+
+  const want = ReadingScope.labelOf(scopedTo);
+
+  // 入力欄は「読みちがい」の琥珀ではなく、続けてよいことが伝わる色にする
+  if (inputEl) {
+    inputEl.style.borderColor = '#5bc0de';
+    inputEl.style.backgroundColor = 'rgba(91, 192, 222, 0.12)';
+    setTimeout(() => {
+      inputEl.style.borderColor = '#ccc';
+      inputEl.style.backgroundColor = 'white';
+    }, 500);
+    inputEl.value = '';
+  }
+
+  const lines = [
+    `「${answer}」も よめてるよ！`,
+    `このモンスターには ${want} で おねがい`
+  ];
+  addToLog(lines.join(' '));
+  battleScreenState.showLogBlock(lines);
+  // 読みちがいと同じ音は鳴らさない。「よめてるよ」と伝えている意味が消える
+  publish('playSE', 'cancel');
+
+  // 同じ問題のまま、もう一度書ける状態に戻す
+  battleState.inputEnabled = true;
+  return true;
+}
+
+/**
  * 「読みとしては合っているのに、書き方だけがずれた入力」を拾う。
  *
  * このゲームは読めるようになることを目指す場なので、きよう／きょう や
@@ -4686,7 +4732,10 @@ const onyomiStr = (gameState.currentKanji.onyomi || []).join('、');
 const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
 const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」`;
 
-  const correctReadings = getReadings(gameState.currentKanji);
+  // 弱点が示されている時は、その読み系統だけを正解にする（設定で切れる）。
+  // しぼれない字（その系統の読みが無い字）では今までどおり全部の読みが通る。
+  const { readings: correctReadings, scopedTo } =
+    ReadingScope.getAcceptedReadings(gameState.currentKanji, gameState.currentEnemy);
   const correct = correctReadings.includes(answer);
 
   if (correct) {
@@ -5125,6 +5174,10 @@ setManagedTimeout(() => {
       }, 1300);
     }
     
+  } else if (handleWrongReadingSystem(answer, scopedTo, inputEl)) {
+    // その字は読めている。欲しい読み系統だけを伝えて、無傷でもう一度書かせる
+    return;
+
   } else if (handleNearMiss(answer, correctReadings, inputEl)) {
     // 読めているのに書き方だけがずれた入力。無傷でもう一度書かせる（記録にも残さない）
     return;
@@ -5293,8 +5346,9 @@ function onHeal() {
   const kunyomiStr = (gameState.currentKanji.kunyomi || []).join('、');
   const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」`;
 
-  // 正解判定
-  const correctReadings = getReadings(gameState.currentKanji);
+  // 正解判定（弱点が示されている時は、その読み系統だけを正解にする）
+  const { readings: correctReadings, scopedTo } =
+    ReadingScope.getAcceptedReadings(gameState.currentKanji, gameState.currentEnemy);
   const correct = correctReadings.includes(answer);
 
   if (correct) {
@@ -5386,6 +5440,10 @@ gameState.playerStats.healsSuccessful++;
     // ▲▲▲ ここまで修正 ▲▲▲
 
         // チャレンジモードの時間加算は廃止（ストップウォッチ化）
+  } else if (handleWrongReadingSystem(answer, scopedTo, inputEl)) {
+    // その字は読めている。かいふくの回数も減らさずに、欲しい読み系統だけを伝える
+    return;
+
   } else if (handleNearMiss(answer, correctReadings, inputEl)) {
     // 読めているのに書き方だけがずれた入力。かいふくの回数も減らさずに書き直させる
     return;
@@ -5484,6 +5542,10 @@ function onHint() {
   const onyomi = Array.isArray(k.onyomi) ? k.onyomi : [];
   const kunyomi = Array.isArray(k.kunyomi) ? k.kunyomi : [];
 
+  // 読み系統をしぼっている時は、ヒントもその系統を見せる。
+  // 求めていない側の読みを「決め手」として渡すと、そのとおり書いても通らない
+  const { scopedTo } = ReadingScope.getAcceptedReadings(k, gameState.currentEnemy);
+
   // ログ・ログブロック・上部バナーに同じ文言を配る。
   // 音訓をどちらにするかはここで1回だけ決める（描画側で決め直さない）
   const show = (text) => {
@@ -5499,7 +5561,9 @@ function onHint() {
       break;
     }
     case 2: {
-      const useOn = (onyomi.length > 0 && (Math.random() >= 0.5 || kunyomi.length === 0));
+      const useOn = scopedTo
+        ? (scopedTo === 'onyomi')
+        : (onyomi.length > 0 && (Math.random() >= 0.5 || kunyomi.length === 0));
       const list = useOn ? onyomi : kunyomi;
       const first = list[0] || '';
       const masked = first ? first.substring(0, 1) + '○○' : '不明';
@@ -5513,7 +5577,9 @@ function onHint() {
     case 4: {
       // 最終ヒント: 読みのどちらかをフル提示
       if (onyomi.length > 0 || kunyomi.length > 0) {
-        const useOn = onyomi.length > 0 ? (Math.random() >= 0.5 || kunyomi.length === 0) : false;
+        const useOn = scopedTo
+          ? (scopedTo === 'onyomi')
+          : (onyomi.length > 0 ? (Math.random() >= 0.5 || kunyomi.length === 0) : false);
         const list = useOn ? onyomi : kunyomi;
         show(`ヒント（決め手）: ${useOn ? '音読み' : '訓読み'}は「${list[0]}」`);
         // 字だけでなく音でも渡す。読むのが苦手な子には耳からの経路が要る

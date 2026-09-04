@@ -9,6 +9,7 @@ import Speech from '../audio/speech.js';
 import TextScale from '../ui/textScale.js';
 import Palette from '../ui/palette.js';
 import SessionTimer from '../core/sessionTimer.js';
+import ReadingScope from '../core/readingScope.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -193,9 +194,81 @@ const settingsScreenState = {
   panel.appendChild(this._createBigFontGroup());
   panel.appendChild(this._createColorModeGroup());
   panel.appendChild(this._createSessionLengthGroup());
+  panel.appendChild(this._createReadingScopeGroup());
 
   return panel;
 },
+
+  /**
+   * 弱点の読み系統だけを正解にするか。
+   *
+   * これまでは単漢字を出して、どの読みでも正解にしていた。「生」なら
+   * せい／しょう／なま／き のどれでも通るので、知っている読みを1つ持っていれば
+   * 最後まで進めてしまう。画面に「弱点は音読み！」と出ているのだから、
+   * そこを合わせてもらうほうが、示していることとも合う。
+   *
+   * 系統ちがいは まちがい 扱いにしない（傷も記録も残さず書き直させる）ので、
+   * ONでも「読めたのに減点された」形にはならない。
+   */
+  _createReadingScopeGroup() {
+    const group = document.createElement('div');
+    group.className = 'setting-group';
+
+    const label = document.createElement('div');
+    label.className = 'setting-label-with-tooltip';
+
+    const labelText = document.createElement('span');
+    labelText.className = 'setting-label';
+    labelText.textContent = 'よわてんの よみで こたえる';
+
+    const tip = document.createElement('span');
+    tip.className = 'tooltip-trigger';
+    tip.textContent = '？';
+
+    label.appendChild(labelText);
+    label.appendChild(tip);
+
+    const row = document.createElement('div');
+    row.className = 'inline-controls';
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = ReadingScope.isEnabled();
+
+    const status = document.createElement('span');
+    status.style.marginLeft = '8px';
+    const describe = (on) => `（いまは: ${on ? 'よわてんの よみだけ' : 'どの よみでも いい'}）`;
+    status.textContent = describe(toggle.checked);
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'settings-button';
+    applyBtn.textContent = '適用';
+    applyBtn.addEventListener('click', () => {
+      publish('playSE', 'decide');
+      const on = !!toggle.checked;
+      ReadingScope.setEnabled(on);
+      status.textContent = describe(on);
+      try { saveGameData(); } catch {}
+      this._showSaveToast('よみの きまりを 更新しました');
+    });
+
+    row.appendChild(toggle);
+    row.appendChild(applyBtn);
+    row.appendChild(status);
+
+    group.appendChild(label);
+    group.appendChild(row);
+
+    this._setupTooltipEvents(
+      tip,
+      'ONにすると、「弱点は音読み！」と出ている敵には音読みで答えてもらいます。' +
+      'ちがう系統で答えても まちがいにはならず、「よめてるよ。いまは おんよみで」と伝えて' +
+      'もう一度書けます（ダメージも学習記録も動きません）。' +
+      'その系統の読みを持たない漢字では、今までどおりどの読みでも正解です。'
+    );
+
+    return group;
+  },
 
   /**
    * 「きょうは ○ふん」で区切る設定。
