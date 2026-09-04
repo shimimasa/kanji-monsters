@@ -1941,12 +1941,19 @@ _teardownGlobalBackHandler() {
       this.ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
-      const guideMain = this.reviewMode ? '○の読みを入力してEnterキー' : '読みを入力してEnterキー';
+      // 50音パッドを使っている子には Enter も スペース も無い。
+      // 使っている入力方法に合わせて案内を変える
+      const padEl = document.getElementById('kanaPad');
+      const usingPad = !!(padEl && padEl.classList.contains('kanaPad--open'));
+      const target = this.reviewMode ? '○のよみ' : 'よみ';
+      const guideMain = usingPad
+        ? `${target}を いれて「よむ！」`
+        : (this.reviewMode ? '○の読みを入力してEnterキー' : '読みを入力してEnterキー');
       this.ctx.fillText(guideMain, x + w/2, y + h/2 - 8);
       // サブテキスト
       this.ctx.font = '14px "UDデジタル教科書体", sans-serif';
       this.ctx.fillStyle = '#bdc3c7';
-      this.ctx.fillText('ヒント: スペースキー', x + w/2, y + h/2 + 12);
+      this.ctx.fillText(usingPad ? 'まちがえても だいじょうぶ' : 'ヒント: スペースキー', x + w/2, y + h/2 + 12);
       
     } catch (error) {
       console.error('❌ 操作ガイド描画エラー:', error);
@@ -2156,10 +2163,13 @@ _teardownGlobalBackHandler() {
              s.top = 'auto';
              s.bottom = `${Math.round(bottomInset + 4)}px`;
            } else {
-             // 石版に重ならない下寄せ + 画面内へクランプ
+             // 上のパネル（〜270）と操作ガイド（380〜）の間の空きに置く。
+             // 以前は 460 に置いていたが、そこは マスター進捗パネル(480〜)の手前で、
+             // 50音パッドを使うと（端末キーボードが開かないので）ここに来て重なっていた。
              let cssTop;
              if (rect) {
-               const targetCanvasY = Math.min(this.canvas.height - 40, 460);
+               const guideY = this.panelConfig?.guide?.y ?? 380;
+               const targetCanvasY = Math.min(this.canvas.height - 40, guideY - 46);
                cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
              } else {
                cssTop = window.innerHeight - inputH - 24;

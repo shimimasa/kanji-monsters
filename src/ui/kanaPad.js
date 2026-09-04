@@ -68,7 +68,7 @@ const CSS = `
   bottom: 0;
   z-index: 2147483646;
   box-sizing: border-box;
-  padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+  padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px));
   background: rgba(28, 35, 48, 0.97);
   border-top: 2px solid rgba(255, 255, 255, 0.18);
   display: none;
@@ -80,16 +80,16 @@ const CSS = `
 #${PAD_ID} .kanaPad__grid {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
-  gap: 4px;
+  gap: 3px;
   max-width: 720px;
   margin: 0 auto;
 }
 #${PAD_ID} .kanaPad__tools {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
+  gap: 3px;
   max-width: 720px;
-  margin: 6px auto 0;
+  margin: 4px auto 0;
 }
 #${PAD_ID} button {
   appearance: none;
@@ -102,8 +102,9 @@ const CSS = `
   font-size: calc(clamp(15px, 3.6vw, 24px) * var(--yomitabi-text-scale, 1));
   font-weight: bold;
   padding: 0;
-  /* 横に広い端末（iPadの横向きなど）で高くなりすぎないよう、画面の高さでも抑える */
-  height: calc(clamp(30px, min(7.2vw, 6.2vh), 46px) * var(--yomitabi-text-scale, 1));
+  /* パッドが場所を取るほど盤面が小さくなるので、高さは画面の高さ基準で抑える。
+     6行ぶん積み上がることを忘れないこと（1キー+8px で全体は約+60px になる） */
+  height: calc(clamp(26px, 4.2vh, 38px) * var(--yomitabi-text-scale, 1));
   line-height: 1;
   cursor: pointer;
 }
@@ -288,11 +289,23 @@ const KanaPad = {
     this._notifyLayout();
   },
 
-  /** パッドの高さを画面側に知らせる（入力欄と盤面の位置合わせに使う） */
+  /**
+   * パッドの高さを画面側に知らせる。
+   *
+   * CSS変数 --kanapad-height を立てるのが本命。これを見て canvas が
+   * パッドのぶんだけ縮むので、盤面がパッドの裏に隠れなくなる。
+   * （以前は canvas を画面いっぱいのままにしてパッドを被せていたため、
+   *   こうげき・かいふく・ヒントのボタンやHPパネルが裏に入って押せなかった）
+   *
+   * イベントの方は、端末キーボード用の既存の処理が購読しているので残す。
+   */
   _notifyLayout() {
     if (!this.el) return;
     const open = this.el.classList.contains('kanaPad--open');
     const height = open ? this.el.offsetHeight : 0;
+    try {
+      document.documentElement.style.setProperty('--kanapad-height', `${height}px`);
+    } catch {}
     window.dispatchEvent(new CustomEvent('kanapad:layout', { detail: { open, height } }));
   }
 };
