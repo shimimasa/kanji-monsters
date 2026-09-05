@@ -18,13 +18,20 @@ html.vh-lock, body.vh-lock { height: 100dvh; overflow: hidden; }
    canvas をパッドの高さぶん縮めることで、こうげき・かいふく・ヒントの
    ボタンやHPパネルがパッドの裏に入らなくなる。
    --kanapad-height は kanaPad.js が出し入れのたびに立てる（閉じていれば 0px）。
-   bottom:auto を明示しないと inset:0 の bottom と競合する。 */
+   canvas の内部解像度は 800x600（4:3）固定（main.js）。object-fit:contain と
+   組み合わせて width/height をそのまま 100vw / calc(...) にすると、パッドが
+   開いた時に表示比率が横長になりすぎて 4:3 の中身が縦横とも大きく縮み、
+   モンスターやUIが小さすぎて見えなくなる。max-width/max-height で 4:3 を
+   超えないよう縦横どちらかを頭打ちにし、margin:auto で余白側を中央寄せする。 */
 #gameCanvas.vh-lock {
   position: fixed;
   inset: 0;
-  bottom: auto;
+  bottom: var(--kanapad-height, 0px);
+  margin: auto;
   width: 100vw;
   height: calc(100dvh - var(--kanapad-height, 0px));
+  max-width: calc((100dvh - var(--kanapad-height, 0px)) * 4 / 3);
+  max-height: calc(100vw * 3 / 4);
 }
   </style>
   <link rel="manifest" href="/manifest.json" />
