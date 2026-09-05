@@ -222,6 +222,11 @@ const tabs = [
   { label: '総復習', kanken_level: "review", grade: 0 },
 ];
 
+// 学年ボーナスの表示名は「4級ボーナス」等の級名ではなく、日本編（地方名）と
+// 揃えて大陸名にする（stages.bonus.json の name はカッコ書きが長く
+// リストボタンには収まらないため、ここは短い地方名のみを使う）
+const WORLD_REGION_NAME_BY_GRADE = { 7: 'アジア', 8: 'ヨーロッパ', 9: 'アメリカ', 10: 'アフリカ' };
+
 // 選択中のステージを追跡するプロパティを追加（約85行目付近）
 const worldStageSelectScreen = {
   canvas: null,
@@ -495,7 +500,8 @@ if (this.isReviewMode) {
         // 追加: 世界ステージにもボーナスステージを表示（日本と同仕様）
         const bonusId = `bonus_g${this.selectedGrade}`;
         const levelText = (String(this.selectedTabLevel) === '準2') ? '準2級' : `${this.selectedTabLevel}級`;
-        const bonusLabel = `${levelText}ボーナス`;
+        // 「4級ボーナス」等の級名ではなく、日本編と揃えて地方名（アジアボーナス等）で表示する
+        const bonusLabel = `${WORLD_REGION_NAME_BY_GRADE[this.selectedGrade] || levelText}ボーナス`;
         this.stageButtons.push({
           id: bonusId,
           text: bonusLabel,

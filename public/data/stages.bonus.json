@@ -3,10 +3,6 @@
     "grade": 1,
     "region": "北海道",
     "pref": "北海道ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "hokkaido_bonus",
     "name": "北海道（1年漢字まとめ）",
     "enemyIdList": [
@@ -110,10 +106,6 @@
     "grade": 2,
     "region": "東北地方",
     "pref": "東北地方ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "tohoku_bonus",
     "name": "東北地方ボーナス（2年漢字まとめ）",
     "enemyIdList": [
@@ -297,10 +289,6 @@
     "grade": 3,
     "region": "関東地方",
     "pref": "関東地方ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "kantou_bonus",
     "name": "関東地方ボーナス(3年漢字まとめ)",
     "enemyIdList": [
@@ -524,10 +512,6 @@
     "grade": 4,
     "region": "中部地方",
     "pref": "中部地方ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "chubu_bonus",
     "name": "中部地方ボーナス（4年漢字まとめ）",
     "enemyIdList": [
@@ -753,10 +737,6 @@
     "grade": 5,
     "region": "近畿地方",
     "pref": "近畿地方ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "kinki_bonus",
     "name": "近畿地方ボーナス（5年漢字まとめ)",
     "enemyIdList": [
@@ -961,12 +941,8 @@
     "grade": 6,
     "region": "中国地方",
     "pref": "中国地方6年漢字まとめ",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "chugoku_bonus",
-    "name": "中国地方",
+    "name": "中国地方ボーナス（6年漢字まとめ）",
     "enemyIdList": [
       "CHG-L01",
       "CHG-L02",
@@ -1178,10 +1154,6 @@
     "grade": 7,
     "region": "アジア州",
     "pref": "アジア州ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "asia_bonus",
     "name": "アジア州ボーナス（中1漢字まとめ）",
     "enemyIdList": [
@@ -1518,10 +1490,6 @@
     "grade": 8,
     "region": "ヨーロッパ州",
     "pref": "ヨーロッパ州ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "europe_bonus",
     "name": "ヨーロッパ州ボーナス（中2漢字まとめ）",
     "enemyIdList": [
@@ -1829,10 +1797,6 @@
     "grade": 9,
     "region": "アメリカ州",
     "pref": "アメリカ州ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "america_bonus",
     "name": "アメリカ州ボーナス（中3漢字まとめ）",
     "enemyIdList": [
@@ -2184,10 +2148,6 @@
     "grade": 10,
     "region": "アフリカ州",
     "pref": "アフリカ州ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "africa_bonus",
     "name": "アフリカ州ボーナス（高1漢字まとめ）",
     "enemyIdList": [
@@ -2394,10 +2354,6 @@
     "grade": 11,
     "region": "四国",
     "pref": "四国ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "shikoku_bonus",
     "name": "四国ボーナス（小学校漢字まとめ）",
     "enemyIdList": [
@@ -3433,10 +3389,6 @@
     "grade": 12,
     "region": "九州",
     "pref": "九州ボーナス",
-    "pos": {
-      "x": 450,
-      "y": 380
-    },
     "stageId": "kyushu_bonus",
     "name": "九州ボーナス（全漢字まとめ）",
     "enemyIdList": [
