@@ -507,6 +507,16 @@ function getGradeFromStageId(stageId) {
   return null;
 }
 
+/**
+ * 学年別のモンスター（敵）データを取得する。
+ * 「学年まとめテスト」に、その学年で見慣れたモンスターを1体出すために使う。
+ * @param {number} grade
+ * @returns {Array} 見つからなければ空配列（呼び出し側でフォールバックする）
+ */
+export function getEnemiesByGrade(grade) {
+  return enemyData.filter(e => e && e.grade === grade && !e.isBoss);
+}
+
 // 学年別の漢字データを取得する関数をエクスポート
 export function getKanjiByGrade(grade) {
   // 既存の漢字データを使用

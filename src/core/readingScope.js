@@ -29,10 +29,12 @@ let enabledCache = null;
 
 function readFromStorage() {
   try {
-    // 既定は ON。弱点を出しておいて何でも通るほうが、示していることと食い違う。
-    return (localStorage.getItem(STORAGE_KEY) ?? '1') === '1';
+    // 既定は OFF（2026-09-05 変更）。「表示されている読み系統でないと攻撃が
+    // 通らない」ことが分かりづらく、遊びにくいという声を受けて既定を緩めた。
+    // 読みを絞って練習したい時は設定画面からいつでも ON にできる。
+    return (localStorage.getItem(STORAGE_KEY) ?? '0') === '1';
   } catch {
-    return true;
+    return false;
   }
 }
 

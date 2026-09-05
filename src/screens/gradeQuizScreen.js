@@ -1,9 +1,12 @@
 import { publish } from '../core/eventBus.js';
 import ReviewQueue from '../models/reviewQueue.js';
-import { getKanjiByGrade, getKanjiById } from '../loaders/dataLoader.js';
+import { getKanjiByGrade, getKanjiById, getEnemiesByGrade } from '../loaders/dataLoader.js';
+import { loadMonsterImage } from '../loaders/assetsLoader.js';
 import { gameState, recordKanjiAnswer, saveGameData } from '../core/gameState.js';
-import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
+import { drawStoneButton, drawGauge, isMouseOverRect } from '../ui/uiRenderer.js';
+import { drawRoundedRect } from '../ui/canvasUtils.js';
 import { toHiragana, getReadings, findNearMiss, getNearMissLines } from '../utils/readings.js';
+import { getGameCoordinates, isValidCoordinates, gameToScreenCoordinates } from '../utils/coordinateUtils.js';
 
 // 読みの正規化・取得は共通実装を使用（配列/文字列データ両対応）
 
@@ -14,12 +17,19 @@ const BTN = {
   select: { x: 480, y: 480, w: 140, h: 40, label: 'ステージ選択へ' },
 };
 
+// モンスターパネル（画面右側。漢字パネルとは canvasUtils.drawRoundedRect で角丸に揃える）
+const MONSTER_PANEL = { x: 560, y: 90, w: 220, h: 170 };
+// 漢字パネル（中央）。他のバトル画面と違い出題は1体固定なので、位置は固定値でよい
+const KANJI_BOX = { centerX: 380, centerY: 300, w: 200, h: 200 };
+
 const gradeQuizScreen = {
   canvas: null,
   ctx: null,
   inputEl: null,
   _keydownHandler: null,
   _clickHandler: null,
+  _resizeHandler: null,
+  _kanapadLayoutHandler: null,
 
   // パラメータ
   grade: 0,
@@ -40,6 +50,11 @@ const gradeQuizScreen = {
     wrong: 0,
     answers: [], // { id, ok, userAnswer, correctReadings }
   },
+
+  // 見た目だけの「モンスター」。実際の攻撃判定やダメージ計算はせず、
+  // 残り問題数に応じてHPゲージが減っていく進捗演出として使う。
+  enemy: null,
+  enemyImg: null,
 
   enter(arg) {
     // Canvas 取得（引数 or DOM）
@@ -70,6 +85,17 @@ const gradeQuizScreen = {
     if (this._advanceTimer) { clearTimeout(this._advanceTimer); this._advanceTimer = null; }
     this._loadCurrent();
 
+    // モンスターは見た目の演出用に1体だけ選ぶ（学年に敵がいなければ表示しない）
+    this.enemy = null;
+    this.enemyImg = null;
+    try {
+      const enemyPool = getEnemiesByGrade(this.grade);
+      if (enemyPool.length > 0) {
+        this.enemy = enemyPool[Math.floor(Math.random() * enemyPool.length)];
+        loadMonsterImage(this.enemy).then(img => { this.enemyImg = img; }).catch(() => {});
+      }
+    } catch {}
+
     // 入力欄
     this.inputEl = document.getElementById('kanjiInput');
     if (this.inputEl) {
@@ -83,10 +109,28 @@ const gradeQuizScreen = {
       this.inputEl.addEventListener('keydown', this._keydownHandler);
     }
 
+    // 画面固定（vh-lock）を有効化。canvas がパッドの高さぶん縮む仕組み
+    // （index.html の #gameCanvas.vh-lock）は他のバトル画面と共通で使う。
+    // これが無いと、他の画面と違って canvas がアスペクト比を保たず伸び縮みし、
+    // 入力欄も静的な座標に取り残されて画面が崩れて見える。
+    requestAnimationFrame(() => {
+      document.documentElement.classList.add('vh-lock');
+      document.body.classList.add('vh-lock');
+      if (this.canvas) this.canvas.classList.add('vh-lock');
+      this._adjustInputPosition();
+    });
+    this._resizeHandler = () => this._adjustInputPosition();
+    window.addEventListener('resize', this._resizeHandler);
+    // 50音パッドの出し入れで canvas の高さが変わった時も、入力欄を追従させる
+    this._kanapadLayoutHandler = () => this._adjustInputPosition();
+    window.addEventListener('kanapad:layout', this._kanapadLayoutHandler);
+
     // クリック（戻る/リザルト操作）
+    // 座標変換は他のバトル画面と同じ共通実装（object-fit:contain の黒帯を除いて計算する）を使う
     this._clickHandler = e => {
-      const r = this.canvas.getBoundingClientRect();
-      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const coords = getGameCoordinates(e, this.canvas);
+      if (!isValidCoordinates(coords)) return; // 黒帯エリアのクリックは無視
+      const { x, y } = coords;
       if (isMouseOverRect(x, y, BTN.back)) {
         publish('changeScreen', 'stageSelect');
         return;
@@ -112,6 +156,47 @@ const gradeQuizScreen = {
       }
     };
     this.canvas.addEventListener('click', this._clickHandler);
+  },
+
+  /**
+   * 入力欄を漢字パネルの直下に、canvas の実表示サイズに合わせて配置する。
+   * 他のバトル画面（battleScreen.js の _adjustInputPosition）と同じ考え方の簡易版。
+   * canvas の内部解像度は 800x600 固定で、CSS 表示サイズは vh-lock と
+   * 50音パッドの開閉で変わるため、都度 getBoundingClientRect() から計算し直す。
+   */
+  _adjustInputPosition() {
+    if (!this.canvas || !this.inputEl) return;
+    // 結果画面では入力欄そのものを隠すので、ここで !important の display:block を
+    // 立て直してしまわないよう抜ける（resize や 50音パッドの開閉はどの phase でも起こる）
+    if (this.phase !== 'quiz') return;
+    try {
+      const rect = this.canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const boxBottom = KANJI_BOX.centerY + KANJI_BOX.h / 2;
+      // フィードバック文言（漢字パネル直下、+16の位置）と重ならないよう、
+      // 入力欄はその下に離して置く
+      // object-fit:contain の黒帯を除いた実コンテンツ位置に合わせる（他のバトル画面と共通の変換）
+      const { x: cssX, y: cssY } = gameToScreenCoordinates(KANJI_BOX.centerX, boxBottom + 70, this.canvas);
+
+      const el = this.inputEl;
+      const s = el.style;
+      s.setProperty('display', 'block', 'important');
+      s.setProperty('position', 'fixed', 'important');
+      s.setProperty('left', `${cssX}px`, 'important');
+      s.setProperty('top', `${cssY}px`, 'important');
+      s.setProperty('transform', 'translateX(-50%)', 'important');
+      s.setProperty('z-index', '2147483647', 'important');
+      const isTablet = window.innerWidth <= 1024;
+      s.width = isTablet ? 'min(80vw, 320px)' : '280px';
+      s.fontSize = isTablet ? '18px' : '20px';
+      s.padding = '8px 12px';
+      s.textAlign = 'center';
+      s.backgroundColor = 'white';
+      s.border = '2px solid #ccc';
+      s.borderRadius = '5px';
+      s.boxSizing = 'border-box';
+      s.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    } catch {}
   },
 
   _loadCurrent() {
@@ -168,8 +253,9 @@ const gradeQuizScreen = {
       if (this.index >= this.order.length) {
         // 終了
         this.phase = 'result';
-        // 入力欄は隠す
-        if (this.inputEl) this.inputEl.style.display = 'none';
+        // 入力欄は隠す（_adjustInputPosition が !important で block を立てているため、
+        // 同じ強さで上書きしないと隠れない）
+        if (this.inputEl) this.inputEl.style.setProperty('display', 'none', 'important');
         // NOTE: recordKanjiAnswer はメモリ上の学習記録を増やすだけで、保存は
         // 既存のセーブ契機に相乗りする設計。力だめしにはその契機が無く、
         // 結果画面で閉じると1回分まるごと消えていたのでここで確定させる。
@@ -195,20 +281,27 @@ const gradeQuizScreen = {
     ctx.fillText(`学年まとめテスト（${this.grade}年）`, 20, 70);
 
     // 戻るボタン
-    drawButton(ctx, BTN.back.x, BTN.back.y, BTN.back.w, BTN.back.h, BTN.back.label);
+    drawStoneButton(ctx, BTN.back.x, BTN.back.y, BTN.back.w, BTN.back.h, BTN.back.label);
 
     if (this.phase === 'quiz') {
       // 進捗
       ctx.fillStyle = 'white';
       ctx.font = '18px "UDデジタル教科書体",sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
       ctx.fillText(`Q ${Math.min(this.index + 1, this.order.length)} / ${this.order.length}`, 20, 110);
 
-      // 中央の漢字ボックス
-      const x = canvas.width / 2, y = canvas.height / 2;
-      const w = 200, h = 200;
+      this._drawMonster(ctx);
+
+      // 中央の漢字パネル
+      const { centerX: x, centerY: y, w, h } = KANJI_BOX;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      drawRoundedRect(ctx, x - w / 2, y - h / 2, w, h, 12);
+      ctx.fill();
       ctx.strokeStyle = 'white';
       ctx.lineWidth = 2;
-      ctx.strokeRect(x - w / 2, y - h / 2, w, h);
+      drawRoundedRect(ctx, x - w / 2, y - h / 2, w, h, 12);
+      ctx.stroke();
 
       // 漢字本体
       ctx.fillStyle = 'white';
@@ -251,9 +344,40 @@ const gradeQuizScreen = {
       ctx.fillText('まちがえた漢字は「きょうのふくしゅう」に いれておいたよ', centerX, 216);
 
       // ボタン
-      drawButton(ctx, BTN.again.x, BTN.again.y, BTN.again.w, BTN.again.h, BTN.again.label);
-      drawButton(ctx, BTN.review.x, BTN.review.y, BTN.review.w, BTN.review.h, BTN.review.label);
-      drawButton(ctx, BTN.select.x, BTN.select.y, BTN.select.w, BTN.select.h, BTN.select.label);
+      drawStoneButton(ctx, BTN.again.x, BTN.again.y, BTN.again.w, BTN.again.h, BTN.again.label);
+      drawStoneButton(ctx, BTN.review.x, BTN.review.y, BTN.review.w, BTN.review.h, BTN.review.label);
+      drawStoneButton(ctx, BTN.select.x, BTN.select.y, BTN.select.w, BTN.select.h, BTN.select.label);
+    }
+  },
+
+  /**
+   * 見た目だけのモンスターパネル。実際に攻撃コマンドは無く、
+   * 「あと何問か」を HP ゲージとして重ねているだけの進捗演出。
+   */
+  _drawMonster(ctx) {
+    const { x, y, w, h } = MONSTER_PANEL;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    drawRoundedRect(ctx, x, y, w, h, 10);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.lineWidth = 2;
+    drawRoundedRect(ctx, x, y, w, h, 10);
+    ctx.stroke();
+
+    ctx.fillStyle = 'white';
+    ctx.font = '15px "UDデジタル教科書体",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(this.enemy?.name || 'モンスター', x + w / 2, y + 8);
+
+    // 残り問題数をHPゲージとして見せる（0問なら空、開始時は満タン）
+    const remaining = Math.max(0, this.order.length - this.index);
+    const hpRatio = this.order.length > 0 ? remaining / this.order.length : 0;
+    drawGauge(ctx, x + 14, y + 32, w - 28, 14, hpRatio, '#e74c3c');
+
+    if (this.enemyImg) {
+      const imgW = 150, imgH = 108;
+      ctx.drawImage(this.enemyImg, x + (w - imgW) / 2, y + 54, imgW, imgH);
     }
   },
 
@@ -265,14 +389,27 @@ const gradeQuizScreen = {
     try { saveGameData(); } catch {}
     if (this.inputEl && this._keydownHandler) {
       this.inputEl.removeEventListener('keydown', this._keydownHandler);
-      this.inputEl.style.display = 'none';
+      this.inputEl.style.setProperty('display', 'none', 'important');
     }
     if (this.canvas && this._clickHandler) {
       this.canvas.removeEventListener('click', this._clickHandler);
     }
+    if (this._resizeHandler) { window.removeEventListener('resize', this._resizeHandler); this._resizeHandler = null; }
+    if (this._kanapadLayoutHandler) { window.removeEventListener('kanapad:layout', this._kanapadLayoutHandler); this._kanapadLayoutHandler = null; }
+
+    // 画面固定（vh-lock）を無効化（1フレーム遅延で安全に解除。他画面と同じ作法）
+    const cvs = this.canvas;
+    requestAnimationFrame(() => {
+      document.documentElement.classList.remove('vh-lock');
+      document.body.classList.remove('vh-lock');
+      if (cvs) cvs.classList.remove('vh-lock');
+    });
+
     // 参照クリア
     this.canvas = this.ctx = this.inputEl = null;
     this._keydownHandler = this._clickHandler = null;
+    this.enemy = null;
+    this.enemyImg = null;
   },
 };
 
