@@ -15,13 +15,13 @@
 //   このパッドは値を書き込んで Enter を投げるだけにして、画面側のロジックには
 //   触らない。表示・非表示も入力欄の display を見て自分で決める。
 
-/** 五十音表（左から あ行→わ行、上から あ段→お段）。null は空きマス */
+/** 五十音表（学校の壁掛け表と同じく右から あ行→わ行、上から あ段→お段）。null は空きマス */
 const GOJUON_ROWS = [
-  ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ'],
-  ['い', 'き', 'し', 'ち', 'に', 'ひ', 'み', null, 'り', 'を'],
-  ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ん'],
-  ['え', 'け', 'せ', 'て', 'ね', 'へ', 'め', null, 'れ', null],
-  ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', null]
+  ['わ', 'ら', 'や', 'ま', 'は', 'な', 'た', 'さ', 'か', 'あ'],
+  ['を', 'り', null, 'み', 'ひ', 'に', 'ち', 'し', 'き', 'い'],
+  ['ん', 'る', 'ゆ', 'む', 'ふ', 'ぬ', 'つ', 'す', 'く', 'う'],
+  [null, 'れ', null, 'め', 'へ', 'ね', 'て', 'せ', 'け', 'え'],
+  [null, 'ろ', 'よ', 'も', 'ほ', 'の', 'と', 'そ', 'こ', 'お']
 ];
 
 /** 「゛」を付ける／外す */
@@ -59,6 +59,7 @@ function toggleLastChar(text, addMap, removeMap) {
 
 const STYLE_ID = 'kanaPadStyle';
 const PAD_ID = 'kanaPad';
+const TOGGLE_ID = 'kanaPadToggle';
 
 const CSS = `
 #${PAD_ID} {
@@ -113,10 +114,36 @@ const CSS = `
 #${PAD_ID} .kanaPad__tools button { background: #4a5b78; font-size: calc(clamp(13px, 3vw, 19px) * var(--yomitabi-text-scale, 1)); }
 #${PAD_ID} .kanaPad__tools button.kanaPad__submit { background: #2f8f4e; }
 #${PAD_ID} .kanaPad__tools button.kanaPad__erase { background: #6b5a3a; }
+
+/* 入力欄のすぐそばに置く「よみのいれかた」切替ボタン。
+   設定画面まで行かなくても、バトルの最中にワンタップで切り替えられるようにする。 */
+#${TOGGLE_ID} {
+  position: fixed;
+  z-index: 2147483646;
+  box-sizing: border-box;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(59, 74, 99, 0.92);
+  color: #fff;
+  font-family: "UDデジタル教科書体", "Hiragino Sans", sans-serif;
+  font-size: calc(11px * var(--yomitabi-text-scale, 1));
+  font-weight: bold;
+  line-height: 1.5;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+#${TOGGLE_ID}[hidden] { display: none; }
+#${TOGGLE_ID}:active { background: rgba(90, 113, 150, 0.95); }
 `;
 
 const KanaPad = {
   el: null,
+  toggleEl: null,
   inputEl: null,
   _observer: null,
   _installed: false,
@@ -141,12 +168,16 @@ const KanaPad = {
 
     this._injectStyle();
     this._buildPad();
+    this._buildToggle();
 
     // 入力欄の見え方が変わったらパッドの出し入れを合わせる。
     // 各画面が style を直接いじる作りなので、属性の変化を見るのが確実。
     this._observer = new MutationObserver(() => this.sync());
     this._observer.observe(this.inputEl, { attributes: true, attributeFilter: ['style', 'hidden'] });
-    window.addEventListener('resize', () => this._notifyLayout());
+    window.addEventListener('resize', () => {
+      this.sync();
+      this._notifyLayout();
+    });
 
     this._installed = true;
     this.sync();
@@ -189,6 +220,37 @@ const KanaPad = {
 
     document.body.appendChild(pad);
     this.el = pad;
+  },
+
+  /**
+   * バトル中に「よみの いれかた」（50音パッド／たんまつのキーボード）を
+   * ワンタップで切り替えられるボタン。設定画面(settingsScreen.js)にも同じ
+   * 項目があるが、対戦の途中でそこまで行くのは現実的でないため入力欄の
+   * そばに常設する。正史は同じ localStorage キー 'inputMethod'。
+   */
+  _buildToggle() {
+    if (document.getElementById(TOGGLE_ID)) {
+      this.toggleEl = document.getElementById(TOGGLE_ID);
+      return;
+    }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = TOGGLE_ID;
+    btn.hidden = true;
+    this._bindPress(btn, () => this._toggleMethod());
+    document.body.appendChild(btn);
+    this.toggleEl = btn;
+  },
+
+  _toggleMethod() {
+    const next = this.isEnabled() ? 'device' : 'kanaPad';
+    try { localStorage.setItem('inputMethod', next); } catch {}
+    this.sync();
+    // たんまつのキーボードに切り替えた直後にフォーカスしないと、
+    // 端末によっては（ユーザー操作の流れの中でないと）キーボードが開かない
+    if (next === 'device' && this.inputEl) {
+      try { this.inputEl.focus(); } catch {}
+    }
   },
 
   _makeKey(kana) {
@@ -275,18 +337,46 @@ const KanaPad = {
   /** 入力欄の見え方に合わせてパッドを出し入れする */
   sync() {
     if (!this.el || !this.inputEl) return;
-    const shouldOpen = this.isEnabled() && this._isInputVisible();
+    const visible = this._isInputVisible();
+    const enabled = this.isEnabled();
+    const shouldOpen = enabled && visible;
     const isOpen = this.el.classList.contains('kanaPad--open');
-    if (shouldOpen === isOpen) return;
-
-    this.el.classList.toggle('kanaPad--open', shouldOpen);
-    // パッドを出す時は端末のキーボードが出ないようにする。
-    // readOnly なら iPad でもタップでキーボードが上がってこない。
-    this.inputEl.readOnly = shouldOpen;
-    if (shouldOpen) {
-      try { this.inputEl.blur(); } catch {}
+    if (shouldOpen !== isOpen) {
+      this.el.classList.toggle('kanaPad--open', shouldOpen);
+      // パッドを出す時は端末のキーボードが出ないようにする。
+      // readOnly なら iPad でもタップでキーボードが上がってこない。
+      this.inputEl.readOnly = shouldOpen;
+      if (shouldOpen) {
+        try { this.inputEl.blur(); } catch {}
+      }
+      this._notifyLayout();
     }
-    this._notifyLayout();
+    // 切替ボタンの表示・文言・位置は開閉が変わらない時も追従させる必要がある
+    // （例: 入力欄が見えたまま画面だけ遷移した、端末キーボードのままリサイズした等）
+    this._syncToggle(visible, enabled);
+  },
+
+  /** 切替ボタンの表示・文言・位置を、入力欄の見え方に合わせて更新する */
+  _syncToggle(visible, enabled) {
+    if (!this.toggleEl) return;
+    this.toggleEl.hidden = !visible;
+    if (!visible) return;
+    this.toggleEl.textContent = enabled ? '⌨ たんまつで書く' : '🔤 50おんで書く';
+    this._positionToggle();
+  },
+
+  /** 入力欄のすぐ上・右寄せに置く。画面端に出ないようclampする */
+  _positionToggle() {
+    if (!this.inputEl || !this.toggleEl) return;
+    const rect = this.inputEl.getBoundingClientRect();
+    if (!rect.width && !rect.height) return;
+    const btnWidth = this.toggleEl.offsetWidth || 140;
+    const btnHeight = this.toggleEl.offsetHeight || 26;
+    let left = rect.right - btnWidth;
+    left = Math.max(4, Math.min(left, window.innerWidth - btnWidth - 4));
+    const top = Math.max(4, rect.top - btnHeight - 6);
+    this.toggleEl.style.left = `${left}px`;
+    this.toggleEl.style.top = `${top}px`;
   },
 
   /**
