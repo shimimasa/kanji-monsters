@@ -1,7 +1,7 @@
 import { publish } from '../core/eventBus.js';
 import ReviewQueue from '../models/reviewQueue.js';
-import { getKanjiByGrade, getKanjiById, getEnemiesByGrade } from '../loaders/dataLoader.js';
-import { loadMonsterImage } from '../loaders/assetsLoader.js';
+import { getKanjiByGrade, getKanjiById, getEnemiesByGrade, stageData } from '../loaders/dataLoader.js';
+import { loadMonsterImage, loadBgImage } from '../loaders/assetsLoader.js';
 import { gameState, recordKanjiAnswer, saveGameData } from '../core/gameState.js';
 import { drawStoneButton, drawGauge, isMouseOverRect } from '../ui/uiRenderer.js';
 import { drawRoundedRect } from '../ui/canvasUtils.js';
@@ -55,6 +55,8 @@ const gradeQuizScreen = {
   // 残り問題数に応じてHPゲージが減っていく進捗演出として使う。
   enemy: null,
   enemyImg: null,
+  // 単色の背景だと寂しいので、学年のステージからランダムに1枚借りる
+  stageBgImage: null,
 
   enter(arg) {
     // Canvas 取得（引数 or DOM）
@@ -93,6 +95,17 @@ const gradeQuizScreen = {
       if (enemyPool.length > 0) {
         this.enemy = enemyPool[Math.floor(Math.random() * enemyPool.length)];
         loadMonsterImage(this.enemy).then(img => { this.enemyImg = img; }).catch(() => {});
+      }
+    } catch {}
+
+    // 背景も単色だと寂しいので、学年のステージ背景から1枚ランダムに借りる。
+    // ステージ選択とは無関係な演出用途なので、選んだステージ自体は覚えておかない
+    this.stageBgImage = null;
+    try {
+      const stageCandidates = stageData.filter(s => s && s.grade === this.grade && !/^bonus_/i.test(String(s.stageId || '')));
+      if (stageCandidates.length > 0) {
+        const pickedStage = stageCandidates[Math.floor(Math.random() * stageCandidates.length)];
+        loadBgImage(pickedStage.stageId).then(img => { this.stageBgImage = img; }).catch(() => {});
       }
     } catch {}
 
@@ -269,9 +282,16 @@ const gradeQuizScreen = {
   update(dt) {
     const { ctx, canvas } = this;
     if (!ctx) return;
-    // 背景
-    ctx.fillStyle = '#1e3c72';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // 背景。単色だと寂しいので学年のステージ画像を敷き、白文字が沈まないよう
+    // 元の紺色を半透明で重ねる（パネル類は元々この紺色を前提にした薄いデザインのため）
+    if (this.stageBgImage) {
+      ctx.drawImage(this.stageBgImage, 0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(30, 60, 114, 0.55)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+      ctx.fillStyle = '#1e3c72';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
 
     // タイトル
     ctx.fillStyle = 'white';
