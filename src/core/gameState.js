@@ -399,8 +399,8 @@ function incrementStageClearCount(stageId) {
                 const autosaveMinutes = parseInt(localStorage.getItem('autosaveMinutes') || `${base.settings?.autosaveMinutes ?? 5}`, 10);
                 const cbMode = (localStorage.getItem('cbMode') ?? `${base.settings?.cbMode ? '1' : '0'}`) === '1';
                 const bigFont = (localStorage.getItem('bigFont') ?? `${base.settings?.bigFont ? '1' : '0'}`) === '1';
-                // 弱点の読み系統だけを正解にするか（既定は ON）
-                const weaknessScope = (localStorage.getItem('weaknessScope') ?? `${base.settings?.weaknessScope === false ? '0' : '1'}`) === '1';
+                // 弱点の読み系統だけを正解にするか（既定は OFF。2026-09-05 変更。readingScope.js と揃える）
+                const weaknessScope = (localStorage.getItem('weaknessScope') ?? `${base.settings?.weaknessScope === true ? '1' : '0'}`) === '1';
                 // 例文の中で読ませるモード（既定は OFF）
                 const exampleMode = (localStorage.getItem('exampleMode') ?? `${base.settings?.exampleMode ? '1' : '0'}`) === '1';
                 // 画面の漢字にふりがなを振るか（既定は OFF）
