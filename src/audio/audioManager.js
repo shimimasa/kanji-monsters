@@ -234,10 +234,11 @@ export class AudioManager {
      */
     async stopBGM(duration = 0) {
       if (!this.#currentBGM) return;
-      await this.#fadeOut(this.#currentBGM, duration);
-      this.#currentBGM.pause();
-      this.#currentBGM.currentTime = 0;
-      this.#currentBGM = null;
+      const stopping = this.#currentBGM;
+      await this.#fadeOut(stopping, duration);
+      stopping.pause();
+      stopping.currentTime = 0;
+      if (this.#currentBGM === stopping) this.#currentBGM = null;
     }
   
     /*───────────────────────
@@ -429,4 +430,3 @@ export class AudioManager {
       console.log('音量設定読み込み - BGM:', this.#bgmVolume, 'SE:', this.#seVolume);
     }
 }
-  

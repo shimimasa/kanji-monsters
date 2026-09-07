@@ -1,10 +1,10 @@
 {
-    "name": "漢字読みバトル",
-    "short_name": "漢字バトル",
+    "name": "漢字ヨミタビ",
+    "short_name": "ヨミタビ",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#000000",
-    "theme_color": "#1e90ff",
+    "background_color": "#16233a",
+    "theme_color": "#8b4513",
     "icons": [
       {
         "src": "/assets/images/icons/icon-192x192.png",

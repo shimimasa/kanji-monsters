@@ -1,4 +1,5 @@
 // src/utils/coordinateUtils.js - 完全な座標変換ソリューション
+import { getContainedRect } from '../ui/viewportLayout.js';
 
 /**
  * 全画面対応の堅牢な座標変換ユーティリティ
@@ -24,47 +25,15 @@ export function getGameCoordinates(event, canvas) {
   
     // Canvas要素の表示情報を取得
     const rect = canvas.getBoundingClientRect();
-    const canvasDisplayWidth = rect.width;
-    const canvasDisplayHeight = rect.height;
     const canvasInternalWidth = canvas.width;
     const canvasInternalHeight = canvas.height;
-  
-    // アスペクト比の計算
-    const internalAspect = canvasInternalWidth / canvasInternalHeight;
-    const displayAspect = canvasDisplayWidth / canvasDisplayHeight;
-  
-    // 表示領域内での相対座標（0～1）
-    let relativeX = (clientX - rect.left) / canvasDisplayWidth;
-    let relativeY = (clientY - rect.top) / canvasDisplayHeight;
-  
-    // object-fit: contain による黒帯（レターボックス/ピラーボックス）の補正
-    if (Math.abs(internalAspect - displayAspect) > 0.001) {
-      if (displayAspect > internalAspect) {
-        // 横長表示（左右に黒帯） - ピラーボックス
-        const actualContentWidth = canvasDisplayHeight * internalAspect;
-        const horizontalPadding = (canvasDisplayWidth - actualContentWidth) / 2;
-        
-        // 黒帯領域のクリックは無視
-        if (clientX < rect.left + horizontalPadding || 
-            clientX > rect.left + horizontalPadding + actualContentWidth) {
-          return { x: -1, y: -1 }; // 無効座標を返す
-        }
-        
-        relativeX = (clientX - rect.left - horizontalPadding) / actualContentWidth;
-      } else {
-        // 縦長表示（上下に黒帯） - レターボックス
-        const actualContentHeight = canvasDisplayWidth / internalAspect;
-        const verticalPadding = (canvasDisplayHeight - actualContentHeight) / 2;
-        
-        // 黒帯領域のクリックは無視
-        if (clientY < rect.top + verticalPadding || 
-            clientY > rect.top + verticalPadding + actualContentHeight) {
-          return { x: -1, y: -1 }; // 無効座標を返す
-        }
-        
-        relativeY = (clientY - rect.top - verticalPadding) / actualContentHeight;
-      }
+    const content = getContainedRect(rect, canvasInternalWidth, canvasInternalHeight);
+    if (clientX < content.left || clientX > content.left + content.width ||
+        clientY < content.top || clientY > content.top + content.height) {
+      return { x: -1, y: -1 };
     }
+    let relativeX = (clientX - content.left) / content.width;
+    let relativeY = (clientY - content.top) / content.height;
   
     // 範囲制限（安全措置）
     relativeX = Math.max(0, Math.min(1, relativeX));
@@ -115,30 +84,12 @@ export function getGameCoordinates(event, canvas) {
    * @returns {{x: number, y: number, scale: number}} 画面座標と表示スケール
    */
   export function gameToScreenCoordinates(gameX, gameY, canvas) {
-    const rect = canvas.getBoundingClientRect();
-    const internalAspect = canvas.width / canvas.height;
-    const displayAspect = rect.width / rect.height;
-
-    let contentLeft = rect.left;
-    let contentTop = rect.top;
-    let contentWidth = rect.width;
-    let contentHeight = rect.height;
-
-    // object-fit: contain による黒帯を除いた実コンテンツ領域を求める
-    if (Math.abs(internalAspect - displayAspect) > 0.001) {
-      if (displayAspect > internalAspect) {
-        contentWidth = rect.height * internalAspect;
-        contentLeft = rect.left + (rect.width - contentWidth) / 2;
-      } else {
-        contentHeight = rect.width / internalAspect;
-        contentTop = rect.top + (rect.height - contentHeight) / 2;
-      }
-    }
+    const content = getContainedRect(canvas.getBoundingClientRect(), canvas.width, canvas.height);
 
     return {
-      x: contentLeft + (gameX / canvas.width) * contentWidth,
-      y: contentTop + (gameY / canvas.height) * contentHeight,
-      scale: contentWidth / canvas.width
+      x: content.left + (gameX / canvas.width) * content.width,
+      y: content.top + (gameY / canvas.height) * content.height,
+      scale: content.scale
     };
   }
   

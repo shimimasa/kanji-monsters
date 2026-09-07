@@ -206,7 +206,7 @@ const NEAR_MISS_MESSAGES = {
  * @returns {string[]} 表示用の行
  */
 export function getNearMissLines(nearMiss, attempt = 1) {
-  const lines = ['よめてるよ！ おしい！', NEAR_MISS_MESSAGES[nearMiss.kind] || NEAR_MISS_MESSAGES.other];
+  const lines = ['おしい！ もういちど かいてみよう', NEAR_MISS_MESSAGES[nearMiss.kind] || NEAR_MISS_MESSAGES.other];
   if (attempt >= 2) lines.push(`「${nearMiss.reading}」だよ`);
   return lines;
 }

@@ -1,0 +1,62 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {installStorage,quota} from '../phase-a/storage-helper.mjs';
+const storage=installStorage();
+const {getDefaultSave,saveNow}=await import('../../src/core/saveData.js');
+const {loadGameData,gameState}=await import('../../src/core/gameState.js');
+const {subscribe}=await import('../../src/core/eventBus.js');
+const {default:battle}=await import('../../src/screens/battleScreen.js');
+const {default:title}=await import('../../src/screens/titleScreen.js');
+const {default:name}=await import('../../src/screens/playerNameInputScreen.js');
+const firebaseController=await import('../../src/services/firebase/firebaseController.js');
+const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
+const silent=t=>{for(const k of ['log','warn','error'])t.mock.method(console,k,()=>{});};
+test('E03: title manual save quota displays failure, never success',async t=>{
+  silent(t);saveNow(getDefaultSave(),{replace:true});await loadGameData();
+  let button;globalThis.document={getElementById:()=>null,createElement:()=>({style:{}}),body:{appendChild:b=>button=b}};
+  const messages=[];t.mock.method(title,'_showSaveToast',s=>messages.push(s));title._injectSaveButton();
+  const before=storage.getItem('krb_save');storage.fail=(op,key)=>{if(op==='set'&&key==='yomitabi_phase_a_pending')throw quota();};
+  await button.onclick();await new Promise(r=>setTimeout(r,30));
+  storage.fail=null;assert.equal(storage.getItem('krb_save'),before);
+  assert.ok(messages.some(s=>s.includes('できません')));assert.ok(!messages.includes('セーブしました'));
+  await button.onclick();assert.equal(messages.filter(s=>s==='セーブしました').length,1);
+  delete globalThis.document;
+});
+test('U05: level-up with reduced motion starts no Canvas interval',t=>{
+  silent(t);globalThis.window={matchMedia:()=>({matches:true})};
+  let count=0;t.mock.method(globalThis,'setInterval',()=>++count);
+  battle.canvas={style:{}};battle.startLevelUpEffect();
+  assert.equal(count,0);assert.equal(battle.levelUpEffect.active,true);
+  delete globalThis.window;
+});
+test('E08: level-up callback cannot touch a released Canvas',t=>{
+  silent(t);globalThis.window={matchMedia:()=>({matches:false})};
+  const callbacks=[];t.mock.method(globalThis,'setInterval',fn=>{callbacks.push(fn);return callbacks.length;});
+  t.mock.method(globalThis,'clearInterval',()=>{});
+  battle._active=true;battle.canvas={style:{}};battle.startLevelUpEffect();
+  battle._active=false;battle._generation++;battle.canvas=null;
+  for(const callback of callbacks)assert.doesNotThrow(callback);
+  delete globalThis.window;
+});
+for(const mode of ['reject','pending']) test(`E06: auth ${mode} settles without creating a save`,async t=>{
+  silent(t);storage.clear();t.mock.timers.enable({apis:['setTimeout']});
+  const auth={currentUser:null,signInAnonymously:()=>mode==='reject'?Promise.reject(Error('auth failed')):new Promise(()=>{})};
+  globalThis.firebase={apps:[{}],auth:()=>auth,firestore:()=>({enablePersistence:async()=>{}})};
+  firebaseController.initializeFirebaseServices();let settled=false;
+  firebaseController.signInAnonymouslyIfNeeded().then(()=>{settled=true},()=>{settled=true});
+  await flush();t.mock.timers.tick(11000);await flush();
+  assert.equal(settled,true);assert.equal(storage.getItem('krb_save'),null);delete globalThis.firebase;
+});
+test('E06/E08: actual name confirmation proceeds locally while cloud is pending; late cloud causes no transition',async t=>{
+  silent(t);saveNow(getDefaultSave(),{replace:true});await loadGameData();
+  let finish;const pending=new Promise(r=>finish=r);const user={uid:'test-child'};
+  const db={enablePersistence:async()=>{},collection(){return this},doc(){return this},runTransaction:()=>pending};
+  globalThis.firebase={apps:[{}],auth:()=>({currentUser:user}),firestore:()=>db};firebaseController.initializeFirebaseServices();
+  const transitions=[];const listener=screen=>transitions.push(screen);subscribe('changeScreen',listener);
+  t.after(()=>{delete globalThis.firebase;});
+  name.nameInputElement={value:'あお'};let done=false;
+  name.submitNameAndSave().then(()=>done=true);await flush();
+  assert.equal(done,true);assert.deepEqual(transitions,['courseSelect']);
+  name.nameInputElement=null;finish();await flush();assert.deepEqual(transitions,['courseSelect']);
+  assert.equal(gameState.playerName,'あお');
+});

@@ -2,10 +2,14 @@ import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { drawButton, isMouseOverRect, drawText } from '../ui/uiRenderer.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
 
 const courseSelectScreen = {
+  _lifecycle: createScreenLifecycle(),
   /** 画面表示時の初期化 */
   enter(canvas) {
+    // Tutorial開始はこの入場世代に所属させ、再入場で旧予約を復活させない。
+    this._lifecycle.activate();
     // canvas が未渡しの場合は DOM から取得
     this.canvas = canvas || document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
@@ -42,14 +46,14 @@ const courseSelectScreen = {
       this._inputBlockUntil = ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) + 350;
     
       // チュートリアル（ゲーム全体の説明）
-      import('../tutorial/TutorialManager.js').then(m =>
+      import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m =>
         m.default.startIfNeeded('courseSelect', {
           canvas: this.canvas,
           japan:  this.japanButton,
           world:  this.worldButton,
           back:   this.backButton
         })
-      );
+      ));
   },
 
   /** 毎フレーム呼び出し（描画） */
@@ -88,7 +92,7 @@ const courseSelectScreen = {
     this._drawCourseArea(
       ctx,
       this.worldButton,
-      '世界編（中学生の漢字）',
+      '世界編（漢検4級〜2級）',
       images.worldMap
     );
         // ヒントテキスト
@@ -136,6 +140,7 @@ const courseSelectScreen = {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    this._lifecycle.deactivate();
     this.unregisterHandlers();
     this.canvas = null;
     this.ctx = null;

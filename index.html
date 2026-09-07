@@ -5,35 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=overlays-content, viewport-fit=cover">
   <title>漢字ヨミタビ</title>
   <link rel="stylesheet" href="/style.css" />
-  <style>
-    body { margin: 0; background:#222; color:#fff; text-align:center; }
-    #kanjiInput { position: absolute; top: 350px; left: 50%; transform: translateX(-50%); width: 280px; padding: 6px 8px; font-size: 20px; text-align: center; display: none; }
-    .progress-bar { height: 24px; background: #1e90ff; }
-
-        /* ▼ iOS向け：コンテンツ高さを“最大ビューポート”に固定（必要時のみ） */
-html.vh-lock, body.vh-lock { height: 100dvh; overflow: hidden; }
-@supports not (height: 100dvh) { html.vh-lock, body.vh-lock { height: 100svh; } }
-@supports not (height: 100svh) { html.vh-lock, body.vh-lock { height: 100lvh; } }
-/* 50音パッドは画面に被せるのではなく、場所を取るものとして扱う。
-   canvas をパッドの高さぶん縮めることで、こうげき・かいふく・ヒントの
-   ボタンやHPパネルがパッドの裏に入らなくなる。
-   --kanapad-height は kanaPad.js が出し入れのたびに立てる（閉じていれば 0px）。
-   canvas の内部解像度は 800x600（4:3）固定（main.js）。object-fit:contain と
-   組み合わせて width/height をそのまま 100vw / calc(...) にすると、パッドが
-   開いた時に表示比率が横長になりすぎて 4:3 の中身が縦横とも大きく縮み、
-   モンスターやUIが小さすぎて見えなくなる。max-width/max-height で 4:3 を
-   超えないよう縦横どちらかを頭打ちにし、margin:auto で余白側を中央寄せする。 */
-#gameCanvas.vh-lock {
-  position: fixed;
-  inset: 0;
-  bottom: var(--kanapad-height, 0px);
-  margin: auto;
-  width: 100vw;
-  height: calc(100dvh - var(--kanapad-height, 0px));
-  max-width: calc((100dvh - var(--kanapad-height, 0px)) * 4 / 3);
-  max-height: calc(100vw * 3 / 4);
-}
-  </style>
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#1e90ff" />
 </head>
@@ -53,13 +24,27 @@ html.vh-lock, body.vh-lock { height: 100dvh; overflow: hidden; }
     (async () => {
       try {
         const regs = await navigator.serviceWorker.getRegistrations();
-        const controlled = !!navigator.serviceWorker.controller;
-        if (!regs.length && !controlled) return;
+        const isYomitabiCache = name => /^(learning-platform-v1|kanji-battle-|yomitabi-)/.test(name);
+        const isYomitabiWorker = registration => {
+          const worker = registration.active || registration.waiting || registration.installing;
+          try {
+            const url = new URL(worker?.scriptURL || '', location.href);
+            return url.origin === location.origin && url.pathname === '/sw.js';
+          } catch { return false; }
+        };
+        const ownRegs = regs.filter(isYomitabiWorker);
+        const controlled = (() => {
+          try {
+            const url = new URL(navigator.serviceWorker.controller?.scriptURL || '', location.href);
+            return url.origin === location.origin && url.pathname === '/sw.js';
+          } catch { return false; }
+        })();
+        if (!ownRegs.length && !controlled) return;
 
-        await Promise.all(regs.map(r => r.unregister().catch(() => {})));
+        await Promise.all(ownRegs.map(r => r.unregister().catch(() => {})));
         if (window.caches) {
           const names = await caches.keys();
-          await Promise.all(names.map(n => caches.delete(n).catch(() => {})));
+          await Promise.all(names.filter(isYomitabiCache).map(n => caches.delete(n).catch(() => {})));
         }
 
         // 読み直しは1回だけ。ループにならないようセッションに印を置く。
@@ -79,11 +64,6 @@ html.vh-lock, body.vh-lock { height: 100dvh; overflow: hidden; }
   <div id="monsterContainer"></div>
   <!-- バトル時だけ表示する入力欄 -->
   <input type="text" id="kanjiInput" autocomplete="off" />
-
-  <!-- Firebase ― 初回だけ読めば十分なので defer 不要 -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
   <!-- 最後にアプリ本体を module で読み込む -->
   <script type="module" src="/src/main.js"></script>

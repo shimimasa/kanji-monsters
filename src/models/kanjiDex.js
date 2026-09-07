@@ -1,3 +1,4 @@
+import { saveGameData } from '../core/gameState.js';
 // src/kanjiDex.js
 // 漢字図鑑管理モジュール
 // localStorage に Set<string> 形式で永続化
@@ -36,16 +37,7 @@ export function loadDex() {
  * @param {Set<string>} dex
  */
 export function saveDex(dex) {
-  try {
-    const dataToSave = [...dex];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-    console.log('【図鑑】データを保存しました。収集数:', dex.size);
-    import('../services/firebase/firebaseController.js')
-      .then(m => m.syncAllCaches?.())
-      .catch(() => {});
-  } catch (e) {
-    console.error('kanjiDex: 図鑑の保存に失敗しました', e);
-  }
+  return saveGameData(save => { save.player.collection.kanjiIds = [...dex]; });
 }
 
 /**

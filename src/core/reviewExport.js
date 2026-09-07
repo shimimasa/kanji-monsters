@@ -62,7 +62,9 @@ export function buildKanjiCsv() {
 
   const rows = [[
     '学年', '漢字', 'ID', '音読み', '訓読み',
-    'よめた回数', 'まだの回数', 'であった回数', 'よめた割合(%)', 'つぎに であう予定'
+    '正解入力回数（支援含む）', 'ヒントなし正解入力回数', 'ヒントあり正解入力回数',
+    '答え表示後正解入力回数', '支援不明の旧正解回数', '読みちがい確定回数',
+    '回答確定回数', '正解入力割合(%)', 'つぎに であう予定'
   ]];
 
   const ids = Object.keys(stats).sort((a, b) => {
@@ -81,6 +83,12 @@ export function buildKanjiCsv() {
 
     const k = byId.get(id);
     const due = dueById.get(id);
+    const observed = entry.observed?.correct || {};
+    const independent = observed.independent || 0;
+    const hinted = (observed.hint1 || 0) + (observed.hint2 || 0) + (observed.hint3 || 0);
+    const revealed = observed.revealed || 0;
+    const knownSupport = independent + hinted + revealed + (observed.unknown || 0);
+    const legacyUnknown = Math.max(0, correct - knownSupport) + (observed.unknown || 0);
 
     rows.push([
       k?.grade ?? '',
@@ -89,6 +97,10 @@ export function buildKanjiCsv() {
       joinReadings(k?.onyomi),
       joinReadings(k?.kunyomi),
       correct,
+      independent,
+      hinted,
+      revealed,
+      legacyUnknown,
       incorrect,
       total,
       Math.round((correct / total) * 100),
@@ -105,15 +117,19 @@ export function buildKanjiCsv() {
  */
 export function buildDailyCsv() {
   const daily = gameState.dailyAnswerStats || {};
-  const rows = [['日付', 'よめた回数', 'といた回数', 'よめた割合(%)']];
+  const rows = [['日付', '正解入力回数（支援含む）', 'ヒントなし正解入力回数', 'ヒントあり正解入力回数', '答え表示後正解入力回数', 'といた回数', '正解入力割合(%)']];
 
   for (const day of Object.keys(daily).sort()) {
     const entry = daily[day] || {};
     const correct = entry.correct || 0;
     const total = entry.total || 0;
+    const observed = entry.observed?.correct || {};
     rows.push([
       day,
       correct,
+      observed.independent || 0,
+      (observed.hint1 || 0) + (observed.hint2 || 0) + (observed.hint3 || 0),
+      observed.revealed || 0,
       total,
       total > 0 ? Math.round((correct / total) * 100) : ''
     ]);

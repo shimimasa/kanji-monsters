@@ -950,6 +950,9 @@ this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
                   ctx.fillStyle = '#FFFFFF';
                   ctx.font = '16px sans-serif';
                   ctx.fillText('✓', button.x + 10, button.y + 5);
+                  ctx.font = 'bold 12px "UDデジタル教科書体", sans-serif';
+                  ctx.textAlign = 'center';
+                  ctx.fillText('もういちど押すと しゅっぱつ', button.x + button.width / 2, button.y + button.height - 17);
                 }
         
                 // クリア状況（星アイコン）

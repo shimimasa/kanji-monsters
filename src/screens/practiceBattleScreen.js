@@ -1,19 +1,25 @@
+import { prefersReducedMotion } from '../ui/motionPreferences.js';
+import { getLearningControls, drawLearningButton, placeLearningInput } from '../ui/learningControls.js';
+import { isMouseOverRect } from '../ui/uiRenderer.js';
 // 練習バトル画面 - UI改善版（ボタンレス・統計強化・フィードバック改善）
 
 import battleScreenState from './battleScreen.js';
-import { gameState, battleState, saveGameData, recordKanjiAnswer } from '../core/gameState.js';
+import { gameState, battleState, saveGameData, beginQuestion } from '../core/gameState.js';
 import { getKanjiByStageId, isKanjiMastered } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
-import reviewQueue from '../models/reviewQueue.js';
 import { images, loadBgImage } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { findNearMiss, getNearMissLines } from '../utils/readings.js';
 import Speech from '../audio/speech.js';
+import { bindInputSubmission } from '../core/answerSubmission.js';
+import { commitLearningOutcome } from '../core/learningOutcome.js';
 // 練習バトル画面状態
 const practiceBattleScreenState = {
   // 既存のbattleScreenStateの全機能を継承
   ...battleScreenState,
+  recordSource: 'practice',
+  practiceComplete: false,
   
   // マスターモード専用のプロパティ
 practiceMode: true,
@@ -81,6 +87,8 @@ wrongTargets: { ids: new Set(), texts: new Set() },
    * 練習バトル画面への入場処理
    */
   enter(canvasEl, onComplete) {
+    const entryLifecycle = this._beginScreenLifecycle();
+    this.practiceComplete = false;
     console.log('🎯 練習バトル開始:', gameState.currentStageId);
 
     try {
@@ -123,9 +131,9 @@ try {
       const pick = candidates[Math.floor(Math.random() * candidates.length)];
       this._candidateStageForBonus = pick;
       // 画像が未キャッシュでも確実にロードして適用
-      loadBgImage(pick.stageId).then(img => {
+      loadBgImage(pick.stageId).then(this._lifecycle.guard(img => {
         if (img) this.stageBgImage = img;
-      });
+      }));
       // BGMキー（親のロジックで候補IDから算出）
       if (typeof battleScreenState.getBGMKeyForStage === 'function') {
         this._preselectedBonusBgmKey = battleScreenState.getBGMKeyForStage.call(this, pick.stageId);
@@ -138,7 +146,7 @@ try {
   }
 }
       
-      import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('practiceBattle', { canvas: canvasEl }));
+      import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => m.default.startIfNeeded('practiceBattle', { canvas: canvasEl })));
       
       // 練習統計の初期化
       this.practiceStats.startTime = Date.now();
@@ -150,12 +158,12 @@ try {
       this._setupPracticeHandlers();
       
             // 通常のバトル画面初期化を実行
-            battleScreenState.enter.call(this, canvasEl);
+            battleScreenState.enter.call(this, canvasEl, undefined, entryLifecycle);
 
             this._setupGlobalBackHandler();
                   // 画面固定（vh-lock）を有効化
       try {
-        requestAnimationFrame(() => {
+        this._lifecycle.requestAnimationFrame(() => {
           document.documentElement.classList.add('vh-lock');
           document.body.classList.add('vh-lock');
           if (this.canvas) this.canvas.classList.add('vh-lock');
@@ -168,7 +176,7 @@ try {
   if (!isBonus) {
     this.stageBgImage = (images && images[`bg_${gameState.currentStageId}`]) || this.stageBgImage || null;
     if (!this.stageBgImage) {
-      loadBgImage(gameState.currentStageId).then(img => { this.stageBgImage = img; });
+      loadBgImage(gameState.currentStageId).then(this._lifecycle.guard(img => { this.stageBgImage = img; }));
     }
   }
 } catch {}
@@ -197,7 +205,7 @@ try {
       
     } catch (error) {
       console.error('❌ 練習バトル画面の初期化に失敗:', error);
-      setTimeout(() => {
+      this._lifecycle.setTimeout(() => {
         const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
         publish('changeScreen', target);
       }, 100);
@@ -333,12 +341,22 @@ try {
         return;
       }
       
+      this._answerSubmission?.dispose?.();
+      this._answerSubmission = bindInputSubmission(this.inputEl, () => {
+        this.handlePracticeAnswer();
+        return battleState.inputEnabled === false;
+      }, { command: () => {
+        if (this.practiceComplete) {
+          this.practiceComplete = false;
+          this.reviewMode = true;
+          battleState.inputEnabled = true;
+          this._pickNextReviewQuestion();
+          return true;
+        }
+        return false;
+      } });
       this._practiceKeydownHandler = (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          console.log('⌨️ Enterキー押下 - 解答実行');
-          this.handlePracticeAnswer();
-        } else if (e.key === ' ') {
+        if (e.key === ' ' && !e.isComposing && e.keyCode !== 229 && !this._answerSubmission.composing) {
           e.preventDefault();
           console.log('⌨️ スペースキー押下 - ヒント表示');
           this.handlePracticeHint();
@@ -604,9 +622,9 @@ if (this.unmasteredKanji.length === 0) {
   if (this.wrongOnlyMode) {
     this._completeQuickReview();
   } else {
-    // 全マスター後はレビューモードへ移行し、以降は○で隠した読みのみを出題
+    // 完了を表示して止まり、子どもが続けるか戻るかを選ぶ
     if (!this.reviewMode) {
-      this._enterReviewMode();
+      this._completePractice();
     } else {
       this._pickNextReviewQuestion();
     }
@@ -642,6 +660,7 @@ if (this.unmasteredKanji.length === 0) {
       };
 
       gameState.currentKanji = {
+          _recordQuestion: beginQuestion(this.recordSource),
         id: selectedKanji.id,
         text: selectedKanji.kanji,
         kunyomi: processReadings(selectedKanji.kunyomi),
@@ -651,6 +670,7 @@ if (this.unmasteredKanji.length === 0) {
         radical: selectedKanji.radical || '',
         jlpt: selectedKanji.jlpt || '',
       };
+      this._answerSubmission?.unlock?.();
       
       gameState.hintLevel = 0;
       
@@ -728,6 +748,7 @@ if (this.unmasteredKanji.length === 0) {
   
         
         gameState.currentKanji = {
+          _recordQuestion: beginQuestion(this.recordSource),
           id: selectedKanji.id,
           text: selectedKanji.kanji,
           kunyomi: normalizeReadings(selectedKanji.kunyomi),
@@ -737,6 +758,7 @@ if (this.unmasteredKanji.length === 0) {
           radical: selectedKanji.radical || '',
           jlpt: selectedKanji.jlpt || '',
         };
+        this._answerSubmission?.unlock?.();
   
         // マスク対象の読みを1つ決定
         const allReadings = this._getReadings(gameState.currentKanji);
@@ -792,7 +814,6 @@ if (this.unmasteredKanji.length === 0) {
       
       // 解答時間を計算
       const answerTime = Date.now() - this.practiceStats.lastQuestionTime;
-      this.practiceStats.timePerQuestion.push(answerTime);
       
       const correctReadings = this._getReadings(gameState.currentKanji);
         const isCorrect = this.reviewMode
@@ -809,6 +830,17 @@ if (this.unmasteredKanji.length === 0) {
         if (this._handleNearMiss(answer, targets.filter(Boolean))) return;
       }
 
+      const learningOutcome = commitLearningOutcome(gameState.currentKanji.id, isCorrect, {
+        question: gameState.currentKanji._recordQuestion, source: this.recordSource,
+        reading: answer, hintLevel: gameState.hintLevel,
+        answerRevealed: !!gameState.currentKanji._retryAnswerRevealed || battleState.nearMissCount >= 2,
+      });
+      if (!learningOutcome.ok) {
+        battleState.inputEnabled = true;
+        this.nearMissNotice = { lines: ['ほぞんできませんでした。もう一度こたえてね。'], until: Date.now() + 5000 };
+        return;
+      }
+      this.practiceStats.timePerQuestion.push(answerTime);
       this.practiceStats.totalPracticed++;
       this._updateTodaysPracticeCount();
       inputEl.value = '';
@@ -819,7 +851,7 @@ if (this.unmasteredKanji.length === 0) {
       if (isCorrect) {
         this.practiceStats.correctStreak++;
         this.practiceStats.maxStreak = Math.max(this.practiceStats.maxStreak, this.practiceStats.correctStreak);
-        this._handlePracticeCorrect(answer);
+        this._handlePracticeCorrect(answer, learningOutcome);
       } else {
         this.practiceStats.correctStreak = 0;
         this._handlePracticeIncorrect(answer);
@@ -879,7 +911,7 @@ if (this.unmasteredKanji.length === 0) {
   /**
    * 練習での正解処理
    */
-  _handlePracticeCorrect(answer) {
+  _handlePracticeCorrect(answer, learningOutcome) {
     console.log('✅ 正解処理開始');
     
     try {
@@ -915,13 +947,6 @@ if (this.unmasteredKanji.length === 0) {
             publish('addToKanjiDex', gameState.currentKanji.id);
 
             // 学習データ記録＋SM-2キューの前進（キュー登録済みの漢字のみ間隔が伸びる）
-            recordKanjiAnswer(gameState.currentKanji.id, true);
-            if (Number(gameState.hintLevel || 0) >= 4) {
-              // ヒントで答えを見てから正解した場合は「おぼえたて」扱い（間隔は進めず再登録）
-              publish('addToReview', gameState.currentKanji.id);
-            } else {
-              reviewQueue.updateReview(gameState.currentKanji.id, 5);
-            }
 
              // レビュー回数カウント（ボーナスのみ）
     try {
@@ -940,7 +965,7 @@ if (this.unmasteredKanji.length === 0) {
             
       
     const wasAlreadyMastered = this._isKanjiMastered(gameState.currentKanji.id);
-    this._updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
+    if (learningOutcome.independent) this._updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
     const isNowMastered = this._isKanjiMastered(gameState.currentKanji.id);
 
         // レビュースコア更新と永続化（正解: +1／5連毎+5）
@@ -965,11 +990,11 @@ if (this.unmasteredKanji.length === 0) {
       
       console.log(`✅ 正解: ${gameState.currentKanji.text} = ${answer}`);
       
-      setTimeout(() => {
+      this._lifecycle.setTimeout(() => {
         this._pickNextUnmasteredKanji();
         battleState.turn = 'player';
         battleState.inputEnabled = true;
-      }, 1000);
+      }, 1100);
       
     } catch (error) {
       console.error('❌ 正解処理エラー:', error);
@@ -1023,8 +1048,9 @@ if (this.unmasteredKanji.length === 0) {
       const isKbOpen = !!(this.keyboardState && this.keyboardState.open);
       const cx = this.canvas.width / 2;
       const top = (isKbOpen ? 120 + 70 : 200 + 80) + 14;
-      const lineH = 20;
-      const w = Math.min(this.canvas.width - 32, 340);
+      const fontSize = Math.max(16,16/getLearningControls(this.canvas).scale);
+      const lineH = fontSize + 4;
+      const w = this.canvas.width - 40;
       const h = notice.lines.length * lineH + 16;
 
       ctx.save();
@@ -1036,10 +1062,10 @@ if (this.unmasteredKanji.length === 0) {
       ctx.strokeRect(cx - w / 2, top, w, h);
 
       ctx.fillStyle = '#eaf6fd';
-      ctx.font = 'bold 14px "UDデジタル教科書体",sans-serif';
+      ctx.font = `bold ${fontSize}px "UDデジタル教科書体",sans-serif`;
       ctx.textAlign = 'center';
       notice.lines.forEach((line, i) => {
-        ctx.fillText(line, cx, top + 22 + i * lineH);
+        ctx.fillText(line, cx, top + fontSize + i * lineH);
       });
       ctx.restore();
     } catch (error) {
@@ -1062,15 +1088,18 @@ if (this.unmasteredKanji.length === 0) {
       publish('playSE', 'wrong');
 
       // 学習データ記録＋復習キューへ登録（バトルの読みちがいと同じ扱い）
-      recordKanjiAnswer(gameState.currentKanji.id, false);
-      publish('addToReview', gameState.currentKanji.id);
 
       console.log(`❌ 不正解: ${gameState.currentKanji.text} ≠ ${answer}`);
       
-      setTimeout(() => {
+      this._lifecycle.setTimeout(() => {
+        // The displayed answer is support. A deliberate retry is a new
+        // observation; key repeats during feedback still belong to the old one.
+        gameState.currentKanji._recordQuestion = beginQuestion(this.recordSource);
+        gameState.currentKanji._retryAnswerRevealed = true;
         battleState.turn = 'player';
         battleState.inputEnabled = true;
-      }, 1000);
+        this._answerSubmission?.unlock();
+      }, 2200);
       
     } catch (error) {
       console.error('❌ 不正解処理エラー:', error);
@@ -1082,6 +1111,7 @@ if (this.unmasteredKanji.length === 0) {
    * 成功パーティクルエフェクトを開始
    */
   startSuccessParticles() {
+    if (prefersReducedMotion()) { this.successParticles.active = false; this.successParticles.particles = []; return; }
     this.successParticles.active = true;
     this.successParticles.particles = [];
     
@@ -1130,12 +1160,18 @@ if (this.unmasteredKanji.length === 0) {
       if (!isValidCoordinates(coords)) return false;
       const x = coords.x, y = coords.y;
 
-      const topMargin = 20;
-      const bx = topMargin, by = topMargin, bw = 120, bh = 36;
-      const SLOP = 16;
-
-      const hitBack = (x >= bx - SLOP && x <= bx + bw + SLOP &&
-                       y >= by - SLOP && y <= by + bh + SLOP);
+      const controls = getLearningControls(this.canvas);
+      if (this.practiceComplete && isMouseOverRect(x,y,controls.continue)) {
+        this._answerSubmission.submit('',e); return true;
+      }
+      if (!this.practiceComplete && isMouseOverRect(x,y,controls.submit)) {
+        this._answerSubmission.submit(this.inputEl.value,e); return true;
+      }
+      if (!this.practiceComplete && isMouseOverRect(x,y,controls.hint)) {
+        this.handlePracticeHint(); return true;
+      }
+      const hitBack = isMouseOverRect(x,y,controls.back) ||
+        (this.practiceComplete && isMouseOverRect(x,y,controls.finish));
                        if (hitBack) {
                         console.log('🗺️ ステージ選択へ');
                         publish('playBGM', 'title');
@@ -1178,6 +1214,7 @@ this._drawImprovedPracticeUI();
 // ← 追加: 漢字パネル＋エフェクトを最前面に再描画（上書きで見切れ防止）
 this._drawKanjiBoxWithEffects();
 this._drawNearMissNotice();
+if (this.practiceComplete) this._drawPracticeCompletePrompt();
 
 gameState.currentEnemy = originalEnemy;
 gameState.enemies = originalEnemies;
@@ -1205,52 +1242,15 @@ gameState.enemies = originalEnemies;
     }
 
 // ② 上部ボタン描画（左上「もどる」）
-const topMargin = 20;
-const BTN = {
-  stage: { x: topMargin, y: topMargin, w: 120, h: 36, label: 'もどる' },
-};
-
-[BTN.stage].forEach(b => {
-  const isHovered = this.mouseX && this.mouseY
-    ? (this.mouseX >= b.x && this.mouseX <= b.x + b.w && this.mouseY >= b.y && this.mouseY <= b.y + b.h)
-    : false;
-  if (typeof drawStoneButton === 'function') {
-    // 修正: ボタン情報をオブジェクトで渡す
-    drawStoneButton(this.ctx, { x: b.x, y: b.y, w: b.w, h: b.h, label: b.label }, isHovered, false);
-  } else {
-    this.ctx.fillStyle = isHovered ? '#4e6d8c' : '#34495e';
-    this.ctx.fillRect(b.x, b.y, b.w, b.h);
-    this.ctx.fillStyle = 'white';
-    this.ctx.font = '16px "UDデジタル教科書体", sans-serif';
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'middle';
-    this.ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2);
-    this.ctx.strokeStyle = 'white';
-    this.ctx.lineWidth = 2;
-    this.ctx.strokeRect(b.x, b.y, b.w, b.h);
-  }
-  // ← 追加: 現在ステージ名ラベル
-  try {
-    const st = stageData.find(s => s.stageId === gameState.currentStageId);
-    const title = st?.name;
-    if (title) {
-      const tx = b.x + b.w + 12;
-      const ty = b.y;
-      this.ctx.font = '14px "UDデジタル教科書体", sans-serif';
-      const tw = Math.ceil(this.ctx.measureText(title).width) + 16;
-      const th = b.h;
-      this.ctx.fillStyle = 'rgba(0,0,0,0.55)';
-      this.ctx.fillRect(tx, ty, tw, th);
-      this.ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-      this.ctx.lineWidth = 1;
-      this.ctx.strokeRect(tx, ty, tw, th);
-      this.ctx.fillStyle = '#fff';
-      this.ctx.textAlign = 'left';
-      this.ctx.textBaseline = 'middle';
-      this.ctx.fillText(title, tx + 8, ty + th / 2);
-    }
-  } catch {}
-});
+const controls = getLearningControls(this.canvas);
+drawLearningButton(this.ctx, controls.back, controls.scale);
+if (this.practiceComplete) {
+  drawLearningButton(this.ctx, controls.continue, controls.scale);
+  drawLearningButton(this.ctx, controls.finish, controls.scale);
+} else {
+  drawLearningButton(this.ctx, controls.submit, controls.scale);
+}
+if (controls.compact) placeLearningInput(this.canvas,this.inputEl,controls);
 
     // ③ 漢字ボックス描画
     this._drawKanjiBoxWithEffects();
@@ -1272,7 +1272,7 @@ const BTN = {
     const kanjiX = this.canvas.width / 2;
 
     //　入力中は上に寄せて少し縮小
-    const kanjiY = isKbOpen ? 120 : 200;
+    const kanjiY = getLearningControls(this.canvas).compact ? 220 : (isKbOpen ? 120 : 200);
     const baseW = isKbOpen ? 160 : 180;
     const baseH = isKbOpen ? 140 : 160;
     
@@ -1282,14 +1282,14 @@ const BTN = {
     let borderWidth = 2;
 
     // シェイクエフェクトの処理
-    if (this.shakeEffect && this.shakeEffect.active) {
+    if (!prefersReducedMotion() && this.shakeEffect && this.shakeEffect.active) {
       const intensity = this.shakeEffect.intensity * (this.shakeEffect.timer / this.shakeEffect.duration);
       offsetX = (Math.random() * 2 - 1) * intensity;
       offsetY = (Math.random() * 2 - 1) * intensity;
     }
 
     // 漢字ボックスエフェクトの処理
-    if (this.kanjiBoxEffect && this.kanjiBoxEffect.active) {
+    if (!prefersReducedMotion() && this.kanjiBoxEffect && this.kanjiBoxEffect.active) {
       this.kanjiBoxEffect.pulsePhase += 0.2;
       
       const progress = 1 - (this.kanjiBoxEffect.timer / this.kanjiBoxEffect.duration);
@@ -1346,34 +1346,8 @@ if (this.stoneAttackEffect && this.stoneAttackEffect.active) {
   this.drawStoneAttackEffect(ax, ay, sw, sh);
 }
   },
-  _setupGlobalBackHandler() {
-    try {
-      if (!this.canvas) return;
-      const handler = (e) => {
-        try {
-          const coords = getGameCoordinates(e, this.canvas);
-          if (!isValidCoordinates(coords)) return;
-          const x = coords.x, y = coords.y;
-          const topMargin = 20, bx = topMargin, by = topMargin, bw = 120, bh = 36, SLOP = 16;
-          if (x >= bx - SLOP && x <= bx + bw + SLOP && y >= by - SLOP && y <= by + bh + SLOP) {
-            e.preventDefault(); e.stopPropagation();
-            publish('playBGM', 'title');
-            if (/^bonus_g\d+$/i.test(String(gameState.currentStageId || ''))) {
-              gameState._returnToWorld = { kanken_level: 'review' };
-              publish('changeScreen', 'worldStageSelect', { kanken_level: 'review' });
-            } else {
-              const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-              publish('changeScreen', target);
-            }
-          }
-        } catch {}
-      };
-      document.addEventListener('pointerdown', handler, { passive: false, capture: true });
-      document.addEventListener('mousedown',  handler, true);
-      document.addEventListener('touchstart', handler, { passive: false, capture: true });
-      this._globalBackHandler = handler;
-    } catch {}
-  },
+  _setupGlobalBackHandler() {},
+
 _teardownGlobalBackHandler() {
   try {
     if (this._globalBackHandler) {
@@ -1388,14 +1362,14 @@ _teardownGlobalBackHandler() {
    * エフェクトの更新
    */
   _updateEffects() {
-    if (this.kanjiBoxEffect && this.kanjiBoxEffect.active) {
+    if (!prefersReducedMotion() && this.kanjiBoxEffect && this.kanjiBoxEffect.active) {
       this.kanjiBoxEffect.timer--;
       if (this.kanjiBoxEffect.timer <= 0) {
         this.kanjiBoxEffect.active = false;
       }
     }
 
-    if (this.shakeEffect && this.shakeEffect.active) {
+    if (!prefersReducedMotion() && this.shakeEffect && this.shakeEffect.active) {
       this.shakeEffect.timer--;
       if (this.shakeEffect.timer <= 0) {
         this.shakeEffect.active = false;
@@ -1424,6 +1398,7 @@ _teardownGlobalBackHandler() {
    * 成功パーティクルの更新
    */
   _updateSuccessParticles() {
+    if (prefersReducedMotion()) { this.successParticles.active = false; return; }
     if (!this.successParticles.active) return;
 
     let activeCount = 0;
@@ -2071,6 +2046,13 @@ _teardownGlobalBackHandler() {
  
   _adjustInputPosition() {
     if (!this.canvas) return;
+    const controls = getLearningControls(this.canvas);
+    if (controls.compact && this.inputEl) {
+      this.inputEl.style.removeProperty('width');
+      this.inputEl.style.bottom = 'auto';
+      placeLearningInput(this.canvas,this.inputEl,controls);
+      return;
+    }
     
     try {
       // 入力欄が無ければ取得/生成して初期化
@@ -2208,6 +2190,19 @@ _teardownGlobalBackHandler() {
       
       // 入力欄の位置を調整
       this._adjustInputPosition();
+      // This is the effective update method. Draw controls after the panels,
+      // so both completion choices remain visible and share the hit rectangles.
+      const controls = getLearningControls(this.canvas);
+      drawLearningButton(this.ctx,controls.back,controls.scale);
+      if (this.practiceComplete) {
+        this._drawPracticeCompletePrompt();
+        drawLearningButton(this.ctx,controls.continue,controls.scale);
+        drawLearningButton(this.ctx,controls.finish,controls.scale);
+      } else {
+        drawLearningButton(this.ctx,controls.submit,controls.scale);
+        drawLearningButton(this.ctx,controls.hint,controls.scale);
+        this._drawNearMissNotice();
+      }
       
       gameState.currentEnemy = originalEnemy;
       gameState.enemies = originalEnemies;
@@ -2223,9 +2218,7 @@ _teardownGlobalBackHandler() {
 _showAllMasteredMessage() {
   try {
     console.log('🎉 全ての漢字をマスターしました！');
-    setTimeout(() => {
-      this._completePractice();
-    }, 1000);
+    this._completePractice();
   } catch (error) {
     console.error('❌ 全マスターメッセージエラー:', error);
   }
@@ -2236,6 +2229,7 @@ _showAllMasteredMessage() {
  */
 _completePractice() {
   try {
+    if (this.practiceComplete) return;
     const { totalPracticed, correctCount, maxStreak } = this.practiceStats;
     const accuracy = totalPracticed > 0 ? Math.round((correctCount / totalPracticed) * 100) : 0;
     const sessionTime = Math.floor((Date.now() - this.practiceStats.startTime) / 1000 / 60);
@@ -2261,13 +2255,33 @@ if (this.wrongOnlyMode) {
   return;
 }
 
-    // 通常はレビューへ移行し継続
-    this.reviewMode = true;
-    this._pickNextReviewQuestion();
+    // 完了後は自動で次問を始めない。Enterで続けるか、左上から地図へ戻れる。
+    this.practiceComplete = true;
+    battleState.inputEnabled = false;
+    this._answerSubmission?.unlock?.();
   } catch (error) {
     console.error('❌ 練習完了処理エラー:', error);
     // 何もしない（画面は維持）
   }
+},
+
+_drawPracticeCompletePrompt() {
+  if (!this.ctx || !this.canvas) return;
+  const ctx = this.ctx;
+  const x = this.canvas.width / 2;
+  ctx.save();
+  ctx.fillStyle = 'rgba(18, 38, 70, 0.94)';
+  ctx.fillRect(20, 220, this.canvas.width-40, 150);
+  ctx.strokeStyle = '#7CFC9A';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(20, 220, this.canvas.width-40, 150);
+  ctx.fillStyle = 'white';
+  ctx.textAlign = 'center';
+  ctx.font = `bold ${Math.max(24,16/getLearningControls(this.canvas).scale)}px "UDデジタル教科書体", sans-serif`;
+  ctx.fillText('このステージの れんしゅう おわり！', x, 260);
+  ctx.fillText('Enterで もう1もん', x, 310);
+  ctx.fillText('やめるときは「今日はここまで」', x, 350);
+  ctx.restore();
 },
 
   /**
@@ -2518,6 +2532,8 @@ if (this.wrongOnlyMode) {
     console.log('🎯 練習バトル画面を終了します');
     
     try {
+      this._lifecycle.deactivate();
+      this.practiceComplete = false;
       if (this._originalHandleAttack) {
         this.handleAttack = this._originalHandleAttack;
         this._originalHandleAttack = null;
@@ -2541,12 +2557,12 @@ if (this.wrongOnlyMode) {
       
       // 画面固定（vh-lock）を無効化（1フレーム遅延で安全に解除）
       try {
-        requestAnimationFrame(() => {
+        {
           document.documentElement.classList.remove('vh-lock');
           document.body.classList.remove('vh-lock');
           const cvs = document.getElementById('gameCanvas');
           if (this.canvas) this.canvas.classList.remove('vh-lock');
-        });
+      }
       } catch {}
 
       if (battleScreenState.exit) {

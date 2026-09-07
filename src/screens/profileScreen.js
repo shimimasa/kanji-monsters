@@ -1,11 +1,14 @@
 import { publish } from '../core/eventBus.js';
 import { gameState } from '../core/gameState.js';
 import { loadProfileSummary, loadAchievementsSummary } from '../models/profile.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
 
 const profileScreen = {
+  _lifecycle: createScreenLifecycle(),
   container: null,
 
   enter(arg) {
+    this._lifecycle.activate();
     // 既存コンテナあれば掃除
     if (this.container) this.container.remove();
 
@@ -189,10 +192,12 @@ const profileScreen = {
       return wrap;
     };
 
-    // 便宜上、総漢字数を「図鑑に登録された全漢字数」として表示（mastered はセッション）
-    barsCard.appendChild(makeBar('漢字収集', summary.collection.kanjiCount, summary.collection.kanjiCount));
-    barsCard.appendChild(makeBar('モンスター収集', summary.collection.monsterCount, summary.collection.monsterCount));
-    barsCard.appendChild(makeBar('マスター漢字（セッション）', summary.collection.masteredCount, summary.collection.kanjiCount || 1));
+    // 全体分母を持たない集計を100%と表示しない。ここでは確認できる収集数だけを示す。
+    barsCard.innerHTML = `
+      <div style="margin:8px 0">漢字図鑑に集めた数: ${summary.collection.kanjiCount}</div>
+      <div style="margin:8px 0">モンスター図鑑に集めた数: ${summary.collection.monsterCount}</div>
+      <div style="margin:8px 0">ゲーム上のマスター漢字: ${summary.collection.masteredCount}</div>
+    `;
 
     // こんしゅうのがんばり（週次の成長を見せる）
     const weeklyCard = document.createElement('div');
@@ -205,23 +210,23 @@ const profileScreen = {
     if (weekly.thisWeek === 0 && weekly.lastWeek === 0) {
       weeklyMessage = 'こんしゅうから きろくがはじまるよ！';
     } else if (weekly.diff > 0) {
-      weeklyMessage = `先週より +${weekly.diff}回 よめた！`;
+      weeklyMessage = `先週より +${weekly.diff}回 正解入力できた！`;
     } else if (weekly.diff === 0) {
       weeklyMessage = '先週とおなじペースだよ';
     } else if (weekly.thisWeek === 0) {
       // 週のはじめ。0 を数えて見せない
       weeklyMessage = 'つづきは いつでも まってるよ';
     } else if (-weekly.diff <= 20) {
-      weeklyMessage = `先週のペースまで あと${-weekly.diff}回`;
+      weeklyMessage = `こんしゅうも ${weekly.thisWeek}回 とりくんだよ`;
     } else {
       // 1ステージで30〜50回よむので、週の回数が落ちると差が60〜100になり得る。
       // 向きが前向きでも量が絶望的なので、その時は差を見せず今週の数を数える
-      weeklyMessage = `こんしゅうも ${weekly.thisWeek}回 よめたよ`;
+      weeklyMessage = `こんしゅうも ${weekly.thisWeek}回 正解入力できたよ`;
     }
     weeklyCard.innerHTML = `
-      <h3 style="margin:0 0 8px; font-size:16px;">こんしゅうのがんばり</h3>
+      <h3 style="margin:0 0 8px; font-size:16px;">こんしゅうのがんばり</h3><p>正解入力の回数（ヒントを含む）</p>
       <div style="font-size:${weekly.thisWeek === 0 ? 18 : 24}px; font-weight:700;">${
-        weekly.thisWeek === 0 ? 'きょう よんだら ここが ふえるよ' : `${weekly.thisWeek}回 よめた`
+        weekly.thisWeek === 0 ? 'きょう よんだら ここが ふえるよ' : `${weekly.thisWeek}回 正解入力できた`
       }</div>
       <div style="opacity:0.85;">先週: ${weekly.lastWeek}回</div>
       <div style="color:#7CFC9A; margin-top:6px; font-weight:700;">${weeklyMessage}</div>
@@ -331,11 +336,12 @@ const profileScreen = {
         this.container.append(header, statsDiv, overview, collection, titles);
         document.body.appendChild(this.container);
         
-        import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('profile', {}));
+        import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => m.default.startIfNeeded('profile', {})));
       
   },
 
   exit() {
+    this._lifecycle.deactivate();
     if (this.container) {
       this.container.remove();
       this.container = null;

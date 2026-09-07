@@ -7,7 +7,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #000; /* 黒帯色を統一 */
+  background-color: #16233a;
   overflow: hidden;
   /* タッチデバイスでの意図しない操作を防ぐ */
   touch-action: manipulation;
@@ -143,6 +143,9 @@ body {
   backdrop-filter: blur(5px);
   z-index: 100;
   display: none; /* デフォルトは非表示 */
+  min-height: 48px;
+  box-sizing: border-box;
+  color: #172033;
   
   /* レスポンシブ対応 */
   width: min(300px, 80vw);
@@ -173,10 +176,22 @@ body {
 
 @media screen and (max-width: 480px) {
   #kanjiInput {
-      font-size: 16px;
-      padding: 6px 10px;
-      width: min(250px, 90vw);
+      font-size: 18px;
+      padding: 8px 10px;
+      width: min(280px, 90vw);
   }
+}
+
+html.vh-lock, body.vh-lock { height: 100dvh; overflow: hidden; }
+#gameCanvas.vh-lock {
+  position: fixed;
+  inset: 0;
+  bottom: var(--kanapad-height, 0px);
+  margin: auto;
+  width: 100vw !important;
+  height: calc(100dvh - var(--kanapad-height, 0px)) !important;
+  max-width: calc((100dvh - var(--kanapad-height, 0px)) * 4 / 3);
+  max-height: calc(100vw * 3 / 4);
 }
 
 .game-input {

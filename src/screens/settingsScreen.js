@@ -3,7 +3,7 @@ import { gameState, saveGameData, loadGameData, clearSaveData, updatePlayerName 
 import { drawButton, isMouseOverRect, drawThemeBackground, drawPanelBackground } from '../ui/uiRenderer.js';
 import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
 import { publish } from '../core/eventBus.js';
-import { hardResetAllLocalData } from '../core/saveData.js';
+import { hardResetAllLocalData, captureSaveContext, isSaveContextCurrent } from '../core/saveData.js';
 import KanaPad from '../ui/kanaPad.js';
 import Speech from '../audio/speech.js';
 import TextScale from '../ui/textScale.js';
@@ -13,6 +13,7 @@ import ReadingScope from '../core/readingScope.js';
 import ExampleMode from '../core/exampleMode.js';
 import ReviewExport from '../core/reviewExport.js';
 import Ruby from '../ui/ruby.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
 
 // レベルプリセット定義
 const LEVEL_PRESETS = {
@@ -49,12 +50,14 @@ function calculateExpForLevel(level) {
 }
 
 const settingsScreenState = {
+  _lifecycle: createScreenLifecycle(),
   canvas: null,
   ctx: null,
   _clickHandler: null,
 
   /** 画面表示時の初期化 */
   enter(arg) {
+    this._lifecycle.activate();
     // canvas 引数が HTMLCanvasElement ならそれを使い、そうでなければ DOM から取得
     this.canvas = (arg && typeof arg.getContext === 'function')
       ? arg
@@ -70,7 +73,7 @@ const settingsScreenState = {
     // 設定画面専用のコンテナを作成
     this.createSettingsContainer(uiRoot);
 
-    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('settings', {}));
+    import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => m.default.startIfNeeded('settings', {})));
 
     // クリックイベント登録
     this.registerHandlers();
@@ -1017,8 +1020,8 @@ const settingsScreenState = {
       return;
     }
     publish('playSE', 'decide');
-    updatePlayerName(name);
-    try { saveGameData(); } catch {}
+    const savedName = updatePlayerName(name);
+    if (!savedName.ok) { this._showSaveToast('保存に失敗しました'); return; }
 
     const user = getCurrentUser();
     if (user?.uid) {
@@ -1421,8 +1424,8 @@ const settingsScreenState = {
       btnSaveNow.addEventListener('click', async () => {
         publish('playSE', 'decide');
         try {
-          saveGameData();
-          await new Promise(r => setTimeout(r, 150));
+          const result = await saveGameData();
+          if (!result.ok) throw result.error;
           this._showSaveToast('保存しました');
           this._refreshSaveStatus();
         } catch {
@@ -1457,11 +1460,11 @@ const settingsScreenState = {
         publish('playSE', 'decide');
         try {
           // ▼ 追加: 事前に現在の状態をセーブ
-          try { saveGameData(); } catch {}
-          await new Promise(r => setTimeout(r, 100));
+          const result = await saveGameData();
+          if (!result.ok) throw result.error;
 
           const mod = await import('../core/saveData.js');
-          const data = mod.loadSave();
+          const data = result.save;
           const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
           const a = document.createElement('a');
           a.href = URL.createObjectURL(blob);
@@ -1480,14 +1483,17 @@ const settingsScreenState = {
       file.type = 'file'; file.accept = 'application/json'; file.style.display = 'none';
       btnImport.addEventListener('click', () => { publish('playSE','decide'); file.click(); });
       file.addEventListener('change', async (e) => {
-        const f = e.target.files && e.target.files[0];
-        if (!f) return;
-        try {
-          const text = await f.text();
+          const f = e.target.files && e.target.files[0];
+          if (!f) return;
+          try {
+            const context = captureSaveContext();
+            const text = await f.text();
           const data = JSON.parse(text);
           const mod = await import('../core/saveData.js');
-          mod.saveNow(data);
-          loadGameData();
+            if (!isSaveContextCurrent(context)) throw new Error('読み込み中にセーブが切り替わりました');
+            const result = mod.saveNow(data, { replace: true });
+          if (!result.ok) throw result.error;
+          if (!await loadGameData()) throw new Error('復元したデータを読み込めませんでした');
           this._showSaveToast('バックアップを読み込みました');
           this._refreshSaveStatus();
         } catch (err) {
@@ -1988,7 +1994,9 @@ const settingsScreenState = {
         clearSaveBtn.addEventListener('click', () => {
           publish('playSE', 'decide');
           if (confirm('セーブ保存箱を作り直します。通常は不要です。続行しますか？')) {
-            try { clearSaveData(); alert('セーブの保存箱を作り直しました。'); } catch {}
+            const result = clearSaveData();
+            if (result.ok) location.reload();
+            else this._showSaveToast('保存箱の変更に失敗しました');
           }
         });
 
@@ -2128,6 +2136,7 @@ const settingsScreenState = {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    this._lifecycle.deactivate();
     this.unregisterHandlers();
     this.cleanupDOM();
     // アクティブなツールチップも削除
@@ -2206,7 +2215,8 @@ const settingsScreenState = {
       
       try {
         // 1. LocalStorageの全関連データを削除
-        hardResetAllLocalData();
+        const reset = hardResetAllLocalData();
+              if (!reset.ok) throw reset.error;
         
         // 2. Firebase Firestoreのユーザーデータを削除
         if (user?.uid) {

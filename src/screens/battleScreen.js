@@ -1,11 +1,12 @@
-import { gameState, battleState, addPlayerExp, recordEnemyDefeated, saveGameData, recordKanjiAnswer, getKanjiAnswerStats } from '../core/gameState.js';
+import { getLearningControls, drawLearningButton, placeLearningInput } from '../ui/learningControls.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
+import { gameState, battleState, addPlayerExp, recordEnemyDefeated, saveGameData, beginQuestion, getKanjiAnswerStats } from '../core/gameState.js';
 import { drawButton, isMouseOverRect, drawStoneButton } from '../ui/uiRenderer.js';
 import { loadMonsterImage, loadBgImage, images, clearImageCache, drawStonePanel } from '../loaders/assetsLoader.js';
 import { getEnemiesByStageId, getKanjiByStageId, kanjiData, stageData } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
 import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
-import reviewQueue from '../models/reviewQueue.js';
 import { drawRoundedRect as traceRoundedRect } from '../ui/canvasUtils.js';
 import { toHiragana, getReadings, findNearMiss, getNearMissLines } from '../utils/readings.js';
 import Speech from '../audio/speech.js';
@@ -13,14 +14,21 @@ import { gaugeColor, availabilityColor } from '../ui/palette.js';
 import SessionTimer from '../core/sessionTimer.js';
 import ReadingScope from '../core/readingScope.js';
 import ExampleMode from '../core/exampleMode.js';
+import { bindInputSubmission } from '../core/answerSubmission.js';
+import { commitLearningOutcome } from '../core/learningOutcome.js';
+import { takeDueRetry } from '../core/battleRetry.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
+import { computeEnemyParams, getBossShieldHits, getStageDifficultyIndex, stageBestTimeKey } from '../core/battleBalance.js';
+import { advanceTimer } from '../core/frameClock.js';
+import { prefersReducedMotion } from '../ui/motionPreferences.js';
+import { getContainedRect } from '../ui/viewportLayout.js';
 // 1. まず、ファイル冒頭にimportを追加
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import {
   ENEMY_FRAME_CONFIG,
   RECENT_QUESTIONS_BUFFER_SIZE,
-  BTN,
+  BTN, layoutBattleButtons,
   ENEMY_DAMAGE_ANIM_DURATION,
   ENEMY_ATTACK_ANIM_DURATION,
   ENEMY_DEFEAT_ANIM_DURATION,
@@ -68,7 +76,12 @@ function getFrameStyleByOrderConfigurable(enemyIndex, isBoss = false) {
 
 // タイムアウト（setTimeout）を一括管理する簡単ユーティリティ
 function setManagedTimeout(fn, ms) {
-  const id = setTimeout(fn, ms);
+  const generation = battleScreenState._generation;
+  const id = setTimeout(() => {
+    clearManagedTimeout(id);
+    if (!battleScreenState._active || battleScreenState._generation !== generation) return;
+    fn();
+  }, ms);
   if (!Array.isArray(battleScreenState._timeouts)) battleScreenState._timeouts = [];
   battleScreenState._timeouts.push(id);
   return id;
@@ -107,6 +120,9 @@ const battleScreenState = {
   timerId: null,
   _timeouts: [],
   _gameOverTimeoutId: null, // gameOver 遷移予約（setManagedTimeout）
+  _active: false,
+  _generation: 0,
+  _answerSubmission: null,
   _focusScrollTimers: [], // フォーカス時の再補正タイマー
 
   // ストップウォッチ用
@@ -254,7 +270,7 @@ const battleScreenState = {
  getKanjiBoxMetrics() {
   const isKbOpen = !!(this.keyboardState && this.keyboardState.open);
   const centerX = this.canvas ? (this.canvas.width / 2) : (window.innerWidth / 2);
-  const centerY = isKbOpen ? 120 : 200;   // 入力中は上へ
+  const centerY = this.canvas && getLearningControls(this.canvas).compact ? 220 : (isKbOpen ? 120 : 200);   // 入力中は上へ
   const width   = isKbOpen ? 160 : 180;   // 少し縮小
   const height  = isKbOpen ? 140 : 160;
   return { centerX, centerY, width, height };
@@ -327,6 +343,7 @@ getFrameStyleByOrder(enemyIndex, isBoss = false) {
  * @param {number} shieldHp - 現在のシールドHP
  */
 drawShieldCracks(ctx, centerX, centerY, radius, crackLevel, shieldHp) {
+  if (prefersReducedMotion()) return;
   if (crackLevel === 0) return; // ヒビなし
   
   ctx.save();
@@ -434,6 +451,7 @@ drawWebCracks(ctx, centerX, centerY, innerRadius) {
  * @param {number} radius - シールドの半径
  */
 drawShieldWarningEffect(ctx, centerX, centerY, radius) {
+  if (prefersReducedMotion()) return;
   // 点滅する赤い警告リング
   const time = Date.now();
   const flashAlpha = (Math.sin(time * 0.01) + 1) * 0.3; // 0-0.6の範囲で点滅
@@ -470,6 +488,10 @@ drawShieldWarningEffect(ctx, centerX, centerY, radius) {
  * @param {number} radius - 爆発の半径
  */
 startShieldBreakEffect(centerX, centerY, radius) {
+  if (prefersReducedMotion()) {
+    this.shieldBreakEffect = { active: false, particles: [] };
+    return;
+  }
   // 爆発エフェクト用のパーティクルシステムを初期化
   this.shieldBreakEffect = {
     active: true,
@@ -567,6 +589,10 @@ updateShieldBreakEffect() {
    * @param {number} intensity - 震えの強さ
    */
   startShakeEffect(duration = 15, intensity = 5) {
+    if (prefersReducedMotion()) {
+      this.shakeEffect.active = false;
+      return;
+    }
     this.shakeEffect.active = true;
     this.shakeEffect.timer = duration;
     this.shakeEffect.duration = duration;
@@ -579,6 +605,7 @@ updateShieldBreakEffect() {
    * 石版攻撃エフェクトを開始するメソッド
    */
   startStoneAttackEffect(centerX, centerY, width, height) {
+    if (prefersReducedMotion()) { this.stoneAttackEffect.active = false; return; }
     const effect = this.stoneAttackEffect;
     effect.active = true;
     effect.timer = effect.duration;
@@ -778,8 +805,24 @@ updateShieldBreakEffect() {
     }
   },
 
-  /** 画面がアクティブになったときの初期化 */
-  enter(canvasEl, onVictory) {
+  // 入場ごとに所有者を作る。派生画面も非同期処理を登録する前に呼ぶ。
+  _beginScreenLifecycle() {
+    this._lifecycle?.deactivate();
+    this._lifecycle = createScreenLifecycle();
+    this._lifecycle.activate();
+    return this._lifecycle;
+  },
+
+  /**
+   * 画面がアクティブになったときの初期化。
+   * entryLifecycle を渡す派生画面は、その所有者とチュートリアル開始を管理する。
+   * 親は所有者を置換・再activateせず共有し、exitで同じ所有者を停止する。
+   */
+  enter(canvasEl, onVictory, entryLifecycle = null) {
+    this._active = true;
+    this._lifecycle = entryLifecycle || this._beginScreenLifecycle();
+    this._generation++;
+    battleState.stageRun = beginQuestion('stage-clear');
     try {
       // 「きょうは ○ふん」はバトルに入ってから数える（地図を見ている時間は数えない）
       SessionTimer.startIfNeeded();
@@ -849,7 +892,7 @@ updateShieldBreakEffect() {
 
             // 画面固定（vh-lock）を有効化
             try {
-              requestAnimationFrame(() => {
+              this._lifecycle.requestAnimationFrame(() => {
                 document.documentElement.classList.add('vh-lock');
                 document.body.classList.add('vh-lock');
                 this.canvas.classList.add('vh-lock');
@@ -868,26 +911,21 @@ updateShieldBreakEffect() {
         this.inputEl.placeholder = 'よみを にゅうりょく';
         
         // Enter キーで最後に選択したコマンドを呼び出す
-        this._keydownHandler = e => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            if (battleState.turn === 'player' && battleState.inputEnabled) {
-              const mode = battleState.lastCommandMode || 'attack';
-              setTimeout(() => {
-                try {
-                  if (mode === 'attack') { if (typeof onAttack === 'function') onAttack(); else { console.error('onAttack関数が定義されていません'); battleState.inputEnabled = true; } }
-                  else if (mode === 'heal') { if (typeof onHeal === 'function') onHeal(); else { console.error('onHeal関数が定義されていません'); battleState.inputEnabled = true; } }
-                  else { if (typeof onHint === 'function') onHint(); else { console.error('onHint関数が定義されていません'); battleState.inputEnabled = true; } }
-                } catch (error) {
-                  console.error('処理中にエラーが発生しました:', error);
-                  battleState.inputEnabled = true;
-                  if (this.inputEl) { this.inputEl.value = ''; }
-                }
-              }, 0);
-            }
+        this._answerSubmission?.dispose?.();
+        this._answerSubmission = bindInputSubmission(this.inputEl, () => {
+          if (battleState.turn !== 'player' || !battleState.inputEnabled) return false;
+          const mode = battleState.lastCommandMode || 'attack';
+          try {
+            if (mode === 'attack') onAttack();
+            else if (mode === 'heal') onHeal();
+            else onHint();
+          } catch (error) {
+            console.error('処理中にエラーが発生しました:', error);
+            battleState.inputEnabled = true;
+            if (this.inputEl) this.inputEl.value = '';
           }
-        };
-        this.inputEl.addEventListener('keydown', this._keydownHandler);
+          return battleState.inputEnabled === false;
+        });
 
         // モバイル入力最適化＆キーボード追従
         this.inputEl.setAttribute('lang', 'ja'); // NOTE: inputmode の 'kana' はHTML仕様に無い値でブラウザに無視される。
@@ -925,53 +963,16 @@ updateShieldBreakEffect() {
         return enemy;
       });
 
-      // ステージ順インデックスとプレイヤーLv
-      const getStageOrderIndex = (stageId) => {
-        try {
-          const normals = stageData.filter(s => {
-            const id = String(s?.stageId || '');
-            return !( /^bonus_/i.test(id) || /_bonus$/i.test(id) );
-          });
-          const idx = normals.findIndex(s => s.stageId === stageId);
-          return Math.max(0, idx);
-        } catch { return 0; }
-      };
-      const stageIdx = getStageOrderIndex(gameState.currentStageId);
+      // 操作への慣れは、選んだ学年・級の中でのステージ順として扱う。
+      const stageIdx = getStageDifficultyIndex(gameState.currentStageId, stageData);
       const pl = gameState.playerStats?.level || 1;
-
-            // 敵パラメータ算出（プレイヤー比例＋ステージ係数）
-            const computeEnemyParams = ({ isBoss, stageIdx, playerLevel, playerAtk = 0, playerMaxHp = 1 }) => {
-              const hp = Math.max(15, Math.round(
-                isBoss
-                  ? (60 + 2.2 * stageIdx + 1.6 * playerLevel)
-                  : (30 + 1.6 * stageIdx + 1.1 * playerLevel)
-              ));
-      
-              const atkBase = isBoss
-                ? (5 + 0.08 * stageIdx + 0.20 * playerLevel)
-                : (4 + 0.06 * stageIdx + 0.12 * playerLevel);
-      
-              // 緩やかな比例項＋安全上限（%はゲームバランス用）
-              const uncapped = isBoss
-                ? (atkBase + 0.22 * playerAtk + 0.04 * playerMaxHp)
-                : (atkBase + 0.18 * playerAtk + 0.03 * playerMaxHp);
-              const cap = Math.max(1, Math.floor(playerMaxHp * (isBoss ? 0.30 : 0.25)));
-              const atk = Math.max(1, Math.min(cap, Math.round(uncapped)));
-      
-              const level = Math.max(1, Math.round(0.7 * playerLevel + 0.3 * (1 + stageIdx / 10)));
-              const expBase = isBoss
-                ? (35 + 0.6 * stageIdx + 1.2 * playerLevel)
-                : (25 + 0.4 * stageIdx + 0.8 * playerLevel);
-              const exp = Math.max(5, Math.round(expBase));
-              return { hp, atk, level, exp };
-            };
 
       // 敵の強さをスケール（全ステージ対象、ボスはやや高め）
       gameState.enemies = gameState.enemies.map((e, idx, arr) => {
         const willBeBoss = !!e.isBoss || idx === arr.length - 1;
         const { hp, atk, level, exp } = computeEnemyParams({
           isBoss: willBeBoss,
-          stageIdx,
+          stageIndex: stageIdx,
           playerLevel: pl,
           playerAtk: gameState.playerStats?.attack || 0,
           playerMaxHp: gameState.playerStats?.maxHp || 1
@@ -1022,9 +1023,7 @@ updateShieldBreakEffect() {
         e.img = images[e.id] || null;
         e.hp  = e.maxHp;
         if (e.isBoss) {
-          const baseShield = (typeof e.originalShieldHp === 'number')
-            ? e.originalShieldHp
-            : (typeof e.shieldHp === 'number' ? e.shieldHp : 3);
+          const baseShield = getBossShieldHits(stageIdx);
           e.originalShieldHp = baseShield;
           e.shieldHp = baseShield;
         } else {
@@ -1072,8 +1071,11 @@ updateShieldBreakEffect() {
 
       console.log("✅ battleScreen.enter() 完了");
 
-      import('../tutorial/TutorialManager.js')
-      .then(m => m.default.startIfNeeded('battle', { canvas: this.canvas }));
+      if (!entryLifecycle) {
+        import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => {
+          m.default.startIfNeeded('battle', { canvas: this.canvas });
+        }));
+      }
       
     } catch (error) {
       // エラーハンドリング
@@ -1188,6 +1190,16 @@ getMaxHealCountFromSettings() {
   },
   /** 1フレームごとの描画更新 */
   update(dt) {
+    if (prefersReducedMotion()) {
+      for (const key of ['shakeEffect','flashEffect','stoneAttackEffect','shieldBreakEffect','kanjiBoxEffect','masteryFlash']) {
+        if (this[key]) this[key].active = false;
+      }
+      this._stopLevelUpShake?.();
+    }
+    if (battleState.enemyActionTimer > 0) {
+      battleState.enemyActionTimer = advanceTimer(battleState.enemyActionTimer, dt);
+      if (battleState.enemyActionTimer === 0) battleState.enemyAction = null;
+    }
     // NOTE: 以前はここで50音パッドの高さを keyboardState に映していたが、
     //       いまは canvas 自体がパッドのぶん縮む（index.html の --kanapad-height）。
     //       映すと二重に持ち上がるので消した。keyboardState は端末キーボード専用。
@@ -1207,16 +1219,12 @@ getMaxHealCountFromSettings() {
     }// ② 右上「もどる」ボタン（石版デザイン）
 // ② 左上「もどる」ボタン（石版デザイン）
 const topMargin = 20;
-BTN.stage.label = 'もどる';
-BTN.stage.w = 120;
-BTN.stage.h = 36;
-BTN.stage.x = topMargin;
-BTN.stage.y = topMargin;
+const controls = layoutBattleButtons(this.canvas);
 
 const hovered = isMouseOverRect(this.mouseX, this.mouseY, BTN.stage);
 const pressed = false;
 if (typeof drawStoneButton === 'function') {
-  drawStoneButton(this.ctx, BTN.stage.x, BTN.stage.y, BTN.stage.w, BTN.stage.h, BTN.stage.label, hovered, pressed);
+  drawStoneButton(this.ctx, BTN.stage.x, BTN.stage.y, BTN.stage.w, BTN.stage.h, BTN.stage.label, hovered, pressed, Math.max(18,16/controls.scale));
 } else {
   this.ctx.fillStyle = hovered ? '#4e6d8c' : '#34495e';
   this.ctx.fillRect(BTN.stage.x, BTN.stage.y, BTN.stage.w, BTN.stage.h);
@@ -1231,11 +1239,10 @@ if (typeof drawStoneButton === 'function') {
 }
 
 // ②' 「れんしゅうへ」ボタン（もどるの直下・同スタイル）
-BTN.practice.x = topMargin;
-BTN.practice.y = BTN.stage.y + BTN.stage.h + 8;
+
 const practiceHovered = isMouseOverRect(this.mouseX, this.mouseY, BTN.practice);
 if (typeof drawStoneButton === 'function') {
-  drawStoneButton(this.ctx, BTN.practice.x, BTN.practice.y, BTN.practice.w, BTN.practice.h, BTN.practice.label, practiceHovered, false);
+  drawStoneButton(this.ctx, BTN.practice.x, BTN.practice.y, BTN.practice.w, BTN.practice.h, BTN.practice.label, practiceHovered, false, Math.max(18,16/controls.scale));
 } else {
   this.ctx.fillStyle = practiceHovered ? '#4e8c6d' : '#345e49';
   this.ctx.fillRect(BTN.practice.x, BTN.practice.y, BTN.practice.w, BTN.practice.h);
@@ -1253,7 +1260,7 @@ if (typeof drawStoneButton === 'function') {
 try {
   const st = stageData.find(s => s.stageId === gameState.currentStageId);
   const title = st?.name;
-  if (title) {
+  if (title && !controls.compact) {
     const baseX = BTN.stage.x + BTN.stage.w + 14;
     const baseY = BTN.stage.y + 2;
 
@@ -1314,11 +1321,9 @@ if (this.canvas) {
 // アニメーション用オフセット計算
 let offsetX = 0, offsetY = 0, rotateAngle = 0, alpha = 1;
 if (battleState.enemyAction === 'damage' && battleState.enemyActionTimer > 0) {
-  offsetX = (Math.random() - 0.5) * 20; 
-  offsetY = (Math.random() - 0.5) * 10;
-  battleState.enemyActionTimer--;
-  if (battleState.enemyActionTimer === 0) {
-    battleState.enemyAction = null;
+  if (!prefersReducedMotion()) {
+    offsetX = (Math.random() - 0.5) * 20;
+    offsetY = (Math.random() - 0.5) * 10;
   }
 }
 else if (battleState.enemyAction === 'attack' && battleState.enemyActionTimer > 0) {
@@ -1326,11 +1331,7 @@ else if (battleState.enemyAction === 'attack' && battleState.enemyActionTimer > 
   const half  = total / 2;
   const t     = battleState.enemyActionTimer;
   const progress = (half - Math.abs(t - half)) / half;
-  offsetX = -progress * 30;
-  battleState.enemyActionTimer--;
-  if (battleState.enemyActionTimer === 0) {
-    battleState.enemyAction = null;
-  }
+  if (!prefersReducedMotion()) offsetX = -progress * 30;
 } else if (battleState.enemyAction === 'defeat' && battleState.enemyActionTimer > 0) {
   const total = ENEMY_DEFEAT_ANIM_DURATION;
   const timer = battleState.enemyActionTimer;
@@ -1338,11 +1339,6 @@ else if (battleState.enemyAction === 'attack' && battleState.enemyActionTimer > 
   rotateAngle = progress * (Math.PI / 2);
   alpha = 1 - progress;
 }
-battleState.enemyActionTimer--;
-if (battleState.enemyActionTimer === 0) {
-  battleState.enemyAction = null;
-}
-
 // 1. モンスター枠を描画
 const frameArea = drawMonsterFrame(this.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy);
 
@@ -1384,7 +1380,7 @@ if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
     const shieldCenterY = 0;
     
     const shieldIntegrity = currentShieldHp / maxShieldHp;
-    const basePulse = Math.sin(Date.now() / 300) + 1;
+    const basePulse = prefersReducedMotion() ? 1 : Math.sin(Date.now() / 300) + 1;
     
     let shieldOpacity, crackLevel;
     
@@ -1429,7 +1425,7 @@ if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
     this.ctx.lineWidth = 2;
     
     if (currentShieldHp < maxShieldHp) {
-      this.ctx.lineWidth = 2 + Math.sin(Date.now() / 100) * 0.5;
+      this.ctx.lineWidth = prefersReducedMotion() ? 2 : 2 + Math.sin(Date.now() / 100) * 0.5;
     }
     
     this.ctx.stroke();
@@ -1645,11 +1641,12 @@ this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY)
       const disp = battleState.playerHpDisplay;
       const tgt  = battleState.playerHpTarget;
       const diff = tgt - disp;
-      if (Math.abs(diff) <= PLAYER_HP_ANIM_SPEED) {
+      const hpStep = PLAYER_HP_ANIM_SPEED * Math.max(0, dt || 0) / 1000;
+      if (Math.abs(diff) <= hpStep) {
         battleState.playerHpDisplay   = tgt;
         battleState.playerHpAnimating = false;
       } else {
-        battleState.playerHpDisplay += Math.sign(diff) * PLAYER_HP_ANIM_SPEED;
+        battleState.playerHpDisplay += Math.sign(diff) * hpStep;
       }
     }
 
@@ -1958,7 +1955,7 @@ if (this.logMode === 'blockPaged') {
       // 半透明の黒いオーバーレイで背景を暗く
       if (this.levelUpEffect.active) {
         this.ctx.save();
-        this.ctx.fillStyle = `rgba(0, 0, 0, ${this.levelUpEffect.overlayOpacity})`;
+        this.ctx.fillStyle = `rgba(0, 0, 0, ${(prefersReducedMotion() ? 0 : this.levelUpEffect.overlayOpacity)})`;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         // エフェクトタイマーを更新
@@ -1969,7 +1966,7 @@ if (this.logMode === 'blockPaged') {
         }
         
         // メッセージのサイズを脈動させる効果
-        const pulsateFactor = 1 + 0.2 * Math.sin(Date.now() * this.levelUpEffect.pulsateSpeed);
+        const pulsateFactor = prefersReducedMotion() ? 1 : 1 + 0.2 * Math.sin(Date.now() * this.levelUpEffect.pulsateSpeed);
         
         // ゴールド色のグラデーションで光る効果を作成
         const centerX = this.canvas.width / 2;
@@ -1996,7 +1993,7 @@ if (this.logMode === 'blockPaged') {
         
         // 輝く光線エフェクト
         this.ctx.save();
-        this.ctx.globalAlpha = 0.6 + 0.4 * Math.sin(Date.now() * 0.003);
+        this.ctx.globalAlpha = prefersReducedMotion() ? 1 : 0.6 + 0.4 * Math.sin(Date.now() * 0.003);
         this.ctx.translate(centerX, centerY);
         
         // 放射状の光線
@@ -2094,7 +2091,7 @@ try {
       this.expParticles.active = false;
       
       // 安全のためにコールバックを非同期で呼び出す
-      setTimeout(() => {
+      setManagedTimeout(() => {
         if (this.victoryCallback) {
           this.victoryCallback();
         }
@@ -2623,27 +2620,21 @@ _adjustInputPosition() {
       this._setupMobileViewportWorkarounds?.();
     }
     // Enterキー未設定なら付与（重複防止）
-    if (this.inputEl && !this._keydownHandler) {
-      this._keydownHandler = e => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          if (battleState.turn === 'player' && battleState.inputEnabled) {
-            const mode = battleState.lastCommandMode || 'attack';
-            setTimeout(() => {
-              try {
-                if (mode === 'attack') onAttack?.();
-                else if (mode === 'heal') onHeal?.();
-                else onHint?.();
-              } catch (err) {
-                console.error('処理中にエラー:', err);
-                battleState.inputEnabled = true;
-                if (this.inputEl) this.inputEl.value = '';
-              }
-            }, 0);
-          }
+    if (this.inputEl && !this._answerSubmission) {
+      this._answerSubmission = bindInputSubmission(this.inputEl, () => {
+        if (battleState.turn !== 'player' || !battleState.inputEnabled) return false;
+        const mode = battleState.lastCommandMode || 'attack';
+        try {
+          if (mode === 'attack') onAttack?.();
+          else if (mode === 'heal') onHeal?.();
+          else onHint?.();
+        } catch (err) {
+          console.error('処理中にエラー:', err);
+          battleState.inputEnabled = true;
+          if (this.inputEl) this.inputEl.value = '';
         }
-      };
-      this.inputEl.addEventListener('keydown', this._keydownHandler);
+        return battleState.inputEnabled === false;
+      });
     }
   
         // 重要: 強制表示（!important で他CSSに勝つ）
@@ -2658,6 +2649,13 @@ _adjustInputPosition() {
     s.setProperty('transform', 'none', 'important');
     s.setProperty('pointer-events', 'auto', 'important');
 
+    const controls = layoutBattleButtons(this.canvas);
+    if (controls.compact) {
+      s.removeProperty('width');
+      s.bottom = 'auto';
+      placeLearningInput(this.canvas, this.inputEl, controls);
+      return;
+    }
     const isTablet = window.innerWidth <= 1024;
     s.width = isTablet ? 'min(80vw, 520px)' : '280px';
     s.fontSize = isTablet ? '18px' : '20px';
@@ -2698,13 +2696,14 @@ const keyboardOpen = insetMax > 30;
 const bottomInset = keyboardOpen ? insetMax : 0;
 
 const rect = this.canvas.getBoundingClientRect?.();
+const content = rect ? getContainedRect(rect, this.canvas.width, this.canvas.height) : null;
 
     // 漢字パネルのメトリクス→CSS座標に変換（幅を入力欄に合わせる）
     const metrics = (this.getKanjiBoxMetrics ? this.getKanjiBoxMetrics() : null);
     let cssCenterX, cssPanelW;
-    if (rect && metrics) {
-      cssCenterX = rect.left + (metrics.centerX / this.canvas.width) * rect.width;
-      cssPanelW  = (metrics.width  / this.canvas.width) * rect.width;
+    if (content && metrics) {
+      cssCenterX = content.left + (metrics.centerX / this.canvas.width) * content.width;
+      cssPanelW  = (metrics.width  / this.canvas.width) * content.width;
     } else {
       cssCenterX = rect ? (rect.left + rect.width / 2) : Math.round(window.innerWidth / 2);
       cssPanelW  = rect ? (180 / this.canvas.width) * rect.width : Math.min(520, window.innerWidth * 0.8);
@@ -2729,7 +2728,7 @@ const rect = this.canvas.getBoundingClientRect?.();
        let cssTop;
        if (rect) {
          const targetCanvasY = Math.min(this.canvas.height - 40, BTN.attack.y - 46);
-         cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
+         cssTop = content.top + (targetCanvasY / this.canvas.height) * content.height - inputH / 2;
        } else {
          cssTop = window.innerHeight - inputH - 24;
        }
@@ -2756,6 +2755,8 @@ const rect = this.canvas.getBoundingClientRect?.();
    * @param {boolean} isHovered - ホバー状態かどうか
    */
   drawRichButton(ctx, x, y, width, height, label, baseColor = '#2980b9', isHovered = false, isPressed = false) {
+    const controls = getLearningControls(this.canvas);
+    if (controls.compact) return drawLearningButton(ctx,{x,y,w:width,h:height,label},controls.scale);
     // 押下状態の表現を追加
     const pressOffset = isPressed ? 2 : 0;
     const shadowOffset = isHovered ? 4 : (isPressed ? 1 : 3);
@@ -2953,6 +2954,10 @@ const rect = this.canvas.getBoundingClientRect?.();
    * @param {number} duration - フラッシュの持続フレーム数（デフォルト: 15）
    */
   startFlashEffect(color = 'rgba(255, 0, 0, 0.5)', duration = 15) {
+    if (prefersReducedMotion()) {
+      this.flashEffect.active = false;
+      return;
+    }
     this.flashEffect.active = true;
     this.flashEffect.timer = duration;
     this.flashEffect.duration = duration;
@@ -3369,6 +3374,12 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
 }
   },
   exit() {
+    this._lifecycle?.deactivate();
+    this._stopLevelUpShake?.();
+    this._active = false;
+    this._generation++;
+    if (Array.isArray(this._timeouts)) this._timeouts.forEach(id => clearTimeout(id));
+    this._timeouts = [];
     // 画面離脱後に遅延遷移が走らないよう、予約を必ず解除
     cancelGameOverTransition();
 
@@ -3376,19 +3387,21 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
     if (this.inputEl) {
       try { this.inputEl.blur(); } catch {}
       this.inputEl.style.display = 'none';
-      this.inputEl.removeEventListener('keydown', this._keydownHandler);
+      this._answerSubmission?.dispose?.();
+      this._answerSubmission = null;
+      if (this._keydownHandler) this.inputEl.removeEventListener('keydown', this._keydownHandler);
       if (this._focusHandler) this.inputEl.removeEventListener('focus', this._focusHandler);
       if (this._blurHandler)  this.inputEl.removeEventListener('blur',  this._blurHandler);
     }
 
-    // 画面固定（vh-lock）を無効化（1フレーム遅延で安全に解除）
+    // 画面固定（vh-lock）を無効化（次画面の表示前に解除）
     try {
-      requestAnimationFrame(() => {
+      {
         document.documentElement.classList.remove('vh-lock');
         document.body.classList.remove('vh-lock');
         const cvs = document.getElementById('gameCanvas');
         if (cvs) cvs.classList.remove('vh-lock');
-      });
+      }
     } catch {}
 
     if (this._vvResizeHandler && window.visualViewport) {
@@ -3634,6 +3647,7 @@ if (e.type === 'touchstart') {
 }
 
   e.preventDefault();
+  layoutBattleButtons(this.canvas);
   
   // 統一された座標変換を使用
   const coords = getGameCoordinates(e, this.canvas);
@@ -3656,14 +3670,6 @@ if (e.type === 'touchstart') {
     const isHit = isMouseOverRect(x, y, btn);
     console.log(`ボタン[${key}] 座標(${btn.x},${btn.y},${btn.w},${btn.h}) ヒット:${isHit}`);
   });
-  
-    // 「タイトルへ」ボタン押下時
-    if (isMouseOverRect(x, y, BTN.back)) {
-      console.log('「タイトルへ」ボタンがクリックされました');
-    publish('playBGM', 'title'); // 先にメニューBGMへ切替
-      publish('changeScreen', 'title');
-      return true;
-    }
   
         // 「ステージ選択」ボタン押下時
         if (isMouseOverRect(x, y, BTN.stage)) {
@@ -3688,7 +3694,8 @@ if (e.type === 'touchstart') {
   if (isMouseOverRect(x, y, BTN.attack)) {
     console.log('「こうげき」ボタンがクリックされました');
     battleState.lastCommandMode = 'attack';
-    onAttack();
+    if (this._answerSubmission) this._answerSubmission.submit(this.inputEl?.value ?? '');
+    else onAttack();
     return true;
   }
   
@@ -3696,7 +3703,8 @@ if (e.type === 'touchstart') {
   if (isMouseOverRect(x, y, BTN.heal)) {
     console.log('「かいふく」ボタンがクリックされました');
     battleState.lastCommandMode = 'heal';
-    onHeal();
+    if (this._answerSubmission) this._answerSubmission.submit(this.inputEl?.value ?? '');
+    else onHeal();
     return true;
   }
   
@@ -3816,6 +3824,7 @@ const comboY = kanjiY;
 
   // 経験値パーティクル用のメソッドを修正
   startExpParticleEffect(sourceX, sourceY, targetX, targetY, expAmount) {
+    if (prefersReducedMotion()) { this.expParticles.active = false; this.expAnimQueue.push(expAmount); return; }
     // パーティクルの初期化
     this.expParticles = {
       active: true,
@@ -3859,7 +3868,10 @@ const comboY = kanjiY;
     this.levelUpEffect.duration = duration;
     
     // 画面シェイク効果を追加（小さな揺れで臨場感を出す）
-    if (this.canvas) {
+    this._stopLevelUpShake?.();
+    if (this.canvas && !prefersReducedMotion()) {
+      const owner = this._generation;
+      const canvas = this.canvas;
       const intensity = 5; // 揺れの強さ
       const shakeDuration = 500; // ミリ秒
       
@@ -3869,7 +3881,7 @@ const comboY = kanjiY;
       const shake = () => {
         const dx = (Math.random() - 0.5) * intensity;
         const dy = (Math.random() - 0.5) * intensity;
-        this.canvas.style.transform = `${originalTransform} translate(${dx}px, ${dy}px)`;
+        canvas.style.transform = `${originalTransform} translate(${dx}px, ${dy}px)`;
       };
       
       // シェイクエフェクトのアニメーション
@@ -3877,14 +3889,21 @@ const comboY = kanjiY;
       const interval = 50; // 50ミリ秒ごとに位置を更新
       
       const shakeInterval = setInterval(() => {
+        if (!this._active || this._generation !== owner || this.canvas !== canvas || prefersReducedMotion()) {
+          this._stopLevelUpShake();
+          return;
+        }
         shake();
         elapsed += interval;
         
         if (elapsed >= shakeDuration) {
-          clearInterval(shakeInterval);
-          this.canvas.style.transform = originalTransform; // 元の位置に戻す
+          this._stopLevelUpShake();
         }
       }, interval);
+      this._stopLevelUpShake = () => {
+        clearInterval(shakeInterval);
+        canvas.style.transform = originalTransform;
+      };
     }
   },
 
@@ -4087,6 +4106,11 @@ const comboY = kanjiY;
    * 経験値パーティクルの更新と描画
    */
   updateAndDrawExpParticles() {
+    if (prefersReducedMotion()) {
+      this.expParticles.active = false;
+      this.expParticles.particles = [];
+      return;
+    }
     // コンテキストがnullの場合は処理をスキップ
     if (!this.ctx) {
       console.warn('描画コンテキストがnullです。パーティクル更新をスキップします。');
@@ -4489,6 +4513,10 @@ const comboY = kanjiY;
    * @param {number} intensity - 震えの強さ
    */
   startShakeEffect(duration = 15, intensity = 5) {
+    if (prefersReducedMotion()) {
+      this.shakeEffect.active = false;
+      return;
+    }
     this.shakeEffect.active = true;
     this.shakeEffect.timer = duration;
     this.shakeEffect.duration = duration;
@@ -4715,7 +4743,7 @@ function handleWrongReadingSystem(answer, scope, inputEl) {
   if (inputEl) {
     inputEl.style.borderColor = '#5bc0de';
     inputEl.style.backgroundColor = 'rgba(91, 192, 222, 0.12)';
-    setTimeout(() => {
+    setManagedTimeout(() => {
       inputEl.style.borderColor = '#ccc';
       inputEl.style.backgroundColor = 'white';
     }, 500);
@@ -4755,7 +4783,7 @@ function handleNearMiss(answer, correctReadings, inputEl) {
   if (inputEl) {
     inputEl.style.borderColor = '#5bc0de';
     inputEl.style.backgroundColor = 'rgba(91, 192, 222, 0.12)';
-    setTimeout(() => {
+    setManagedTimeout(() => {
       inputEl.style.borderColor = '#ccc';
       inputEl.style.backgroundColor = 'white';
     }, 500);
@@ -4777,6 +4805,13 @@ function handleNearMiss(answer, correctReadings, inputEl) {
 }
 
 // battleScreen.js の onAttack 関数を修正
+function reportAnswerSaveFailure() {
+  battleState.inputEnabled = true;
+  battleState.turn = 'player';
+  battleScreenState._answerSubmission?.unlock();
+  battleScreenState.showLogBlock(['ほぞんできませんでした', '同じもんだいに、もう一度こたえてね']);
+}
+
 function onAttack() {
   if (DEBUG) console.log('🗡 onAttack() called — turn:', battleState.turn, 'inputEnabled:', battleState.inputEnabled);
 
@@ -4789,6 +4824,7 @@ if (!inputEl) { battleState.inputEnabled = true; return; }
 battleState.inputEnabled = false;
 const raw = inputEl.value.trim();
 const answer = toHiragana(raw);
+if (!answer) { battleState.inputEnabled = true; return; }
 
 // ── 読みメッセージ生成 ──
 const onyomiStr = (gameState.currentKanji.onyomi || []).join('、');
@@ -4801,6 +4837,9 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
   const correct = correctReadings.includes(answer);
 
   if (correct) {
+    const firstCorrect = getKanjiAnswerStats(gameState.currentKanji.id).correct === 0;
+    const learningOutcome = commitLearningOutcome(gameState.currentKanji.id, true, { question: gameState.currentKanji._recordQuestion, source: 'attack', reading: answer, hintLevel: gameState.hintLevel, answerRevealed: battleState.nearMissCount >= 2 });
+    if (!learningOutcome.ok) { reportAnswerSaveFailure(); return; }
     // 正解処理
     if (DEBUG) console.log('正解！エフェクト開始'); // デバッグ用
     
@@ -4826,7 +4865,7 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
     // 正解時の入力欄フィードバック
     inputEl.style.borderColor = 'green';
     inputEl.style.backgroundColor = 'rgba(0, 255, 0, 0.1)';
-    setTimeout(() => {
+    setManagedTimeout(() => {
       inputEl.style.borderColor = '#ccc';
       inputEl.style.backgroundColor = 'white';
     }, 500);
@@ -4840,26 +4879,14 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
     publish('addToKanjiDex', gameState.currentKanji.id);
     
     // 統計データの更新（正解）
-    gameState.playerStats.totalCorrect++;
     gameState.playerStats.comboCount++;
     
     // ← 学習データ記録（正解・永続化される正史へ）
     // 初めて読めた漢字なら「あたらしく読めた」リストに積む（勝利画面で祝う）
-    if (getKanjiAnswerStats(gameState.currentKanji.id).correct === 0) {
+    if (firstCorrect) {
       gameState.newlyReadKanjiList.push({ ...gameState.currentKanji });
     }
-    recordKanjiAnswer(gameState.currentKanji.id, true);
-    if (Number(gameState.hintLevel || 0) >= 4) {
-      // ヒントで答えを見てから正解した場合は「おぼえたて」扱い:
-      // ペナルティにはせず、復習キューに登録して後日もう一度出会わせる（SM-2間隔は進めない）
-      publish('addToReview', gameState.currentKanji.id);
-    } else {
-      // SM-2キューの前進（復習対象だった漢字を自力で読めたら間隔が伸びる）。
-      // ヒントを見ての正解は「自力」ではないので品質を下げ、間隔を伸ばしすぎない
-      // （ヒント無し→5 / Lv1→4 / Lv2・Lv3→3。3以上なので正解扱いは保つ）
-      const hintLv = Number(gameState.hintLevel || 0);
-      reviewQueue.updateReview(gameState.currentKanji.id, hintLv === 0 ? 5 : (hintLv === 1 ? 4 : 3));
-    }
+
     
     // チャレンジモードの時間加算は廃止（ストップウォッチ化）
     
@@ -4902,7 +4929,7 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
     const isInOnyomi  = onyomiArr.includes(answer);
     
     // 追加: 読み進捗更新・マスター判定
-    updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
+    if (learningOutcome.independent) updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
     
     if (isInKunyomi && !isInOnyomi) {
       readingType = 'kunyomi';
@@ -5202,7 +5229,7 @@ setManagedTimeout(() => {
                                               try {
                                                 const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
                                                 const ms = Math.max(0, Math.floor(now - (battleScreenState._timeStartMs || now) - (battleScreenState._timePauseAccMs || 0)));
-                                                const sid = gameState.currentStageId;
+                                                const sid = stageBestTimeKey(gameState.currentStageId);
                                                 const prev = gameState.stageBestTimes?.[sid];
                                                 if (typeof prev !== 'number' || ms < prev) {
                                                   gameState.stageBestTimes = gameState.stageBestTimes || {};
@@ -5245,10 +5272,11 @@ setManagedTimeout(() => {
     return;
 
   } else {
+    if (!commitLearningOutcome(gameState.currentKanji.id, false, { question: gameState.currentKanji._recordQuestion, source: 'attack', reading: answer, hintLevel: gameState.hintLevel, answerRevealed: battleState.nearMissCount >= 2 }).ok) { reportAnswerSaveFailure(); return; }
     // 読みちがい時の入力欄フィードバック（責める赤ではなく、やわらかい琥珀色）
     inputEl.style.borderColor = '#f0ad4e';
     inputEl.style.backgroundColor = 'rgba(240, 173, 78, 0.12)';
-    setTimeout(() => {
+    setManagedTimeout(() => {
       inputEl.style.borderColor = '#ccc';
       inputEl.style.backgroundColor = 'white';
     }, 500);
@@ -5259,7 +5287,6 @@ setManagedTimeout(() => {
     // 前回の漢字として記録
     battleState.lastAnswered = { ...gameState.currentKanji };
     gameState.wrongKanjiList.push({ ...gameState.currentKanji });
-    publish('addToReview', gameState.currentKanji.id);
     publish('playSE', 'wrong');
     addToLog(`おしい！${readingMsg}`);
     battleScreenState.showLogBlock([
@@ -5268,12 +5295,11 @@ setManagedTimeout(() => {
     ]);
     
     // 統計データの更新（不正解）
-    gameState.playerStats.totalIncorrect++;
     battleState.mistakesThisStage++;
     gameState.playerStats.comboCount = 0; // プレイヤー統計のコンボリセット
     
     // ← 学習データ記録（不正解・永続化される正史へ）
-    recordKanjiAnswer(gameState.currentKanji.id, false);
+
     // 翌日のSM-2とは別に、このステージの中でもう一度出会えるようにする
     scheduleKanjiRetry(gameState.currentKanji.id);
     
@@ -5318,10 +5344,10 @@ setManagedTimeout(() => {
     
     console.log('🔄 敵のターンに移行します');
     
-      　      setTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
+      　      setManagedTimeout(() => { // プレイヤー行動→敵ターン開始待ち: 1.3s
                enemyTurn();
               // 敵ターン終了→次の問題表示: 1.7s
-              setTimeout(() => {
+              setManagedTimeout(() => {
                  pickNextKanji();
                  battleState.turn = 'player';
                  battleState.inputEnabled = true;
@@ -5402,6 +5428,7 @@ function onHeal() {
   if (!inputEl) { battleState.inputEnabled = true; return; }
   const raw    = inputEl.value.trim();
   const answer = toHiragana(raw);
+if (!answer) { battleState.inputEnabled = true; return; }
   
   // 読みメッセージ生成
   const onyomiStr = (gameState.currentKanji.onyomi || []).join('、');
@@ -5414,6 +5441,9 @@ function onHeal() {
   const correct = correctReadings.includes(answer);
 
   if (correct) {
+    const firstCorrect = getKanjiAnswerStats(gameState.currentKanji.id).correct === 0;
+    const learningOutcome = commitLearningOutcome(gameState.currentKanji.id, true, { question: gameState.currentKanji._recordQuestion, source: 'heal', reading: answer, hintLevel: gameState.hintLevel, answerRevealed: battleState.nearMissCount >= 2 });
+    if (!learningOutcome.ok) { reportAnswerSaveFailure(); return; }
     // 正解処理
     
     // 正解時に前回の不正解をクリア
@@ -5428,28 +5458,16 @@ function onHeal() {
     publish('addToKanjiDex', gameState.currentKanji.id);
 
     // 統計データの更新（正解）
-    gameState.playerStats.totalCorrect++;
     gameState.playerStats.comboCount++;
 
     // 学習データ記録（かいふくでの正解も読めた実績として数える）
-    if (getKanjiAnswerStats(gameState.currentKanji.id).correct === 0) {
+    if (firstCorrect) {
       gameState.newlyReadKanjiList.push({ ...gameState.currentKanji });
     }
-    recordKanjiAnswer(gameState.currentKanji.id, true);
-    if (Number(gameState.hintLevel || 0) >= 4) {
-      // ヒントで答えを見てから正解した場合は「おぼえたて」扱い:
-      // ペナルティにはせず、復習キューに登録して後日もう一度出会わせる（SM-2間隔は進めない）
-      publish('addToReview', gameState.currentKanji.id);
-    } else {
-      // SM-2キューの前進（復習対象だった漢字を自力で読めたら間隔が伸びる）。
-      // ヒントを見ての正解は「自力」ではないので品質を下げ、間隔を伸ばしすぎない
-      // （ヒント無し→5 / Lv1→4 / Lv2・Lv3→3。3以上なので正解扱いは保つ）
-      const hintLv = Number(gameState.hintLevel || 0);
-      reviewQueue.updateReview(gameState.currentKanji.id, hintLv === 0 ? 5 : (hintLv === 1 ? 4 : 3));
-    }
+
 
     // ★★★ 追加: 読み進捗更新・マスター判定 ★★★
-    updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
+    if (learningOutcome.independent) updateKanjiMasteryAfterCorrect(gameState.currentKanji, answer);
 
     // 回復前のHPを保存
     const prevHp = gameState.playerStats.hp;
@@ -5511,6 +5529,7 @@ gameState.playerStats.healsSuccessful++;
     return;
 
   } else {
+    if (!commitLearningOutcome(gameState.currentKanji.id, false, { question: gameState.currentKanji._recordQuestion, source: 'heal', reading: answer, hintLevel: gameState.hintLevel, answerRevealed: battleState.nearMissCount >= 2 }).ok) { reportAnswerSaveFailure(); return; }
     // 不正解処理
 
     // 不正解の答えを保存
@@ -5518,7 +5537,6 @@ gameState.playerStats.healsSuccessful++;
     
     battleState.lastAnswered = { ...gameState.currentKanji };
     gameState.wrongKanjiList.push({ ...gameState.currentKanji });
-    publish('addToReview', gameState.currentKanji.id);
     publish('playSE', 'wrong');
     addToLog(`読みがちがったみたい。${readingMsg}`);
     battleScreenState.showLogBlock([
@@ -5527,12 +5545,11 @@ gameState.playerStats.healsSuccessful++;
     ]);
 
     // 統計データの更新（不正解）
-    gameState.playerStats.totalIncorrect++;
     battleState.mistakesThisStage++;
     gameState.playerStats.comboCount = 0; // コンボカウントをリセット
 
     // 学習データ記録（かいふくでの読みちがいも記録する）
-    recordKanjiAnswer(gameState.currentKanji.id, false);
+
     // 翌日のSM-2とは別に、このステージの中でもう一度出会えるようにする
     scheduleKanjiRetry(gameState.currentKanji.id);
 
@@ -5774,17 +5791,8 @@ export function pickNextKanji() {
 function pickWeightedKanji(candidatePool) {
   // 1) 「さっき読めなかった字」の再会が来ていれば、それを優先する
   const retry = battleState.retryQueue || [];
-  for (let i = 0; i < retry.length; i++) {
-    if (retry[i].waitTurns > 0) continue;
-    const found = candidatePool.find(k => k.id === retry[i].id);
-    if (found) {
-      retry.splice(i, 1);
-      return found;
-    }
-    // プールに居ない（別ステージの字など）なら、待ち続けても仕方ないので捨てる
-    retry.splice(i, 1);
-    i--;
-  }
+  const retryKanji = takeDueRetry(retry, candidatePool, gameState.kanjiPool || []);
+  if (retryKanji) return retryKanji;
 
   // 2) 重み付き抽選
   const weightOf = (kanji) => {
@@ -5880,6 +5888,7 @@ function pickFromPool(pool, poolName) {
   };
 
   gameState.currentKanji = {
+    _recordQuestion: beginQuestion('battle'),
     id: selectedKanji.id,
     text: selectedKanji.kanji,
     kunyomi: processReadings(selectedKanji.kunyomi),
@@ -5891,6 +5900,7 @@ function pickFromPool(pool, poolName) {
     // 例文モードで使う。持っているのは1年の80字だけで、他の学年は空
     examples: selectedKanji.examples,
   };
+  battleScreenState._answerSubmission?.unlock?.();
 
   // 追加: マスター済み再出題なら、この出題中の1回だけ2倍ボーナスを有効化
   battleState.masteryBonusActive = isKanjiMastered(selectedKanji.id);
@@ -5973,23 +5983,25 @@ function waitForDefeatAnimationThen(callback) {
   // 子どもから見れば「倒したのに何も起きない」という止まった画面になる。
   // 実時間の締め切りを置いて、フレームが来なくても必ず先へ進むようにする。
   const DEADLINE_MS = 2000; // 演出は約1秒。その倍を上限にする
+  const owner = battleScreenState._generation;
+  const current = () => battleScreenState._active && battleScreenState._generation === owner;
   let fallbackId = null;
   let done = false;
 
   const run = () => {
-    if (done) return;
+    if (done || !current()) return;
     done = true;
     if (fallbackId !== null) clearManagedTimeout(fallbackId);
     callback();
   };
 
   const check = () => {
-    if (done) return;
+    if (done || !current()) return;
     if (battleState.enemyAction === 'defeat' && battleState.enemyActionTimer > 0) {
-      requestAnimationFrame(check);
+      battleScreenState._lifecycle.requestAnimationFrame(check);
     } else {
       // 念のため次フレームで実行（フレームが来なければ締め切りが拾う）
-      requestAnimationFrame(run);
+      battleScreenState._lifecycle.requestAnimationFrame(run);
     }
   };
 
@@ -6028,7 +6040,7 @@ function drawExpBar(ctx, x, y, width, height, currentExp, maxExp) {
     ctx.fillRect(x, y, width * expRatio, height);
     
         // アニメーション中は光るエフェクトを追加
-      if (battleScreenState.playerExpAnimating && currentExp > 0) {
+      if (!prefersReducedMotion() && battleScreenState.playerExpAnimating && currentExp > 0) {
       // バーの先端に光るハイライト
       const glowWidth = 5;
       const glowX = x + (width * expRatio) - glowWidth;
@@ -6359,6 +6371,7 @@ function colorize(s) {
  * @param {Object} currentStyle - 現在のスタイル情報
  */
 function drawShieldFrameEffects(ctx, x, y, width, height, shieldStyle, currentStyle) {
+  if (prefersReducedMotion()) return;
   const time = Date.now() * 0.003;
   const integrity = shieldStyle.hp / shieldStyle.maxHp;
   

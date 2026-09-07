@@ -24,7 +24,8 @@ self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     try {
       const names = await caches.keys();
-      await Promise.all(names.map(name => caches.delete(name)));
+      const isYomitabiCache = name => /^(learning-platform-v1|kanji-battle-|yomitabi-)/.test(name);
+      await Promise.all(names.filter(isYomitabiCache).map(name => caches.delete(name)));
     } catch {}
 
     try {
@@ -34,7 +35,9 @@ self.addEventListener('activate', (event) => {
     // 開いているページを、今度はネットワークから読み直させる
     try {
       const clients = await self.clients.matchAll({ type: 'window' });
-      clients.forEach(client => client.navigate(client.url));
+      clients
+        .filter(client => client.url.startsWith(self.registration.scope))
+        .forEach(client => client.navigate(client.url));
     } catch {}
   })());
 });

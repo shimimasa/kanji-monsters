@@ -13,6 +13,7 @@ export const images = {};                // key → HTMLImageElement
 const ASSET_PATHS = {
   MONSTER_FULL_PRIMARY: '/assets/images/monsters/full',
 };
+const PUBLIC_ASSET_REVISION = 'v1';
 
 /* ------------------------------------------------------------------ */
 /*  共通 UI 画像のプリロード                                           */
@@ -66,6 +67,51 @@ const UI_IMAGE_PATHS = {
   stageSelect9: '/assets/images/stage.select/stage.select9.png', // 準2級
   stageSelect10: '/assets/images/stage.select/stage.select10.png', // 2級
 };
+
+const STARTUP_IMAGE_KEYS = [
+  'logo',
+];
+
+async function loadUIEntry(key, src) {
+  if (images[key]) return images[key];
+  const needsTransparency = ['panelStone', 'panelPlayer', 'panelEnemy', 'iconOnyomi', 'iconKunyomi'].includes(key);
+  const img = await (needsTransparency ? loadImageWithTransparency(src) : loadImage(src));
+  images[key] = img;
+  return img;
+}
+
+async function loadUIEntries(entries, onProgress, concurrency = 4) {
+  let loadedCount = 0;
+  let nextIndex = 0;
+  onProgress?.(loadedCount, entries.length);
+  async function worker() {
+    while (nextIndex < entries.length) {
+      const [key, src] = entries[nextIndex++];
+      try {
+          await withDeadline(() => loadUIEntry(key, src));
+      } catch {
+        console.warn(`⚠️ ${src} の読み込み失敗`);
+      } finally {
+        loadedCount++;
+        onProgress?.(loadedCount, entries.length);
+      }
+    }
+  }
+  const workerCount = Math.min(entries.length, Math.max(1, concurrency));
+  await Promise.all(Array.from({ length: workerCount }, () => worker()));
+}
+
+export function loadStartupImages(onProgress) {
+  return loadUIEntries(
+    STARTUP_IMAGE_KEYS.map(key => [key, UI_IMAGE_PATHS[key]]),
+    onProgress,
+  );
+}
+
+export function loadRemainingUIImages(onProgress) {
+  const entries = Object.entries(UI_IMAGE_PATHS).filter(([key]) => !STARTUP_IMAGE_KEYS.includes(key));
+  return loadUIEntries(entries, onProgress, 3);
+}
 
 // L.73 付近の initAssets 関数を修正
 export async function initAssets() {
@@ -130,7 +176,6 @@ export async function loadBgImage(stageId) {
   const cacheKey = `bg_${id}`;
   if (images[cacheKey]) return images[cacheKey];
   
-  const timestamp = Date.now();
 
   // 候補ID: canonical のみを基本にし、最低限の互換だけ残す（アセット命名は変更しないため）
   // P1-2 方針: 例外（互換候補の追加）は **この2種類まで** とする（これ以上増やさない）。
@@ -176,20 +221,20 @@ export async function loadBgImage(stageId) {
   // 試行パスを列挙
   const pathsToTry = [];
   // 1) そのまま
-  pathsToTry.push(`/assets/images/backgrounds/${id}.webp?v=${timestamp}`);
+  pathsToTry.push(`/assets/images/backgrounds/${id}.webp?v=${PUBLIC_ASSET_REVISION}`);
   // 2) 最小限の候補
   for (const a of candidates) {
-    pathsToTry.push(`/assets/images/backgrounds/${a}.webp?v=${timestamp}`);
+    pathsToTry.push(`/assets/images/backgrounds/${a}.webp?v=${PUBLIC_ASSET_REVISION}`);
   }
   // 3) 地域 area1 の汎用フォールバック（webp → png の順）
-  pathsToTry.push(`/assets/images/backgrounds/${regionName}_area1.webp?v=${timestamp}`);
-  pathsToTry.push(`/assets/images/backgrounds/${regionName}_area1.png?v=${timestamp}`);
+  pathsToTry.push(`/assets/images/backgrounds/${regionName}_area1.webp?v=${PUBLIC_ASSET_REVISION}`);
+  pathsToTry.push(`/assets/images/backgrounds/${regionName}_area1.png?v=${PUBLIC_ASSET_REVISION}`);
   if (worldCapRegionName) {
-    pathsToTry.push(`/assets/images/backgrounds/${worldCapRegionName}_area1.webp?v=${timestamp}`);
-    pathsToTry.push(`/assets/images/backgrounds/${worldCapRegionName}_area1.png?v=${timestamp}`);
+    pathsToTry.push(`/assets/images/backgrounds/${worldCapRegionName}_area1.webp?v=${PUBLIC_ASSET_REVISION}`);
+    pathsToTry.push(`/assets/images/backgrounds/${worldCapRegionName}_area1.png?v=${PUBLIC_ASSET_REVISION}`);
   }
   // 4) 学年別のステージ選択画像（最終フォールバック）
-  pathsToTry.push(`/assets/images/stage.select/stage.select${getGradeFromStageId(id)}.png?v=${timestamp}`);
+  pathsToTry.push(`/assets/images/stage.select/stage.select${getGradeFromStageId(id)}.png?v=${PUBLIC_ASSET_REVISION}`);
 
   for (const path of pathsToTry) {
     try {
@@ -205,7 +250,7 @@ export async function loadBgImage(stageId) {
 
   // デフォルト
   try {
-    const defaultPath = `/assets/images/stage.select/stage.select.png?v=${timestamp}`;
+    const defaultPath = `/assets/images/stage.select/stage.select.png?v=${PUBLIC_ASSET_REVISION}`;
     const fallbackImg = await loadImageWithTransparency(defaultPath);
     images[cacheKey] = fallbackImg;
     return fallbackImg;
@@ -451,22 +496,7 @@ export async function loadAllGameData() {
  * @returns {Promise<void>}
  */
 export async function loadAll(onProgress) {
-  const entries = Object.entries(UI_IMAGE_PATHS);
-  const total = entries.length;
-  let loadedCount = 0;
-  onProgress?.(loadedCount, total);
-
-  for (const [key, src] of entries) {
-    try {
-      const needsTransparency = ['panelStone', 'panelPlayer', 'panelEnemy','iconOnyomi','iconKunyomi'].includes(key);
-      const img = await (needsTransparency ? loadImageWithTransparency(src) : loadImage(src));
-      images[key] = img;
-    } catch {
-      console.warn(`⚠️ ${src} の読み込み失敗`);
-    }
-    loadedCount++;
-    onProgress?.(loadedCount, total);
-  }
+  await loadUIEntries(Object.entries(UI_IMAGE_PATHS), onProgress);
 }
 
 // キャッシュクリア関数を追加
@@ -628,3 +658,4 @@ function getGradeFromStageId(stageId) {
 }
 
 
+import { withDeadline } from '../core/asyncDeadline.js';

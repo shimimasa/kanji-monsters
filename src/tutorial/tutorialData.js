@@ -1,3 +1,5 @@
+import { getLearningControls } from '../ui/learningControls.js';
+import { gameToScreenCoordinates } from '../utils/coordinateUtils.js';
 // tutorialData.js
 // 画面ごとのガイド手順を定義。座標は canvas 左上起点のpx。
 // 必要に応じて ctx からボタンや入力欄の矩形を算出して返す。
@@ -36,7 +38,7 @@ export function getStepsFor(screenId, ctx = {}) {
           },
           {
             title: 'マスターにちょうせん！',
-            text: '「マスター」ボタンで漢字の読みをマスターしよう！マスターを押した後に、ステージに入ろう！',
+            text: '「マスター」はゲームの達成マークだよ。登録された読みを各1回正解するとつくよ。文の中など、すべての読みの力を確かめたマークではないよ。',
             anchor: () => canvasRect(ctx.canvas, ( (ctx.canvas?.width||800)/2 - 70 ), 540, 140, 40)
           }
         ];
@@ -45,7 +47,7 @@ export function getStepsFor(screenId, ctx = {}) {
         return [
           {
             title: 'もんだい',
-            text: 'かんじの よみを いれよう。\nかなで入力 → Enterキー！',
+            text: '出ている かんじの よみを ひとつ いれよう。\nかなで入力 →「こうげき」！ EnterでもOK。',
             anchor: () => canvasBottomCenter(ctx.canvas, 320, 80) // 入力域の下辺を目安に
           },
           {
@@ -56,17 +58,17 @@ export function getStepsFor(screenId, ctx = {}) {
           {
             title: 'ヒント',
             text: 'わからないときは ヒントをつかってOK！\n4回おすと こたえも みられるよ。',
-            anchor: () => canvasTopRight(ctx.canvas, 180, 80)
+            anchor: () => learningButtonRect(ctx.canvas, 'hint')
           },
           {
             title: 'HPとこうげき',
-            text: 'こたえると こうげき！ まちがえると ダメージ！\nがんばって ぜんいん たおそう！',
+            text: '正解すると こうげき！ ダメージのルールは あそびかたで変わるよ。\nがんばって ぜんいん たおそう！',
             anchor: () => canvasTopLeft(ctx.canvas, 260, 120)
           },
           {
             title: 'こわくなったら',
             text: '「れんしゅうへ」をおすと、てきのいない\nれんしゅうモードで ゆっくり おぼえられるよ。',
-            anchor: () => canvasRect(ctx.canvas, 20, 64, 120, 32) // れんしゅうへボタン
+            anchor: () => learningButtonRect(ctx.canvas, 'practice') // れんしゅうへボタン
           }
         ];
   
@@ -133,14 +135,14 @@ export function getStepsFor(screenId, ctx = {}) {
     
           case 'practiceBattle':
             return [
-              { title: 'マスターモード', text: 'かなで よみを入力 → Enter！\nまちがえても へいき、れんしゅうだよ。', anchor: () => canvasBottomCenter(ctx.canvas, 320, 80) }
+              { title: 'マスターモード', text: 'かなで よみを入力 →「こたえる」！ EnterでもOK。\nまちがえても へいき、れんしゅうだよ。', anchor: () => canvasBottomCenter(ctx.canvas, 320, 80) }
             ];
         
              case 'courseSelect':
                return [
                  {
                    title: 'このゲームについて',
-                   text: '日本編（小学生の漢字）と 世界編（中学生の漢字）があります。\nはじめは 日本編から すすんでいこう！',
+                   text: '日本編（小学生の漢字）と 世界編（漢検4級〜2級の漢字）があります。\nはじめは 日本編から すすんでいこう！',
                    anchor: () => canvasCenterBox(ctx.canvas, 500, 160)
                  },
                  {
@@ -150,7 +152,7 @@ export function getStepsFor(screenId, ctx = {}) {
                 },
                 {
                   title: '世界編',
-                  text: 'ここは ちからが ついてからでもOK。中学生レベルのかんじに ちょうせん！',
+                  text: 'ここは ちからが ついてからでもOK。漢検4級〜2級のかんじに ちょうせん！',
                   anchor: () => buttonRect(ctx.world || { x: 430, y: 150, width: 280, height: 260 }, ctx.canvas)
                 },
                 {
@@ -169,13 +171,13 @@ export function getStepsFor(screenId, ctx = {}) {
  function canvasRectToViewport(canvas, r) {
      const b = canvas?.getBoundingClientRect?.();
      if (!b) return { x: r.x|0, y: r.y|0, w: r.w|0, h: r.h|0 };
-     const sx = b.width  / (canvas.width  || b.width);
-     const sy = b.height / (canvas.height || b.height);
+     const start = gameToScreenCoordinates(r.x, r.y, canvas);
+     const end = gameToScreenCoordinates(r.x + r.w, r.y + r.h, canvas);
      return {
-       x: Math.round(b.left + r.x * sx),
-       y: Math.round(b.top  + r.y * sy),
-       w: Math.round(r.w * sx),
-       h: Math.round(r.h * sy),
+       x: Math.round(start.x),
+       y: Math.round(start.y),
+       w: Math.round(end.x - start.x),
+       h: Math.round(end.y - start.y),
      };
    }    
   
@@ -219,3 +221,8 @@ export function getStepsFor(screenId, ctx = {}) {
    } 
 
   export default getStepsFor;
+function learningButtonRect(canvas, key) {
+ const c = canvas || document.getElementById('gameCanvas');
+ const b = getLearningControls(c)[key];
+ return canvasRect(c,b.x,b.y,b.w,b.h);
+}

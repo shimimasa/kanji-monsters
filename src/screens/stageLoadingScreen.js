@@ -2,14 +2,23 @@ import { publish } from '../core/eventBus.js';
 import { gameState } from '../core/gameState.js';
 import { getEnemiesByStageId } from '../loaders/dataLoader.js';
 import { loadBgImage, loadMonsterImage } from '../loaders/assetsLoader.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
+import { withDeadline } from '../core/asyncDeadline.js';
+import { showBootError, hideBootProgress } from '../ui/bootProgress.js';
+import { getLearningControls, drawLearningButton } from '../ui/learningControls.js';
+import { getGameCoordinates } from '../utils/coordinateUtils.js';
+import { isMouseOverRect } from '../ui/uiRenderer.js';
 
 const stageLoadingState = {
   canvas: null,
   ctx: null,
   progress: 0,
   stageId: null,
+  _lifecycle: createScreenLifecycle(),
 
   async enter(canvas) {
+    const generation = this._lifecycle.activate();
+    this.loadError = null;
     try {
       console.log("🔄 stageLoadingState.enter() 実行", { canvas, stageId: gameState.currentStageId });
       
@@ -25,6 +34,11 @@ const stageLoadingState = {
       }
       
       this.ctx = this.canvas.getContext('2d');
+      this._clickHandler = e => {
+        const {x,y} = getGameCoordinates(e,this.canvas);
+        if (isMouseOverRect(x,y,getLearningControls(this.canvas).back)) publish('changeScreen','stageSelect');
+      };
+      this.canvas.addEventListener?.('click',this._clickHandler);
       this.progress = 0;
       this.stageId = gameState.currentStageId;
 
@@ -55,6 +69,7 @@ const stageLoadingState = {
       let loadedCount = 0;
 
       const progressCallback = () => {
+        if (!this._lifecycle.active || this._lifecycle.generation !== generation || this.loadError) return;
         loadedCount++;
         this.progress = loadedCount / totalAssets;
         // 進捗状況を表示するために強制的に再描画
@@ -67,7 +82,8 @@ const stageLoadingState = {
       }));
 
       // Promise.allSettledを使用して、一部の画像が読み込めなくても続行
-      const results = await Promise.allSettled(wrappedPromises);
+      const results = await withDeadline(() => Promise.allSettled(wrappedPromises));
+      if (!this._lifecycle.active || this._lifecycle.generation !== generation) return;
       
       // 結果のログ出力
       const succeeded = results.filter(r => r.status === 'fulfilled').length;
@@ -80,12 +96,16 @@ const stageLoadingState = {
       // 直接ステージIDに遷移せず、常にbattleスクリーンに遷移する
       gameState.currentStageId = this.stageId;
       // キャンバスとステージIDを渡す
-      publish('changeScreen', 'battle', this.canvas);
+      publish('changeScreen', ['battle', this.canvas]);
 
     } catch (err) {
+      if (!this._lifecycle.active || this._lifecycle.generation !== generation) return;
       console.error(`[${this.stageId}]のアセット読み込み中にエラー:`, err);
-      alert('ステージの準備に失敗しました。ステージ選択に戻ります。');
-      publish('changeScreen', 'stageSelect');
+      this.loadError = err;
+      this._errorPanel = showBootError('ステージを準備できませんでした。もう一度ためすか、地図にもどれます。', {
+        retry: () => { const canvas = this.canvas; this.exit(); this.enter(canvas); },
+        back: () => publish('changeScreen','stageSelect'),
+      });
     }
   },
 
@@ -95,7 +115,10 @@ const stageLoadingState = {
 
     // ローディング画面の描画
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'black';
+    const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    bg.addColorStop(0, '#2c1810');
+    bg.addColorStop(1, '#3d2414');
+    ctx.fillStyle = bg;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const barWidth = 600;
@@ -103,22 +126,28 @@ const stageLoadingState = {
     const x = (canvas.width - barWidth) / 2;
     const y = (canvas.height - barHeight) / 2;
 
-    ctx.fillStyle = '#555';
+    ctx.fillStyle = 'rgba(255,255,255,0.16)';
     ctx.fillRect(x, y, barWidth, barHeight);
-    ctx.fillStyle = '#4caf50';
+    ctx.fillStyle = '#CD853F';
     ctx.fillRect(x, y, barWidth * this.progress, barHeight);
-    ctx.strokeStyle = '#fff';
+    ctx.strokeStyle = '#D2B48C';
     ctx.strokeRect(x, y, barWidth, barHeight);
 
     ctx.fillStyle = '#fff';
-    ctx.font = '16px "UDデジタル教科書体", sans-serif';
+    ctx.font = '18px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText(`${Math.floor(this.progress * 100)}%`, canvas.width / 2, y + barHeight + 8);
-    ctx.fillText(`ステージ準備中...`, canvas.width / 2, y - 20);
+    ctx.font = 'bold 26px "UDデジタル教科書体", sans-serif';
+    ctx.fillText('ステージを じゅんびしています', canvas.width / 2, y - 44);
+    const controls = getLearningControls(canvas);
+    drawLearningButton(ctx,controls.back,controls.scale);
   },
 
   exit() {
+    this._lifecycle.deactivate();
+    this.canvas?.removeEventListener?.('click',this._clickHandler);
+    if (this._errorPanel) { hideBootProgress(); this._errorPanel = null; }
     console.log("🚪 stageLoadingState.exit() 実行");
     this.ctx = null;
     this.canvas = null;

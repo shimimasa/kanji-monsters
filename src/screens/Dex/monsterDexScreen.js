@@ -3,6 +3,7 @@ import { loadDex, loadSeenMonsters, markAsSeen, isNewMonster, loadFavorites, sav
 import { getMonsterById, getAllMonsterIds } from '../../loaders/dataLoader.js';
 import { publish } from '../../core/eventBus.js';
 import { gameState } from '../../core/gameState.js';
+import { createScreenLifecycle } from '../../core/screenLifecycle.js';
 
 // --- グローバルスコープにあったヘルパー関数を、このファイル内に移動 ---
 
@@ -235,6 +236,7 @@ function showMonsterModal(monster) {
 }
 
 const monsterDexState = {
+  _lifecycle: createScreenLifecycle(),
   canvas: null,
   dexSet: null,
   seenSet: null,
@@ -265,6 +267,7 @@ const monsterDexState = {
   container: null,
 
   enter(canvas) {
+    this._lifecycle.activate();
     this.canvas = canvas || document.getElementById('gameCanvas');
     
     if (this.canvas) {
@@ -309,7 +312,7 @@ const monsterDexState = {
       }
     };
     window.addEventListener('keydown', this._keyHandler);
-    import('../../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('monsterDex', { canvas: this.canvas }));
+    import('../../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => m.default.startIfNeeded('monsterDex', { canvas: this.canvas })));
   },
 
   /** DOMコンテナを作成（KanjiDexと統一） */
@@ -982,6 +985,7 @@ rightControls.appendChild(nextBtn);
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    this._lifecycle.deactivate();
     // DOM要素を削除
     if (this.container) {
       this.container.remove();

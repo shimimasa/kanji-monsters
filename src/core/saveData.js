@@ -1,14 +1,53 @@
 // src/core/saveData.js
-// LocalStorage ベースのセーブ機構（v1）
+// LocalStorage ベースのセーブ機構（形式v2、カタログ版は別管理）
 // - 将来の IndexedDB 拡張に備え、APIは純粋関数で分離
 // - マイグレーション: 旧 'kanjiGameSave' や個別キー（bgmVolume/seVolume/krb_review_queue 等）を吸収
 
+import { validateSave } from './saveValidation.js';
+import { migrateKanjiIds, CATALOG_VERSION } from './kanjiIdMigration.js';
+import { saveProjection, collectCompatibilityEntries } from './saveProjection.js';
+import { writeStorageTransaction, recoverStorageTransaction } from './storageTransaction.js';
+
 const STORAGE_KEY = 'krb_save';
-const CURRENT_VERSION = 1;
+export const CURRENT_VERSION = 2;
+export const confirmedSaveKey = (slot = localStorage.getItem('yomitabi_slot') || '1') => `yomitabi_confirmed_${slot}`;
+export function captureSaveContext() {
+  return JSON.stringify([localStorage.getItem('yomitabi_slot') || '1', localStorage.getItem('yomitabi_storage_epoch'), localStorage.getItem(STORAGE_KEY)]);
+}
+export function isSaveContextCurrent(context) {
+  try { return context === captureSaveContext(); } catch { return false; }
+}
+export function hasLegacySave() {
+  if (localStorage.getItem('kanjiGameSave') !== null) return true;
+  for (const key of ['krb_review_queue','krb_kanji_dex','krb_monster_dex','quickReviewBuffer','krb_wrong_kanji']) {
+    const raw = localStorage.getItem(key);
+    if (raw !== null && !['[]','null',''].includes(raw.trim())) return true;
+  }
+  return Object.entries(collectCompatibilityEntries()).some(([key, value]) => /^(clear_|stage_clear_)/.test(key) && Number(value) > 0);
+}
+export function preserveLocalOriginal() {
+  const slot = localStorage.getItem('yomitabi_slot') || '1';
+  const key = `yomitabi_preserved_${slot}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  const entries = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (/^(krb_|clear_|stage_clear_|stage_first_clear_at_|bonus_|tutorial_seen_)/.test(k) ||
+        ['kanjiGameSave','quickReviewBuffer','playerStats','unlockedStages','kanjiBattleScores','dailyPracticeStats','bs_blockHistory'].includes(k)) entries[k] = localStorage.getItem(k);
+  }
+  entries[confirmedSaveKey()] = localStorage.getItem(confirmedSaveKey());
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const data = JSON.stringify(entries);
+  localStorage.setItem(`${key}_entries`, data);
+  if (localStorage.getItem(`${key}_entries`) !== data) throw new Error('Could not preserve legacy entries');
+  if (raw !== null) {
+    localStorage.setItem(key, raw);
+    if (localStorage.getItem(key) !== raw) throw new Error('Could not preserve original save');
+  }
+}
 
 export function getDefaultSave() {
   return {
-    meta: { version: CURRENT_VERSION, lastSavedAt: 0 },
+    meta: { version: CURRENT_VERSION, catalogVersion: CATALOG_VERSION, lastSavedAt: 0 },
     player: {
       name: '',
       coreStats: {
@@ -58,27 +97,44 @@ export function getDefaultSave() {
 }
 
 export function loadSave() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      // 旧データから移行
-      const migrated = migrateFromLegacyOrEmpty();
-      saveNow(migrated);
-      return migrated;
-    }
-    const parsed = JSON.parse(raw);
-    const fixed = migrateSave(parsed);
-    if (fixed !== parsed) saveNow(fixed);
-    return fixed;
-  } catch (e) {
-    console.warn('loadSave failed, fallback to default:', e);
-    const d = getDefaultSave();
-    saveNow(d);
-    return d;
+  const state = readSaveState();
+  if (state.status === 'valid') return state.save;
+  if (state.status === 'missing') {
+    try { return migrateFromLegacyOrEmpty(); } catch { return null; }
   }
+  return null;
+}
+
+export function readSaveState() {
+  try {
+    const recovery = recoverStorageTransaction();
+    if (!recovery.ok) return { status: 'unavailable', error: recovery.error };
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const slot = localStorage.getItem('yomitabi_slot');
+    if (slot !== null && !/^[1-3]$/.test(slot)) return { status: 'unavailable', raw, error: new Error('Invalid save slot') };
+    const confirmed = localStorage.getItem(confirmedSaveKey());
+    if (confirmed !== null && raw !== confirmed) return { status: 'conflict', raw, error: new Error('Save changed outside this version; both copies have been preserved') };
+    if (raw === null) return { status: 'missing', raw: null };
+    try {
+      const parsed = JSON.parse(raw);
+      const save = migrateSave(parsed);
+      // Only the active pre-v2 save may absorb missing legacy mirrors. Imports are pure.
+      if ((parsed.meta?.version || 0) < 2) {
+        if (!parsed.meta?.legacyStageProgressMerged) mergeLegacyStageProgressKeys(save);
+        save.meta.compatibilityEntries = collectCompatibilityEntries();
+        readLegacyStudyMirrors(save, parsed);
+        migrateKanjiIds(save);
+      }
+      validateSave(save, CURRENT_VERSION);
+      return { status: 'valid', raw, save };
+    }
+    catch (error) { return { status: error.code === 'UNSUPPORTED_VERSION' ? 'unsupported' : 'corrupt', raw, error }; }
+  } catch (error) { return { status: 'unavailable', error }; }
 }
 
 export function migrateSave(save) {
+  validateSave(save, CURRENT_VERSION);
+  save = JSON.parse(JSON.stringify(save));
   // バージョン未設定（v0 扱い）を v1 へ包む
   if (!save || !save.meta || typeof save.meta.version !== 'number') {
     const wrapped = getDefaultSave();
@@ -94,15 +150,14 @@ export function migrateSave(save) {
       if (save.practiceProgress) wrapped.player.study.practiceProgress = save.practiceProgress || {};
       if (save.kanjiReadProgress) wrapped.player.study.kanjiReadProgress = save.kanjiReadProgress || {};
     }
-    // 個別キーを取り込み
-    mergeAmbientKeys(wrapped);
+    // Import is independent of this device's current child and legacy mirrors.
     wrapped.meta.version = CURRENT_VERSION;
     wrapped.meta.lastSavedAt = Date.now();
-    return wrapped;
+    return migrateKanjiIds(wrapped);
   }
 
   // 既に v1 だが欠損があればデフォルトで埋める
-  if (save.meta.version === 1) {
+  if (save.meta.version <= CURRENT_VERSION) {
     const d = getDefaultSave();
     // 浅いマージで未知キーは温存
     save.meta.lastSavedAt = save.meta.lastSavedAt || 0;
@@ -114,41 +169,44 @@ export function migrateSave(save) {
     save.settings = Object.assign({}, d.settings, save.settings || {});
     save.flags = Object.assign({}, d.flags, save.flags || {});
 
-    // StepB-3: 旧クリアキー（clear_* / stage_clear_*）との差を縮めるため、
-    // 既存 krb_save(v1) に対しても「1回だけ」legacy進捗を取り込む。
-    // これにより、clearedStages が空（または欠損補完で空）でも legacy fallback が無視され続ける事故を防ぐ。
-    let changed = false;
-    if (!save.meta.legacyStageProgressMerged) {
-      const ok = mergeLegacyStageProgressKeys(save);
-      if (ok) {
-        save.meta.legacyStageProgressMerged = true;
-        changed = true;
-      }
-    }
-    if (changed) return Object.assign({}, save); // loadSave 側で saveNow されるよう参照を変える
-
-    return save;
+    // Ambient legacy keys are read only by the active local migration, never by imports.
+    save.meta.version = CURRENT_VERSION;
+    return migrateKanjiIds(save);
   }
 
-  // 将来バージョン: 段階的に引き上げる想定（今は 1 のみ）
-  // fallthrough: とりあえず最新版の型に埋め直す
-  const d = getDefaultSave();
-  return Object.assign(d, save);
+  throw new Error('Unsupported save migration');
 }
 
-export function saveNow(save) {
+export function saveNow(save, { replace = false, extraEntries = {} } = {}) {
   try {
-    save.meta = save.meta || {};
-    save.meta.version = CURRENT_VERSION;
-    save.meta.lastSavedAt = Date.now();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(save));
-  } catch (e) {
-    console.error('saveNow failed:', e);
-  }
+    const recovery = recoverStorageTransaction();
+    if (!recovery.ok) return recovery;
+    const state = readSaveState();
+    if (state.status === 'unavailable' || state.status === 'unsupported' ||
+        (['corrupt','conflict'].includes(state.status) && !replace)) return { ok: false, error: state.error };
+    const candidate = migrateSave(save);
+    candidate.meta.version = CURRENT_VERSION;
+    candidate.meta.lastSavedAt = Date.now();
+    candidate.meta.legacyStageProgressMerged = true;
+    validateSave(candidate, CURRENT_VERSION);
+    const entries = { ...extraEntries, [STORAGE_KEY]: JSON.stringify(candidate), ...saveProjection(candidate) };
+    entries[confirmedSaveKey()] = entries[STORAGE_KEY];
+    if (replace) entries.yomitabi_storage_epoch = `${Date.now()}-${Math.random()}`;
+    const oldMeta = state.status === 'valid' ? JSON.parse(state.raw).meta : null;
+    const needsMigration = state.status === 'valid' &&
+      (oldMeta?.version !== CURRENT_VERSION || oldMeta?.catalogVersion !== CATALOG_VERSION ||
+       JSON.stringify(JSON.parse(state.raw).player?.study?.legacyAmbiguousKanji) !== JSON.stringify(state.save.player.study.legacyAmbiguousKanji));
+    if (replace || needsMigration || state.status === 'missing') preserveLocalOriginal();
+    const result = writeStorageTransaction(entries);
+    return result.ok ? { ok: true, save: candidate } : result;
+  } catch (error) { return { ok: false, error }; }
 }
 
 export function clearSave() {
-  try { localStorage.removeItem(STORAGE_KEY); } catch {}
+  try {
+    preserveLocalOriginal();
+    return writeStorageTransaction({ [STORAGE_KEY]: null, kanjiGameSave: null, [confirmedSaveKey()]: null, yomitabi_storage_epoch: `${Date.now()}-${Math.random()}` });
+  } catch (error) { return { ok: false, error }; }
 }
 
 // ---------- StepB-1: 読み取り入口の集約（SSoT=krb_save 優先） ----------
@@ -156,7 +214,7 @@ export function clearSave() {
 // 目的: clear_* / stage_clear_* / stage_first_clear_at_* の読み取りを 1箇所に集約する。
 // - 新しい保存キー/スキーマは作らない（read-only）
 // - 既存挙動は fallback(localStorage) で維持する
-// - 注意: loadSave() は migrate に伴い saveNow() を呼び得るため、ここでは「読み取り専用」で krb_save を読む。
+// - loadSave/migrateSave are read-only; persistence is explicit in saveNow/loadGameData.
 
 function __readKrbSaveNoWrite() {
   try {
@@ -213,13 +271,13 @@ export function getStageFirstClearAt(stageId) {
 // ---------- 内部: レガシー取り込み ----------
 
 function migrateFromLegacyOrEmpty() {
-  const d = getDefaultSave();
+  let d = getDefaultSave();
 
   // 旧メインセーブ
-  try {
     const legacyRaw = localStorage.getItem('kanjiGameSave');
-    if (legacyRaw) {
+    if (legacyRaw !== null) {
       const legacy = JSON.parse(legacyRaw);
+      d = migrateSave(legacy);
       if (legacy?.playerName) d.player.name = legacy.playerName;
       if (legacy?.playerStats) Object.assign(d.player.coreStats, legacy.playerStats);
       if (legacy?.practiceProgress) d.player.study.practiceProgress = legacy.practiceProgress || {};
@@ -228,11 +286,32 @@ function migrateFromLegacyOrEmpty() {
         d.flags.achievementsUnlocked = legacy.unlockedAchievements.slice();
       }
     }
-  } catch {}
 
   mergeAmbientKeys(d);
+  d.meta.compatibilityEntries = collectCompatibilityEntries();
+  readLegacyStudyMirrors(d, {});
+  migrateKanjiIds(d);
+  validateSave(d, CURRENT_VERSION);
   d.meta.lastSavedAt = Date.now();
   return d;
+}
+
+function readLegacyStudyMirrors(save, original) {
+  const read = (key, fallback) => {
+    const raw = localStorage.getItem(key);
+    return raw === null ? fallback : JSON.parse(raw);
+  };
+  const study = save.player.study, collection = save.player.collection;
+  if (!original.player?.study?.reviewQueueDetail && localStorage.getItem('krb_review_queue') !== null) {
+    study.reviewQueueDetail = read('krb_review_queue', []);
+    if (!Array.isArray(study.reviewQueueDetail)) throw new Error('Invalid legacy review queue');
+    study.reviewQueue = study.reviewQueueDetail.map(e => e.id);
+  }
+  if (!original.player?.collection?.kanjiIds && localStorage.getItem('krb_kanji_dex') !== null) collection.kanjiIds = read('krb_kanji_dex', []);
+  collection.seenMonsterIds ??= read('krb_seen_monsters', []);
+  collection.favoriteMonsterIds ??= read('krb_monster_favorites', []);
+  study.quickReviewBuffer ??= read('quickReviewBuffer', null);
+  study.wrongKanji ??= read('krb_wrong_kanji', null);
 }
 
 function mergeAmbientKeys(saveObj) {
@@ -316,6 +395,7 @@ function clamp01(v) { return Math.max(0, Math.min(1, v)); }
 
 export function hardResetAllLocalData() {
   try {
+    preserveLocalOriginal();
     const targets = new Set([
       'krb_save', 'kanjiGameSave',
       'bgmVolume','seVolume','gameMode','maxHealCount','enemyAttackMode',
@@ -336,9 +416,9 @@ export function hardResetAllLocalData() {
         toDelete.push(k);
       }
     }
-    toDelete.forEach(k => { try { localStorage.removeItem(k); } catch {} });
-    console.log(`LocalStorage hard reset: ${toDelete.length} keys removed`);
+    return writeStorageTransaction({ ...Object.fromEntries(toDelete.map(k => [k, null])), [confirmedSaveKey()]: null, yomitabi_storage_epoch: `${Date.now()}-${Math.random()}` });
   } catch (e) {
     console.error('hardResetAllLocalData failed:', e);
+    return { ok: false, error: e };
   }
 }

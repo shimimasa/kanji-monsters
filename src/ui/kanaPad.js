@@ -105,7 +105,8 @@ const CSS = `
   padding: 0;
   /* パッドが場所を取るほど盤面が小さくなるので、高さは画面の高さ基準で抑える。
      6行ぶん積み上がることを忘れないこと（1キー+8px で全体は約+60px になる） */
-  height: calc(clamp(26px, 4.2vh, 38px) * var(--yomitabi-text-scale, 1));
+  min-height: 44px;
+  height: calc(44px * var(--yomitabi-text-scale, 1));
   line-height: 1;
   cursor: pointer;
 }
@@ -122,12 +123,13 @@ const CSS = `
   z-index: 2147483646;
   box-sizing: border-box;
   padding: 4px 10px;
+  min-height: 44px;
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 999px;
   background: rgba(59, 74, 99, 0.92);
   color: #fff;
   font-family: "UDデジタル教科書体", "Hiragino Sans", sans-serif;
-  font-size: calc(11px * var(--yomitabi-text-scale, 1));
+  font-size: calc(13px * var(--yomitabi-text-scale, 1));
   font-weight: bold;
   line-height: 1.5;
   cursor: pointer;
@@ -286,9 +288,13 @@ const KanaPad = {
       e.stopPropagation();
       action();
     };
-    btn.addEventListener('pointerdown', handler);
-    // pointer 非対応の端末向け
-    btn.addEventListener('touchstart', handler, { passive: false });
+    if ('PointerEvent' in window) {
+      btn.addEventListener('pointerdown', handler);
+    } else {
+      // 古いWebKit向け。pointerdownとtouchstartを同時登録して二重入力にしない。
+      btn.addEventListener('touchstart', handler, { passive: false });
+      btn.addEventListener('mousedown', handler);
+    }
   },
 
   _setValue(next) {
@@ -315,15 +321,10 @@ const KanaPad = {
     this._setValue(this.inputEl.value.slice(0, -1));
   },
 
-  /** 各画面がすでに持っている Enter の処理に乗せる */
+  /** 端末キーボードと同じ一回確定口へ送る（疑似Enterは作らない） */
   _submit() {
     if (!this.inputEl) return;
-    this.inputEl.dispatchEvent(new KeyboardEvent('keydown', {
-      key: 'Enter',
-      code: 'Enter',
-      bubbles: true,
-      cancelable: true
-    }));
+    this.inputEl.dispatchEvent(new CustomEvent('yomitabi:submit', { bubbles: true, cancelable: true }));
   },
 
   /** 入力欄が見えているか */

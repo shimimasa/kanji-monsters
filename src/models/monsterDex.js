@@ -1,3 +1,4 @@
+import { saveGameData } from '../core/gameState.js';
 // src/monsterDex.js
 // モンスターデックス管理モジュール
 // localStorage に Set<string> 形式で永続化
@@ -31,14 +32,7 @@ export function loadFavorites() {
  * @param {Set<string>} favSet
  */
 export function saveFavorites(favSet) {
-  try {
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favSet]));
-    import('../services/firebase/firebaseController.js')
-      .then(m => m.syncAllCaches?.())
-      .catch(() => {});
-  } catch (e) {
-    console.error('monsterDex: お気に入りの保存に失敗しました', e);
-  }
+  return saveGameData(save => { save.player.collection.favoriteMonsterIds = [...favSet]; });
 }
 
 /**
@@ -82,14 +76,7 @@ export function loadSeenMonsters() {
  * @param {Set<string>} dex
  */
 export function saveDex(dex) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...dex]));
-    import('../services/firebase/firebaseController.js')
-      .then(m => m.syncAllCaches?.())
-      .catch(() => {});
-  } catch (e) {
-    console.error('monsterDex: 図鑑の保存に失敗しました', e);
-  }
+  return saveGameData(save => { save.player.collection.gotomonIds = [...dex]; });
 }
 
 /**
@@ -97,14 +84,7 @@ export function saveDex(dex) {
  * @param {Set<string>} seenSet
  */
 export function saveSeenMonsters(seenSet) {
-  try {
-    localStorage.setItem(SEEN_STORAGE_KEY, JSON.stringify([...seenSet]));
-    import('../services/firebase/firebaseController.js')
-      .then(m => m.syncAllCaches?.())
-      .catch(() => {});
-  } catch (e) {
-    console.error('monsterDex: 確認済みモンスターの保存に失敗しました', e);
-  }
+  return saveGameData(save => { save.player.collection.seenMonsterIds = [...seenSet]; });
 }
 
 /**

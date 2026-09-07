@@ -5,6 +5,7 @@ import { loadDex } from '../../models/kanjiDex.js';
 import { getKanjiById, kanjiData, getKanjiByGrade, isKanjiMastered } from '../../loaders/dataLoader.js';
 import { gameState, getKanjiAnswerStats } from '../../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../../ui/uiRenderer.js';
+import { createScreenLifecycle } from '../../core/screenLifecycle.js';
 
 const BTN = {
   back: { x: 20, y: 20, w: 100, h: 30, label: 'ステージ選択へ' },
@@ -20,6 +21,7 @@ const BTN = {
 };
 
 const kanjiDexScreen = {
+  _lifecycle: createScreenLifecycle(),
   canvas: null,
   ctx:    null,
   dexSet: null,
@@ -45,6 +47,7 @@ const kanjiDexScreen = {
 
   /** enter：画面表示時の初期化 */
   enter(arg) {
+    this._lifecycle.activate();
     // 最新の収集状況を反映
     this.dexSet = loadDex();
     
@@ -116,7 +119,7 @@ const kanjiDexScreen = {
       }
     };
     window.addEventListener('keydown', this._keyHandler);
-    import('../../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('kanjiDex', { canvas: this.canvas }));
+    import('../../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => m.default.startIfNeeded('kanjiDex', { canvas: this.canvas })));
   },
 
   createDOMHeader() {
@@ -817,7 +820,7 @@ const kanjiDexScreen = {
     Object.assign(statsEl.style, { margin: '6px 0 2px', fontSize: '14px' });
     if (total > 0) {
       const pct = Math.round((stats.correct / total) * 100);
-      statsEl.innerHTML = `<strong>よめた回数:</strong> ${stats.correct}回（ちょうせん ${total}回）`;
+      statsEl.innerHTML = `<strong>正解入力回数:</strong> ${stats.correct}回（ヒントを含む／ちょうせん ${total}回）`;
       wrap.appendChild(statsEl);
 
       const barWrap = document.createElement('div');
@@ -843,7 +846,7 @@ const kanjiDexScreen = {
 
     if (prog?.mastered) {
       const badge = document.createElement('p');
-      badge.textContent = '⭐ マスターかんじ！';
+      badge.textContent = '⭐ マスターかんじ！ ゲームの達成マークです。文の中など、すべての場面で読めることを示すものではありません。';
       Object.assign(badge.style, { margin: '8px 0 0', color: '#b7950b', fontWeight: '700' });
       wrap.appendChild(badge);
     }
@@ -1099,6 +1102,7 @@ const kanjiDexScreen = {
 
   /** exit：画面離脱時のクリーンアップ */
   exit() {
+    this._lifecycle.deactivate();
     // DOM要素を削除
     if (this.container) {
       this.container.remove();

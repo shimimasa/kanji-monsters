@@ -17,9 +17,13 @@
  * @param {string} label
  * @param {string} [fill='#2980b9']
  */
-export function drawButton(ctx, x, y, width, height, label, fill = '#2980b9') {
+export function drawButton(ctx, x, y, width, height, label, fill = '#8B4513') {
   ctx.fillStyle = fill;
   ctx.fillRect(x, y, width, height);
+
+  ctx.strokeStyle = '#D2B48C';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x + 1, y + 1, width - 2, height - 2);
 
   ctx.fillStyle = 'white';
   ctx.font = '18px "UDデジタル教科書体", sans-serif';
@@ -84,7 +88,7 @@ export function drawGauge(ctx, x, y, w, h, value, fill = '#27ae60') {
  * @param {boolean} isHovered
  * @param {boolean} isPressed
  */
-export function drawStoneButton(ctx, x, y, width, height, label, isHovered = false, isPressed = false) {
+export function drawStoneButton(ctx, x, y, width, height, label, isHovered = false, isPressed = false, fontSize = 18) {
   // 押下状態の表現を追加
   const pressOffset = isPressed ? 2 : 0;
   const shadowOffset = isHovered ? 4 : (isPressed ? 1 : 3);
@@ -119,7 +123,7 @@ export function drawStoneButton(ctx, x, y, width, height, label, isHovered = fal
   
   // テキストを描画
   ctx.fillStyle = 'white';
-  ctx.font = '18px "UDデジタル教科書体", sans-serif';
+  ctx.font = `${fontSize}px "UDデジタル教科書体", sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(label, x + width / 2, adjustedY + height / 2);

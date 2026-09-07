@@ -1,15 +1,19 @@
 import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
-import { gameState, updatePlayerName, clearSaveData } from '../core/gameState.js';
+import { gameState, updatePlayerName, clearSaveData, isSaveSessionReady, saveGameData } from '../core/gameState.js';
 import { getCurrentUser } from '../services/firebase/firebaseController.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { hardResetAllLocalData } from '../core/saveData.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { listSlots, switchToSlot } from '../core/saveSlots.js';
+import { prefersReducedMotion } from '../ui/motionPreferences.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
 const titleState = {
+  _lifecycle: createScreenLifecycle(),
   /** 画面表示時の初期化 */
   enter(canvas) {
+    this._lifecycle.activate();
     // BGM再生
     // publish('playBGM', 'title');
     
@@ -20,8 +24,8 @@ const titleState = {
     
     // アニメーション用の時間管理
     this.animationTime = 0;
-    this.logoFloatSpeed = 0.02; // ロゴ浮遊の速度
-    this.logoFloatAmplitude = 8; // ロゴ浮遊の振幅（ピクセル）
+    this.logoFloatSpeed = 0.001; // 約6秒で一往復する穏やかな速度
+    this.logoFloatAmplitude = prefersReducedMotion() ? 0 : 5;
     this.particleTime = 0; // パーティクル用時間
     
     // プレイヤー名の有無でUIを変更
@@ -64,7 +68,7 @@ const titleState = {
     
     this.registerHandlers();
     // チュートリアル（初回のみ）
-    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('title', { canvas: this.canvas, playButton: this.playButton }));
+    import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => m.default.startIfNeeded('title', { canvas: this.canvas, playButton: this.playButton })));
     // 非表示設定なら既存ボタンを確実に除去
     try {
       const showSave = localStorage.getItem('showSaveButton') === '1';
@@ -134,7 +138,7 @@ const titleState = {
     this._drawPaperTexture(ctx, cw, ch);
 
     // 魔法のパーティクル効果
-    this._drawMagicParticles(ctx, cw, ch);
+    if (!prefersReducedMotion()) this._drawMagicParticles(ctx, cw, ch);
   },
 
   /** 和紙のような質感を描画 */
@@ -148,10 +152,10 @@ const titleState = {
     
     for (let i = 0; i < 50; i++) {
       ctx.beginPath();
-      const x1 = Math.random() * cw;
-      const y1 = Math.random() * ch;
-      const x2 = x1 + (Math.random() - 0.5) * 100;
-      const y2 = y1 + (Math.random() - 0.5) * 100;
+      const x1 = (i * 137) % cw;
+      const y1 = (i * 83) % ch;
+      const x2 = x1 + ((i % 5) - 2) * 18;
+      const y2 = y1 + ((i % 7) - 3) * 12;
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
       ctx.stroke();
@@ -205,7 +209,7 @@ const titleState = {
     if (images.logo) {
       const { width: iw, height: ih } = images.logo;
       let w = cw * 0.6, h = (cw * 0.6 / iw) * ih;
-      if (h > ch * 0.25) { h = ch * 0.25; w = (ch * 0.25 / ih) * iw; }
+      if (h > ch * 0.36) { h = ch * 0.36; w = (ch * 0.36 / ih) * iw; }
       
       // 浮遊アニメーション：Math.sin()を使って上下に揺らす
       const floatOffset = Math.sin(this.animationTime * this.logoFloatSpeed) * this.logoFloatAmplitude;
@@ -267,7 +271,7 @@ const titleState = {
     
     // 巻物の背景
     const scrollX = cw / 2 - 200;
-    const scrollY = ch * 0.4 - 20;
+    const scrollY = ch * 0.46 - 20;
     const scrollWidth = 400;
     const scrollHeight = 40;
     
@@ -279,7 +283,7 @@ const titleState = {
     ctx.font = '24px "UDデジタル教科書体", serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(message, cw / 2, ch * 0.4);
+    ctx.fillText(message, cw / 2, ch * 0.46);
     ctx.restore();
   },
 
@@ -420,6 +424,7 @@ const titleState = {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    this._lifecycle.deactivate();
     this.unregisterHandlers();
     const old = document.getElementById('titleSaveButton');
     if (old) old.remove();
@@ -457,12 +462,13 @@ const titleState = {
     btn.textContent = '💾 セーブ';
     btn.onclick = () => {
       try {
-        // 動的importでgameStateのsaveを呼ぶ
-        import('../core/gameState.js').then(mod => {
-          mod.saveGameData();
+        const result = saveGameData();
+        if (result.ok) {
           publish('playSE', 'decide');
           this._showSaveToast('セーブしました');
-        }).catch(console.error);
+        } else {
+          this._showSaveToast('セーブできませんでした。前の記録は残っています。');
+        }
       } catch (e) {
         console.error(e);
       }
@@ -484,6 +490,10 @@ const titleState = {
 
   /** プレイヤー名確認と画面遷移の共通処理 */
 _startGame() {
+  if (!isSaveSessionReady()) {
+    alert('セーブを安全に読み込めていません。通信を確認して再読込するか、設定からバックアップを読み込んでください。元のデータは保持しています。');
+    return;
+  }
   // プレイヤー名未設定なら名前入力画面へ遷移
   if (!gameState.playerName) {
     publish('changeScreen', 'playerNameInput');
@@ -496,6 +506,7 @@ _startGame() {
 
   /** 前回あそんだステージのID（stageDataで実在確認できたもののみ） */
   _getResumableStageId() {
+    if (!isSaveSessionReady()) return null;
     try {
       const id = localStorage.getItem('lastPlayedStage');
       if (!id) return null;
@@ -558,7 +569,8 @@ _startGame() {
       
             try {
               // 1. ゲームデータのクリア（完全削除）
-              hardResetAllLocalData();
+              const reset = hardResetAllLocalData();
+              if (!reset.ok) throw reset.error;
               
               // 2. Firebase関連データのクリア（必要に応じて）
               const user = getCurrentUser();
@@ -697,6 +709,8 @@ _startGame() {
         if (switchToSlot(slot.index)) {
           // 切り替えたら読み込み直す（前の子の状態を残さない）
           location.reload();
+        } else {
+          alert('セーブを安全に切り替えられませんでした。元のデータは保持しています。');
         }
       });
       panel.appendChild(row);

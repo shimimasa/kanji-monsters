@@ -1,11 +1,12 @@
 import basePractice from './practiceBattleScreen.js';
-import { gameState, battleState, saveGameData } from '../core/gameState.js';
+import { gameState, battleState, saveGameData, beginQuestion } from '../core/gameState.js';
 import { publish } from '../core/eventBus.js';
 import { getKanjiByStageId } from '../loaders/dataLoader.js';
 
 
 const quickReviewPracticeScreen = {
   ...basePractice,
+  recordSource: 'quick-review',
   // セッション追跡用の集合
   pendingReviewIds: new Set(),
   originalReviewIds: new Set(),
@@ -127,12 +128,12 @@ const quickReviewPracticeScreen = {
         .map(k => (k.kanji || k.text || ''))
         .filter(Boolean);
   
-      try { alert(`誤答の復習が完了しました！\n今回マスター: ${list.length ? list.join(' ') : '（なし）'}`); } catch {}
+      try { alert(`誤答の復習が完了しました！\n今回とりくんだ字: ${list.length ? list.join(' ') : '（なし）'}`); } catch {}
   
       // レビューに進むか？（OK=レビュー / キャンセル=ステージ選択）
       let goReview = false;
       try {
-        goReview = window.confirm('このまま○で隠した読みのレビューを続けますか？\nOK=レビュー / キャンセル=ステージ選択');
+        goReview = window.confirm('もう少しつづけますか？\nOK：もう1もん（今回の字で練習）\nキャンセル：今日はここまで（地図へ）');
       } catch {} 
 
       if (goReview) {
@@ -216,6 +217,7 @@ const quickReviewPracticeScreen = {
       };
 
       gameState.currentKanji = {
+        _recordQuestion: beginQuestion('quick-review'),
         id: selectedKanji.id,
         text: selectedKanji.kanji,
         kunyomi: processReadings(selectedKanji.kunyomi),
@@ -226,6 +228,8 @@ const quickReviewPracticeScreen = {
         jlpt: selectedKanji.jlpt || '',
       };
 
+      this._answerSubmission?.unlock?.();
+      battleState.nearMissCount = 0;
       gameState.hintLevel = 0;
       this.practiceStats.lastQuestionTime = Date.now();
     } catch (e) {
@@ -235,10 +239,10 @@ const quickReviewPracticeScreen = {
   },
 
   // 正解時にIDを消し込み（本当にマスター済みになった場合のみ）
-  _handlePracticeCorrect(answer) {
+  _handlePracticeCorrect(answer, learningOutcome) {
     try {
       if (typeof basePractice._handlePracticeCorrect === 'function') {
-        basePractice._handlePracticeCorrect.call(this, answer);
+        basePractice._handlePracticeCorrect.call(this, answer, learningOutcome);
       }
       if (gameState.currentKanji && gameState.currentKanji.id !== undefined) {
         const idKey = String(gameState.currentKanji.id);
@@ -311,6 +315,7 @@ _pickNextReviewQuestion() {
     };
 
     gameState.currentKanji = {
+      _recordQuestion: beginQuestion('quick-review'),
       id: selectedKanji.id,
       text: selectedKanji.kanji,
       kunyomi: normalizeReadings(selectedKanji.kunyomi),
@@ -332,6 +337,8 @@ _pickNextReviewQuestion() {
     }
     this.reviewTargetReading = allReadings[Math.floor(Math.random() * allReadings.length)];
 
+    this._answerSubmission?.unlock?.();
+    battleState.nearMissCount = 0;
     gameState.hintLevel = 0;
     this.practiceStats.lastQuestionTime = Date.now();
   } catch (e) {

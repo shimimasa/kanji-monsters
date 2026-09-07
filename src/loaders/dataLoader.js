@@ -1,6 +1,8 @@
+import { fetchJsonResponse } from '../core/asyncDeadline.js';
 // js/dataLoader.js
 import { gameState } from '../core/gameState.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
+import { validateKanjiCatalog } from '../core/kanjiIdMigration.js';
 
 export let stageData = [];
 let enemyData = [];
@@ -22,20 +24,22 @@ const __canon = (raw) => {
   return canon || r;
 };
 
-export async function loadAllGameData() {
+let allGameDataPromise = null;
+
+async function performLoadAllGameData() {
   try {
     console.log("外部JSONファイルの読み込みを開始します...");
 
     // 複数学年の漢字データをまとめて読み込む
     const grades = [1, 2, 3, 4, 5, 6];
     const kanjiPromises = grades.map(n =>
-      fetch(`/data/kanji_g${n}_proto.json`).then(r => {
+      fetchJsonResponse(`/data/kanji_g${n}_proto.json`).then(r => {
         if (!r.ok) throw new Error(`漢字データ g${n} の読み込みに失敗: ${r.statusText}`);
         return r.json();
       })
     );
     const kanjiArrays = await Promise.all(kanjiPromises);
-    kanjiData = kanjiArrays.flat().map(k => ({
+    kanjiData = validateKanjiCatalog(kanjiArrays.flat()).map(k => ({
       ...k,
       stageId: Array.isArray(k?.stageId) ? k.stageId.map(__canon) : __canon(k?.stageId),
       incorrectCount: k.incorrectCount ?? 0
@@ -53,71 +57,23 @@ export async function loadAllGameData() {
     }
     console.log("漢字データを学年別に整理しました:", Object.keys(kanjiByGrade).map(g => `${g}年生: ${kanjiByGrade[g].length}件`));
 
-    // 中学生用の漢字データを読み込む（7〜10年生相当）
-    try {
-      // 漢検4級（7年生相当）
-      const g7Response = await fetch('/data/kanji_g7_proto.json').catch(() => null);
-      if (g7Response && g7Response.ok) {
-        const g7Data = await g7Response.json();
-        kanjiByGrade[7] = g7Data;
-        console.log(`漢検4級（7年生相当）の漢字データ: ${g7Data.length}件`);
-      }
-
-      // 漢検3級（8年生相当）
-      const g8Response = await fetch('/data/kanji_g8_proto.json').catch(() => null);
-      if (g8Response && g8Response.ok) {
-        const g8Data = await g8Response.json();
-        kanjiByGrade[8] = g8Data;
-        console.log(`漢検3級（8年生相当）の漢字データ: ${g8Data.length}件`);
-      }
-
-      // 漢検準2級（9年生相当）
-      const g9Response = await fetch('/data/kanji_g9_proto.json').catch(() => null);
-      if (g9Response && g9Response.ok) {
-        const g9Data = await g9Response.json();
-        kanjiByGrade[9] = g9Data;
-        console.log(`漢検準2級（9年生相当）の漢字データ: ${g9Data.length}件`);
-      }
-
-      // 漢検2級（10年生相当）
-      const g10Response = await fetch('/data/kanji_g10_proto.json').catch(() => null);
-      if (g10Response && g10Response.ok) {
-        const g10Data = await g10Response.json();
-        kanjiByGrade[10] = g10Data;
-        console.log(`漢検2級（10年生相当）の漢字データ: ${g10Data.length}件`);
-      }
-    } catch (error) {
-      console.warn("中学生用漢字データの読み込みに一部失敗しました:", error);
-    }
-
-    // 中学生用の漢字データがない場合のフォールバック
-    if (!kanjiByGrade[7]) {
-      console.log("漢検4級の漢字データが見つからないため、小学6年生の漢字を代用します");
-      kanjiByGrade[7] = kanjiByGrade[6] || [];
-    }
-    if (!kanjiByGrade[8]) {
-      console.log("漢検3級の漢字データが見つからないため、小学6年生の漢字を代用します");
-      kanjiByGrade[8] = kanjiByGrade[6] || [];
-    }
-    if (!kanjiByGrade[9]) {
-      console.log("漢検準2級の漢字データが見つからないため、小学6年生の漢字を代用します");
-      kanjiByGrade[9] = kanjiByGrade[6] || [];
-    }
-    if (!kanjiByGrade[10]) {
-      console.log("漢検2級の漢字データが見つからないため、小学6年生の漢字を代用します");
-      kanjiByGrade[10] = kanjiByGrade[6] || [];
-    }
+    // 世界編も必須教材。失敗を別学年で代用しない。
+    const upperGrades = await Promise.all([7, 8, 9, 10].map(async grade => {
+      const response = await fetchJsonResponse(`/data/kanji_g${grade}_proto.json`);
+      return [grade, await response.json()];
+    }));
+    for (const [grade, data] of upperGrades) kanjiByGrade[grade] = validateKanjiCatalog(data);
 
         // 敵データ読み込み
         const enemyPath = '/data/enemies_proto.json';
-        const enemyResponse = await fetch(enemyPath);
+        const enemyResponse = await fetchJsonResponse(enemyPath);
         if (!enemyResponse.ok) throw new Error(`敵データの読み込みに失敗: ${enemyResponse.statusText}`);
         enemyData = (await enemyResponse.json()).map(e => e && e.stageId ? ({ ...e, stageId: __canon(e.stageId) }) : e);
         console.log("敵データ読み込み完了");
     
                 // 追加: 伝説/幻ゴトモンの読み込みをマージ
                 try {
-                  const legendResp = await fetch('/data/enemies_legend.json');
+                  const legendResp = await fetchJsonResponse('/data/enemies_legend.json');
                   if (legendResp && legendResp.ok) {
                     const more = await legendResp.json();
                     // 学年推定: stageId / id プレフィックス
@@ -151,14 +107,14 @@ export async function loadAllGameData() {
 
         // ステージデータ読み込み
         const stagePath = '/data/stages_proto.json';
-        const stageResponse = await fetch(stagePath);
+        const stageResponse = await fetchJsonResponse(stagePath);
         if (!stageResponse.ok) throw new Error(`ステージデータの読み込みに失敗: ${stageResponse.statusText}`);
         stageData = (await stageResponse.json()).map(s => s && s.stageId ? ({ ...s, stageId: __canon(s.stageId) }) : s);
         console.log("ステージデータ読み込み完了");
     
         // 追加: ボーナスステージ定義のマージ（存在時のみ）
         try {
-          const bonusResp = await fetch('/data/stages.bonus.json').catch(() => null);
+          const bonusResp = await fetchJsonResponse('/data/stages.bonus.json').catch(() => null);
           if (bonusResp && bonusResp.ok) {
             const bonusStages = await bonusResp.json();
             const exists = new Set(stageData.map(s => s?.stageId).filter(Boolean));
@@ -231,14 +187,34 @@ export async function loadAllGameData() {
           //}
         //}
 
+    const catalogue = validateKanjiCatalog(Object.values(kanjiByGrade).flat());
+    const ids = new Set(catalogue.map(k => k.id));
+    const enemies = new Set(enemyData.map(e => e.id));
+    for (const stage of stageData) {
+      if (stage.kanjiPoolIdList?.some(id => !ids.has(id)) || stage.enemyIdList?.some(id => !enemies.has(id))) {
+        throw new Error('ステージの教材がそろっていません: ' + stage.stageId);
+      }
+    }
     return { kanjiData, enemyData, stageData };
   } catch (error) {
+    kanjiData = []; kanjiByGrade = {}; stageData = []; enemyData = []; stageKanjiMap = {};
     console.error("ゲームデータの読み込み中にエラーが発生しました:", error);
     return null;
   }
 }
 
-
+export function loadAllGameData() {
+  if (!allGameDataPromise) {
+    allGameDataPromise = performLoadAllGameData().then(result => {
+      if (!result) allGameDataPromise = null;
+      return result;
+    }, error => {
+      allGameDataPromise = null;
+      throw error;
+    });
+  }
+  return allGameDataPromise;
+}
 export function getEnemiesByStageId(stageId) {
   // ボーナス: 通常ステージ型（伝説5体）。レビュー解放で幻が混入
   const m = /^bonus_g(\d+)$/i.exec(stageId);
@@ -441,8 +417,18 @@ export function getKanjiByStageId(stageId) {
     console.log(`bonus_g${g}: 学年全漢字プールを使用します`);
     return getKanjiByGrade(g);
   }
-  
-  // 中学生ステージの場合、学年に基づいて漢字プールを取得
+
+  // ステージごとの出題範囲を最優先する。世界編も学年全件ではなく、
+  // stages_proto に定義された範囲で反復できる量に保つ。
+  const st =
+    stageData.find(s => String(s.stageId || '') === canonId) ||
+    (rawId && rawId !== canonId ? stageData.find(s => String(s.stageId || '') === rawId) : null);
+  if (st && Array.isArray(st.kanjiPoolIdList) && st.kanjiPoolIdList.length > 0) {
+    const pool = st.kanjiPoolIdList.map(id => getKanjiById(id)).filter(Boolean);
+    if (pool.length > 0) return pool;
+  }
+
+  // 古い・定義外の世界ステージだけは学年プールへフォールバックする
   if (canonId.startsWith('asia_')) {
     console.log('4級（grade 7）の漢字プールを使用します');
     return getKanjiByGrade(7);
@@ -525,8 +511,8 @@ export function getKanjiByGrade(grade) {
   }
   
   // 該当する学年の漢字がない場合、代替として小学6年生の漢字を使用
-  console.warn(`学年${grade}の漢字データがありません。代替として小学6年生の漢字を使用します。`);
-  return kanjiByGrade[6] || kanjiData.filter(k => k.grade === 6) || [];
+  console.warn(`学年${grade}の教材を取得できていません。再読み込みが必要です。`);
+  return [];
 }
 
 // 追加: ID から単一の漢字データを取得するヘルパ関数
@@ -655,10 +641,10 @@ async function _loadGrades(grades) {
   if (!Array.isArray(grades) || grades.length === 0) return;
   const tasks = grades.map(async g => {
     try {
-      const r = await fetch(`/data/kanji_g${g}_proto.json`).catch(() => null);
+      const r = await fetchJsonResponse(`/data/kanji_g${g}_proto.json`).catch(() => null);
       if (!r || !r.ok) return;
       const arr = await r.json();
-      kanjiByGrade[g] = Array.isArray(arr) ? arr : [];
+      kanjiByGrade[g] = validateKanjiCatalog(arr);
       // 重複を避けつつ kanjiData に統合
       const exist = new Set(kanjiData.map(k => k.id));
       for (const k of kanjiByGrade[g]) {
@@ -691,7 +677,7 @@ export async function loadProverbs() {
 
   proverbPromise = (async () => {
     try {
-      const res = await fetch('/data/proverbs_with_monsters.json');
+      const res = await fetchJsonResponse('/data/proverbs_with_monsters.json');
       if (!res.ok) throw new Error(`ことわざの読み込みに失敗: ${res.statusText}`);
       const arr = await res.json();
       proverbData = Array.isArray(arr) ? arr : [];

@@ -2,6 +2,47 @@
 //
 // すべての一時データを 1 か所に集約し、他モジュールは「読む／書く」だけ。
 // これ以上の入れ子は作らず、必要に応じてプロパティを追加していく方針。
+import { loadSave, saveNow, captureSaveContext, isSaveContextCurrent, readSaveState, clearSave, confirmedSaveKey, hasLegacySave } from './saveData.js';
+import { saveProjection, collectCompatibilityEntries } from './saveProjection.js';
+import { writeStorageTransaction } from './storageTransaction.js';
+let loadedContext = null;
+export function isSaveSessionReady() {
+  return loadedContext !== null && isSaveContextCurrent(loadedContext);
+}
+let recordingSession = 0;
+let recordedQuestions = new WeakSet();
+let recordedClears = new WeakSet();
+let pendingRecordSave = false;
+let pendingCloudSync = false;
+function scheduleCloudSync() {
+  if (pendingCloudSync || typeof window === 'undefined') return;
+  pendingCloudSync = true;
+  const session = recordingSession;
+  queueMicrotask(async () => {
+    pendingCloudSync = false;
+    if (session !== recordingSession || !isSaveContextCurrent(loadedContext)) return;
+    try {
+      const { syncAllCaches } = await import('../services/firebase/firebaseController.js');
+      if (session === recordingSession && isSaveContextCurrent(loadedContext)) {
+        const result = await syncAllCaches();
+        if (!result.ok && !result.offline) console.warn('Cloud sync paused; local save is retained', result.error);
+      }
+    } catch (error) { console.warn('Cloud sync unavailable; local save is retained', error); }
+  });
+}
+export function beginQuestion(source) {
+  return { id: globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`, source, session: recordingSession };
+}
+function scheduleRecordSave() {
+  if (pendingRecordSave) return;
+  pendingRecordSave = true;
+  const session = recordingSession;
+  queueMicrotask(() => {
+    pendingRecordSave = false;
+    if (session === recordingSession) saveGameData();
+  });
+}
+
 export const battleState = {
   turn: 'player', // 'player' または 'enemy'
   inputEnabled: true,
@@ -124,10 +165,13 @@ export const gameState = {
   /**
    * ステージクリア時に呼び出す統計更新関数
    */
-  export function recordStageCleared() {
+  export function recordStageCleared(run = battleState.stageRun) {
+    if (!run || run.session !== recordingSession || recordedClears.has(run)) return false;
+    recordedClears.add(run);
     gameState.playerStats.stagesCleared++;
     saveGameData();
     console.log(`📊 クリアしたステージ数: ${gameState.playerStats.stagesCleared}`);
+    return true;
   }
 
   /**
@@ -163,17 +207,38 @@ export const gameState = {
 
   /**
    * 漢字1問の正誤を学習記録（正史）に加算する
-   * 保存は既存のセーブ契機（ステージクリア・EXP加算等）に相乗りする
+   * 同じ問題の確定を一度記録し、現在の同期処理が終わる時点で保存する。
    * @param {string|number} kanjiId
    * @param {boolean} isCorrect
    */
-  export function recordKanjiAnswer(kanjiId, isCorrect) {
-    if (kanjiId === null || kanjiId === undefined || kanjiId === '') return;
+  export function recordKanjiAnswer(kanjiId, isCorrect, context = {}) {
+    if (kanjiId === null || kanjiId === undefined || kanjiId === '') return false;
+    const question = context.question;
+    if (question && (question.session !== recordingSession || recordedQuestions.has(question))) return false;
+    if (question) recordedQuestions.add(question);
     if (!gameState.kanjiAnswerStats) gameState.kanjiAnswerStats = {};
     const key = String(kanjiId);
     const stats = gameState.kanjiAnswerStats[key] || (gameState.kanjiAnswerStats[key] = { correct: 0, incorrect: 0 });
     if (isCorrect) stats.correct++;
     else stats.incorrect++;
+    if (['attack','heal'].includes(context.source)) gameState.playerStats[isCorrect ? 'totalCorrect' : 'totalIncorrect']++;
+    const support = context.answerRevealed === true || context.hintLevel === 4 ? 'revealed'
+      : Number.isInteger(context.hintLevel) && context.hintLevel >= 0 && context.hintLevel <= 3
+        ? ['independent','hint1','hint2','hint3'][context.hintLevel] : 'unknown';
+    const observe = target => {
+      const measured = target.observed || (target.observed = { version: 1, correct: {}, incorrect: 0 });
+      if (isCorrect) measured.correct[support] = (measured.correct[support] || 0) + 1;
+      else measured.incorrect++;
+    };
+    observe(stats);
+    stats.lastObservation = { questionId: question?.id || null, source: context.source || question?.source || 'unknown',
+      reading: typeof context.reading === 'string' ? context.reading : null, support, correct: !!isCorrect };
+    if (isCorrect && typeof context.reading === 'string') {
+      const progress = gameState.kanjiReadProgress[key] || (gameState.kanjiReadProgress[key] = { onyomi: new Set(), kunyomi: new Set(), mastered: false });
+      const readings = progress.observedReadings || (progress.observedReadings = {});
+      const values = readings[support] || (readings[support] = []);
+      if (!values.includes(context.reading)) values.push(context.reading);
+    }
 
     // 日別カウンタ（週次の成長表示用）
     if (!gameState.dailyAnswerStats) gameState.dailyAnswerStats = {};
@@ -181,6 +246,7 @@ export const gameState = {
     const day = gameState.dailyAnswerStats[dayKey] || (gameState.dailyAnswerStats[dayKey] = { correct: 0, total: 0 });
     day.total++;
     if (isCorrect) day.correct++;
+    observe(day);
 
     // 古い日別記録は60日で間引く（肥大化防止）
     const keys = Object.keys(gameState.dailyAnswerStats);
@@ -190,6 +256,13 @@ export const gameState = {
         delete gameState.dailyAnswerStats[k];
       }
     }
+    if (!context.deferSave) scheduleRecordSave();
+    return true;
+  }
+
+  // commitLearningOutcome が保存に失敗した時だけ、同じ問題を安全に再試行できるように戻す。
+  export function releaseRecordedQuestion(question) {
+    if (question) recordedQuestions.delete(question);
   }
 
   /**
@@ -286,7 +359,7 @@ function serializeKanjiReadProgress(progress) {
   for (const [id, prog] of Object.entries(progress || {})) {
     const ony = prog?.onyomi instanceof Set ? Array.from(prog.onyomi) : Array.isArray(prog?.onyomi) ? prog.onyomi : [];
     const kun = prog?.kunyomi instanceof Set ? Array.from(prog.kunyomi) : Array.isArray(prog?.kunyomi) ? prog.kunyomi : [];
-    out[id] = { onyomi: ony, kunyomi: kun, mastered: !!prog?.mastered };
+    out[id] = { ...prog, onyomi: ony, kunyomi: kun, mastered: !!prog?.mastered };
   }
   return out;
 }
@@ -295,7 +368,7 @@ function deserializeKanjiReadProgress(raw) {
   for (const [id, prog] of Object.entries(raw || {})) {
     const onyArr = Array.isArray(prog?.onyomi) ? prog.onyomi : [];
     const kunArr = Array.isArray(prog?.kunyomi) ? prog.kunyomi : [];
-    out[id] = { onyomi: new Set(onyArr), kunyomi: new Set(kunArr), mastered: !!prog?.mastered };
+    out[id] = { ...prog, onyomi: new Set(onyArr), kunyomi: new Set(kunArr), mastered: !!prog?.mastered };
   }
   return out;
 }
@@ -315,77 +388,34 @@ function incrementStageClearCount(stageId) {
   /**
    * ゲームデータをlocalStorageに保存する
    */
-  export function saveGameData() {
+  export function saveGameData(updateSnapshot) {
     try {
+        if (!loadedContext || !isSaveContextCurrent(loadedContext)) return { ok: false, error: new Error('Save session changed or is not ready') };
       // セーブのベースを取得
-      import('./saveData.js').then(mod => {
-        const { getDefaultSave, loadSave, saveNow } = mod;
-        const base = loadSave ? loadSave() : getDefaultSave();
+        const base = loadSave();
+        if (!base) return { ok: false, error: new Error('Save is not readable') };
 
         // 現在のレビューキュー/図鑑などはローカルキーからスナップショット
-        let gotomonIds = [];
-        try {
-          const dex = JSON.parse(localStorage.getItem('krb_monster_dex') || '[]');
-          if (Array.isArray(dex)) gotomonIds = dex.filter(x => typeof x === 'string');
-        } catch {}
-        let reviewIds = [];
+        const gotomonIds = JSON.parse(localStorage.getItem('krb_monster_dex') || '[]');
         // NOTE: reviewQueue は id 配列としてしか保存しておらず、しかも読み戻す処理が
         // どこにも無かったため、ファイル経由のバックアップで「今日の復習」が空になっていた。
         // 互換のため id 配列（reviewQueue）はそのまま残し、SM-2 の間隔まで含めた
         // 全項目を reviewQueueDetail として併せて保存する。
-        let reviewDetail = [];
-        try {
-          const rq = JSON.parse(localStorage.getItem('krb_review_queue') || '[]');
-          if (Array.isArray(rq)) {
-            reviewIds = rq.map(e => e?.id).filter(Boolean);
-            reviewDetail = rq.filter(e => e && e.id);
-          }
-        } catch {}
+        const reviewDetail = JSON.parse(localStorage.getItem('krb_review_queue') || '[]');
+        const reviewIds = reviewDetail.map(e => e.id);
 
         // ボーナスの称号カウント（bonus_{grade}_clearCount / _firstClear）も
         // localStorage にしかなく、バックアップで失われていた。
         const bonusCounters = {};
-        try {
-          for (let i = 0; i < localStorage.length; i++) {
-            const k = localStorage.key(i);
-            if (!k) continue;
-            const m = /^bonus_(\d+)_(clearCount|firstClear)$/.exec(k);
-            if (!m) continue;
-            const g = m[1];
-            bonusCounters[g] = bonusCounters[g] || {};
-            if (m[2] === 'clearCount') {
-              const n = parseInt(localStorage.getItem(k) || '0', 10);
-              bonusCounters[g].clearCount = Number.isFinite(n) ? n : 0;
-            } else {
-              bonusCounters[g].firstClear = localStorage.getItem(k) === '1';
-            }
-          }
-        } catch {}
-
-        // ステージクリアの統合
-        const cleared = new Set(base?.player?.progress?.clearedStages || []);
-        // NOTE: 以前は window.gameState を読んでいたが、window.gameState への代入は
-        // コードベースのどこにも存在せず（読み取り2箇所のみ）、この分岐は常に false だった。
-        // その結果、clear_* 互換ミラーの書き込み停止(StepC-1)以降、新規クリアが
-        // krb_save に一切保存されず、リロードで巻き戻っていた。
-        // 同一モジュールの gameState（正史）を直接参照する。
-        if (gameState.stageProgress) {
-          Object.entries(gameState.stageProgress).forEach(([sid, v]) => {
-            if (v && v.cleared) cleared.add(sid);
-          });
-        }
         for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (!k) continue;
-          if (k.startsWith('clear_') && localStorage.getItem(k) === '1') cleared.add(k.replace(/^clear_/, ''));
-          if (k.startsWith('stage_clear_')) {
-            const sid = k.replace(/^stage_clear_/, '');
-            const v = parseInt(localStorage.getItem(k) || '0', 10);
-            if (v > 0) cleared.add(sid);
-          }
+          const key = localStorage.key(i);
+          const match = /^bonus_(\d+)_(clearCount|firstClear)$/.exec(key);
+          if (!match) continue;
+          const value = bonusCounters[match[1]] || (bonusCounters[match[1]] = {});
+          value[match[2]] = match[2] === 'firstClear' ? localStorage.getItem(key) === '1' : Number(localStorage.getItem(key));
         }
-
-                // 音量・設定
+        const cleared = new Set(Object.entries(gameState.stageProgress || {}).filter(([, p]) => p.cleared).map(([id]) => id));
+                  // 音量・設定
                 const bgm = parseFloat(localStorage.getItem('bgmVolume') || `${base.settings?.bgmVolume ?? 0.7}`);
                 const se  = parseFloat(localStorage.getItem('seVolume')  || `${base.settings?.seVolume  ?? 0.8}`);
                 const gameMode = localStorage.getItem('gameMode') || base.settings?.gameMode || 'jikkuri';
@@ -407,24 +437,30 @@ function incrementStageClearCount(stageId) {
                 const rubyMode = (localStorage.getItem('rubyMode') ?? `${base.settings?.rubyMode ? '1' : '0'}`) === '1';
         
                 // 新スキーマを更新
-                const save = base || getDefaultSave();
+                const save = base;
                 save.player = save.player || {};
                 save.player.name = gameState.playerName || save.player.name || '';
                 save.player.coreStats = Object.assign({}, save.player.coreStats || {}, gameState.playerStats || {});
                 save.player.progress = Object.assign({}, save.player.progress || {}, {
-                  currentStage: gameState.currentStageId || save.player?.progress?.currentStage || null,
+                  currentStage: gameState.currentStageId,
+                  checkpoints: Object.fromEntries(Object.entries(gameState.stageProgress || {}).filter(([, p]) => !p.cleared && p.checkpoint !== undefined).map(([id, p]) => [id, p.checkpoint])),
                   clearedStages: Array.from(cleared),
                   bonusCounters,
                   stageBestTimes: Object.assign({}, save.player?.progress?.stageBestTimes, gameState.stageBestTimes || {})
                 });
                 save.player.collection = Object.assign({}, save.player.collection || {}, {
-                  gotomonIds
+                  gotomonIds,
+                  kanjiIds: JSON.parse(localStorage.getItem('krb_kanji_dex') || '[]'),
+                  seenMonsterIds: JSON.parse(localStorage.getItem('krb_seen_monsters') || '[]'),
+                  favoriteMonsterIds: JSON.parse(localStorage.getItem('krb_monster_favorites') || '[]')
                 });
                 save.player.study = Object.assign({}, save.player.study || {}, {
                   practiceProgress: gameState.practiceProgress || {},
                   kanjiReadProgress: serializeKanjiReadProgress(gameState.kanjiReadProgress || {}),
                   reviewQueue: reviewIds,
                   reviewQueueDetail: reviewDetail,
+                  quickReviewBuffer: JSON.parse(localStorage.getItem('quickReviewBuffer') || 'null'),
+                  wrongKanji: JSON.parse(localStorage.getItem('krb_wrong_kanji') || 'null'),
                   // 漢字別の正答/誤答の累計（{ [kanjiId]: { correct, incorrect } }）
                   answers: gameState.kanjiAnswerStats || {},
                   // 日別の解答数（{ 'YYYY-MM-DD': { correct, total } }）
@@ -456,170 +492,82 @@ function incrementStageClearCount(stageId) {
           achievementsUnlocked: Array.from(gameState.unlockedAchievements)
         });
         
-        saveNow(save);
+        if (typeof updateSnapshot === 'function') updateSnapshot(save);
+        save.meta.recordingVersion = 1;
+        save.meta.compatibilityEntries = collectCompatibilityEntries();
+        const result = saveNow(save);
+        if (result.ok) { loadedContext = captureSaveContext(); scheduleCloudSync(); }
 
         // P0-2 StepA: 旧フォーマット（kanjiGameSave）への新規書き込みを停止（読み取り互換は saveData 側のマイグレーションで維持）
-        console.log('💾 ゲームデータを保存しました');
-      }).catch(e => console.warn('saveData import failed:', e));
+        if (!result.ok) console.warn('ゲームデータの保存に失敗しました', result.error);
+        return result;
     } catch (error) {
       console.error('❌ ゲームデータの保存に失敗しました:', error);
+      return { ok: false, error };
     }
   }
 
-  export function loadGameData() {
+  export async function loadGameData() {
     try {
-      return import('./saveData.js').then(mod => {
-        const save = mod.loadSave();
-        if (!save) return false;
-
-        // 反映
-        if (save.player?.name) gameState.playerName = save.player.name;
-        if (save.player?.coreStats) Object.assign(gameState.playerStats, save.player.coreStats);
-
-        if (save.player?.study?.practiceProgress) {
-          gameState.practiceProgress = save.player.study.practiceProgress || {};
-        }
-        // ▼ kanjiReadProgress 反映＋図鑑を復元
-        const rawKRP = save.player?.study?.kanjiReadProgress || {};
-        if (rawKRP) {
-          gameState.kanjiReadProgress = deserializeKanjiReadProgress(rawKRP || {});
-          try {
-            const ids = [];
-            for (const [id, prog] of Object.entries(rawKRP)) {
-              const onLen  = Array.isArray(prog?.onyomi) ? prog.onyomi.length : 0;
-              const kunLen = Array.isArray(prog?.kunyomi) ? prog.kunyomi.length : 0;
-              if (prog?.mastered || onLen > 0 || kunLen > 0) ids.push(id);
-            }
-            if (ids.length > 0) localStorage.setItem('krb_kanji_dex', JSON.stringify(ids));
-          } catch {}
-        }
-        // 復習キュー（krb_review_queue）を復元する。
-        // reviewQueueDetail があれば SM-2 の間隔ごと戻し、無ければ id 配列から
-        // 「すぐ復習対象」の最小エントリを組み立てる（古いバックアップとの互換）。
-        try {
-          const detail = save.player?.study?.reviewQueueDetail;
-          const ids = save.player?.study?.reviewQueue;
-          if (Array.isArray(detail) && detail.length > 0) {
-            localStorage.setItem('krb_review_queue', JSON.stringify(detail.filter(e => e && e.id)));
-          } else if (Array.isArray(ids) && ids.length > 0) {
-            const rebuilt = ids.filter(Boolean).map(id => ({
-              id: String(id), repetition: 0, interval: 0, eFactor: 2.5, nextReviewAt: Date.now()
-            }));
-            localStorage.setItem('krb_review_queue', JSON.stringify(rebuilt));
-          }
-        } catch {}
-
-        // ボーナスの称号カウントを復元する
-        try {
-          const counters = save.player?.progress?.bonusCounters;
-          if (counters && typeof counters === 'object') {
-            for (const [g, v] of Object.entries(counters)) {
-              if (!v || typeof v !== 'object') continue;
-              if (Number.isFinite(v.clearCount)) {
-                localStorage.setItem(`bonus_${g}_clearCount`, String(v.clearCount));
-              }
-              if (v.firstClear) localStorage.setItem(`bonus_${g}_firstClear`, '1');
-            }
-          }
-        } catch {}
-
-        // 追加: レビュー解放のロード
-        if (save.player?.study?.stageReviewUnlocked) {
-          gameState.stageReviewUnlocked = save.player.study.stageReviewUnlocked || {};
-        }
-        // 漢字別の正答/誤答の累計（旧スキーマの配列は捨ててマップのみ受け入れる）
-        const rawAnswers = save.player?.study?.answers;
-        if (rawAnswers && typeof rawAnswers === 'object' && !Array.isArray(rawAnswers)) {
-          gameState.kanjiAnswerStats = rawAnswers;
-        }
-        // 日別の解答数
-        const rawDaily = save.player?.study?.dailyAnswerStats;
-        if (rawDaily && typeof rawDaily === 'object' && !Array.isArray(rawDaily)) {
-          gameState.dailyAnswerStats = rawDaily;
-        }
-        
-        if (save.player?.progress?.stageBestTimes) {
-          gameState.stageBestTimes = Object.assign({}, save.player.progress.stageBestTimes);
-        }
-
-        // ▼ 追加: ゴトモン図鑑（krb_monster_dex）を localStorage に復元
-        if (Array.isArray(save.player?.collection?.gotomonIds)) {
-          try {
-            localStorage.setItem('krb_monster_dex', JSON.stringify(save.player.collection.gotomonIds));
-          } catch {}
-        }
-
-        // ステージ進捗（軽量反映）
-        if (Array.isArray(save.player?.progress?.clearedStages)) {
-          gameState.stageProgress = gameState.stageProgress || {};
-          save.player.progress.clearedStages.forEach(id => {
-            gameState.stageProgress[id] = { cleared: true };
-            // P0-2 StepC-1: clear_* 互換ミラー書き込みを停止（読み取り互換は saveData.isStageCleared の legacy fallback で維持）
-            // try { localStorage.setItem(`clear_${id}`, '1'); } catch {}
-          });
-        }
-        if (save.player?.progress?.currentStage) {
-          gameState.currentStageId = save.player.progress.currentStage;
-          try { localStorage.setItem('lastPlayedStage', gameState.currentStageId); } catch {}
-        }
-
-        // 実績（v1）読込
-        if (Array.isArray(save.flags?.achievementsUnlocked)) {
-          gameState.unlockedAchievements = new Set(save.flags.achievementsUnlocked);
-        }
-        // 音量等は AudioManager が localStorage から起動時読込するためここでは保存のみ（整合性確保）
-        if (save.settings) {
-          try {
-            if (typeof save.settings.bgmVolume === 'number') localStorage.setItem('bgmVolume', `${save.settings.bgmVolume}`);
-            if (typeof save.settings.seVolume  === 'number') localStorage.setItem('seVolume',  `${save.settings.seVolume}`);
-            if (save.settings.gameMode)      localStorage.setItem('gameMode', save.settings.gameMode);
-            if (save.settings.maxHealCount)  localStorage.setItem('maxHealCount', `${save.settings.maxHealCount}`);
-            if (save.settings.enemyAttackMode) localStorage.setItem('enemyAttackMode', save.settings.enemyAttackMode);
-            if ('showTimer' in save.settings) localStorage.setItem('showTimer', save.settings.showTimer ? '1' : '0');
-            if (save.settings.healMode) localStorage.setItem('healMode', save.settings.healMode);
-            if ('autosaveEnabled' in save.settings) localStorage.setItem('autosaveEnabled', save.settings.autosaveEnabled ? '1' : '0');
-            if ('autosaveMinutes' in save.settings) localStorage.setItem('autosaveMinutes', `${save.settings.autosaveMinutes}`);
-            if ('cbMode' in save.settings) localStorage.setItem('cbMode', save.settings.cbMode ? '1' : '0');
-            if ('bigFont' in save.settings) localStorage.setItem('bigFont', save.settings.bigFont ? '1' : '0');
-            if ('weaknessScope' in save.settings) localStorage.setItem('weaknessScope', save.settings.weaknessScope ? '1' : '0');
-            if ('exampleMode' in save.settings) localStorage.setItem('exampleMode', save.settings.exampleMode ? '1' : '0');
-            if ('rubyMode' in save.settings) localStorage.setItem('rubyMode', save.settings.rubyMode ? '1' : '0');
-            // 文字サイズと配色は描画のたびに参照するので localStorage を読み直させない。
-            // セーブから書き戻した時だけ、判定用の値を取り直す。
-            import('../ui/textScale.js').then(m => m.refresh()).catch(() => {});
-            import('../ui/palette.js').then(m => m.refresh()).catch(() => {});
-            import('./readingScope.js').then(m => m.refresh()).catch(() => {});
-            import('./exampleMode.js').then(m => m.refresh()).catch(() => {});
-            import('../ui/ruby.js').then(m => m.refresh()).catch(() => {});
-          } catch {}
-        }
-
-        console.log('💾 ゲームデータを読み込みました');
-        return true;
-      }).catch(e => {
-        console.warn('load saveData failed:', e);
-        return false;
-      });
-    } catch (error) {
-      console.error('❌ ゲームデータの読み込みに失敗しました:', error);
-      return Promise.resolve(false);
-    }
+      loadedContext = null;
+      recordingSession++;
+      recordedQuestions = new WeakSet();
+      recordedClears = new WeakSet();
+      let save = loadSave();
+      if (!save) return false;
+      const state = readSaveState();
+      const old = state.raw && JSON.parse(state.raw);
+      const legacy = state.status === 'missing' && hasLegacySave();
+      const migrationNeeded = legacy || (old && JSON.stringify(old) !== JSON.stringify(save));
+      const entries = saveProjection(save);
+      if (state.raw !== null) entries[confirmedSaveKey()] = state.raw;
+      const projected = migrationNeeded ? saveNow(save) : writeStorageTransaction(entries);
+      if (!projected.ok) return false;
+      if (projected.save) save = projected.save;
+      const { player } = save;
+      gameState.playerName = player.name;
+      gameState.playerStats = { ...player.coreStats };
+      gameState.practiceProgress = player.study.practiceProgress || {};
+      gameState.kanjiReadProgress = deserializeKanjiReadProgress(player.study.kanjiReadProgress || {});
+      gameState.kanjiAnswerStats = player.study.answers || {};
+      gameState.dailyAnswerStats = player.study.dailyAnswerStats || {};
+      gameState.stageReviewUnlocked = player.study.stageReviewUnlocked || {};
+      gameState.stageBestTimes = player.progress.stageBestTimes || {};
+      gameState.currentStageId = player.progress.currentStage;
+      gameState.stageProgress = {};
+      for (const [id, checkpoint] of Object.entries(player.progress.checkpoints || {})) gameState.stageProgress[id] = { checkpoint };
+      for (const id of player.progress.clearedStages) gameState.stageProgress[id] = { cleared: true };
+      gameState.unlockedAchievements = new Set(save.flags.achievementsUnlocked || []);
+      gameState.quickReviewTargets = player.study.quickReviewBuffer || null;
+      gameState.wrongKanjiList = [];
+      gameState.correctKanjiList = [];
+      loadedContext = captureSaveContext();
+      if (typeof window !== 'undefined') {
+        import('../ui/textScale.js').then(m => m.refresh()).catch(() => {});
+        import('../ui/palette.js').then(m => m.refresh()).catch(() => {});
+        import('./readingScope.js').then(m => m.refresh()).catch(() => {});
+        import('./exampleMode.js').then(m => m.refresh()).catch(() => {});
+        import('../ui/ruby.js').then(m => m.refresh()).catch(() => {});
+      }
+      return true;
+    } catch (error) { console.warn('Save hydration failed', error); return false; }
   }
 
   export function clearSaveData() {
-    try {
-      import('./saveData.js').then(mod => mod.clearSave && mod.clearSave());
-      localStorage.removeItem('kanjiGameSave'); // 旧フォーマットも削除
-      console.log('💾 セーブデータを削除しました');
-    } catch {}
+    const result = clearSave();
+    if (result.ok) loadedContext = null;
+    return result;
   }
 
 
   /* ---- 🔧 ラッパ関数（必要最低限だけ用意） ----------------------------- */
   
   export function updatePlayerName(newName) {
+    const previous = gameState.playerName;
     gameState.playerName = newName.trim();
-    saveGameData(); // プレイヤー名変更時もセーブ
+    const result = saveGameData();
+    if (!result.ok) gameState.playerName = previous;
+    return result;
   }
   
   export function resetStageProgress(stageId) {
@@ -629,6 +577,3 @@ function incrementStageClearCount(stageId) {
     gameState.enemies            = [];
     gameState.kanjiPool          = [];
   }
-
-// ゲーム開始時にセーブデータを自動読み込み
-loadGameData();

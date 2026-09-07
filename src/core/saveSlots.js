@@ -17,6 +17,9 @@
 //     （スロット1は users/{uid}/... のまま）。
 //   ・名前は krb_save の player.name をそのまま使う。別に持たない。
 
+import { migrateSave, confirmedSaveKey } from './saveData.js';
+import { writeStorageTransaction, recoverStorageTransaction } from './storageTransaction.js';
+
 export const MAX_SLOTS = 3;
 
 // このモジュール自身のキー。控えの中身と混ざらないよう krb_ は付けない
@@ -31,7 +34,7 @@ const OWNED_EXACT = [
   'quickReviewBuffer', 'dailyPracticeStats', 'bs_blockHistory',
   'lastPlayedStage',
   // 見え方の設定は、その子に付いて回るべきものなので一緒に持ち運ぶ
-  'cbMode', 'bigFont'
+  'cbMode', 'bigFont', 'weaknessScope', 'exampleMode', 'rubyMode'
 ];
 
 /** 子ども1人ぶんのデータにあたるキー（前方一致） */
@@ -67,36 +70,12 @@ export function getCurrentSlot() {
 /** localStorage 上の「いまの子ども」のデータを丸ごと取り出す */
 function collectOwnedEntries() {
   const entries = {};
-  try {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (!isOwnedKey(key)) continue;
       entries[key] = localStorage.getItem(key);
     }
-  } catch {}
   return entries;
-}
-
-/** localStorage 上の「いまの子ども」のデータを消す */
-function clearOwnedEntries() {
-  const toDelete = [];
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (isOwnedKey(key)) toDelete.push(key);
-    }
-    toDelete.forEach(key => { try { localStorage.removeItem(key); } catch {} });
-  } catch {}
-}
-
-/** 控えを localStorage に書き戻す */
-function restoreEntries(entries) {
-  if (!entries) return;
-  try {
-    Object.entries(entries).forEach(([key, value]) => {
-      if (typeof value === 'string') localStorage.setItem(key, value);
-    });
-  } catch {}
 }
 
 /** いまのスロットの中身を控えに書き出す（切り替えの前に必ず呼ぶ） */
@@ -104,7 +83,8 @@ export function snapshotCurrentSlot() {
   const slot = getCurrentSlot();
   try {
     localStorage.setItem(slotStoreKey(slot), JSON.stringify(collectOwnedEntries()));
-  } catch {}
+    return true;
+  } catch { return false; }
 }
 
 /** 控えから、その子の名前を読み出す（無ければ null） */
@@ -158,24 +138,28 @@ export function listSlots() {
  */
 export function switchToSlot(next) {
   if (!Number.isInteger(next) || next < 1 || next > MAX_SLOTS) return false;
+  if (!recoverStorageTransaction().ok) return false;
   const current = getCurrentSlot();
   if (next === current) return false;
 
-  // 1) いまの子のデータを控えへ
-  snapshotCurrentSlot();
-
-  // 2) 場を空ける
-  clearOwnedEntries();
-
-  // 3) 行き先の控えを戻す（空のスロットなら何も戻さない＝新しい子として始まる）
   try {
+    if (!recoverStorageTransaction().ok) return false;
+    const slotValue = localStorage.getItem(CURRENT_SLOT_KEY);
+    if (slotValue !== null && !/^[1-3]$/.test(slotValue)) return false;
     const raw = localStorage.getItem(slotStoreKey(next));
-    restoreEntries(raw ? JSON.parse(raw) : null);
-  } catch {}
-
-  // 4) 現在位置を更新
-  try { localStorage.setItem(CURRENT_SLOT_KEY, String(next)); } catch {}
-  return true;
+    const target = raw === null ? {} : JSON.parse(raw);
+    if (!target || typeof target !== 'object' || Array.isArray(target) ||
+        Object.entries(target).some(([key, value]) => !isOwnedKey(key) || typeof value !== 'string')) return false;
+    if (target.krb_save !== undefined) migrateSave(JSON.parse(target.krb_save));
+    const confirmed = localStorage.getItem(confirmedSaveKey(String(next)));
+    if (confirmed !== null && target.krb_save !== confirmed) return false;
+    const source = collectOwnedEntries();
+    const entries = { [slotStoreKey(current)]: JSON.stringify(source) };
+    for (const key of new Set([...Object.keys(source), ...Object.keys(target)])) entries[key] = target[key] ?? null;
+    entries[CURRENT_SLOT_KEY] = String(next);
+    entries.yomitabi_storage_epoch = `${Date.now()}-${Math.random()}`;
+    return writeStorageTransaction(entries).ok;
+  } catch { return false; }
 }
 
 /**
@@ -186,8 +170,7 @@ export function switchToSlot(next) {
  * @param {string} uid
  * @returns {object} DocumentReference（この下に profile / progress が並ぶ）
  */
-export function userRootRef(db, uid) {
+export function userRootRef(db, uid, slot = getCurrentSlot()) {
   const root = db.collection('users').doc(uid);
-  const slot = getCurrentSlot();
   return slot === 1 ? root : root.collection('slots').doc(String(slot));
 }

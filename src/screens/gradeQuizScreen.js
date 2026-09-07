@@ -1,12 +1,16 @@
 import { publish } from '../core/eventBus.js';
-import ReviewQueue from '../models/reviewQueue.js';
 import { getKanjiByGrade, getKanjiById, getEnemiesByGrade, stageData } from '../loaders/dataLoader.js';
 import { loadMonsterImage, loadBgImage } from '../loaders/assetsLoader.js';
-import { gameState, recordKanjiAnswer, saveGameData } from '../core/gameState.js';
+import { gameState, beginQuestion, saveGameData } from '../core/gameState.js';
 import { drawStoneButton, drawGauge, isMouseOverRect } from '../ui/uiRenderer.js';
 import { drawRoundedRect } from '../ui/canvasUtils.js';
 import { toHiragana, getReadings, findNearMiss, getNearMissLines } from '../utils/readings.js';
 import { getGameCoordinates, isValidCoordinates, gameToScreenCoordinates } from '../utils/coordinateUtils.js';
+import { bindInputSubmission, classifyReadingAnswer } from '../core/answerSubmission.js';
+import { commitLearningOutcome } from '../core/learningOutcome.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
+import { getQuizResultSummary } from '../core/learningPresentation.js';
+import { getLearningControls, drawLearningButton, placeLearningInput } from '../ui/learningControls.js';
 
 // 読みの正規化・取得は共通実装を使用（配列/文字列データ両対応）
 
@@ -30,6 +34,19 @@ const gradeQuizScreen = {
   _clickHandler: null,
   _resizeHandler: null,
   _kanapadLayoutHandler: null,
+  _lifecycle: createScreenLifecycle(),
+  _answerSubmission: null,
+  getControls() {
+    const controls = getLearningControls(this.canvas);
+    Object.assign(BTN.back, controls.back);
+    for (const [key, source] of [['again','attack'],['review','heal'],['select','hint']]) {
+      const label = BTN[key].label;
+      Object.assign(BTN[key], controls[source], {label, y: controls.compact ? controls.submit.y : 480});
+    }
+    controls.submit.y = controls.compact ? controls.submit.y : 480;
+    KANJI_BOX.centerY = 220;
+    return controls;
+  },
 
   // パラメータ
   grade: 0,
@@ -59,6 +76,7 @@ const gradeQuizScreen = {
   stageBgImage: null,
 
   enter(arg) {
+    this._lifecycle.activate();
     // Canvas 取得（引数 or DOM）
     const isCanvasArg = arg && typeof arg.getContext === 'function';
     this.canvas = isCanvasArg ? arg : document.getElementById('gameCanvas');
@@ -94,7 +112,7 @@ const gradeQuizScreen = {
       const enemyPool = getEnemiesByGrade(this.grade);
       if (enemyPool.length > 0) {
         this.enemy = enemyPool[Math.floor(Math.random() * enemyPool.length)];
-        loadMonsterImage(this.enemy).then(img => { this.enemyImg = img; }).catch(() => {});
+        loadMonsterImage(this.enemy).then(this._lifecycle.guard(img => { this.enemyImg = img; })).catch(() => {});
       }
     } catch {}
 
@@ -105,7 +123,7 @@ const gradeQuizScreen = {
       const stageCandidates = stageData.filter(s => s && s.grade === this.grade && !/^bonus_/i.test(String(s.stageId || '')));
       if (stageCandidates.length > 0) {
         const pickedStage = stageCandidates[Math.floor(Math.random() * stageCandidates.length)];
-        loadBgImage(pickedStage.stageId).then(img => { this.stageBgImage = img; }).catch(() => {});
+        loadBgImage(pickedStage.stageId).then(this._lifecycle.guard(img => { this.stageBgImage = img; })).catch(() => {});
       }
     } catch {}
 
@@ -114,19 +132,14 @@ const gradeQuizScreen = {
     if (this.inputEl) {
       this.inputEl.style.display = 'block';
       this.inputEl.value = '';
-      this._keydownHandler = e => {
-        if (e.key !== 'Enter') return;
-        e.preventDefault();
-        this._checkAnswer(this.inputEl.value);
-      };
-      this.inputEl.addEventListener('keydown', this._keydownHandler);
+      this._answerSubmission = bindInputSubmission(this.inputEl, value => this._checkAnswer(value));
     }
 
     // 画面固定（vh-lock）を有効化。canvas がパッドの高さぶん縮む仕組み
     // （index.html の #gameCanvas.vh-lock）は他のバトル画面と共通で使う。
     // これが無いと、他の画面と違って canvas がアスペクト比を保たず伸び縮みし、
     // 入力欄も静的な座標に取り残されて画面が崩れて見える。
-    requestAnimationFrame(() => {
+    this._lifecycle.requestAnimationFrame(() => {
       document.documentElement.classList.add('vh-lock');
       document.body.classList.add('vh-lock');
       if (this.canvas) this.canvas.classList.add('vh-lock');
@@ -144,6 +157,7 @@ const gradeQuizScreen = {
       const coords = getGameCoordinates(e, this.canvas);
       if (!isValidCoordinates(coords)) return; // 黒帯エリアのクリックは無視
       const { x, y } = coords;
+      const controls = this.getControls();
       if (isMouseOverRect(x, y, BTN.back)) {
         publish('changeScreen', 'stageSelect');
         return;
@@ -167,6 +181,9 @@ const gradeQuizScreen = {
           return;
         }
       }
+      if (this.phase === 'quiz' && isMouseOverRect(x,y,controls.submit)) {
+        this._answerSubmission?.submit(this.inputEl.value,e);
+      }
     };
     this.canvas.addEventListener('click', this._clickHandler);
   },
@@ -182,63 +199,45 @@ const gradeQuizScreen = {
     // 結果画面では入力欄そのものを隠すので、ここで !important の display:block を
     // 立て直してしまわないよう抜ける（resize や 50音パッドの開閉はどの phase でも起こる）
     if (this.phase !== 'quiz') return;
-    try {
-      const rect = this.canvas.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const boxBottom = KANJI_BOX.centerY + KANJI_BOX.h / 2;
-      // フィードバック文言（漢字パネル直下、+16の位置）と重ならないよう、
-      // 入力欄はその下に離して置く
-      // object-fit:contain の黒帯を除いた実コンテンツ位置に合わせる（他のバトル画面と共通の変換）
-      const { x: cssX, y: cssY } = gameToScreenCoordinates(KANJI_BOX.centerX, boxBottom + 70, this.canvas);
-
-      const el = this.inputEl;
-      const s = el.style;
-      s.setProperty('display', 'block', 'important');
-      s.setProperty('position', 'fixed', 'important');
-      s.setProperty('left', `${cssX}px`, 'important');
-      s.setProperty('top', `${cssY}px`, 'important');
-      s.setProperty('transform', 'translateX(-50%)', 'important');
-      s.setProperty('z-index', '2147483647', 'important');
-      const isTablet = window.innerWidth <= 1024;
-      s.width = isTablet ? 'min(80vw, 320px)' : '280px';
-      s.fontSize = isTablet ? '18px' : '20px';
-      s.padding = '8px 12px';
-      s.textAlign = 'center';
-      s.backgroundColor = 'white';
-      s.border = '2px solid #ccc';
-      s.borderRadius = '5px';
-      s.boxSizing = 'border-box';
-      s.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-    } catch {}
+    placeLearningInput(this.canvas, this.inputEl, this.getControls());
   },
 
   _loadCurrent() {
     const id = this.order[this.index];
     const data = getKanjiById(id);
-    this.current = data ? { ...data, readings: getReadings(data) } : null;
+    this.current = data ? { _recordQuestion: beginQuestion('quiz'), ...data, readings: getReadings(data) } : null;
     this.feedback = '';
     this.feedbackColor = 'white';
     this.nearMissCount = 0; // 「おしい」の回数は問題ごとに数え直す
+    this._answerSubmission?.unlock?.();
   },
 
   _checkAnswer(raw) {
-    if (!this.current || this.locked) return;
-    const user = toHiragana(raw);
-    const ok = this.current.readings.includes(user);
+    if (!this.current || this.locked) return false;
+    const assessment = classifyReadingAnswer(raw, this.current.readings);
+    if (assessment.kind === 'blank') return false;
+    const user = assessment.normalized;
+    const ok = assessment.kind === 'correct';
 
     // 読めているのに書き方だけずれた入力は、力だめしでも「よめなかった」に数えない。
     // 記録も残さず、同じ問題のまま書き直させる。
     if (!ok) {
-      const nearMiss = findNearMiss(user, this.current.readings);
-      if (nearMiss) {
+      const nearMiss = assessment.nearMiss;
+      if (assessment.kind === 'near-miss') {
         this.nearMissCount = (this.nearMissCount || 0) + 1;
         this.feedback = getNearMissLines(nearMiss, this.nearMissCount).join('  ');
         this.feedbackColor = '#5bc0de'; // 読みちがいの琥珀とは分ける
         if (this.inputEl) this.inputEl.value = '';
-        return;
+        return false;
       }
     }
 
+    // Save first: a failed attempt must leave the same question and counters.
+    if (!commitLearningOutcome(this.current.id, ok, { question: this.current._recordQuestion, source:'quiz', reading: user, hintLevel: 0, answerRevealed: this.nearMissCount >= 2 }).ok) {
+      this.feedback = 'ほぞんできませんでした。もう一度こたえてね。';
+      this.feedbackColor = '#f1c40f';
+      return false;
+    }
     // フィードバック・記録
     this.feedback = ok ? 'せいかい！' : `おしい！ こたえは「${this.current.readings.join('、')}」`;
     // 読みちがいは責めない中立色（琥珀）。赤 #e74c3c は使わない
@@ -249,17 +248,16 @@ const gradeQuizScreen = {
       ok,
       userAnswer: user,
       correctReadings: this.current.readings,
+      support: this.nearMissCount >= 2 ? 'revealed' : 'independent',
     });
     // 学習記録（正史）へ加算し、不正解は復習キューへ
-    recordKanjiAnswer(this.current.id, ok);
-    if (!ok) ReviewQueue.add(this.current.id);
 
     // フィードバックを1秒見せてから次へ進む。
     // 以前はここで同期的に _loadCurrent() を呼んでいたため、直前に入れた
     // this.feedback が1フレームも描画されず、答えても無反応に見えていた。
     this.locked = true;
     if (this.inputEl) this.inputEl.value = '';
-    this._advanceTimer = setTimeout(() => {
+    this._advanceTimer = this._lifecycle.setTimeout(() => {
       this._advanceTimer = null;
       this.locked = false;
       this.index++;
@@ -277,11 +275,14 @@ const gradeQuizScreen = {
       }
       this._loadCurrent();
     }, 1000);
+    return true;
   },
 
   update(dt) {
     const { ctx, canvas } = this;
     if (!ctx) return;
+    const controls = this.getControls();
+    this._adjustInputPosition();
     // 背景。単色だと寂しいので学年のステージ画像を敷き、白文字が沈まないよう
     // 元の紺色を半透明で重ねる（パネル類は元々この紺色を前提にした薄いデザインのため）
     if (this.stageBgImage) {
@@ -298,10 +299,10 @@ const gradeQuizScreen = {
     ctx.font = '24px "UDデジタル教科書体",sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(`学年まとめテスト（${this.grade}年）`, 20, 70);
+    ctx.fillText(`学年まとめテスト（${this.grade}年）`, controls.compact ? 310 : 170, 35);
 
     // 戻るボタン
-    drawStoneButton(ctx, BTN.back.x, BTN.back.y, BTN.back.w, BTN.back.h, BTN.back.label);
+    drawLearningButton(ctx, BTN.back, controls.scale);
 
     if (this.phase === 'quiz') {
       // 進捗
@@ -333,11 +334,12 @@ const gradeQuizScreen = {
       // フィードバック
       if (this.feedback) {
         ctx.fillStyle = this.feedbackColor;
-        ctx.font = '20px "UDデジタル教科書体",sans-serif';
+        ctx.font = `${Math.max(20,16/controls.scale)}px "UDデジタル教科書体",sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-        ctx.fillText(this.feedback, x, y + h / 2 + 16);
+        (this.feedback.match(/.{1,22}/gu)||[]).forEach((line,i)=>ctx.fillText(line, x, y + h / 2 + 16 + i*34));
       }
+      drawLearningButton(ctx, controls.submit, controls.scale);
     } else {
       // リザルト画面
       const centerX = canvas.width / 2;
@@ -347,26 +349,30 @@ const gradeQuizScreen = {
       ctx.font = '24px "UDデジタル教科書体",sans-serif';
       ctx.fillText('テスト結果', centerX, 120);
 
-      const total = this.order.length;
-      const correct = this.stats.correct;
+      const summary = getQuizResultSummary(this.stats.answers, this.order.length);
+      const total = summary.total;
+      const correct = summary.correctInputs;
       // 合否ではなく到達度で伝える。届いていない時も「あと何問で届くか」と
       // 上向きに数え、「不合格」に相当する表示は出さない
       const need = Math.ceil(total * 0.8);
       const reached = correct >= need;
       ctx.font = '18px "UDデジタル教科書体",sans-serif';
       ctx.fillStyle = reached ? '#2ecc71' : '#f1c40f';
-      ctx.fillText(`よめた: ${correct} / ${total}`, centerX, 160);
+      ctx.fillText(`今回の正解入力: ${correct} / ${total}`, centerX, 160);
 
       ctx.font = '16px "UDデジタル教科書体",sans-serif';
-      ctx.fillText(reached ? 'この学年は バッチリ！' : `あと ${need - correct} もんで バッチリ！`, centerX, 188);
+      ctx.fillText(reached ? '今回の問題、よく取り組んだね！' : `今回の問題で あと${need - correct}もん！`, centerX, 188);
 
       ctx.fillStyle = 'white';
-      ctx.fillText('まちがえた漢字は「きょうのふくしゅう」に いれておいたよ', centerX, 216);
+      ctx.fillText(`ヒントなしで正解入力: ${summary.independentCorrect}もん`, centerX, 216);
+      const examples = summary.independentKanjiIds.map(id => getKanjiById(id)?.kanji).filter(Boolean);
+      if (examples.length) ctx.fillText(`今回じぶんで答えた字: ${examples.join('・')}`, centerX, 242);
+      ctx.fillText('読みちがいの漢字は「つぎのふくしゅう」に いれておいたよ', centerX, 268);
 
       // ボタン
-      drawStoneButton(ctx, BTN.again.x, BTN.again.y, BTN.again.w, BTN.again.h, BTN.again.label);
-      drawStoneButton(ctx, BTN.review.x, BTN.review.y, BTN.review.w, BTN.review.h, BTN.review.label);
-      drawStoneButton(ctx, BTN.select.x, BTN.select.y, BTN.select.w, BTN.select.h, BTN.select.label);
+      drawLearningButton(ctx, BTN.again, controls.scale);
+      drawLearningButton(ctx, BTN.review, controls.scale);
+      drawLearningButton(ctx, BTN.select, controls.scale);
     }
   },
 
@@ -402,13 +408,16 @@ const gradeQuizScreen = {
   },
 
   exit() {
+    this._lifecycle.deactivate();
     // 画面を離れた後にタイマーが発火して、片付け済みの参照を触らないようにする
     if (this._advanceTimer) { clearTimeout(this._advanceTimer); this._advanceTimer = null; }
     this.locked = false;
     // 途中でやめた場合も、そこまでの学習記録を残す
     try { saveGameData(); } catch {}
-    if (this.inputEl && this._keydownHandler) {
-      this.inputEl.removeEventListener('keydown', this._keydownHandler);
+    this._answerSubmission?.dispose?.();
+    this._answerSubmission = null;
+    if (this.inputEl) {
+      if (this._keydownHandler) this.inputEl.removeEventListener('keydown', this._keydownHandler);
       this.inputEl.style.setProperty('display', 'none', 'important');
     }
     if (this.canvas && this._clickHandler) {
@@ -417,13 +426,13 @@ const gradeQuizScreen = {
     if (this._resizeHandler) { window.removeEventListener('resize', this._resizeHandler); this._resizeHandler = null; }
     if (this._kanapadLayoutHandler) { window.removeEventListener('kanapad:layout', this._kanapadLayoutHandler); this._kanapadLayoutHandler = null; }
 
-    // 画面固定（vh-lock）を無効化（1フレーム遅延で安全に解除。他画面と同じ作法）
+    // 画面固定（vh-lock）を無効化（次画面の表示前に解除。他画面と同じ作法）
     const cvs = this.canvas;
-    requestAnimationFrame(() => {
+    {
       document.documentElement.classList.remove('vh-lock');
       document.body.classList.remove('vh-lock');
       if (cvs) cvs.classList.remove('vh-lock');
-    });
+      }
 
     // 参照クリア
     this.canvas = this.ctx = this.inputEl = null;

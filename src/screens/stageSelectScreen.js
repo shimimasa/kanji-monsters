@@ -11,6 +11,7 @@ import { getEnemiesByStageId } from '../loaders/dataLoader.js';
 import { loadDex } from '../models/monsterDex.js';
 import { isStageCleared as isStageClearedSSoT } from '../core/saveData.js';
 import { drawRoundedRect, drawEnhancedTabs as drawEnhancedTabsShared } from '../ui/canvasUtils.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
 
 /** 学年に応じたアイコンを返す */
 function getGradeIcon(grade) {
@@ -158,6 +159,7 @@ const tabs = [
 
 // 選択中のステージを追跡するプロパティを追加（89行目付近）
 const stageSelectScreenState = {
+  _lifecycle: createScreenLifecycle(),
   canvas: null,
   ctx: null,
   stages: [],
@@ -262,6 +264,7 @@ _drawAllCaughtMark(ctx, x, y) {
 
   /** 画面表示時の初期化 */
   enter(arg) {
+    this._lifecycle.activate();
     // BGM 再生 & canvas 取得
     publish('playBGM', 'title');
     this.canvas = (arg && typeof arg.getContext === 'function')
@@ -278,7 +281,7 @@ _drawAllCaughtMark(ctx, x, y) {
     this.updateStageList();
 
     // チュートリアル
-    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('stageSelect', { canvas: this.canvas }));
+    import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => m.default.startIfNeeded('stageSelect', { canvas: this.canvas })));
 
     // イベント登録
     this._clickHandler = this.handleClick.bind(this);
@@ -549,7 +552,7 @@ this._dex = loadDex();
           const g = stage.grade ?? null;
           if (!g || !isBonusUnlocked(g)) {
              ctx.fillStyle = '#ffb74d';
-             ctx.fillText('同学年の通常ステージ全クリ＋学年漢字を全マスターで解放', tooltipX + 10, tooltipY + yOffset + 20);
+             ctx.fillText('同学年の通常ステージ全クリア＋各ステージの練習完了で解放', tooltipX + 10, tooltipY + yOffset + 20);
            }
          }
   },
@@ -941,6 +944,9 @@ update(dt) {
           ctx.fillStyle = '#FFFFFF';
           ctx.font = '16px sans-serif';
           ctx.fillText('✓', button.x + 10, button.y + 5);
+          ctx.font = 'bold 12px "UDデジタル教科書体", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('もういちど押すと しゅっぱつ', button.x + button.width / 2, button.y + button.height - 17);
         }
 
                 // クリア状況（星アイコン）
@@ -1209,6 +1215,7 @@ update(dt) {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    this._lifecycle.deactivate();
     this.unregisterHandlers();
     // スライダー削除
     const bgmSlider = document.getElementById('bgmVolumeSlider');
@@ -1302,17 +1309,9 @@ update(dt) {
       const button = this.reviewChallengeButton;
       if (isMouseOverRect(x, y, button)) {
         publish('playSE','decide');
-        if (reviewQueue.size() > 0) {
-          publish('changeScreen','reviewStage');
-        } else {
-          // 推奨ステージから学年だけ借用して学年ボーナスへ
-          const selectedStage = this.selectReviewStage();
-          const g = selectedStage?.grade ?? 1;
-          const bonusId = `bonus_g${g}`;
-          gameState.currentStageId = bonusId;
-          resetStageProgress(bonusId);
-          publish('changeScreen', 'stageLoading');
-        }
+        // 0件でも復習画面の「きょうの分はおわり」へ進める。
+        // 未解放の学年ボーナスを復習の代わりに起動しない。
+        publish('changeScreen','reviewStage');
         return;
       }
     } else {

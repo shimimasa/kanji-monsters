@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { installStorage } from './storage-helper.mjs';
+import { getDefaultSave } from '../../src/core/saveData.js';
+import { loadGameData, gameState, battleState, recordKanjiAnswer } from '../../src/core/gameState.js';
+import { setStageKanjiMap } from '../../src/loaders/dataLoader.js';
+installStorage();
+const { default: quick } = await import('../../src/screens/quickReviewPracticeScreen.js');
+for (const method of ['_pickNextUnmasteredKanji','_pickNextReviewQuestion']) test(`T04: quick review ${method} creates a new supported record context`, async () => {
+  installStorage({krb_save:JSON.stringify(getDefaultSave())});await loadGameData();
+  setStageKanjiMap({teststage:[{id:'g1-001',kanji:'一',onyomi:['イチ'],kunyomi:['ひと']} ]});
+  gameState.currentStageId='teststage';
+  quick.pendingReviewIds=new Set(['g1-001']);quick.originalReviewIds=new Set(['g1-001']);quick.quickReviewPoolIds=new Set(['g1-001']);
+  quick.quickReviewOnlyPoolMode=true;quick.practiceStats={};battleState.nearMissCount=2;
+  quick[method]();
+  const question=gameState.currentKanji._recordQuestion;
+  assert.equal(question?.source,'quick-review');assert.equal(battleState.nearMissCount,0);
+  assert.equal(recordKanjiAnswer('g1-001',true,{question,reading:'いち',hintLevel:0}),true);
+  assert.equal(recordKanjiAnswer('g1-001',true,{question,reading:'いち',hintLevel:0}),false);
+});

@@ -1,8 +1,11 @@
+import { initializeSaveSession } from './core/saveBootstrap.js';
+import { readSaveState } from './core/saveData.js';
 /* ----------------------------- 依存モジュール ----------------------------- */
 import { gameState, saveGameData, loadGameData } from './core/gameState.js';
 import { setCanvas, update as updateScreen, render as renderScreen } from './core/screenManager.js';
-import { loadAll as loadUIImages } from './loaders/assetsLoader.js';
-import { loadKanjiGradesPhased } from './loaders/dataLoader.js';
+import { loadStartupImages, loadRemainingUIImages } from './loaders/assetsLoader.js';
+import { createFrameClock } from './core/frameClock.js';
+import { loadFirebaseSdk } from './services/firebase/sdkLoader.js';
 import {
   initializeFirebaseServices,
   signInAnonymouslyIfNeeded,
@@ -11,7 +14,7 @@ import {
   syncAllCaches,
   startDataSync
 } from './services/firebase/firebaseController.js';
-import { showBootProgress, updateBootProgress, hideBootProgress } from './ui/bootProgress.js';
+import { showBootProgress, updateBootProgress, hideBootProgress, showBootError } from './ui/bootProgress.js';
 import { AudioManager } from './audio/audioManager.js';
 import reviewQueue from './models/reviewQueue.js';
 import { FSM } from './core/stateMachine.js';
@@ -70,15 +73,14 @@ document.body.addEventListener(
 );
 
 /* ----------------------------- アプリ初期化 ----------------------------- */
-let lastTime = performance.now();
+const frameClock = createFrameClock(performance.now());
 let __achvCheckAccum = 0;
 function loop(now) {
-  const dt = now - lastTime;
-  lastTime = now;
+  const { logicDeltaMs: dt, playtimeDeltaMs } = frameClock.tick(now, document.hidden);
   
   // プレイ時間の統計更新（毎フレーム）
-  gameState.playerStats.playtimeSeconds += dt / 1000;
-  __achvCheckAccum += dt;
+  gameState.playerStats.playtimeSeconds += playtimeDeltaMs / 1000;
+  __achvCheckAccum += playtimeDeltaMs;
   
   // ロジック更新
   updateScreen(dt);
@@ -193,25 +195,52 @@ function drawAchievementNotifications(ctx) {
   // 1) 画像 & JSON プリロード
   // await initAssets();
   showBootProgress();
-  await loadUIImages((n, total) => updateBootProgress(n, total, '画像を読み込み中…'));
+  await loadStartupImages((n, total) => updateBootProgress(n, total, '画面を準備中…'));
   updateBootProgress(0, 1, 'データを準備中…');
-  await loadKanjiGradesPhased({ eager: [1,2], lazy: [3,4,5,6], idle: [7,8,9,10] });
+  try {
+    window.fsm = await setupFSM();
+  } catch (error) {
+    console.error('Required game data could not be loaded', error);
+    showBootError('ゲームのデータを読み込めませんでした。通信を確認して、もういちど試してください。');
+    return;
+  }
   updateBootProgress(1, 1, 'データを準備中…');
   hideBootProgress();
-  // ▼ FSM の初期化を切り出し
-  window.fsm = await setupFSM();
+  requestAnimationFrame(loop);
 
-  // 2) Firebase
-  if (!initializeFirebaseServices()) return;
-  const user = await signInAnonymouslyIfNeeded();
-  console.log('UID:', user?.uid);
-  
-  // StepD Step2-Download: Firestore からの読み取りは「krb_save が無い/破損」時のみ復旧用途で行う
-  const recovered = await recoverKrbSaveFromFirestoreIfMissing();
-  console.log('[StepD Step2-Download] recovered krb_save from Firestore:', recovered);
-  // リロードは禁止：FirestoreでgameStateを上書きせず、ローカル(krb_save)を読み直して反映する
-  if (recovered) {
-    try { await loadGameData(); } catch {}
+  // セーブ確認が終わるまでタイトル側の開始操作は既存ガードで止まる。
+  const connectCloud = async (recoverMissing = false) => {
+    await loadFirebaseSdk();
+    if (!initializeFirebaseServices()) throw new Error('Cloud connection unavailable');
+    await signInAnonymouslyIfNeeded();
+    if (recoverMissing) await recoverKrbSaveFromFirestoreIfMissing();
+  };
+  const session = await initializeSaveSession(() => connectCloud(true));
+  if (!session.ok) {
+    console.error('Save startup blocked', session.error);
+    const errorPanel = showBootError('記録を安全に読み込めませんでした。元の記録は保持しています。もう一度読み込むか、設定からバックアップを読み込んでください。', {
+      back: () => { hideBootProgress(); publish('changeScreen', 'settings'); },
+      recover: readSaveState().status === 'corrupt' ? async () => {
+        await loadFirebaseSdk();
+        if (!initializeFirebaseServices()) throw new Error('Cloud unavailable');
+        await signInAnonymouslyIfNeeded();
+        if (!errorPanel.isConnected) return;
+        const isCurrent = () => errorPanel.isConnected;
+        const recovered = await initializeSaveSession(() => recoverKrbSaveFromFirestoreIfMissing({ replaceCorrupt: true, isCurrent }), { recoverCorrupt: true, isCurrent });
+        if (!recovered.ok) throw recovered.error;
+        if (errorPanel.isConnected) location.reload();
+      } : null,
+    });
+    return;
+  }
+  const preloadRemaining = () => loadRemainingUIImages().catch(() => {});
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(preloadRemaining, { timeout: 2000 });
+  } else {
+    setTimeout(preloadRemaining, 300);
+  }
+  if (window.fsm.currentState === window.fsm.states.title) {
+    window.fsm.change('title');
   }
 
   // セーブデータ読み込み完了後に実績チェックを実行（プレイ時間や累計系実績のチェック）
@@ -230,14 +259,16 @@ function drawAchievementNotifications(ctx) {
     gameState.currentStageId = 'hokkaido_area1';
   }
 
-  // DataSync 初期化（Firestore → localStorage のマージ監視開始）
-  startDataSync();
-  // StepD Step3-2A: キャッシュ用途の任意同期トリガ（失敗してもゲーム進行は継続）
-  try {
-    syncAllCaches()
-      .then(() => console.log('[StepD Step3-2A] syncAllCaches done'))
-      .catch(() => {});
-  } catch {}
+  // 既存のローカルセーブはすぐ開始し、クラウド接続は背後で行う。
+  // 欠損セーブだけは上の復旧確認を待つため、初期値で上書きしない。
+  connectCloud(false).then(() => {
+    startDataSync();
+    return syncAllCaches();
+  }).then(() => {
+    console.log('[StepD Step3-2A] syncAllCaches done');
+  }).catch(error => {
+    console.warn('Cloud sync unavailable; local play continues', error);
+  });
 
    // 4) FSMは既に初期状態で'title'画面を設定済みのため、追加の画面遷移は不要
 
@@ -245,7 +276,6 @@ function drawAchievementNotifications(ctx) {
   __setupAutosaveFromSettings();
 
   console.log('✅ Init done → Start loop');
-  requestAnimationFrame(loop);
 })();
 
 // ── 追加: オートセーブ管理 ──

@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "ヨミタビ",
   "scripts": {
+    "test:phase-a": "node --experimental-default-type=module --test tests/phase-a/*.test.mjs",
+    "test:phase-b": "node --experimental-default-type=module --test tests/phase-b/*.test.mjs",
+    "test:phase-c": "node --experimental-default-type=module --test tests/phase-c/*.test.mjs",
+    "test:no-go": "node --experimental-default-type=module --test tests/no-go/*.test.mjs",
     "dev": "vite",
     "build": "vite build",
     "deploy": "npm run build && firebase deploy --only hosting",

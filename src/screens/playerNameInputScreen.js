@@ -3,8 +3,8 @@ import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState, updatePlayerName } from '../core/gameState.js';
-import { getCurrentUser, initializeNewPlayerData } from '../services/firebase/firebaseController.js';
 import { getGameCoordinates, isValidCoordinates, gameToScreenCoordinates } from '../utils/coordinateUtils.js';
+import { bindInputSubmission } from '../core/answerSubmission.js';
 
 const playerNameInputState = {
   /** 画面表示時の初期化 */
@@ -44,6 +44,9 @@ const playerNameInputState = {
 
     this.nameInputElement.focus();
 
+    this._answerSubmission?.dispose?.();
+    this._answerSubmission = bindInputSubmission(this.nameInputElement, () => this.submitNameAndSave(), { allowBlank: true });
+
     this.registerHandlers();
   },
 
@@ -53,12 +56,15 @@ const playerNameInputState = {
     const cx = this.canvas.width / 2;
     const frame = { x: cx - 150, y: 280, w: 300, h: 40 };
     const topLeft = gameToScreenCoordinates(frame.x, frame.y, this.canvas);
+    const center = gameToScreenCoordinates(cx, frame.y + frame.h / 2, this.canvas);
     const scale = topLeft.scale;
-    this.nameInputElement.style.left = `${topLeft.x + 4 * scale}px`;
-    this.nameInputElement.style.top = `${topLeft.y + 4 * scale}px`;
-    this.nameInputElement.style.width = `${(frame.w - 8) * scale}px`;
-    this.nameInputElement.style.height = `${(frame.h - 8) * scale}px`;
-    this.nameInputElement.style.fontSize = `${Math.max(14, Math.round(22 * scale))}px`;
+    const width = Math.min(window.innerWidth - 32, Math.max(240, (frame.w - 8) * scale));
+    const height = 48;
+    this.nameInputElement.style.left = `${center.x - width / 2}px`;
+    this.nameInputElement.style.top = `${center.y - height / 2}px`;
+    this.nameInputElement.style.width = `${width}px`;
+    this.nameInputElement.style.height = `${height}px`;
+    this.nameInputElement.style.fontSize = '18px';
   },
 
   /** 毎フレーム呼び出し（描画） */
@@ -68,7 +74,10 @@ const playerNameInputState = {
     ctx.clearRect(0, 0, cw, ch);
 
     // 背景
-    ctx.fillStyle = '#1e3c72';
+    const bg = ctx.createLinearGradient(0, 0, cw, ch);
+    bg.addColorStop(0, '#2c1810');
+    bg.addColorStop(1, '#3d2414');
+    ctx.fillStyle = bg;
     ctx.fillRect(0, 0, cw, ch);
 
     // タイトル
@@ -98,7 +107,7 @@ const playerNameInputState = {
         this.confirmButton.x, this.confirmButton.y, this.confirmButton.width, this.confirmButton.height
       );
     }
-    drawButton(ctx, this.confirmButton.x, this.confirmButton.y, this.confirmButton.width, this.confirmButton.height, this.confirmButton.text);
+    drawButton(ctx, this.confirmButton.x, this.confirmButton.y, this.confirmButton.width, this.confirmButton.height, this.confirmButton.text, '#8B4513');
   },
 
   /** 画面離脱時のクリーンアップ */
@@ -112,6 +121,8 @@ const playerNameInputState = {
       this.nameInputElement.style.display = 'none';
       this.nameInputElement.onkeydown = null;
     }
+    this._answerSubmission?.dispose?.();
+    this._answerSubmission = null;
     this.canvas = null;
     this.ctx = null;
   },
@@ -124,9 +135,6 @@ const playerNameInputState = {
     this.canvas.addEventListener('click', this._clickHandler);
     this.canvas.addEventListener('touchstart', this._clickHandler);
     
-    if (this.nameInputElement) {
-      this.nameInputElement.onkeydown = this._keyHandler;
-    }
   },
 
   /** イベントリスナー解除 */
@@ -137,10 +145,7 @@ const playerNameInputState = {
 
   /** Enterキー処理 */
   handleKeydown(event) {
-    if (event.key === 'Enter') {
-      this.submitNameAndSave();
-      event.preventDefault();
-    }
+    return this._answerSubmission?.handleKeydown(event, this.nameInputElement?.value ?? '');
   },
 
   /** クリック処理 */
@@ -166,13 +171,13 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
 
     if (isMouseOverRect(x, y, this.confirmButton)) {
       publish('playSE', 'decide');
-      this.submitNameAndSave();
+      this._answerSubmission?.submit(this.nameInputElement?.value ?? '');
     }
   },
 
   /** 名前送信と保存処理 */
   async submitNameAndSave() {
-    if (!this.nameInputElement) return;
+    if (!this.nameInputElement) return false;
     
     const trimmedName = this.nameInputElement.value.trim();
 
@@ -187,25 +192,16 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       this.validationMessage = 'なまえを 1〜5もじで いれてね';
       this.nameInputElement.value = "";
       this.nameInputElement.focus();
-      return;
+      return false;
     }
     this.validationMessage = '';
 
     // プレイヤー名を更新
-    updatePlayerName(trimmedName);
+    const saved = updatePlayerName(trimmedName);
+    if (!saved.ok) { this.validationMessage = '名前を保存できませんでした。もう一度ためしてください'; return false; }
     
-    // Firebase保存処理
-    const user = getCurrentUser();
-    if (user && user.uid) {
-      try {
-        const newPlayerData = await initializeNewPlayerData(user.uid, trimmedName);
-        if (newPlayerData) {
-          console.log("New player profile created/updated in Firestore:", newPlayerData);
-        }
-      } catch (error) {
-        console.error("Firebase保存エラー:", error);
-      }
-    }
+    // updatePlayerName のローカル保存がクラウド同期も予約する。
+    // 通信完了を待つ画面処理を残さず、確定した名前で先へ進む。
 
     // ゲームモードを設定
     if (gameState.pendingGameMode) {
@@ -216,6 +212,7 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
     // 通常フローと同じくコース選択画面へ遷移
     gameState.currentGrade = 0;
     publish('changeScreen', 'courseSelect');
+    return true;
   },
 
   render() {

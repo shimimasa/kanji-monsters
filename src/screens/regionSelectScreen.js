@@ -6,6 +6,7 @@ import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { images } from '../loaders/assetsLoader.js';
 import { stageData } from '../loaders/dataLoader.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
 
 // 地方マーカーの定義（mapRect基準の割合）
 const regionMarkers = [
@@ -22,6 +23,7 @@ const backButton = { x: 10, y: 540, width: 120, height: 40, text: 'もどる' };
 
 
 const regionSelectState = {
+  _lifecycle: createScreenLifecycle(),
   canvas: null,
   ctx: null,
   animationTime: 0,
@@ -45,6 +47,7 @@ const regionSelectState = {
   },
 
   enter(canvas) {
+    this._lifecycle.activate();
     this.canvas = canvas || document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
     this.animationTime = 0;
@@ -73,7 +76,7 @@ const regionSelectState = {
     this.mapRect = null;
 
     // チュートリアル
-    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('regionSelect', { canvas: this.canvas, mapRect: this.mapRect }));
+    import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => m.default.startIfNeeded('regionSelect', { canvas: this.canvas, mapRect: this.mapRect })));
 
     this.mapRect = null;
   },
@@ -828,6 +831,7 @@ const regionSelectState = {
   },
 
   exit() {
+    this._lifecycle.deactivate();
     this.canvas.removeEventListener('click', this._clickHandler);
     this.canvas.removeEventListener('touchstart', this._clickHandler);
     this.canvas.removeEventListener('mousemove', this._mouseMoveHandler);

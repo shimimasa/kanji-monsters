@@ -1,3 +1,4 @@
+import { saveGameData } from '../core/gameState.js';
 // reviewQueue.js
 // localStorage に SM-2 用のレビューキューを永続化
 // 格納データ例：{ id, repetition, interval, eFactor, nextReviewAt }
@@ -21,14 +22,13 @@ const reviewQueue = (() => {
 
   // ストレージへ保存
   const save = () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch (e) {
-      console.error('ReviewQueue の保存に失敗しました:', e);
-    }
-    import('../services/firebase/firebaseController.js')
-      .then(m => m.syncAllCaches?.())
-      .catch(() => {});
+    const snapshot = items.map(e => ({ ...e }));
+    const result = saveGameData(save => {
+      save.player.study.reviewQueueDetail = snapshot;
+      save.player.study.reviewQueue = snapshot.map(e => e.id);
+    });
+    load();
+    return result;
   };
 
   load();
@@ -45,11 +45,29 @@ const reviewQueue = (() => {
    * 以前は登録時刻そのもの（＝即 due）で、1分前に間違えた字がその場で
    * 「復習待ち」に並び、同じ日のうちに詰め込む形になっていた。
    */
-  const nextMorning = () => {
-    const d = new Date();
+  const nextMorning = (now = Date.now()) => {
+    const d = new Date(now);
     d.setHours(4, 0, 0, 0);
-    if (Date.now() >= d.getTime()) d.setDate(d.getDate() + 1);
+    if (now >= d.getTime()) d.setDate(d.getDate() + 1);
     return d.getTime();
+  };
+
+  const makeEntry = (id, now = Date.now()) => ({
+    id, repetition: 0, interval: 0, eFactor: 2.5, nextReviewAt: nextMorning(now)
+  });
+
+  const applyQuality = (entry, quality, now = Date.now()) => {
+    if (quality < 3) {
+      entry.repetition = 0;
+      entry.interval = 1;
+    } else {
+      entry.repetition++;
+      if (entry.repetition === 1) entry.interval = 1;
+      else if (entry.repetition === 2) entry.interval = 6;
+      else entry.interval = Math.round(entry.interval * entry.eFactor);
+      entry.eFactor = calcEF(entry.eFactor, quality);
+    }
+    entry.nextReviewAt = now + entry.interval * 24 * 60 * 60 * 1000;
   };
 
   return {
@@ -58,14 +76,9 @@ const reviewQueue = (() => {
      * repetition=0, interval=0, eFactor=2.5, nextReviewAt=次の午前4時 で初期化
      */
     add(id) {
+      load();
       if (items.some(i => i.id === id)) return;
-      items.push({
-        id,
-        repetition: 0,
-        interval:   0,
-        eFactor:    2.5,
-        nextReviewAt: nextMorning()
-      });
+      items.push(makeEntry(id));
       save();
     },
 
@@ -75,21 +88,28 @@ const reviewQueue = (() => {
      * @param {number} quality 0〜5 （0…完全忘却, 5…完全正解）
      */
     updateReview(id, quality) {
+      load();
       const entry = items.find(i => i.id === id);
       if (!entry) return;
-      if (quality < 3) {
-        // 再出現を翌日に固定
-        entry.repetition = 0;
-        entry.interval   = 1;
-      } else {
-        entry.repetition++;
-        if (entry.repetition === 1)      entry.interval = 1;
-        else if (entry.repetition === 2) entry.interval = 6;
-        else                             entry.interval = Math.round(entry.interval * entry.eFactor);
-        entry.eFactor = calcEF(entry.eFactor, quality);
-      }
-      entry.nextReviewAt = Date.now() + entry.interval * 24 * 60 * 60 * 1000;
+      applyQuality(entry, quality);
       save();
+    },
+
+    /** 1解答の支援状況に応じて、追加または既存予定の更新を1回の保存で行う。 */
+    applyOutcome(id, { isCorrect, quality }, now = Date.now()) {
+      load();
+      let entry = items.find(item => item.id === id);
+      let created = false;
+      if (!entry && (!isCorrect || quality < 3)) {
+        entry = makeEntry(id, now);
+        items.push(entry);
+        created = true;
+      }
+      if (entry) {
+        // 新規の誤答は従来どおり次の午前4時。既存項目の再誤答・答え表示は翌日に戻す。
+        if (!created || isCorrect) applyQuality(entry, quality, now);
+      }
+      return save();
     },
 
     /**
@@ -97,6 +117,7 @@ const reviewQueue = (() => {
      * @returns Array<entry>
      */
     getDueReviews() {
+      load();
       const now = Date.now();
       return items.filter(i =>
         i != null &&
@@ -116,6 +137,7 @@ const reviewQueue = (() => {
      * @returns Array<entry>
      */
     getAll() {
+      load();
       return items.filter(Boolean).map(i => ({ ...i }));
     },
 

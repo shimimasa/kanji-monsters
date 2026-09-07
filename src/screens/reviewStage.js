@@ -1,9 +1,14 @@
 import { publish } from '../core/eventBus.js';
 import ReviewQueue   from '../models/reviewQueue.js';
 import { getKanjiById } from '../loaders/dataLoader.js';
-import { recordKanjiAnswer, saveGameData } from '../core/gameState.js';
+import { beginQuestion, saveGameData } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
-import { toHiragana, getReadings } from '../utils/readings.js';
+import { getReadings, getNearMissLines } from '../utils/readings.js';
+import { bindInputSubmission, classifyReadingAnswer } from '../core/answerSubmission.js';
+import { commitLearningOutcome } from '../core/learningOutcome.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
+import { getGameCoordinates } from '../utils/coordinateUtils.js';
+import { getLearningControls, drawLearningButton, placeLearningInput } from '../ui/learningControls.js';
 
 // 読みの正規化・取得は共通実装を使用（配列/文字列データ両対応）
 
@@ -19,9 +24,14 @@ const reviewStage = {
   message:     '',
   emptyMessage: null,   // きょうの分が無い時に出すひと言
   _emptyTimer:  null,
+  _lifecycle: createScreenLifecycle(),
+  _answerSubmission: null,
+  nearMissCount: 0,
+  getControls() { return getLearningControls(this.canvas); },
 
   /** enter: 初期化 */
   enter(arg) {
+    this._lifecycle.activate();
     // canvas 引数が渡されない場合は DOM から取得
     this.canvas = (arg && typeof arg.getContext === 'function')
       ? arg
@@ -44,10 +54,12 @@ const reviewStage = {
       .filter(id => id != null);
 
     if (this.kanjiIds.length === 0) {
+      this.inputEl = document.getElementById('kanjiInput');
+      if (this.inputEl) this.inputEl.style.display = 'none';
       // 無言で戻ると「押しても何も起きない」ように見える。
       // 初回の復習予定を翌朝にしたので、ここに来る子は今後もっと増える。
       this.emptyMessage = ['きょうの ぶんは ぜんぶ おわったよ！', 'また あした ここで まってるね'];
-      this._emptyTimer = setTimeout(() => {
+      this._emptyTimer = this._lifecycle.setTimeout(() => {
         this._emptyTimer = null;
         publish('changeScreen', 'stageSelect');
       }, 1800);
@@ -66,18 +78,18 @@ const reviewStage = {
     this._loadCurrent();
 
     // 4) キーダウン登録 (Enter判定)
-    this._keydownHandler = this._onKeydown.bind(this);
-    this.inputEl?.addEventListener('keydown', this._keydownHandler);
+    this._answerSubmission = bindInputSubmission(this.inputEl, value => this._submitAnswer(value));
 
     // 5) クリック登録 (ステージ選択へ戻るボタン用)
     this._clickHandler = e => {
-      const r = this.canvas.getBoundingClientRect();
-      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const { x, y } = getGameCoordinates(e, this.canvas);
+      const controls = this.getControls();
       // 左上「ステージ選択」ボタン
-      if (x >= 20 && x <= 120 && y >= 20 && y <= 50) {
+      if (isMouseOverRect(x, y, controls.back)) {
         publish('playSE', 'decide');
         publish('changeScreen', 'stageSelect');
       }
+      if (isMouseOverRect(x, y, controls.submit)) this._answerSubmission.submit(this.inputEl.value, e);
     };
     this.canvas.addEventListener('click', this._clickHandler);
   },
@@ -87,40 +99,48 @@ const reviewStage = {
     const id = this.kanjiIds[this.currentIndex++];
     const data = getKanjiById(id);
     // 読み候補もセット
-    this.currentKanji = { ...data, readings: getReadings(data) };
+    this.currentKanji = { _recordQuestion: beginQuestion('review'), ...data, readings: getReadings(data) };
     this.message = `「${data.kanji}」をよもう！`;
+    this.nearMissCount = 0;
+    this._answerSubmission?.unlock?.();
   },
 
   /** キー処理: Enter で読み判定 */
   _onKeydown(e) {
-    if (e.key !== 'Enter') return;
-    e.preventDefault();
-    if (!this.currentKanji) return;
+    return this._answerSubmission?.handleKeydown(e, this.inputEl?.value ?? '');
+  },
 
-    // バトル画面と同じ normalize + 完全一致判定
-    const answer = toHiragana(this.inputEl.value);
-    const ok = this.currentKanji.readings.includes(answer);
+  _submitAnswer(raw) {
+    if (!this.currentKanji) return false;
+
+    const assessment = classifyReadingAnswer(raw, this.currentKanji.readings);
+    if (assessment.kind === 'blank') return false;
+    if (assessment.kind === 'near-miss') {
+      this.nearMissCount++;
+      this.message = getNearMissLines(assessment.nearMiss, this.nearMissCount).join('  ');
+      if (this.inputEl) this.inputEl.value = '';
+      return false;
+    }
+    const answer = assessment.normalized;
+    const ok = assessment.kind === 'correct';
 
     // 学習記録（正史）へ加算。ここが抜けていたため、復習だけやった日は
     // 「こんしゅうのがんばり」が 0回 のままだった
-    recordKanjiAnswer(this.currentKanji.id, ok);
+    const outcome = commitLearningOutcome(this.currentKanji.id, ok, { question: this.currentKanji._recordQuestion, source:'review', reading: answer, hintLevel: 0, answerRevealed: this.nearMissCount >= 2 });
+    if (!outcome.ok) { this.message = 'ほぞんできませんでした。もう一度こたえてね。'; return false; }
 
     if (ok) {
       publish('playSE', 'correct');
-      this.message = '正解！';
-      // 正解の場合：品質5（完璧に正解）でSM-2アルゴリズムに記録
-      ReviewQueue.updateReview(this.currentKanji.id, 5);
+      this.message = '前に復習へ入れた字を、今回は正解入力できたよ！';
     } else {
       // 「今日の復習」は過去に間違えた漢字と向き合う場面。ここで誤答音を重ねると
       // 追い打ちになるため鳴らさない（ゲームオーバー画面を無音にしたのと同じ理由）
       // 正しい読みをその場で示す
       this.message = `おしい！ こたえは「${this.currentKanji.readings.join('、')}」`;
-      // 不正解の場合：品質1（間違えた）でSM-2アルゴリズムに記録
-      ReviewQueue.updateReview(this.currentKanji.id, 1);
     }
 
     // 次の漢字へ or 終了
-    setTimeout(() => {
+    this._lifecycle.setTimeout(() => {
       if (this.currentIndex < this.kanjiIds.length) {
         this.inputEl.value = '';
         this._loadCurrent();
@@ -129,6 +149,7 @@ const reviewStage = {
         publish('changeScreen', 'stageSelect');
       }
     }, 1000);
+    return true;
   },
 
   /** 毎フレーム描画 */
@@ -158,13 +179,16 @@ const reviewStage = {
     // タイトル
     ctx.fillStyle = 'white';
     ctx.font      = '24px "UDデジタル教科書体",sans-serif';
-    ctx.fillText('復習モード', 20, 50);
+    ctx.fillText('復習モード', 540, 60);
 
     // ステージ選択ボタン
-    drawButton(ctx, 20, 20, 100, 30, 'ステージ選択');
+    const controls = this.getControls();
+    drawLearningButton(ctx, controls.back, controls.scale);
+    drawLearningButton(ctx, controls.submit, controls.scale);
+    placeLearningInput(canvas, this.inputEl, controls);
 
     // 漢字ボックス
-    const x = canvas.width/2, y = canvas.height/2;
+    const x = canvas.width/2, y = controls.compact ? 205 : 220;
     const w = 180, h = 180;
     ctx.strokeStyle = 'white';
     ctx.lineWidth   = 2;
@@ -178,13 +202,15 @@ const reviewStage = {
     ctx.fillText(this.currentKanji.kanji, x, y);
 
     // メッセージ
-    ctx.font      = '20px "UDデジタル教科書体",sans-serif';
+    ctx.font      = `${Math.max(20,16/controls.scale)}px "UDデジタル教科書体",sans-serif`;
     ctx.textBaseline = 'top';
-    ctx.fillText(this.message, x, y + h/2 + 10);
+    const lines = this.message.match(/.{1,20}/gu) || [];
+    lines.forEach((line,i)=>ctx.fillText(line, x, y+h/2+10+i*36));
   },
 
   /** exit: クリーンアップ */
   exit() {
+    this._lifecycle.deactivate();
     // 空振り案内のタイマーが、片付けた後に遷移を起こさないようにする
     if (this._emptyTimer) { clearTimeout(this._emptyTimer); this._emptyTimer = null; }
     this.emptyMessage = null;
@@ -192,6 +218,8 @@ const reviewStage = {
     // recordKanjiAnswer はメモリ上を増やすだけで、保存契機が無いと消える）
     try { saveGameData(); } catch {}
     // 入力欄イベント解除
+    this._answerSubmission?.dispose?.();
+    this._answerSubmission = null;
     this.inputEl?.removeEventListener('keydown', this._keydownHandler);
     if (this.inputEl) this.inputEl.style.display = 'none';
     // キャンバスクリック解除

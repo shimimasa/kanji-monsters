@@ -7,6 +7,8 @@ import { gameState, battleState, recordStageCleared, saveGameData } from '../cor
 import { checkAchievements } from '../core/achievementManager.js';
 import { calcBonusReward, isFirstClear, markBonusFirstClear } from '../core/bonusManager.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import { prefersReducedMotion } from '../ui/motionPreferences.js';
+import { createScreenLifecycle } from '../core/screenLifecycle.js';
 
 const nextStageButton = {
   x: 300,
@@ -25,6 +27,7 @@ const quickReviewButton = {
 };
 
 const resultWinState = {
+  _lifecycle: createScreenLifecycle(),
   canvas: null,
   ctx: null,
   _clickHandler: null,
@@ -38,6 +41,7 @@ const resultWinState = {
 
   /** 画面表示時の初期化 */
   async enter(canvas, resultData) {
+    const entryGeneration = this._lifecycle.activate();
     // 結果データを保存
     this.resultData = resultData || {
       correct: gameState.correctKanjiList || [],
@@ -70,13 +74,15 @@ const resultWinState = {
       console.error('実績チェック中にエラーが発生しました:', error);
     }
 
+    // import予約より前のawaitも、開始した入場世代に所属する。
+    if (!this._lifecycle.active || this._lifecycle.generation !== entryGeneration) return;
+
     // クリア画面に入ったらクリアBGMを再生
     publish('playBGM', 'victory');
 
     // ステージクリアの統計データを更新（多重防止）
 if (!this._countCommitted) {
   recordStageCleared();
-  gameState.playerStats.stagesCleared++;
   this._countCommitted = true;
 }
     // パーフェクトクリア判定
@@ -131,7 +137,7 @@ if (!this._countCommitted) {
     // イベントハンドラ登録
     this.registerHandlers();
     // チュートリアル（初回のみ）
-    import('../tutorial/TutorialManager.js').then(m => m.default.startIfNeeded('resultWin', { canvas: this.canvas }));
+    import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => m.default.startIfNeeded('resultWin', { canvas: this.canvas })));
   },
 
   /** 毎フレーム呼び出し（描画） */
@@ -139,7 +145,7 @@ if (!this._countCommitted) {
     if (!this.ctx || !this.canvas) return;
     
     const { ctx, canvas } = this;
-    this.animationTime += 16; // 約60FPSでアニメーション
+    if (!prefersReducedMotion()) this.animationTime += Math.max(0, dt || 0);
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -218,9 +224,9 @@ if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
     // 和紙のテクスチャ効果（ランダムな点）
     ctx.fillStyle = 'rgba(139, 69, 19, 0.05)';
     for (let i = 0; i < 200; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const size = Math.random() * 3 + 1;
+      const x = (i * 137) % width;
+      const y = (i * 83) % height;
+      const size = (i % 3) + 1;
       ctx.beginPath();
       ctx.arc(x, y, size, 0, Math.PI * 2);
       ctx.fill();
@@ -229,9 +235,9 @@ if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
     // 古い紙の汚れ効果
     ctx.fillStyle = 'rgba(160, 82, 45, 0.08)';
     for (let i = 0; i < 50; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const radius = Math.random() * 20 + 10;
+      const x = (i * 181) % width;
+      const y = (i * 109) % height;
+      const radius = 10 + (i % 20);
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
@@ -425,11 +431,13 @@ if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
     // 永久に 0個 になる。0個のときは「0」を見せず、絶対に減らない累計に差し替える
     const readSoFar = Object.values(gameState.kanjiAnswerStats || {})
       .filter(v => (v?.correct || 0) > 0).length;
+    const answeredExamples = [...new Set((gameState.correctKanjiList || []).map(k => k?.text || k?.kanji).filter(Boolean))].slice(0, 3);
+    const newExamples = [...new Set((gameState.newlyReadKanjiList || []).map(k => k?.text || k?.kanji).filter(Boolean))].slice(0, 3);
     const results = [
-      `正解数: ${gameState.correctKanjiList ? gameState.correctKanjiList.length : 0}`,
+      `今回の正解入力: ${gameState.correctKanjiList ? gameState.correctKanjiList.length : 0}`,
       newlyReadCount > 0
-        ? `はじめて読めた漢字: ${newlyReadCount}個`
-        : `いままでに読めた漢字: ${readSoFar}字`,
+        ? `今回初めて正解した字: ${newExamples.join('・')}（${newlyReadCount}字）`
+        : (answeredExamples.length ? `今回正解した字: ${answeredExamples.join('・')}` : `正解記録のある字: ${readSoFar}字`),
       `現在レベル: ${gameState.playerStats.level}`,
       `総ステージクリア: ${gameState.playerStats.stagesCleared}`
     ];
@@ -644,6 +652,7 @@ drawBonusResultPanel(ctx, x, y, width, height) {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    this._lifecycle.deactivate();
     this.unregisterHandlers();
     this.canvas = null;
     this.ctx = null;
