@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
+const profile=path.resolve(process.argv[2]);
+const root=path.resolve('artifacts/v0/run-01');
+if(!profile.startsWith(root+path.sep))throw Error('Outside V0 run');
+const [port,route]=fs.readFileSync(path.join(profile,'DevToolsActivePort'),'utf8').trim().split('\n');
+const socket=new WebSocket(`ws://127.0.0.1:${port}${route}`);
+socket.onopen=()=>socket.send(JSON.stringify({id:1,method:'Browser.close'}));
+socket.onmessage=()=>socket.close();
+socket.onclose=()=>console.log('Closed dedicated V0 profile browser');

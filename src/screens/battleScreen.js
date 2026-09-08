@@ -23,6 +23,7 @@ import { computeEnemyParams, getBossShieldHits, getStageDifficultyIndex, stageBe
 import { advanceTimer } from '../core/frameClock.js';
 import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { getContainedRect } from '../ui/viewportLayout.js';
+import { createBattleVisualAdapter, readVisualLayout } from '../visuals/battleVisualAdapter.js';
 // 1. まず、ファイル冒頭にimportを追加
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import {
@@ -819,6 +820,8 @@ updateShieldBreakEffect() {
    * 親は所有者を置換・再activateせず共有し、exitで同じ所有者を停止する。
    */
   enter(canvasEl, onVictory, entryLifecycle = null) {
+    this._battleVisual?.dispose();
+    this._battleVisual = null;
     this._active = true;
     this._lifecycle = entryLifecycle || this._beginScreenLifecycle();
     this._generation++;
@@ -1071,6 +1074,11 @@ updateShieldBreakEffect() {
 
       console.log("✅ battleScreen.enter() 完了");
 
+      // PC-10: normal battle owns a display session; derived practice/quick remain 2D.
+      if (this === battleScreenState && !entryLifecycle) {
+        this._battleVisual = createBattleVisualAdapter({ canvas: this.canvas, generation: this._generation });
+      }
+
       if (!entryLifecycle) {
         import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => {
           m.default.startIfNeeded('battle', { canvas: this.canvas });
@@ -1205,7 +1213,35 @@ getMaxHealCountFromSettings() {
     //       映すと二重に持ち上がるので消した。keyboardState は端末キーボード専用。
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+// PC-13: retain the existing monster rectangle and all foreground UI coordinates.
+const enemy = gameState.currentEnemy;
+const ew = 240, eh = 120;
+const { centerX: kx, width: kw } = this.getKanjiBoxMetrics();
+const kanjiRight = kx + kw / 2;
+const enemyMargin = 24;
+const outerPad = 10;
+let ex = Math.max(kanjiRight + enemyMargin + outerPad, 520);
+let ey = 120;
+const outerW = ew + 20;
+if (this.canvas) {
+  const maxEx = (this.canvas.width - outerW) - outerPad;
+  ex = Math.min(ex, maxEx);
+}
+let visual3D = false;
+if (this._battleVisual) {
+  // Value copies only. Nothing here grants the renderer access to learning or saves.
+  const snapshot = Object.freeze({ stageId: gameState.currentStageId,
+    enemyId: enemy?.id, enemyIndex: gameState.currentEnemyIndex,
+    enemyAction: battleState.enemyAction, enemyActionTimer: battleState.enemyActionTimer,
+    enemyHp: enemy?.hp, enemyMaxHp: enemy?.maxHp, shield: enemy?.shieldHp || 0,
+    reducedMotion: prefersReducedMotion(), generation: this._generation, session: this._battleVisual.session,
+    monsterRect: Object.freeze({ x: ex + 4, y: ey + 4, width: ew - 8, height: eh - 8 }),
+  });
+  visual3D = this._battleVisual.present(snapshot, dt, readVisualLayout(this.canvas));
+}
+
     // ① 背景描画 (画像 or グラデ)
+    if (!visual3D) {
     if (this.stageBgImage) {
       // ステージ背景画像がある場合は画像を描画
       this.ctx.drawImage(this.stageBgImage, 0, 0, this.canvas.width, this.canvas.height);
@@ -1216,6 +1252,7 @@ getMaxHealCountFromSettings() {
     grad.addColorStop(1, '#2a5298');
     this.ctx.fillStyle = grad;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
     }// ② 右上「もどる」ボタン（石版デザイン）
 // ② 左上「もどる」ボタン（石版デザイン）
 const topMargin = 20;
@@ -1300,24 +1337,6 @@ try {
 } catch {}
 
 /* 敵（新しいモンスター枠付き） */
-const enemy = gameState.currentEnemy;
-
-// ← 変更: 漢字パネルの右側に枠が被らないように動的配置
-const ew = 240, eh = 120;
-const { centerX: kx, width: kw } = this.getKanjiBoxMetrics();
-const kanjiRight = kx + kw / 2;
-const enemyMargin = 24;    // パネルとの余白
-const outerPad = 10;  // drawMonsterFrame で足す余白(左右合計20)
-let ex = Math.max(kanjiRight + enemyMargin + outerPad, 520); // 既定より少し右へ
-let ey = 120;
-
-// キャンバス端でクリップ（はみ出し防止）
-const outerW = ew + 20;
-if (this.canvas) {
-  const maxEx = (this.canvas.width - outerW) - outerPad;
-  ex = Math.min(ex, maxEx);
-}
-
 // アニメーション用オフセット計算
 let offsetX = 0, offsetY = 0, rotateAngle = 0, alpha = 1;
 if (battleState.enemyAction === 'damage' && battleState.enemyActionTimer > 0) {
@@ -1340,7 +1359,7 @@ else if (battleState.enemyAction === 'attack' && battleState.enemyActionTimer > 
   alpha = 1 - progress;
 }
 // 1. モンスター枠を描画
-const frameArea = drawMonsterFrame(this.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy);
+const frameArea = drawMonsterFrame(this.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy, 'normal', visual3D);
 
 // 直近の表示領域を保存（他処理で参照するため）
 this._lastMonsterFrameArea = frameArea;
@@ -1368,7 +1387,7 @@ if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
     console.log('シールド描画開始:', enemy.shieldHp);
     
     // **重要な修正**: モンスター枠のサイズを考慮してシールド半径を調整
-    const frameArea = drawMonsterFrame(this.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy);
+    const frameArea = drawMonsterFrame(this.ctx, ex - 10, ey - 10, ew + 20, eh + 20, enemy, 'normal', visual3D);
     
     // シールド半径をモンスター枠の実際の表示エリアに基づいて計算
     const shieldRadius = Math.min(frameArea.width, frameArea.height) * 0.45; // 0.6から0.45に調整してより適切なサイズに
@@ -1457,6 +1476,7 @@ if (enemy && enemy.isBoss && enemy.shieldHp > 0) {
   }
 }
 
+if (!visual3D) {
 if (enemy && enemy.img) {
   // 透過処理の問題を軽減するため、背景を少し暗くする
   this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
@@ -1472,6 +1492,7 @@ if (enemy && enemy.img) {
   this.ctx.font = 'bold 20px sans-serif';
   this.ctx.textAlign = 'center';
   this.ctx.fillText(enemy ? enemy.name : 'モンスター', 0, 0);
+}
 }
 this.ctx.restore();
 
@@ -3374,6 +3395,8 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
 }
   },
   exit() {
+    this._battleVisual?.dispose();
+    this._battleVisual = null;
     this._lifecycle?.deactivate();
     this._stopLevelUpShake?.();
     this._active = false;
@@ -6413,7 +6436,7 @@ function drawShieldFrameEffects(ctx, x, y, width, height, shieldStyle, currentSt
  * モンスター出現枠を描画する関数
  */
 
-function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'normal') {
+function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'normal', transparentInterior = false) {
   ctx.save();
   
   // 敵のタイプに応じて枠のスタイルを決定
@@ -6528,7 +6551,7 @@ function drawMonsterFrame(ctx, x, y, width, height, enemy = null, style = 'norma
   ctx.shadowColor = 'transparent';
   ctx.shadowBlur = 0;
   ctx.fillStyle = currentStyle.bgColor;
-  drawRoundedRect(ctx, x, y, width, height, cornerRadius);
+  if (!transparentInterior) drawRoundedRect(ctx, x, y, width, height, cornerRadius);
   
   // 3. 外枠（シールド状態に応じて太さ調整）
   ctx.strokeStyle = currentStyle.outerColor;

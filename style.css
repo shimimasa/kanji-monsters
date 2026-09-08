@@ -1,5 +1,17 @@
 /* style.css - 全画面対応改善版（完全版） */
 
+/* PC-13: back layer follows the actual canvas box and its contain content. */
+.yomitabi-3d-backdrop {
+  position: fixed;
+  z-index: 0;
+  background: #000;
+  pointer-events: none;
+  overflow: hidden;
+}
+.yomitabi-3d-backdrop[hidden] { display: none; }
+.yomitabi-3d-canvas { position: absolute; pointer-events: none; }
+#gameCanvas.yomitabi-3d-active { background-color: transparent; z-index: 1; }
+
 body {
   margin: 0;
   padding: 0;

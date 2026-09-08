@@ -1,0 +1,22 @@
+const fs=require('fs'),crypto=require('crypto');
+const root=require('node:path').resolve('artifacts/v0/run-01');
+const files=['src/screens/battleScreen.js','src/visuals/battleVisualAdapter.js','src/visuals/babylonPrimitiveRenderer.js','src/visuals/primitivePose.js','style.css','package.json','package-lock.json'];
+const hashes=Object.fromEntries(files.map(p=>[p,crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')]));
+const freezePath=root+'/foreground-product-freeze.json';
+if(!fs.existsSync(freezePath))fs.writeFileSync(freezePath,JSON.stringify({createdAt:new Date().toISOString(),scope:'foreground only; separate explicit readiness required for every run',hashes},null,2),{flag:'wx'});
+else require('assert/strict').deepEqual(hashes,JSON.parse(fs.readFileSync(freezePath)).hashes);
+const run=process.argv[2]||'baseline-cold-B1';
+const waiting=JSON.parse(fs.readFileSync(root+'/'+run+'-waiting.json'));
+const info=fs.readFileSync(waiting.profile+'/DevToolsActivePort','utf8').trim().split('\n');
+const ws=new WebSocket('ws://127.0.0.1:'+info[0]+info[1]);
+const pending=new Map();let id=0;
+ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id){const p=pending.get(m.id);pending.delete(m.id);m.error?p.reject(Error(JSON.stringify(m.error))):p.resolve(m.result);}};
+const call=(method,params={})=>new Promise((resolve,reject)=>{const i=++id;pending.set(i,{resolve,reject});ws.send(JSON.stringify({id:i,method,params}));});
+ws.onopen=async()=>{try{
+  const version=await call('Browser.getVersion');
+  const targetId=waiting.targetId;
+  const win=await call('Browser.getWindowForTarget',{targetId});
+  await call('Browser.setWindowBounds',{windowId:win.windowId,bounds:{windowState:'normal'}});
+  await call('Target.activateTarget',{targetId});
+  console.log(JSON.stringify({version,window:await call('Browser.getWindowForTarget',{targetId}),productHashCheck:'PASS',run},null,2));
+}catch(e){console.error(e);process.exitCode=1;}finally{ws.close();}};

@@ -16,5 +16,8 @@
   "license": "ISC",
   "devDependencies": {
     "vite": "^5.3.1"
+  },
+  "dependencies": {
+    "@babylonjs/core": "9.25.0"
   }
 }
