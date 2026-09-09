@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MOTION-01 · Pixel Companion Slice</title><link rel="stylesheet" href="/demo.css"></head>
+<body><main>
+<header><span class="eyebrow">YOMITABI · MOTION-01</span><h1>同じ一枚から、仲間の動きへ。</h1>
+<p>ジャガイモスライム / HKD-E01　<span class="tag">Standalone / 学習・保存処理なし</span></p></header>
+<section class="controls" aria-label="表示コントロール">
+<div class="row"><strong>ヨミタビ表示通知</strong>
+<button data-action="idle">idle</button><button data-action="attack">attack</button>
+<button data-action="hit">hit</button><button data-action="defeat">defeat</button></div>
+<div class="row"><button id="play">再生</button><button id="step">+100ms</button>
+<label for="progress">進捗</label><input id="progress" type="range" min="0" max="1000" value="0">
+<output id="time">0%</output></div>
+<div class="row"><label><input id="reduced" type="checkbox"> 動きを減らす</label>
+<label>表示サイズ <select id="size"><option value="1">232 × 112</option><option value=".75">174 × 84</option></select></label>
+<label>表示 <select id="mode"><option value="both">Legacy / Motion 比較</option><option value="legacy">Legacy 2D</option><option value="motion">New 2D Motion</option><option value="static">静止比較</option></select></label></div>
+</section>
+<section class="cards" aria-label="モンスター表示比較">
+<article id="legacy-card"><h2>Legacy 2D</h2><p>現行の寸法・枠・画像処理を参照</p>
+<canvas id="legacy" width="360" height="200" aria-hidden="true" tabindex="-1" inert></canvas></article>
+<article id="motion-card"><h2>New 2D Motion</h2><p>slime profile / 4 actions</p>
+<canvas id="motion" width="360" height="200" aria-hidden="true" tabindex="-1" inert></canvas></article>
+<article><h2>Sprint mock</h2><p>別hostから同じengineを使う</p>
+<canvas id="sprint" width="360" height="200" aria-hidden="true" tabindex="-1" inert></canvas>
+<button id="correct">正解通知 → attack</button><button id="mock-idle">待機通知 → idle</button></article>
+</section>
+<section class="inspection"><div class="row"><button id="exit">host退出</button><button id="enter">新sessionで再入場</button>
+<label>画像状態 <select id="image-state"><option value="ready">通常</option><option value="pending">pending</option><option value="failed">failure</option></select></label></div>
+<p id="status" role="status">画像を準備しています。操作は先に使えます。</p>
+<pre id="state"></pre></section>
+<footer>画像fit・切抜き・透過処理は改善していません。Legacy hitのみ固定ジッターによる近似です。
+正式性能比較・実battle・実計算スプリントには接続していません。</footer>
+</main><script type="module" src="/demo.mjs"></script></body></html>
