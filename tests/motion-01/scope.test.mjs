@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { assertMotionScope } from '../motion-02/scope-audit.mjs';
 import { HKD_E01_MOTION } from '../../src/visuals/motion/monsterMotionManifest.js';
 const base='src/visuals/motion/';
 test('engine imports remain within display-only modules and own no side-effect APIs',()=>{
@@ -19,14 +19,10 @@ test('metadata is only HKD-E01 display information; original image hash remains 
   const hash=crypto.createHash('sha256').update(fs.readFileSync('public'+HKD_E01_MOTION.imageUrl)).digest('hex');
   assert.equal(hash,'ee2a5e2456227d92efdf4824e7d8b17d3babd74165bd81bf70816e699155110e');
 });
-test('all baseline tracked source/package/assets remain unchanged',()=>{
-  const stable='2a521dd5aa747314b25e761d976bd4f880cd58c3';
-  const baseline=new Set(execFileSync('git',['ls-tree','-r','--name-only','-z',stable],{encoding:'utf8'}).split('\0').filter(Boolean));
-  assert.ok(baseline.size>0);
-  // New committed slice files are allowed; every original path must remain unchanged.
-  // Disable rename detection so moving a protected path still exposes its deletion.
-  const diff=execFileSync('git',['diff','--no-renames','--name-only','-z',stable,'--'],{encoding:'utf8'});
-  assert.deepEqual(diff.split('\0').filter(path=>baseline.has(path)),[]);
+test('baseline paths remain unchanged except the exact approved MOTION-02 battle hooks',()=>{
+  const audit=assertMotionScope();
+  assert.ok(audit.stablePaths>0);
+  assert.equal(audit.approvedHooks,9);
 });
 test('package dependency tree has no Babylon or animation dependency',()=>{
   const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));

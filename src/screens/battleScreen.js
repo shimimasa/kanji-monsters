@@ -23,6 +23,7 @@ import { computeEnemyParams, getBossShieldHits, getStageDifficultyIndex, stageBe
 import { advanceTimer } from '../core/frameClock.js';
 import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { getContainedRect } from '../ui/viewportLayout.js';
+import { createBattleMotionBridge } from '../visuals/battleMotionBridge.js';
 // 1. まず、ファイル冒頭にimportを追加
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import {
@@ -819,6 +820,8 @@ updateShieldBreakEffect() {
    * 親は所有者を置換・再activateせず共有し、exitで同じ所有者を停止する。
    */
   enter(canvasEl, onVictory, entryLifecycle = null) {
+    this._pixelMotion?.dispose();
+    this._pixelMotion = null;
     this._active = true;
     this._lifecycle = entryLifecycle || this._beginScreenLifecycle();
     this._generation++;
@@ -1071,6 +1074,13 @@ updateShieldBreakEffect() {
 
       console.log("✅ battleScreen.enter() 完了");
 
+      if (this === battleScreenState && gameState.currentStageId === 'hokkaido_area1' &&
+          ['jikkuri', 'challenge'].includes(gameState.gameMode)) {
+        this._pixelMotion = createBattleMotionBridge({ session: this._generation,
+          durations: { attack: ENEMY_ATTACK_ANIM_DURATION, damage: ENEMY_DAMAGE_ANIM_DURATION,
+            defeat: ENEMY_DEFEAT_ANIM_DURATION } });
+      }
+
       if (!entryLifecycle) {
         import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => {
           m.default.startIfNeeded('battle', { canvas: this.canvas });
@@ -1200,6 +1210,11 @@ getMaxHealCountFromSettings() {
       battleState.enemyActionTimer = advanceTimer(battleState.enemyActionTimer, dt);
       if (battleState.enemyActionTimer === 0) battleState.enemyAction = null;
     }
+    this._pixelMotion?.update({ stageId: gameState.currentStageId,
+      mode: this === battleScreenState && ['jikkuri', 'challenge'].includes(gameState.gameMode) ? 'normal' : 'excluded',
+      monsterId: gameState.currentEnemy?.id, enemyKey: gameState.currentEnemyIndex,
+      image: gameState.currentEnemy?.img, action: battleState.enemyAction,
+      remainingMs: battleState.enemyActionTimer, reducedMotion: prefersReducedMotion() }, dt);
     // NOTE: 以前はここで50音パッドの高さを keyboardState に映していたが、
     //       いまは canvas 自体がパッドのぶん縮む（index.html の --kanapad-height）。
     //       映すと二重に持ち上がるので消した。keyboardState は端末キーボード専用。
@@ -1463,7 +1478,11 @@ if (enemy && enemy.img) {
   this.ctx.fillRect(-ew/2 - 2, -eh/2 - 2, ew + 4, eh + 4);
   
   this.ctx.globalCompositeOperation = 'source-over';
-  this.ctx.drawImage(enemy.img, -ew/2, -eh/2, ew, eh);
+  const motionDrawn = this._pixelMotion?.present(this.ctx, {
+    imageRect: { x: imageX - offsetX, y: imageY - offsetY, width: ew, height: eh },
+    clipRect: frameArea,
+  }, { x: imageX + ew/2, y: imageY + eh/2, rotation: rotateAngle });
+  if (!motionDrawn) this.ctx.drawImage(enemy.img, -ew/2, -eh/2, ew, eh);
 } else {
   // 画像がない場合は代替表示
   this.ctx.fillStyle = '#6b8e23';
@@ -3374,6 +3393,8 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
 }
   },
   exit() {
+    this._pixelMotion?.dispose();
+    this._pixelMotion = null;
     this._lifecycle?.deactivate();
     this._stopLevelUpShake?.();
     this._active = false;
@@ -5099,6 +5120,7 @@ setManagedTimeout(() => {
     
     battleState.enemyAction      = 'damage';
     battleState.enemyActionTimer = ENEMY_DAMAGE_ANIM_DURATION;
+    battleScreenState._pixelMotion?.actionStarted();
     updateEnemyUI(gameState.currentEnemy.name, gameState.currentEnemy.hp, gameState.currentEnemy.maxHp);
     
     // 敵撃破判定
@@ -5113,6 +5135,7 @@ setManagedTimeout(() => {
       publish('playSE', 'defeat');
       battleState.enemyAction      = 'defeat';
       battleState.enemyActionTimer = ENEMY_DEFEAT_ANIM_DURATION;
+      battleScreenState._pixelMotion?.actionStarted();
       
       // ボス撃破統計の更新
       if (gameState.currentEnemy.isBoss) {
@@ -5689,6 +5712,7 @@ function enemyTurn() {
   // 敵の攻撃時に突進アニメーション開始
   battleState.enemyAction      = 'attack';
   battleState.enemyActionTimer = ENEMY_ATTACK_ANIM_DURATION;
+  battleScreenState._pixelMotion?.actionStarted();
 
   const atk = gameState.currentEnemy.atk || 5;
   // 敵攻撃メッセージのフォーマットを `${e.name} のこうげき！プレイヤー名に～のダメージ！` に変更
