@@ -1,4 +1,5 @@
 import { getContainedRect } from '../ui/viewportLayout.js';
+import { createGLBTimeline } from './glbTimeline.js';
 
 // Display ownership only. No imports from game state, learning, storage or loaders.
 const owners = new WeakMap();
@@ -24,10 +25,11 @@ export function readVisualLayout(canvas) {
 }
 
 export function createBattleVisualAdapter({ canvas, generation,
-  load = () => import('./babylonPrimitiveRenderer.js'),
+  load = () => import('./babylonGLBRenderer.js'),
 }) {
   owners.get(canvas)?.dispose();
   const session = ++nextSession;
+  const timeline = createGLBTimeline();
   let disposed = false, failed = false, pending = null, renderer = null, host = null, surface = null;
   let lastLayout = null, appliedLayoutKey = '';
   const current = () => !disposed && owners.get(canvas) === api;
@@ -66,7 +68,7 @@ export function createBattleVisualAdapter({ canvas, generation,
         surface.dataset.visualSession = String(session);
         host.appendChild(surface);
         canvas.parentNode.insertBefore(host, canvas);
-        const handle = await module.preparePrimitive({ canvas: surface, onFailure: fail });
+        const handle = await module.preparePrimitive({ canvas: surface, onFailure: fail, timeline, isCurrent: current });
         if (!current() || failed) { handle.dispose(); return false; }
         renderer = handle;
         if (lastLayout) api.resize(lastLayout);
@@ -76,6 +78,7 @@ export function createBattleVisualAdapter({ canvas, generation,
     },
     present(snapshot, dt, layout) {
       if (!current() || failed || snapshot.generation !== generation || snapshot.session !== session) return false;
+      timeline.observe(snapshot, dt);
       if (snapshot.stageId !== 'hokkaido_area1' || snapshot.enemyId !== 'HKD-E01') { hide(); return false; }
       try {
         api.resize(layout);

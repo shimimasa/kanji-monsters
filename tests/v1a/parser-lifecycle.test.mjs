@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {NullEngine} from '@babylonjs/core/Engines/nullEngine.js';
+import {Scene} from '@babylonjs/core/scene.js';
+import {readGLB} from '../../src/visuals/glbValidation.js';
+import {parseGLBAsset} from '../../src/visuals/glbParser.js';
+const bytes=new Uint8Array(fs.readFileSync(new URL('../../public/assets/3d/monsters/HKD-E01/HKD-E01.v1a.1.glb',import.meta.url)));
+for(const fault of ['before-start','binary-reject','bad-animation'])test('real parser cleanup: '+fault,async t=>{
+  const engine=new NullEngine(),scene=new Scene(engine),data=readGLB(bytes);
+  t.after(()=>{scene.dispose();engine.dispose();});
+  if(fault==='binary-reject')data.bin.readAsync=async()=>{throw Error('injected binary failure');};
+  if(fault==='bad-animation')data.json.animations[3].samplers[0].input=99999;
+  const op=parseGLBAsset(scene,data);
+  if(fault==='before-start')op.dispose();
+  await assert.rejects(op.promise);op.dispose();op.dispose();
+  assert.equal(op.resources().observers,0);
+  for(const key of ['meshes','transformNodes','animationGroups','materials','geometries'])assert.equal(scene[key].length,0,key);
+  for(const node of data.json.nodes)if(node._babylonTransformNode)assert.equal(node._babylonTransformNode.isDisposed(),true);
+});
