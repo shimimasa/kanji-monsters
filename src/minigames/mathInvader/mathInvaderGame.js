@@ -160,6 +160,13 @@ export function createMathInvaderGame({ sessionId, random = Math.random, onEvent
       }
       return true;
     },
+    // Contract-v1 adapter only. Existing command methods retain all Core logic.
+    dispatch(command) {
+      if (!command || typeof command !== 'object') return false;
+      if (command.type === 'submit') return this.submit(command.payload);
+      if (command.type === 'select') return this.select(command.payload);
+      return false;
+    },
     snapshot,
     exit() {
       if (!active) return;

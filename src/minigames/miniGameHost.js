@@ -42,16 +42,12 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       const current = game;
       const createView = makeView || definition.createView;
       if (typeof createView !== 'function') throw new Error('Mini game view unavailable');
+      const dispatch = command => {
+        if (!valid || current !== game || current.dispatch(command) !== true) return false;
+        host.update(0); return true;
+      };
       view = createView({ document: doc, getSnapshot: () => current.snapshot(),
-        onSubmit: answer => {
-          if (!valid || current !== game || !current.submit(answer)) return false;
-          host.update(0); return true;
-        },
-        onNext: (...args) => valid && current === game && current.next?.(...args),
-        onSelect: (...args) => {
-          if (!valid || current !== game || !current.select?.(...args)) return false;
-          host.update(0); return true;
-        },
+        dispatch,
         onBack: () => { if (valid && current === game) { host.exit(); onBack(); } },
         onReplay: () => { if (valid && current === game && current.snapshot().result) host.enter(props); } });
       const visibility = () => { visibilityPaused = !!doc.hidden; syncPause(); host.update(0); };

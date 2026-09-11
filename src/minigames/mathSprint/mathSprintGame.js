@@ -66,6 +66,16 @@ export function createMathSprintGame({ sessionId, random = Math.random, onEvent 
           problemId !== problems[index].problemId) return false;
       presentProblem(); return true;
     },
+    // Contract-v1 adapter only. Existing command methods retain all Core logic.
+    dispatch(command) {
+      if (!command || typeof command !== 'object') return false;
+      if (command.type === 'submit') return this.submit(command.payload);
+      if (command.type === 'next') {
+        const { sessionId: sourceSession, problemId } = command.payload ?? {};
+        return this.next(sourceSession, problemId);
+      }
+      return false;
+    },
     snapshot,
     exit() {
       if (!active) return;
