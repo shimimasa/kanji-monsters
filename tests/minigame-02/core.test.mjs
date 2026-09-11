@@ -16,8 +16,8 @@ const select = (game, enemy = game.snapshot().enemies[0]) =>
 const submit = (game, value = game.snapshot().selectedEnemy.answer) => game.submit({ ...identity(game.snapshot()), value });
 const spawnReady = game => game.update(MATH_INVADER_RULES.spawnIntervalMs);
 
-test('registry has Sprint and Invader definitions without replacing Sprint', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader']);
+test('registry retains Sprint and Invader definitions when later entries are added', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder']);
   for (const id of ['mathSprint', 'mathInvader']) {
     assert.equal(miniGameRegistry[id].id, id);
     assert.equal(typeof miniGameRegistry[id].create, 'function');

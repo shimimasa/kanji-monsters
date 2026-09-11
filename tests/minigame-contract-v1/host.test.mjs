@@ -92,7 +92,7 @@ test('one Host enters both games, composes external pause, and rejects an old se
   assert.equal(counters.companionDisposals, 2); assert.equal(host.inspect().listeners, 0);
 });
 
-test('both registry views retain the v1 return contract behind thin callback adapters', () => {
+test('all registry views retain the v1 return contract through the generic Host context', () => {
   for (const id of Object.keys(miniGameRegistry)) {
     const { doc } = environment(); const game = miniGameRegistry[id].create({
       sessionId: `${id}-view`, random: () => 0.25, onEvent: () => {},

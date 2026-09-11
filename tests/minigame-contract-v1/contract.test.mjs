@@ -7,8 +7,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('the two definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader']);
+test('the four definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.equal(definition.id, id);
     assert.equal(typeof definition.title, 'string'); assert.ok(definition.title.length > 0);
@@ -17,7 +17,7 @@ test('the two definitions expose only the required v1 creation boundary', () => 
   }
 });
 
-test('Sprint and Invader instances implement the v1 lifecycle and command port', () => {
+test('all four mechanics implement the v1 lifecycle and command port', () => {
   const methods = ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit'];
   for (const id of Object.keys(miniGameRegistry)) {
     const game = create(id, `${id}-shape`);
@@ -88,7 +88,7 @@ test('LearningEvent v1 keeps its exact envelope, ordering and four event types',
   assert.equal(game.snapshot().correct, 9);
 });
 
-test('both games commit learning state before notifying observers', () => {
+test('all four games commit learning state before notifying observers', () => {
   let sprint;
   sprint = create('mathSprint', 'sprint-order', event => {
     if (event.type === 'correct') assert.equal(sprint.snapshot().answered, 1);
@@ -109,6 +109,26 @@ test('both games commit learning state before notifying observers', () => {
   const selected = invader.snapshot().selectedEnemy;
   assert.equal(invader.dispatch({ type: 'submit', payload: { ...target,
     attemptId: selected.attemptId, token: selected.token, value: selected.answer } }), true);
+
+  let english;
+  english = create('englishChoice', 'english-order', event => {
+    if (event.type === 'correct') assert.equal(english.snapshot().correct, 1);
+  });
+  english.enter(); const englishState = english.snapshot();
+  assert.equal(english.dispatch({ type: 'answer', payload: {
+    sessionId: englishState.sessionId, problemId: englishState.problem.problemId,
+    attemptId: englishState.attemptId, choiceId: englishState.problem.correctChoiceId,
+  } }), true);
+
+  let sentence;
+  sentence = create('sentenceOrder', 'sentence-order', event => {
+    if (event.type === 'incorrect') assert.equal(sentence.snapshot().incorrect, 1);
+  });
+  sentence.enter(); const sentenceState = sentence.snapshot();
+  assert.equal(sentence.dispatch({ type: 'submit', payload: {
+    sessionId: sentenceState.sessionId, problemId: sentenceState.problem.problemId,
+    attemptId: sentenceState.attemptId,
+  } }), true);
 });
 
 test('instance exit is idempotent and permanently rejects old commands', () => {
@@ -118,8 +138,14 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
     assert.equal(game.snapshot().active, false); assert.equal(game.snapshot().aborted, true);
     const old = id === 'mathSprint'
       ? { type: 'submit', payload: { sessionId: before.sessionId, token: before.token, value: before.problem.answer } }
-      : { type: 'select', payload: { sessionId: before.sessionId,
-        enemyId: before.enemies[0].enemyId, problemId: before.enemies[0].problemId } };
+      : id === 'mathInvader'
+        ? { type: 'select', payload: { sessionId: before.sessionId,
+          enemyId: before.enemies[0].enemyId, problemId: before.enemies[0].problemId } }
+        : id === 'englishChoice'
+          ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: before.problem.problemId,
+            attemptId: before.attemptId, choiceId: before.problem.correctChoiceId } }
+          : { type: 'submit', payload: { sessionId: before.sessionId, problemId: before.problem.problemId,
+            attemptId: before.attemptId } };
     assert.equal(game.dispatch(old), false);
   }
 });

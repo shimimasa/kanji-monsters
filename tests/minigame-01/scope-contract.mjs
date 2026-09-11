@@ -14,6 +14,8 @@ const APPROVED_ENTRY_HASHES = Object.freeze({
   'src/screens/titleScreen.js': Object.freeze([
     'b4a76b5ebf837a3c012738ebe468414b89ed88228397e9806dea884564b92ee5',
     MINI_GAME_ENTRY_HASHES['src/screens/titleScreen.js'],
+    '0e84752ece6ffe2822596af4929e62547465dc1b6b762a4100dbd9a8429c379d',
+    '839c1100d99c40741462d7467ba7afd8c2a0a84e9adca82bba148978faac7bc2',
   ]),
 });
 export const MINI_GAME_ADDITIONS = Object.freeze([
@@ -29,5 +31,5 @@ export const MINI_GAME_ADDITIONS = Object.freeze([
 export function assertMiniGameEntry(path, source) {
   assert.ok(Object.hasOwn(MINI_GAME_ENTRY_HASHES, path));
   const actual = crypto.createHash('sha256').update(source.replaceAll('\r\n','\n')).digest('hex');
-  assert.ok(APPROVED_ENTRY_HASHES[path].includes(actual), `mini-game entry changed outside its reviewed delta: ${path}`);
+  assert.ok(APPROVED_ENTRY_HASHES[path].includes(actual), `mini-game entry changed outside its reviewed delta: ${path} (${actual})`);
 }

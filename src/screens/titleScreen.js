@@ -465,6 +465,8 @@ const titleState = {
     };
     add('titleMiniGameButton', 'ミニゲーム：けいさんスプリント', 'mathSprint', '#236d60');
     add('titleMathInvaderButton', 'ミニゲーム：けいさんインベーダー', 'mathInvader', '#315b8a');
+    add('titleEnglishChoiceButton', 'ミニゲーム：えいたんご4たく', 'englishChoice', '#60468a');
+    add('titleSentenceOrderButton', 'ミニゲーム：文ならべ', 'sentenceOrder', '#376a43');
     this._miniGameButton = group;
     document.body.appendChild(group);
   },

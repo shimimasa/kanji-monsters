@@ -2,6 +2,10 @@ import { createMathSprintGame } from './mathSprint/mathSprintGame.js';
 import { createMathSprintView } from './mathSprint/mathSprintView.js';
 import { createMathInvaderGame } from './mathInvader/mathInvaderGame.js';
 import { createMathInvaderView } from './mathInvader/mathInvaderView.js';
+import { createEnglishChoiceGame } from './englishChoice/englishChoiceGame.js';
+import { createEnglishChoiceView } from './englishChoice/englishChoiceView.js';
+import { createSentenceOrderGame } from './sentenceOrder/sentenceOrderGame.js';
+import { createSentenceOrderView } from './sentenceOrder/sentenceOrderView.js';
 
 function withCommandAdapter(createView) {
   return context => createView({
@@ -11,6 +15,7 @@ function withCommandAdapter(createView) {
       type: 'next', payload: { sessionId, problemId },
     }),
     onSelect: payload => context.dispatch({ type: 'select', payload }),
+    onAnswer: payload => context.dispatch({ type: 'answer', payload }),
   });
 }
 
@@ -19,4 +24,8 @@ export const miniGameRegistry = Object.freeze({
     create: createMathSprintGame, createView: withCommandAdapter(createMathSprintView) }),
   mathInvader: Object.freeze({ id: 'mathInvader', title: 'けいさんインベーダー',
     create: createMathInvaderGame, createView: withCommandAdapter(createMathInvaderView) }),
+  englishChoice: Object.freeze({ id: 'englishChoice', title: 'えいたんご4たく',
+    create: createEnglishChoiceGame, createView: withCommandAdapter(createEnglishChoiceView) }),
+  sentenceOrder: Object.freeze({ id: 'sentenceOrder', title: '文ならべ',
+    create: createSentenceOrderGame, createView: createSentenceOrderView }),
 });

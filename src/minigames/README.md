@@ -25,6 +25,10 @@ Unknown commands return `false`. The Host forwards commands without inspecting
 keep private or compatibility methods such as Sprint `next()` and Invader
 `select()`; they are not contract methods.
 
+Only the existence and side-effect semantics of the lifecycle methods, plus the
+boolean acceptance result of `dispatch`, are shared. Snapshot fields and the
+return values of the other lifecycle methods are game-specific.
+
 ## View
 
 `createView` returns `root`, `update(snapshot, companionSnapshot)`,
@@ -50,8 +54,9 @@ The fixed event types are `problemPresented`, `correct`, `incorrect`, and
 
 Core state is committed before notification. Observers cannot change scoring or
 progress through a return value, Promise, exception, animation, or render pass.
-`sessionId + seq` identifies an observed event; the game still consumes its own
-problem/attempt token as the primary duplicate-submission defense.
+`sessionId + seq` identifies an observed event. Each game owns command validity,
+stale-input rejection, and one-time consumption; its concrete command identity
+fields and token structure are game-specific and provisional.
 
 ## Pause and lifecycle
 
@@ -74,8 +79,10 @@ completion never gates input, scoring, results, or session completion.
 
 ## Non-negotiables
 
-- No mini-game-owned `requestAnimationFrame` or continuous interval.
-- Reject old session, old problem/attempt, and consumed-token commands.
+- Under the current v1 lifecycle, advance through Host `update`; do not own a
+  separate `requestAnimationFrame` or continuous interval.
+- Reject stale, invalid, replayed, and already-consumed commands in game Core;
+  exact identity fields remain game-specific.
 - Commit Core state before LearningEvent, then start visual reactions.
 - Emit `sessionComplete` once; aborted sessions do not emit it.
 - Clean up input, listeners, DOM, Companion, and game-specific entities on exit.
@@ -89,13 +96,14 @@ life, enemies, spawn, stages, rounds, result details, input widgets, and visual
 mechanics stay in the game. The shared contract does not define a persistent
 result wrapper or selected-companion persistence.
 
-The exact command payloads and registry-to-View callback argument names remain
-provisional. Games may add commands without expanding the Host contract.
+The exact command names and payloads, registry-to-View callback argument names,
+snapshot fields, and result schemas remain provisional or game-local. Games may
+add commands without expanding the Host contract.
 
 ## Breaking changes
 
 Use Contract v2 for removal, renaming, or semantic changes to required fields or
-methods; the millisecond clock or scheduler owner; session/event identity; the
+methods; the millisecond clock or scheduler owner; LearningEvent identity; the
 LearningEvent envelope or fixed event meanings; commit-before-event;
 display-only Companion; or exit/cleanup ownership. Additive game commands,
 payload fields, result details, and registry entries remain v1.
