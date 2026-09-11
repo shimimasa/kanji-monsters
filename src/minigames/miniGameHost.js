@@ -5,7 +5,6 @@ import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { miniGameRegistry } from './registry.js';
 import { readActiveCollection } from './collectionAdapter.js';
 import { createCompanionAdapter } from './companionAdapter.js';
-import { createMathSprintView } from './mathSprint/mathSprintView.js';
 
 const layout = Object.freeze({ imageRect: { x: 20, y: 10, width: 240, height: 120 },
   clipRect: { x: 24, y: 14, width: 232, height: 112 } });
@@ -27,7 +26,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
   window: win = globalThis.window, collection = readActiveCollection,
   makeSessionId = () => crypto.randomUUID(), random = Math.random,
   loadImage = loadCompanionImage,
-  makeCompanion = createCompanionAdapter, makeView = createMathSprintView,
+  makeCompanion = createCompanionAdapter, makeView = null,
   reduced = prefersReducedMotion, onBack = () => publish('changeScreen', 'title') } = {}) {
   let game = null, view = null, companion = null, valid = false, cleanups = [], props = null;
   let visibilityPaused = false, manualPaused = false;
@@ -41,16 +40,25 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       companion = makeCompanion({ sessionId, ownedMonsterIds: collection(), loadImage });
       game = definition.create({ sessionId, random, onEvent: event => { if (valid) companion?.observe(event); } });
       const current = game;
-      view = makeView({ document: doc, getSnapshot: () => current.snapshot(),
-        onSubmit: answer => valid && current === game && current.submit(answer),
-        onNext: (...args) => valid && current === game && current.next(...args),
+      const createView = makeView || definition.createView;
+      if (typeof createView !== 'function') throw new Error('Mini game view unavailable');
+      view = createView({ document: doc, getSnapshot: () => current.snapshot(),
+        onSubmit: answer => {
+          if (!valid || current !== game || !current.submit(answer)) return false;
+          host.update(0); return true;
+        },
+        onNext: (...args) => valid && current === game && current.next?.(...args),
+        onSelect: (...args) => {
+          if (!valid || current !== game || !current.select?.(...args)) return false;
+          host.update(0); return true;
+        },
         onBack: () => { if (valid && current === game) { host.exit(); onBack(); } },
         onReplay: () => { if (valid && current === game && current.snapshot().result) host.enter(props); } });
       const visibility = () => { visibilityPaused = !!doc.hidden; syncPause(); host.update(0); };
       doc.addEventListener('visibilitychange', visibility);
       cleanups.push(() => doc.removeEventListener('visibilitychange', visibility));
       // Respect the visible viewport when the OS keyboard shrinks or pans it.
-      const root = doc.getElementById('mathSprintScreen');
+      const root = view.root;
       const viewport = win?.visualViewport;
       const keyboard = win?.navigator?.virtualKeyboard;
       const resize = () => {
@@ -82,9 +90,11 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       const state = game.snapshot();
       companion.update(state.paused ? 0 : dtMs, reduced());
       view.update(state, companion.inspect());
-      const ctx = view.canvas.getContext('2d');
-      ctx.clearRect(0, 0, view.canvas.width, view.canvas.height);
-      companion.present(ctx, layout);
+      const ctx = view.canvas?.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, view.canvas.width, view.canvas.height);
+        companion.present(ctx, layout);
+      }
     },
     setPaused(value) { manualPaused = !!value; syncPause(); host.update(0); },
     exit() {

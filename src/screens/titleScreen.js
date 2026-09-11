@@ -451,14 +451,22 @@ const titleState = {
   },
 
   _injectMiniGameButton() {
-    const button = document.createElement('button');
-    button.id = 'titleMiniGameButton';
-    button.type = 'button';
-    button.textContent = 'ミニゲーム：けいさんスプリント';
-    button.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:10000;min-height:44px;max-width:94vw;width:310px;padding:10px;font:16px system-ui;background:#236d60;color:white;border:1px solid #fff;border-radius:10px;cursor:pointer';
-    button.onclick = this._lifecycle.guard(() => publish('changeScreen', { name: 'miniGame', props: { gameId: 'mathSprint' } }));
-    this._miniGameButton = button;
-    document.body.appendChild(button);
+    const group = document.createElement('div');
+    group.id = 'titleMiniGameButtons';
+    group.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;gap:8px;max-width:94vw;width:640px;justify-content:center;flex-wrap:wrap';
+    const add = (id, label, gameId, color) => {
+      const button = document.createElement('button');
+      button.id = id;
+      button.type = 'button';
+      button.textContent = label;
+      button.style.cssText = `min-height:44px;flex:1 1 260px;max-width:310px;padding:10px;font:16px system-ui;background:${color};color:white;border:1px solid #fff;border-radius:10px;cursor:pointer`;
+      button.onclick = this._lifecycle.guard(() => publish('changeScreen', { name: 'miniGame', props: { gameId } }));
+      group.appendChild(button);
+    };
+    add('titleMiniGameButton', 'ミニゲーム：けいさんスプリント', 'mathSprint', '#236d60');
+    add('titleMathInvaderButton', 'ミニゲーム：けいさんインベーダー', 'mathInvader', '#315b8a');
+    this._miniGameButton = group;
+    document.body.appendChild(group);
   },
 
   _injectSaveButton() {

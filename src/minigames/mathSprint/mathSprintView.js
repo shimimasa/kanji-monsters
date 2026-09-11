@@ -84,6 +84,7 @@ export function createMathSprintView({ document: doc, onBack, onReplay, onNext, 
   on(replay, 'click', () => { if (active && !getSnapshot().paused) onReplay(); });
   doc.body.append(root);
   return {
+    root,
     update(state, companionState) {
       if (!active) return;
       const key = `${state.sessionId}:${state.seq}:${state.paused}`;

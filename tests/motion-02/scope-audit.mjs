@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {BATTLE_DISPLAY_HOOKS} from './battle-display-hooks.mjs';
 import {MINI_GAME_ENTRY_HASHES, MINI_GAME_ADDITIONS, assertMiniGameEntry} from '../minigame-01/scope-contract.mjs';
+import {MINIGAME_02_ADDITIONS} from '../minigame-02/scope-contract.mjs';
 
 export const STABLE = '2a521dd5aa747314b25e761d976bd4f880cd58c3';
 export const CHECKPOINT = '997a08b8b7e1291901b11e279033b1d5d322eda9';
@@ -72,7 +73,7 @@ export function assertBattleDisplayOnly(current, checkpoint = readCheckpointBatt
 }
 
 export function assertAddedPaths(inventory, checkpointPaths) {
-  const allowed = new Set([...MOTION_02_ADDITIONS, ...CARRYOVER, ...MINI_GAME_ADDITIONS]);
+  const allowed = new Set([...MOTION_02_ADDITIONS, ...CARRYOVER, ...MINI_GAME_ADDITIONS, ...MINIGAME_02_ADDITIONS]);
   const added = [...new Set(inventory)].filter(p => !checkpointPaths.has(p));
   assert.deepEqual(added.filter(p => !allowed.has(p)).sort(), [], 'unapproved new paths');
 }
