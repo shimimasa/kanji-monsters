@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {BATTLE_DISPLAY_HOOKS} from './battle-display-hooks.mjs';
+import {MINI_GAME_ENTRY_HASHES, MINI_GAME_ADDITIONS, assertMiniGameEntry} from '../minigame-01/scope-contract.mjs';
 
 export const STABLE = '2a521dd5aa747314b25e761d976bd4f880cd58c3';
 export const CHECKPOINT = '997a08b8b7e1291901b11e279033b1d5d322eda9';
@@ -71,7 +72,7 @@ export function assertBattleDisplayOnly(current, checkpoint = readCheckpointBatt
 }
 
 export function assertAddedPaths(inventory, checkpointPaths) {
-  const allowed = new Set([...MOTION_02_ADDITIONS, ...CARRYOVER]);
+  const allowed = new Set([...MOTION_02_ADDITIONS, ...CARRYOVER, ...MINI_GAME_ADDITIONS]);
   const added = [...new Set(inventory)].filter(p => !checkpointPaths.has(p));
   assert.deepEqual(added.filter(p => !allowed.has(p)).sort(), [], 'unapproved new paths');
 }
@@ -84,9 +85,18 @@ export function assertMotionScope() {
   // hidden by an opposite unstaged change must not pass the audit.
   for (const cached of [[], ['--cached']]) {
     const stableDiff = paths(git('diff', ...cached, '--no-renames', '--name-only', '-z', STABLE, '--'));
-    assert.deepEqual(stableDiff.filter(p => stablePaths.has(p) && p !== BATTLE), [], 'protected stable path changed/deleted/renamed/type-changed');
+    assert.deepEqual(stableDiff.filter(p => stablePaths.has(p) && p !== BATTLE && !Object.hasOwn(MINI_GAME_ENTRY_HASHES, p)), [], 'protected stable path changed/deleted/renamed/type-changed');
     const checkpointDiff = paths(git('diff', ...cached, '--no-renames', '--name-only', '-z', CHECKPOINT, '--'));
-    assert.deepEqual(checkpointDiff.filter(p => checkpointPaths.has(p) && ![BATTLE, SCOPE_TEST].includes(p)), [], 'checkpoint path changed outside the two authorized files');
+    assert.deepEqual(checkpointDiff.filter(p => checkpointPaths.has(p) && ![BATTLE, SCOPE_TEST, ...Object.keys(MINI_GAME_ENTRY_HASHES)].includes(p)), [], 'checkpoint path changed outside authorized Motion and MiniGame entries');
+  }
+  for (const p of Object.keys(MINI_GAME_ENTRY_HASHES)) {
+    assert.ok(fs.lstatSync(p).isFile());
+    assertMiniGameEntry(p, fs.readFileSync(p, 'utf8'));
+    const fields = git('ls-files', '--stage', '--', p).toString('utf8').trim().split(/\s+/);
+    assert.equal(fields[0], '100644'); assert.equal(fields[2], '0');
+    const indexedEntry = git('show', `:${p}`).toString('utf8');
+    const checkpointEntry = git('show', `${CHECKPOINT}:${p}`).toString('utf8');
+    if (lf(indexedEntry) !== lf(checkpointEntry)) assertMiniGameEntry(p, indexedEntry);
   }
   // Never allow deleting or type-changing even the two intentionally edited paths.
   for (const p of [BATTLE, SCOPE_TEST]) {

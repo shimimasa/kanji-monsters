@@ -67,6 +67,7 @@ const titleState = {
     }
     
     this.registerHandlers();
+    this._injectMiniGameButton();
     // チュートリアル（初回のみ）
     import('../tutorial/TutorialManager.js').then(this._lifecycle.guard(m => m.default.startIfNeeded('title', { canvas: this.canvas, playButton: this.playButton })));
     // 非表示設定なら既存ボタンを確実に除去
@@ -424,6 +425,8 @@ const titleState = {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    this._miniGameButton?.remove();
+    this._miniGameButton = null;
     this._lifecycle.deactivate();
     this.unregisterHandlers();
     const old = document.getElementById('titleSaveButton');
@@ -445,6 +448,17 @@ const titleState = {
   unregisterHandlers() {
     this.canvas.removeEventListener('click', this._clickHandler);
     this.canvas.removeEventListener('touchstart', this._clickHandler);
+  },
+
+  _injectMiniGameButton() {
+    const button = document.createElement('button');
+    button.id = 'titleMiniGameButton';
+    button.type = 'button';
+    button.textContent = 'ミニゲーム：けいさんスプリント';
+    button.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:10000;min-height:44px;max-width:94vw;width:310px;padding:10px;font:16px system-ui;background:#236d60;color:white;border:1px solid #fff;border-radius:10px;cursor:pointer';
+    button.onclick = this._lifecycle.guard(() => publish('changeScreen', { name: 'miniGame', props: { gameId: 'mathSprint' } }));
+    this._miniGameButton = button;
+    document.body.appendChild(button);
   },
 
   _injectSaveButton() {
