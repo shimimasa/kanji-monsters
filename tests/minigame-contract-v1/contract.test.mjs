@@ -7,8 +7,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('the five definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice']);
+test('the six definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -18,7 +18,7 @@ test('the five definitions expose only the required v1 creation boundary', () =>
   }
 });
 
-test('all five mechanics implement the v1 lifecycle and command port', () => {
+test('all six mechanics implement the v1 lifecycle and command port', () => {
   const methods = ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit'];
   for (const id of Object.keys(miniGameRegistry)) {
     const game = create(id, `${id}-shape`);
@@ -89,7 +89,7 @@ test('LearningEvent v1 keeps its exact envelope, ordering and four event types',
   assert.equal(game.snapshot().correct, 9);
 });
 
-test('all five games commit learning state before notifying observers', () => {
+test('all six games commit learning state before notifying observers', () => {
   let sprint;
   sprint = create('mathSprint', 'sprint-order', event => {
     if (event.type === 'correct') assert.equal(sprint.snapshot().answered, 1);
@@ -140,6 +140,20 @@ test('all five games commit learning state before notifying observers', () => {
     sessionId: timedState.sessionId, problemId: timedState.problem.problemId,
     attemptId: timedState.attemptId, choiceId: timedState.problem.correctChoiceId,
   } }), true);
+
+  let multi;
+  multi = create('multiSelect', 'multi-order', event => {
+    if (event.type === 'incorrect') assert.equal(multi.snapshot().partial, 1);
+  });
+  multi.enter(); const multiState = multi.snapshot();
+  for (const choiceId of multiState.problem.correctChoiceIds.slice(0, 2)) {
+    const current = multi.snapshot();
+    assert.equal(multi.dispatch({ type: 'toggle', payload: { sessionId: current.sessionId,
+      problemId: current.problem.problemId, attemptId: current.attemptId, choiceId } }), true);
+  }
+  const ready = multi.snapshot();
+  assert.equal(multi.dispatch({ type: 'submit', payload: { sessionId: ready.sessionId,
+    problemId: ready.problem.problemId, attemptId: ready.attemptId } }), true);
 });
 
 test('instance exit is idempotent and permanently rejects old commands', () => {

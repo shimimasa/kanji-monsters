@@ -49,7 +49,7 @@ const wrongChoice = (d, host) => {
 
 test('Registry and title expose Timed Choice without replacing the first four games', () => {
   assert.deepEqual(Object.keys(miniGameRegistry),
-    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice']);
+    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect']);
   const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8');
   assert.match(title, /titleTimedChoiceButton[^\n]+timedChoice/);
 });

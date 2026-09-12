@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { MINIGAME_05_ADDITIONS, MINIGAME_05_BASE, MINIGAME_05_CHANGED } from './scope-contract.mjs';
+import { MINIGAME_06_ADDITIONS, MINIGAME_06_CHANGED } from '../minigame-06/scope-contract.mjs';
 
 const git = (...args) => execFileSync('git', args, { maxBuffer: 16 * 1024 * 1024 }).toString('utf8').replaceAll('\r\n', '\n');
 const read = path => fs.readFileSync(path, 'utf8').replaceAll('\r\n', '\n');
@@ -11,7 +12,8 @@ test('Deadline probe stays inside its exact changed-file allowlist', () => {
   const tracked = git('diff', '--name-only', MINIGAME_05_BASE, '--').trim().split('\n').filter(Boolean);
   const untracked = git('ls-files', '--others', '--exclude-standard').trim().split('\n').filter(Boolean);
   const actual = [...new Set([...tracked, ...untracked])].sort();
-  const allowed = new Set([...MINIGAME_05_CHANGED, ...MINIGAME_05_ADDITIONS]);
+  const allowed = new Set([...MINIGAME_05_CHANGED, ...MINIGAME_05_ADDITIONS,
+    ...MINIGAME_06_CHANGED, ...MINIGAME_06_ADDITIONS]);
   assert.deepEqual(actual.filter(path => !allowed.has(path)), []);
   for (const path of MINIGAME_05_ADDITIONS.filter(path => path.startsWith('src/') || path.startsWith('tests/'))) {
     assert.ok(actual.includes(path), `required MINIGAME-05 file missing: ${path}`);

@@ -47,9 +47,9 @@ test('generator and deadline validate injected inputs without retries', () => {
   }
 });
 
-test('registry has five exact v1 definitions and Timed Choice keeps the instance shape', () => {
+test('registry has six exact v1 definitions and Timed Choice keeps the instance shape', () => {
   assert.deepEqual(Object.keys(miniGameRegistry),
-    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice']);
+    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect']);
   assert.deepEqual(Object.keys(miniGameRegistry.timedChoice), ['id', 'title', 'create', 'createView']);
   const game = create();
   for (const method of ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit']) {

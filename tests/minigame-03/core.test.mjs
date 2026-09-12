@@ -34,7 +34,7 @@ test('generator validates injected random without retrying', () => {
 });
 
 test('registry retains the English definition when later entries are added', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice']);
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect']);
   const definition = miniGameRegistry.englishChoice;
   assert.deepEqual(Object.keys(definition), ['id', 'title', 'create', 'createView']);
   const game = create();

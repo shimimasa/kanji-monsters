@@ -17,6 +17,7 @@ const APPROVED_ENTRY_HASHES = Object.freeze({
     '0e84752ece6ffe2822596af4929e62547465dc1b6b762a4100dbd9a8429c379d',
     '839c1100d99c40741462d7467ba7afd8c2a0a84e9adca82bba148978faac7bc2',
     'a4658d74a4509c6d643562536458aeb2e3482e8bdf310bb94867da5733ac0ab1',
+    '82a518719d6358396bcc01a843b2d862b34f1185a4bb63d5a92fb0c4bcca5c57',
   ]),
 });
 export const MINI_GAME_ADDITIONS = Object.freeze([
