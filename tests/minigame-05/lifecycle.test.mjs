@@ -40,90 +40,106 @@ const click = node => node.dispatchEvent(new Event('click'));
 const key = (doc, value, options = {}) => doc.dispatchEvent(Object.assign(new Event('keydown', { cancelable: true }), {
   key: value, repeat: false, isComposing: false, altKey: false, ctrlKey: false, metaKey: false, ...options,
 }));
-const chunk = (d, chunkId) => d.find(node => node.dataset.chunkId === chunkId);
-function solveThroughView(d, host) {
-  const correctOrder = host.inspect().session.problem.correctOrder;
-  for (let target = 0; target < correctOrder.length; target++) {
-    while (host.inspect().session.currentOrder.indexOf(correctOrder[target]) > target) {
-      click(chunk(d, correctOrder[target])); click(d.find(node => node.dataset.action === 'move-left'));
-    }
-  }
-}
+const choice = (d, choiceId) => d.find(node => node.dataset.choiceId === choiceId);
+const correctChoice = (d, host) => choice(d, host.inspect().session.problem.correctChoiceId);
+const wrongChoice = (d, host) => {
+  const state = host.inspect().session;
+  return choice(d, state.problem.choices.find(item => item.choiceId !== state.problem.correctChoiceId).choiceId);
+};
 
-test('Registry and title retain Sentence Order when the fifth game is added', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice']);
+test('Registry and title expose Timed Choice without replacing the first four games', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry),
+    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice']);
   const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8');
-  assert.match(title, /titleSentenceOrderButton[^\n]+sentenceOrder/);
+  assert.match(title, /titleTimedChoiceButton[^\n]+timedChoice/);
 });
 
-test('View source keeps 44px targets, responsive portrait/landscape rules, focus, and answer feedback', () => {
-  const view = fs.readFileSync('src/minigames/sentenceOrder/sentenceOrderView.js', 'utf8');
+test('View source keeps timer UI, 44px targets, responsive layout, focus, and no animation clock', () => {
+  const view = fs.readFileSync('src/minigames/timedChoice/timedChoiceView.js', 'utf8');
   assert.match(view, /min-width:44px;min-height:44px/); assert.match(view, /overflow:auto/);
+  assert.match(view, /role', 'progressbar'/); assert.match(view, /data.*remaining|dataset\.role = 'remaining'/);
   assert.match(view, /@media\(max-width:540px\)/); assert.match(view, /@media\(max-height:430px\)/);
-  assert.match(view, /:focus-visible/); assert.match(view, /aria-live/); assert.match(view, /正しい文/);
-  assert.doesNotMatch(view, /@keyframes|animation:|transition:/);
+  assert.match(view, /:focus-visible/); assert.match(view, /時間切れ/);
+  assert.doesNotMatch(view, /@keyframes|animation:|transition:|requestAnimationFrame|setInterval|setTimeout/);
 });
 
-test('unchanged Host runs reorder, correct/incorrect feedback, Next, and owned/unowned Companion', async () => {
+test('unchanged Host renders countdown and runs answer, timeout, Next, and owned/unowned Companion', async () => {
   for (const owned of [true, false]) {
     const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win,
       collection: () => owned ? ['HKD-E01'] : [], makeSessionId: () => `owned-${owned}`,
       random: () => 0, loadImage: () => image, reduced: () => false });
-    host.enter({ gameId: 'sentenceOrder' }); await drain(); host.update(0);
-    assert.ok(d.doc.getElementById('sentenceOrderScreen'));
+    host.enter({ gameId: 'timedChoice' }); await drain(); host.update(1000);
+    assert.ok(d.doc.getElementById('timedChoiceScreen'));
+    assert.equal(d.find(node => node.dataset.role === 'remaining').textContent, 'のこり 4.0 秒');
     assert.equal(host.inspect().companion.selected, owned ? 'HKD-E01' : null);
-    const before = host.inspect().session.currentOrder; solveThroughView(d, host);
-    assert.notDeepEqual(host.inspect().session.currentOrder, before); assert.equal(host.inspect().session.answered, 0);
-    click(d.find(node => node.dataset.action === 'submit')); assert.equal(host.inspect().session.correct, 1);
+    click(correctChoice(d, host)); assert.equal(host.inspect().session.correct, 1);
     if (owned) assert.equal(host.inspect().companion.action, 'attack');
-    click(d.find(node => node.dataset.action === 'next')); click(d.find(node => node.dataset.action === 'submit'));
-    assert.equal(host.inspect().session.incorrect, 1); assert.match(d.find(node => node.className === 'so-feedback').textContent, /正しい文/);
+    click(d.find(node => node.dataset.action === 'next')); host.update(5000);
+    assert.equal(host.inspect().session.incorrect, 1); assert.equal(host.inspect().session.timedOut, 1);
+    assert.match(d.find(node => node.className === 'tc-feedback').textContent, /時間切れ/);
     if (owned) assert.equal(host.inspect().companion.action, 'idle');
     host.exit(); assert.equal(d.listeners(), 0); assert.equal(d.doc.body.children.length, 0);
   }
 });
 
-test('keyboard and pointer share Core identity gates for reorder, Submit, repeat, pause, and double Submit', () => {
+test('Host processing order resolves answer/deadline races and rejects late UI callbacks', () => {
+  const answerDom = dom(); const answerHost = createMiniGameHost({ document: answerDom.doc, window: answerDom.win,
+    collection: () => [], makeSessionId: () => 'answer-first', random: () => 0, reduced: () => false });
+  answerHost.enter({ gameId: 'timedChoice' }); answerHost.update(4999);
+  const oldAnswer = correctChoice(answerDom, answerHost); click(oldAnswer); answerHost.update(1);
+  assert.equal(answerHost.inspect().session.correct, 1); assert.equal(answerHost.inspect().session.timedOut, 0);
+  answerHost.exit();
+
+  const timeoutDom = dom(); const timeoutHost = createMiniGameHost({ document: timeoutDom.doc, window: timeoutDom.win,
+    collection: () => [], makeSessionId: () => 'timeout-first', random: () => 0, reduced: () => false });
+  timeoutHost.enter({ gameId: 'timedChoice' }); const lateAnswer = correctChoice(timeoutDom, timeoutHost);
+  timeoutHost.update(5000); click(lateAnswer);
+  assert.equal(timeoutHost.inspect().session.answered, 1); assert.equal(timeoutHost.inspect().session.timedOut, 1);
+  timeoutHost.exit(); click(lateAnswer); assert.equal(timeoutHost.inspect().valid, false);
+});
+
+test('keyboard shares Core gates with pointer for answer, repeat, pause, and stale input', () => {
   const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win, collection: () => [],
     makeSessionId: () => 'keyboard', random: () => 0, reduced: () => false });
-  host.enter({ gameId: 'sentenceOrder' }); let state = host.inspect().session;
-  const selected = state.currentOrder[1]; click(chunk(d, selected)); key(d.doc, 'ArrowLeft');
-  assert.equal(host.inspect().session.currentOrder[0], selected); assert.equal(host.inspect().session.answered, 0);
-  key(d.doc, 'ArrowRight', { repeat: true }); assert.equal(host.inspect().session.currentOrder[0], selected);
-  host.setPaused(true); key(d.doc, 'ArrowRight'); key(d.doc, 'Enter'); click(d.find(node => node.dataset.action === 'submit'));
-  assert.equal(host.inspect().session.answered, 0); host.setPaused(false);
-  key(d.doc, 'Enter'); key(d.doc, 'Enter'); click(d.find(node => node.dataset.action === 'submit'));
-  assert.equal(host.inspect().session.answered, 1); host.exit();
+  host.enter({ gameId: 'timedChoice' }); const state = host.inspect().session;
+  const correctIndex = state.problem.choices.findIndex(item => item.choiceId === state.problem.correctChoiceId);
+  key(d.doc, String(correctIndex + 1), { repeat: true }); assert.equal(host.inspect().session.answered, 0);
+  host.setPaused(true); key(d.doc, String(correctIndex + 1)); assert.equal(host.inspect().session.answered, 0);
+  host.setPaused(false); key(d.doc, String(correctIndex + 1)); key(d.doc, String(correctIndex + 1));
+  assert.equal(host.inspect().session.answered, 1); assert.equal(host.inspect().session.correct, 1); host.exit();
 });
 
-test('visibility and manual pause compose and freeze active elapsed time', () => {
+test('visibility and manual pause compose while active and deadline time stay frozen', () => {
   const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win, collection: () => [],
     makeSessionId: () => 'pause-host', random: () => 0, reduced: () => false });
-  host.enter({ gameId: 'sentenceOrder' }); host.update(100); const before = host.inspect().session;
+  host.enter({ gameId: 'timedChoice' }); host.update(3000); const before = host.inspect().session;
   host.setPaused(true); d.doc.hidden = true; d.doc.dispatchEvent(new Event('visibilitychange'));
-  host.setPaused(false); host.update(500); assert.equal(host.inspect().session.paused, true);
-  assert.equal(host.inspect().session.activeElapsedMs, before.activeElapsedMs);
+  host.setPaused(false); host.update(10000);
+  assert.equal(host.inspect().session.paused, true); assert.equal(host.inspect().session.activeElapsedMs, before.activeElapsedMs);
+  assert.equal(host.inspect().session.remainingMs, 2000); assert.equal(host.inspect().session.answered, 0);
   d.doc.hidden = false; d.doc.dispatchEvent(new Event('visibilitychange'));
-  assert.equal(host.inspect().session.paused, false); host.update(50);
-  assert.equal(host.inspect().session.activeElapsedMs, before.activeElapsedMs + 50); host.exit();
+  assert.equal(host.inspect().session.paused, false); host.update(1999);
+  assert.equal(host.inspect().session.remainingMs, 1); host.update(1);
+  assert.equal(host.inspect().session.timedOut, 1); host.exit();
 });
 
-test('replay and repeated enter/exit reject stale and disposed callbacks with no DOM/listener/scheduler leaks', async t => {
+test('pending image and repeated enter/exit leave no scheduler, stale callback, listener, or DOM leak', async t => {
   t.mock.method(globalThis, 'setInterval', () => { throw new Error('new interval'); });
   const previousRAF = globalThis.requestAnimationFrame; globalThis.requestAnimationFrame = () => { throw new Error('new RAF'); };
   t.after(() => { globalThis.requestAnimationFrame = previousRAF; });
   const d = dom(); let serial = 0; const host = createMiniGameHost({ document: d.doc, window: d.win,
-    collection: () => serial % 2 ? ['HKD-E01'] : [], makeSessionId: () => `cycle-${++serial}`,
+    collection: () => ['HKD-E01'], makeSessionId: () => `cycle-${++serial}`,
     random: () => 0, loadImage: () => new Promise(() => {}), reduced: () => false });
   for (let index = 0; index < 10; index++) {
-    host.enter({ gameId: 'sentenceOrder' }); const oldSubmit = d.find(node => node.dataset.action === 'submit');
-    click(oldSubmit); assert.equal(host.inspect().session.answered, 1); host.exit(); host.exit(); await drain();
-    click(oldSubmit); key(d.doc, 'Enter'); assert.equal(host.inspect().valid, false); assert.equal(host.inspect().session, null);
+    host.enter({ gameId: 'timedChoice' }); const oldChoice = correctChoice(d, host);
+    host.update(5000); assert.equal(host.inspect().session.timedOut, 1);
+    host.exit(); host.exit(); await drain(); click(oldChoice); key(d.doc, '1');
+    assert.equal(host.inspect().valid, false); assert.equal(host.inspect().session, null);
     assert.equal(host.inspect().companion, null); assert.equal(d.doc.body.children.length, 0); assert.equal(d.listeners(), 0);
   }
 });
 
-test('ten questions, immutable result, replay, image failure, reduced motion, and Storage isolation hold through Host', async t => {
+test('ten questions, result, replay, image failure, reduced motion, and Storage isolation hold through Host', async t => {
   const storage = installStorage(), save = getDefaultSave(); save.player.collection.gotomonIds = ['HKD-E01'];
   save.player.coreStats.hp = 73; save.player.coreStats.exp = 31; save.player.study.answers = {};
   assert.equal(saveNow(save, { replace: true }).ok, true); assert.equal(await loadGameData(), true);
@@ -133,14 +149,17 @@ test('ten questions, immutable result, replay, image failure, reduced motion, an
   const d = dom(); let serial = 0; const host = createMiniGameHost({ document: d.doc, window: d.win,
     makeSessionId: () => `replay-${++serial}`, random: () => 0,
     loadImage: () => Promise.reject(new Error('missing')), reduced: () => true });
-  host.enter({ gameId: 'sentenceOrder' }); await drain(); const firstSession = host.inspect().session.sessionId;
+  host.enter({ gameId: 'timedChoice' }); await drain(); const firstSession = host.inspect().session.sessionId;
   for (let index = 0; index < 10; index++) {
-    if (index !== 4) solveThroughView(d, host);
-    click(d.find(node => node.dataset.action === 'submit'));
+    if (index === 2 || index === 7) host.update(5000);
+    else if (index === 4) click(wrongChoice(d, host));
+    else click(correctChoice(d, host));
     if (index < 9) click(d.find(node => node.dataset.action === 'next'));
   }
-  assert.deepEqual(host.inspect().session.result, { answered: 10, correct: 9, incorrect: 1, accuracy: 0.9 });
+  assert.deepEqual(host.inspect().session.result,
+    { answered: 10, correct: 7, incorrect: 3, accuracy: 0.7, timedOut: 2 });
   assert.ok(Object.isFrozen(host.inspect().session.result)); assert.equal(host.inspect().session.seq, 21);
+  assert.equal(host.inspect().companion.motion.imageState, 'failed');
   click(d.find(node => node.dataset.action === 'replay'));
   assert.notEqual(host.inspect().session.sessionId, firstSession); assert.equal(host.inspect().session.seq, 1);
   host.exit(); await drain(); assert.equal(writes, 0);

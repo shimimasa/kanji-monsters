@@ -29,6 +29,7 @@ export const MINIGAME_02_SOURCE_HASHES = Object.freeze({
     '5714d2f6b604ec2ace62131cb0a53e3c51437276012cdb6e2a9ca5a17db79f92',
     '1f4615a7abbeabd6597b065695d2dd3112f804d8d99c56d85646dc8bf5bf567f',
     '334788eec3ad21c67a9d708347616fcdfdae76eac20a16592c241d9803a01b66',
+    '3b3a8a99e6052d71ab82c983e7de9728ff2863eaf220d8b80c51aa5be69f6ffc',
   ]),
   'src/minigames/mathSprint/mathSprintView.js': Object.freeze([
     '6431762dcf11e41322a592d38c14f75d2255fc8190aa765abf732033f8b478ba',
@@ -44,5 +45,6 @@ export const MINIGAME_02_SOURCE_HASHES = Object.freeze({
     'fc2b525478472f4f4882cfdd15f3ba2f2f88b4627f43e79fed28b1c2a5b47e96',
     '0e84752ece6ffe2822596af4929e62547465dc1b6b762a4100dbd9a8429c379d',
     '839c1100d99c40741462d7467ba7afd8c2a0a84e9adca82bba148978faac7bc2',
+    'a4658d74a4509c6d643562536458aeb2e3482e8bdf310bb94867da5733ac0ab1',
   ]),
 });

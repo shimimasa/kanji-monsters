@@ -6,6 +6,8 @@ import { createEnglishChoiceGame } from './englishChoice/englishChoiceGame.js';
 import { createEnglishChoiceView } from './englishChoice/englishChoiceView.js';
 import { createSentenceOrderGame } from './sentenceOrder/sentenceOrderGame.js';
 import { createSentenceOrderView } from './sentenceOrder/sentenceOrderView.js';
+import { createTimedChoiceGame } from './timedChoice/timedChoiceGame.js';
+import { createTimedChoiceView } from './timedChoice/timedChoiceView.js';
 
 function withCommandAdapter(createView) {
   return context => createView({
@@ -28,4 +30,6 @@ export const miniGameRegistry = Object.freeze({
     create: createEnglishChoiceGame, createView: withCommandAdapter(createEnglishChoiceView) }),
   sentenceOrder: Object.freeze({ id: 'sentenceOrder', title: '文ならべ',
     create: createSentenceOrderGame, createView: createSentenceOrderView }),
+  timedChoice: Object.freeze({ id: 'timedChoice', title: 'タイムことば',
+    create: createTimedChoiceGame, createView: withCommandAdapter(createTimedChoiceView) }),
 });

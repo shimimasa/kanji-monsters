@@ -6,6 +6,7 @@ import { CONTRACT_V1_ADDITIONS, CONTRACT_V1_BASE, CONTRACT_V1_CHANGED,
   withoutContractDispatch } from './scope-contract.mjs';
 import { MINIGAME_03_ADDITIONS, MINIGAME_03_CHANGED } from '../minigame-03/scope-contract.mjs';
 import { MINIGAME_04_ADDITIONS, MINIGAME_04_CHANGED } from '../minigame-04/scope-contract.mjs';
+import { MINIGAME_05_ADDITIONS, MINIGAME_05_CHANGED } from '../minigame-05/scope-contract.mjs';
 
 const git = (...args) => execFileSync('git', args, { maxBuffer: 16 * 1024 * 1024 })
   .toString('utf8').replaceAll('\r\n', '\n');
@@ -17,7 +18,8 @@ test('Contract-v1 fixation stays inside its explicit checkpoint allowlist', () =
   const actual = [...new Set([...tracked, ...untracked])].sort();
   const allowed = new Set([...CONTRACT_V1_CHANGED, ...CONTRACT_V1_ADDITIONS,
     ...MINIGAME_03_CHANGED, ...MINIGAME_03_ADDITIONS,
-    ...MINIGAME_04_CHANGED, ...MINIGAME_04_ADDITIONS]);
+    ...MINIGAME_04_CHANGED, ...MINIGAME_04_ADDITIONS,
+    ...MINIGAME_05_CHANGED, ...MINIGAME_05_ADDITIONS]);
   assert.deepEqual(actual.filter(path => !allowed.has(path)), []);
   for (const path of CONTRACT_V1_ADDITIONS.filter(path => path.startsWith('src/') || path.startsWith('tests/'))) {
     assert.ok(actual.includes(path), `required Contract-v1 file missing: ${path}`);

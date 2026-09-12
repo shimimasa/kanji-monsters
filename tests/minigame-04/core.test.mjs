@@ -58,8 +58,8 @@ test('generator validates random input without retries', () => {
   assert.throws(() => generateSentenceOrderQuestions({ sessionId: 'bad', random: null }), TypeError);
 });
 
-test('registry has four v1 definitions and Sentence Order preserves the instance shape', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder']);
+test('registry retains Sentence Order and its instance shape when the fifth definition is added', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice']);
   assert.deepEqual(Object.keys(miniGameRegistry.sentenceOrder), ['id', 'title', 'create', 'createView']);
   const game = create();
   for (const method of ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit']) {

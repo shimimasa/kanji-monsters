@@ -7,8 +7,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('the four definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder']);
+test('the five definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -18,7 +18,7 @@ test('the four definitions expose only the required v1 creation boundary', () =>
   }
 });
 
-test('all four mechanics implement the v1 lifecycle and command port', () => {
+test('all five mechanics implement the v1 lifecycle and command port', () => {
   const methods = ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit'];
   for (const id of Object.keys(miniGameRegistry)) {
     const game = create(id, `${id}-shape`);
@@ -89,7 +89,7 @@ test('LearningEvent v1 keeps its exact envelope, ordering and four event types',
   assert.equal(game.snapshot().correct, 9);
 });
 
-test('all four games commit learning state before notifying observers', () => {
+test('all five games commit learning state before notifying observers', () => {
   let sprint;
   sprint = create('mathSprint', 'sprint-order', event => {
     if (event.type === 'correct') assert.equal(sprint.snapshot().answered, 1);
@@ -130,6 +130,16 @@ test('all four games commit learning state before notifying observers', () => {
     sessionId: sentenceState.sessionId, problemId: sentenceState.problem.problemId,
     attemptId: sentenceState.attemptId,
   } }), true);
+
+  let timed;
+  timed = create('timedChoice', 'timed-order', event => {
+    if (event.type === 'correct') assert.equal(timed.snapshot().correct, 1);
+  });
+  timed.enter(); const timedState = timed.snapshot();
+  assert.equal(timed.dispatch({ type: 'answer', payload: {
+    sessionId: timedState.sessionId, problemId: timedState.problem.problemId,
+    attemptId: timedState.attemptId, choiceId: timedState.problem.correctChoiceId,
+  } }), true);
 });
 
 test('instance exit is idempotent and permanently rejects old commands', () => {
@@ -142,7 +152,7 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
       : id === 'mathInvader'
         ? { type: 'select', payload: { sessionId: before.sessionId,
           enemyId: before.enemies[0].enemyId, problemId: before.enemies[0].problemId } }
-        : id === 'englishChoice'
+        : id === 'englishChoice' || id === 'timedChoice'
           ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: before.problem.problemId,
             attemptId: before.attemptId, choiceId: before.problem.correctChoiceId } }
           : { type: 'submit', payload: { sessionId: before.sessionId, problemId: before.problem.problemId,
