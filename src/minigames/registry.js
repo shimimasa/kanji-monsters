@@ -12,6 +12,8 @@ import { createMultiSelectGame } from './multiSelect/multiSelectGame.js';
 import { createMultiSelectView } from './multiSelect/multiSelectView.js';
 import { createAsyncChoiceGame } from './asyncChoice/asyncChoiceGame.js';
 import { createAsyncChoiceView } from './asyncChoice/asyncChoiceView.js';
+import { createKanjiDefenseGame } from './kanjiDefense/kanjiDefenseGame.js';
+import { createKanjiDefenseView } from './kanjiDefense/kanjiDefenseView.js';
 
 function withCommandAdapter(createView) {
   return context => createView({
@@ -40,4 +42,6 @@ export const miniGameRegistry = Object.freeze({
     create: createMultiSelectGame, createView: createMultiSelectView }),
   asyncChoice: Object.freeze({ id: 'asyncChoice', title: 'よみこみクイズ',
     create: createAsyncChoiceGame, createView: withCommandAdapter(createAsyncChoiceView) }),
+  kanjiDefense: Object.freeze({ id: 'kanjiDefense', title: '漢字防衛隊',
+    create: createKanjiDefenseGame, createView: createKanjiDefenseView }),
 });

@@ -1,14 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { miniGameRegistry } from '../../src/minigames/registry.js';
+import { KANJI_DEFENSE_GOLDEN_CONTENT } from '../../src/minigames/kanjiDefense/kanjiDefenseContent.js';
 
 const seeded = (seed = 1) => () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
 const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameId].create({
   sessionId, random: seeded(42), onEvent,
 });
 
-test('the seven definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice']);
+test('all eight definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -18,7 +19,7 @@ test('the seven definitions expose only the required v1 creation boundary', () =
   }
 });
 
-test('all seven mechanics implement the v1 lifecycle and command port', () => {
+test('all eight mechanics implement the v1 lifecycle and command port', () => {
   const methods = ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit'];
   for (const id of Object.keys(miniGameRegistry)) {
     const game = create(id, `${id}-shape`);
@@ -89,7 +90,7 @@ test('LearningEvent v1 keeps its exact envelope, ordering and four event types',
   assert.equal(game.snapshot().correct, 9);
 });
 
-test('all seven games commit learning state before notifying observers', async () => {
+test('all eight games commit learning state before notifying observers', async () => {
   let sprint;
   sprint = create('mathSprint', 'sprint-order', event => {
     if (event.type === 'correct') assert.equal(sprint.snapshot().answered, 1);
@@ -163,6 +164,21 @@ test('all seven games commit learning state before notifying observers', async (
   assert.equal(asyncGame.dispatch({ type: 'answer', payload: { sessionId: asyncState.sessionId,
     problemId: asyncState.problem.problemId, attemptId: asyncState.attemptId,
     choiceId: asyncState.problem.correctChoiceId } }), true);
+
+  let defense;
+  defense = create('kanjiDefense', 'defense-order', event => {
+    if (event.type === 'correct') assert.equal(defense.snapshot().resolved, 1);
+  });
+  defense.enter(); const defenseEnemy = defense.snapshot().enemies[0];
+  assert.equal(defense.dispatch({ type: 'select', payload: { sessionId: 'defense-order',
+    enemyId: defenseEnemy.enemyId, problemId: defenseEnemy.problemId } }), true);
+  const defenseTarget = defense.snapshot().selectedEnemy;
+  const defenseAnswer = KANJI_DEFENSE_GOLDEN_CONTENT
+    .find(item => item.fixtureId === defenseTarget.fixtureId)?.acceptedReadings[0];
+  assert.ok(defenseAnswer, `Contract fixture missing: ${defenseTarget.fixtureId}`);
+  assert.equal(defense.dispatch({ type: 'submit', payload: { sessionId: 'defense-order',
+    enemyId: defenseTarget.enemyId, problemId: defenseTarget.problemId,
+    attemptId: defenseTarget.attemptId, token: defenseTarget.token, value: defenseAnswer } }), true);
 });
 
 test('instance exit is idempotent and permanently rejects old commands', () => {
@@ -172,7 +188,7 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
     assert.equal(game.snapshot().active, false); assert.equal(game.snapshot().aborted, true);
     const old = id === 'mathSprint'
       ? { type: 'submit', payload: { sessionId: before.sessionId, token: before.token, value: before.problem.answer } }
-      : id === 'mathInvader'
+      : id === 'mathInvader' || id === 'kanjiDefense'
         ? { type: 'select', payload: { sessionId: before.sessionId,
           enemyId: before.enemies[0].enemyId, problemId: before.enemies[0].problemId } }
         : id === 'englishChoice' || id === 'timedChoice'

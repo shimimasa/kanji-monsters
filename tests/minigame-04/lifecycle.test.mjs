@@ -51,7 +51,7 @@ function solveThroughView(d, host) {
 }
 
 test('Registry and title retain Sentence Order when the fifth game is added', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice']);
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense']);
   const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8');
   assert.match(title, /titleSentenceOrderButton[^\n]+sentenceOrder/);
 });

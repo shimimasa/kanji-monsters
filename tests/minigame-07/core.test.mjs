@@ -196,8 +196,8 @@ test('production local loader resolves without network and observes an already-a
   await assert.rejects(loadAsyncChoiceFixture({ signal: { aborted: true } }), error => error.name === 'AbortError');
 });
 
-test('registry has seven exact v1 definitions and Async Choice keeps synchronous instance methods', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice']);
+test('registry has eight exact v1 definitions and Async Choice keeps synchronous instance methods', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense']);
   assert.deepEqual(Object.keys(miniGameRegistry.asyncChoice), ['id', 'title', 'create', 'createView']);
   const game = miniGameRegistry.asyncChoice.create({ sessionId: 'shape', random: seeded(1) });
   for (const method of ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit']) assert.equal(typeof game[method], 'function');

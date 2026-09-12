@@ -68,9 +68,9 @@ test('scorer rejects unknown identities and malformed answer universes', () => {
   assert.throws(() => scoreMultiSelect({ selectedChoiceIds: [], correctChoiceIds: ['a'], choiceIds: ['a'] }), TypeError);
 });
 
-test('registry has seven exact definitions and Multi Select keeps the v1 instance shape', () => {
+test('registry has eight exact definitions and Multi Select keeps the v1 instance shape', () => {
   assert.deepEqual(Object.keys(miniGameRegistry),
-    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice']);
+    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense']);
   assert.deepEqual(Object.keys(miniGameRegistry.multiSelect), ['id', 'title', 'create', 'createView']);
   const game = create();
   for (const method of ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit']) assert.equal(typeof game[method], 'function');

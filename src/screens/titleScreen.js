@@ -470,6 +470,7 @@ const titleState = {
     add('titleTimedChoiceButton', 'ミニゲーム：タイムことば', 'timedChoice', '#9a5518');
     add('titleMultiSelectButton', 'ミニゲーム：えらんで完成', 'multiSelect', '#376a43');
     add('titleAsyncChoiceButton', 'ミニゲーム：よみこみクイズ', 'asyncChoice', '#315b8a');
+    add('titleKanjiDefenseButton', '旗艦ゲーム：漢字防衛隊', 'kanjiDefense', '#9a3f22');
     this._miniGameButton = group;
     document.body.appendChild(group);
   },
