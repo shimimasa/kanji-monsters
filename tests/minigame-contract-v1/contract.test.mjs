@@ -10,6 +10,7 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
 test('the four definitions expose only the required v1 creation boundary', () => {
   assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
+    assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
     assert.equal(typeof definition.title, 'string'); assert.ok(definition.title.length > 0);
     assert.equal(typeof definition.create, 'function');

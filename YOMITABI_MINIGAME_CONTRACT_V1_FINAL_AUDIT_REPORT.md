@@ -1,9 +1,11 @@
 # YOMITABI MiniGame Platform Contract v1 Final Audit Report
 
 - 監査日: 2026-09-11
+- checkpoint再監査日: 2026-09-12
 - 対象worktree: `artifacts/minigame-03/worktree`
 - 対象branch: `experiment/minigame-english-choice-probe`
 - 監査開始時HEAD: `ca1d1c31648d9c020f2215bf0f4325022e4656f8`
+- 再監査開始時HEAD: `a2a572ceab3be2843d8ce7b663c6ac6b57343c43`
 基準tag: `yomitabi-minigame-contract-v1-checkpoint-2026-09`
 
 ## 1. Executive Summary
@@ -21,6 +23,7 @@ Hostのルーティングとdispatchはgame-agnosticであり、`gameId`条件�
 - target worktreeは専用branch `experiment/minigame-english-choice-probe`、開始時HEADは上記のContract v1 checkpointだった。
 - 開始時のstaged fileは0。
 - MINIGAME-03 / 04のproduct、tests、tools、各probe reportは未commitだった。
+- 2026-09-12の再監査開始時には、上記差分はlocal commit `a2a572c` とtag `yomitabi-minigame-contract-v1-cross-mechanic-checkpoint-2026-09`で固定済みで、target worktreeはclean、staged fileは0だった。
 - top-level `main` worktreeにはFirebase cacheと複数artifact等の別作業が存在した。対象worktreeへ移動、コピー、削除、stageしていない。
 - `reset --hard`、`clean -fd`、checkoutによる破棄、rebase、merge、pushは行っていない。
 - remoteは`origin`が設定されているが、対象branchにupstreamはない。したがってcheckpointはlocal commit/tagまでとし、push対象の明示がない限りpushしない。
@@ -52,7 +55,7 @@ Hostのルーティングとdispatchはgame-agnosticであり、`gameId`条件�
 | dispatch利用 | あり | あり | あり | あり |
 | commands | `submit`, `next` | `select`, `submit` | `answer`, `next` | `reorder`, `submit`, `next` |
 | LearningEvent | 既存4 types | 既存4 types | 既存4 types | 既存4 types |
-| View shape | 共通shape | 共通shape＋optional canvas | 共通shape | 共通shape |
+| View shape | 共通shape＋現実装はcanvas | 共通shape＋現実装はcanvas | 共通shape＋現実装はcanvas | 共通shape＋現実装はcanvas |
 | pause | Host external pause | Host external pause＋game-local simulation pause | Host external pause | Host external pause |
 | Companion | 共通adapter | 共通adapter | 共通adapter | 共通adapter |
 | Collection | read-only ownership | read-only ownership | read-only ownership | read-only ownership |
@@ -96,7 +99,7 @@ semanticsは一貫している。ただし、たとえばMINIGAME-01の`enter`�
 
 ## 8. View Contract
 
-4 Viewは`root`, `update`, `stopInput`, `dispose`を返し、MINIGAME-02のみ必要に応じて`canvas`を返す。MINIGAME-04の複数操作UIもこのshape内で成立した。新しいView abstractionは不要である。
+4 Viewは`root`, `update`, `stopInput`, `dispose`を返し、現4実装はいずれもCompanion描画用`canvas`も返す。Contract上は`canvas`はoptionalであり、Hostは欠如時も安全に動作する。MINIGAME-04の複数操作UIもこのshape内で成立した。新しいView abstractionは不要である。
 
 StableなのはHostが利用するreturn shapeとcleanup semanticsであり、`onAnswer`、`onReorder`相当の内部callback名、DOM構造、keyboard割当、CSS classはStableではない。
 
@@ -252,7 +255,7 @@ Stableに含めないことは欠落ではなく、未実証の共通化を避�
 
 `fail 0 / cancelled 0 / skipped 0 / todo 0`。以前の462は、今回追加したContract文書境界test 1件より前の値であり、現在のsource of truthは463である。既存assertの削除、skip/todo化、弱体化は行っていない。
 
-補強内容は、4 definitions exact registry、Hostのgame/command固有分岐なし、legacy default literalが1箇所だけであること、Contract文書がcommand identity/snapshot/payload/resultをStableへ誤昇格させないこと、文書hash保護である。
+補強内容は、4 definitions exact registry、各definitionのexact field set、Hostのgame/command固有分岐なし、legacy default literalが1箇所だけであること、Contract文書がcommand identity/snapshot/payload/resultをStableへ誤昇格させないこと、文書hash保護である。
 
 ## 22. Browser Certification
 
@@ -326,7 +329,7 @@ Fはcheckpointへ含めない。package/lock、Host、Companion、Collection、m
 
 ## 25. Git Checkpoint
 
-監査対象の関連差分だけを明示的にstageし、local commitとlocal annotated tag `yomitabi-minigame-contract-v1-cross-mechanic-checkpoint-2026-09`で固定する。正確なcommitはこのreportを含むtag targetとしてGitで解決できる。対象branchにupstreamがなくremote destinationの明示もないためpushは実施しない。
+監査対象の関連差分だけを明示的にstageし、local commitとlocal annotated tag `yomitabi-minigame-contract-v1-cross-mechanic-checkpoint-2026-09`で固定した。2026-09-12の再監査で行った事実表現とexact Definition field testの補正は、後続のlocal annotated tag `yomitabi-minigame-contract-v1-final-audit-2026-09`で固定する。正確なcommitは各tag targetとしてGitで解決できる。対象branchにupstreamがなくremote destinationの明示もないためpushは実施しない。
 
 checkpointはBrowser Certification完了を意味しない。Browser未実施はtagged reportの既知制約として残す。
 
