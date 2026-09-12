@@ -1,13 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { MINIGAME_05_ADDITIONS, MINIGAME_05_BASE, MINIGAME_05_CHANGED } from './scope-contract.mjs';
 import { MINIGAME_06_ADDITIONS, MINIGAME_06_CHANGED } from '../minigame-06/scope-contract.mjs';
 import { MINIGAME_07_ADDITIONS, MINIGAME_07_CHANGED } from '../minigame-07/scope-contract.mjs';
+import { PLATFORM_V1_CONSOLIDATION_ADDITIONS, PLATFORM_V1_CONSOLIDATION_CHANGED,
+  PLATFORM_V1_README_HASH } from '../minigame-platform-v1/scope-contract.mjs';
 
 const git = (...args) => execFileSync('git', args, { maxBuffer: 16 * 1024 * 1024 }).toString('utf8').replaceAll('\r\n', '\n');
 const read = path => fs.readFileSync(path, 'utf8').replaceAll('\r\n', '\n');
+const hash = source => crypto.createHash('sha256').update(source).digest('hex');
 
 test('Deadline probe stays inside its exact changed-file allowlist', () => {
   const tracked = git('diff', '--name-only', MINIGAME_05_BASE, '--').trim().split('\n').filter(Boolean);
@@ -15,7 +19,8 @@ test('Deadline probe stays inside its exact changed-file allowlist', () => {
   const actual = [...new Set([...tracked, ...untracked])].sort();
   const allowed = new Set([...MINIGAME_05_CHANGED, ...MINIGAME_05_ADDITIONS,
     ...MINIGAME_06_CHANGED, ...MINIGAME_06_ADDITIONS,
-    ...MINIGAME_07_CHANGED, ...MINIGAME_07_ADDITIONS]);
+    ...MINIGAME_07_CHANGED, ...MINIGAME_07_ADDITIONS,
+    ...PLATFORM_V1_CONSOLIDATION_CHANGED, ...PLATFORM_V1_CONSOLIDATION_ADDITIONS]);
   assert.deepEqual(actual.filter(path => !allowed.has(path)), []);
   for (const path of MINIGAME_05_ADDITIONS.filter(path => path.startsWith('src/') || path.startsWith('tests/'))) {
     assert.ok(actual.includes(path), `required MINIGAME-05 file missing: ${path}`);
@@ -23,9 +28,8 @@ test('Deadline probe stays inside its exact changed-file allowlist', () => {
   }
 });
 
-test('Stable Contract, Host, adapters, and existing games remain byte-identical', () => {
+test('Stable Host, adapters, and existing games remain byte-identical; Contract doc is exact', () => {
   const protectedFiles = [
-    'src/minigames/README.md',
     'src/minigames/miniGameHost.js',
     'src/minigames/collectionAdapter.js',
     'src/minigames/companionAdapter.js',
@@ -42,6 +46,7 @@ test('Stable Contract, Host, adapters, and existing games remain byte-identical'
     'src/minigames/sentenceOrder/sentenceOrderView.js',
   ];
   for (const path of protectedFiles) assert.equal(read(path), git('show', `${MINIGAME_05_BASE}:${path}`), path);
+  assert.equal(hash(read('src/minigames/README.md')), PLATFORM_V1_README_HASH);
 });
 
 test('Host has no timeout/game branch and Timed Choice owns only answer/next commands', () => {

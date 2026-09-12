@@ -3,6 +3,13 @@
 Contract version: **1**. This is an in-app contract for the static registry and
 one active FSM mini-game. It is not a plugin protocol or persistence schema.
 
+This file is the normative Contract reference. For the implementation workflow,
+patterns, anti-patterns, and templates, see
+[`YOMITABI_MINIGAME_AUTHORING_GUIDE_V1.md`](../../YOMITABI_MINIGAME_AUTHORING_GUIDE_V1.md);
+use [`YOMITABI_MINIGAME_AUTHORING_CHECKLIST_V1.md`](../../YOMITABI_MINIGAME_AUTHORING_CHECKLIST_V1.md)
+as the per-game review gate. Those manuals explain this Contract without adding
+Stable fields or semantics.
+
 ## Definition
 
 Every registry entry has `id`, `title`, `create(context)`, and

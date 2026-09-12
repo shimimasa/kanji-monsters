@@ -1,5 +1,6 @@
 export const MINIGAME_04_BASE = 'ca1d1c31648d9c020f2215bf0f4325022e4656f8';
-export const MINIGAME_04_CONTRACT_DOC_HASH = 'd531726fa40ebe895b6ee915b888700ac0edc281e6ca69cd846694515af740d9';
+// Updated only for the reviewed Authoring Guide/checklist links; Contract semantics are unchanged.
+export const MINIGAME_04_CONTRACT_DOC_HASH = '36b44bda9b7debdecb2bfc38cfa033ad5bb9bda5ae10995963ba873bf4eaa658';
 
 export const MINIGAME_04_CHANGED = Object.freeze([
   'src/minigames/registry.js',

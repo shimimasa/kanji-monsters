@@ -11,6 +11,7 @@ import {MINIGAME_04_ADDITIONS} from '../minigame-04/scope-contract.mjs';
 import {MINIGAME_05_ADDITIONS} from '../minigame-05/scope-contract.mjs';
 import {MINIGAME_06_ADDITIONS} from '../minigame-06/scope-contract.mjs';
 import {MINIGAME_07_ADDITIONS} from '../minigame-07/scope-contract.mjs';
+import {PLATFORM_V1_CONSOLIDATION_ADDITIONS} from '../minigame-platform-v1/scope-contract.mjs';
 
 export const STABLE = '2a521dd5aa747314b25e761d976bd4f880cd58c3';
 export const CHECKPOINT = '997a08b8b7e1291901b11e279033b1d5d322eda9';
@@ -81,7 +82,8 @@ export function assertBattleDisplayOnly(current, checkpoint = readCheckpointBatt
 export function assertAddedPaths(inventory, checkpointPaths) {
   const allowed = new Set([...MOTION_02_ADDITIONS, ...CARRYOVER, ...MINI_GAME_ADDITIONS,
     ...MINIGAME_02_ADDITIONS, ...CONTRACT_V1_ADDITIONS, ...MINIGAME_03_ADDITIONS,
-    ...MINIGAME_04_ADDITIONS, ...MINIGAME_05_ADDITIONS, ...MINIGAME_06_ADDITIONS, ...MINIGAME_07_ADDITIONS]);
+    ...MINIGAME_04_ADDITIONS, ...MINIGAME_05_ADDITIONS, ...MINIGAME_06_ADDITIONS, ...MINIGAME_07_ADDITIONS,
+    ...PLATFORM_V1_CONSOLIDATION_ADDITIONS]);
   const added = [...new Set(inventory)].filter(p => !checkpointPaths.has(p));
   assert.deepEqual(added.filter(p => !allowed.has(p)).sort(), [], 'unapproved new paths');
 }
