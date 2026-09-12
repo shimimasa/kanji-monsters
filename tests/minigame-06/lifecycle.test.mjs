@@ -42,7 +42,7 @@ const advance = d => click(d.find(node => node.dataset.action === 'next'));
 
 test('Registry and title expose Multi Select without replacing the first five games', () => {
   assert.deepEqual(Object.keys(miniGameRegistry),
-    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect']);
+    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice']);
   const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8');
   assert.match(title, /titleMultiSelectButton[^\n]+multiSelect/); assert.equal(miniGameRegistry.multiSelect.title, 'えらんで完成');
 });

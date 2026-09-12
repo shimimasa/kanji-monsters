@@ -9,6 +9,7 @@ import { MINIGAME_03_ADDITIONS, MINIGAME_03_CHANGED } from '../minigame-03/scope
 import { MINIGAME_04_ADDITIONS, MINIGAME_04_CHANGED } from '../minigame-04/scope-contract.mjs';
 import { MINIGAME_05_ADDITIONS, MINIGAME_05_CHANGED } from '../minigame-05/scope-contract.mjs';
 import { MINIGAME_06_ADDITIONS, MINIGAME_06_CHANGED } from '../minigame-06/scope-contract.mjs';
+import { MINIGAME_07_ADDITIONS, MINIGAME_07_CHANGED } from '../minigame-07/scope-contract.mjs';
 
 const BASE = 'f067a6ce8c611b0f68d8ba456a4fb511e5dfc9e2';
 const git = (...args) => execFileSync('git', args, { maxBuffer: 16 * 1024 * 1024 }).toString('utf8').replaceAll('\r\n', '\n');
@@ -31,7 +32,8 @@ test('probe changes and additions stay inside the explicit MINIGAME-02 allowlist
     ...MINIGAME_03_CHANGED, ...MINIGAME_03_ADDITIONS,
     ...MINIGAME_04_CHANGED, ...MINIGAME_04_ADDITIONS,
     ...MINIGAME_05_CHANGED, ...MINIGAME_05_ADDITIONS,
-    ...MINIGAME_06_CHANGED, ...MINIGAME_06_ADDITIONS]);
+    ...MINIGAME_06_CHANGED, ...MINIGAME_06_ADDITIONS,
+    ...MINIGAME_07_CHANGED, ...MINIGAME_07_ADDITIONS]);
   assert.deepEqual(actual.filter(path => !allowed.has(path)), []);
   for (const path of MINIGAME_02_ADDITIONS.filter(path => path.startsWith('src/') || path.startsWith('tests/'))) {
     assert.ok(actual.includes(path), `required probe file missing: ${path}`);

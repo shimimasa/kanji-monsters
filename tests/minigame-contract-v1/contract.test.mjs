@@ -7,8 +7,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('the six definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect']);
+test('the seven definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -18,7 +18,7 @@ test('the six definitions expose only the required v1 creation boundary', () => 
   }
 });
 
-test('all six mechanics implement the v1 lifecycle and command port', () => {
+test('all seven mechanics implement the v1 lifecycle and command port', () => {
   const methods = ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit'];
   for (const id of Object.keys(miniGameRegistry)) {
     const game = create(id, `${id}-shape`);
@@ -89,7 +89,7 @@ test('LearningEvent v1 keeps its exact envelope, ordering and four event types',
   assert.equal(game.snapshot().correct, 9);
 });
 
-test('all six games commit learning state before notifying observers', () => {
+test('all seven games commit learning state before notifying observers', async () => {
   let sprint;
   sprint = create('mathSprint', 'sprint-order', event => {
     if (event.type === 'correct') assert.equal(sprint.snapshot().answered, 1);
@@ -154,6 +154,15 @@ test('all six games commit learning state before notifying observers', () => {
   const ready = multi.snapshot();
   assert.equal(multi.dispatch({ type: 'submit', payload: { sessionId: ready.sessionId,
     problemId: ready.problem.problemId, attemptId: ready.attemptId } }), true);
+
+  let asyncGame;
+  asyncGame = create('asyncChoice', 'async-order', event => {
+    if (event.type === 'correct') assert.equal(asyncGame.snapshot().correct, 1);
+  });
+  asyncGame.enter(); await new Promise(resolve => setImmediate(resolve)); const asyncState = asyncGame.snapshot();
+  assert.equal(asyncGame.dispatch({ type: 'answer', payload: { sessionId: asyncState.sessionId,
+    problemId: asyncState.problem.problemId, attemptId: asyncState.attemptId,
+    choiceId: asyncState.problem.correctChoiceId } }), true);
 });
 
 test('instance exit is idempotent and permanently rejects old commands', () => {
@@ -169,8 +178,11 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
         : id === 'englishChoice' || id === 'timedChoice'
           ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: before.problem.problemId,
             attemptId: before.attemptId, choiceId: before.problem.correctChoiceId } }
-          : { type: 'submit', payload: { sessionId: before.sessionId, problemId: before.problem.problemId,
-            attemptId: before.attemptId } };
+          : id === 'asyncChoice'
+            ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: null,
+              attemptId: null, choiceId: null } }
+            : { type: 'submit', payload: { sessionId: before.sessionId, problemId: before.problem.problemId,
+              attemptId: before.attemptId } };
     assert.equal(game.dispatch(old), false);
   }
 });

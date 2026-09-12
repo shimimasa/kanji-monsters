@@ -1,0 +1,142 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { installStorage } from '../phase-a/storage-helper.mjs';
+import { createMiniGameHost } from '../../src/minigames/miniGameHost.js';
+import { createAsyncChoiceView } from '../../src/minigames/asyncChoice/asyncChoiceView.js';
+import { miniGameRegistry } from '../../src/minigames/registry.js';
+import { getDefaultSave, saveNow } from '../../src/core/saveData.js';
+import { gameState, loadGameData } from '../../src/core/gameState.js';
+import { flushAsync } from './deferred.mjs';
+
+const image = { complete: true, naturalWidth: 512, naturalHeight: 512 };
+function dom() {
+  const nodes = [];
+  class Element extends EventTarget {
+    constructor(tag = '') { super(); this.tagName = tag.toUpperCase(); this.children = []; this.style = {}; this.dataset = {};
+      this.listeners = new Map(); this.inert = false; this.hidden = false; this.disabled = false; this.textContent = ''; this.className = ''; nodes.push(this); }
+    addEventListener(type, fn, ...args) { super.addEventListener(type, fn, ...args); if (!this.listeners.has(type)) this.listeners.set(type, new Set()); this.listeners.get(type).add(fn); }
+    removeEventListener(type, fn, ...args) { super.removeEventListener(type, fn, ...args); this.listeners.get(type)?.delete(fn); }
+    append(...items) { for (const item of items) { this.children.push(item); item.parent = this; } }
+    appendChild(item) { this.append(item); return item; }
+    remove() { if (this.parent) this.parent.children = this.parent.children.filter(node => node !== this); this.parent = null; }
+    setAttribute(key, value) { this[key] = String(value); }
+    getContext() { return { clearRect() {}, save() {}, restore() {}, clip() {}, translate() {}, rotate() {}, scale() {}, drawImage() {}, globalAlpha: 1 }; }
+  }
+  const body = new Element('body'), doc = new Element('document'), viewport = new Element(); doc.body = body; doc.hidden = false;
+  doc.createElement = tag => new Element(tag); const walk = node => [node, ...node.children.flatMap(walk)];
+  doc.getElementById = id => walk(body).find(node => node.id === id) ?? null;
+  viewport.height = 723; viewport.offsetTop = 0; const keyboard = new Element(); keyboard.boundingRect = { height: 0, y: 723 };
+  return { doc, win: { visualViewport: viewport, navigator: { virtualKeyboard: keyboard } }, nodes,
+    find: fn => walk(body).find(fn), all: fn => walk(body).filter(fn),
+    listeners: () => nodes.reduce((count, node) => count + [...node.listeners.values()].reduce((sum, set) => sum + set.size, 0), 0) };
+}
+const click = node => node.dispatchEvent(new Event('click'));
+const key = (doc, value, options = {}) => doc.dispatchEvent(Object.assign(new Event('keydown', { cancelable: true }), {
+  key: value, repeat: false, isComposing: false, altKey: false, ctrlKey: false, metaKey: false, ...options,
+}));
+const choice = (d, choiceId) => d.find(node => node.dataset.choiceId === choiceId);
+const correctChoice = (d, host) => choice(d, host.inspect().session.problem.correctChoiceId);
+const wrongChoice = (d, host) => { const state = host.inspect().session;
+  return choice(d, state.problem.choices.find(item => item.choiceId !== state.problem.correctChoiceId).choiceId); };
+
+test('Registry and title expose Async Choice without replacing the first six games', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice']);
+  const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8'); assert.match(title, /titleAsyncChoiceButton[^\n]+asyncChoice/);
+  assert.equal(miniGameRegistry.asyncChoice.title, 'よみこみクイズ');
+});
+
+test('View source has loading/failure UI, 44px targets, responsive rules and no scheduler', () => {
+  const view = fs.readFileSync('src/minigames/asyncChoice/asyncChoiceView.js', 'utf8');
+  assert.match(view, /問題を読み込んでいます/); assert.match(view, /問題を読み込めませんでした/);
+  assert.match(view, /min-width:44px;min-height:44px/); assert.match(view, /overflow:auto/); assert.match(view, /:focus-visible/);
+  assert.match(view, /@media\(max-width:540px\)/); assert.match(view, /@media\(max-height:430px\)/);
+  assert.doesNotMatch(view, /requestAnimationFrame|setInterval|setTimeout|@keyframes|animation:/);
+});
+
+test('unchanged Host renders loading then resolved game with owned/unowned Companion', async () => {
+  for (const owned of [true, false]) {
+    const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win,
+      collection: () => owned ? ['HKD-E01'] : [], makeSessionId: () => `owned-${owned}`,
+      random: () => 0, loadImage: () => image, reduced: () => false });
+    host.enter({ gameId: 'asyncChoice' }); assert.equal(host.inspect().session.phase, 'loading');
+    assert.equal(d.find(node => node.dataset.role === 'loading').hidden, false); assert.equal(host.inspect().companion.selected, owned ? 'HKD-E01' : null);
+    await flushAsync(); host.update(0); assert.equal(host.inspect().session.phase, 'answering');
+    assert.equal(d.find(node => node.dataset.role === 'loading').hidden, true); click(correctChoice(d, host));
+    assert.equal(host.inspect().session.correct, 1); if (owned) assert.equal(host.inspect().companion.action, 'attack');
+    host.exit(); assert.equal(d.listeners(), 0); assert.equal(d.doc.body.children.length, 0);
+  }
+});
+
+test('View renders current-session failure without treating it as an answer', () => {
+  const d = dom(); let state = { phase: 'loading', paused: false, problem: null, attemptId: null,
+    sessionId: 'failed', answered: 0, correct: 0, result: null, lastAnswer: null };
+  const view = createAsyncChoiceView({ document: d.doc, onBack() {}, onReplay() {}, onNext() {}, onAnswer() {}, getSnapshot: () => state });
+  const companion = { selected: null, motion: null }; view.update(state, companion);
+  assert.equal(d.find(node => node.dataset.role === 'loading').hidden, false);
+  state = { ...state, phase: 'failed', loadError: 'questionsUnavailable' }; view.update(state, companion);
+  assert.equal(d.find(node => node.dataset.role === 'failure').hidden, false); assert.equal(d.find(node => node.className === 'ac-play').hidden, false);
+  view.dispose(); assert.equal(d.doc.body.children.length, 0); assert.equal(d.listeners(), 0);
+});
+
+test('exit during loading ignores late production completion and cleans DOM/listeners', async () => {
+  const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win, collection: () => [],
+    makeSessionId: () => 'exit-loading', random: () => 0, reduced: () => false });
+  host.enter({ gameId: 'asyncChoice' }); const oldChoice = d.find(node => node.dataset.choiceIndex === '1'); host.exit();
+  await flushAsync(); click(oldChoice); key(d.doc, '1'); assert.equal(host.inspect().valid, false); assert.equal(host.inspect().session, null);
+  assert.equal(d.doc.body.children.length, 0); assert.equal(d.listeners(), 0);
+});
+
+test('new Host enter while old load is pending keeps only session B', async () => {
+  const d = dom(); let serial = 0; const host = createMiniGameHost({ document: d.doc, window: d.win, collection: () => [],
+    makeSessionId: () => `session-${++serial}`, random: () => 0, reduced: () => false });
+  host.enter({ gameId: 'asyncChoice' }); assert.equal(host.inspect().session.sessionId, 'session-1');
+  host.enter({ gameId: 'asyncChoice' }); assert.equal(host.inspect().session.sessionId, 'session-2'); assert.equal(host.inspect().session.phase, 'loading');
+  await flushAsync(); host.update(0); assert.equal(host.inspect().session.sessionId, 'session-2');
+  assert.match(host.inspect().session.problem.problemId, /^session-2:/); assert.equal(d.all(node => node.id === 'asyncChoiceScreen').length, 1); host.exit();
+});
+
+test('keyboard waits for readiness and visibility/manual pause remain OR-composed', async () => {
+  const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win, collection: () => [],
+    makeSessionId: () => 'keyboard-pause', random: () => 0, reduced: () => false });
+  host.enter({ gameId: 'asyncChoice' }); key(d.doc, '1'); assert.equal(host.inspect().session.answered, 0);
+  host.setPaused(true); await flushAsync(); host.update(0); assert.equal(host.inspect().session.phase, 'ready');
+  d.doc.hidden = true; d.doc.dispatchEvent(new Event('visibilitychange')); host.setPaused(false); key(d.doc, '1'); host.update(500);
+  assert.equal(host.inspect().session.paused, true); assert.equal(host.inspect().session.activeElapsedMs, 0); assert.equal(host.inspect().session.answered, 0);
+  d.doc.hidden = false; d.doc.dispatchEvent(new Event('visibilitychange')); assert.equal(host.inspect().session.phase, 'answering');
+  const state = host.inspect().session, correctIndex = state.problem.choices.findIndex(item => item.choiceId === state.problem.correctChoiceId);
+  key(d.doc, String(correctIndex + 1), { repeat: true }); assert.equal(host.inspect().session.answered, 0);
+  key(d.doc, String(correctIndex + 1)); assert.equal(host.inspect().session.correct, 1); host.exit();
+});
+
+test('repeated pending enter/exit has no RAF, interval, stale callback, listener or DOM leak', async t => {
+  t.mock.method(globalThis, 'setInterval', () => { throw new Error('new interval'); });
+  const previousRAF = globalThis.requestAnimationFrame; globalThis.requestAnimationFrame = () => { throw new Error('new RAF'); };
+  t.after(() => { globalThis.requestAnimationFrame = previousRAF; });
+  const d = dom(); let serial = 0; const host = createMiniGameHost({ document: d.doc, window: d.win,
+    collection: () => ['HKD-E01'], makeSessionId: () => `cycle-${++serial}`, random: () => 0,
+    loadImage: () => new Promise(() => {}), reduced: () => false });
+  for (let index = 0; index < 10; index++) { host.enter({ gameId: 'asyncChoice' }); host.exit(); host.exit(); await flushAsync();
+    assert.equal(host.inspect().valid, false); assert.equal(host.inspect().session, null); assert.equal(host.inspect().companion, null);
+    assert.equal(d.doc.body.children.length, 0); assert.equal(d.listeners(), 0); }
+});
+
+test('ten questions, result/replay, image failure, reduced motion and Storage isolation hold', async t => {
+  const storage = installStorage(), save = getDefaultSave(); save.player.collection.gotomonIds = ['HKD-E01'];
+  save.player.coreStats.hp = 73; save.player.coreStats.exp = 31; save.player.study.answers = {};
+  assert.equal(saveNow(save, { replace: true }).ok, true); assert.equal(await loadGameData(), true);
+  const beforeGame = JSON.stringify(gameState), beforeStorage = JSON.stringify([...storage.data]); let writes = 0;
+  t.mock.method(storage, 'setItem', () => { writes++; throw new Error('Storage write forbidden'); });
+  t.mock.method(storage, 'removeItem', () => { writes++; throw new Error('Storage delete forbidden'); });
+  const d = dom(); let serial = 0; const host = createMiniGameHost({ document: d.doc, window: d.win,
+    makeSessionId: () => `replay-${++serial}`, random: () => 0,
+    loadImage: () => Promise.reject(new Error('missing')), reduced: () => true });
+  host.enter({ gameId: 'asyncChoice' }); await flushAsync(); host.update(0); const firstSession = host.inspect().session.sessionId;
+  for (let index = 0; index < 10; index++) { if (index < 7) click(correctChoice(d, host)); else click(wrongChoice(d, host));
+    if (index < 9) click(d.find(node => node.dataset.action === 'next')); }
+  assert.deepEqual(host.inspect().session.result, { answered: 10, correct: 7, incorrect: 3, accuracy: 0.7 });
+  assert.equal(host.inspect().companion.motion.imageState, 'failed'); click(d.find(node => node.dataset.action === 'replay'));
+  assert.notEqual(host.inspect().session.sessionId, firstSession); assert.equal(host.inspect().session.phase, 'loading');
+  await flushAsync(); host.update(0); assert.equal(host.inspect().session.seq, 1); host.exit(); await flushAsync();
+  assert.equal(writes, 0); assert.equal(JSON.stringify(gameState), beforeGame); assert.equal(JSON.stringify([...storage.data]), beforeStorage);
+});

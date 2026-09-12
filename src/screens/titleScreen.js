@@ -469,6 +469,7 @@ const titleState = {
     add('titleSentenceOrderButton', 'ミニゲーム：文ならべ', 'sentenceOrder', '#376a43');
     add('titleTimedChoiceButton', 'ミニゲーム：タイムことば', 'timedChoice', '#9a5518');
     add('titleMultiSelectButton', 'ミニゲーム：えらんで完成', 'multiSelect', '#376a43');
+    add('titleAsyncChoiceButton', 'ミニゲーム：よみこみクイズ', 'asyncChoice', '#315b8a');
     this._miniGameButton = group;
     document.body.appendChild(group);
   },

@@ -10,6 +10,8 @@ import { createTimedChoiceGame } from './timedChoice/timedChoiceGame.js';
 import { createTimedChoiceView } from './timedChoice/timedChoiceView.js';
 import { createMultiSelectGame } from './multiSelect/multiSelectGame.js';
 import { createMultiSelectView } from './multiSelect/multiSelectView.js';
+import { createAsyncChoiceGame } from './asyncChoice/asyncChoiceGame.js';
+import { createAsyncChoiceView } from './asyncChoice/asyncChoiceView.js';
 
 function withCommandAdapter(createView) {
   return context => createView({
@@ -36,4 +38,6 @@ export const miniGameRegistry = Object.freeze({
     create: createTimedChoiceGame, createView: withCommandAdapter(createTimedChoiceView) }),
   multiSelect: Object.freeze({ id: 'multiSelect', title: 'えらんで完成',
     create: createMultiSelectGame, createView: createMultiSelectView }),
+  asyncChoice: Object.freeze({ id: 'asyncChoice', title: 'よみこみクイズ',
+    create: createAsyncChoiceGame, createView: withCommandAdapter(createAsyncChoiceView) }),
 });

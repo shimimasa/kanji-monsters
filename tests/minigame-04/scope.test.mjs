@@ -8,6 +8,7 @@ import { MINIGAME_04_ADDITIONS, MINIGAME_04_BASE, MINIGAME_04_CHANGED,
   MINIGAME_04_CONTRACT_DOC_HASH } from './scope-contract.mjs';
 import { MINIGAME_05_ADDITIONS, MINIGAME_05_CHANGED } from '../minigame-05/scope-contract.mjs';
 import { MINIGAME_06_ADDITIONS, MINIGAME_06_CHANGED } from '../minigame-06/scope-contract.mjs';
+import { MINIGAME_07_ADDITIONS, MINIGAME_07_CHANGED } from '../minigame-07/scope-contract.mjs';
 
 const git = (...args) => execFileSync('git', args, { maxBuffer: 16 * 1024 * 1024 }).toString('utf8').replaceAll('\r\n', '\n');
 const read = path => fs.readFileSync(path, 'utf8').replaceAll('\r\n', '\n');
@@ -20,7 +21,8 @@ test('Sentence Order probe stays inside the cumulative MINIGAME-03/04 allowlist'
   const allowed = new Set([...MINIGAME_03_CHANGED, ...MINIGAME_03_ADDITIONS,
     ...MINIGAME_04_CHANGED, ...MINIGAME_04_ADDITIONS,
     ...MINIGAME_05_CHANGED, ...MINIGAME_05_ADDITIONS,
-    ...MINIGAME_06_CHANGED, ...MINIGAME_06_ADDITIONS]);
+    ...MINIGAME_06_CHANGED, ...MINIGAME_06_ADDITIONS,
+    ...MINIGAME_07_CHANGED, ...MINIGAME_07_ADDITIONS]);
   assert.deepEqual(actual.filter(path => !allowed.has(path)), []);
   for (const path of MINIGAME_04_ADDITIONS.filter(path => path.startsWith('src/') || path.startsWith('tests/'))) {
     assert.ok(actual.includes(path), `required MINIGAME-04 file missing: ${path}`);
