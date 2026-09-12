@@ -18,7 +18,9 @@ export const PLATFORM_V1_CONSOLIDATION_ADDITIONS = Object.freeze([
   'YOMITABI_MINIGAME_AUTHORING_GUIDE_V1.md',
   'YOMITABI_MINIGAME_AUTHORING_CHECKLIST_V1.md',
   'YOMITABI_MINIGAME_PLATFORM_V1_CONSOLIDATION_REPORT.md',
+  'YOMITABI_PRODUCTION_GAME_PORTFOLIO_DESIGN.md',
   'tests/minigame-platform-v1/authoring-docs.test.mjs',
+  'tests/minigame-platform-v1/portfolio-doc.test.mjs',
   'tests/minigame-platform-v1/scope.test.mjs',
   'tests/minigame-platform-v1/scope-contract.mjs',
 ]);
