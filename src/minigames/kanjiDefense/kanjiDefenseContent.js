@@ -31,6 +31,17 @@ export const KANJI_DEFENSE_GOLDEN_CONTENT = Object.freeze([
   { fixtureId: 'kd-g4-024', prompt: '季節', acceptedReadings: ['きせつ'], focusKanjiIds: ['g4-035', 'g4-116'], meaning: '春夏秋冬のそれぞれの時期', hint: '春・夏・秋・冬' },
 ].map(item => freezeItem({ ...item, skillId: 'kanji-reading-g4' })));
 
+export const KANJI_DEFENSE_LIMITED_UX_CONTENT_VERSION = 'kanji-defense-limited-ux-playtest-pre-reviewed-v1';
+export const KANJI_DEFENSE_LIMITED_UX_EXCLUDED_FIXTURE_IDS = Object.freeze([
+  'kd-g4-003', // 以下: meaning and short-reading hint require Human Content Review
+  'kd-g4-004', // 位置: short-reading hint requires Human Content Review
+  'kd-g4-011', // 結果: meaning and hint require Human Content Review
+]);
+const limitedUxExcludedIds = new Set(KANJI_DEFENSE_LIMITED_UX_EXCLUDED_FIXTURE_IDS);
+export const KANJI_DEFENSE_LIMITED_UX_CONTENT = Object.freeze(
+  KANJI_DEFENSE_GOLDEN_CONTENT.filter(item => !limitedUxExcludedIds.has(item.fixtureId)),
+);
+
 export const KANJI_DEFENSE_MONSTERS = Object.freeze([
   ['NGT-E01', 'コシヒカリスプライト', '新潟'],
   ['NGT-E08', '長岡花火ファントマトン', '新潟'],
@@ -92,7 +103,7 @@ const shuffle = (items, random) => {
 };
 
 export function buildKanjiDefenseSession({ random = Math.random,
-  content = KANJI_DEFENSE_GOLDEN_CONTENT, monsters = KANJI_DEFENSE_MONSTERS,
+  content = KANJI_DEFENSE_LIMITED_UX_CONTENT, monsters = KANJI_DEFENSE_MONSTERS,
   count = 12 } = {}) {
   validateKanjiDefenseContent(content);
   if (!Array.isArray(monsters) || monsters.length < 3 || !Number.isInteger(count) || count < 1 || count > content.length) {

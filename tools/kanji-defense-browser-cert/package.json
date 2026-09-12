@@ -1,0 +1,12 @@
+{
+  "name": "yomitabi-kanji-defense-browser-cert",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "certify": "node run.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

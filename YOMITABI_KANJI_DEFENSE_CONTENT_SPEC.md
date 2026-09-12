@@ -2,6 +2,10 @@
 
 Date: 2026-09-12
 
+## Limited UX playtest overlay
+
+Formal release content remains the 24-item golden pack and still requires Human Content Review. For the narrower exploratory UX pilot only, runtime selection uses content version `kanji-defense-limited-ux-playtest-pre-reviewed-v1`: the 21 `APPROVE (PRE)` items, excluding `以下` (`kd-g4-003`)、`位置` (`kd-g4-004`)、`結果` (`kd-g4-011`)。Each session samples 12 unique items from this pool. This pool is **PRE-REVIEWED**, not certified content, and cannot support curriculum、learning-effect or public-release claims.
+
 ## Target grade and source audit
 
 MVPは小学4年配当漢字を少なくとも1字含む語を対象とする。source auditは`public/data/kanji_g4_proto.json`を基準にした。現在202 records、ID重複0、漢字重複0、reading欠落0、meaning欠落1、空readingを含むrecords 2、単一reading 61、複数reading 141である。したがって全件自動出題は禁止する。

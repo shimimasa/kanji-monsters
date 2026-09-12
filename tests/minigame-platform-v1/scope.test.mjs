@@ -44,11 +44,22 @@ test('production integration changes only registry/title behavior and preserves 
   assert.doesNotMatch(read('src/minigames/miniGameHost.js'), /kanjiDefense/);
 });
 
-test('package, lock, save/core, main scheduler, battle, Motion, assets, and tooling are unchanged', () => {
+test('package, lock, save/core, main scheduler, battle, Motion, and assets are unchanged', () => {
   const protectedPaths = ['package.json', 'package-lock.json', 'src/core', 'src/data', 'src/main.js',
-    'src/init/fsmsetup.js', 'src/screens/battleScreen.js', 'src/visuals', 'public', 'tools'];
+    'src/init/fsmsetup.js', 'src/screens/battleScreen.js', 'src/visuals', 'public'];
   assert.equal(git('diff', '--name-only', PLATFORM_V1_CONSOLIDATION_BASE, '--', ...protectedPaths).trim(), '');
   assert.equal(git('ls-files', '--others', '--exclude-standard', '--', ...protectedPaths).trim(), '');
+});
+
+test('tooling changes are isolated to the Kanji Defense browser-certification harness', () => {
+  const tracked = git('diff', '--name-only', PLATFORM_V1_CONSOLIDATION_BASE, '--', 'tools')
+    .trim().split('\n').filter(Boolean);
+  const untracked = git('ls-files', '--others', '--exclude-standard', '--', 'tools')
+    .trim().split('\n').filter(Boolean);
+  const actual = [...new Set([...tracked, ...untracked])].sort();
+  const allowed = PLATFORM_V1_CONSOLIDATION_ADDITIONS
+    .filter(path => path.startsWith('tools/kanji-defense-browser-cert/')).sort();
+  assert.deepEqual(actual, allowed);
 });
 
 test('Host remains generic and all game sources own no continuous scheduler or direct Storage', () => {

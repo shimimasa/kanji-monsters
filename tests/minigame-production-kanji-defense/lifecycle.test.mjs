@@ -183,6 +183,6 @@ test('session performs no direct Storage write or deletion', t => {
 test('responsive, focus, touch target, non-color and reduced-motion rules exist in production CSS', () => {
   const source = fs.readFileSync('src/minigames/kanjiDefense/kanjiDefenseView.js', 'utf8');
   assert.match(source, /min-width:44px;min-height:44px/); assert.match(source, /:focus-visible/);
-  assert.match(source, /@media\(max-width:580px\)/); assert.match(source, /@media\(max-height:430px\)/);
+  assert.match(source, /@media\(max-width:580px\)/); assert.match(source, /@media\(max-height:430px\).*\.kd-board\{height:140px\}/);
   assert.match(source, /@media\(prefers-reduced-motion:reduce\)/); assert.match(source, /選択中/); assert.match(source, /危険/);
 });

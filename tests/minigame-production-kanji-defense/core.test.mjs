@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createKanjiDefenseGame, KANJI_DEFENSE_RULES } from '../../src/minigames/kanjiDefense/kanjiDefenseGame.js';
-import { buildKanjiDefenseSession, KANJI_DEFENSE_GOLDEN_CONTENT, KANJI_DEFENSE_MONSTERS,
+import { buildKanjiDefenseSession, KANJI_DEFENSE_GOLDEN_CONTENT, KANJI_DEFENSE_LIMITED_UX_CONTENT,
+  KANJI_DEFENSE_LIMITED_UX_CONTENT_VERSION, KANJI_DEFENSE_LIMITED_UX_EXCLUDED_FIXTURE_IDS, KANJI_DEFENSE_MONSTERS,
   normalizeKanjiDefenseReading, validateKanjiDefenseContent } from '../../src/minigames/kanjiDefense/kanjiDefenseContent.js';
 
 const seeded = (seed = 1) => () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
@@ -38,6 +39,15 @@ test('golden focus IDs exist in current Grade 4 source', () => {
   for (const item of KANJI_DEFENSE_GOLDEN_CONTENT) for (const id of item.focusKanjiIds) assert.ok(ids.has(id), `${item.prompt}: ${id}`);
 });
 
+test('limited UX pool has exactly 21 pre-reviewed items and excludes all three known revisions', () => {
+  assert.equal(KANJI_DEFENSE_LIMITED_UX_CONTENT_VERSION, 'kanji-defense-limited-ux-playtest-pre-reviewed-v1');
+  assert.equal(KANJI_DEFENSE_LIMITED_UX_CONTENT.length, 21);
+  assert.equal(validateKanjiDefenseContent(KANJI_DEFENSE_LIMITED_UX_CONTENT), true);
+  assert.deepEqual(KANJI_DEFENSE_LIMITED_UX_EXCLUDED_FIXTURE_IDS,
+    ['kd-g4-003', 'kd-g4-004', 'kd-g4-011']);
+  assert.deepEqual(KANJI_DEFENSE_LIMITED_UX_CONTENT.filter(item => ['以下', '位置', '結果'].includes(item.prompt)), []);
+});
+
 test('all selected regional Monster assets exist and identities are unique', () => {
   assert.equal(KANJI_DEFENSE_MONSTERS.length, 12);
   assert.equal(new Set(KANJI_DEFENSE_MONSTERS.map(item => item.monsterId)).size, 12);
@@ -51,6 +61,7 @@ test('session generation is deterministic, unique and contains 12 encounters', (
   const b = buildKanjiDefenseSession({ random: seeded(7) });
   assert.deepEqual(a, b); assert.equal(a.length, 12);
   assert.equal(new Set(a.map(item => item.content.fixtureId)).size, 12);
+  assert.ok(a.every(item => KANJI_DEFENSE_LIMITED_UX_CONTENT.includes(item.content)));
   assert.deepEqual(a.map(item => item.encounterNumber), Array.from({ length: 12 }, (_, index) => index + 1));
 });
 
