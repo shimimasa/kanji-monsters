@@ -24,6 +24,7 @@ function element() {
     classList: { add: k => classes.add(k), remove: k => classes.delete(k), contains: k => classes.has(k) },
     focus() {}, blur() {}, setAttribute() {}, removeAttribute() {},
     appendChild(e) { this.children.push(e); e.parentElement = this; return e; },
+    append(...children) { children.forEach(child => this.appendChild(child)); },
     removeChild(e) { this.children = this.children.filter(child => child !== e); e.parentElement = null; },
     remove() { this.parentElement?.removeChild(this); },
     getBoundingClientRect: () => ({ left: 0, top: 0, width: 320, height: 48 }),

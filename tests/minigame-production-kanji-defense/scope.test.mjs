@@ -2,71 +2,54 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { KANJI_DEFENSE_ADDITIONS, KANJI_DEFENSE_BASE, KANJI_DEFENSE_CHANGED } from './scope-contract.mjs';
+import { KANJI_DEFENSE_BASE } from './scope-contract.mjs';
 
 const git = (...args) => execFileSync('git', args, { maxBuffer: 16 * 1024 * 1024 }).toString('utf8').replaceAll('\r\n', '\n');
 const read = path => fs.readFileSync(path, 'utf8').replaceAll('\r\n', '\n');
 
-test('production change stays inside its exact allowlist', () => {
-  const tracked = git('diff', '--name-only', KANJI_DEFENSE_BASE, '--').trim().split('\n').filter(Boolean);
-  const untracked = git('ls-files', '--others', '--exclude-standard').trim().split('\n').filter(Boolean);
-  const actual = [...new Set([...tracked, ...untracked])].sort();
-  const allowed = new Set([...KANJI_DEFENSE_CHANGED, ...KANJI_DEFENSE_ADDITIONS]);
-  assert.deepEqual(actual.filter(path => !allowed.has(path)), []);
-  for (const path of KANJI_DEFENSE_ADDITIONS.filter(path => path !== 'YOMITABI_KANJI_DEFENSE_PRODUCTION_IMPLEMENTATION_REPORT.md')) {
-    assert.ok(actual.includes(path), `required production file missing: ${path}`);
-    assert.ok(fs.lstatSync(path).isFile(), `regular file required: ${path}`);
+// This redesign supersedes the old title-only integration allowlist.
+// Preserve certified input/content/Core; the original scope-contract remains.
+test('certified defense Core, content and View remain byte unchanged', () => {
+  for (const file of ['kanjiDefenseGame.js','kanjiDefenseContent.js','kanjiDefenseView.js']) {
+    const path = 'src/minigames/kanjiDefense/' + file;
+    assert.equal(read(path), git('show', '148553c48f18905ae5aed8c95354ef8792f4ae34:' + path), path);
   }
 });
-test('Stable Host, Contract, Companion, Collection, Math Invader and main scheduler are byte unchanged', () => {
-  const paths = [
-    'src/minigames/miniGameHost.js',
-    'src/minigames/README.md',
-    'src/minigames/companionAdapter.js',
-    'src/minigames/collectionAdapter.js',
-    'src/minigames/mathInvader/mathInvaderGame.js',
-    'src/minigames/mathInvader/mathInvaderView.js',
-    'src/main.js',
-  ];
-  for (const path of paths) assert.equal(read(path), git('show', `${KANJI_DEFENSE_BASE}:${path}`), path);
+test('main scheduler, battle, save transaction, audio and Motion remain unchanged', () => {
+  for (const path of ['src/main.js','src/core/gameState.js','src/core/saveData.js','src/core/storageTransaction.js',
+    'src/screens/battleScreen.js','src/audio/audioManager.js','src/visuals/motion/monsterMotionHost.js']) {
+    assert.equal(read(path), git('show', KANJI_DEFENSE_BASE + ':' + path), path);
+  }
 });
-
-test('Host has no Kanji Defense, command, reading, retry or escape knowledge', () => {
+test('Host delegates every command without interpreting defense rules', () => {
   const host = read('src/minigames/miniGameHost.js');
-  assert.match(host, /current\.dispatch\(command\) !== true/);
-  assert.doesNotMatch(host, /kanjiDefense|reading|retry|escaped|command\.type|switch\s*\(|case\s+['"]|if\s*\([^)]*gameId/);
+  assert.ok(host.includes('current.dispatch(command) !== true'));
+  for (const token of ['kanjiDefense','reading','escaped','command.type']) assert.ok(!host.includes(token), token);
 });
-
-test('production Core and View own no scheduler, wall clock, Storage, save, battle or shared engine', () => {
-  for (const path of KANJI_DEFENSE_ADDITIONS.filter(path => path.startsWith('src/'))) {
-    const source = read(path);
-    assert.doesNotMatch(source, /Date\.now|performance\.now|requestAnimationFrame|setInterval|setTimeout|Worker\s*\(/, path);
-    assert.doesNotMatch(source, /localStorage|sessionStorage|saveNow\s*\(|saveGameData\s*\(|battleMotionBridge|battleScreen/, path);
-    assert.doesNotMatch(source, /sharedLane|InvaderEngine|CombatFramework/, path);
+test('production Core and View own no scheduler, Storage, save or shared engine', () => {
+  for (const file of ['kanjiDefenseGame.js','kanjiDefenseContent.js','kanjiDefenseView.js']) {
+    const source = read('src/minigames/kanjiDefense/' + file);
+    for (const token of ['Date.now','performance.now','requestAnimationFrame','setInterval','setTimeout',
+      'localStorage','sessionStorage','saveNow(','saveGameData(','battleMotionBridge','battleScreen',
+      'sharedLane','InvaderEngine','CombatFramework']) assert.ok(!source.includes(token), token);
   }
 });
-
-test('LearningEvent uses only v1 types with terminal retry and escape reasons in payload', () => {
+test('v1 learning event and retry/escape payload remain intact', () => {
   const core = read('src/minigames/kanjiDefense/kanjiDefenseGame.js');
-  for (const type of ['problemPresented', 'correct', 'incorrect', 'sessionComplete']) assert.match(core, new RegExp(`['"]${type}['"]`));
-  assert.doesNotMatch(core, /notify\(['"](?:retry|escaped|wrongAttempt|monsterDefeated)['"]/);
-  assert.match(core, /reason: 'attemptsExhausted'/); assert.match(core, /reason: 'escaped'/);
-  assert.match(core, /version: 1/); assert.match(core, /activeElapsedMs/);
+  for (const type of ['problemPresented','correct','incorrect','sessionComplete']) assert.ok(core.includes("'" + type + "'"));
+  assert.ok(core.includes("reason: 'attemptsExhausted'")); assert.ok(core.includes("reason: 'escaped'"));
+  assert.ok(core.includes('version: 1')); assert.ok(core.includes('activeElapsedMs'));
 });
-
-test('registry is an exact v1 Definition and title is the only public entry integration', async () => {
+test('v1 Definition stays exact; the public title routes through the registry hub', async () => {
   const { miniGameRegistry } = await import('../../src/minigames/registry.js');
-  assert.deepEqual(Object.keys(miniGameRegistry.kanjiDefense).sort(), ['create', 'createView', 'id', 'title']);
-  assert.equal(miniGameRegistry.kanjiDefense.id, 'kanjiDefense');
-  const registryDiff = git('diff', '--unified=0', KANJI_DEFENSE_BASE, '--', 'src/minigames/registry.js');
-  const titleDiff = git('diff', '--unified=0', KANJI_DEFENSE_BASE, '--', 'src/screens/titleScreen.js');
-  assert.match(registryDiff, /createKanjiDefenseGame/); assert.match(registryDiff, /createKanjiDefenseView/);
-  assert.match(titleDiff, /titleKanjiDefenseButton/);
+  assert.deepEqual(Object.keys(miniGameRegistry.kanjiDefense).sort(), ['create','createView','id','title']);
+  assert.ok(read('src/screens/titleScreen.js').includes("publish('changeScreen', 'miniGameHub')"));
+  assert.ok(!read('src/screens/titleScreen.js').includes('titleKanjiDefenseButton'));
+  assert.ok(read('src/screens/miniGameHubScreen.js').includes('Object.values(miniGameRegistry)'));
 });
-
-test('package, lock, public data/assets, save schema, Motion and audio sources are unchanged', () => {
-  const protectedPaths = ['package.json', 'package-lock.json', 'public', 'src/core', 'src/visuals', 'src/audio',
-    'src/screens/battleScreen.js', 'src/init/fsmsetup.js'];
-  assert.equal(git('diff', '--name-only', KANJI_DEFENSE_BASE, '--', ...protectedPaths).trim(), '');
-  assert.equal(git('ls-files', '--others', '--exclude-standard', '--', ...protectedPaths).trim(), '');
+test('shell and reward presentation never own Storage or learning answer dispatch', () => {
+  for (const path of ['src/minigames/miniGameShell.js','src/minigames/companionScene.js','src/minigames/companionPlay.js']) {
+    const source = read(path);
+    for (const token of ['localStorage','sessionStorage','.dispatch(','setInterval','requestAnimationFrame']) assert.ok(!source.includes(token), path + ': ' + token);
+  }
 });

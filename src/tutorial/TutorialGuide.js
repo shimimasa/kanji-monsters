@@ -88,8 +88,11 @@ function getUiRoot() {
       focus.style.height = `${r.h}px`;
   
       // 吹き出しは枠の下側右寄せに出す（はみ出し簡易対応）
-      const fx = Math.min(r.x + r.w + 16, window.innerWidth - 560);
-      const fy = Math.min(r.y + r.h + 16, window.innerHeight - 160);
+      const frameWidth = Math.min(520, window.innerWidth - 32);
+      frame.style.boxSizing = 'border-box';
+      frame.style.width = `${frameWidth}px`;
+      const fx = Math.max(16, Math.min(r.x + r.w + 16, window.innerWidth - frameWidth - 16));
+      const fy = Math.max(16, Math.min(r.y + r.h + 16, window.innerHeight - 210));
       frame.style.left = `${fx}px`;
       frame.style.top = `${fy}px`;
   

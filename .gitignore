@@ -2,6 +2,10 @@ node_modules/
 dist/
 artifacts/
 
+# Anonymous child-playtest exports still stay out of source control.
+playtest-records/
+yomitabi-playtest-pt-*.json
+
 # Firebase debug logs
 firebase-debug.log
 firebase-debug.*.log

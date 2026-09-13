@@ -44,7 +44,7 @@ test('Registry and title expose Multi Select without replacing the first five ga
   assert.deepEqual(Object.keys(miniGameRegistry),
     ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense']);
   const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8');
-  assert.match(title, /titleMultiSelectButton[^\n]+multiSelect/); assert.equal(miniGameRegistry.multiSelect.title, 'えらんで完成');
+  assert.match(title, /publish\('changeScreen', 'miniGameHub'\)/); assert.equal(miniGameRegistry.multiSelect.title, 'えらんで完成');
 });
 
 test('View source has multi-select semantics, 44px targets, responsive rules, focus and non-color status text', () => {

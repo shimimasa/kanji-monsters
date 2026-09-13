@@ -807,7 +807,7 @@ rightControls.appendChild(nextBtn);
     backButton.addEventListener('click', () => {
       publish('playSE', 'decide');
       publish('playBGM', 'title');
-      const targetScreen = (gameState.previousScreen === 'worldStageSelect')
+      const targetScreen = gameState.previousScreen === 'title' ? 'title' : (gameState.previousScreen === 'worldStageSelect')
         ? 'worldStageSelect'
         : 'stageSelect';
       publish('changeScreen', targetScreen);

@@ -42,7 +42,7 @@ const wrongChoice = (d, host) => { const state = host.inspect().session;
 
 test('Registry and title expose Async Choice without replacing the first six games', () => {
   assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense']);
-  const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8'); assert.match(title, /titleAsyncChoiceButton[^\n]+asyncChoice/);
+  const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8'); assert.match(title, /publish\('changeScreen', 'miniGameHub'\)/);
   assert.equal(miniGameRegistry.asyncChoice.title, 'よみこみクイズ');
 });
 

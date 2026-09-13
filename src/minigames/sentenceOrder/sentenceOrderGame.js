@@ -73,6 +73,14 @@ export function createSentenceOrderGame({ sessionId, random = Math.random, onEve
       currentOrder = Object.freeze(nextOrder);
       return true;
     },
+    place(payload = {}) {
+      if (!payload || typeof payload !== 'object') return false;
+      const { chunkId, to, ...identity } = payload;
+      const from = currentOrder.indexOf(chunkId);
+      if (!matchesIdentity(identity) || from < 0 || !Number.isInteger(to) || to < 0 || to >= currentOrder.length || from === to) return false;
+      const order = [...currentOrder]; order.splice(from, 1); order.splice(to, 0, chunkId);
+      currentOrder = Object.freeze(order); return true;
+    },
     submit(identity = {}) {
       const problem = currentProblem();
       if (!matchesIdentity(identity)) return false;
@@ -114,6 +122,7 @@ export function createSentenceOrderGame({ sessionId, random = Math.random, onEve
     dispatch(command) {
       if (!command || typeof command !== 'object') return false;
       if (command.type === 'reorder') return this.reorder(command.payload);
+      if (command.type === 'place') return this.place(command.payload);
       if (command.type === 'submit') return this.submit(command.payload);
       if (command.type === 'next') return this.next(command.payload);
       return false;

@@ -1,10 +1,11 @@
 import { createMonsterMotionHost } from '../visuals/motion/monsterMotionHost.js';
 
-export function createCompanionAdapter({ sessionId, ownedMonsterIds, loadImage,
+export function createCompanionAdapter({ sessionId, ownedMonsterIds, selectedId, loadImage,
   createHost = createMonsterMotionHost }) {
   let disposed = false, host = null, action = 'idle', remainingMs = 0, elapsedMs = 0, revision = 0, seq = 0;
-  const selected = ownedMonsterIds.includes('HKD-E01') ? 'HKD-E01' : null;
-  if (selected) {
+  const selected = selectedId && ownedMonsterIds.includes(selectedId) ? selectedId
+    : ownedMonsterIds.includes('HKD-E01') ? 'HKD-E01' : null;
+  if (selected === 'HKD-E01') {
     // A synchronous loader error is the same display-only failure as a rejection.
     const imagePromise = Promise.resolve().then(() => disposed ? null : loadImage());
     host = createHost({ session: sessionId, imagePromise });

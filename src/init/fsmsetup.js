@@ -10,6 +10,7 @@ import stageSelectState    from '../screens/stageSelectScreen.js';
 import titleState          from '../screens/titleScreen.js';
 import menuScreenState     from '../screens/menuScreen.js';
 import miniGameHost        from '../minigames/miniGameHost.js';
+import miniGameHub         from '../screens/miniGameHubScreen.js';
 import { loadAllGameData } from '../loaders/dataLoader.js';
 import { subscribe }       from '../core/eventBus.js';
 import settingsState       from '../screens/settingsScreen.js';
@@ -44,6 +45,7 @@ export async function setupFSM() {
     playerNameInput:  playerNameInputState,
     menu:             menuScreenState,
     miniGame:         miniGameHost,
+    miniGameHub:      miniGameHub,
     status:           statusScreen,
     achievements:     achievementsScreen,
     gradeSelect:      gradeSelectState,
@@ -86,7 +88,7 @@ export async function setupFSM() {
     console.log(`画面遷移: ${name}, props=`, props); // デバッグログを追加
     
     // 特定の画面名の場合は直接遷移する（安全リスト）
-    const safeScreens = ['title', 'menu', 'miniGame', 'stageSelect', 'stageLoading', 'battle',
+    const safeScreens = ['title', 'menu', 'miniGame', 'miniGameHub', 'stageSelect', 'stageLoading', 'battle',
                         'worldStageSelect', 'continentSelect', 'courseSelect',
                         // 追加
                         'profile',

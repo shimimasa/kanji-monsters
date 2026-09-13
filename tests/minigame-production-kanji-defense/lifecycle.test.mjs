@@ -74,7 +74,10 @@ test('registry and title expose the independent Flagship Definition', () => {
   assert.deepEqual(Object.keys(miniGameRegistry.kanjiDefense).sort(), ['create', 'createView', 'id', 'title']);
   assert.equal(miniGameRegistry.kanjiDefense.id, 'kanjiDefense'); assert.equal(miniGameRegistry.kanjiDefense.title, '漢字防衛隊');
   const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8');
-  assert.match(title, /titleKanjiDefenseButton/); assert.match(title, /'旗艦ゲーム：漢字防衛隊', 'kanjiDefense'/);
+  assert.match(title, /publish\('changeScreen', 'miniGameHub'\)/);
+  const hub = fs.readFileSync('src/screens/miniGameHubScreen.js', 'utf8');
+  assert.match(hub, /Object.values\(miniGameRegistry\)/);
+  assert.match(hub, /gameId: definition.id/);
 });
 test('generic Host renders three-lane UI and first Monster without game-specific Host logic', () => {
   const d = dom(), host = createHost(d); host.enter({ gameId: 'kanjiDefense' });

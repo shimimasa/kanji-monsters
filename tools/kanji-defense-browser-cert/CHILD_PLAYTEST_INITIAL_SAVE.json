@@ -1,0 +1,107 @@
+{
+  "meta": {
+    "version": 2,
+    "catalogVersion": 2,
+    "lastSavedAt": 0,
+    "compatibilityEntries": {
+      "tutorial_seen_title": "1",
+      "tutorial_seen_courseSelect": "1",
+      "tutorial_seen_stageSelect": "1",
+      "tutorial_seen_battle": "1",
+      "tutorial_seen_regionSelect": "1"
+    }
+  },
+  "player": {
+    "name": "ゲスト",
+    "coreStats": {
+      "hp": 100,
+      "maxHp": 100,
+      "level": 1,
+      "exp": 0,
+      "nextLevelExp": 100,
+      "attack": 10,
+      "healCount": 3,
+      "skillPoints": 0,
+      "enemiesDefeated": 0,
+      "stagesCleared": 0,
+      "totalCorrect": 0,
+      "totalIncorrect": 0,
+      "comboCount": 0,
+      "weaknessHits": 0,
+      "healsSuccessful": 0,
+      "skillPointsUsed": 0,
+      "bossesDefeated": 0,
+      "playtimeSeconds": 0
+    },
+    "progress": {
+      "currentRegion": null,
+      "currentStage": null,
+      "clearedStages": []
+    },
+    "collection": {
+      "gotomonIds": [
+        "HKD-E01",
+        "HKD-E02",
+        "HKD-E03"
+      ],
+      "legendaryUnlocked": {},
+      "phantomUnlocked": {}
+    },
+    "study": {
+      "answers": {},
+      "reviewQueue": [],
+      "practiceProgress": {},
+      "kanjiReadProgress": {},
+      "masterMode": {
+        "xp": 0,
+        "level": 1,
+        "gauge": 0
+      }
+    },
+    "miniGames": {
+      "version": 1,
+      "selectedGotomonId": "HKD-E01",
+      "games": {},
+      "companions": {
+        "HKD-E01": {
+          "plays": 0,
+          "friendship": 0,
+          "level": 1,
+          "xp": 0,
+          "medals": []
+        },
+        "HKD-E02": {
+          "plays": 0,
+          "friendship": 0,
+          "level": 1,
+          "xp": 0,
+          "medals": []
+        },
+        "HKD-E03": {
+          "plays": 0,
+          "friendship": 0,
+          "level": 1,
+          "xp": 0,
+          "medals": []
+        }
+      }
+    }
+  },
+  "settings": {
+    "bgmVolume": 0.2,
+    "seVolume": 0.3,
+    "lang": "ja",
+    "gameMode": "jikkuri",
+    "maxHealCount": 3,
+    "enemyAttackMode": "onMistakeOnly",
+    "showTimer": false,
+    "healMode": "noAttack",
+    "autosaveEnabled": true,
+    "autosaveMinutes": 5,
+    "cbMode": false,
+    "bigFont": false
+  },
+  "flags": {
+    "bonusUnlocked": {}
+  }
+}

@@ -51,7 +51,8 @@ test('Registry and title expose Timed Choice without replacing the first four ga
   assert.deepEqual(Object.keys(miniGameRegistry),
     ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense']);
   const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8');
-  assert.match(title, /titleTimedChoiceButton[^\n]+timedChoice/);
+  assert.match(title, /publish\('changeScreen', 'miniGameHub'\)/);
+  assert.match(fs.readFileSync('src/screens/miniGameHubScreen.js', 'utf8'), /Object.values\(miniGameRegistry\)/);
 });
 
 test('View source keeps timer UI, 44px targets, responsive layout, focus, and no animation clock', () => {

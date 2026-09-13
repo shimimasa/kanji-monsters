@@ -1,0 +1,38 @@
+// Clean, disposable archive build; never changes a worktree, dependency tree or ref.
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { runLogged } from '../tools/kanji-defense-browser-cert/helpers.mjs';
+
+const root=fileURLToPath(new URL('../',import.meta.url));
+const out=path.join(root,'artifacts','candidate-1'); await fs.mkdir(out,{recursive:true});
+const commit=execFileSync('git',['rev-parse','HEAD'],{cwd:root}).toString().trim();
+const clean=await fs.mkdtemp(path.join(out,'clean-'));
+const archive=path.join(clean,'source.tar');
+execFileSync('git',['archive','--format=tar',`--output=${archive}`,commit],{cwd:root});
+const source=path.join(clean,'source');await fs.mkdir(source);
+execFileSync('tar',['-xf',archive,'-C',source]);
+const receipt={commit,node:process.version,startedAt:new Date().toISOString(),source,builds:{},status:'RUNNING'};
+async function hashOutputs(directory) {
+  const names=(await fs.readdir(directory,{recursive:true})).filter(name=>name==='index.html'||/^(assets[\\/]).*\.(js|css|json)$/.test(name)).sort();
+  return Object.fromEntries(await Promise.all(names.map(async name=>[name.replaceAll('\\','/'),createHash('sha256').update(await fs.readFile(path.join(directory,name))).digest('hex')])));
+}
+try {
+  await runLogged(process.platform==='win32'?'npm.cmd':'npm',['ci','--offline'],{cwd:source,logPath:path.join(out,'clean-npm-ci.log')});
+  for(const [label,mode,flag,reference] of [
+    ['production','production','1','dist'],
+    ['observation-on','child-playtest','1','artifacts/child-playtest-app-on'],
+    ['observation-off','child-playtest','0','artifacts/child-playtest-app-off']]) {
+    const env={...process.env,VITE_PLAYTEST_LOGGER:flag};
+    await runLogged(process.execPath,['node_modules/vite/bin/vite.js','build','--mode',mode,'--outDir',`build-${label}`],{cwd:source,env,logPath:path.join(out,`clean-${label}.log`)});
+    const hashes=await hashOutputs(path.join(source,`build-${label}`));
+    const original=await hashOutputs(path.join(root,reference));
+    const same=JSON.stringify(hashes)===JSON.stringify(original);
+    receipt.builds[label]={same,hashes};
+    if(!same)throw new Error(`Clean ${label} output differs from QA build`);
+  }
+  receipt.status='PASS';
+} catch(error) {receipt.status='FAIL';receipt.error=error.message;process.exitCode=1;}
+finally {receipt.finishedAt=new Date().toISOString();await fs.writeFile(path.join(out,'reproducibility.json'),JSON.stringify(receipt,null,2));console.log(JSON.stringify(receipt,null,2));}

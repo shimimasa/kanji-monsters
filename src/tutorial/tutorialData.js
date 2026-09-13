@@ -10,8 +10,12 @@ export function getStepsFor(screenId, ctx = {}) {
         return [
           {
             title: 'ゲームをはじめよう',
-            text: 'スタートボタンをおそう！\nなまえを入れたら ぼうけんへ。',
-            anchor: () => buttonRect(ctx?.playButton || { x: 300, y: 350, width: 300, height: 50 }, ctx.canvas)
+            text: '冒険をはじめよう！\n捕まえたゴトモンは、ミニゲームの相棒にもなるよ。',
+            anchor: () => {
+              const r = globalThis.document?.getElementById('titleAdventureButton')?.getBoundingClientRect();
+              return r ? { x: r.left, y: r.top, w: r.width, h: r.height }
+                : buttonRect(ctx?.playButton || { x: 300, y: 350, width: 300, height: 50 }, ctx.canvas);
+            }
           }
         ];
   

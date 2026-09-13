@@ -211,6 +211,10 @@ const monsterCaptureScreen = {
     footer.appendChild(confirmBtn);
 
     panel.appendChild(header);
+    const companionNote = document.createElement('p');
+    companionNote.textContent = '迎えたゴトモンは、タイトルの「ミニゲーム」から相棒に選べます。好きな仲間と記録を伸ばそう！';
+    Object.assign(companionNote.style, { fontSize: '14px', lineHeight: '1.6', color: '#e3f3d4' });
+    panel.appendChild(companionNote);
     panel.appendChild(grid);
     panel.appendChild(footer);
     this.container.appendChild(panel);

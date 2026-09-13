@@ -53,7 +53,8 @@ function solveThroughView(d, host) {
 test('Registry and title retain Sentence Order when the fifth game is added', () => {
   assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense']);
   const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8');
-  assert.match(title, /titleSentenceOrderButton[^\n]+sentenceOrder/);
+  assert.match(title, /publish\('changeScreen', 'miniGameHub'\)/);
+  assert.match(fs.readFileSync('src/screens/miniGameHubScreen.js', 'utf8'), /Object.values\(miniGameRegistry\)/);
 });
 
 test('View source keeps 44px targets, responsive portrait/landscape rules, focus, and answer feedback', () => {

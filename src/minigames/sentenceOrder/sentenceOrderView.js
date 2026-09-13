@@ -1,3 +1,4 @@
+import { publish } from '../../core/eventBus.js';
 const CSS = `
 #sentenceOrderScreen{position:fixed;inset:0;z-index:100010;background:#f4f7ef;color:#263126;overflow:auto;overscroll-behavior:contain;font:18px system-ui,sans-serif;box-sizing:border-box;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom));touch-action:manipulation}
 #sentenceOrderScreen *{box-sizing:border-box}#sentenceOrderScreen [hidden]{display:none!important}
@@ -29,7 +30,7 @@ export function createSentenceOrderView({ document: doc, dispatch, onBack, onRep
   const pause = el('p', 'so-pause', 'おやすみ中'); pause.hidden = true; shell.append(pause);
   const play = el('div', 'so-play'), controls = el('div'); shell.append(play); play.append(controls);
   const prompt = el('p', 'so-prompt'); prompt.dataset.role = 'problem'; controls.append(prompt);
-  const help = el('p', 'so-help', '文節を選び、左右のボタンか矢印キーで動かします。Enterで決定します。'); controls.append(help);
+  const help = el('p', 'so-help', '板をつかんで移動。選んで「左右」でも並べ替えできます。'); controls.append(help);
   const chunkArea = el('div', 'so-chunks'); chunkArea.setAttribute('aria-label', '現在の文節の並び'); controls.append(chunkArea);
   const chunkButtons = Array.from({ length: 6 }, (_, index) => {
     const button = el('button', 'so-chunk'); button.type = 'button'; button.dataset.chunkPosition = String(index + 1);
@@ -46,6 +47,43 @@ export function createSentenceOrderView({ document: doc, dispatch, onBack, onRep
   const identity = state => ({
     sessionId: state.sessionId, problemId: state.problem.problemId, attemptId: state.attemptId,
   });
+  let drag = null;
+  on(chunkArea, 'pointerdown', event => {
+    const target = event.target.closest?.('[data-chunk-id]');
+    if (!target || event.button !== 0 || !select(target)) return;
+    drag = { id: target.dataset.chunkId, identity: identity(getSnapshot()), x: event.clientX, y: event.clientY, moved: false, target };
+    target.setPointerCapture?.(event.pointerId); updateSelection();
+  });
+  on(chunkArea, 'pointermove', event => {
+    if (!drag) return;
+    const dx = event.clientX-drag.x, dy=event.clientY-drag.y;
+    if (Math.hypot(dx,dy)>8) drag.moved=true;
+    if (drag.moved) {
+      drag.target.classList.add('gt-dragging'); drag.target.style.translate=`${dx}px ${dy}px`;
+      // Hit-test the other planks, not the lifted piece itself.
+      drag.target.style.pointerEvents='none';
+      const over=doc.elementFromPoint?.(event.clientX,event.clientY)?.closest?.('[data-chunk-id]');
+      drag.target.style.pointerEvents='';
+      for (const node of chunkButtons) node.classList.toggle('gt-drop-target',node===over);
+    }
+  });
+  const endDrag = (event, cancelled = false) => {
+    if (!drag) return;
+    const moving=drag;drag=null;
+    moving.target.style.pointerEvents='none';
+    const over=doc.elementFromPoint?.(event.clientX,event.clientY)?.closest?.('[data-chunk-id]');
+    moving.target.style.pointerEvents='';moving.target.style.translate='';moving.target.classList.remove('gt-dragging');
+    for (const node of chunkButtons) node.classList.remove('gt-drop-target');
+    if (!cancelled && moving.moved && over) {
+      selectedChunkId=moving.id;refocusSelected=true;
+      if(dispatch({type:'place',payload:{...moving.identity,chunkId:moving.id,to:getSnapshot().currentOrder.indexOf(over.dataset.chunkId)}})) {
+        publish('playSE','decide');
+        const landed=chunkButtons.find(node=>node.dataset.chunkId===moving.id);
+        if(landed){landed.classList.remove('gt-landed');void landed.offsetWidth;landed.classList.add('gt-landed');}
+      }
+    }
+  };
+  on(chunkArea,'pointerup',event=>endDrag(event));on(chunkArea,'pointercancel',event=>endDrag(event,true));
   const move = direction => {
     const state = getSnapshot();
     if (!active || state.paused || state.phase !== 'answering' || !state.attemptId || !selectedChunkId) return false;
