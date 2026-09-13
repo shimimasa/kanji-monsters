@@ -23,11 +23,17 @@ async function hashOutputs(directory) {
   const names=(await walk()).sort(), hashes=[];
   // Include all copied public images/audio/data, not just generated bundles.
   for(let i=0;i<names.length;i+=8)hashes.push(...await Promise.all(names.slice(i,i+8).map(async name=> {
-    const hash=createHash('sha256');for await(const chunk of createReadStream(path.join(directory,name)))hash.update(chunk);
-    return [name.replaceAll('\\','/'),hash.digest('hex')];
+    const hash=createHash('sha256'),canonical=createHash('sha256');
+    const textFile=/\.(css|js|json|html|csv|py|txt|svg|xml|md)$/i.test(name);
+    for await(const chunk of createReadStream(path.join(directory,name))) {
+      hash.update(chunk);canonical.update(textFile?chunk.filter(byte=>byte!==13):chunk);
+    }
+    return [name.replaceAll('\\','/'),hash.digest('hex'),canonical.digest('hex')];
   })));
-  return {files:hashes.length,treeSHA256:createHash('sha256').update(JSON.stringify(hashes)).digest('hex'),
-    entryHashes:Object.fromEntries(hashes.filter(([name])=>name==='index.html'||/^assets\/[^/]+\.(js|css|json)$/.test(name)))};
+  const digest=items=>createHash('sha256').update(JSON.stringify(items)).digest('hex');
+  return {files:hashes.length,treeSHA256:digest(hashes.map(([name,raw])=>[name,raw])),
+    textCRCanonicalTreeSHA256:digest(hashes.map(([name,,canonical])=>[name,canonical])),
+    entryHashes:Object.fromEntries(hashes.filter(([name])=>name==='index.html'||/^assets\/[^/]+\.(js|css|json)$/.test(name)).map(([name,raw])=>[name,raw]))};
 }
 try {
   // Explicit build closure excludes historical raw-art archives and hosting cache.
@@ -50,9 +56,15 @@ try {
     await runLogged(process.execPath,['node_modules/vite/bin/vite.js','build','--mode',mode,'--outDir',`build-${label}`],{cwd:source,env,logPath:path.join(out,`clean-${label}.log`)});
     const hashes=await hashOutputs(path.join(source,`build-${label}`));
     const original=await hashOutputs(path.join(root,reference));
-    const same=JSON.stringify(hashes)===JSON.stringify(original);
-    receipt.builds[label]={same,hashes};
-    if(!same)throw new Error(`Clean ${label} output differs from QA build`);
+    const same=hashes.files===original.files&&hashes.textCRCanonicalTreeSHA256===original.textCRCanonicalTreeSHA256;
+    receipt.builds[label]={same,referenceRawByteEqual:hashes.treeSHA256===original.treeSHA256,hashes};
+    if(!same)throw new Error(`Clean ${label} output differs beyond text CR line endings`);
+    // A second clean output must be byte-identical. Do not confuse this with the
+    // mixed-EOL worktree's raw bytes; its difference is explicitly reported above.
+    await runLogged(process.execPath,['node_modules/vite/bin/vite.js','build','--mode',mode,'--outDir',`repeat-${label}`],{cwd:source,env,logPath:path.join(out,`repeat-${label}.log`)});
+    const repeat=await hashOutputs(path.join(source,`repeat-${label}`));
+    receipt.builds[label].repeatRawByteEqual=hashes.treeSHA256===repeat.treeSHA256;
+    if(!receipt.builds[label].repeatRawByteEqual)throw new Error(`Clean ${label} is not byte-reproducible`);
   }
   receipt.status='PASS';
 } catch(error) {receipt.status='FAIL';receipt.error=error.message;process.exitCode=1;}
