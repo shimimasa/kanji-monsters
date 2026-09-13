@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
 import { runLogged } from '../tools/kanji-defense-browser-cert/helpers.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
@@ -12,11 +13,21 @@ const commit=execFileSync('git',['rev-parse','HEAD'],{cwd:root}).toString().trim
 const clean=await fs.mkdtemp(path.join(out,'clean-'));
 const archive=path.join(clean,'source.zip');
 const source=path.join(clean,'source');
-const buildInputs=['src','public','scripts','tests','tools/kanji-defense-browser-cert','index.html','package.json','package-lock.json','vite.config.js'];
+const buildInputs=['src','public','scripts','tests','tools/kanji-defense-browser-cert','index.html','style.css','manifest.json','package.json','package-lock.json','vite.config.js'];
 const receipt={commit,node:process.version,startedAt:new Date().toISOString(),source,buildInputs,builds:{},status:'RUNNING'};
 async function hashOutputs(directory) {
-  const names=(await fs.readdir(directory,{recursive:true})).filter(name=>name==='index.html'||/^(assets[\\/]).*\.(js|css|json)$/.test(name)).sort();
-  return Object.fromEntries(await Promise.all(names.map(async name=>[name.replaceAll('\\','/'),createHash('sha256').update(await fs.readFile(path.join(directory,name))).digest('hex')])));
+  async function walk(prefix='') {
+    const items=await fs.readdir(path.join(directory,prefix),{withFileTypes:true});
+    return (await Promise.all(items.map(item=>item.isDirectory()?walk(path.join(prefix,item.name)):[path.join(prefix,item.name)]))).flat();
+  }
+  const names=(await walk()).sort(), hashes=[];
+  // Include all copied public images/audio/data, not just generated bundles.
+  for(let i=0;i<names.length;i+=8)hashes.push(...await Promise.all(names.slice(i,i+8).map(async name=> {
+    const hash=createHash('sha256');for await(const chunk of createReadStream(path.join(directory,name)))hash.update(chunk);
+    return [name.replaceAll('\\','/'),hash.digest('hex')];
+  })));
+  return {files:hashes.length,treeSHA256:createHash('sha256').update(JSON.stringify(hashes)).digest('hex'),
+    entryHashes:Object.fromEntries(hashes.filter(([name])=>name==='index.html'||/^assets\/[^/]+\.(js|css|json)$/.test(name)))};
 }
 try {
   // Explicit build closure excludes historical raw-art archives and hosting cache.
