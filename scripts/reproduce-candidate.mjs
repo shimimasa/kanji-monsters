@@ -25,7 +25,12 @@ try {
   if(process.platform==='win32')execFileSync('powershell.exe',['-NoProfile','-Command',
     `Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('${archive.replaceAll("'","''")}','${source.replaceAll("'","''")}')`]);
   else {await fs.mkdir(source);execFileSync('unzip',['-q',archive,'-d',source]);}
-  await runLogged(process.platform==='win32'?'npm.cmd':'npm',['ci','--offline'],{cwd:source,logPath:path.join(out,'clean-npm-ci.log')});
+  // Invoke the Windows npm CLI with Node directly; cmd/bat nested quoting is not portable.
+  const npmCommand=process.platform==='win32'?process.execPath:'npm';
+  const npmArgs=process.platform==='win32'
+    ?[path.join(path.dirname(process.execPath),'node_modules','npm','bin','npm-cli.js'),'ci','--offline']
+    :['ci','--offline'];
+  await runLogged(npmCommand,npmArgs,{cwd:source,logPath:path.join(out,'clean-npm-ci.log')});
   for(const [label,mode,flag,reference] of [
     ['production','production','1','dist'],
     ['observation-on','child-playtest','1','artifacts/child-playtest-app-on'],
