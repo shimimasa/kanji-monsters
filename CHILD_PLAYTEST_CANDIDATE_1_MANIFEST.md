@@ -18,7 +18,7 @@ Windows x64、Node v22.14.0、npm 10.9.2、Vite 5.4.19、Playwright 1.63.0（既
 
 - root `package-lock.json` SHA256：`cd00e39cfb76d2a1c602948616a688476e9c77e335d7c2b295ab630e358e4b74`
 - browser QA lock SHA256：`1d671652b15542f9f9c44d57e9942af727c608dfbc6b46b4abcb8269e8afadb3`
-- 両lockとpackageは既存から変更なし。再現はcommitの新規archive＋`npm ci --offline`（キャッシュなし端末は事前に通常の`npm ci`）。`scripts/reproduce-candidate.mjs` が通常／観察ON／OFFの生成物をSHA256比較する。
+- 両lockとpackageは既存から変更なし。再現はcommitからビルド入力（src/public/scripts/tests/browser-tools/index/package/lock/vite-config）をZIP展開＋`npm ci --offline`（キャッシュなし端末は事前に通常の`npm ci`）。raw素材の過去archiveやhostingキャッシュはビルド入力ではない。`scripts/reproduce-candidate.mjs` が通常／観察ON／OFFの生成物をSHA256比較する。Windows tarの日本語名展開失敗を受け、ZIP/.NET方式へ修正した。
 - 通常：`npm.cmd run build`→dist。観察：`node scripts/start-playtest.mjs --record`→5181、フラグOFF比較は同コマンド引数なし→5182。観察生成物はartifacts配下のみ。
 
 # Included Features

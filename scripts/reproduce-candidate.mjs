@@ -10,16 +10,21 @@ const root=fileURLToPath(new URL('../',import.meta.url));
 const out=path.join(root,'artifacts','candidate-1'); await fs.mkdir(out,{recursive:true});
 const commit=execFileSync('git',['rev-parse','HEAD'],{cwd:root}).toString().trim();
 const clean=await fs.mkdtemp(path.join(out,'clean-'));
-const archive=path.join(clean,'source.tar');
-execFileSync('git',['archive','--format=tar',`--output=${archive}`,commit],{cwd:root});
-const source=path.join(clean,'source');await fs.mkdir(source);
-execFileSync('tar',['-xf',archive,'-C',source]);
-const receipt={commit,node:process.version,startedAt:new Date().toISOString(),source,builds:{},status:'RUNNING'};
+const archive=path.join(clean,'source.zip');
+const source=path.join(clean,'source');
+const buildInputs=['src','public','scripts','tests','tools/kanji-defense-browser-cert','index.html','package.json','package-lock.json','vite.config.js'];
+const receipt={commit,node:process.version,startedAt:new Date().toISOString(),source,buildInputs,builds:{},status:'RUNNING'};
 async function hashOutputs(directory) {
   const names=(await fs.readdir(directory,{recursive:true})).filter(name=>name==='index.html'||/^(assets[\\/]).*\.(js|css|json)$/.test(name)).sort();
   return Object.fromEntries(await Promise.all(names.map(async name=>[name.replaceAll('\\','/'),createHash('sha256').update(await fs.readFile(path.join(directory,name))).digest('hex')])));
 }
 try {
+  // Explicit build closure excludes historical raw-art archives and hosting cache.
+  // Windows tar on this device cannot extract Japanese filenames; .NET ZIP can.
+  execFileSync('git',['archive','--format=zip',`--output=${archive}`,commit,'--',...buildInputs],{cwd:root});
+  if(process.platform==='win32')execFileSync('powershell.exe',['-NoProfile','-Command',
+    `Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('${archive.replaceAll("'","''")}','${source.replaceAll("'","''")}')`]);
+  else {await fs.mkdir(source);execFileSync('unzip',['-q',archive,'-d',source]);}
   await runLogged(process.platform==='win32'?'npm.cmd':'npm',['ci','--offline'],{cwd:source,logPath:path.join(out,'clean-npm-ci.log')});
   for(const [label,mode,flag,reference] of [
     ['production','production','1','dist'],
