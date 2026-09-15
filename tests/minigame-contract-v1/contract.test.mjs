@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { miniGameRegistry } from '../../src/minigames/registry.js';
-import { KANJI_DEFENSE_GOLDEN_CONTENT } from '../../src/minigames/kanjiDefense/kanjiDefenseContent.js';
+import { KANJI_DEFENSE_LIMITED_UX_CONTENT } from '../../src/minigames/kanjiDefense/kanjiDefenseContent.js';
 
 const seeded = (seed = 1) => () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
 const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameId].create({
@@ -173,7 +173,7 @@ test('all eight games commit learning state before notifying observers', async (
   assert.equal(defense.dispatch({ type: 'select', payload: { sessionId: 'defense-order',
     enemyId: defenseEnemy.enemyId, problemId: defenseEnemy.problemId } }), true);
   const defenseTarget = defense.snapshot().selectedEnemy;
-  const defenseAnswer = KANJI_DEFENSE_GOLDEN_CONTENT
+  const defenseAnswer = KANJI_DEFENSE_LIMITED_UX_CONTENT
     .find(item => item.fixtureId === defenseTarget.fixtureId)?.acceptedReadings[0];
   assert.ok(defenseAnswer, `Contract fixture missing: ${defenseTarget.fixtureId}`);
   assert.equal(defense.dispatch({ type: 'submit', payload: { sessionId: 'defense-order',

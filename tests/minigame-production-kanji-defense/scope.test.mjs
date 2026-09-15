@@ -9,8 +9,10 @@ const read = path => fs.readFileSync(path, 'utf8').replaceAll('\r\n', '\n');
 
 // This redesign supersedes the old title-only integration allowlist.
 // Preserve certified input/content/Core; the original scope-contract remains.
-test('certified defense Core, content and View remain byte unchanged', () => {
-  for (const file of ['kanjiDefenseGame.js','kanjiDefenseContent.js','kanjiDefenseView.js']) {
+// Content baseline intentionally expanded under user approval. Old content
+// preservation and all 120 records are separately certified in content-120 tests.
+test('certified defense Core and View remain byte unchanged across the Content 120 boundary', () => {
+  for (const file of ['kanjiDefenseGame.js','kanjiDefenseView.js']) {
     const path = 'src/minigames/kanjiDefense/' + file;
     assert.equal(read(path), git('show', '148553c48f18905ae5aed8c95354ef8792f4ae34:' + path), path);
   }

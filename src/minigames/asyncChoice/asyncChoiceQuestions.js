@@ -1,4 +1,6 @@
+import { ASYNC_CONTENT_ADDITIONS } from './asyncContent.js';
 const RAW_FIXTURE = [
+  ...ASYNC_CONTENT_ADDITIONS.map(q=>[q.id,q.prompt,q.options.map((text,i)=>[`option-${i+1}`,text]),'option-1',q.skillId]),
   ['freeze-water', '水がこおり始める温度は？', [['zero', '0度'], ['ten', '10度'], ['fifty', '50度'], ['hundred', '100度']], 'zero', 'science.matter'],
   ['triangle', '三角形の辺はいくつ？', [['two', '2本'], ['three', '3本'], ['four', '4本'], ['five', '5本']], 'three', 'math.geometry'],
   ['pacific', '日本の東に広がる海洋は？', [['atlantic', '大西洋'], ['indian', 'インド洋'], ['pacific', '太平洋'], ['arctic', '北極海']], 'pacific', 'social.geography'],
@@ -16,7 +18,7 @@ const RAW_FIXTURE = [
   ['largest-number', '最も大きい数は？', [['nineTenths', '0.9'], ['ninetyNineHundredths', '0.99'], ['one', '1'], ['oneTenth', '0.1']], 'one', 'math.decimals'],
   ['spring-month', '日本で春にあたる月は？', [['january', '1月'], ['april', '4月'], ['august', '8月'], ['december', '12月']], 'april', 'general.seasons'],
   ['kanji-river', '「川」の音読みは？', [['kawa', 'かわ'], ['sen', 'セン'], ['yama', 'やま'], ['sui', 'スイ']], 'sen', 'japanese.kanji'],
-  ['oxygen', '人が呼吸で取り入れる気体は？', [['oxygen', '酸素'], ['nitrogen', '窒素'], ['carbon', '二酸化炭素'], ['hydrogen', '水素']], 'oxygen', 'science.body'],
+  ['oxygen', '呼吸で取り入れ、体内で使う気体は？', [['oxygen', '酸素'], ['nitrogen', '窒素'], ['carbon', '二酸化炭素'], ['hydrogen', '水素']], 'oxygen', 'science.body'],
   ['rectangle', '長方形の角はいくつ？', [['two', '2つ'], ['three', '3つ'], ['four', '4つ'], ['six', '6つ']], 'four', 'math.geometry'],
   ['english-library', '英語「library」の意味は？', [['hospital', '病院'], ['library', '図書館'], ['station', '駅'], ['park', '公園']], 'library', 'english.vocabulary'],
 ];

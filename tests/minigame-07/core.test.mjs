@@ -17,8 +17,8 @@ const answer = (game, state, choiceId = state.problem.correctChoiceId) =>
 const next = (game, state) => game.dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem.problemId } });
 
 test('fixture and prepared questions are immutable, deterministic and identity-based', () => {
-  assert.equal(ASYNC_CHOICE_FIXTURE.length, 20); assert.ok(Object.isFrozen(ASYNC_CHOICE_FIXTURE));
-  assert.equal(new Set(ASYNC_CHOICE_FIXTURE.map(item => item.fixtureId)).size, 20);
+  assert.equal(ASYNC_CHOICE_FIXTURE.length, 120); assert.ok(Object.isFrozen(ASYNC_CHOICE_FIXTURE));
+  assert.equal(new Set(ASYNC_CHOICE_FIXTURE.map(item => item.fixtureId)).size, 120);
   for (const item of ASYNC_CHOICE_FIXTURE) { assert.ok(Object.isFrozen(item)); assert.ok(Object.isFrozen(item.choices));
     assert.ok(item.choices.length >= 3 && item.choices.length <= 4); assert.equal(new Set(item.choices.map(choice => choice.choiceId)).size, item.choices.length);
     assert.ok(item.choices.some(choice => choice.choiceId === item.correctChoiceId)); assert.ok(item.choices.every(choice => choice.choiceId !== choice.text)); }

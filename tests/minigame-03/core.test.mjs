@@ -12,7 +12,7 @@ const answerPayload = (state, choiceId = state.problem.correctChoiceId) => ({
 });
 
 test('probe fixture is explicit and deterministic: ten questions with four identity-based choices', () => {
-  assert.equal(ENGLISH_CHOICE_FIXTURE.length, 20);
+  assert.equal(ENGLISH_CHOICE_FIXTURE.length, 120); // Approved content expansion; original 20 retained.
   const first = generateEnglishChoiceQuestions({ sessionId: 'seed', random: seeded(7) });
   const second = generateEnglishChoiceQuestions({ sessionId: 'seed', random: seeded(7) });
   assert.deepEqual(first, second); assert.equal(first.length, 10);

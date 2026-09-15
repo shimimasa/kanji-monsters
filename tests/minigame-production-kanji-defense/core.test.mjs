@@ -8,7 +8,7 @@ import { buildKanjiDefenseSession, KANJI_DEFENSE_GOLDEN_CONTENT, KANJI_DEFENSE_L
 
 const seeded = (seed = 1) => () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
 const create = (options = {}) => createKanjiDefenseGame({ sessionId: 'kd-test', random: seeded(42), ...options });
-const readingFor = enemy => KANJI_DEFENSE_GOLDEN_CONTENT.find(item => item.fixtureId === enemy.fixtureId).acceptedReadings[0];
+const readingFor = enemy => KANJI_DEFENSE_LIMITED_UX_CONTENT.find(item => item.fixtureId === enemy.fixtureId).acceptedReadings[0];
 const select = (game, enemy = game.snapshot().enemies[0]) => game.dispatch({
   type: 'select', payload: { sessionId: game.snapshot().sessionId, enemyId: enemy.enemyId, problemId: enemy.problemId },
 });
@@ -39,9 +39,10 @@ test('golden focus IDs exist in current Grade 4 source', () => {
   for (const item of KANJI_DEFENSE_GOLDEN_CONTENT) for (const id of item.focusKanjiIds) assert.ok(ids.has(id), `${item.prompt}: ${id}`);
 });
 
-test('limited UX pool has exactly 21 pre-reviewed items and excludes all three known revisions', () => {
-  assert.equal(KANJI_DEFENSE_LIMITED_UX_CONTENT_VERSION, 'kanji-defense-limited-ux-playtest-pre-reviewed-v1');
-  assert.equal(KANJI_DEFENSE_LIMITED_UX_CONTENT.length, 21);
+test('CONTENT 120 BASELINE retains the 21 old items and excludes all three known revisions', () => {
+  assert.equal(KANJI_DEFENSE_LIMITED_UX_CONTENT_VERSION, 'kanji-defense-content-120-v1');
+  assert.equal(KANJI_DEFENSE_LIMITED_UX_CONTENT.length, 120);
+  assert.deepEqual(KANJI_DEFENSE_LIMITED_UX_CONTENT.slice(0,21), KANJI_DEFENSE_GOLDEN_CONTENT.filter(item=>!['kd-g4-003','kd-g4-004','kd-g4-011'].includes(item.fixtureId)));
   assert.equal(validateKanjiDefenseContent(KANJI_DEFENSE_LIMITED_UX_CONTENT), true);
   assert.deepEqual(KANJI_DEFENSE_LIMITED_UX_EXCLUDED_FIXTURE_IDS,
     ['kd-g4-003', 'kd-g4-004', 'kd-g4-011']);

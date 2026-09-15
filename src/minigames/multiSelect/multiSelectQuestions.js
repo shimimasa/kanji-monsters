@@ -1,10 +1,13 @@
-// Small, self-authored probe fixture. This is not a canonical curriculum dataset.
+import { MULTI_CONTENT_ADDITIONS } from './multiContent.js';
+// Canonical classification bank; original choice identities are retained.
 const RAW_FIXTURE = [
-  ['spring', '春に関係するものをすべて選ぼう', [['sakura', '桜', 1], ['entrance', '入学式', 1], ['horsetail', 'つくし', 1], ['snowman', '雪だるま', 0], ['autumnLeaves', '紅葉', 0]], 'general.seasons'],
+  ...MULTI_CONTENT_ADDITIONS.map(q=>[q.id,q.prompt,
+    [...q.yes.map((text,i)=>[`yes-${i+1}`,text,1]),...q.no.map((text,i)=>[`no-${i+1}`,text,0])],q.skillId]),
+  ['spring', '日本で主に春に見られるものは？', [['sakura', '桜', 1], ['entrance', '入学式', 1], ['horsetail', 'つくし', 1], ['snowman', '雪だるま', 0], ['autumnLeaves', '紅葉', 0]], 'general.seasons'],
   ['mammals', 'ほ乳類をすべて選ぼう', [['dog', '犬', 1], ['cat', '猫', 1], ['dolphin', 'イルカ', 1], ['frog', 'カエル', 0], ['sparrow', 'スズメ', 0]], 'science.animals'],
   ['kanto', '関東地方の都県をすべて選ぼう', [['tokyo', '東京都', 1], ['kanagawa', '神奈川県', 1], ['chiba', '千葉県', 1], ['osaka', '大阪府', 0], ['miyagi', '宮城県', 0]], 'social.prefectures'],
   ['verbs', '動詞をすべて選ぼう', [['run', '走る', 1], ['read', '読む', 1], ['eat', '食べる', 1], ['blue', '青い', 0], ['quiet', '静かだ', 0]], 'japanese.grammar'],
-  ['summer', '夏に関係するものをすべて選ぼう', [['sunflower', 'ひまわり', 1], ['cicada', 'せみ', 1], ['swimming', '海水浴', 1], ['snow', '雪', 0], ['acorn', 'どんぐり', 0]], 'general.seasons'],
+  ['summer', '日本で主に夏に見られるものは？', [['sunflower', 'ひまわり', 1], ['cicada', 'せみ', 1], ['swimming', '海水浴', 1], ['snow', '雪', 0], ['acorn', 'どんぐり', 0]], 'general.seasons'],
   ['birds', '鳥の仲間をすべて選ぼう', [['swallow', 'ツバメ', 1], ['penguin', 'ペンギン', 1], ['owl', 'フクロウ', 1], ['bat', 'コウモリ', 0], ['lizard', 'トカゲ', 0]], 'science.animals'],
   ['kyushu', '九州地方の県をすべて選ぼう', [['fukuoka', '福岡県', 1], ['nagasaki', '長崎県', 1], ['kagoshima', '鹿児島県', 1], ['ehime', '愛媛県', 0], ['shiga', '滋賀県', 0]], 'social.prefectures'],
   ['adjectives', '形容詞をすべて選ぼう', [['red', '赤い', 1], ['fun', '楽しい', 1], ['long', '長い', 1], ['walk', '歩く', 0], ['quietNoun', '静かだ', 0]], 'japanese.grammar'],
@@ -12,10 +15,10 @@ const RAW_FIXTURE = [
   ['solids', '常温で固体のものをすべて選ぼう', [['iron', '鉄', 1], ['salt', '食塩', 1], ['glass', 'ガラス', 1], ['water', '水', 0], ['oxygen', '酸素', 0]], 'science.matter'],
   ['chubu', '中部地方の県をすべて選ぼう', [['niigata', '新潟県', 1], ['aichi', '愛知県', 1], ['nagano', '長野県', 1], ['okayama', '岡山県', 0], ['iwate', '岩手県', 0]], 'social.prefectures'],
   ['nouns', '名詞をすべて選ぼう', [['school', '学校', 1], ['friend', '友達', 1], ['sky', '空', 1], ['write', '書く', 0], ['bright', '明るい', 0]], 'japanese.grammar'],
-  ['autumn', '秋に関係するものをすべて選ぼう', [['moonViewing', '月見', 1], ['chestnut', 'くり', 1], ['riceHarvest', '稲刈り', 1], ['cherry', '桜', 0], ['newYear', '正月', 0]], 'general.seasons'],
+  ['autumn', '日本で主に秋に見られるものは？', [['moonViewing', '月見', 1], ['chestnut', 'くり', 1], ['riceHarvest', '稲刈り', 1], ['cherry', '桜', 0], ['newYear', '正月', 0]], 'general.seasons'],
   ['fish', '魚の仲間をすべて選ぼう', [['tuna', 'マグロ', 1], ['salmon', 'サケ', 1], ['seahorse', 'タツノオトシゴ', 1], ['whale', 'クジラ', 0], ['octopus', 'タコ', 0]], 'science.animals'],
   ['shikoku', '四国地方の県をすべて選ぼう', [['kagawa', '香川県', 1], ['tokushima', '徳島県', 1], ['kochi', '高知県', 1], ['hyogo', '兵庫県', 0], ['oita', '大分県', 0]], 'social.prefectures'],
-  ['winter', '冬に関係するものをすべて選ぼう', [['snowmanWinter', '雪だるま', 1], ['newYearWinter', '正月', 1], ['heating', '暖房', 1], ['swimmingWinter', '海水浴', 0], ['cicadaWinter', 'せみ', 0]], 'general.seasons'],
+  ['winter', '日本で主に冬に見られるものは？', [['snowmanWinter', '雪だるま', 1], ['newYearWinter', '正月', 1], ['heating', '暖房', 1], ['swimmingWinter', '海水浴', 0], ['cicadaWinter', 'せみ', 0]], 'general.seasons'],
   ['planets', '太陽のまわりを回る惑星をすべて選ぼう', [['earth', '地球', 1], ['mars', '火星', 1], ['jupiter', '木星', 1], ['moon', '月', 0], ['sun', '太陽', 0]], 'science.space'],
   ['kinki', '近畿地方の府県をすべて選ぼう', [['kyoto', '京都府', 1], ['nara', '奈良県', 1], ['wakayama', '和歌山県', 1], ['yamaguchi', '山口県', 0], ['akita', '秋田県', 0]], 'social.prefectures'],
   ['pastTense', '英語の過去形をすべて選ぼう', [['went', 'went', 1], ['played', 'played', 1], ['saw', 'saw', 1], ['go', 'go', 0], ['playing', 'playing', 0]], 'english.grammar'],

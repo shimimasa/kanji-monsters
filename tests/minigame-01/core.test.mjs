@@ -18,16 +18,17 @@ test('generator: deterministic ten, 5+5, legal operands and answers, no exact du
     assert.equal(new Set(questions.map(q => `${q.a}:${q.operation}:${q.b}`)).size, 10);
     for (const q of questions) {
       assert.ok(Number.isInteger(q.a) && Number.isInteger(q.b));
-      assert.ok(q.a >= 1 && q.a <= (q.operation === 'addition' ? 8 : 9));
-      assert.ok(q.b >= 1 && q.b <= (q.operation === 'addition' ? 9 - q.a : q.a));
+      assert.ok(q.a >= 1 && q.a <= (q.operation === 'addition' ? 19 : 20));
+      assert.ok(q.b >= 1 && q.b <= (q.operation === 'addition' ? 20 - q.a : q.a));
       assert.equal(q.answer, q.operation === 'addition' ? q.a + q.b : q.a - q.b);
-      assert.ok(q.answer >= 0 && q.answer <= 9);
+      assert.ok(q.answer >= 0 && q.answer <= 20);
     }
   }
 });
-test('generator: constant random terminates with exactly 88 calls, invalid RNG fails boundedly', () => {
+test('generator: content-120 constant random terminates with exactly 132 calls, invalid RNG fails boundedly', () => {
   let calls = 0; generateSessionProblems({ sessionId: 's', random: () => { calls++; return 0; } });
-  assert.equal(calls, 88);
+  // 120 canonical pool shuffles + ten-question shuffle + selected legacy variants.
+  assert.equal(calls, 132);
   for (const invalid of [1, -1, NaN, Infinity]) assert.throws(() => generateSessionProblems({ random: () => invalid }), RangeError);
 });
 for (const [raw, expected] of [[' ０ ',0], ['１２',12], ['9',9], ['00',0], ['',null], ['  ',null],

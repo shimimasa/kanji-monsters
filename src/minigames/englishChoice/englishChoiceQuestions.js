@@ -1,4 +1,5 @@
-// Small, self-authored probe fixture. This is not the canonical English curriculum.
+import { ENGLISH_CONTENT_ADDITIONS,englishCategory } from './englishContent.js';
+// Canonical local vocabulary bank; original IDs and meanings are retained.
 export const ENGLISH_CHOICE_FIXTURE = Object.freeze([
   ['apple', 'apple', 'りんご'],
   ['book', 'book', '本'],
@@ -20,6 +21,7 @@ export const ENGLISH_CHOICE_FIXTURE = Object.freeze([
   ['small', 'small', '小さい'],
   ['morning', 'morning', '朝'],
   ['night', 'night', '夜'],
+  ...ENGLISH_CONTENT_ADDITIONS.map(({word,meaning}) => [word,word,meaning]),
 ].map(([id, prompt, meaning]) => Object.freeze({ id, prompt, meaning })));
 
 function takeRandom(random) {
@@ -44,9 +46,12 @@ export function generateEnglishChoiceQuestions({ sessionId, random = Math.random
   if (typeof random !== 'function') throw new TypeError('random must be a function');
   const selected = shuffled(ENGLISH_CHOICE_FIXTURE, random).slice(0, 10);
   return Object.freeze(selected.map((entry, index) => {
-    const distractors = shuffled(
-      ENGLISH_CHOICE_FIXTURE.filter(candidate => candidate.id !== entry.id), random,
-    ).slice(0, 3);
+    // Two same-topic meanings plus one other-topic meaning; no synonym traps.
+    const candidates = ENGLISH_CHOICE_FIXTURE.filter(candidate => candidate.id !== entry.id && candidate.meaning !== entry.meaning);
+    const category = englishCategory(entry.prompt);
+    const related = shuffled(candidates.filter(candidate=>englishCategory(candidate.prompt)===category),random).slice(0,2);
+    const outside = shuffled(candidates.filter(candidate=>englishCategory(candidate.prompt)!==category),random).slice(0,3-related.length);
+    const distractors = [...related,...outside];
     const choices = shuffled([entry, ...distractors], random).map(candidate => Object.freeze({
       choiceId: `meaning:${candidate.id}`,
       text: candidate.meaning,

@@ -13,9 +13,9 @@ const submit = (game, state) => game.dispatch({ type: 'submit', payload: identit
 const next = (game, state) => game.dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem.problemId } });
 const choose = (game, state, ids) => ids.forEach(id => assert.equal(toggle(game, game.snapshot(), id), true));
 
-test('self-authored fixture has 20 immutable, unique, identity-based questions', () => {
-  assert.equal(MULTI_SELECT_FIXTURE.length, 20); assert.ok(Object.isFrozen(MULTI_SELECT_FIXTURE));
-  assert.equal(new Set(MULTI_SELECT_FIXTURE.map(item => item.fixtureId)).size, 20);
+test('content-120 fixture has 120 immutable, unique, identity-based questions', () => {
+  assert.equal(MULTI_SELECT_FIXTURE.length, 120); assert.ok(Object.isFrozen(MULTI_SELECT_FIXTURE));
+  assert.equal(new Set(MULTI_SELECT_FIXTURE.map(item => item.fixtureId)).size, 120);
   for (const item of MULTI_SELECT_FIXTURE) {
     assert.ok(Object.isFrozen(item)); assert.ok(Object.isFrozen(item.choices)); assert.ok(Object.isFrozen(item.correctChoiceIds));
     assert.ok(item.prompt); assert.ok(item.skillId); assert.ok(item.choices.length >= 4 && item.choices.length <= 6);

@@ -1,4 +1,5 @@
-// Small, self-authored probe fixture. This is not the canonical kanji curriculum.
+import { TIMED_CONTENT_ADDITIONS } from './timedContent.js';
+// Canonical short-word recognition bank, distinct from typed defense content.
 export const TIMED_CHOICE_FIXTURE = Object.freeze([
   ['anzen', '安全', 'あんぜん'],
   ['kibou', '希望', 'きぼう'],
@@ -20,6 +21,7 @@ export const TIMED_CHOICE_FIXTURE = Object.freeze([
   ['koutsuu', '交通', 'こうつう'],
   ['tosho', '図書', 'としょ'],
   ['ongaku', '音楽', 'おんがく'],
+  ...TIMED_CONTENT_ADDITIONS.map(q=>[q.fixtureId,q.word,q.reading]),
 ].map(([fixtureId, word, reading]) => Object.freeze({ fixtureId, word, reading })));
 
 function takeRandom(random) {

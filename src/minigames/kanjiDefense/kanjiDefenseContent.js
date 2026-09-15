@@ -1,3 +1,4 @@
+import { KANJI_DEFENSE_CONTENT_ADDITIONS } from './kanjiDefenseContent120.js';
 const freezeItem = item => Object.freeze({
   ...item,
   acceptedReadings: Object.freeze([...item.acceptedReadings]),
@@ -31,7 +32,9 @@ export const KANJI_DEFENSE_GOLDEN_CONTENT = Object.freeze([
   { fixtureId: 'kd-g4-024', prompt: '季節', acceptedReadings: ['きせつ'], focusKanjiIds: ['g4-035', 'g4-116'], meaning: '春夏秋冬のそれぞれの時期', hint: '春・夏・秋・冬' },
 ].map(item => freezeItem({ ...item, skillId: 'kanji-reading-g4' })));
 
-export const KANJI_DEFENSE_LIMITED_UX_CONTENT_VERSION = 'kanji-defense-limited-ux-playtest-pre-reviewed-v1';
+// OLD CONTENT BASELINE is the unchanged GOLDEN array minus the exclusions below.
+// CONTENT 120 BASELINE adds reviewed entries without changing validation or Core.
+export const KANJI_DEFENSE_LIMITED_UX_CONTENT_VERSION = 'kanji-defense-content-120-v1';
 export const KANJI_DEFENSE_LIMITED_UX_EXCLUDED_FIXTURE_IDS = Object.freeze([
   'kd-g4-003', // 以下: meaning and short-reading hint require Human Content Review
   'kd-g4-004', // 位置: short-reading hint requires Human Content Review
@@ -39,7 +42,8 @@ export const KANJI_DEFENSE_LIMITED_UX_EXCLUDED_FIXTURE_IDS = Object.freeze([
 ]);
 const limitedUxExcludedIds = new Set(KANJI_DEFENSE_LIMITED_UX_EXCLUDED_FIXTURE_IDS);
 export const KANJI_DEFENSE_LIMITED_UX_CONTENT = Object.freeze(
-  KANJI_DEFENSE_GOLDEN_CONTENT.filter(item => !limitedUxExcludedIds.has(item.fixtureId)),
+  [...KANJI_DEFENSE_GOLDEN_CONTENT.filter(item => !limitedUxExcludedIds.has(item.fixtureId)),
+    ...KANJI_DEFENSE_CONTENT_ADDITIONS],
 );
 
 export const KANJI_DEFENSE_MONSTERS = Object.freeze([

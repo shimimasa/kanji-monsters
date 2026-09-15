@@ -12,10 +12,10 @@ const answerPayload = (state, choiceId = state.problem.correctChoiceId) => ({
 });
 const nextPayload = state => ({ sessionId: state.sessionId, problemId: state.problem.problemId });
 
-test('self-authored fixture contains 20 unique identity-based vocabulary entries', () => {
-  assert.equal(TIMED_CHOICE_FIXTURE.length, 20); assert.ok(Object.isFrozen(TIMED_CHOICE_FIXTURE));
-  assert.equal(new Set(TIMED_CHOICE_FIXTURE.map(entry => entry.fixtureId)).size, 20);
-  assert.equal(new Set(TIMED_CHOICE_FIXTURE.map(entry => entry.reading)).size, 20);
+test('content-120 fixture contains 120 unique identity-based vocabulary entries', () => {
+  assert.equal(TIMED_CHOICE_FIXTURE.length, 120); assert.ok(Object.isFrozen(TIMED_CHOICE_FIXTURE));
+  assert.equal(new Set(TIMED_CHOICE_FIXTURE.map(entry => entry.fixtureId)).size, 120);
+  assert.equal(new Set(TIMED_CHOICE_FIXTURE.map(entry => entry.reading)).size, 120);
   for (const entry of TIMED_CHOICE_FIXTURE) {
     assert.match(entry.fixtureId, /^[a-z0-9]+$/); assert.ok(entry.word); assert.ok(entry.reading);
     assert.ok(Object.isFrozen(entry));

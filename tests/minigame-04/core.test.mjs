@@ -20,8 +20,8 @@ function solve(game) {
   }
 }
 
-test('self-authored fixture has 20 valid identity-based problems with 3-6 chunks', () => {
-  assert.equal(SENTENCE_ORDER_FIXTURE.length, 20); assert.ok(Object.isFrozen(SENTENCE_ORDER_FIXTURE));
+test('content-120 fixture has 120 valid identity-based problems with 3-6 chunks', () => {
+  assert.equal(SENTENCE_ORDER_FIXTURE.length, 120); assert.ok(Object.isFrozen(SENTENCE_ORDER_FIXTURE));
   for (const entry of SENTENCE_ORDER_FIXTURE) {
     assert.match(entry.fixtureId, /^[a-z0-9-]+$/); assert.ok(entry.prompt); assert.ok(entry.skillId);
     assert.ok(entry.chunks.length >= 3 && entry.chunks.length <= 6); assert.ok(Object.isFrozen(entry.chunks));

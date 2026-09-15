@@ -4,12 +4,12 @@ import fs from 'node:fs';
 import { createMiniGameHost } from '../../src/minigames/miniGameHost.js';
 import { miniGameRegistry } from '../../src/minigames/registry.js';
 import { createCompanionAdapter } from '../../src/minigames/companionAdapter.js';
-import { KANJI_DEFENSE_GOLDEN_CONTENT } from '../../src/minigames/kanjiDefense/kanjiDefenseContent.js';
+import { KANJI_DEFENSE_LIMITED_UX_CONTENT } from '../../src/minigames/kanjiDefense/kanjiDefenseContent.js';
 import { installStorage } from '../phase-a/storage-helper.mjs';
 
 const drain = () => new Promise(resolve => setImmediate(resolve));
 const companionImage = { complete: true, naturalWidth: 512, naturalHeight: 512 };
-const readingFor = enemy => KANJI_DEFENSE_GOLDEN_CONTENT.find(item => item.fixtureId === enemy.fixtureId).acceptedReadings[0];
+const readingFor = enemy => KANJI_DEFENSE_LIMITED_UX_CONTENT.find(item => item.fixtureId === enemy.fixtureId).acceptedReadings[0];
 
 function dom() {
   const nodes = [];
