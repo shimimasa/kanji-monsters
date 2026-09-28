@@ -12,32 +12,63 @@ import { createCompanionMemoryDialog } from '../ui/companionMemoryDialog.js';
 import { createLearningNotebookDialog } from '../ui/learningNotebookDialog.js';
 import { companionCourse } from '../minigames/companionCourses.js';
 
+const PACE_KEY = 'yomitabi.minigamePace';
+const readPace = () => { try { return localStorage.getItem(PACE_KEY) === 'slow' ? 'slow' : 'normal'; } catch { return 'normal'; } };
+const writePace = value => { try { localStorage.setItem(PACE_KEY, value); } catch { /* A preference only. */ } };
+
 const hub = {
   enter(props = {}) {
     this.exit();
     const doc = document, root = element(doc, 'section', 'yt-world yt-hub'); root.id = 'miniGameHub';
     root.setAttribute('aria-label', 'ミニゲーム広場');
     const wrap = element(doc, 'div', 'yt-hub-content'), header = element(doc, 'header', 'yt-hub-header');
-    header.append(element(doc, 'div', '', 'ヨミタビ / 旅のよりみち'), button(doc, 'タイトルへ', () => publish('changeScreen', 'title')));
-    wrap.append(header, element(doc, 'h1', '', 'ミニゲーム広場'), element(doc, 'p', 'yt-hub-lead', '今日の相棒と、ひと勝負。'));
-    const selected = gotomonService.getSelectedGotomon(), owned = gotomonService.getOwnedGotomon();
+    const heading = element(doc, 'div', 'yt-hub-heading');
+    heading.append(element(doc, 'small', '', 'ヨミタビ / 旅のよりみち'), element(doc, 'h1', '', 'ミニゲーム広場'));
+    const tools = element(doc, 'div', 'yt-hub-tools');
+    const selected = gotomonService.getSelectedGotomon();
+    if (selected) {
+      const memories = button(doc, '思い出', () => this.showMemories(), 'yt-memory-open');
+      memories.dataset.action = 'memories'; tools.append(memories);
+    }
+    const notebook = button(doc, '学習ノート', () => this.showLearningNotebook());
+    notebook.dataset.action = 'learning-notebook';
+    tools.append(notebook, button(doc, 'タイトルへ', () => publish('changeScreen', 'title')));
+    header.append(heading, tools); wrap.append(header);
+    // The companion is one slim bar: every game is played with it, so cards don't repeat it.
     const banner = element(doc, 'div', 'yt-friend-banner');
     if (selected) {
       const growth = gotomonService.getGrowth(selected.id), details = element(doc, 'div', 'yt-friend-growth');
       details.append(element(doc, 'strong', '', `${selected.name} Lv${growth.level}`));
       const track = element(doc, 'progress', 'yt-xp'); track.max = 1; track.value = growth.fraction; track.setAttribute('aria-label', '次のレベルまでの経験値');
       details.append(track, element(doc, 'small', '', growth.remaining ? `あと${growth.remaining} XPでLv${growth.level + 1}` : 'MASTER · 育ちきった旅の相棒'));
-      banner.append(companionPortrait(doc, selected), details);
-      const memories = button(doc, '思い出を見る', () => this.showMemories(), 'yt-memory-open');
-      memories.dataset.action = 'memories'; banner.append(memories);
+      banner.append(companionPortrait(doc, selected), details, element(doc, 'p', 'yt-friend-cheer', 'いっしょに あそぼう！'));
     }
     else banner.append(element(doc, 'p', '', '相棒は、冒険のステージをクリアして捕まえよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title'), 'yt-primary'));
     wrap.append(banner);
-    const notebook = button(doc, '学習ノートを見る', () => this.showLearningNotebook());
-    notebook.dataset.action = 'learning-notebook'; wrap.append(notebook);
     const reviewCount = englishLearningService.getReviewIds().length, progress = gotomonService.getProgress();
     const suggestions = hubRecommendations({ gameIds: Object.keys(miniGameRegistry), progress, reviewCount,
       sentenceReviewCount: sentenceLearningService.getReviewIds().length, timedReviewCount: timedLearningService.getReviewIds().length });
+    const grid = element(doc, 'div', 'yt-game-grid');
+    for (const definition of Object.values(miniGameRegistry)) {
+      const info = gameExperiences[definition.id], card = button(doc, '', () => this.selectGame(definition), 'yt-game-card');
+      card.dataset.gameId = definition.id; card.dataset.arcade = String(!!info.arcade); card.style.setProperty('--accent', info.color);
+      const stats = progress.games?.[definition.id];
+      const art = element(doc, 'span', 'yt-card-art'); art.dataset.scene = info.scene;
+      art.append(element(doc, 'span', 'yt-card-icon', info.icon));
+      if (info.badge) art.append(element(doc, 'span', 'yt-card-badge', info.badge));
+      if (stats?.bestRank) { const medal = element(doc, 'span', 'yt-card-medal', stats.bestRank); medal.dataset.rank = stats.bestRank; art.append(medal); }
+      const body = element(doc, 'span', 'yt-card-body');
+      body.append(element(doc, 'strong', 'yt-card-title', definition.title), element(doc, 'span', 'yt-card-description', info.description));
+      const tags = element(doc, 'span', 'yt-card-meta');
+      for (const tag of [info.genre, info.difficulty, info.time]) tags.append(element(doc, 'span', '', tag));
+      body.append(tags);
+      const featuredCourse = companionCourse(selected, definition.id);
+      if (featuredCourse) body.append(element(doc, 'span', 'yt-card-course', `★ 得意コース：${featuredCourse.name}`));
+      body.append(element(doc, 'small', 'yt-card-record', stats ? `BEST ${stats.bestScore} pt · ${stats.plays}回あそんだ` : 'はじめての記録をつくろう'));
+      card.append(art, body);
+      grid.append(card);
+    }
+    wrap.append(grid);
     if (selected && suggestions.length) {
       const recommendation = element(doc, 'section', 'yt-recommendations');
       recommendation.setAttribute('aria-label', '今日のおすすめ');
@@ -47,6 +78,7 @@ const hub = {
         const definition = miniGameRegistry[suggestion.gameId];
         const card = button(doc, '', () => this.selectGame(definition, { review: !!suggestion.review }), 'yt-recommendation');
         card.dataset.recommendation = suggestion.kind;
+        card.style.setProperty('--accent', gameExperiences[definition.id].color);
         card.setAttribute('aria-label', `${suggestion.action}：${definition.title}`);
         card.append(element(doc, 'small', '', suggestion.label), element(doc, 'strong', '', definition.title),
           element(doc, 'span', '', suggestion.reason), element(doc, 'span', 'yt-recommendation-action', suggestion.action));
@@ -55,24 +87,9 @@ const hub = {
       recommendation.append(list);
       wrap.append(recommendation);
     }
-    const grid = element(doc, 'div', 'yt-game-grid');
-    for (const definition of Object.values(miniGameRegistry)) {
-      const info = gameExperiences[definition.id], card = button(doc, '', () => this.selectGame(definition), 'yt-game-card');
-      card.dataset.gameId = definition.id; card.style.setProperty('--accent', info.color);
-      card.append(element(doc, 'span', 'yt-card-icon', info.icon), element(doc, 'span', 'yt-card-meta', `${info.genre} · ${info.difficulty} · ${info.time}`),
-        element(doc, 'strong', 'yt-card-title', definition.title), element(doc, 'span', 'yt-card-description', info.description));
-      const foot = element(doc, 'span', 'yt-card-foot');
-      if (selected) foot.append(companionPortrait(doc, selected));
-      foot.append(element(doc, 'span', '', selected?.name || '冒険で相棒を見つけよう'));
-      const featuredCourse = companionCourse(selected, definition.id);
-      if (featuredCourse) card.append(element(doc, 'span', 'yt-card-course', `★ ${selected.name}の得意コース：${featuredCourse.name}`));
-      const stats = progress.games?.[definition.id];
-      card.append(foot, element(doc, 'small', 'yt-card-record', stats ? `${stats.bestRank || 'C'} RANK · BEST ${stats.bestScore} · ${stats.plays}回` : 'はじめての記録をつくろう'));
-      grid.append(card);
-    }
-    wrap.append(grid, element(doc, 'p', 'yt-note', '遊ぶと相棒が成長し、技が少し強くなる。新しい仲間は、本編の新しい土地で。'));
+    wrap.append(element(doc, 'p', 'yt-note', '遊ぶと相棒が成長し、技が少し強くなる。新しい仲間は、本編の新しい土地で。'));
     root.append(wrap); doc.body.append(root); this.root = root; this.restore = isolateScreen(doc, root);
-    header.querySelector('button').focus();
+    grid.querySelector('button').focus({ preventScroll: true });
     if (PLAYTEST_ENABLED) trackPlaytest('hubShown', {});
     if (props?.notebookContext) this.showLearningNotebook(props.notebookContext);
   },
@@ -104,7 +121,8 @@ const hub = {
     const steps = element(doc, 'ol');
     for (const step of gameExperiences[definition.id].howTo) steps.append(element(doc, 'li', '', step));
     guide.append(steps);
-    dialog.append(guide);
+    // Arcade games explain themselves on an intro card right before play.
+    if (!gameExperiences[definition.id].arcade) dialog.append(guide);
     if (!playOptions.review && ['englishChoice', 'timedChoice', 'sentenceOrder'].includes(definition.id)) {
       dialog.append(element(doc, 'p', 'yt-note', '記録に合わせて、まちがえた問題・まだ解いていない問題・前に正解した問題を組み合わせます。'));
     }
@@ -119,6 +137,20 @@ const hub = {
       }
       select.onchange = () => { sentenceLevel = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', 'どちらも10問。挑戦コースは10文を順番を変えて出題します。得点・ランク・相棒の記録は共通です。'));
+    }
+    // Real-time games offer ゆっくり: slower enemies/runner for children who need time.
+    let pace = readPace();
+    if (gameExperiences[definition.id].paced && !playOptions.review) {
+      const paceBox = element(doc, 'div', 'yt-pace'); paceBox.setAttribute('role', 'radiogroup'); paceBox.setAttribute('aria-label', 'はやさ');
+      paceBox.append(element(doc, 'span', 'yt-pace-label', 'はやさ'));
+      const choices = [['normal', 'ふつう', 'いつものはやさ'], ['slow', 'ゆっくり', '敵や相棒がゆっくり動く']].map(([value, label, hint]) => {
+        const choice = button(doc, '', () => { pace = value; writePace(value); sync(); }, 'yt-pace-choice');
+        choice.setAttribute('role', 'radio'); choice.dataset.pace = value;
+        choice.append(element(doc, 'strong', '', label), element(doc, 'small', '', hint));
+        paceBox.append(choice); return choice;
+      });
+      const sync = () => choices.forEach(choice => choice.setAttribute('aria-checked', String(choice.dataset.pace === pace)));
+      sync(); dialog.append(paceBox);
     }
     const owned = gotomonService.getOwnedGotomon(), selected = gotomonService.getSelectedGotomon();
     let selectedId = selected?.id;
@@ -138,6 +170,7 @@ const hub = {
       if (!result.ok) { message.textContent = '相棒を保存できませんでした。保存状態を確認して、もう一度お試しください。'; return; }
       dialog.close(); publish('changeScreen', { name: 'miniGame', props: { ...playOptions, gameId: definition.id, gotomonId: selectedId,
         courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
+        ...(gameExperiences[definition.id].paced ? { pace } : {}),
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');
