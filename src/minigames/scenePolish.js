@@ -12,6 +12,9 @@ export function createFindings(doc, count) {
 // Small, clock-driven presentation additions. No answer logic or independent timer.
 export function installScenePolish({doc,root,stage,scene,actor,board,info}) {
   const pop=element(doc,'span','gt-score-pop');pop.setAttribute('aria-hidden','true');(board||scene).append(pop);
+  const event=element(doc,'div','gt-world-event');event.setAttribute('aria-hidden','true');(board||scene).append(event);
+  const landmark=!board?element(doc,'div','gt-landmark'):null;
+  if(landmark){landmark.setAttribute('aria-hidden','true');scene.prepend(landmark);}
   const impact=board?element(doc,'span','gt-impact'):null;if(impact){impact.setAttribute('aria-hidden','true');board.append(impact);}
   const collection=['explore','treasure'].includes(info.scene)?createFindings(doc,info.scene==='explore'?5:4):null;
   const hint=info.scene==='explore'?element(doc,'p','gt-route-hint'):null;
@@ -45,11 +48,18 @@ export function installScenePolish({doc,root,stage,scene,actor,board,info}) {
     if(answerChanged||boostChanged){
       const hit=play.correct>correct;pop.textContent=hit||play.score>score?`+${play.score-score}${hit&&play.combo>=3?' CHAIN!':''}`:'つぎのチャンスへ';
       pop.style.left=actor.style.left||'50%';animate(pop);
+      if(state.mode!=='review'){
+        const success={race:'ダッシュ！',shoot:'命中！',treasure:'扉が開いた！',bridge:'橋がつながった！',lantern:'光が届いた！',craft:'星が輝いた！',explore:'発見！',defend:'防衛成功！'};
+        event.textContent=boostChanged&&!answerChanged?'相棒の技、発動！':hit?(success[info.scene]||'成功！'):'もう一度、挑戦！';
+        event.dataset.tone=boostChanged&&!answerChanged?'skill':hit?'success':'retry';
+        animate(event);
+      }
       if(impact&&hit){impact.style.left=`${((world.hitLane??state.lastResolution?.lane??1)+.5)*100/3}%`;impact.style.top=`${Math.max(15,Math.min(75,(world.hitY??.35)*100))}%`;impact.dataset.chain=String(play.combo>=3);animate(impact);}
       if(info.scene==='bridge'&&hit){scene.dataset.crossing='true';animate(actor);}
     }
     if(info.scene==='bridge'&&problem!==state.problem?.problemId){scene.dataset.crossing='false';problem=state.problem?.problemId;}
     if(info.scene==='bridge'){actor.style.left='9%';scene.classList.toggle('gt-whole-bridge',!!state.lastAnswer?.correct);}
+    scene.style.setProperty('--world-gap',`${(1-Math.max(0,Math.min(1,world.progress||0)))*30}%`);
     if(world.bossHp===0&&bossAlive){bossAlive=false;scene.dataset.bossDefeated='true';}
     if(hint)hint.textContent=world.hint||'';
     collection?.update(world.findings);

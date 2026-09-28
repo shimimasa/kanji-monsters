@@ -40,6 +40,7 @@ export function createCompanionScene({ doc, root, info, gotomon, act }) {
     scene.dataset.mode=state.paused?'paused':world.fever||world.boostMs>0?'fever':world.danger?'danger':world.progress>=.8?'climax':play.combo>=3?'combo':'normal';
     if(board)board.dataset.mode=scene.dataset.mode;
     scene.dataset.reaction=actor.dataset.reaction=state.paused?'idle':play.reaction;
+    if(board)board.dataset.reaction=scene.dataset.reaction;
     if(revision!==play.revision) {
       revision=play.revision;
       for(const node of [actor,particles]) {node.style.animation='none';void node.offsetWidth;node.style.animation='';}

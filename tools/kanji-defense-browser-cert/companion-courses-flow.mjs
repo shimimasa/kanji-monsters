@@ -81,16 +81,22 @@ try {
     await page.setViewportSize({ width: 768, height: 900 });
     expect(await page.locator('.yt-game').evaluate(root => root.scrollWidth <= root.clientWidth + 2 && root.scrollHeight <= root.clientHeight + 2)).toBe(true);
     await page.screenshot({ path: fileURLToPath(new URL(`${gameId}-wide.png`, out)), fullPage: true });
+    await page.setViewportSize({ width: 1920, height: 950 });
+    expect(await page.locator('.yt-game').evaluate(root => root.scrollWidth <= root.clientWidth + 2 && root.scrollHeight <= root.clientHeight + 2)).toBe(true);
+    await page.screenshot({ path: fileURLToPath(new URL(`${gameId}-desktop.png`, out)), fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });
     if (gameId === 'mathSprint') {
       await page.locator('.gt-play-controls .ms-answer-row input').fill('0');
       await page.locator('.gt-play-controls .ms-answer-row input').press('Enter');
       await expect(page.locator('.gt-play-controls .ms-feedback')).not.toBeEmpty();
+      await expect(page.locator('.gt-world-event')).not.toBeEmpty();
+      await page.screenshot({ path: fileURLToPath(new URL('mathSprint-feedback.png', out)), fullPage: true });
     }
     if (gameId === 'englishChoice') {
       await page.locator('.gt-play-controls .ec-choice').first().focus();
       await page.keyboard.press('1');
       await expect(page.locator('.gt-play-controls .ec-feedback')).not.toBeEmpty();
+      await expect(page.locator('.gt-world-event')).not.toBeEmpty();
     }
     await page.locator('[data-action=back]').click();
     await expect(page.locator('#miniGameHub')).toBeVisible();
