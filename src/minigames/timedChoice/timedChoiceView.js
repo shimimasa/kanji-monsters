@@ -104,7 +104,9 @@ export function createTimedChoiceView({ document: doc, onBack, onReplay, onNext,
         }
         feedback.textContent = state.lastAnswer.reason === 'timeout'
           ? `時間切れ。こたえは「${correctChoice?.text ?? ''}」だよ`
-          : state.lastAnswer.correct ? 'せいかい！' : `こたえは「${correctChoice?.text ?? ''}」だよ`;
+          : state.lastAnswer.correct
+            ? state.mode === 'review' ? `せいかい！「${problem?.prompt ?? ''}」は「${correctChoice?.text ?? ''}」` : 'せいかい！'
+            : `こたえは「${correctChoice?.text ?? ''}」だよ`;
       } else feedback.textContent = '';
       const remaining = Math.max(0, state.remainingMs);
       const percent = state.deadlineMs > 0 ? Math.min(100, remaining / state.deadlineMs * 100) : 0;

@@ -37,13 +37,29 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, onPa
     }
   }, 'gt-button'));
   header.after(soundPanel);
+  const howTo = element(doc, 'details', 'gt-how-to');
+  const howToSummary = element(doc, 'summary', '', 'あそびかた');
+  const howToList = element(doc, 'ol');
+  for (const step of info.howTo) howToList.append(element(doc, 'li', '', step));
+  howTo.append(howToSummary, howToList);
+  soundPanel.after(howTo);
+  howTo.addEventListener('keydown', event => event.stopPropagation());
+  howTo.addEventListener('toggle', () => {
+    if (howTo.open && !state?.paused && !state?.result) {
+      helpAutoPaused = true;
+      onPause(true);
+    } else if (!howTo.open && helpAutoPaused) {
+      helpAutoPaused = false;
+      onPause(false);
+    }
+  });
   const hud = element(doc, 'div', 'gt-hud'), name = element(doc, 'span', 'gt-friend-name', gotomon?.name || '相棒なし');
   const score = element(doc, 'strong'), combo = element(doc, 'span');
   name.textContent = `${gotomon?.name || '相棒'} Lv${play.snapshot().growth.level}`;
   hud.append(name, score, combo);
   const skill = button(doc, '', onBoost, 'gt-button gt-skill'); skill.dataset.action = 'boost';
   const gauge = element(doc, 'meter'); gauge.min = 0; gauge.max = 3; gauge.value = 0; gauge.setAttribute('aria-label', '相棒ゲージ');
-  const skillLabel = element(doc, 'span'); skill.append(gauge, skillLabel); hud.append(skill); soundPanel.after(hud);
+  const skillLabel = element(doc, 'span'); skill.append(gauge, skillLabel); hud.append(skill); howTo.after(hud);
   const scene = createCompanionScene({ doc, root, info, gotomon, act: onAct }); hud.after(scene.root);
   if(info.scene==='lantern')scene.root.querySelector('.gt-scene').append(skill);
   const help = element(doc, 'p', 'gt-help', info.goal); scene.root.after(help);
@@ -94,6 +110,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, onPa
   result.append(resultDetails);
   resultDetails.append(button(doc, '新しい相棒を探しに冒険へ', () => { onBack(); publish('changeScreen', 'title'); }, 'gt-button'));
   let state = null, receipt = null, resultShown = false, soundAnswers=0,soundBoosts=0,soundComplete=false;
+  let helpAutoPaused = false;
   let feedbackId = null, feedbackMs = 0;
   function commit() {
     const current = play.snapshot();
@@ -132,16 +149,17 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, onPa
       root.dataset.paused = String(state.paused); root.dataset.completed = String(!!state.result);
       // Pause owns all play input, while navigation, sound and resume remain active.
       for (const child of shell.children) {
-        if (![header, soundPanel].includes(child)) child.inert = !!state.paused;
+        if (![header, soundPanel, howTo].includes(child)) child.inert = !!state.paused;
       }
-      pause.textContent = state.paused ? '再開' : '一時停止'; pause.disabled = !!state.result;
+      pause.textContent = howTo.open ? 'あそびかた確認中' : state.paused ? '再開' : '一時停止'; pause.disabled = !!state.result || howTo.open;
+      howTo.hidden = !!state.result;
       gauge.value = Math.min(3, current.gauge); skill.disabled = state.paused || !!state.result || current.gauge < 3;
       skillLabel.textContent = info.scene==='lantern'?(current.gauge>=3?'光をひらく！':'正解で光がたまる'):current.gauge >= 3 ? `${info.skill} · ${info.scene==='craft'?'2ルートへ光':info.effect}` : `${info.skill} ${Math.floor(current.gauge)}/3`;
       skill.title = `${current.growth.description}・技 ${current.skillPoints}pt＋ゲーム固有効果`;
       score.textContent = `${(state.score ?? current.learningPoints) + current.bonus} pt`;
       combo.textContent = `${current.combo} COMBO`;
       scene.update(state, current, dt);
-      if (!(definition.id === 'sentenceOrder' && state.mode === 'review') && state.phase === 'feedback' && !state.paused && (state.lastAnswer?.correct || state.lastAnswer?.classification === 'fullCorrect')) {
+      if (state.mode !== 'review' && state.phase === 'feedback' && !state.paused && (state.lastAnswer?.correct || state.lastAnswer?.classification === 'fullCorrect')) {
         const id = state.problem?.problemId;
         if (feedbackId !== id) { feedbackId = id; feedbackMs = 0; }
         feedbackMs += dt;

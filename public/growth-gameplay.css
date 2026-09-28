@@ -46,6 +46,10 @@
 .yt-game .gt-learning-save-alert p{margin:0;font-size:14px;line-height:1.45}
 .yt-game .gt-learning-save-alert button{flex:none;min-height:44px}
 @media(max-width:390px){.yt-game .gt-learning-save-alert:not([hidden]){flex-wrap:wrap}.yt-game .gt-learning-save-alert button{width:100%}}
+.yt-game .gt-how-to{margin:6px 0;padding:0 10px;border:1px solid #9caf9a;border-radius:10px;background:#fff9e8;color:#294538}
+.yt-game .gt-how-to summary{display:list-item;min-height:44px;padding:10px 4px;cursor:pointer;font-size:14px;font-weight:700}
+.yt-game .gt-how-to ol{margin:0 0 10px;padding-left:1.6em;font-size:14px;line-height:1.6}
+.yt-game .gt-how-to li+li{margin-top:4px}
 .gt-constellations{position:absolute;right:7px;top:32px;display:grid;gap:3px;z-index:2}.gt-constellations span{font-size:14px;line-height:18px;color:#73858b}.gt-constellations .gt-constellation-done{color:#ffe68a;text-shadow:0 0 7px #ffe49a;animation:gt-snap .35s ease-out}
 #mathInvaderScreen.yt-game .mi-board{background:repeating-linear-gradient(90deg,transparent 0 calc(33.333% - 1px),#718faf55 calc(33.333% - 1px) 33.333%),linear-gradient(#172f49,#496b85);border-color:#748e99}
 #mathInvaderScreen.yt-game .mi-enemy{border-radius:14px 14px 6px 6px;border-bottom:5px solid #a68449;box-shadow:0 3px 0 #16314b}

@@ -96,6 +96,12 @@ const hub = {
     const header = element(doc, 'div', 'yt-picker-header');
     header.append(element(doc, 'h2', '', definition.title), button(doc, '閉じる', () => dialog.close()));
     dialog.append(header, element(doc, 'p', '', '今回いっしょに遊ぶ相棒を選ぼう。'));
+    const guide = element(doc, 'section', 'yt-game-guide');
+    guide.append(element(doc, 'h3', '', 'あそびかた'));
+    const steps = element(doc, 'ol');
+    for (const step of gameExperiences[definition.id].howTo) steps.append(element(doc, 'li', '', step));
+    guide.append(steps);
+    dialog.append(guide);
     if (!playOptions.review && ['englishChoice', 'timedChoice', 'sentenceOrder'].includes(definition.id)) {
       dialog.append(element(doc, 'p', 'yt-note', '記録に合わせて、まちがえた問題・まだ解いていない問題・前に正解した問題を組み合わせます。'));
     }

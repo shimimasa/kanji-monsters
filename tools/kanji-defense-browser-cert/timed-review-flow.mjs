@@ -46,7 +46,14 @@ try {
   }
   await page.locator('[data-action=back]').click(); await page.reload(); await page.locator('#titleMiniGameButton').click();
   await page.getByRole('button', { name: '時間なしで復習する：タイムことば', exact: true }).click(); await page.locator('[data-action=start-game]').click();
-  const reviewed = []; reviewed.push(await answer(true)); await next();
+  const reviewed = []; reviewed.push(await answer(true));
+  const firstReviewProblem = (await state()).problem.problemId;
+  await expect(page.locator('.tc-feedback')).toContainText('せいかい！');
+  await expect(page.locator('.tc-feedback')).toContainText('は「');
+  await page.waitForTimeout(750);
+  expect((await state()).problem.problemId).toBe(firstReviewProblem);
+  expect((await state()).phase).toBe('feedback');
+  await next();
   const beforeFailure = await progress();
   await page.evaluate(() => {
     window.qaSet = Storage.prototype.setItem;

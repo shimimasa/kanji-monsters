@@ -99,7 +99,9 @@ export function createEnglishChoiceView({ document: doc, onBack, onReplay, onNex
           if (button.dataset.choiceId === state.lastAnswer.correctChoiceId) button.dataset.status = 'correct';
           else if (button.dataset.choiceId === state.lastAnswer.choiceId) button.dataset.status = 'incorrect';
         }
-        feedback.textContent = state.lastAnswer.correct ? 'せいかい！' : `こたえは「${correctChoice?.text ?? ''}」だよ`;
+        feedback.textContent = state.lastAnswer.correct
+          ? state.mode === 'review' ? `せいかい！「${problem?.prompt ?? ''}」は「${correctChoice?.text ?? ''}」` : 'せいかい！'
+          : `こたえは「${correctChoice?.text ?? ''}」だよ`;
       } else feedback.textContent = '';
       next.hidden = state.phase !== 'feedback'; next.disabled = state.paused;
       pause.hidden = !state.paused;

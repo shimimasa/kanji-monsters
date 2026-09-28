@@ -80,7 +80,15 @@ try {
   await page.reload(); await page.locator('#titleMiniGameButton').click();
   await page.getByRole('button', { name: '相棒と復習する' }).click(); await start();
   const reviewed = [];
-  for (let i = 0; i < 3; i++) { reviewed.push(await answer(true)); await next(); }
+  reviewed.push(await answer(true));
+  const firstReviewProblem = (await state()).problem.problemId;
+  await expect(page.locator('.ec-feedback')).toContainText('せいかい！');
+  await expect(page.locator('.ec-feedback')).toContainText('は「');
+  await page.waitForTimeout(750);
+  expect((await state()).problem.problemId).toBe(firstReviewProblem);
+  expect((await state()).phase).toBe('feedback');
+  await next();
+  for (let i = 1; i < 3; i++) { reviewed.push(await answer(true)); await next(); }
   expect(new Set(reviewed)).toEqual(new Set(missed));
   await expect(page.locator('.gt-reward')).toHaveText('復習の記録を保存しました。');
   await expect(page.locator('.gt-rank')).toBeHidden();
