@@ -11,11 +11,11 @@ export function createCompanionScene({ doc, root, info, gotomon, act }) {
   const particles = element(doc, 'div', 'gt-particles'); particles.setAttribute('aria-hidden', 'true');
   for (let i=0;i<7;i++) { const spark=element(doc,'i'); spark.style.setProperty('--i',i); spark.style.setProperty('--row',`${i%3*20}%`); particles.append(spark); }
   scene.append(objects, actor, particles, metric, label); stage.append(scene, actions);
-  const goalPicker = info.scene === 'craft' ? element(doc, 'details', 'gt-goal-picker') : null;
-  const goalSummary = goalPicker ? element(doc, 'summary') : null;
-  const goalRule = goalPicker ? element(doc, 'p') : null;
-  const goalActions = goalPicker ? element(doc, 'div', 'gt-goal-actions') : null;
-  const goalStatus = goalPicker ? element(doc, 'p', 'gt-goal-status') : null;
+  const goalPicker = element(doc, 'details', 'gt-goal-picker');
+  const goalSummary = element(doc, 'summary');
+  const goalRule = element(doc, 'p');
+  const goalActions = element(doc, 'div', 'gt-goal-actions');
+  const goalStatus = element(doc, 'p', 'gt-goal-status');
   const goalNodes = new Map();
   if (goalPicker) {
     goalPicker.append(goalSummary, goalRule, goalActions);
@@ -55,7 +55,7 @@ export function createCompanionScene({ doc, root, info, gotomon, act }) {
       for (const choice of goal.choices) {
         let node = goalNodes.get(choice.id);
         if (!node) { node = button(doc, choice.label, () => act?.(choice.id), 'gt-button'); node.dataset.worldAction = choice.id; goalActions.append(node); goalNodes.set(choice.id, node); }
-        node.title = choice.hint; node.disabled = state.paused || !goal.canChoose;
+        node.title = choice.hint; node.disabled = state.paused || !goal.canChoose || !['answering','playing'].includes(state.phase);
         node.setAttribute('aria-pressed', String(choice.selected));
       }
     }

@@ -40,6 +40,15 @@ try {
     await expect(dialog.locator('.yt-game-guide li')).toHaveText(gameExperiences[id].howTo);
     if (id === 'mathSprint') await page.screenshot({ path: fileURLToPath(new URL('start-dialog.png', out)), fullPage: true });
     await dialog.locator('[data-action=start-game]').click();
+    const goalPicker = page.locator('.gt-goal-picker');
+    await expect(goalPicker).toBeVisible();
+    await goalPicker.locator('summary').click();
+    const goals = goalPicker.locator('.gt-goal-actions button');
+    await expect(goals).toHaveCount(id === 'multiSelect' ? 3 : 2);
+    await expect(goals.nth(1)).toBeEnabled();
+    await goals.nth(1).click();
+    await expect(goals.nth(1)).toHaveAttribute('aria-pressed', 'true');
+    await goalPicker.locator('summary').click();
     const guide = page.locator('.gt-how-to');
     await expect(guide).toBeVisible();
     await guide.locator('summary').click();

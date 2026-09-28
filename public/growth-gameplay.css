@@ -59,8 +59,8 @@
 #multiSelectScreen.yt-game .ms-feedback{min-height:26px;margin:5px 0}#multiSelectScreen.yt-game .ms-prompt{font-size:17px;margin:5px 0}#multiSelectScreen.yt-game .ms-help{font-size:12px;margin:4px 0}}
 @media(max-height:680px){.gt-scene{height:95px}.gt-explore{height:140px}.gt-board-caption{height:49px}.gt-star-map{height:68px}.gt-world-actions{margin-top:3px}}
 .gt-goal-picker{margin:4px 0 8px;border:1px solid #a4b8a8;border-radius:9px;padding:8px;background:#fffaf0}.gt-goal-picker summary{cursor:pointer;min-height:32px;display:flex;align-items:center;font-size:14px;font-weight:700}.gt-goal-picker summary:focus-visible{outline:3px solid #19766d}.gt-goal-picker p{font-size:13px;line-height:1.5;margin:8px 0}.gt-goal-actions{display:flex;flex-wrap:wrap;gap:6px}.gt-goal-actions .gt-button{flex:1 1 95px;min-height:44px;font-size:13px;padding:8px}.gt-goal-actions [aria-pressed=true]{background:#d9efdf;border-color:#28734a}.gt-goal-status{font-size:13px;line-height:1.5;margin:5px 0}.gt-goal-status[data-status=achieved],.gt-challenge-result[data-status=achieved]{color:#165e4e;font-weight:700}.gt-challenge-result{font-size:15px;line-height:1.5}
-#multiSelectScreen .gt-goal-picker summary{min-height:44px}#multiSelectScreen .gt-goal-actions .gt-button{font-size:13px;padding:8px;min-height:44px}
-@media(max-width:360px){#multiSelectScreen .gt-goal-actions .gt-button{flex-basis:100%}}
+.yt-game .gt-goal-picker summary{min-height:44px}.yt-game .gt-goal-actions .gt-button{font-size:13px;padding:8px;min-height:44px}
+@media(max-width:360px){.yt-game .gt-goal-actions .gt-button{flex-basis:100%}}
 @media(prefers-reduced-motion:reduce){.yt-game *, .yt-game *::before,.yt-game *::after{animation:none!important;transition:none!important}}
 @keyframes gt-run{to{transform:translate(-50%,-3px) rotate(3deg)}}
 @keyframes gt-course{to{background-position:-56px 0}}
