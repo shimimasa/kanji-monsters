@@ -16,7 +16,7 @@ try {
   browser = launched.browser; report.browser = launched.name;
   const save = getDefaultSave();
   save.player.name = '相棒コースQA';
-  save.player.collection.gotomonIds = ['HKD-E01', 'HKD-E02', 'HKD-E03'];
+  save.player.collection.gotomonIds = ['HKD-E01', 'HKD-E02', 'HKD-E03', 'HKD-E04', 'AOM-E09'];
   save.meta.compatibilityEntries = { tutorial_seen_title: '1' };
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(value => {
@@ -33,7 +33,12 @@ try {
   for (const [gameId, gotomonId, action, courseName] of [
     ['mathSprint', 'HKD-E01', 'roll', 'ころころ近道'],
     ['mathInvader', 'HKD-E02', 'golden-burst', '黄金の連射'],
+    ['englishChoice', 'HKD-E01', 'use-key', 'ひみつの鍵'],
+    ['sentenceOrder', 'AOM-E09', 'bridge-anchor', '虹の支え'],
     ['timedChoice', 'HKD-E03', 'store-light', 'しずくの灯台'],
+    ['multiSelect', 'HKD-E04', 'release-spark', '星のたくわえ'],
+    ['asyncChoice', 'HKD-E04', 'use-compass', '発見の羅針盤'],
+    ['kanjiDefense', 'AOM-E09', 'use-ward', '守りの札'],
   ]) {
     await page.locator(`[data-game-id=${gameId}]`).click();
     const dialog = page.locator('.yt-companion-dialog');
@@ -45,7 +50,7 @@ try {
     await dialog.locator('[data-action=start-game]').click();
     await expect(page.locator('.gt-course-notice')).toContainText(courseName);
     await page.locator('.gt-goal-picker summary').click();
-    await expect(page.locator('.gt-goal-actions button')).toHaveCount(3);
+    await expect(page.locator('.gt-goal-actions button')).toHaveCount(gameId === 'multiSelect' ? 4 : 3);
     await page.locator('.gt-goal-picker summary').click();
     const specialAction = page.locator(`[data-world-action=${action}]`);
     await expect(specialAction).toBeVisible();

@@ -26,13 +26,22 @@ export function createShootingWorld(effects,{course=null}={}) {
   };
 }
 
-export function createDefenseWorld() {
-  let correct=0, bonus=0, encouragement=0;
+export function createDefenseWorld(effects,{course=null}={}) {
+  let correct=0, bonus=0, encouragement=0, wards=0, streak=0, wardArmed=false, wardHits=0;
   return {
-    answer(success){if(success){correct++;if(encouragement>0){bonus+=15;encouragement--;}}},
+    act(action){if(course?.id!=='defense-ward'||action!=='use-ward'||wards<1||wardArmed)return false;
+      wards--;wardArmed=true;return true;},
+    answer(success){
+      streak=success?streak+1:0;
+      if(success){correct++;if(encouragement>0){bonus+=15;encouragement--;}
+        if(wardArmed){bonus+=15;wardHits++;wardArmed=false;}
+        if(course?.id==='defense-ward'&&streak>=2){wards=Math.min(2,wards+1);streak=0;}}
+    },
     boost(){encouragement=2;},
-    snapshot(){return {kind:'defend',bonus,progress:correct/12,encouragement,
-      metric:encouragement?`相棒エール：次の正解${encouragement}回を応援`:'相棒と旅路を守ろう',
-      caption:'読みで攻撃。相棒技は得点だけを後押し',summary:`${correct}体を撃退`,goal:'迫る敵の順番を見て、連続撃退を目指そう',actions:[]}},
+    snapshot(){return {kind:'defend',bonus,progress:correct/12,encouragement,wards,wardArmed,wardHits,
+      metric:`${encouragement?`相棒エール：次の正解${encouragement}回を応援`:'相棒と旅路を守ろう'}${course?` · 札 ${wards}`:''}`,
+      caption:wardArmed?'守りの札を構えた！次の正解を強めよう':'読みで攻撃。相棒技は得点だけを後押し',
+      summary:`${correct}体を撃退${course?` · 札を使って${wardHits}回正解`:''}`,goal:'迫る敵の順番を見て、連続撃退を目指そう',
+      actions:course?.id==='defense-ward'?[{id:'use-ward',label:`守りの札を使う（${wards}）`,enabled:wards>0&&!wardArmed,hint:'次の正解で得点を追加'}]:[]}},
   };
 }

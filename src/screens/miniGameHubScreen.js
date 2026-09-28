@@ -64,8 +64,8 @@ const hub = {
       const foot = element(doc, 'span', 'yt-card-foot');
       if (selected) foot.append(companionPortrait(doc, selected));
       foot.append(element(doc, 'span', '', selected?.name || '冒険で相棒を見つけよう'));
-      const featuredCourse = companionCourse(selected?.id, definition.id);
-      if (featuredCourse) card.append(element(doc, 'span', 'yt-card-course', `★ ${selected.name}の専用コース：${featuredCourse.name}`));
+      const featuredCourse = companionCourse(selected, definition.id);
+      if (featuredCourse) card.append(element(doc, 'span', 'yt-card-course', `★ ${selected.name}の得意コース：${featuredCourse.name}`));
       const stats = progress.games?.[definition.id];
       card.append(foot, element(doc, 'small', 'yt-card-record', stats ? `${stats.bestRank || 'C'} RANK · BEST ${stats.bestScore} · ${stats.plays}回` : 'はじめての記録をつくろう'));
       grid.append(card);
@@ -126,9 +126,9 @@ const hub = {
     const courseCheck = element(doc, 'input'); courseCheck.type = 'checkbox'; courseCheck.checked = true;
     const courseText = element(doc, 'span'); courseLabel.append(courseCheck, courseText);
     const updateCourse = () => {
-      const course = !playOptions.review && !playOptions.practiceContentIds && companionCourse(selectedId, definition.id);
+      const course = !playOptions.review && !playOptions.practiceContentIds && companionCourse(owned.find(item => item.id === selectedId), definition.id);
       courseLabel.hidden = !course;
-      courseText.textContent = course ? `専用コース「${course.name}」で遊ぶ · ${course.description}` : '';
+      courseText.textContent = course ? `得意コース「${course.name}」で遊ぶ · ${course.description}` : '';
       courseCheck.checked = !!course;
     };
     updateCourse();
@@ -137,7 +137,7 @@ const hub = {
       const result = gotomonService.setSelectedGotomon(selectedId);
       if (!result.ok) { message.textContent = '相棒を保存できませんでした。保存状態を確認して、もう一度お試しください。'; return; }
       dialog.close(); publish('changeScreen', { name: 'miniGame', props: { ...playOptions, gameId: definition.id, gotomonId: selectedId,
-        courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(selectedId, definition.id)?.id : null,
+        courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');
@@ -157,7 +157,7 @@ const hub = {
         element(doc, 'small', '', `Lv${gotomonService.getGrowth(friend.id).level} · なかよし ${stats[friend.id]?.friendship ?? 0}`)); grid.append(choice);
     }
     if (!owned.length) dialog.append(element(doc, 'p', '', 'まだ捕獲したゴトモンがいません。本編でステージをクリアし、仲間に迎えよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title')));
-    dialog.append(grid, courseLabel, message, begin, element(doc, 'p', 'yt-note', '通常コースと復習は、どの相棒でも遊べます。専用コースでも問題の正解は同じです。'));
+    dialog.append(grid, courseLabel, message, begin, element(doc, 'p', 'yt-note', '通常コースと復習は、どの相棒でも遊べます。得意コースでも問題の正解は同じです。'));
     this.root.append(dialog); this.dialog = dialog; dialog.showModal();
     if (selected) begin.focus();
   },

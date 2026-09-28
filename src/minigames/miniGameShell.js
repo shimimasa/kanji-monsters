@@ -161,7 +161,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, onPa
       score.textContent = `${(state.score ?? current.learningPoints) + current.bonus} pt`;
       combo.textContent = `${current.combo} COMBO`;
       courseNotice.hidden = !current.world?.course || state.mode === 'review' || !!state.result;
-      if (!courseNotice.hidden) courseNotice.textContent = `★ ${gotomon?.name}の専用コース：${current.world.course.name} · ${current.world.course.description}`;
+      if (!courseNotice.hidden) courseNotice.textContent = `★ ${gotomon?.name}の得意コース：${current.world.course.name} · ${current.world.course.description}`;
       scene.update(state, current, dt);
       if (state.mode !== 'review' && state.phase === 'feedback' && !state.paused && (state.lastAnswer?.correct || state.lastAnswer?.classification === 'fullCorrect')) {
         const id = state.problem?.problemId;

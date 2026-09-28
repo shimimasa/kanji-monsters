@@ -20,18 +20,24 @@ export function createLanternWorld(effects,{course=null}={}) {
   };
 }
 
-export function createBridgeWorld(effects) {
-  let bridges = 0, bonus = 0, rainbow = false, special = 0, answered = 0;
+export function createBridgeWorld(effects,{course=null}={}) {
+  let bridges = 0, bonus = 0, rainbow = false, special = 0, answered = 0, links = 0, streak = 0, anchored = false, anchorBridges = 0;
   return {
+    act(action) { if (course?.id !== 'bridge-anchor' || action !== 'bridge-anchor' || links < 1 || rainbow) return false;
+      links--; rainbow = true; anchored = true; return true; },
     answer(correct, payload, combo) {
       answered++;
+      streak = correct ? streak + 1 : 0;
+      if (course?.id === 'bridge-anchor' && streak >= 2) { links = Math.min(2, links + 1); streak = 0; }
       if (correct) {bridges++; const isSpecial=rainbow||combo%3===0; if(isSpecial)special++;
+        if (anchored) anchorBridges++;
         bonus += isSpecial ? Math.round(45*effects.potency) : 12;}
-      rainbow=false;
+      rainbow=false;anchored=false;
     },
     boost() {rainbow=true;},
-    snapshot() {return {kind:'bridge',bonus,progress:answered/10,bridges,special,rainbow,
-      metric:`橋 ${bridges}/10 · 虹の橋 ${special}`,caption:rainbow ? '虹の橋をかけよう！' : '板をつかんで並べ替え。文章がつながると相棒が渡る',
-      summary:`橋 ${bridges}本・虹の橋 ${special}本`,goal:'3連続で虹の橋！板を動かす順番も工夫しよう',actions:[]}},
+    snapshot() {return {kind:'bridge',bonus,progress:answered/10,bridges,special,rainbow,links,anchorBridges,
+      metric:`橋 ${bridges}/10 · 虹の橋 ${special}${course ? ` · 支え ${links}` : ''}`,caption:rainbow ? '虹の橋をかけよう！' : '板をつかんで並べ替え。文章がつながると相棒が渡る',
+      summary:`橋 ${bridges}本・虹の橋 ${special}本${course ? ` · 支えた橋 ${anchorBridges}本` : ''}`,goal:'3連続で虹の橋！板を動かす順番も工夫しよう',
+      actions:course?.id === 'bridge-anchor' ? [{id:'bridge-anchor',label:`虹の支えを使う（${links}）`,enabled:links>0&&!rainbow,hint:'次の正解で虹の橋になる'}] : []}},
   };
 }

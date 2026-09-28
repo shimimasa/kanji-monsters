@@ -85,8 +85,8 @@ export function createMiniGameHost({ document: doc = globalThis.document,
         return wordLearning.getPracticeIds(runMistakes.ids()).filter(id => savedHistory[id]?.lastCorrect === false);
       };
       const growth = service.getGrowth?.(gotomon?.id);
-      const course = !nextProps.review && nextProps.courseId === companionCourse(gotomon?.id, definition.id)?.id
-        ? companionCourse(gotomon?.id, definition.id) : null;
+      const course = !nextProps.review && nextProps.courseId === companionCourse(gotomon, definition.id)?.id
+        ? companionCourse(gotomon, definition.id) : null;
       const ticket = service.beginPlay?.({ sessionId, gameId: definition.id, gotomonId: gotomon?.id });
       play = createCompanionPlay(sessionId, doc.querySelector && !makeView
         ? { gameId: definition.id, growth, support: gotomon?.support?.id, bestTimeMs: service.getProgress().games?.[definition.id]?.bestTimeMs, course } : {});

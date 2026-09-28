@@ -56,6 +56,14 @@ const COURSE_GOALS = Object.freeze({
   'milk-lantern': { id: 'drops', name: 'しずくで灯台を3つ', deadline: 8, target: 3,
     rule: 'しずくを使い、問題に答えながら灯台を3つ灯そう。', hint: 'しずくは問題ごとに1つ蓄えられる。',
     value: data => data.world.poured ? data.world.towers || 0 : 0 },
+  'treasure-key': { id: 'key', name: '鍵で宝箱を守る', deadline: 9, target: 1,
+    rule: '2回続けて正解し、作った鍵で宝箱を見つけよう。', hint: '鍵は部屋の途中でも使える。', value: data => data.world.guardedChests || 0 },
+  'bridge-anchor': { id: 'anchor', name: '支えで虹の橋をかける', deadline: 8, target: 1,
+    rule: '文を続けて完成し、支えを使って次の橋を虹色に。', hint: '支えを使った次の文を正解しよう。', value: data => data.world.anchorBridges || 0 },
+  'explorer-compass': { id: 'compass', name: '羅針盤で2地点発見', deadline: 8, target: 2,
+    rule: '2問続けて正解し、次の探索で羅針盤を使おう。', hint: '地点を選ぶ前に使える。', value: data => data.world.compassFindings || 0 },
+  'defense-ward': { id: 'ward', name: '札で2回読みを正解', deadline: 12, target: 2,
+    rule: '2回続けて正解して札を作り、次の読みに使おう。', hint: '札は次の正解で力になる。', value: data => data.world.wardHits || 0 },
 });
 
 export function createRunChallenge(gameId, variation = 0, course = null) {
