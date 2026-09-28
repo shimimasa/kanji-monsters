@@ -126,7 +126,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       view = createView({ document: doc, getSnapshot: () => current.snapshot(),
         dispatch,
         onBack: goBack, onReplay: replay });
-      shell = makeShell({ doc, view, definition, gotomon, play,
+      shell = makeShell({ doc, view, definition, gotomon, play, reviewMode: !!nextProps.review,
         onPause: value => host.setPaused(value), onBack: goBack, onReplay: replay,
         onReview: wordLearning ? review : null, onNormalPlay: normalPlay,
         onNotebook: returnToNotebook,

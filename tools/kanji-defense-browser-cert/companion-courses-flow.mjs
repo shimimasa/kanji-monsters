@@ -10,7 +10,7 @@ await fs.mkdir(out, { recursive: true });
 const server = await createServer({ configFile: false, server: { host: '127.0.0.1', port: 0, watch: null } });
 await server.listen();
 let browser;
-const report = { courses: [], errors: [], pass: false };
+const report = { courses: [], layout: {}, errors: [], pass: false };
 try {
   const launched = await launchPreferredBrowser(chromium);
   browser = launched.browser; report.browser = launched.name;
@@ -48,12 +48,24 @@ try {
     await expect(choice).toContainText(courseName);
     await expect(choice.locator('input')).toBeChecked();
     await dialog.locator('[data-action=start-game]').click();
-    await expect(page.locator('.gt-course-notice')).toContainText(courseName);
+    await expect(page.locator('.gt-goal-picker summary')).toContainText(courseName);
     await page.locator('.gt-goal-picker summary').click();
     await expect(page.locator('.gt-goal-actions button')).toHaveCount(gameId === 'multiSelect' ? 4 : 3);
     await page.locator('.gt-goal-picker summary').click();
     const specialAction = page.locator(`[data-world-action=${action}]`);
     await expect(specialAction).toBeVisible();
+    report.layout[gameId] = await page.locator('.gt-scene').evaluate(node => ({ height: Math.round(node.getBoundingClientRect().height), classes: node.className }));
+    if (!['mathInvader', 'kanjiDefense'].includes(gameId)) {
+      expect(await page.locator('.gt-scene > .gt-embedded').count()).toBeGreaterThanOrEqual(2);
+    } else {
+      const enemy = page.locator(gameId === 'mathInvader' ? '.mi-enemy' : '.kd-monster').first();
+      await expect(enemy).toBeVisible();
+      await enemy.click();
+      const answer = page.locator(gameId === 'mathInvader' ? '.mi-answer-row input' : '.kd-controls input');
+      await expect(answer).toBeVisible();
+      report.layout[gameId].answerBottom = await answer.evaluate(node => Math.round(node.getBoundingClientRect().bottom));
+      expect(report.layout[gameId].answerBottom).toBeLessThanOrEqual(844);
+    }
     if (gameId === 'timedChoice') {
       await specialAction.click();
       await expect(page.locator('.gt-scene-metric')).toContainText('しずく 1/2');

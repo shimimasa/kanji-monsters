@@ -69,3 +69,54 @@
 @keyframes gt-snap{50%{transform:translateY(3px) scale(1.03,.97)}}
 @keyframes gt-level-up{40%{transform:translateY(-12px) scale(1.1) rotate(4deg)}70%{transform:scale(1.05,.95)}}
 @keyframes gt-door{45%{transform:perspective(400px) rotateY(-9deg);filter:brightness(1.1)}}
+
+/* Place the question and its actions inside each game world. Review keeps the plain learning layout. */
+section.yt-game[id] .gt-scene:not(.gt-board-caption){height:clamp(300px,43vh,400px);border-width:3px;box-shadow:0 8px 0 #193e3520,0 16px 28px #193e3520}
+section.yt-game[id] .gt-scene.gt-explore{height:clamp(350px,49vh,440px)}
+section#multiSelectScreen.yt-game .gt-scene.gt-craft{height:clamp(365px,51vh,450px)}
+section#timedChoiceScreen.yt-game .gt-scene.gt-lantern{height:clamp(310px,45vh,410px)}
+section.yt-game[id] .gt-scene-label{font-weight:700;min-height:29px}
+section.yt-game[id] .gt-scene>.gt-embedded{position:absolute;z-index:6;box-sizing:border-box;margin:0;max-width:560px}
+section.yt-game[id] .gt-scene>:is(.ms-question,.ec-prompt,.so-prompt,.tc-prompt,.ms-prompt,.ac-prompt){top:42px;left:50%;width:calc(100% - 30px);transform:translateX(-50%);padding:7px 12px;border:2px solid #fff7d2a8;border-radius:12px;background:#132f31d9;color:#fff8dc;text-shadow:0 1px #10232b;box-shadow:0 5px 15px #10232b44;text-align:center;line-height:1.25;overflow-wrap:anywhere}
+section#mathSprintScreen.yt-game .gt-scene>.ms-question{font-size:clamp(28px,7vw,40px)!important;top:45px;width:max-content;min-width:170px}
+section#mathSprintScreen.yt-game .gt-scene>.ms-answer-row{top:116px;left:50%;width:min(90%,420px);transform:translateX(-50%);padding:7px;border:2px solid #ffe9b7;border-radius:14px;background:#173b35e0;box-shadow:0 6px 18px #08221f66}
+section#mathSprintScreen.yt-game .gt-race .gt-actor{width:72px;height:70px}
+section#mathSprintScreen.yt-game .ms-pad{grid-template-columns:repeat(5,minmax(0,1fr));max-width:520px;margin:10px auto!important}
+section#mathSprintScreen.yt-game .ms-pad button{min-height:44px!important}
+section#englishChoiceScreen.yt-game .gt-scene>.ec-prompt{font-size:clamp(27px,7vw,39px);top:44px}
+section.yt-game[id] .gt-scene>:is(.ec-choices,.tc-choices,.ac-choices,.ms-choices){left:50%;bottom:37px;width:calc(100% - 22px);transform:translateX(-50%);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:8px;border:2px solid #fff0ca8c;border-radius:15px;background:#102d32a8;box-shadow:0 6px 18px #0a202c66}
+section.yt-game[id] .gt-scene>:is(.ec-choices,.tc-choices,.ac-choices,.ms-choices) button{min-width:0;min-height:52px;padding:7px 8px;font-size:clamp(14px,3.5vw,18px);line-height:1.25;overflow-wrap:anywhere}
+section#englishChoiceScreen.yt-game .gt-scene>.ec-choices button{min-height:62px}
+section#englishChoiceScreen.yt-game .gt-treasure .gt-world-objects{inset:94px 8% 200px}
+section#englishChoiceScreen.yt-game .gt-treasure .gt-actor{bottom:198px}
+section#sentenceOrderScreen.yt-game .gt-scene>.so-prompt{font-size:15px;top:42px}
+section#sentenceOrderScreen.yt-game .gt-scene>.so-chunks{left:50%;bottom:39px;width:calc(100% - 20px);transform:translateX(-50%);max-height:55%;overflow:auto;padding:9px 7px;border:2px solid #ffe9b59c;border-radius:14px;background:#123d4fbe}
+section#sentenceOrderScreen.yt-game .gt-scene>.so-chunks .so-chunk{min-height:52px;flex:1 1 calc(50% - 8px)}
+section#sentenceOrderScreen.yt-game .gt-bridge .gt-world-objects{inset:95px 5% 145px}
+section#sentenceOrderScreen.yt-game .gt-bridge .gt-actor{bottom:155px}
+section#timedChoiceScreen.yt-game .gt-scene>.tc-prompt{font-size:clamp(25px,6vw,37px);top:79px}
+section#timedChoiceScreen.yt-game .gt-scene>.tc-timer-label{top:36px;right:15px;z-index:7;color:#fff5ce;font-size:13px;background:#152b45c9;padding:3px 8px;border-radius:8px}
+section#timedChoiceScreen.yt-game .gt-scene>.tc-timer-track{top:62px;left:50%;width:min(85%,420px);transform:translateX(-50%);z-index:7}
+section#timedChoiceScreen.yt-game .gt-lantern .gt-world-objects{inset:130px 9% 175px}
+section#multiSelectScreen.yt-game .gt-scene>.ms-prompt{font-size:clamp(17px,4vw,25px);top:41px}
+section#multiSelectScreen.yt-game .gt-scene>.ms-choices{grid-template-columns:repeat(2,minmax(0,1fr));max-height:65%;overflow:auto}
+section#multiSelectScreen.yt-game .gt-scene>.ms-choices button{min-height:49px;padding:7px 8px 7px 30px;font-size:14px}
+section#multiSelectScreen.yt-game .gt-craft .gt-star-map{width:230px;height:115px;top:98px}
+section#multiSelectScreen.yt-game .gt-craft .gt-route-sky{inset:87px 7% auto;width:86%;height:130px}
+section#multiSelectScreen.yt-game .gt-craft .gt-actor{bottom:204px}
+section#asyncChoiceScreen.yt-game .gt-scene>.ac-prompt{top:92px;font-size:clamp(19px,4.5vw,29px);max-height:80px;overflow:auto}
+section#asyncChoiceScreen.yt-game .gt-explore .gt-world-objects{inset:155px 9% 180px}
+section#asyncChoiceScreen.yt-game .gt-explore .gt-actor{bottom:176px}
+section.yt-game[id] :is(.ec-play,.so-play,.tc-play,.ms-play,.ac-play){margin-top:8px;gap:0}
+section.yt-game[id] :is(.ec-help,.so-help,.tc-help,.ms-help,.ac-help){font-size:12px;margin:4px 0 7px}
+section.yt-game[id] :is(.ec-feedback,.so-feedback,.tc-feedback,.ms-feedback,.ac-feedback){min-height:24px;margin:5px 0}
+section#mathInvaderScreen.yt-game .mi-board,section#kanjiDefenseScreen.yt-game .kd-board{height:clamp(300px,45vh,440px);box-shadow:0 8px 0 #193e3520,0 16px 28px #193e3520}
+section#mathInvaderScreen.yt-game .mi-controls,section#kanjiDefenseScreen.yt-game .kd-controls{margin:-4px 0 0;padding:10px;border:2px solid #8fb5cc;border-radius:0 0 14px 14px;background:#183b51;color:#fff7db;box-shadow:0 7px 14px #09223033}
+section#mathInvaderScreen.yt-game .mi-selected,section#kanjiDefenseScreen.yt-game .kd-target{color:#fff0ba;font-size:20px;line-height:1.3}
+section#mathInvaderScreen.yt-game .mi-pad{grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;margin:8px 0}
+section#mathInvaderScreen.yt-game .mi-pad button{min-width:0;min-height:44px}
+section.yt-game[id] :is(.mi-board,.kd-board) :is(.gt-scene-metric,.gt-scene-label){display:none}
+section.yt-game[id] .gt-goal-picker{color:#17362f}
+section.yt-game[id] :is(.mi-board,.kd-board)[data-mode=danger]{border-color:#e49860;box-shadow:0 0 0 3px #e4986066}
+@media(max-width:580px){section.yt-game[id] .gt-scene:not(.gt-board-caption){height:300px}section.yt-game[id] .gt-scene.gt-explore{height:360px}section#multiSelectScreen.yt-game .gt-scene.gt-craft{height:380px}section#timedChoiceScreen.yt-game .gt-scene.gt-lantern{height:320px}section#mathInvaderScreen.yt-game .mi-board,section#kanjiDefenseScreen.yt-game .kd-board{height:280px}}
+@media(max-height:680px){section.yt-game[id] .gt-scene:not(.gt-board-caption){height:260px}section.yt-game[id] .gt-scene.gt-explore{height:320px}section#multiSelectScreen.yt-game .gt-scene.gt-craft{height:340px}section#timedChoiceScreen.yt-game .gt-scene.gt-lantern{height:280px}section#mathInvaderScreen.yt-game .mi-board,section#kanjiDefenseScreen.yt-game .kd-board{height:250px}}

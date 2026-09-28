@@ -22,7 +22,7 @@ export function createCompanionScene({ doc, root, info, gotomon, act }) {
     goalStatus.setAttribute('role', 'status'); stage.prepend(goalPicker); stage.append(goalStatus);
   }
   const board = root.querySelector('.mi-board, .kd-board');
-  if (board) { board.append(actor); actor.classList.add('gt-board-actor'); scene.classList.add('gt-board-caption'); }
+  if (board) { board.append(actor, metric, label); actor.classList.add('gt-board-actor'); scene.classList.add('gt-board-caption'); scene.hidden = true; }
   const pieces = [];
   for (const symbol of ({race:['▴','▴','▴','▴','⚑'],treasure:['1','2','3','4'],bridge:['━','━','━','━','━'],lantern:['✧','✧','✧','✧','✧']}[info.scene] || [])) {
     const piece=element(doc,'span','gt-world-piece',symbol); objects.append(piece); pieces.push(piece);
@@ -38,6 +38,7 @@ export function createCompanionScene({ doc, root, info, gotomon, act }) {
     state=next; const world=play.world || {};
     stage.hidden=actor.hidden=!!state.result;
     scene.dataset.mode=state.paused?'paused':world.fever||world.boostMs>0?'fever':world.danger?'danger':world.progress>=.8?'climax':play.combo>=3?'combo':'normal';
+    if(board)board.dataset.mode=scene.dataset.mode;
     scene.dataset.reaction=actor.dataset.reaction=state.paused?'idle':play.reaction;
     if(revision!==play.revision) {
       revision=play.revision;
@@ -47,8 +48,8 @@ export function createCompanionScene({ doc, root, info, gotomon, act }) {
     metric.textContent=world.metric || info.goal;
     if (goalPicker && world.challenge) {
       const goal = world.challenge;
-      goalSummary.textContent = `目標：${goal.name}${goal.canChoose ? '（選ぶ）' : '（確認）'}`;
-      goalRule.textContent = `${goal.rule} ${goal.hint}`;
+      goalSummary.textContent = `${world.course ? `★ ${world.course.name} · ` : ''}目標：${goal.name}${goal.canChoose ? '（選ぶ）' : '（確認）'}`;
+      goalRule.textContent = `${world.course ? `${world.course.description} ` : ''}${goal.rule} ${goal.hint}`;
       goalStatus.textContent = goal.status === 'active' ? `${goal.progress || 'これから挑戦'} · あと${goal.remaining}問` : goal.message;
       goalStatus.dataset.status = goal.status;
       if (!goal.canChoose && goalPicker.dataset.locked !== 'true') { goalPicker.open = false; goalPicker.dataset.locked = 'true'; }
