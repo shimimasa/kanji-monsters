@@ -120,3 +120,69 @@ section.yt-game[id] .gt-goal-picker{color:#17362f}
 section.yt-game[id] :is(.mi-board,.kd-board)[data-mode=danger]{border-color:#e49860;box-shadow:0 0 0 3px #e4986066}
 @media(max-width:580px){section.yt-game[id] .gt-scene:not(.gt-board-caption){height:300px}section.yt-game[id] .gt-scene.gt-explore{height:360px}section#multiSelectScreen.yt-game .gt-scene.gt-craft{height:380px}section#timedChoiceScreen.yt-game .gt-scene.gt-lantern{height:320px}section#mathInvaderScreen.yt-game .mi-board,section#kanjiDefenseScreen.yt-game .kd-board{height:280px}}
 @media(max-height:680px){section.yt-game[id] .gt-scene:not(.gt-board-caption){height:260px}section.yt-game[id] .gt-scene.gt-explore{height:320px}section#multiSelectScreen.yt-game .gt-scene.gt-craft{height:340px}section#timedChoiceScreen.yt-game .gt-scene.gt-lantern{height:280px}section#mathInvaderScreen.yt-game .mi-board,section#kanjiDefenseScreen.yt-game .kd-board{height:250px}}
+
+/* The whole viewport is the playfield. Navigation stays above it; play controls stay inside it. */
+section.yt-game.gt-fullscreen-play{padding:0!important;overflow:hidden!important;background:#193b3b}
+section.yt-game.gt-fullscreen-play header{position:fixed!important;inset:0 0 auto!important;z-index:100!important;height:56px;box-sizing:border-box;margin:0!important;padding:5px 9px!important;background:#102d32ed!important;color:#fff7dc!important;backdrop-filter:blur(8px)}
+section.yt-game.gt-fullscreen-play header h1{color:#fff7dc!important;font-size:clamp(17px,4.5vw,23px)!important}
+section.yt-game.gt-fullscreen-play .gt-sound:not([hidden]){position:fixed;z-index:101;top:56px;right:8px;max-width:calc(100vw - 16px);padding:10px;border:2px solid #f4d99b;border-radius:10px;background:#fff9e8;color:#17362f;box-shadow:0 12px 28px #071e22aa}
+section.yt-game.gt-fullscreen-play .gt-stage{position:fixed;inset:0;z-index:2;margin:0!important;pointer-events:none}
+section.yt-game.gt-fullscreen-play .gt-scene:not(.gt-board-caption),section#mathInvaderScreen.yt-game.gt-fullscreen-play .mi-board,section#kanjiDefenseScreen.yt-game.gt-fullscreen-play .kd-board{position:fixed;inset:0;width:100vw;height:100dvh!important;max-width:none;margin:0;border:0;border-radius:0;box-shadow:none;pointer-events:auto}
+section.yt-game.gt-fullscreen-play .gt-scene.gt-board-caption{display:none!important}
+section.yt-game.gt-fullscreen-play .gt-scene-metric,section.yt-game.gt-fullscreen-play .gt-scene-label{display:none}
+section.yt-game.gt-fullscreen-play .gt-goal-status{display:none}
+section.yt-game.gt-fullscreen-play .gt-in-world{position:absolute;z-index:8;box-sizing:border-box}
+section.yt-game.gt-fullscreen-play .gt-how-to{position:fixed;z-index:101;top:62px;left:8px;width:30%;margin:0;padding:0 5px;background:#fff9e8ee;color:#24453a}
+section.yt-game.gt-fullscreen-play .gt-how-to summary{min-height:46px;padding:10px 2px;font-size:12px;line-height:1.2}
+section.yt-game.gt-fullscreen-play .gt-how-to[open]{z-index:20;width:min(94%,460px);max-height:65dvh;overflow:auto;box-shadow:0 12px 30px #071e22aa}
+section.yt-game.gt-fullscreen-play .gt-goal-picker{top:62px;right:8px;width:calc(70% - 20px);margin:0;padding:3px 7px;background:#fff9e8f0}
+section.yt-game.gt-fullscreen-play .gt-goal-picker summary{min-height:46px;font-size:12px;line-height:1.2}
+section.yt-game.gt-fullscreen-play .gt-goal-picker[open]{z-index:20;left:8px;width:calc(100% - 16px);max-height:65dvh;overflow:auto;box-shadow:0 12px 30px #071e22aa}
+section.yt-game.gt-fullscreen-play .gt-hud{top:119px;left:8px;right:8px;display:flex;align-items:center;gap:6px;margin:0;padding:4px 8px;border-radius:9px;background:#143534cf;color:#fff8dd;min-height:36px;font-size:12px}
+section.yt-game.gt-fullscreen-play .gt-hud .gt-friend-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+section.yt-game.gt-fullscreen-play .gt-hud .gt-skill{position:static!important;flex:0 0 100px;min-width:0;min-height:36px!important;max-width:100px;padding:3px 5px!important;font-size:10px!important;line-height:1.1}
+section.yt-game.gt-fullscreen-play .gt-hud .gt-skill meter{display:none}
+section.yt-game.gt-fullscreen-play :is(.ms-progress,.ec-progress,.so-progress,.tc-progress,.ac-progress,.mi-hud,.kd-hud){top:158px;left:8px;right:8px;margin:0!important;padding:3px 6px;border-radius:8px;background:#13353bc4;color:#fff7d8;font-size:12px;min-height:30px;z-index:9}
+section.yt-game.gt-fullscreen-play .gt-play-controls{top:196px;left:9px;right:9px;bottom:63px;display:flex!important;flex-direction:column;gap:7px;overflow:auto;overscroll-behavior:contain;padding:5px 3px 8px;scrollbar-width:thin}
+section.yt-game.gt-fullscreen-play .gt-play-controls :is(.ms-help,.ec-help,.so-help,.tc-help,.ac-help){display:none}
+section.yt-game.gt-fullscreen-play .gt-play-controls :is(.ms-question,.ec-prompt,.so-prompt,.tc-prompt,.ms-prompt,.ac-prompt){position:static;transform:none;width:100%;max-width:none;margin:0;padding:9px 10px;border:2px solid #fff1c9a8;border-radius:12px;background:#122e36de;color:#fff8dd;text-align:center;font-size:clamp(19px,5vw,31px);line-height:1.25;box-shadow:0 5px 15px #071f2b55}
+section#mathSprintScreen.yt-game.gt-fullscreen-play .gt-play-controls .ms-question{font-size:clamp(31px,8vw,46px)!important}
+section.yt-game.gt-fullscreen-play .gt-play-controls :is(.ec-choices,.tc-choices,.ac-choices,.ms-choices,.so-chunks){position:static;transform:none;width:100%;max-width:none;margin:auto 0 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:8px;border:2px solid #fff0ca8c;border-radius:14px;background:#102d32bd;box-shadow:0 6px 18px #0a202c66}
+section.yt-game.gt-fullscreen-play .gt-play-controls :is(.ec-choices,.tc-choices,.ac-choices,.ms-choices) button{min-width:0;min-height:54px;font-size:clamp(14px,3.7vw,18px);line-height:1.2;overflow-wrap:anywhere}
+section#sentenceOrderScreen.yt-game.gt-fullscreen-play .gt-play-controls .so-chunks{display:flex;flex-wrap:wrap;max-height:48%;overflow:auto}
+section.yt-game.gt-fullscreen-play .gt-play-controls :is(.ms-feedback,.ec-feedback,.so-feedback,.tc-feedback,.ac-feedback){min-height:22px;margin:0;padding:2px 6px;border-radius:7px;background:#102d32cc;color:#fff8dd;font-size:12px}
+section.yt-game.gt-fullscreen-play .gt-play-controls [data-action=next],section.yt-game.gt-fullscreen-play .gt-play-controls [data-action=submit]{align-self:stretch;min-height:42px}
+section.yt-game.gt-fullscreen-play .gt-world-actions{position:absolute;z-index:9;left:7px;right:7px;bottom:7px;margin:0;display:flex;gap:5px;pointer-events:auto}
+section.yt-game.gt-fullscreen-play .gt-world-actions .gt-button{min-height:48px;font-size:clamp(11px,2.9vw,14px);padding:4px 3px;line-height:1.15}
+section#asyncChoiceScreen.yt-game.gt-fullscreen-play .gt-map-actions{top:auto;inset:auto 7px 7px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+section#mathSprintScreen.yt-game.gt-fullscreen-play .gt-play-controls .ms-answer-row{position:static;transform:none;width:100%;margin:0;padding:6px;border:2px solid #ffe9b7;border-radius:12px;background:#173b35e0}
+section#mathSprintScreen.yt-game.gt-fullscreen-play .gt-play-controls .ms-pad{margin:auto 0 0!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+section#mathSprintScreen.yt-game.gt-fullscreen-play .gt-play-controls .ms-pad button{min-height:44px;padding:3px}
+section#timedChoiceScreen.yt-game.gt-fullscreen-play .gt-play-controls :is(.tc-timer-label,.tc-timer-track){position:static;width:auto;height:auto;overflow:visible;clip-path:none;white-space:normal;margin:0;color:#fff7dc}
+section#timedChoiceScreen.yt-game.gt-fullscreen-play .gt-play-controls .tc-timer-track{width:100%}
+section#multiSelectScreen.yt-game.gt-fullscreen-play .gt-play-controls .ms-choices{max-height:50%;overflow:auto}
+section#multiSelectScreen.yt-game.gt-fullscreen-play .gt-play-controls .ms-choices button{min-height:46px;padding:5px 6px 5px 28px;font-size:13px}
+section.yt-game.gt-fullscreen-play :is(.gt-treasure,.gt-bridge,.gt-craft,.gt-explore,.gt-lantern,.gt-race) .gt-actor{bottom:31%!important}
+section#multiSelectScreen.yt-game.gt-fullscreen-play .gt-craft .gt-route-sky{inset:27% 7% auto;width:86%;height:32%}
+section#multiSelectScreen.yt-game.gt-fullscreen-play .gt-craft .gt-star-map{top:27%;height:30%}
+section#multiSelectScreen.yt-game.gt-fullscreen-play .gt-craft .gt-actor{bottom:40%!important}
+section.yt-game.gt-fullscreen-play .gt-learning-save-alert:not([hidden]){position:fixed;z-index:24;bottom:60px;left:8px;right:8px}
+section.yt-game.gt-fullscreen-play .gt-result:not([hidden]){position:fixed;z-index:22;inset:56px 0 0;overflow:auto;margin:0!important;max-width:none}
+section.yt-game.gt-fullscreen-play :is(.mi-board,.kd-board) .gt-play-controls{top:auto;bottom:61px;left:8px;right:8px;padding:7px;border:2px solid #8fb5cc;border-radius:12px;background:#14364ce8;color:#fff7dc;max-height:34dvh}
+section#mathInvaderScreen.yt-game.gt-fullscreen-play .mi-controls .mi-pad{grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin:3px 0}
+section#mathInvaderScreen.yt-game.gt-fullscreen-play .mi-controls .mi-pad button{min-height:42px;padding:2px}
+section#mathInvaderScreen.yt-game.gt-fullscreen-play .mi-instruction,section#kanjiDefenseScreen.yt-game.gt-fullscreen-play .kd-instruction{top:193px;left:9px;right:9px;margin:0;padding:4px 8px;border-radius:7px;background:#132f3ad9;color:#fff8dd;font-size:12px;min-height:25px}
+section#kanjiDefenseScreen.yt-game.gt-fullscreen-play .kd-instruction{top:207px}
+section#mathInvaderScreen.yt-game.gt-fullscreen-play{background:repeating-linear-gradient(90deg,transparent 0 calc(33.333% - 1px),#718faf55 calc(33.333% - 1px) 33.333%),linear-gradient(#172f49,#496b85)}
+section#kanjiDefenseScreen.yt-game.gt-fullscreen-play{background:linear-gradient(#88c7ec 0%,#d8f1d0 72%,#76583d 73%,#3c2b20 100%)}
+section#mathInvaderScreen.yt-game.gt-fullscreen-play .mi-board,section#kanjiDefenseScreen.yt-game.gt-fullscreen-play .kd-board{position:fixed;inset:auto 0 auto;width:100vw;overflow:visible;border:0;border-radius:0;box-shadow:none;background:transparent}
+section#mathInvaderScreen.yt-game.gt-fullscreen-play .mi-board{top:250px;height:max(60px,calc(100dvh - 570px))!important}
+section#kanjiDefenseScreen.yt-game.gt-fullscreen-play .kd-board{top:255px;height:max(70px,calc(100dvh - 475px))!important}
+section.yt-game.gt-fullscreen-play :is(.mi-board,.kd-board) .gt-in-world,section.yt-game.gt-fullscreen-play :is(.mi-board,.kd-board) .gt-world-actions{position:fixed}
+section#mathInvaderScreen.yt-game.gt-fullscreen-play .mi-board::after{bottom:0}
+section#kanjiDefenseScreen.yt-game.gt-fullscreen-play .kd-board::after{bottom:0}
+section#mathInvaderScreen.yt-game.gt-fullscreen-play .mi-board .gt-board-actor,section#kanjiDefenseScreen.yt-game.gt-fullscreen-play .kd-board .gt-board-actor{bottom:0!important}
+section.yt-game.gt-fullscreen-play .gt-result:not([hidden]),section.yt-game.gt-fullscreen-play .mi-result:not([hidden]),section.yt-game.gt-fullscreen-play .kd-result:not([hidden]){background:#fffaf0;color:#17362f}
+@media(max-height:680px){section.yt-game.gt-fullscreen-play .gt-play-controls{top:180px;bottom:53px}section.yt-game.gt-fullscreen-play .gt-hud{top:112px}section.yt-game.gt-fullscreen-play :is(.ms-progress,.ec-progress,.so-progress,.tc-progress,.ac-progress,.mi-hud,.kd-hud){top:150px}section#sentenceOrderScreen.yt-game.gt-fullscreen-play .so-chunks{flex-shrink:0;max-height:160px;min-height:126px}section#sentenceOrderScreen.yt-game.gt-fullscreen-play .so-chunk{min-height:43px;padding-block:5px}}
+@media(max-width:360px){section.yt-game.gt-fullscreen-play header{flex-wrap:nowrap!important}section.yt-game.gt-fullscreen-play header h1{font-size:16px!important;min-width:0}section.yt-game.gt-fullscreen-play header button{min-width:44px!important;min-height:42px!important;padding:3px!important;font-size:10px!important}section.yt-game.gt-fullscreen-play .gt-header-actions{display:flex;gap:3px;flex:none}}
+@media(min-width:600px){section#mathInvaderScreen.yt-game.gt-fullscreen-play .mi-controls{left:50%;right:auto;width:min(calc(100vw - 16px),520px);transform:translateX(-50%)}}

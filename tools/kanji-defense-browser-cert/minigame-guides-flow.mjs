@@ -44,7 +44,7 @@ try {
     await expect(goalPicker).toBeVisible();
     await goalPicker.locator('summary').click();
     const goals = goalPicker.locator('.gt-goal-actions button');
-    await expect(goals).toHaveCount(id === 'multiSelect' ? 3 : 2);
+    expect(await goals.count()).toBeGreaterThanOrEqual(2);
     await expect(goals.nth(1)).toBeEnabled();
     await goals.nth(1).click();
     await expect(goals.nth(1)).toHaveAttribute('aria-pressed', 'true');

@@ -62,17 +62,18 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   const skillLabel = element(doc, 'span'); skill.append(gauge, skillLabel); hud.append(skill); howTo.after(hud);
   const scene = createCompanionScene({ doc, root, info, gotomon, act: onAct }); hud.after(scene.root);
   const sceneCanvas = scene.root.querySelector('.gt-scene');
-  const embedded = reviewMode ? [] : ({
-    mathSprint: ['.ms-question', '.ms-answer-row'],
-    englishChoice: ['.ec-prompt', '.ec-choices'],
-    sentenceOrder: ['.so-prompt', '.so-chunks'],
-    timedChoice: ['.tc-timer-label', '.tc-timer-track', '.tc-prompt', '.tc-choices'],
-    multiSelect: ['.ms-prompt', '.ms-choices'],
-    asyncChoice: ['.ac-prompt', '.ac-choices'],
-  }[definition.id] || []);
-  for (const selector of embedded) {
-    const node = root.querySelector(selector);
-    if (node) { node.classList.add('gt-embedded'); sceneCanvas.append(node); }
+  if (!reviewMode) {
+    root.classList.add('gt-fullscreen-play');
+    const arena = root.querySelector('.mi-board, .kd-board') || sceneCanvas;
+    const playControls = root.querySelector('.ms-play > div, .ec-play > div, .so-play > div, .tc-play > div, .ac-play > div, .mi-controls, .kd-controls');
+    for (const node of [hud, scene.root.querySelector('.gt-goal-picker'), scene.root.querySelector('.gt-goal-status'),
+      root.querySelector('.ms-progress, .ec-progress, .so-progress, .tc-progress, .ac-progress, .mi-hud, .kd-hud'),
+      root.querySelector('.mi-instruction, .kd-instruction'), playControls]) {
+      if (node) { node.classList.add('gt-in-world'); arena.append(node); }
+    }
+    if (playControls) playControls.classList.add('gt-play-controls');
+    const worldActions = scene.root.querySelector('.gt-world-actions');
+    if (worldActions && worldActions.parentElement !== arena) arena.append(worldActions);
   }
   const help = element(doc, 'p', 'gt-help', info.goal); scene.root.after(help);
   const saveAlert = element(doc, 'div', 'gt-learning-save-alert');
@@ -85,8 +86,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   const sentenceExplanation = definition.id === 'sentenceOrder' ? element(doc, 'p', 'gt-sentence-explanation') : null;
   if (sentenceExplanation) { sentenceExplanation.hidden = true; sentenceExplanation.setAttribute('role', 'status'); root.querySelector('.so-feedback')?.after(sentenceExplanation); }
   // Keyboard activation of shell controls must not submit the game's answer.
-  for (const node of [header, soundPanel, hud, scene.root]) {
-    node.addEventListener('keydown', event => event.stopPropagation());
+  for (const node of [header, soundPanel, hud, root.querySelector('.gt-goal-picker'), root.querySelector('.gt-world-actions')]) {
+    node?.addEventListener('keydown', event => event.stopPropagation());
   }
   const result = element(doc, 'section', 'gt-result'); result.hidden = true; result.setAttribute('aria-label', '相棒とのプレイ結果');
   result.addEventListener('keydown', event => event.stopPropagation());

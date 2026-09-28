@@ -56,11 +56,12 @@ try {
     await expect(specialAction).toBeVisible();
     report.layout[gameId] = await page.locator('.gt-scene').evaluate(node => ({ height: Math.round(node.getBoundingClientRect().height), classes: node.className }));
     if (!['mathInvader', 'kanjiDefense'].includes(gameId)) {
-      expect(await page.locator('.gt-scene > .gt-embedded').count()).toBeGreaterThanOrEqual(2);
+      await expect(page.locator('.gt-scene > .gt-play-controls')).toBeVisible();
+      expect(await page.locator('.gt-scene .gt-play-controls [data-role=problem]').count()).toBe(1);
     } else {
       const enemy = page.locator(gameId === 'mathInvader' ? '.mi-enemy' : '.kd-monster').first();
       await expect(enemy).toBeVisible();
-      await enemy.click();
+      await enemy.click({ force: true });
       const answer = page.locator(gameId === 'mathInvader' ? '.mi-answer-row input' : '.kd-controls input');
       await expect(answer).toBeVisible();
       report.layout[gameId].answerBottom = await answer.evaluate(node => Math.round(node.getBoundingClientRect().bottom));
@@ -74,6 +75,23 @@ try {
     }
     expect(await page.locator('.yt-game').evaluate(root => root.scrollWidth <= root.clientWidth + 2)).toBe(true);
     await page.screenshot({ path: fileURLToPath(new URL(`${gameId}.png`, out)), fullPage: true });
+    await page.setViewportSize({ width: 320, height: 568 });
+    expect(await page.locator('.yt-game').evaluate(root => root.scrollWidth <= root.clientWidth + 2 && root.scrollHeight <= root.clientHeight + 2)).toBe(true);
+    await page.screenshot({ path: fileURLToPath(new URL(`${gameId}-small.png`, out)), fullPage: true });
+    await page.setViewportSize({ width: 768, height: 900 });
+    expect(await page.locator('.yt-game').evaluate(root => root.scrollWidth <= root.clientWidth + 2 && root.scrollHeight <= root.clientHeight + 2)).toBe(true);
+    await page.screenshot({ path: fileURLToPath(new URL(`${gameId}-wide.png`, out)), fullPage: true });
+    await page.setViewportSize({ width: 390, height: 844 });
+    if (gameId === 'mathSprint') {
+      await page.locator('.gt-play-controls .ms-answer-row input').fill('0');
+      await page.locator('.gt-play-controls .ms-answer-row input').press('Enter');
+      await expect(page.locator('.gt-play-controls .ms-feedback')).not.toBeEmpty();
+    }
+    if (gameId === 'englishChoice') {
+      await page.locator('.gt-play-controls .ec-choice').first().focus();
+      await page.keyboard.press('1');
+      await expect(page.locator('.gt-play-controls .ec-feedback')).not.toBeEmpty();
+    }
     await page.locator('[data-action=back]').click();
     await expect(page.locator('#miniGameHub')).toBeVisible();
     report.courses.push(gameId);
