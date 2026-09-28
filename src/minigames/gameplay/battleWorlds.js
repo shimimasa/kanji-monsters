@@ -1,6 +1,8 @@
-export function createShootingWorld(effects) {
-  let kills=0, bonus=0, bossHp=8, shots=0, danger=false, priority=null, aimed=null, hitLane=1,hitY=.35;
+export function createShootingWorld(effects,{course=null}={}) {
+  let kills=0, bonus=0, bossHp=8, shots=0, danger=false, priority=null, aimed=null, hitLane=1,hitY=.35, grains=0, golden=false, goldenHits=0;
   return {
+    act(action) { if (course?.id !== 'corn-barrage' || action !== 'golden-burst' || grains < 3 || golden || bossHp === 0) return false;
+      grains -= 3; golden = true; return true; },
     context(state) {
       const enemies = state.enemies || [];
       priority = enemies.reduce((best,enemy)=>!best||enemy.y>best.y?enemy:best,null)?.enemyId;
@@ -10,15 +12,17 @@ export function createShootingWorld(effects) {
     },
     answer(correct) {
       if(!correct)return;
-      kills++; if(aimed && aimed===priority)bonus+=12;
+      kills++; if(aimed && aimed===priority){bonus+=12;if(course?.id==='corn-barrage')grains=Math.min(6,grains+1);}
+      if(golden){bossHp=Math.max(0,bossHp-2);golden=false;goldenHits++;if(bossHp===0)bonus+=60;}
       if(kills>=8&&bossHp>0){bossHp=Math.max(0,bossHp-(shots>0 ? Math.round(4*effects.potency) : 2)); if(bossHp===0)bonus+=60;}
       if(shots>0)shots--;
     },
     boost(){shots=2;},
-    snapshot(){return {kind:'shoot',bonus,progress:kills/10,bossHp,shots,danger,priority,hitLane,hitY,
+    snapshot(){return {kind:'shoot',bonus,progress:kills/10,bossHp,shots,danger,priority,hitLane,hitY,grains,golden,goldenHits,
       metric:kills>=7?`大型機 HP ${bossHp}/8 · 強化弾 ${shots}`:`WAVE ${Math.min(3,1+Math.floor(kills/3))}/3 · 撃破 ${kills}/10`,
-      caption:kills>=7?'ラスト3機で大型機を撃退！技を合わせて連射':'手前の敵を優先して撃退。選択中はゆっくり計算できる',
-      summary:bossHp===0?'大型機を撃退！':`大型機 残りHP ${bossHp}`,goal:'技を最後の3機に合わせ、大型機を撃退しよう',actions:[]}},
+      caption:golden?'黄金弾を準備！次の正解で大型機にも命中':kills>=7?'ラスト3機で大型機を撃退！技を合わせて連射':'手前の敵を優先して撃退。選択中はゆっくり計算できる',
+      summary:`${bossHp===0?'大型機を撃退！':`大型機 残りHP ${bossHp}`}${course ? ` · 黄金弾 ${goldenHits}発` : ''}`,goal:'技を最後の3機に合わせ、大型機を撃退しよう',
+      actions:course?.id==='corn-barrage'?[{id:'golden-burst',label:golden?'黄金弾を装填中':`黄金弾を装填（粒 ${grains}/3）`,enabled:grains>=3&&!golden&&bossHp>0}]:[]}},
   };
 }
 

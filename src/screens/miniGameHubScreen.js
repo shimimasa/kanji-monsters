@@ -10,6 +10,7 @@ import { sentenceLearningService } from '../minigames/sentenceOrder/sentenceLear
 import { hubRecommendations } from '../minigames/hubRecommendations.js';
 import { createCompanionMemoryDialog } from '../ui/companionMemoryDialog.js';
 import { createLearningNotebookDialog } from '../ui/learningNotebookDialog.js';
+import { companionCourse } from '../minigames/companionCourses.js';
 
 const hub = {
   enter(props = {}) {
@@ -63,6 +64,8 @@ const hub = {
       const foot = element(doc, 'span', 'yt-card-foot');
       if (selected) foot.append(companionPortrait(doc, selected));
       foot.append(element(doc, 'span', '', selected?.name || '冒険で相棒を見つけよう'));
+      const featuredCourse = companionCourse(selected?.id, definition.id);
+      if (featuredCourse) card.append(element(doc, 'span', 'yt-card-course', `★ ${selected.name}の専用コース：${featuredCourse.name}`));
       const stats = progress.games?.[definition.id];
       card.append(foot, element(doc, 'small', 'yt-card-record', stats ? `${stats.bestRank || 'C'} RANK · BEST ${stats.bestScore} · ${stats.plays}回` : 'はじめての記録をつくろう'));
       grid.append(card);
@@ -119,11 +122,22 @@ const hub = {
     }
     const owned = gotomonService.getOwnedGotomon(), selected = gotomonService.getSelectedGotomon();
     let selectedId = selected?.id;
+    const courseLabel = element(doc, 'label', 'yt-course-choice');
+    const courseCheck = element(doc, 'input'); courseCheck.type = 'checkbox'; courseCheck.checked = true;
+    const courseText = element(doc, 'span'); courseLabel.append(courseCheck, courseText);
+    const updateCourse = () => {
+      const course = !playOptions.review && !playOptions.practiceContentIds && companionCourse(selectedId, definition.id);
+      courseLabel.hidden = !course;
+      courseText.textContent = course ? `専用コース「${course.name}」で遊ぶ · ${course.description}` : '';
+      courseCheck.checked = !!course;
+    };
+    updateCourse();
     const message = element(doc, 'p', 'yt-note'); message.setAttribute('role', 'status');
     const begin = button(doc, selected ? `${selected.name}とスタート` : '相棒が必要です', () => {
       const result = gotomonService.setSelectedGotomon(selectedId);
       if (!result.ok) { message.textContent = '相棒を保存できませんでした。保存状態を確認して、もう一度お試しください。'; return; }
       dialog.close(); publish('changeScreen', { name: 'miniGame', props: { ...playOptions, gameId: definition.id, gotomonId: selectedId,
+        courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(selectedId, definition.id)?.id : null,
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');
@@ -132,6 +146,7 @@ const hub = {
       const choice = button(doc, '', () => {
         if (PLAYTEST_ENABLED) trackPlaytest('companionChosen', {gameId:definition.id,gotomonId:friend.id});
         selectedId = friend.id;
+        updateCourse();
         for (const node of grid.children) node.setAttribute('aria-pressed', String(node.dataset.gotomonId === selectedId));
         begin.textContent = `${friend.name}とスタート`;
         const growth = gotomonService.getGrowth(friend.id);
@@ -142,7 +157,7 @@ const hub = {
         element(doc, 'small', '', `Lv${gotomonService.getGrowth(friend.id).level} · なかよし ${stats[friend.id]?.friendship ?? 0}`)); grid.append(choice);
     }
     if (!owned.length) dialog.append(element(doc, 'p', '', 'まだ捕獲したゴトモンがいません。本編でステージをクリアし、仲間に迎えよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title')));
-    dialog.append(grid, message, begin, element(doc, 'p', 'yt-note', '好きな相棒を選んでOK。答えや難しさは変わりません。'));
+    dialog.append(grid, courseLabel, message, begin, element(doc, 'p', 'yt-note', '通常コースと復習は、どの相棒でも遊べます。専用コースでも問題の正解は同じです。'));
     this.root.append(dialog); this.dialog = dialog; dialog.showModal();
     if (selected) begin.focus();
   },

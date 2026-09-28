@@ -8,7 +8,7 @@ const worlds={mathSprint:createRaceWorld, mathInvader:createShootingWorld, engli
 
 export function createGameplayRun(gameId,effects,options={}) {
   const world=worlds[gameId]?.(effects,options);
-  const challenge=createRunChallenge(gameId,options.variation);
+  const challenge=createRunChallenge(gameId,options.variation,options.course);
   if (challenge && world) challenge.observeAction(world.snapshot());
   let state=null, completed=false;
   return {
@@ -29,6 +29,8 @@ export function createGameplayRun(gameId,effects,options={}) {
       return !!accepted;
     },
     allow(command){return !(gameId==='asyncChoice' && command?.type==='answer' && world.snapshot().waiting);},
-    snapshot(){const current=world?.snapshot();return current&&challenge?{...current,challenge:challenge.snapshot()}:current??null;},
+    snapshot(){const current=world?.snapshot();return current?{...current,
+      ...(challenge ? {challenge:challenge.snapshot()} : {}),
+      ...(options.course ? {course:{id:options.course.id,name:options.course.name,description:options.course.description}} : {})} : null;},
   };
 }

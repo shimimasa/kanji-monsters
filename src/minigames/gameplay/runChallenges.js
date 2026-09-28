@@ -48,10 +48,22 @@ const GOALS = Object.freeze({
   ],
 });
 
-export function createRunChallenge(gameId, variation = 0) {
-  const goals = GOALS[gameId];
-  if (!goals) return null;
-  let selected = goals[Math.abs(variation) % goals.length];
+const COURSE_GOALS = Object.freeze({
+  'potato-shortcut': { id: 'shortcut', name: '近道を2回見つける', deadline: 9, target: 2,
+    rule: '障害区間で力1を使って転がり、正解して近道へ。', hint: '3・6・9区間目が障害。', value: data => data.world.shortcuts || 0 },
+  'corn-barrage': { id: 'golden', name: '黄金弾を1発当てる', deadline: 8, target: 1,
+    rule: '手前の敵を3回倒して粒を集め、黄金弾を装填しよう。', hint: '装填後の次の正解で命中。', value: data => data.world.goldenHits || 0 },
+  'milk-lantern': { id: 'drops', name: 'しずくで灯台を3つ', deadline: 8, target: 3,
+    rule: 'しずくを使い、問題に答えながら灯台を3つ灯そう。', hint: 'しずくは問題ごとに1つ蓄えられる。',
+    value: data => data.world.poured ? data.world.towers || 0 : 0 },
+});
+
+export function createRunChallenge(gameId, variation = 0, course = null) {
+  const base = GOALS[gameId];
+  if (!base) return null;
+  const courseGoal = COURSE_GOALS[course?.id];
+  const goals = courseGoal ? [courseGoal, ...base] : base;
+  let selected = courseGoal || goals[Math.abs(variation) % goals.length];
   const data = { answered: 0, correct: 0, maxCombo: 0, jumps: 0, priorityHits: 0, world: {} };
   let status = 'active', achievedAt = null;
   const evaluate = () => {

@@ -54,13 +54,15 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, onPa
     }
   });
   const hud = element(doc, 'div', 'gt-hud'), name = element(doc, 'span', 'gt-friend-name', gotomon?.name || '相棒なし');
+  const courseNotice = element(doc, 'p', 'gt-course-notice');
+  courseNotice.hidden = true;
   const score = element(doc, 'strong'), combo = element(doc, 'span');
   name.textContent = `${gotomon?.name || '相棒'} Lv${play.snapshot().growth.level}`;
   hud.append(name, score, combo);
   const skill = button(doc, '', onBoost, 'gt-button gt-skill'); skill.dataset.action = 'boost';
   const gauge = element(doc, 'meter'); gauge.min = 0; gauge.max = 3; gauge.value = 0; gauge.setAttribute('aria-label', '相棒ゲージ');
   const skillLabel = element(doc, 'span'); skill.append(gauge, skillLabel); hud.append(skill); howTo.after(hud);
-  const scene = createCompanionScene({ doc, root, info, gotomon, act: onAct }); hud.after(scene.root);
+  const scene = createCompanionScene({ doc, root, info, gotomon, act: onAct }); hud.after(courseNotice,scene.root);
   if(info.scene==='lantern')scene.root.querySelector('.gt-scene').append(skill);
   const help = element(doc, 'p', 'gt-help', info.goal); scene.root.after(help);
   const saveAlert = element(doc, 'div', 'gt-learning-save-alert');
@@ -158,6 +160,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, onPa
       skill.title = `${current.growth.description}・技 ${current.skillPoints}pt＋ゲーム固有効果`;
       score.textContent = `${(state.score ?? current.learningPoints) + current.bonus} pt`;
       combo.textContent = `${current.combo} COMBO`;
+      courseNotice.hidden = !current.world?.course || state.mode === 'review' || !!state.result;
+      if (!courseNotice.hidden) courseNotice.textContent = `★ ${gotomon?.name}の専用コース：${current.world.course.name} · ${current.world.course.description}`;
       scene.update(state, current, dt);
       if (state.mode !== 'review' && state.phase === 'feedback' && !state.paused && (state.lastAnswer?.correct || state.lastAnswer?.classification === 'fullCorrect')) {
         const id = state.problem?.problemId;
@@ -210,7 +214,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, onPa
         growthResult.update(state.paused ? 0 : dt);
         findings?.update(current.world?.findings);
         resultScore.textContent = `${points} pt`;
-        stats.textContent = reviewing ? '相棒と、ことばをたしかめたよ。' : `${current.world?.summary || ''}${receipt?.reward?.newTimeBest?' · タイム更新！':''}`;
+        stats.textContent = reviewing ? '相棒と、ことばをたしかめたよ。' : `${current.world?.course ? `${current.world.course.name} · ` : ''}${current.world?.summary || ''}${receipt?.reward?.newTimeBest?' · タイム更新！':''}`;
         result.dataset.world=info.scene;result.dataset.triumph=String(info.scene==='craft'?current.world?.completed===3:info.scene==='shoot'?current.world?.bossHp===0:info.scene==='defend'?state.life>0:current.correct>=8);
         replay.disabled = state.paused;
         if (!resultShown) { resultShown = true; root.scrollTop = 0; (onNotebook && receipt?.ok ? notebook : replay).focus({ preventScroll: true }); }

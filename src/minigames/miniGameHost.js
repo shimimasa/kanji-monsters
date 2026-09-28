@@ -16,6 +16,7 @@ import { sentenceLearningService } from './sentenceOrder/sentenceLearningService
 import { hubActivityService } from './hubActivityService.js';
 import { notebookContext } from './learningNotebook.js';
 import { createRunMistakes } from './runMistakes.js';
+import { companionCourse } from './companionCourses.js';
 
 const layout = Object.freeze({ imageRect: { x: 20, y: 10, width: 240, height: 120 },
   clipRect: { x: 24, y: 14, width: 232, height: 112 } });
@@ -84,9 +85,11 @@ export function createMiniGameHost({ document: doc = globalThis.document,
         return wordLearning.getPracticeIds(runMistakes.ids()).filter(id => savedHistory[id]?.lastCorrect === false);
       };
       const growth = service.getGrowth?.(gotomon?.id);
+      const course = !nextProps.review && nextProps.courseId === companionCourse(gotomon?.id, definition.id)?.id
+        ? companionCourse(gotomon?.id, definition.id) : null;
       const ticket = service.beginPlay?.({ sessionId, gameId: definition.id, gotomonId: gotomon?.id });
       play = createCompanionPlay(sessionId, doc.querySelector && !makeView
-        ? { gameId: definition.id, growth, support: gotomon?.support?.id, bestTimeMs: service.getProgress().games?.[definition.id]?.bestTimeMs } : {});
+        ? { gameId: definition.id, growth, support: gotomon?.support?.id, bestTimeMs: service.getProgress().games?.[definition.id]?.bestTimeMs, course } : {});
       companion = makeCompanion({ sessionId, ownedMonsterIds: owned, selectedId: gotomon?.id, loadImage });
       game = definition.create({ sessionId, random, history, reviewContentIds, sentenceLevel: nextProps.sentenceLevel, onEvent: event => {
         if (valid) { companion?.observe(event); play?.observe(event); }

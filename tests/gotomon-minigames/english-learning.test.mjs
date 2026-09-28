@@ -97,8 +97,8 @@ test('save validator rejects corrupt learning records and allows legacy saves', 
 test('learning features preserve other five cores/views, reward formulas, kanji save and logger', () => {
   const games = ['mathSprint', 'mathInvader', 'multiSelect', 'asyncChoice', 'kanjiDefense'];
   const files = games.flatMap(id => [`src/minigames/${id}/${id}Game.js`, `src/minigames/${id}/${id}View.js`]);
-  // The memory feature now extends the service transaction; formulas remain frozen.
-  files.push('src/minigames/companionPlay.js', 'src/minigames/companionGrowth.js', 'src/minigames/scoreRank.js',
+  // Companion play can select a course; grading and growth formulas remain frozen.
+  files.push('src/minigames/companionGrowth.js', 'src/minigames/scoreRank.js',
     'src/playtest/developmentLogger.js', 'src/core/saveData.js', 'src/core/learningOutcome.js', 'src/audio/audioManager.js');
   for (const file of files) assert.equal(readFileSync(file, 'utf8').replaceAll('\r\n', '\n'),
     execFileSync('git', ['show', `2c5c501:${file}`], { encoding: 'utf8' }).replaceAll('\r\n', '\n'), file);
