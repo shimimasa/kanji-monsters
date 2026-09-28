@@ -4,9 +4,15 @@ import { gameExperiences } from '../minigames/gameExperiences.js';
 import { gotomonService } from '../minigames/gotomonService.js';
 import { element, button, companionPortrait, isolateScreen } from '../ui/adventureUI.js';
 import { PLAYTEST_ENABLED, trackPlaytest } from '../playtest/developmentLogger.js';
+import { englishLearningService } from '../minigames/englishChoice/englishLearningService.js';
+import { timedLearningService } from '../minigames/timedChoice/timedLearningService.js';
+import { sentenceLearningService } from '../minigames/sentenceOrder/sentenceLearningService.js';
+import { hubRecommendations } from '../minigames/hubRecommendations.js';
+import { createCompanionMemoryDialog } from '../ui/companionMemoryDialog.js';
+import { createLearningNotebookDialog } from '../ui/learningNotebookDialog.js';
 
 const hub = {
-  enter() {
+  enter(props = {}) {
     this.exit();
     const doc = document, root = element(doc, 'section', 'yt-world yt-hub'); root.id = 'miniGameHub';
     root.setAttribute('aria-label', 'ミニゲーム広場');
@@ -21,10 +27,34 @@ const hub = {
       const track = element(doc, 'progress', 'yt-xp'); track.max = 1; track.value = growth.fraction; track.setAttribute('aria-label', '次のレベルまでの経験値');
       details.append(track, element(doc, 'small', '', growth.remaining ? `あと${growth.remaining} XPでLv${growth.level + 1}` : 'MASTER · 育ちきった旅の相棒'));
       banner.append(companionPortrait(doc, selected), details);
+      const memories = button(doc, '思い出を見る', () => this.showMemories(), 'yt-memory-open');
+      memories.dataset.action = 'memories'; banner.append(memories);
     }
     else banner.append(element(doc, 'p', '', '相棒は、冒険のステージをクリアして捕まえよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title'), 'yt-primary'));
     wrap.append(banner);
-    const grid = element(doc, 'div', 'yt-game-grid'), progress = gotomonService.getProgress();
+    const notebook = button(doc, '学習ノートを見る', () => this.showLearningNotebook());
+    notebook.dataset.action = 'learning-notebook'; wrap.append(notebook);
+    const reviewCount = englishLearningService.getReviewIds().length, progress = gotomonService.getProgress();
+    const suggestions = hubRecommendations({ gameIds: Object.keys(miniGameRegistry), progress, reviewCount,
+      sentenceReviewCount: sentenceLearningService.getReviewIds().length, timedReviewCount: timedLearningService.getReviewIds().length });
+    if (selected && suggestions.length) {
+      const recommendation = element(doc, 'section', 'yt-recommendations');
+      recommendation.setAttribute('aria-label', '今日のおすすめ');
+      recommendation.append(element(doc, 'h2', '', '今日のおすすめ'));
+      const list = element(doc, 'div', 'yt-recommendation-list');
+      for (const suggestion of suggestions) {
+        const definition = miniGameRegistry[suggestion.gameId];
+        const card = button(doc, '', () => this.selectGame(definition, { review: !!suggestion.review }), 'yt-recommendation');
+        card.dataset.recommendation = suggestion.kind;
+        card.setAttribute('aria-label', `${suggestion.action}：${definition.title}`);
+        card.append(element(doc, 'small', '', suggestion.label), element(doc, 'strong', '', definition.title),
+          element(doc, 'span', '', suggestion.reason), element(doc, 'span', 'yt-recommendation-action', suggestion.action));
+        list.append(card);
+      }
+      recommendation.append(list);
+      wrap.append(recommendation);
+    }
+    const grid = element(doc, 'div', 'yt-game-grid');
     for (const definition of Object.values(miniGameRegistry)) {
       const info = gameExperiences[definition.id], card = button(doc, '', () => this.selectGame(definition), 'yt-game-card');
       card.dataset.gameId = definition.id; card.style.setProperty('--accent', info.color);
@@ -41,8 +71,24 @@ const hub = {
     root.append(wrap); doc.body.append(root); this.root = root; this.restore = isolateScreen(doc, root);
     header.querySelector('button').focus();
     if (PLAYTEST_ENABLED) trackPlaytest('hubShown', {});
+    if (props?.notebookContext) this.showLearningNotebook(props.notebookContext);
   },
-  selectGame(definition) {
+  showLearningNotebook(initialContext) {
+    this.dialog?.close(); this.dialog?.remove();
+    const dialog = createLearningNotebookDialog({ doc: document, initialContext,
+      services: { englishChoice: englishLearningService, timedChoice: timedLearningService, sentenceOrder: sentenceLearningService },
+      canReview: !!gotomonService.getSelectedGotomon(),
+      onReview: (gameId, practiceContentIds, notebookContext) => { dialog.remove(); this.selectGame(miniGameRegistry[gameId], { review: true, practiceContentIds, notebookContext }); },
+      onClose: () => this.root?.querySelector('[data-action=learning-notebook]')?.focus() });
+    this.dialog = dialog; this.root.append(dialog); dialog.showModal();
+  },
+  showMemories() {
+    this.dialog?.close(); this.dialog?.remove();
+    const dialog = createCompanionMemoryDialog({ doc: document, service: gotomonService, definitions: miniGameRegistry,
+      onClose: () => this.root?.querySelector('[data-action=memories]')?.focus() });
+    this.dialog = dialog; this.root.append(dialog); dialog.showModal();
+  },
+  selectGame(definition, playOptions = {}) {
     if (PLAYTEST_ENABLED) trackPlaytest('gameChosen', {gameId:definition.id});
     this.dialog?.remove();
     const doc = document, dialog = element(doc, 'dialog', 'yt-companion-dialog');
@@ -50,13 +96,29 @@ const hub = {
     const header = element(doc, 'div', 'yt-picker-header');
     header.append(element(doc, 'h2', '', definition.title), button(doc, '閉じる', () => dialog.close()));
     dialog.append(header, element(doc, 'p', '', '今回いっしょに遊ぶ相棒を選ぼう。'));
+    if (!playOptions.review && ['englishChoice', 'timedChoice', 'sentenceOrder'].includes(definition.id)) {
+      dialog.append(element(doc, 'p', 'yt-note', '記録に合わせて、まちがえた問題・まだ解いていない問題・前に正解した問題を組み合わせます。'));
+    }
+    let sentenceLevel = 'standard';
+    if (playOptions.practiceContentIds) dialog.append(element(doc, 'p', 'yt-note', '学習ノートで選んだ問題を練習します。得点や相棒の成長は増えません。'));
+    else if (definition.id === 'sentenceOrder' && playOptions.review) dialog.append(element(doc, 'p', 'yt-note', '3ピース・4ピースでまちがえた文を、最大10文ずつ復習します。'));
+    if (definition.id === 'sentenceOrder' && !playOptions.review) {
+      const label = element(doc, 'label', 'yt-memory-picker', '文ならべのコース');
+      const select = element(doc, 'select'); select.setAttribute('aria-label', '文ならべのコース');
+      for (const [value, text] of [['standard', 'いつもの3ピース（120文）'], ['challenge', '4ピースに挑戦（10文）']]) {
+        const option = element(doc, 'option', '', text); option.value = value; select.append(option);
+      }
+      select.onchange = () => { sentenceLevel = select.value; }; label.append(select); dialog.append(label,
+        element(doc, 'p', 'yt-note', 'どちらも10問。挑戦コースは10文を順番を変えて出題します。得点・ランク・相棒の記録は共通です。'));
+    }
     const owned = gotomonService.getOwnedGotomon(), selected = gotomonService.getSelectedGotomon();
     let selectedId = selected?.id;
     const message = element(doc, 'p', 'yt-note'); message.setAttribute('role', 'status');
     const begin = button(doc, selected ? `${selected.name}とスタート` : '相棒が必要です', () => {
       const result = gotomonService.setSelectedGotomon(selectedId);
       if (!result.ok) { message.textContent = '相棒を保存できませんでした。保存状態を確認して、もう一度お試しください。'; return; }
-      dialog.close(); publish('changeScreen', { name: 'miniGame', props: { gameId: definition.id, gotomonId: selectedId } });
+      dialog.close(); publish('changeScreen', { name: 'miniGame', props: { ...playOptions, gameId: definition.id, gotomonId: selectedId,
+        ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');
     const stats = gotomonService.getProgress().companions ?? {};

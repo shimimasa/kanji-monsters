@@ -1,18 +1,21 @@
 import { generateSentenceOrderQuestions } from './sentenceOrderQuestions.js';
 
 // Nonpersistent Core: no DOM, Storage, save, Motion, or scheduler dependencies.
-export function createSentenceOrderGame({ sessionId, random = Math.random, onEvent = () => {} }) {
-  const questions = generateSentenceOrderQuestions({ sessionId, random });
+export function createSentenceOrderGame({ sessionId, random = Math.random, onEvent = () => {}, sentenceLevel = 'standard', reviewContentIds, history }) {
+  const questions = generateSentenceOrderQuestions({ sessionId, random, sentenceLevel, reviewContentIds, history });
+  const totalQuestions = questions.length;
+  const reviewing = Array.isArray(reviewContentIds) && questions.every(q => reviewContentIds.includes(q.fixtureId));
   let active = true, paused = false, notifying = false, observer = onEvent;
   let phase = 'ready', index = -1, attemptId = null, seq = 0, activeElapsedMs = 0;
   let answered = 0, correct = 0, incorrect = 0, result = null, lastAnswer = null, aborted = false;
   let currentOrder = Object.freeze([]), completeEmitted = false;
+  const missed = [];
 
   const currentProblem = () => questions[index] ?? null;
   const snapshot = () => Object.freeze({
-    gameId: 'sentenceOrder', mode: 'tenQuestions', sessionId, phase, paused, active, aborted,
+    gameId: 'sentenceOrder', mode: reviewing ? 'review' : 'tenQuestions', totalQuestions, sentenceLevel, sessionId, phase, paused, active, aborted,
     problem: currentProblem(), attemptId, currentOrder, seq, activeElapsedMs,
-    answered, correct, incorrect, result, lastAnswer,
+    answered, correct, incorrect, result, lastAnswer, missed: Object.freeze([...missed]),
   });
   const notify = (type, payload = {}) => {
     const event = Object.freeze({
@@ -94,16 +97,24 @@ export function createSentenceOrderGame({ sessionId, random = Math.random, onEve
       const isCorrect = submittedOrder.every((chunkId, orderIndex) => chunkId === problem.correctOrder[orderIndex]);
       answered++;
       if (isCorrect) correct++;
-      else incorrect++;
+      else {
+        incorrect++;
+        const textFor = id => problem.chunks.find(chunk => chunk.chunkId === id).text;
+        missed.push(Object.freeze({ contentId: problem.fixtureId, questionNumber: answered,
+          submittedParts: Object.freeze(submittedOrder.map(textFor)),
+          correctParts: Object.freeze(problem.correctOrder.map(textFor)),
+          explanation: problem.explanation || '正しい文を声に出して読み、言葉のつながりをたしかめよう。' }));
+      }
       lastAnswer = Object.freeze({
         attemptId: committedAttempt,
         submittedOrder,
         correctOrder: problem.correctOrder,
         correct: isCorrect,
       });
-      phase = answered === 10 ? 'completed' : 'feedback';
-      if (phase === 'completed') result = Object.freeze({ answered, correct, incorrect, accuracy: correct / 10 });
+      phase = answered === totalQuestions ? 'completed' : 'feedback';
+      if (phase === 'completed') result = Object.freeze({ answered, correct, incorrect, accuracy: correct / totalQuestions });
       notify(isCorrect ? 'correct' : 'incorrect', {
+        contentId: problem.fixtureId,
         attemptId: committedAttempt,
         skillId: problem.skillId,
         submittedOrder,

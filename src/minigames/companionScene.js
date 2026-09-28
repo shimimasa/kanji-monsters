@@ -11,6 +11,16 @@ export function createCompanionScene({ doc, root, info, gotomon, act }) {
   const particles = element(doc, 'div', 'gt-particles'); particles.setAttribute('aria-hidden', 'true');
   for (let i=0;i<7;i++) { const spark=element(doc,'i'); spark.style.setProperty('--i',i); spark.style.setProperty('--row',`${i%3*20}%`); particles.append(spark); }
   scene.append(objects, actor, particles, metric, label); stage.append(scene, actions);
+  const goalPicker = info.scene === 'craft' ? element(doc, 'details', 'gt-goal-picker') : null;
+  const goalSummary = goalPicker ? element(doc, 'summary') : null;
+  const goalRule = goalPicker ? element(doc, 'p') : null;
+  const goalActions = goalPicker ? element(doc, 'div', 'gt-goal-actions') : null;
+  const goalStatus = goalPicker ? element(doc, 'p', 'gt-goal-status') : null;
+  const goalNodes = new Map();
+  if (goalPicker) {
+    goalPicker.append(goalSummary, goalRule, goalActions);
+    goalStatus.setAttribute('role', 'status'); stage.prepend(goalPicker); stage.append(goalStatus);
+  }
   const board = root.querySelector('.mi-board, .kd-board');
   if (board) { board.append(actor); actor.classList.add('gt-board-actor'); scene.classList.add('gt-board-caption'); }
   const pieces = [];
@@ -35,6 +45,20 @@ export function createCompanionScene({ doc, root, info, gotomon, act }) {
       if(play.reaction==='correct')attackMs=400;
     }
     metric.textContent=world.metric || info.goal;
+    if (goalPicker && world.challenge) {
+      const goal = world.challenge;
+      goalSummary.textContent = `目標：${goal.name}${goal.canChoose ? '（選ぶ）' : '（確認）'}`;
+      goalRule.textContent = `${goal.rule} ${goal.hint}`;
+      goalStatus.textContent = goal.status === 'active' ? `${goal.progress || 'これから挑戦'} · あと${goal.remaining}問` : goal.message;
+      goalStatus.dataset.status = goal.status;
+      if (!goal.canChoose && goalPicker.dataset.locked !== 'true') { goalPicker.open = false; goalPicker.dataset.locked = 'true'; }
+      for (const choice of goal.choices) {
+        let node = goalNodes.get(choice.id);
+        if (!node) { node = button(doc, choice.label, () => act?.(choice.id), 'gt-button'); node.dataset.worldAction = choice.id; goalActions.append(node); goalNodes.set(choice.id, node); }
+        node.title = choice.hint; node.disabled = state.paused || !goal.canChoose;
+        node.setAttribute('aria-pressed', String(choice.selected));
+      }
+    }
     label.textContent=state.paused?'一時停止中':play.reaction==='boost'?`${gotomon?.name}の${info.skill}！`:world.caption || info.goal;
     if(board) {
       const lane=state.selectedEnemy?.lane??world.hitLane;

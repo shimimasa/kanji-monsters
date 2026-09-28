@@ -1,18 +1,20 @@
 import { generateEnglishChoiceQuestions } from './englishChoiceQuestions.js';
 
 // Nonpersistent Core: no DOM, Storage, save, Motion, or scheduler dependencies.
-export function createEnglishChoiceGame({ sessionId, random = Math.random, onEvent = () => {} }) {
-  const questions = generateEnglishChoiceQuestions({ sessionId, random });
+export function createEnglishChoiceGame({ sessionId, random = Math.random, onEvent = () => {}, history, reviewContentIds }) {
+  const questions = generateEnglishChoiceQuestions({ sessionId, random, history, reviewContentIds });
+  const review = !!reviewContentIds?.length && questions.every(question => reviewContentIds.includes(question.contentId));
   let active = true, paused = false, notifying = false, observer = onEvent;
   let phase = 'ready', index = -1, attemptId = null, seq = 0, activeElapsedMs = 0;
   let answered = 0, correct = 0, incorrect = 0, result = null, lastAnswer = null, aborted = false;
   let completeEmitted = false;
+  const missed = [];
 
   const currentProblem = () => questions[index] ?? null;
   const snapshot = () => Object.freeze({
-    gameId: 'englishChoice', mode: 'tenQuestions', sessionId, phase, paused, active, aborted,
+    gameId: 'englishChoice', mode: review ? 'review' : 'tenQuestions', totalQuestions: questions.length, sessionId, phase, paused, active, aborted,
     problem: currentProblem(), attemptId, seq, activeElapsedMs,
-    answered, correct, incorrect, result, lastAnswer,
+    answered, correct, incorrect, result, lastAnswer, missed: Object.freeze([...missed]),
   });
   const notify = (type, payload = {}) => {
     const event = Object.freeze({
@@ -66,14 +68,19 @@ export function createEnglishChoiceGame({ sessionId, random = Math.random, onEve
       const isCorrect = choiceId === problem.correctChoiceId;
       answered++;
       if (isCorrect) correct++;
-      else incorrect++;
+      else {
+        incorrect++;
+        missed.push(Object.freeze({ contentId: problem.contentId, prompt: problem.prompt, questionNumber: answered, selectedAnswer: choice.text,
+          meaning: problem.choices.find(choice => choice.choiceId === problem.correctChoiceId).text }));
+      }
       lastAnswer = Object.freeze({
         attemptId: committedAttempt, choiceId, correctChoiceId: problem.correctChoiceId, correct: isCorrect,
       });
-      phase = answered === 10 ? 'completed' : 'feedback';
-      if (phase === 'completed') result = Object.freeze({ answered, correct, incorrect, accuracy: correct / 10 });
+      phase = answered === questions.length ? 'completed' : 'feedback';
+      if (phase === 'completed') result = Object.freeze({ answered, correct, incorrect, accuracy: correct / questions.length });
       notify(isCorrect ? 'correct' : 'incorrect', {
         attemptId: committedAttempt, choiceId, correctChoiceId: problem.correctChoiceId,
+        contentId: problem.contentId,
         skillId: problem.skillId,
       });
       if (result) complete();

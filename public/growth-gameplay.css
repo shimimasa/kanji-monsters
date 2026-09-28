@@ -42,6 +42,10 @@
 .gt-growth-result{margin:10px auto 8px;max-width:340px;padding:9px 12px;background:#e5eedc;border-radius:12px}.gt-growth-result>strong{font-size:17px}.gt-xp-track{height:10px;border-radius:6px;background:#bbcbb7;overflow:hidden;margin:7px 0}.gt-xp-track span{display:block;height:100%;background:linear-gradient(90deg,#589e78,#c6d95c);border-radius:6px}.gt-growth-result[data-level-up=true]{box-shadow:0 0 0 2px #dfb955;background:#fff0c2}.gt-result>.gt-level-up{animation:gt-level-up .85s ease-in-out 2;filter:drop-shadow(0 0 16px #edc64b)}
 .yt-friend-growth{display:grid;gap:6px;min-width:0}.yt-friend-growth strong{font-size:18px}.yt-friend-growth small{font-size:12px}.yt-xp{height:10px;width:min(250px,100%);accent-color:#589e78}
 .yt-game[data-paused=true] *{animation-play-state:paused!important}
+.yt-game .gt-learning-save-alert:not([hidden]){display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0;padding:9px 12px;border:2px solid #a44c30;border-radius:10px;background:#fff1e8;color:#632817}
+.yt-game .gt-learning-save-alert p{margin:0;font-size:14px;line-height:1.45}
+.yt-game .gt-learning-save-alert button{flex:none;min-height:44px}
+@media(max-width:390px){.yt-game .gt-learning-save-alert:not([hidden]){flex-wrap:wrap}.yt-game .gt-learning-save-alert button{width:100%}}
 .gt-constellations{position:absolute;right:7px;top:32px;display:grid;gap:3px;z-index:2}.gt-constellations span{font-size:14px;line-height:18px;color:#73858b}.gt-constellations .gt-constellation-done{color:#ffe68a;text-shadow:0 0 7px #ffe49a;animation:gt-snap .35s ease-out}
 #mathInvaderScreen.yt-game .mi-board{background:repeating-linear-gradient(90deg,transparent 0 calc(33.333% - 1px),#718faf55 calc(33.333% - 1px) 33.333%),linear-gradient(#172f49,#496b85);border-color:#748e99}
 #mathInvaderScreen.yt-game .mi-enemy{border-radius:14px 14px 6px 6px;border-bottom:5px solid #a68449;box-shadow:0 3px 0 #16314b}
@@ -50,6 +54,9 @@
 #kanjiDefenseScreen.yt-game .kd-board{height:235px}
 #multiSelectScreen.yt-game .ms-feedback{min-height:26px;margin:5px 0}#multiSelectScreen.yt-game .ms-prompt{font-size:17px;margin:5px 0}#multiSelectScreen.yt-game .ms-help{font-size:12px;margin:4px 0}}
 @media(max-height:680px){.gt-scene{height:95px}.gt-explore{height:140px}.gt-board-caption{height:49px}.gt-star-map{height:68px}.gt-world-actions{margin-top:3px}}
+.gt-goal-picker{margin:4px 0 8px;border:1px solid #a4b8a8;border-radius:9px;padding:8px;background:#fffaf0}.gt-goal-picker summary{cursor:pointer;min-height:32px;display:flex;align-items:center;font-size:14px;font-weight:700}.gt-goal-picker summary:focus-visible{outline:3px solid #19766d}.gt-goal-picker p{font-size:13px;line-height:1.5;margin:8px 0}.gt-goal-actions{display:flex;flex-wrap:wrap;gap:6px}.gt-goal-actions .gt-button{flex:1 1 95px;min-height:44px;font-size:13px;padding:8px}.gt-goal-actions [aria-pressed=true]{background:#d9efdf;border-color:#28734a}.gt-goal-status{font-size:13px;line-height:1.5;margin:5px 0}.gt-goal-status[data-status=achieved],.gt-challenge-result[data-status=achieved]{color:#165e4e;font-weight:700}.gt-challenge-result{font-size:15px;line-height:1.5}
+#multiSelectScreen .gt-goal-picker summary{min-height:44px}#multiSelectScreen .gt-goal-actions .gt-button{font-size:13px;padding:8px;min-height:44px}
+@media(max-width:360px){#multiSelectScreen .gt-goal-actions .gt-button{flex-basis:100%}}
 @media(prefers-reduced-motion:reduce){.yt-game *, .yt-game *::before,.yt-game *::after{animation:none!important;transition:none!important}}
 @keyframes gt-run{to{transform:translate(-50%,-3px) rotate(3deg)}}
 @keyframes gt-course{to{background-position:-56px 0}}

@@ -54,7 +54,7 @@ export function installScenePolish({doc,root,stage,scene,actor,board,info}) {
     if(hint)hint.textContent=world.hint||'';
     collection?.update(world.findings);
     if(dungeon){rooms.forEach((room,i)=>{room.dataset.passed=String(i<(world.steps?.length||0));room.dataset.correct=String(!!world.steps?.[i]?.correct);room.dataset.current=String(i===world.steps?.length);});}
-    if(orb){
+    if(orb && state.mode !== 'review'){
       const deadline=state.phase==='answering'?Math.max(0,Math.min(1,state.remainingMs/state.deadlineMs)):1;
       orb.style.setProperty('--deadline',`${deadline*360}deg`);orb.style.setProperty('--glow',String(.3+(world.light||0)/140));
       orb.dataset.danger=String(deadline<.3||world.danger);orb.dataset.ready=String(play.gauge>=3);orb.setAttribute('aria-label',`残り${Math.ceil((state.remainingMs||0)/1000)}秒・${world.danger?'光が弱い':'光は安定'}・${play.gauge>=3?'技が使える':'正解で技がたまる'}`);

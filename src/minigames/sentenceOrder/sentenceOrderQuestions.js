@@ -1,4 +1,6 @@
 import { SENTENCE_CONTENT_ADDITIONS } from './sentenceContent.js';
+import { SENTENCE_CHALLENGE_CONTENT } from './sentenceChallengeContent.js';
+import { selectLearningEntries } from '../learningSelection.js';
 // Canonical sentence bank. Corrections and ambiguity evidence are documented.
 const fixture = (fixtureId, texts) => {
   const chunks = texts.map((text, index) => Object.freeze({
@@ -37,6 +39,8 @@ export const SENTENCE_ORDER_FIXTURE = Object.freeze([
   fixture('promise-arrive', ['約束に', '遅れないようにと', '急いで家を出ました。']),
   ...SENTENCE_CONTENT_ADDITIONS.map(({id,chunks}) => fixture(id,chunks)),
 ]);
+export const SENTENCE_CHALLENGE_FIXTURE = Object.freeze(SENTENCE_CHALLENGE_CONTENT.map(({ id, chunks, explanation }) =>
+  Object.freeze({ ...fixture(id, chunks), prompt: '言葉のまとまりを正しい順に並べてください。', explanation })));
 
 function takeRandom(random) {
   const value = random();
@@ -57,10 +61,13 @@ function shuffled(items, random) {
 
 const sameOrder = (left, right) => left.every((value, index) => value === right[index]);
 
-export function generateSentenceOrderQuestions({ sessionId, random = Math.random } = {}) {
+export function generateSentenceOrderQuestions({ sessionId, random = Math.random, sentenceLevel = 'standard', reviewContentIds, history } = {}) {
   if (typeof sessionId !== 'string' || !sessionId) throw new TypeError('sessionId is required');
   if (typeof random !== 'function') throw new TypeError('random must be a function');
-  const selected = shuffled(SENTENCE_ORDER_FIXTURE, random).slice(0, 10);
+  if (!['standard', 'challenge'].includes(sentenceLevel)) throw new TypeError('Unknown sentence level');
+  const review = Array.isArray(reviewContentIds) ? [...SENTENCE_ORDER_FIXTURE, ...SENTENCE_CHALLENGE_FIXTURE].filter(entry => reviewContentIds.includes(entry.fixtureId)).slice(0, 10) : [];
+  const selected = review.length ? review : selectLearningEntries(
+    shuffled(sentenceLevel === 'challenge' ? SENTENCE_CHALLENGE_FIXTURE : SENTENCE_ORDER_FIXTURE, random), history, undefined, entry => entry.fixtureId);
   return Object.freeze(selected.map((entry, index) => {
     let initialOrder = shuffled(entry.correctOrder, random);
     // A correct initial layout would bypass the interaction being probed. Rotate once,
@@ -76,6 +83,7 @@ export function generateSentenceOrderQuestions({ sessionId, random = Math.random
       correctOrder: entry.correctOrder,
       initialOrder: Object.freeze(initialOrder),
       skillId: entry.skillId,
+      ...(entry.explanation || review.length ? { explanation: entry.explanation || '正しい文を声に出して読み、言葉のつながりをたしかめよう。' } : {}),
     });
   }));
 }

@@ -1,4 +1,5 @@
 import { ENGLISH_CONTENT_ADDITIONS,englishCategory } from './englishContent.js';
+import { selectEnglishEntries } from './englishLearning.js';
 // Canonical local vocabulary bank; original IDs and meanings are retained.
 export const ENGLISH_CHOICE_FIXTURE = Object.freeze([
   ['apple', 'apple', 'りんご'],
@@ -41,10 +42,10 @@ function shuffled(items, random) {
   return copy;
 }
 
-export function generateEnglishChoiceQuestions({ sessionId, random = Math.random } = {}) {
+export function generateEnglishChoiceQuestions({ sessionId, random = Math.random, history, reviewContentIds } = {}) {
   if (typeof sessionId !== 'string' || !sessionId) throw new TypeError('sessionId is required');
   if (typeof random !== 'function') throw new TypeError('random must be a function');
-  const selected = shuffled(ENGLISH_CHOICE_FIXTURE, random).slice(0, 10);
+  const selected = selectEnglishEntries(shuffled(ENGLISH_CHOICE_FIXTURE, random), history, reviewContentIds);
   return Object.freeze(selected.map((entry, index) => {
     // Two same-topic meanings plus one other-topic meaning; no synonym traps.
     const candidates = ENGLISH_CHOICE_FIXTURE.filter(candidate => candidate.id !== entry.id && candidate.meaning !== entry.meaning);
@@ -58,6 +59,7 @@ export function generateEnglishChoiceQuestions({ sessionId, random = Math.random
     }));
     return Object.freeze({
       problemId: `${sessionId}:english:${index + 1}:${entry.id}`,
+      contentId: entry.id,
       prompt: entry.prompt,
       choices: Object.freeze(choices),
       correctChoiceId: `meaning:${entry.id}`,

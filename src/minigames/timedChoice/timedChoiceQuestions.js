@@ -1,4 +1,5 @@
 import { TIMED_CONTENT_ADDITIONS } from './timedContent.js';
+import { selectLearningEntries } from '../learningSelection.js';
 // Canonical short-word recognition bank, distinct from typed defense content.
 export const TIMED_CHOICE_FIXTURE = Object.freeze([
   ['anzen', '安全', 'あんぜん'],
@@ -41,10 +42,12 @@ function shuffled(items, random) {
   return copy;
 }
 
-export function generateTimedChoiceQuestions({ sessionId, random = Math.random } = {}) {
+export function generateTimedChoiceQuestions({ sessionId, random = Math.random, reviewContentIds, history } = {}) {
   if (typeof sessionId !== 'string' || !sessionId) throw new TypeError('sessionId is required');
   if (typeof random !== 'function') throw new TypeError('random must be a function');
-  const selected = shuffled(TIMED_CHOICE_FIXTURE, random).slice(0, 10);
+  const pool = shuffled(TIMED_CHOICE_FIXTURE, random);
+  const review = reviewContentIds?.length ? pool.filter(entry => reviewContentIds.includes(entry.fixtureId)) : [];
+  const selected = review.length ? review.slice(0, 10) : selectLearningEntries(pool, history, undefined, entry => entry.fixtureId);
   return Object.freeze(selected.map((entry, index) => {
     const distractors = shuffled(
       TIMED_CHOICE_FIXTURE.filter(candidate => candidate.fixtureId !== entry.fixtureId), random,

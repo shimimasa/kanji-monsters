@@ -1,20 +1,31 @@
+import { createConstellationChallenge } from './constellationChallenge.js';
 const NAMES = ['やさしい弧','つなぐ翼','きらめく冠'];
 const FINISH = [18,32,55];
 // Three six-star routes; no additional inventory, currency or question rules.
 export function createConstellationWorld(effects) {
   let stars=0,bonus=0,answered=0,mistakes=0,rainbow=false,route=1,revision=0,notice='';
   const routes=[0,0,0],lines=[0,0,0],finished=[false,false,false];
+  const challenge = createConstellationChallenge();
+  let firstFinished = null;
   function add(id,amount) {
     for(let n=0;n<3&&amount>.00001;n++) {
       const target=(id+n)%3,used=Math.min(6-routes[target],amount);
       routes[target]+=used;amount-=used;
       const count=Math.floor((routes[target]+.00001)/3);
       if(count>lines[target]) {bonus+=(count-lines[target])*8;lines[target]=count;notice=`${NAMES[target]}のラインがつながった！`;revision++;}
-      if(routes[target]>=6&&!finished[target]) {finished[target]=true;bonus+=FINISH[target];notice=`${NAMES[target]} 完成！ +${FINISH[target]}pt`;revision++;}
+      if(routes[target]>=6&&!finished[target]) {firstFinished ??= target;finished[target]=true;bonus+=FINISH[target];notice=`${NAMES[target]} 完成！ +${FINISH[target]}pt`;revision++;}
     }
   }
   return {
-    act(action){const id=Number(action.replace('star-route-',''));if(!action.startsWith('star-route-')||!Number.isInteger(id)||id<0||id>2||finished[id])return false;route=id;return true;},
+    act(action){
+      if (typeof action !== 'string') return false;
+      if (action.startsWith('star-goal-')) {
+        const target = challenge.choose(action.slice('star-goal-'.length));
+        if (target === null) return false;
+        route = target; return true;
+      }
+      const id=Number(action.replace('star-route-',''));if(!action.startsWith('star-route-')||!Number.isInteger(id)||id<0||id>2||finished[id])return false;route=id;return true;
+    },
     answer(correct,payload={}) {
       const rate=correct?1:Math.max(0,Math.min(1,payload.score||0));
       const gained=rate*(rainbow?3*effects.potency:2);
@@ -25,13 +36,14 @@ export function createConstellationWorld(effects) {
       const factor=route===0&&rate>0&&rate<1?1.2:route===2?(rate===1?1.2:.8):1;
       add(route,main*factor);
       if(rainbow)add((route+1)%3,gained/3);
+      challenge.observe({ routes, lines, firstFinished, count: answered });
       rainbow=false;
       if(finished.every(Boolean)){notice='3つの星座が、ひとつの空に！';revision++;}
       if(finished[route])route=Math.max(0,finished.findIndex(value=>!value));
     },
     boost(){rainbow=true;},
     snapshot(){const completed=finished.filter(Boolean).length,total=routes.reduce((a,b)=>a+b,0),selected=route<0?0:route;
-      return {kind:'craft',bonus,stars,completed,rainbow,route,routes:[...routes],lines:[...lines],finishRevision:revision,notice,
+      return {kind:'craft',bonus,stars,completed,rainbow,route,routes:[...routes],lines:[...lines],finishRevision:revision,notice,challenge:challenge.snapshot(),
         progress:total/18,climax:answered>=8||total>=15,
         metric:`星座 ${completed}/3 · ${completed===3?'空が完成！':`ライン ${lines.reduce((a,b)=>a+b,0)}/6`}`,
         caption:notice|| (rainbow?'次の正解で2つのルートが光る！':completed===3?'完成した空に、星を増やそう':`${NAMES[selected]}：あと${Math.ceil(6-routes[selected])}つ${selected===2?' · 全部正解で大きく進む':'で完成'}`),

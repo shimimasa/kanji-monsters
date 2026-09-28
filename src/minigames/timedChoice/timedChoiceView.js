@@ -1,3 +1,5 @@
+import { createChoiceHint } from '../choiceHint.js';
+import { createChoiceComparison } from '../choiceComparison.js';
 const CSS = `
 #timedChoiceScreen{position:fixed;inset:0;z-index:100010;background:#fff7e8;color:#332814;overflow:auto;overscroll-behavior:contain;font:18px system-ui,sans-serif;box-sizing:border-box;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom));touch-action:manipulation}
 #timedChoiceScreen *{box-sizing:border-box}#timedChoiceScreen [hidden]{display:none!important}
@@ -37,9 +39,18 @@ export function createTimedChoiceView({ document: doc, onBack, onReplay, onNext,
     const button = el('button', 'tc-choice'); button.type = 'button'; button.dataset.choiceIndex = String(index + 1);
     choiceArea.append(button); return button;
   });
+  const hint = createChoiceHint({ doc, container: controls, getSnapshot, onChange: () => updateChoices(getSnapshot()) });
+  const updateChoices = state => {
+    hint.update(state);
+    const canAnswer = !state.paused && state.phase === 'answering';
+    choiceButtons.forEach(button => {
+      button.hidden = hint.excludes(state, button.dataset.choiceId);
+      button.disabled = !canAnswer || button.hidden; button.dataset.status = '';
+    });
+  };
   const choose = index => {
     const state = getSnapshot(), choice = state.problem?.choices[index];
-    if (!active || state.paused || state.phase !== 'answering' || !state.attemptId || !choice) return false;
+    if (!active || state.paused || state.phase !== 'answering' || !state.attemptId || !choice || hint.excludes(state, choice.choiceId)) return false;
     return onAnswer({
       sessionId: state.sessionId, problemId: state.problem.problemId,
       attemptId: state.attemptId, choiceId: choice.choiceId,
@@ -61,7 +72,8 @@ export function createTimedChoiceView({ document: doc, onBack, onReplay, onNext,
   const companion = el('figure', 'tc-companion'), canvas = el('canvas'); canvas.width = 280; canvas.height = 140;
   canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', '仲間のジャガイモスライム');
   const caption = el('figcaption', '', 'ジャガイモスライム'); companion.append(canvas, caption); play.append(companion);
-  const result = el('div', 'tc-result'); result.hidden = true; shell.append(result); result.append(el('h2', '', '10もん おつかれさま！'));
+  const result = el('div', 'tc-result'), resultTitle = el('h2', '', '10もん おつかれさま！'); result.hidden = true; shell.append(result); result.append(resultTitle);
+  const comparison = createChoiceComparison(doc, 'tc-missed'); result.append(comparison.root);
   const resultCorrect = el('strong'), resultIncorrect = el('strong'), resultTimedOut = el('strong'), resultAccuracy = el('strong');
   for (const [label, value] of [['せいかい', resultCorrect], ['まちがい', resultIncorrect], ['時間切れ', resultTimedOut], ['せいかいりつ', resultAccuracy]]) {
     const row = el('p', '', label); row.append(value); result.append(row);
@@ -83,8 +95,7 @@ export function createTimedChoiceView({ document: doc, onBack, onReplay, onNext,
           choiceButtons[index].dataset.choiceId = choice.choiceId;
         });
       }
-      const canAnswer = !state.paused && state.phase === 'answering';
-      choiceButtons.forEach(button => { button.disabled = !canAnswer; button.dataset.status = ''; });
+      updateChoices(state);
       if (state.lastAnswer) {
         const correctChoice = problem?.choices.find(choice => choice.choiceId === state.lastAnswer.correctChoiceId);
         for (const button of choiceButtons) {
@@ -101,16 +112,20 @@ export function createTimedChoiceView({ document: doc, onBack, onReplay, onNext,
       timerTrack.setAttribute('aria-valuemax', String(state.deadlineMs));
       timerTrack.setAttribute('aria-valuenow', String(Math.round(remaining)));
       timerBar.style.width = `${percent}%`;
-      timerTrack.hidden = state.phase !== 'answering'; timerLabel.hidden = state.phase !== 'answering';
+      timerTrack.hidden = state.phase !== 'answering' || state.mode === 'review'; timerLabel.hidden = state.phase !== 'answering' || state.mode === 'review';
+      help.textContent = state.mode === 'review' ? '時間制限なし。ゆっくり よみを えらんでね' : '時間内に よみを えらんでね';
       next.hidden = state.phase !== 'feedback'; next.disabled = state.paused;
       pause.hidden = !state.paused;
-      position.textContent = `${Math.min(10, state.answered + (state.phase === 'answering' ? 1 : 0))} / 10`;
+      const total = state.totalQuestions ?? 10;
+      position.textContent = `${state.mode === 'review' ? '復習 ' : ''}${Math.min(total, state.answered + (state.phase === 'answering' ? 1 : 0))} / ${total}`;
       score.textContent = `せいかい ${state.correct}`;
       controls.hidden = !!state.result; result.hidden = !state.result;
       play.style.display = state.result ? 'flex' : '';
       play.style.justifyContent = state.result ? 'center' : '';
       if (state.result) {
-        resultCorrect.textContent = `${state.result.correct} / 10`;
+        resultTitle.textContent = `${total}もん おつかれさま！`;
+        resultCorrect.textContent = `${state.result.correct} / ${total}`;
+        comparison.update(state);
         resultIncorrect.textContent = String(state.result.incorrect);
         resultTimedOut.textContent = String(state.result.timedOut);
         resultAccuracy.textContent = `${Math.round(state.result.accuracy * 100)}%`;
@@ -118,7 +133,7 @@ export function createTimedChoiceView({ document: doc, onBack, onReplay, onNext,
       companion.hidden = !companionState.selected;
       caption.textContent = companionState.motion?.imageState === 'failed' ? '仲間といっしょに！' : 'ジャガイモスライム';
     },
-    stopInput() { active = false; [...choiceButtons, next, replay, back].forEach(button => { button.disabled = true; }); },
-    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); root?.remove(); root = null; },
+    stopInput() { active = false; hint.stopInput(); [...choiceButtons, next, replay, back].forEach(button => { button.disabled = true; }); },
+    dispose() { this.stopInput(); hint.dispose(); removes.splice(0).forEach(remove => remove()); root?.remove(); root = null; },
   };
 }

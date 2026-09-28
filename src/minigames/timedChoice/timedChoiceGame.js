@@ -4,21 +4,23 @@ export const TIMED_CHOICE_DEFAULT_DEADLINE_MS = 5000;
 
 // Nonpersistent Core: time advances only through update(dtMs).
 export function createTimedChoiceGame({ sessionId, random = Math.random, onEvent = () => {},
-  deadlineMs = TIMED_CHOICE_DEFAULT_DEADLINE_MS } = {}) {
+  deadlineMs = TIMED_CHOICE_DEFAULT_DEADLINE_MS, reviewContentIds, history } = {}) {
   if (!Number.isFinite(deadlineMs) || deadlineMs <= 0) throw new TypeError('deadlineMs must be positive and finite');
-  const questions = generateTimedChoiceQuestions({ sessionId, random });
+  const questions = generateTimedChoiceQuestions({ sessionId, random, reviewContentIds, history });
+  const review = !!reviewContentIds?.length && questions.every(question => reviewContentIds.includes(question.fixtureId));
   let active = true, paused = false, notifying = false, observer = onEvent;
   let phase = 'ready', index = -1, attemptId = null, seq = 0, activeElapsedMs = 0;
   let problemElapsedMs = 0, answered = 0, correct = 0, incorrect = 0, timedOut = 0;
   let result = null, lastAnswer = null, aborted = false, completeEmitted = false;
+  const missed = [];
 
   const currentProblem = () => questions[index] ?? null;
-  const remainingMs = () => Math.max(0, deadlineMs - problemElapsedMs);
+  const remainingMs = () => review ? null : Math.max(0, deadlineMs - problemElapsedMs);
   const snapshot = () => Object.freeze({
-    gameId: 'timedChoice', mode: 'deadlineProbe', sessionId, phase, paused, active, aborted,
+    gameId: 'timedChoice', mode: review ? 'review' : 'deadlineProbe', totalQuestions: questions.length, sessionId, phase, paused, active, aborted,
     problem: currentProblem(), attemptId, seq, activeElapsedMs,
-    problemElapsedMs, remainingMs: remainingMs(), deadlineMs,
-    answered, correct, incorrect, timedOut, result, lastAnswer,
+    problemElapsedMs, remainingMs: remainingMs(), deadlineMs: review ? null : deadlineMs,
+    answered, correct, incorrect, timedOut, result, lastAnswer, missed: Object.freeze([...missed]),
   });
   const notify = (type, payload = {}) => {
     const event = Object.freeze({
@@ -41,7 +43,7 @@ export function createTimedChoiceGame({ sessionId, random = Math.random, onEvent
     notify('problemPresented', {
       skillId: problem.skillId,
       choiceIds: Object.freeze(problem.choices.map(choice => choice.choiceId)),
-      deadlineMs,
+      deadlineMs: review ? null : deadlineMs,
     });
   };
   const emitComplete = () => {
@@ -60,19 +62,24 @@ export function createTimedChoiceGame({ sessionId, random = Math.random, onEvent
     const isCorrect = reason === 'answer' && choiceId === problem.correctChoiceId;
     answered++;
     if (isCorrect) correct++;
-    else incorrect++;
+    else {
+      incorrect++;
+      missed.push(Object.freeze({ contentId: problem.fixtureId, questionNumber: answered, selectedAnswer: choice?.text ?? null,
+        prompt: problem.prompt, reading: problem.choices.find(choice => choice.choiceId === problem.correctChoiceId).text, reason }));
+    }
     if (reason === 'timeout') timedOut++;
     lastAnswer = Object.freeze({
       attemptId: committedAttempt, choiceId, correctChoiceId: problem.correctChoiceId,
       correct: isCorrect, reason,
     });
-    phase = answered === 10 ? 'completed' : 'feedback';
+    phase = answered === questions.length ? 'completed' : 'feedback';
     if (phase === 'completed') {
-      result = Object.freeze({ answered, correct, incorrect, accuracy: correct / 10, timedOut });
+      result = Object.freeze({ answered, correct, incorrect, accuracy: correct / questions.length, timedOut });
     }
     notify(isCorrect ? 'correct' : 'incorrect', {
       attemptId: committedAttempt, choiceId, correctChoiceId: problem.correctChoiceId,
-      skillId: problem.skillId, reason, problemElapsedMs, deadlineMs,
+      skillId: problem.skillId, reason, problemElapsedMs, deadlineMs: review ? null : deadlineMs,
+      contentId: problem.fixtureId,
     });
     if (result) emitComplete();
     return true;
@@ -87,6 +94,7 @@ export function createTimedChoiceGame({ sessionId, random = Math.random, onEvent
       if (!active || paused || phase === 'ready' || phase === 'completed' || !Number.isFinite(dtMs)) return;
       const dt = Math.max(0, dtMs);
       activeElapsedMs += dt;
+      if (review) return;
       if (phase !== 'answering' || !attemptId || dt === 0) return;
       problemElapsedMs = Math.min(deadlineMs, problemElapsedMs + dt);
       if (problemElapsedMs >= deadlineMs) consumeAttempt({ reason: 'timeout' });

@@ -1,4 +1,5 @@
 import { isCompatibilityKey } from './saveProjection.js';
+import { validateCompanionMemories } from '../minigames/companionMemories.js';
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 function requireRecord(value, label) {
@@ -107,6 +108,60 @@ export function validateSave(save, currentVersion) {
     if (typeof entry.id !== 'string' || !entry.id) throw new Error('Invalid review id');
     for (const key of ['nextReviewAt','interval','repetition','eFactor']) {
       if (entry[key] !== undefined && (!Number.isFinite(entry[key]) || entry[key] < 0)) throw new Error('Invalid review schedule');
+    }
+  }
+  for (const friend of Object.values(save.player.miniGames?.companions || {})) {
+    if (friend?.memories !== undefined) validateCompanionMemories(friend.memories);
+  }
+  const activity = save.player.miniGames?.hubActivity;
+  if (activity !== undefined) {
+    requireRecord(activity, 'hub activity');
+    ids(activity.startedGames, 'started games');
+    if (activity.version !== 1 || typeof activity.lastGameId !== 'string' || !activity.lastGameId ||
+        !Array.isArray(activity.startedGames) || activity.startedGames.length > 8 ||
+        new Set(activity.startedGames).size !== activity.startedGames.length || !activity.startedGames.includes(activity.lastGameId)) {
+      throw new Error('Invalid hub activity');
+    }
+  }
+  const timed = save.player.miniGames?.timedLearning;
+  if (timed !== undefined) {
+    requireRecord(timed, 'Timed learning'); requireRecord(timed.items, 'Timed learning items');
+    ids(timed.recentAttempts, 'Timed attempts');
+    if (timed.version !== 1 || !Array.isArray(timed.recentAttempts) || timed.recentAttempts.length > 64 || Object.keys(timed.items).length > 120) throw new Error('Invalid Timed history');
+    for (const item of Object.values(timed.items)) {
+      requireRecord(item, 'Timed item');
+      for (const key of ['correct', 'incorrect', 'timedOut', 'lastAnsweredAt']) {
+        if (!Number.isSafeInteger(item[key]) || item[key] < 0) throw new Error('Invalid Timed observation');
+      }
+      if (typeof item.lastCorrect !== 'boolean' || !['answer', 'timeout'].includes(item.lastReason)) throw new Error('Invalid Timed outcome');
+    }
+  }
+  const sentence = save.player.miniGames?.sentenceLearning;
+  if (sentence !== undefined) {
+    requireRecord(sentence, 'Sentence learning'); requireRecord(sentence.items, 'Sentence items');
+    ids(sentence.recentAttempts, 'Sentence attempts');
+    if (sentence.version !== 1 || !Array.isArray(sentence.recentAttempts) || sentence.recentAttempts.length > 64 || Object.keys(sentence.items).length > 130) throw new Error('Invalid Sentence history');
+    for (const item of Object.values(sentence.items)) {
+      requireRecord(item, 'Sentence item');
+      for (const key of ['correct', 'incorrect', 'lastAnsweredAt']) {
+        if (!Number.isSafeInteger(item[key]) || item[key] < 0) throw new Error('Invalid Sentence observation');
+      }
+      if (typeof item.lastCorrect !== 'boolean') throw new Error('Invalid Sentence outcome');
+    }
+  }
+  const english = save.player.miniGames?.englishLearning;
+  if (english !== undefined) {
+    requireRecord(english, 'English learning');
+    requireRecord(english.items, 'English learning items');
+    if (english.version !== 1) throw new Error('Unsupported English learning version');
+    ids(english.recentAttempts, 'English attempts');
+    if (!Array.isArray(english.recentAttempts) || english.recentAttempts.length > 64 || Object.keys(english.items).length > 120) throw new Error('Invalid English history size');
+    for (const item of Object.values(english.items)) {
+      requireRecord(item, 'English item');
+      for (const key of ['correct', 'incorrect', 'lastAnsweredAt']) {
+        if (!Number.isSafeInteger(item[key]) || item[key] < 0) throw new Error('Invalid English observation');
+      }
+      if (typeof item.lastCorrect !== 'boolean') throw new Error('Invalid English outcome');
     }
   }
 }
