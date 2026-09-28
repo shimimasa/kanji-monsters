@@ -38,41 +38,26 @@ test('every monster receives two shared routes across all eight games', () => {
     'timedChoice','multiSelect','asyncChoice','kanjiDefense'].sort());
 });
 
-test('potato route uses one energy for a shortcut while normal race has no roll action', () => {
+test('potato route rolls ahead after two correct jumps in a row', () => {
   const run = runFor('mathSprint', 'HKD-E01');
   const normal = runFor('mathSprint', 'HKD-E01', false);
-  assert.equal(normal.act('roll'), false);
-  run.answer(true, {}, 1); run.answer(true, {}, 2);
-  assert.equal(run.snapshot().danger, true);
-  assert.equal(run.act('roll'), true);
-  run.answer(true, {}, 3);
+  for (const target of [run, normal]) { target.answer(true, {}, 1); target.answer(true, {}, 2); target.update(20000); }
   assert.equal(run.snapshot().shortcuts, 1);
-  assert.equal(run.snapshot().energy, 1);
+  assert.equal(normal.snapshot().shortcuts, 0);
   assert.equal(run.snapshot().course.id, 'potato-shortcut');
   assert.equal(run.snapshot().challenge.progress, '1/2');
-  assert.equal(run.snapshot().challenge.choices.length, 3);
 });
-
-test('corn route earns a special shot from priority targets', () => {
+test('corn route loads a golden shot after three hits in a row', () => {
   const run = runFor('mathInvader', 'HKD-E02');
   const normal = runFor('mathInvader', 'HKD-E02', false);
-  assert.equal(normal.act('golden-burst'), false);
-  assert.equal(run.act('golden-burst'), false);
-  for (let index = 0; index < 3; index++) {
-    const enemy = { enemyId: `e-${index}`, y: .8, lane: 1 };
-    run.context({ phase: 'answering', paused: false, life: 3, enemies: [enemy], selectedEnemy: enemy });
-    run.answer(true, {}, index + 1);
-  }
-  assert.equal(run.snapshot().grains, 3);
-  assert.equal(run.act('golden-burst'), true);
-  run.answer(false, {}, 0);
+  for (let index = 0; index < 3; index++) { run.answer(true, {}, index + 1); normal.answer(true, {}, index + 1); }
+  assert.equal(run.snapshot().golden, true); assert.equal(normal.snapshot().golden, false);
+  run.answer(false, { reason: 'wrong' }, 0);
   assert.equal(run.snapshot().golden, true);
-  run.answer(true, {}, 1);
-  assert.equal(run.snapshot().bossHp, 6);
-  assert.equal(run.snapshot().goldenHits, 1);
+  const before = run.snapshot().bonus; run.answer(true, {}, 1);
+  assert.equal(run.snapshot().goldenHits, 1); assert.ok(run.snapshot().bonus - before >= 40);
   assert.equal(run.snapshot().challenge.status, 'achieved');
 });
-
 test('milk route stores and pours light without creating points', () => {
   const run = runFor('timedChoice', 'HKD-E03');
   const normal = runFor('timedChoice', 'HKD-E03', false);
@@ -115,9 +100,10 @@ test('shared treasure, bridge, craft, exploration and defense routes have distin
   explore.act('route-1'); explore.answer(true, {}, 3); explore.answer(true, {}, 4);
   assert.equal(explore.snapshot().compassFindings, 1);
 
+  // The defense ward is automatic: two hits in a row make one, the next hit uses it.
   const defense = runFor('kanjiDefense', 'AOM-E09');
   defense.answer(true, {}, 1); defense.answer(true, {}, 2);
-  assert.equal(defense.act('use-ward'), true);
+  assert.equal(defense.snapshot().wards, 1);
   defense.answer(true, {}, 3);
   assert.equal(defense.snapshot().wardHits, 1);
 });

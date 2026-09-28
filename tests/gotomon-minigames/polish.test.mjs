@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createConstellationWorld } from '../../src/minigames/gameplay/constellationWorld.js';
-import { createTreasureWorld, createExplorationWorld, createRaceWorld } from '../../src/minigames/gameplay/trailWorlds.js';
+import { createTreasureWorld, createExplorationWorld } from '../../src/minigames/gameplay/trailWorlds.js';
+import { createDashWorld, DASH_FINISH } from '../../src/minigames/gameplay/arcadeWorlds.js';
 import { growthStatus } from '../../src/minigames/companionGrowth.js';
 import { createGotomonService } from '../../src/minigames/gotomonService.js';
 import { getDefaultSave, loadSave } from '../../src/core/saveData.js';
@@ -67,11 +68,13 @@ test('found objects stay in chosen order; rumours reward a different early detou
   assert.notEqual(ordered.findings[0].label,alternative.findings[0].label);
   assert.ok(ordered.findings.find(item=>item.place==='湖').points>alternative.findings.find(item=>item.place==='湖').points);
 });
-test('race marker uses own best average pace; missing legacy time creates no fake opponent',()=>{
-  assert.equal(createRaceWorld(effects).snapshot().bestTimeMs,null);
-  const race=createRaceWorld(effects,{bestTimeMs:60000});race.update(7000);race.answer(true,{},1);
-  const s=race.snapshot();assert.equal(s.paceDeltaMs,s.timeMs-6000);assert.match(s.summary,/ベスト比/);
-  assert.equal(createRaceWorld(effects,{bestTimeMs:NaN}).snapshot().bestTimeMs,null);
+test('race ghost uses own best pace; missing legacy time or slow pace creates no ghost',()=>{
+  assert.equal(createDashWorld(effects).snapshot().bestTimeMs,null);
+  const race=createDashWorld(effects,{bestTimeMs:60000});race.update(6000);
+  const s=race.snapshot();assert.equal(s.ghost,DASH_FINISH*6000/60000);assert.equal(s.paceDeltaMs,s.timeMs-60000*s.position/DASH_FINISH);
+  assert.match(s.summary,/ベスト比/);
+  assert.equal(createDashWorld(effects,{bestTimeMs:NaN}).snapshot().bestTimeMs,null);
+  assert.equal(createDashWorld(effects,{bestTimeMs:60000,pace:'slow'}).snapshot().ghost,null);
 });
 async function fixture(){
   const value=getDefaultSave();value.player.collection.gotomonIds=['HKD-E01'];value.player.coreStats.exp=42;

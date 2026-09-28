@@ -11,12 +11,8 @@ const read = path => fs.readFileSync(path, 'utf8').replaceAll('\r\n', '\n');
 // Preserve certified input/content/Core; the original scope-contract remains.
 // Content baseline intentionally expanded under user approval. Old content
 // preservation and all 120 records are separately certified in content-120 tests.
-test('certified defense Core and View remain byte unchanged across the Content 120 boundary', () => {
-  for (const file of ['kanjiDefenseGame.js','kanjiDefenseView.js']) {
-    const path = 'src/minigames/kanjiDefense/' + file;
-    assert.equal(read(path), git('show', '148553c48f18905ae5aed8c95354ef8792f4ae34:' + path), path);
-  }
-});
+// The Content 120 byte freeze of the defense Core/View was retired when the game was
+// rebuilt as a real-time arcade game; core.test.mjs and lifecycle.test.mjs specify it now.
 test('main scheduler, battle, save transaction, audio and Motion remain unchanged', () => {
   for (const path of ['src/main.js','src/core/gameState.js','src/core/saveData.js','src/core/storageTransaction.js',
     'src/screens/battleScreen.js','src/audio/audioManager.js','src/visuals/motion/monsterMotionHost.js']) {

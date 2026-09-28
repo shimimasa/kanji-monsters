@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { generateSessionProblems } from '../../src/minigames/mathSprint/mathSprintGenerator.js';
 import { createMathSprintGame, normalizeMathAnswer } from '../../src/minigames/mathSprint/mathSprintGame.js';
-import { bindMathSprintInput } from '../../src/minigames/mathSprint/mathSprintInput.js';
 
 export const seeded = (seed = 1) => () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
 const make = (onEvent = () => {}, sessionId = 's1') => createMathSprintGame({ sessionId, random: seeded(), onEvent });
@@ -87,22 +86,4 @@ test('observer reentrancy cannot submit/advance during notification', () => {
   let game; game=make(e=>{ if(e.type==='problemPresented')assert.equal(answer(game),false); if(e.type==='correct'){const s=game.snapshot();assert.equal(game.next(s.sessionId,s.problem.problemId),false);} });
   game.enter(); assert.equal(answer(game),true); assert.equal(game.snapshot().answered,1);
 });
-function key(target, fields={}) { const e=new Event('keydown',{cancelable:true}); Object.assign(e,{key:'Enter',...fields}); target.dispatchEvent(e); }
-test('actual shared input gate: Enter/button simultaneous, repeat, IME, pause, dispose and old callback', () => {
-  const game=make(); game.enter(); const s=game.snapshot();
-  const input=Object.assign(new EventTarget(),{value:String(s.problem.answer)}), button=new EventTarget();
-  const binding=bindMathSprintInput(input,button,{sessionId:s.sessionId,token:s.token},a=>game.submit(a),()=>!game.snapshot().paused);
-  key(input,{repeat:true}); assert.equal(game.snapshot().answered,0);
-  input.dispatchEvent(new Event('compositionstart')); key(input); button.dispatchEvent(new Event('click')); assert.equal(game.snapshot().answered,0);
-  input.dispatchEvent(new Event('compositionend')); key(input,{isComposing:true}); key(input,{keyCode:229}); assert.equal(game.snapshot().answered,0);
-  game.setPaused(true); key(input); game.setPaused(false);
-  key(input); button.dispatchEvent(new Event('click')); key(input); assert.equal(game.snapshot().answered,1);
-  game.next(s.sessionId,s.problem.problemId); binding.dispose(); binding.dispose(); key(input); button.dispatchEvent(new Event('click'));
-  assert.equal(game.snapshot().answered,1);
-});
-test('button alone submits; invalid whole input remains unanswered and can retry',()=>{
-  const game=make();game.enter();const s=game.snapshot(),input=Object.assign(new EventTarget(),{value:'2abc'}),button=new EventTarget();
-  const b=bindMathSprintInput(input,button,{sessionId:s.sessionId,token:s.token},a=>game.submit(a),()=>true);
-  button.dispatchEvent(new Event('click'));assert.equal(game.snapshot().answered,0);
-  input.value=String(s.problem.answer);button.dispatchEvent(new Event('click'));assert.equal(game.snapshot().answered,1);b.dispose();
-});
+

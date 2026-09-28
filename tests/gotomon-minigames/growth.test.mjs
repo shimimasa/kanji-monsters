@@ -8,9 +8,9 @@ import { createGotomonService } from '../../src/minigames/gotomonService.js';
 import { growthStatus, XP_THRESHOLDS, calculateXP, supportStyle, supportPoints, friendshipTitle } from '../../src/minigames/companionGrowth.js';
 import { scoreRank } from '../../src/minigames/scoreRank.js';
 import { createCompanionPlay } from '../../src/minigames/companionPlay.js';
-import { createExplorationWorld, createRaceWorld, createTreasureWorld } from '../../src/minigames/gameplay/trailWorlds.js';
+import { createExplorationWorld, createTreasureWorld } from '../../src/minigames/gameplay/trailWorlds.js';
 import { createLanternWorld, createConstellationWorld } from '../../src/minigames/gameplay/puzzleWorlds.js';
-import { createShootingWorld } from '../../src/minigames/gameplay/battleWorlds.js';
+import { createDashWorld, createInvaderWorld, DASH_FINISH } from '../../src/minigames/gameplay/arcadeWorlds.js';
 import { createSentenceOrderGame } from '../../src/minigames/sentenceOrder/sentenceOrderGame.js';
 
 const effects=growthStatus().effects;
@@ -122,11 +122,24 @@ test('exploration blocks keyboard answer until a route is chosen; pause blocks a
   assert.equal(play.allowCommand({type:'answer'}),false);assert.equal(play.act('route-0'),true);assert.equal(play.allowCommand({type:'answer'}),true);
   play.context({phase:'answering',paused:true});assert.equal(play.act('route-1'),false);
 });
-test('race charge then jump beats blindly pushing through obstacle with same answers/time',()=>{
-  const smart=createRaceWorld(effects),blind=createRaceWorld(effects);blind.act('push');
-  for(let i=0;i<3;i++){smart.update(5000);blind.update(5000);if(i===2)smart.act('push');smart.answer(true,{},i+1);blind.answer(true,{},i+1);}
-  assert.ok(smart.snapshot().timeMs<blind.snapshot().timeMs);assert.ok(smart.snapshot().bonus>blind.snapshot().bonus);
-  const before=smart.snapshot().speed;smart.answer(false,{},0);assert.ok(smart.snapshot().speed<before);
+test('answering before the hurdle beats waiting at it; a slip only slows the runner',()=>{
+  const early=createDashWorld(effects),late=createDashWorld(effects);
+  for(let i=0;i<10;i++)early.answer(true,{},i+1);
+  for(let i=0;i<120&&!early.snapshot().finished;i++)early.update(500);
+  for(let i=0;i<10;i++){late.update(9000);late.answer(true,{},i+1);}
+  for(let i=0;i<120&&!late.snapshot().finished;i++)late.update(500);
+  assert.equal(early.snapshot().position,DASH_FINISH);assert.ok(early.snapshot().timeMs<late.snapshot().timeMs);
+  assert.ok(early.snapshot().bonus>late.snapshot().bonus);assert.ok(late.snapshot().cleanJumps<early.snapshot().cleanJumps);
+  const slip=createDashWorld(effects);slip.answer(false,{},0);slip.update(8000);
+  assert.equal(slip.snapshot().trips,1);assert.equal(slip.snapshot().cleared,1);
+});
+test('the runner waits at an unanswered hurdle and holds the result until the goal',()=>{
+  const world=createDashWorld(effects);world.update(20000);
+  assert.equal(world.snapshot().waiting,true);assert.equal(world.snapshot().cleared,0);
+  for(let i=0;i<10;i++)world.answer(true,{},i+1);world.complete();
+  assert.equal(world.snapshot().holdResult,true);
+  for(let i=0;i<200&&world.snapshot().holdResult;i++)world.update(250);
+  assert.equal(world.snapshot().finished,true);assert.equal(world.snapshot().holdResult,false);
 });
 test('treasure safe vs rare has a real risk/reward tradeoff without changing grading',()=>{
   const run=correct=>{const safe=createTreasureWorld(effects),rare=createTreasureWorld(effects);rare.act('rare');for(const value of correct){safe.answer(value);rare.answer(value);}return[safe.snapshot().bonus,rare.snapshot().bonus];};
@@ -142,11 +155,12 @@ test('constellation partial points add real stars and a skill amplifies only ear
   world.boost();world.answer(false,{score:.5});assert.equal(world.snapshot().stars,2.5);
   world.boost();world.answer(false,{score:0});assert.equal(world.snapshot().stars,2.5);
 });
-test('boss requires well-timed strengthened shots; deadboss rewards cannot duplicate',()=>{
-  const world=createShootingWorld(effects);
-  for(let i=0;i<8;i++)world.answer(true);assert.equal(world.snapshot().bossHp,6);
-  world.boost();world.answer(true);world.answer(true);assert.equal(world.snapshot().bossHp,0);
-  const bonus=world.snapshot().bonus;world.answer(true);assert.equal(world.snapshot().bonus,bonus);
+test('fever shots and the boss add bonus without changing hits',()=>{
+  const world=createInvaderWorld(effects);
+  world.answer(true,{},1);const plain=world.snapshot().bonus;
+  world.boost();world.answer(true,{},1);assert.equal(world.snapshot().bonus-plain,plain+25);
+  world.answer(true,{boss:true,wrongAttempts:1},2);assert.equal(world.snapshot().bossDown,true);assert.equal(world.snapshot().bossFirstTry,false);
+  world.answer(false,{reason:'escaped'},0);assert.equal(world.snapshot().escapes,1);assert.equal(world.snapshot().kills,3);
 });
 test('world time freezes when paused and ends at completion',()=>{
   const play=createCompanionPlay('x',{gameId:'timedChoice'});play.context({phase:'answering',paused:false});play.update(1000);const light=play.snapshot().world.light;
@@ -167,13 +181,14 @@ test('all seven non-defense games can reach S at Lv1 using their world goals',()
     for(let i=0;i<10;i++){
       play.context({phase:gameId==='mathInvader'?'playing':'answering',paused:false,enemies:[{enemyId:'target',y:.3,lane:1}],selectedEnemy:{enemyId:'target',lane:1},life:3});
       if(gameId==='asyncChoice'&&i%2===0)assert.equal(play.act(`route-${i/2}`),true);
-      if(gameId==='mathSprint')play.act([2,5,8].includes(i)?'push':'charge');
       if(gameId==='englishChoice'&&i%3===0)play.act('rare');
       if(gameId==='timedChoice')play.act('light-tower');
       play.update(3000);play.observe({sessionId:'x',seq:++seq,type:'correct'});
       if(i<9&&play.snapshot().gauge>=3)play.boost();
     }
     play.observe({sessionId:'x',seq:++seq,type:'sessionComplete'});
+    // Worlds that hold the result (the runner reaching the goal) finish before scoring.
+    for(let k=0;k<400&&play.snapshot().world?.holdResult;k++){play.context({phase:'completed',paused:false});play.update(250);}
     assert.equal(scoreRank(gameId,play.snapshot().score,10).rank,'S',`${gameId}: ${play.snapshot().score}`);
   }
 });

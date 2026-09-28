@@ -48,14 +48,13 @@ test('Sprint dispatch delegates submit and next without changing Core identity g
   assert.notEqual(game.snapshot().problem.problemId, first.problem.problemId);
 });
 
-test('Invader dispatch delegates select and submit without changing attempt gates', () => {
+test('Invader dispatch delegates select and submit and keeps one-time input tokens', () => {
   const game = create('mathInvader', 'invader-dispatch'); game.enter();
   const enemy = game.snapshot().enemies[0];
   const selection = { sessionId: 'invader-dispatch', enemyId: enemy.enemyId, problemId: enemy.problemId };
   assert.equal(game.dispatch({ type: 'select', payload: { ...selection, sessionId: 'old-session' } }), false);
   assert.equal(game.dispatch({ type: 'select', payload: selection }), true);
-  const selected = game.snapshot().selectedEnemy;
-  const attempt = { ...selection, attemptId: selected.attemptId, token: selected.token, value: selected.answer };
+  const attempt = { sessionId: 'invader-dispatch', token: game.snapshot().inputToken, value: enemy.answer };
   assert.equal(game.dispatch({ type: 'submit', payload: { ...attempt, sessionId: 'old-session' } }), false);
   assert.equal(game.dispatch({ type: 'submit', payload: attempt }), true);
   assert.equal(game.dispatch({ type: 'submit', payload: attempt }), false);
@@ -106,11 +105,8 @@ test('all eight games commit learning state before notifying observers', async (
     }
   });
   invader.enter(); const enemy = invader.snapshot().enemies[0];
-  const target = { sessionId: 'invader-order', enemyId: enemy.enemyId, problemId: enemy.problemId };
-  assert.equal(invader.dispatch({ type: 'select', payload: target }), true);
-  const selected = invader.snapshot().selectedEnemy;
-  assert.equal(invader.dispatch({ type: 'submit', payload: { ...target,
-    attemptId: selected.attemptId, token: selected.token, value: selected.answer } }), true);
+  assert.equal(invader.dispatch({ type: 'submit', payload: { sessionId: 'invader-order',
+    token: invader.snapshot().inputToken, value: enemy.answer } }), true);
 
   let english;
   english = create('englishChoice', 'english-order', event => {
@@ -172,13 +168,12 @@ test('all eight games commit learning state before notifying observers', async (
   defense.enter(); const defenseEnemy = defense.snapshot().enemies[0];
   assert.equal(defense.dispatch({ type: 'select', payload: { sessionId: 'defense-order',
     enemyId: defenseEnemy.enemyId, problemId: defenseEnemy.problemId } }), true);
-  const defenseTarget = defense.snapshot().selectedEnemy;
+  const defenseTarget = defense.snapshot().targetEnemy;
   const defenseAnswer = KANJI_DEFENSE_LIMITED_UX_CONTENT
     .find(item => item.fixtureId === defenseTarget.fixtureId)?.acceptedReadings[0];
   assert.ok(defenseAnswer, `Contract fixture missing: ${defenseTarget.fixtureId}`);
   assert.equal(defense.dispatch({ type: 'submit', payload: { sessionId: 'defense-order',
-    enemyId: defenseTarget.enemyId, problemId: defenseTarget.problemId,
-    attemptId: defenseTarget.attemptId, token: defenseTarget.token, value: defenseAnswer } }), true);
+    token: defense.snapshot().inputToken, value: defenseAnswer } }), true);
 });
 
 test('instance exit is idempotent and permanently rejects old commands', () => {

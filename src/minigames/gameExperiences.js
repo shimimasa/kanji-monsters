@@ -1,11 +1,14 @@
 // Presentation metadata stays outside the stable v1 registry contract.
+// `arcade` games draw their own real-time world; `paced` games offer ゆっくり.
 export const gameExperiences = Object.freeze({
-  mathSprint: { genre: '算数', difficulty: '入門', time: '約1分', icon: '➜', scene: 'race',
-    description: 'ためて跳ぶ、計算レース。最速ゴールへ。', goal: '障害の前に力をため、攻めてタイムを縮めよう。', skill: 'ゴトモンダッシュ', effect: '6秒ブースト', unit: 'm', color: '#177a69',
-    howTo: ['計算の答えを入力して「回答」を押す。', '走路の行動を選び、障害と力の残りを見て進む。', '正解で相棒ゲージがたまる。満タンなら技を使える。'] },
-  mathInvader: { genre: '算数', difficulty: 'ふつう', time: '約2分', icon: '✦', scene: 'shoot',
-    description: 'ねらう敵を選び、計算ショットで撃退。', goal: '敵を選ぶ → 計算 → 相棒が発射！', skill: 'スター連射', effect: '次の2発を強化', unit: '撃退', color: '#346bab',
-    howTo: ['先にねらう敵を選ぶ。', '計算の答えを入力して攻撃する。', '迫る敵を見て、強化弾を使うタイミングを決める。'] },
+  mathSprint: { genre: '算数', difficulty: '入門', time: '約1分', icon: '➜', scene: 'race', arcade: true, paced: true, badge: 'NEW',
+    description: '計算してハードルをジャンプ！ ゴールまで走りぬけ。', goal: '答えるとジャンプ。止まらず走ってタイムを縮めよう。', skill: 'ゴトモンダッシュ', effect: '5秒間スピードアップ', unit: 'm', color: '#177a69',
+    howTo: ['ハードルの計算に答えると、相棒がジャンプ！', '早く答えるほど止まらずに走れる。まちがえても前へ進めるよ。', '3回正解すると「ゴトモンダッシュ」が自動で発動！'],
+    controlsNote: 'キーボードの数字とEnterでも遊べます。' },
+  mathInvader: { genre: '算数', difficulty: 'ふつう', time: '約2分', icon: '✦', scene: 'shoot', arcade: true, paced: true, badge: 'NEW',
+    description: '答えの数字をうつと、その敵に命中！ 最後はボス戦。', goal: '答えをうつ → 同じ答えの敵に命中！', skill: 'スター連射', effect: '次の3発を強化', unit: '撃退', color: '#346bab',
+    howTo: ['落ちてくる敵の計算を見る。', '答えの数字を入れて「うつ！」。同じ答えの敵に自動で命中！', 'バリアまで来ても大丈夫。最後に出てくるボスをたおそう！'],
+    controlsNote: 'キーボードの数字とEnterでも遊べます。敵をタップすると、ねらいを決められます。' },
   englishChoice: { genre: '英語', difficulty: '入門', time: '約1分', icon: '◇', scene: 'treasure',
     description: '安全？レア？扉を開けて4部屋の宝探し。', goal: '意味の合う扉を開けて、宝箱を集めよう。', skill: 'おたからフィーバー', effect: '宝箱の鍵を補充', unit: '箱', color: '#7153a4',
     howTo: ['部屋ごとに安全な道かレアな道を選ぶ。', '英単語の意味に合う扉を一つ選ぶ。', '正解して宝を集め、4部屋の先を目指す。'] },
@@ -21,7 +24,8 @@ export const gameExperiences = Object.freeze({
   asyncChoice: { genre: '教科ミックス', difficulty: 'ふつう', time: '約2分', icon: '⌖', scene: 'explore',
     description: '5地点の順路を選び、手がかりでレア発見。', goal: '林道・海辺の手がかりを遺跡で使おう！', skill: '発見フィーバー', effect: '手がかり＋発見強化', unit: '発見', color: '#447b67',
     howTo: ['次に調べる場所を選ぶ。', '出てきた問題の答えを一つ選ぶ。', '手がかりを集めて、5地点の発見を増やす。'] },
-  kanjiDefense: { genre: '漢字の読み', difficulty: '挑戦', time: '約3分', icon: '♜', scene: 'defend',
-    description: '漢字を読んで相棒と旅路を守りきろう。', goal: '迫る敵を選ぶ → 読みで攻撃 → 旅路を守る！', skill: '相棒エール', effect: '次の2正解で得点UP', unit: '撃退', color: '#ac5838',
-    howTo: ['迫る敵を選ぶ。', '漢字の読みを入力して攻撃する。', '旅路を守りきろう。間違えた読みは結果で確認できる。'] },
+  kanjiDefense: { genre: '漢字の読み', difficulty: '挑戦', time: '約3分', icon: '♜', scene: 'defend', arcade: true, paced: true, badge: 'NEW',
+    description: '読みを入力して、せまるモンスターを撃退！', goal: '読みを入力 → 同じ読みのモンスターに命中！', skill: '相棒エール', effect: '次の3正解で得点UP', unit: '撃退', color: '#ac5838',
+    howTo: ['モンスターが持つ漢字の読みを考える。', '読みをひらがなで入れて「こうげき」。同じ読みのモンスターに自動で命中！', '門まで来ても大丈夫。読みを見て、次に生かそう。'],
+    controlsNote: 'モンスターをタップすると、ねらいを決められます。' },
 });

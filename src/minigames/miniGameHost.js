@@ -88,10 +88,11 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       const course = !nextProps.review && nextProps.courseId === companionCourse(gotomon, definition.id)?.id
         ? companionCourse(gotomon, definition.id) : null;
       const ticket = service.beginPlay?.({ sessionId, gameId: definition.id, gotomonId: gotomon?.id });
+      const pace = nextProps.pace === 'slow' ? 'slow' : 'normal';
       play = createCompanionPlay(sessionId, doc.querySelector && !makeView
-        ? { gameId: definition.id, growth, support: gotomon?.support?.id, bestTimeMs: service.getProgress().games?.[definition.id]?.bestTimeMs, course } : {});
+        ? { gameId: definition.id, growth, support: gotomon?.support?.id, bestTimeMs: service.getProgress().games?.[definition.id]?.bestTimeMs, course, pace } : {});
       companion = makeCompanion({ sessionId, ownedMonsterIds: owned, selectedId: gotomon?.id, loadImage });
-      game = definition.create({ sessionId, random, history, reviewContentIds, sentenceLevel: nextProps.sentenceLevel, onEvent: event => {
+      game = definition.create({ sessionId, random, history, reviewContentIds, sentenceLevel: nextProps.sentenceLevel, pace, onEvent: event => {
         if (valid) { companion?.observe(event); play?.observe(event); }
         if (valid) learningRun?.observe(event);
         if (valid && wordLearning) runMistakes.observe(event);
@@ -126,7 +127,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       view = createView({ document: doc, getSnapshot: () => current.snapshot(),
         dispatch,
         onBack: goBack, onReplay: replay });
-      shell = makeShell({ doc, view, definition, gotomon, play, reviewMode: !!nextProps.review,
+      shell = makeShell({ doc, view, definition, gotomon, play, reviewMode: !!nextProps.review, pace, course,
         onPause: value => host.setPaused(value), onBack: goBack, onReplay: replay,
         onReview: wordLearning ? review : null, onNormalPlay: normalPlay,
         onNotebook: returnToNotebook,
@@ -137,7 +138,11 @@ export function createMiniGameHost({ document: doc = globalThis.document,
         onRefresh: () => host.update(0),
         onAct: action => { if (play.act(action)) { if (PLAYTEST_ENABLED) trackPlaytest('action', {sessionId,action}); host.update(0); } },
         onAdvance: state => dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem?.problemId } }),
-        onBoost: () => { if (play.boost(current.snapshot().paused)) { if (PLAYTEST_ENABLED) trackPlaytest('action', {sessionId,action:'boost'}); host.update(0); } },
+        onBoost: () => {
+          if (!play.boost(current.snapshot().paused)) return false;
+          if (PLAYTEST_ENABLED) trackPlaytest('action', {sessionId,action:'boost'});
+          host.update(0); return true;
+        },
         award: result => {
           const saved = flushLearning();
           if (saved && !saved.ok) return saved;

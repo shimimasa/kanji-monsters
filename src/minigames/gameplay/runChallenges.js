@@ -1,16 +1,18 @@
 // Optional goals are local to a run. They guide play without changing answers or scores.
 const GOALS = Object.freeze({
+  // Arcade goals run for the whole session (deadline 99), so nothing is marked
+  // "missed" in the middle of play.
   mathSprint: [
-    { id: 'jump', name: '障害を2回ジャンプ', deadline: 9, target: 2,
-      rule: '力を2ためて、障害区間で「攻める」を選ぼう。', hint: '障害は3・6・9区間目。', value: data => data.jumps },
-    { id: 'pace', name: '7問目までに加速3.5', deadline: 7, target: 3.5,
-      rule: '正解を重ねてスピードを上げよう。', hint: '間違えるとスピードが下がる。', value: data => data.world.speed || 0 },
+    { id: 'clean', name: '止まらずに5回ジャンプ', deadline: 99, target: 5,
+      rule: 'ハードルに着く前に答えて、止まらずにとびこえよう。', hint: '早めに答えるほど、走り続けられる。', value: data => data.world.cleanJumps || 0 },
+    { id: 'chain', name: '5回連続でジャンプ', deadline: 99, target: 5,
+      rule: '正解をつないで、ハードルを続けてとびこえよう。', hint: 'まちがえても、次からまたつなげられる。', value: data => data.maxCombo },
   ],
   mathInvader: [
-    { id: 'priority', name: '手前の敵を3回ねらう', deadline: 8, target: 3,
-      rule: '迫っている敵を選び、計算を正解しよう。', hint: '近い敵は目印がつく。', value: data => data.priorityHits },
-    { id: 'chain', name: '4回連続で撃破', deadline: 8, target: 4,
-      rule: '正解をつなげて連続撃破しよう。', hint: '敵を選んでから計算に集中。', value: data => data.maxCombo },
+    { id: 'chain', name: '4回連続で撃破', deadline: 99, target: 4,
+      rule: '正解をつなげて連続撃破しよう。', hint: '近い敵から順にねらうと、つなげやすい。', value: data => data.maxCombo },
+    { id: 'boss', name: 'ボスをいっぱつで撃破', deadline: 99, target: 1,
+      rule: '最後に出てくるボスを、1回で撃ちぬこう。', hint: 'ボスはゆっくり。落ち着いて計算しよう。', value: data => data.world.bossFirstTry ? 1 : 0 },
   ],
   englishChoice: [
     { id: 'rare', name: 'レア宝箱を1つ発見', deadline: 6, target: 1,
@@ -41,18 +43,18 @@ const GOALS = Object.freeze({
         return index >= 0 && index < 3 && (data.world.findings?.[index]?.points || 0) >= 25 ? 1 : 0; } },
   ],
   kanjiDefense: [
-    { id: 'chain', name: '4回連続で読みを正解', deadline: 8, target: 4,
-      rule: '敵を選び、読みを4回続けて正解しよう。', hint: '落ち着いて読むことが旅路を守る。', value: data => data.maxCombo },
-    { id: 'clear', name: '12問で9問正解', deadline: 12, target: 9,
-      rule: '最後まで進み、9問以上の読みを正解しよう。', hint: '間違えた読みは結果で確かめられる。', value: data => data.correct },
+    { id: 'chain', name: '4回連続で読みを正解', deadline: 99, target: 4,
+      rule: '読みを4回続けて正解しよう。', hint: '落ち着いて読むことが旅路を守る。', value: data => data.maxCombo },
+    { id: 'clear', name: '12体中9体を撃退', deadline: 99, target: 9,
+      rule: '最後まで守り、9体以上を読みで撃退しよう。', hint: '読めなかった字は結果で確かめられる。', value: data => data.correct },
   ],
 });
 
 const COURSE_GOALS = Object.freeze({
-  'potato-shortcut': { id: 'shortcut', name: '近道を2回見つける', deadline: 9, target: 2,
-    rule: '障害区間で力1を使って転がり、正解して近道へ。', hint: '3・6・9区間目が障害。', value: data => data.world.shortcuts || 0 },
-  'corn-barrage': { id: 'golden', name: '黄金弾を1発当てる', deadline: 8, target: 1,
-    rule: '手前の敵を3回倒して粒を集め、黄金弾を装填しよう。', hint: '装填後の次の正解で命中。', value: data => data.world.goldenHits || 0 },
+  'potato-shortcut': { id: 'shortcut', name: 'ころころ近道を2回', deadline: 99, target: 2,
+    rule: '2回続けて正解ジャンプすると、転がって近道できる。', hint: '早めに答えて、ジャンプをつなげよう。', value: data => data.world.shortcuts || 0 },
+  'corn-barrage': { id: 'golden', name: '黄金弾を1発当てる', deadline: 99, target: 1,
+    rule: '3回続けて撃破すると、次の一発が黄金弾になる。', hint: '黄金弾は次の正解で自動で撃てる。', value: data => data.world.goldenHits || 0 },
   'milk-lantern': { id: 'drops', name: 'しずくで灯台を3つ', deadline: 8, target: 3,
     rule: 'しずくを使い、問題に答えながら灯台を3つ灯そう。', hint: 'しずくは問題ごとに1つ蓄えられる。',
     value: data => data.world.poured ? data.world.towers || 0 : 0 },
@@ -62,8 +64,8 @@ const COURSE_GOALS = Object.freeze({
     rule: '文を続けて完成し、支えを使って次の橋を虹色に。', hint: '支えを使った次の文を正解しよう。', value: data => data.world.anchorBridges || 0 },
   'explorer-compass': { id: 'compass', name: '羅針盤で2地点発見', deadline: 8, target: 2,
     rule: '2問続けて正解し、次の探索で羅針盤を使おう。', hint: '地点を選ぶ前に使える。', value: data => data.world.compassFindings || 0 },
-  'defense-ward': { id: 'ward', name: '札で2回読みを正解', deadline: 12, target: 2,
-    rule: '2回続けて正解して札を作り、次の読みに使おう。', hint: '札は次の正解で力になる。', value: data => data.world.wardHits || 0 },
+  'defense-ward': { id: 'ward', name: '札で2回撃退', deadline: 99, target: 2,
+    rule: '2回続けて正解すると札ができ、次の撃退が強くなる。', hint: '札は次の正解で自動で使われる。', value: data => data.world.wardHits || 0 },
 });
 
 export function createRunChallenge(gameId, variation = 0, course = null) {
@@ -72,7 +74,7 @@ export function createRunChallenge(gameId, variation = 0, course = null) {
   const courseGoal = COURSE_GOALS[course?.id];
   const goals = courseGoal ? [courseGoal, ...base] : base;
   let selected = courseGoal || goals[Math.abs(variation) % goals.length];
-  const data = { answered: 0, correct: 0, maxCombo: 0, jumps: 0, priorityHits: 0, world: {} };
+  const data = { answered: 0, correct: 0, maxCombo: 0, world: {} };
   let status = 'active', achievedAt = null;
   const evaluate = () => {
     if (status !== 'active') return;
@@ -86,9 +88,7 @@ export function createRunChallenge(gameId, variation = 0, course = null) {
       selected = goal; evaluate(); return true;
     },
     observeAction(world) { data.world = world; evaluate(); },
-    observeAnswer({ correct, combo, before, world, state }) {
-      if (correct && gameId === 'mathSprint' && before.danger && before.energy >= 2 && before.actions?.some(action => action.id === 'push' && action.selected)) data.jumps++;
-      if (correct && gameId === 'mathInvader' && state?.selectedEnemy?.enemyId && state.selectedEnemy.enemyId === before.priority) data.priorityHits++;
+    observeAnswer({ correct, combo, world }) {
       data.answered++; if (correct) data.correct++;
       data.maxCombo = Math.max(data.maxCombo, combo || 0);
       data.world = world; evaluate();

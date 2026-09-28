@@ -95,7 +95,9 @@ test('save validator rejects corrupt learning records and allows legacy saves', 
   assert.throws(() => validateSave(save, 2), /English/);
 });
 test('learning features preserve other five cores/views, reward formulas, kanji save and logger', () => {
-  const games = ['mathSprint', 'mathInvader', 'multiSelect', 'asyncChoice', 'kanjiDefense'];
+  // Sprint, Invader and Defense were later rebuilt as arcade games on purpose; their
+  // behaviour is covered by their own suites instead of this byte freeze.
+  const games = ['multiSelect', 'asyncChoice'];
   const files = games.flatMap(id => [`src/minigames/${id}/${id}Game.js`, `src/minigames/${id}/${id}View.js`]);
   // Companion play can select a course; grading and growth formulas remain frozen.
   files.push('src/minigames/companionGrowth.js', 'src/minigames/scoreRank.js',

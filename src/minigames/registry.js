@@ -29,9 +29,9 @@ function withCommandAdapter(createView) {
 
 export const miniGameRegistry = Object.freeze({
   mathSprint: Object.freeze({ id: 'mathSprint', title: 'けいさんスプリント',
-    create: createMathSprintGame, createView: withCommandAdapter(createMathSprintView) }),
+    create: createMathSprintGame, createView: createMathSprintView }),
   mathInvader: Object.freeze({ id: 'mathInvader', title: 'けいさんインベーダー',
-    create: createMathInvaderGame, createView: withCommandAdapter(createMathInvaderView) }),
+    create: createMathInvaderGame, createView: createMathInvaderView }),
   englishChoice: Object.freeze({ id: 'englishChoice', title: 'えいたんご4たく',
     create: createEnglishChoiceGame, createView: withCommandAdapter(createEnglishChoiceView) }),
   sentenceOrder: Object.freeze({ id: 'sentenceOrder', title: '文ならべ',

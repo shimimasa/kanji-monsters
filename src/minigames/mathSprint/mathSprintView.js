@@ -1,126 +1,188 @@
-import { bindMathSprintInput } from './mathSprintInput.js';
+import { restartClass, toggleClass, setVar, createArcadeFrame, createNumberPad, bindArcadeKeys } from '../arcade/arcadeKit.js';
 
 const CSS = `
-#mathSprintScreen{position:fixed;inset:0;z-index:100010;background:#faf5e9;color:#302d28;overflow:auto;overscroll-behavior:contain;font:18px system-ui,sans-serif;box-sizing:border-box;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom));touch-action:manipulation}
-#mathSprintScreen *{box-sizing:border-box}
-#mathSprintScreen [hidden]{display:none!important}
-#mathSprintScreen .ms-shell{max-width:660px;margin:0 auto}
-#mathSprintScreen header{display:flex;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:-12px;background:#faf5e9;z-index:1;padding:4px 0}
-#mathSprintScreen h1{font-size:clamp(18px,4.8vw,26px);margin:0}
-#mathSprintScreen button{min-width:44px;min-height:44px;border:1px solid #8c806d;border-radius:10px;background:#fff;color:#302d28;font:inherit;cursor:pointer;padding:8px 14px}
-#mathSprintScreen button:disabled{opacity:.48;cursor:default}
-#mathSprintScreen button:focus-visible,#mathSprintScreen input:focus-visible{outline:3px solid #207c79;outline-offset:2px}
-#mathSprintScreen .ms-progress{display:flex;justify-content:space-between;margin:12px 0;font-size:16px}
-#mathSprintScreen .ms-play{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:16px;align-items:start}
-#mathSprintScreen .ms-question{font-size:38px;font-weight:700;margin:8px 0 12px;letter-spacing:2px}
-#mathSprintScreen .ms-answer-row{display:flex;gap:8px}
-#mathSprintScreen input{min-width:0;width:100%;height:48px;border:2px solid #8c806d;border-radius:10px;font:26px system-ui;padding:4px 12px;background:#fff;color:#302d28}
-#mathSprintScreen .ms-primary{background:#236d60;color:white;border-color:#236d60;white-space:nowrap}
-#mathSprintScreen .ms-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
-#mathSprintScreen .ms-pad button{min-height:48px;font-size:23px}
-#mathSprintScreen .ms-pad .ms-delete{grid-column:span 2;font-size:18px}
-#mathSprintScreen .ms-feedback{min-height:30px;margin:8px 0;line-height:1.5}
-#mathSprintScreen .ms-companion{text-align:center;margin:0;padding-top:8px;font-size:14px;color:#655d4e}
-#mathSprintScreen canvas{display:block;width:200px;height:100px;max-width:100%;margin:auto}
-#mathSprintScreen .ms-result{text-align:center;padding:8px 0}
-#mathSprintScreen .ms-result h2{font-size:26px}
-#mathSprintScreen .ms-result p{margin:12px 0;font-size:18px}
-#mathSprintScreen .ms-result strong{font-size:28px;display:block;margin-top:4px}
-#mathSprintScreen .ms-pause{margin:8px 0;color:#685d4a}
-@media(max-width:540px){#mathSprintScreen .ms-play{grid-template-columns:minmax(0,1fr)}#mathSprintScreen .ms-companion{padding:0}#mathSprintScreen .ms-question{margin-top:0}#mathSprintScreen canvas{width:160px;height:80px}#mathSprintScreen .ms-progress{margin:8px 0}}
-@media(max-height:480px) and (min-width:541px){#mathSprintScreen .ms-pad{grid-template-columns:repeat(5,1fr)}#mathSprintScreen .ms-pad .ms-delete{grid-column:span 1}#mathSprintScreen .ms-pad button{padding:4px}#mathSprintScreen .ms-question{font-size:30px;margin:4px 0}#mathSprintScreen .ms-progress{margin:4px 0}}
+#mathSprintScreen .ya-field{background:linear-gradient(#8fd3ff 0,#d9f2ff 52%,#b6e3a0 52.2%,#8cc86f 70%)}
+#mathSprintScreen .sp-sun{position:absolute;right:8%;top:10%;width:70px;height:70px;border-radius:50%;background:#fff3b0;box-shadow:0 0 40px #fff3b0}
+#mathSprintScreen .sp-hills,#mathSprintScreen .sp-clouds{position:absolute;left:0;right:0;background-repeat:repeat-x}
+#mathSprintScreen .sp-clouds{top:8%;height:22%;background-image:radial-gradient(ellipse 60px 22px at 80px 40px,#fff 60%,transparent 62%),radial-gradient(ellipse 44px 18px at 260px 70px,#ffffffcc 60%,transparent 62%);background-size:360px 100%}
+#mathSprintScreen .sp-hills{top:30%;height:23%;background-image:radial-gradient(ellipse 160px 80px at 120px 100%,#6fbf73 60%,transparent 61%),radial-gradient(ellipse 200px 110px at 380px 100%,#58a860 60%,transparent 61%);background-size:520px 100%}
+#mathSprintScreen .sp-track{position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(#c8764c,#a85c38);border-top:6px solid #f1efe6}
+#mathSprintScreen .sp-lines{position:absolute;left:0;right:0;top:34%;height:4px;background:repeating-linear-gradient(90deg,#fff 0 40px,transparent 40px 90px);opacity:.75}
+#mathSprintScreen .sp-runner,#mathSprintScreen .sp-ghost{position:absolute;bottom:31%;width:clamp(72px,10vw,108px);height:clamp(72px,10vw,108px);transform:translateX(-50%);z-index:5}
+#mathSprintScreen .sp-runner .gt-portrait{display:block;width:100%;height:100%;background:none;border:0}
+#mathSprintScreen .sp-runner .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 3px #0005)}
+#mathSprintScreen .sp-runner[data-state=run] .gt-portrait{animation:sp-bob var(--stride,.4s) ease-in-out infinite alternate}
+#mathSprintScreen .sp-runner[data-state=jump] .gt-portrait{animation:sp-jump .56s ease-out}
+#mathSprintScreen .sp-runner[data-state=trip] .gt-portrait{animation:sp-trip .6s ease-out}
+#mathSprintScreen .sp-runner[data-state=wait] .gt-portrait{transform:scaleY(.9) translateY(6%)}
+#mathSprintScreen .sp-runner[data-fever=true]::before{content:'';position:absolute;right:70%;top:25%;width:120%;height:50%;background:repeating-linear-gradient(0deg,transparent 0 8px,#fff6 8px 11px);filter:blur(1px);animation:sp-lines .25s linear infinite}
+#mathSprintScreen .sp-runner[data-fever=true]::after{content:'';position:absolute;inset:-10%;border-radius:50%;background:radial-gradient(circle,#ffd54a77,transparent 70%);animation:ya-glow .4s infinite alternate}
+#mathSprintScreen .sp-bubble{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);padding:4px 10px;border-radius:12px;background:#fff;color:#16242c;font-weight:900;font-size:15px;white-space:nowrap;box-shadow:0 3px 0 #0003}
+#mathSprintScreen .sp-ghost{opacity:.35;filter:grayscale(1) brightness(1.6);pointer-events:none;z-index:4}
+#mathSprintScreen .sp-ghost span{position:absolute;left:50%;top:-18px;transform:translateX(-50%);font-size:11px;font-weight:900;color:#16242c;white-space:nowrap}
+#mathSprintScreen .sp-hurdle{position:absolute;bottom:31%;width:40px;height:62px;transform:translateX(-50%);z-index:3}
+#mathSprintScreen .sp-hurdle::before{content:'';position:absolute;left:0;right:0;top:6px;height:12px;border-radius:4px;background:repeating-linear-gradient(90deg,#fff 0 10px,#e2412f 10px 20px);box-shadow:0 2px 0 #0003}
+#mathSprintScreen .sp-hurdle::after{content:'';position:absolute;left:4px;right:4px;top:18px;bottom:0;border-left:5px solid #ddd;border-right:5px solid #ddd}
+#mathSprintScreen .sp-hurdle[data-state=knocked]::before{transform:rotate(70deg) translate(24px,6px);transform-origin:0 50%}
+#mathSprintScreen .sp-hurdle[data-state=passed]{opacity:.5}
+#mathSprintScreen .sp-sign{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-8px);padding:4px 10px;border-radius:12px;background:#fffdf3;color:#16242c;border:3px solid #16242c;font-weight:900;font-size:clamp(16px,2.4vw,22px);white-space:nowrap;box-shadow:0 4px 0 #0004}
+#mathSprintScreen .sp-hurdle[data-state=active] .sp-sign{font-size:clamp(22px,3.4vw,32px);border-color:#ff9f1c;box-shadow:0 4px 0 #b86a00,0 0 0 4px #ffe08a;animation:sp-float 1s ease-in-out infinite alternate}
+#mathSprintScreen .sp-hurdle[data-state=ready] .sp-sign{background:#d7f7df;border-color:#1f9d55}
+#mathSprintScreen .sp-hurdle[data-state=knocked] .sp-sign{background:#fff1d6;border-color:#c77f16}
+#mathSprintScreen .sp-finish{position:absolute;bottom:31%;width:14px;height:48%;transform:translateX(-50%);background:repeating-linear-gradient(0deg,#16242c 0 12px,#fff 12px 24px);z-index:2}
+#mathSprintScreen .sp-finish::after{content:'GOAL';position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-weight:900;color:#16242c;background:#ffe066;border-radius:6px;padding:2px 8px}
+#mathSprintScreen .sp-question{margin:0;text-align:center;font-size:clamp(28px,4.6vw,42px);font-weight:900;font-variant-numeric:tabular-nums;color:#fff}
+#mathSprintScreen .sp-review{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+#mathSprintScreen .sp-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
+#mathSprintScreen .sp-review li[data-correct=false]{background:#fff3da}
+@keyframes sp-bob{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-8px) rotate(3deg)}}
+@keyframes sp-jump{0%{transform:none}45%{transform:translateY(-70%) rotate(-10deg)}100%{transform:none}}
+@keyframes sp-trip{0%{transform:none}30%{transform:rotate(18deg) translateY(6px)}100%{transform:none}}
+@keyframes sp-float{from{transform:translate(-50%,-8px)}to{transform:translate(-50%,-14px)}}
+@keyframes sp-lines{to{transform:translateX(-20px)}}
 `;
 
-export function createMathSprintView({ document: doc, onBack, onReplay, onNext, onSubmit, getSnapshot }) {
-  let root = null, binding = null, previousKey = null, previousProblem = null, active = true;
+const RUNNER_X = 24, PERCENT_PER_M = 1.5;
+
+export function createMathSprintView({ document: doc, dispatch, onBack, getSnapshot }) {
+  let active = true, entry = '', lastSeq = -1, lastEventId = 0, problemId = null;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
-  const el = (tag, className, text) => {
-    const node = doc.createElement(tag); if (className) node.className = className;
-    if (text) node.textContent = text; return node;
-  };
-  root = el('section'); root.id = 'mathSprintScreen'; root.setAttribute('aria-label', 'けいさんスプリント');
+  const frame = createArcadeFrame(doc, { id: 'mathSprintScreen', title: 'けいさんスプリント', theme: 'track' });
+  const { root, world, dock, fx, el } = frame;
   const style = el('style'); style.textContent = CSS; root.append(style);
-  const shell = el('div', 'ms-shell'); root.append(shell);
-  const header = el('header'); shell.append(header);
-  header.append(el('h1', '', 'けいさんスプリント'));
-  const back = el('button', '', 'もどる'); back.type = 'button'; back.dataset.action = 'back'; header.append(back);
-  on(back, 'click', () => { if (active) onBack(); });
-  const progress = el('div', 'ms-progress'), position = el('span'), score = el('span');
-  progress.append(position, score); shell.append(progress);
-  const pause = el('p', 'ms-pause', 'おやすみ中'); pause.hidden = true; shell.append(pause);
-  const play = el('div', 'ms-play'), controls = el('div'); shell.append(play); play.append(controls);
-  const question = el('div', 'ms-question'); question.dataset.role = 'problem'; controls.append(question);
-  const row = el('div', 'ms-answer-row'), input = el('input');
-  input.type = 'text'; input.inputMode = 'numeric'; input.autocomplete = 'off'; input.maxLength = 16;
-  input.setAttribute('aria-label', 'こたえ'); input.setAttribute('enterkeyhint', 'done');
-  const answer = el('button', 'ms-primary', '回答'); answer.type = 'button'; answer.dataset.action = 'answer';
-  row.append(input, answer); controls.append(row);
-  const pad = el('div', 'ms-pad'); pad.setAttribute('aria-label', '数字パッド'); controls.append(pad);
-  const canAnswer = () => active && getSnapshot().phase === 'answering' && !getSnapshot().paused;
-  for (const digit of ['1','2','3','4','5','6','7','8','9','0','削除']) {
-    const button = el('button', digit === '削除' ? 'ms-delete' : '', digit); button.type = 'button';
-    button.dataset.digit = digit; pad.append(button);
-    on(button, 'click', () => {
-      if (!canAnswer() || binding?.composing()) return;
-      input.value = digit === '削除' ? input.value.slice(0, -1) : (input.value + digit).slice(0, 16);
-    });
-  }
-  const feedback = el('p', 'ms-feedback'); feedback.setAttribute('aria-live', 'polite'); controls.append(feedback);
-  const next = el('button', 'ms-primary', '次へ'); next.type = 'button'; next.dataset.action = 'next'; controls.append(next);
-  let nextIdentity = null;
-  on(next, 'click', () => { if (active && nextIdentity) onNext(...nextIdentity); });
-  const companion = el('figure', 'ms-companion'), canvas = el('canvas');
-  canvas.width = 280; canvas.height = 140; canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', '仲間のジャガイモスライム');
-  const caption = el('figcaption', '', 'ジャガイモスライム'); companion.append(canvas, caption); play.append(companion);
-  const result = el('div', 'ms-result'); result.hidden = true; shell.append(result);
-  result.append(el('h2', '', '10もん おつかれさま！'));
-  const finalFeedback = el('p', 'ms-feedback'); result.append(finalFeedback);
-  const values = {};
-  for (const [key, label] of [['correct','せいかい'],['accuracy','せいかいりつ'],['maxStreak','さいこうれんぞく']]) {
-    const p = el('p', '', label), strong = el('strong'); p.append(strong); result.append(p); values[key] = strong;
-  }
-  const replay = el('button', 'ms-primary', 'もういちど'); replay.type = 'button'; replay.dataset.action = 'replay'; result.append(replay);
-  on(replay, 'click', () => { if (active && !getSnapshot().paused) onReplay(); });
+  on(frame.back, 'click', () => { if (active) onBack(); });
+  const clouds = el('div', 'sp-clouds'), hills = el('div', 'sp-hills');
+  world.append(el('div', 'sp-sun'), clouds, hills, el('div', 'sp-track'));
+  const lines = el('div', 'sp-lines'); world.append(lines);
+  const hurdles = Array.from({ length: 10 }, () => {
+    const node = el('div', 'sp-hurdle'), sign = el('span', 'sp-sign', '?'); node.append(sign); world.append(node); return { node, sign };
+  });
+  const finish = el('div', 'sp-finish'); world.append(finish);
+  const ghost = el('div', 'sp-ghost'); ghost.append(el('span', '', 'ベスト')); ghost.hidden = true; world.append(ghost);
+  const runner = el('div', 'sp-runner'); runner.style.left = `${RUNNER_X}%`;
+  const bubble = el('span', 'sp-bubble', 'こたえて ジャンプ！'); bubble.hidden = true; runner.append(bubble); world.append(runner);
+
+  const question = el('p', 'sp-question'); question.dataset.role = 'problem';
+  const display = el('div', 'ya-entry'); display.setAttribute('aria-live', 'polite'); display.setAttribute('aria-label', 'こたえ');
+  const note = el('p', 'ya-dock-note', '答えるとジャンプ！ 早いほど止まらず走れる');
+  const pad = createNumberPad(doc, { on,
+    onDigit: digit => type(digit), onDelete: () => erase(), onFire: () => fire(), fireLabel: 'ジャンプ！',
+  });
+  dock.append(question, display, note, pad.root);
+  const review = el('div', 'ya-learning-result'); review.hidden = true;
+  const reviewList = el('ol', 'sp-review'); review.append(el('h3', '', '今回の計算'), reviewList); frame.shell.append(review);
   doc.body.append(root);
+  const answers = [];
+
+  const canType = () => { const state = getSnapshot(); return active && !state.paused && ['answering', 'feedback'].includes(state.phase); };
+  const renderEntry = () => {
+    display.dataset.empty = String(!entry); display.textContent = '';
+    if (entry) display.textContent = entry; else display.append(el('span', '', '答えの数字を入力'));
+  };
+  const type = digit => { if (canType() && entry.length < 3) { entry += digit; renderEntry(); } };
+  const erase = () => { if (canType()) { entry = entry.slice(0, -1); renderEntry(); } };
+  const fire = () => {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'answering' || !entry) {
+      if (!entry) { restartClass(display, 'ya-miss'); }
+      return false;
+    }
+    const accepted = dispatch({ type: 'submit', payload: { sessionId: state.sessionId, token: state.token, value: entry } });
+    if (accepted) { entry = ''; renderEntry(); }
+    return accepted;
+  };
+  removes.push(bindArcadeKeys(doc, event => {
+    if (!active) return false;
+    if (/^[0-9]$/.test(event.key)) { type(event.key); return true; }
+    if (event.key === 'Backspace') { erase(); return true; }
+    if (event.key === 'Enter' && !event.repeat) { fire(); return true; }
+    return false;
+  }));
+  renderEntry();
+
+  const formatProblem = p => `${p.a} ${p.operation === 'addition' ? '+' : '−'} ${p.b}`;
+  const renderTrack = (state, w) => {
+    const position = w.position ?? 0;
+    // Ground marks move exactly with the hurdles; scenery moves slower (parallax).
+    const shift = -position * (frame.field.clientWidth || 1000) * PERCENT_PER_M / 100;
+    clouds.style.backgroundPositionX = `${shift * .08}px`; hills.style.backgroundPositionX = `${shift * .3}px`;
+    lines.style.backgroundPositionX = `${shift}px`;
+    const results = w.results ?? [];
+    hurdles.forEach(({ node, sign }, index) => {
+      const at = w.hurdles?.[index] ?? 40 + 36 * index, x = RUNNER_X + (at - position) * PERCENT_PER_M;
+      node.hidden = x < -10 || x > 112; node.style.left = `${x}%`;
+      const result = results[index], passed = index < (w.cleared ?? 0);
+      const activeHurdle = !result && index === results.length && state.phase === 'answering';
+      node.dataset.state = passed ? (result?.correct ? 'passed' : 'knocked') : result ? (result.correct ? 'ready' : 'knocked') : activeHurdle ? 'active' : 'idle';
+      sign.textContent = result ? (result.correct ? '✓' : `${answers[index]?.answer ?? ''}`) : activeHurdle && state.problem ? `${formatProblem(state.problem)} = ?` : '?';
+      sign.hidden = passed;
+    });
+    const fx2 = RUNNER_X + ((w.finishAt ?? 394) - position) * PERCENT_PER_M;
+    finish.hidden = fx2 > 112; finish.style.left = `${fx2}%`;
+    ghost.hidden = !Number.isFinite(w.ghost) || !!state.result;
+    if (!ghost.hidden) ghost.style.left = `${RUNNER_X + (w.ghost - position) * PERCENT_PER_M}%`;
+    runner.dataset.state = w.jumpMs > 0 ? 'jump' : w.stumbleMs > 0 ? 'trip' : w.waiting ? 'wait' : 'run';
+    runner.dataset.fever = String(!!w.fever);
+    setVar(runner, '--stride', `${Math.max(.16, .5 - (w.speed ?? 0) * .03)}s`);
+    bubble.hidden = !w.waiting || state.phase !== 'answering';
+  };
+  const reactToWorld = w => {
+    const event = w.lastEvent;
+    if (!event || event.id === lastEventId) return;
+    lastEventId = event.id;
+    if (event.type === 'jump') fx.pop(RUNNER_X, 44, event.clean ? 'ナイスジャンプ！' : 'ジャンプ！', 'good');
+    else if (event.type === 'shortcut') { fx.pop(RUNNER_X, 44, 'ころころ近道！', 'great'); fx.burst(RUNNER_X, 62, 'great'); }
+    else if (event.type === 'trip') fx.pop(RUNNER_X, 44, 'よいしょ！', 'soft');
+    else if (event.type === 'boost') { fx.banner('ゴトモンダッシュ！', 'great'); fx.flash('great'); }
+    else if (event.type === 'finish') { fx.banner(`ゴール！ ${((w.timeMs ?? 0) / 1000).toFixed(1)}秒`, 'great'); fx.flash('great'); frame.announce('ゴール'); }
+  };
+
   return {
     root,
-    update(state, companionState) {
+    attachCompanion(portrait) { runner.prepend(portrait); },
+    update(state) {
       if (!active) return;
-      const key = `${state.sessionId}:${state.seq}:${state.paused}`;
-      if (key !== previousKey) {
-        previousKey = key;
-        const p = state.problem;
-        if (p && previousProblem !== p.problemId) {
-          binding?.dispose(); previousProblem = p.problemId; input.value = '';
-          binding = bindMathSprintInput(input, answer, { sessionId: state.sessionId, token: state.token }, onSubmit, canAnswer);
-          question.textContent = `${p.a} ${p.operation === 'addition' ? '+' : '−'} ${p.b} = ?`;
-          nextIdentity = [state.sessionId, p.problemId];
-        }
-        const disabled = state.paused || state.phase !== 'answering';
-        input.disabled = disabled; answer.disabled = disabled;
-        for (const button of pad.children) button.disabled = disabled;
-        next.hidden = state.phase !== 'feedback'; next.disabled = state.paused;
-        replay.disabled = state.paused; pause.hidden = !state.paused;
-        position.textContent = `${Math.min(10, state.answered + (state.phase === 'answering' ? 1 : 0))} / 10`;
-        score.textContent = `せいかい ${state.correct}`;
-        feedback.textContent = state.lastAnswer ? (state.lastAnswer.correct ? 'せいかい！' : `こたえは ${state.lastAnswer.answer} だよ`) : '';
-        controls.hidden = !!state.result; result.hidden = !state.result;
-        play.style.display = state.result ? 'flex' : '';
-        play.style.justifyContent = state.result ? 'center' : '';
-        if (state.result) {
-          finalFeedback.textContent = feedback.textContent;
-          values.correct.textContent = `${state.result.correct} / 10`;
-          values.accuracy.textContent = `${Math.round(state.result.accuracy * 100)}%`;
-          values.maxStreak.textContent = `${state.result.maxStreak}`;
+      frame.setPaused(state.paused && !state.result);
+      if (state.problem && state.problem.problemId !== problemId) {
+        problemId = state.problem.problemId;
+        question.textContent = `${formatProblem(state.problem)} = ?`;
+      }
+      if (state.seq !== lastSeq) {
+        lastSeq = state.seq;
+        const answer = state.lastAnswer;
+        if (answer && answers.length < state.answered) {
+          answers.push({ question: formatProblem(state.problem), answer: answer.answer, correct: answer.correct });
+          if (answer.correct) { fx.pop(70, 30, `${answer.value}！ せいかい`, 'good'); note.textContent = 'せいかい！ ハードルをとびこえよう'; frame.announce('せいかい'); }
+          else {
+            fx.pop(70, 30, `こたえは ${answer.answer}`, 'info'); fx.shake();
+            note.textContent = `${formatProblem(state.problem)} = ${answer.answer}。次でとりかえそう！`;
+            frame.announce(`こたえは ${answer.answer}`);
+          }
+        } else if (state.phase === 'answering') note.textContent = '答えるとジャンプ！ 早いほど止まらず走れる';
+      }
+      pad.setEnabled(!state.paused && ['answering', 'feedback'].includes(state.phase));
+      if (state.result && review.hidden) {
+        review.hidden = false; reviewList.textContent = '';
+        for (const item of answers) {
+          const row = el('li', '', `${item.correct ? '✓' : '☆'} ${item.question} = ${item.answer}`);
+          row.dataset.correct = String(item.correct); reviewList.append(row);
         }
       }
-      companion.hidden = !companionState.selected;
-      const label = companionState.motion?.imageState === 'failed' ? '仲間といっしょに！' : 'ジャガイモスライム';
-      if (caption.textContent !== label) caption.textContent = label;
     },
-    canvas,
-    stopInput() { binding?.dispose(); binding = null; active = false; },
-    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); root?.remove(); root = null; },
+    present(play, dt, state) {
+      if (!active || !state) return;
+      frame.tick(dt);
+      const w = play.world || {};
+      renderTrack(state, w);
+      reactToWorld(w);
+      const mission = w.challenge;
+      frame.hud.set({ points: play.learningPoints + play.bonus, comboCount: play.combo,
+        progressValue: (w.position ?? 0) / (w.finishAt ?? 1), progressLabel: `ハードル ${w.cleared ?? 0}/10 · ${((w.timeMs ?? 0) / 1000).toFixed(1)}秒`,
+        life: null, gaugeValue: play.gauge, fever: w.fever,
+        missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
+    },
+    stopInput() { active = false; pad.setEnabled(false); },
+    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

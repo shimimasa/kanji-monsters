@@ -2,13 +2,13 @@ import { growthStatus, supportPoints } from './companionGrowth.js';
 import { createGameplayRun } from './gameplay/gameplayRun.js';
 
 // Consumes committed events; never supplies answers or changes learning rules.
-export function createCompanionPlay(sessionId, { gameId, growth = growthStatus(), support = 'steady', bestTimeMs = null, course = null } = {}) {
+export function createCompanionPlay(sessionId, { gameId, growth = growthStatus(), support = 'steady', bestTimeMs = null, course = null, pace = 'normal' } = {}) {
   let seq = 0, correct = 0, combo = 0, maxCombo = 0, gauge = 0, bonus = 0, boosts = 0;
   let reaction = 'idle', remaining = 0, completed = false, revision = 0;
   let answered = 0, learningPoints = 0, recovering = false;
   gauge = growth.effects.startGauge;
   const variation=[...sessionId].reduce((sum,char)=>sum+char.charCodeAt(0),0)%3;
-  const world = gameId ? createGameplayRun(gameId, growth.effects, {bestTimeMs,variation,course}) : null;
+  const world = gameId ? createGameplayRun(gameId, growth.effects, {bestTimeMs,variation,course,pace}) : null;
   const skillPoints = () => growth.effects.skillPoints + supportPoints(support, {combo,answered,boosts,recovering});
   return {
     context(state) { world?.context(state); },

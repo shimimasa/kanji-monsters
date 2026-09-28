@@ -7,29 +7,23 @@ const effects = growthStatus().effects;
 const start = gameId => { const run = createGameplayRun(gameId, effects); run.context({ phase: 'answering', paused: false }); return run; };
 const answer = (run, correct = true, combo = 1) => run.answer(correct, {}, combo);
 
-test('race goal rewards a deliberate charge and jump at two obstacles', () => {
+test('race goal counts hurdles jumped without waiting', () => {
   const run = start('mathSprint');
-  assert.equal(run.act('run-goal-jump'), true);
-  answer(run, true, 1); answer(run, true, 2);
-  assert.equal(run.snapshot().danger, true);
-  run.act('push'); answer(run, true, 3);
-  assert.equal(run.snapshot().challenge.progress, '1/2');
-  run.act('charge'); answer(run, true, 4); answer(run, true, 5);
-  run.act('push'); answer(run, true, 6);
-  assert.equal(run.snapshot().challenge.status, 'achieved');
-  assert.equal(run.snapshot().challenge.achievedAt, 6);
-});
-
-test('shooting goal counts correctly aimed priority enemies', () => {
-  const run = start('mathInvader'); run.act('run-goal-priority');
-  for (let i = 1; i <= 3; i++) {
-    run.context({ phase: 'answering', paused: false, life: 3,
-      enemies: [{ enemyId: `enemy-${i}`, y: .8, lane: 1 }], selectedEnemy: { enemyId: `enemy-${i}`, y: .8, lane: 1 } });
-    answer(run, true, i);
-  }
+  assert.equal(run.snapshot().challenge.id === 'clean' || run.snapshot().challenge.id === 'chain', true);
+  assert.equal(run.act('run-goal-clean'), true);
+  for (let i = 1; i <= 5; i++) answer(run, true, i);
+  run.update(30000);
+  assert.equal(run.snapshot().cleanJumps, 5);
   assert.equal(run.snapshot().challenge.status, 'achieved');
 });
-
+test('shooting boss goal needs the boss downed on the first try', () => {
+  const run = start('mathInvader'); run.act('run-goal-boss');
+  for (let i = 1; i <= 9; i++) answer(run, true, i);
+  assert.equal(run.snapshot().challenge.status, 'active');
+  run.answer(true, { boss: true, wrongAttempts: 0 }, 10);
+  assert.equal(run.snapshot().bossDown, true);
+  assert.equal(run.snapshot().challenge.status, 'achieved');
+});
 test('treasure goal follows rare room choice and cannot be changed after answering', () => {
   const run = start('englishChoice');
   assert.equal(run.act('run-goal-rare'), true);

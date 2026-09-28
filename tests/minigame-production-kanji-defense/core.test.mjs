@@ -12,14 +12,10 @@ const readingFor = enemy => KANJI_DEFENSE_LIMITED_UX_CONTENT.find(item => item.f
 const select = (game, enemy = game.snapshot().enemies[0]) => game.dispatch({
   type: 'select', payload: { sessionId: game.snapshot().sessionId, enemyId: enemy.enemyId, problemId: enemy.problemId },
 });
-const submit = (game, value) => {
-  const enemy = game.snapshot().selectedEnemy;
-  return game.dispatch({ type: 'submit', payload: { sessionId: game.snapshot().sessionId, enemyId: enemy?.enemyId,
-    problemId: enemy?.problemId, attemptId: enemy?.attemptId, token: enemy?.token, value } });
-};
+const submit = (game, value, token = game.snapshot().inputToken) =>
+  game.dispatch({ type: 'submit', payload: { sessionId: game.snapshot().sessionId, token, value } });
 const defeatCurrent = game => {
   const enemy = game.snapshot().enemies[0];
-  assert.equal(select(game, enemy), true);
   assert.equal(submit(game, readingFor(enemy)), true);
 };
 const spawnAfterClear = game => game.update(game.snapshot().rules.emptySpawnDelayMs);
@@ -104,84 +100,93 @@ test('pause freezes movement, spawn and active elapsed then resumes in place', (
   game.setPaused(false); game.update(100); assert.ok(game.snapshot().enemies[0].progress > paused.enemies[0].progress);
 });
 
-test('select issues an attempt and selecting the same target is not accepted twice', () => {
+test('select aims at a Monster without stopping it; aiming at the same target twice is not accepted', () => {
   const game = create(); game.enter(); assert.equal(select(game), true);
-  const selected = game.snapshot().selectedEnemy; assert.ok(selected.attemptId); assert.ok(selected.token);
-  assert.equal(select(game, selected), false);
+  const aimed = game.snapshot().enemies[0]; assert.equal(game.snapshot().explicitTargetId, aimed.enemyId);
+  assert.equal(select(game, aimed), false);
+  game.update(100); assert.ok(game.snapshot().enemies[0].progress > aimed.progress);
 });
 
-test('switching simultaneous targets invalidates the old attempt', () => {
+test('a typed reading hits the Monster it reads even when another Monster is aimed', () => {
   const game = create(); game.enter();
   for (let index = 0; index < 4; index++) { defeatCurrent(game); if (index < 3) spawnAfterClear(game); }
   spawnAfterClear(game); game.update(game.snapshot().rules.act2SpawnMs);
   const [first, second] = game.snapshot().enemies; assert.ok(second);
-  assert.equal(select(game, first), true); const old = game.snapshot().selectedEnemy;
-  assert.equal(select(game, second), true);
-  assert.equal(game.dispatch({ type: 'submit', payload: { sessionId: 'kd-test', enemyId: old.enemyId,
-    problemId: old.problemId, attemptId: old.attemptId, token: old.token, value: readingFor(first) } }), false);
+  assert.equal(select(game, first), true);
+  assert.equal(submit(game, readingFor(second)), true);
+  const state = game.snapshot();
+  assert.deepEqual(state.enemies.map(enemy => enemy.enemyId), [first.enemyId]);
+  assert.equal(state.lastResolution.outcome, 'correct'); assert.equal(state.lastResolution.fixtureId, second.fixtureId);
 });
-
+test('each accepted submit consumes the input token and a stale token is rejected', () => {
+  const game = create(); game.enter(); const enemy = game.snapshot().enemies[0]; const stale = game.snapshot().inputToken;
+  assert.equal(submit(game, 'まちがい', stale), true); assert.notEqual(game.snapshot().inputToken, stale);
+  assert.equal(submit(game, readingFor(enemy), stale), false); assert.equal(game.snapshot().resolved, 0);
+});
 test('a correct accepted reading defeats exactly one Monster', () => {
   const events = [], game = create({ onEvent: event => events.push(event) }); game.enter(); const enemy = game.snapshot().enemies[0];
-  assert.equal(select(game, enemy), true); assert.equal(submit(game, readingFor(enemy)), true);
+  assert.equal(submit(game, readingFor(enemy)), true);
   const state = game.snapshot(); assert.equal(state.correct, 1); assert.equal(state.resolved, 1); assert.equal(state.enemies.length, 0);
   assert.equal(events.filter(event => event.type === 'correct').length, 1);
 });
 
 test('katakana answer is accepted through game-local normalization', () => {
-  const game = create(); game.enter(); const enemy = game.snapshot().enemies[0]; select(game, enemy);
+  const game = create(); game.enter(); const enemy = game.snapshot().enemies[0];
   const katakana = readingFor(enemy).replace(/[ぁ-ゖ]/g, value => String.fromCodePoint(value.codePointAt(0) + 0x60));
   assert.equal(submit(game, katakana), true); assert.equal(game.snapshot().correct, 1);
 });
 
 test('first wrong reading is a retry, emits no completion and does not cost life', () => {
-  const events = [], game = create({ onEvent: event => events.push(event) }); game.enter(); select(game);
-  const old = game.snapshot().selectedEnemy; assert.equal(submit(game, 'まちがい'), true); const state = game.snapshot();
+  const events = [], game = create({ onEvent: event => events.push(event) }); game.enter();
+  assert.equal(submit(game, 'まちがい'), true); const state = game.snapshot();
   assert.equal(state.resolved, 0); assert.equal(state.incorrect, 0); assert.equal(state.wrongAttempts, 1); assert.equal(state.life, 3);
   assert.equal(state.combo, 0); assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, 0);
-  assert.notEqual(state.selectedEnemy.attemptId, old.attemptId); assert.match(state.lastAttempt.hint, /^.[…]/u);
+  assert.equal(state.lastAttempt.enemyId, state.enemies[0].enemyId); assert.match(state.lastAttempt.hint, /^.[…]/u);
 });
-
-test('old attempt is rejected after first wrong answer', () => {
-  const game = create(); game.enter(); select(game); const old = game.snapshot().selectedEnemy; submit(game, 'まちがい');
-  assert.equal(game.dispatch({ type: 'submit', payload: { sessionId: 'kd-test', enemyId: old.enemyId,
-    problemId: old.problemId, attemptId: old.attemptId, token: old.token, value: readingFor(old) } }), false);
+test('an empty or whitespace reading is not accepted and keeps the token', () => {
+  const game = create(); game.enter(); const token = game.snapshot().inputToken;
+  assert.equal(submit(game, '   '), false); assert.equal(game.snapshot().inputToken, token); assert.equal(game.snapshot().wrongAttempts, 0);
 });
-
 test('correct retry completes once and records a weak word', () => {
-  const events = [], game = create({ onEvent: event => events.push(event) }); game.enter(); const enemy = game.snapshot().enemies[0]; select(game, enemy);
+  const events = [], game = create({ onEvent: event => events.push(event) }); game.enter(); const enemy = game.snapshot().enemies[0];
   submit(game, 'まちがい'); assert.equal(submit(game, readingFor(enemy)), true); const state = game.snapshot();
   assert.equal(state.correct, 1); assert.equal(state.resolved, 1); assert.equal(state.maxCombo, 1);
   assert.equal(events.filter(event => event.type === 'correct').length, 1);
 });
 
 test('second wrong answer terminally emits one incorrect without life loss', () => {
-  const events = [], game = create({ onEvent: event => events.push(event) }); game.enter(); select(game); submit(game, 'まちがい');
+  const events = [], game = create({ onEvent: event => events.push(event) }); game.enter(); submit(game, 'まちがい');
   assert.equal(submit(game, 'まだちがう'), true); const state = game.snapshot();
   assert.equal(state.incorrect, 1); assert.equal(state.resolved, 1); assert.equal(state.life, 3); assert.equal(state.enemies.length, 0);
   const outcomes = events.filter(event => event.type === 'incorrect'); assert.equal(outcomes.length, 1); assert.equal(outcomes[0].payload.reason, 'attemptsExhausted');
 });
 
 test('double submit is rejected after terminal completion', () => {
-  const game = create(); game.enter(); const enemy = game.snapshot().enemies[0]; select(game, enemy); const attempt = game.snapshot().selectedEnemy;
-  const command = { type: 'submit', payload: { sessionId: 'kd-test', enemyId: attempt.enemyId, problemId: attempt.problemId,
-    attemptId: attempt.attemptId, token: attempt.token, value: readingFor(enemy) } };
+  const game = create(); game.enter(); const enemy = game.snapshot().enemies[0];
+  const command = { type: 'submit', payload: { sessionId: 'kd-test', token: game.snapshot().inputToken, value: readingFor(enemy) } };
   assert.equal(game.dispatch(command), true); assert.equal(game.dispatch(command), false); assert.equal(game.snapshot().resolved, 1);
 });
-
 test('escape is terminal incorrect and costs one life', () => {
   const events = [], game = create({ onEvent: event => events.push(event), rules: { act1SpeedPerMs: 1 } }); game.enter(); game.update(250);
   const state = game.snapshot(); assert.equal(state.life, 2); assert.equal(state.incorrect, 1); assert.equal(state.resolved, 1);
   assert.equal(events.find(event => event.type === 'incorrect').payload.reason, 'escaped');
 });
 
-test('three escapes end the route and emit sessionComplete once', () => {
-  const events = [], game = create({ onEvent: event => events.push(event), rules: { act1SpeedPerMs: 1 } }); game.enter();
-  for (let index = 0; index < 3; index++) { game.update(250); if (!game.snapshot().result) spawnAfterClear(game); }
-  assert.equal(game.snapshot().result.outcome, 'routeBroken'); assert.equal(game.snapshot().life, 0);
+test('escapes dim the gate but never end the route; all twelve encounters are played', () => {
+  const events = [], game = create({ onEvent: event => events.push(event), rules: { act1SpeedPerMs: 1, act2SpeedPerMs: 1, act3SpeedPerMs: 1 } }); game.enter();
+  for (let index = 0; index < 40 && !game.snapshot().result; index++) { game.update(250); game.update(5000); }
+  const state = game.snapshot();
+  assert.equal(state.result.outcome, 'defended'); assert.equal(state.result.resolved, 12); assert.equal(state.life, 0);
+  assert.equal(events.filter(event => event.type === 'problemPresented').length, 12);
   assert.equal(events.filter(event => event.type === 'sessionComplete').length, 1);
 });
 
+test('slow pace walks slower than normal pace', () => {
+  const normal = create(), slow = create({ pace: 'slow' }); normal.enter(); slow.enter();
+  normal.update(200); slow.update(200);
+  assert.ok(slow.snapshot().enemies[0].progress < normal.snapshot().enemies[0].progress);
+  assert.equal(slow.snapshot().pace, 'slow');
+});
 test('Act 2 permits two simultaneous Monsters and never more', () => {
   const game = create(); game.enter();
   for (let index = 0; index < 4; index++) { defeatCurrent(game); if (index < 3) spawnAfterClear(game); }
@@ -204,26 +209,23 @@ test('score rewards correctness, first try and combo but not elapsed millisecond
 
 test('wrong attempt resets an existing combo', () => {
   const game = create(); game.enter(); defeatCurrent(game); spawnAfterClear(game); assert.equal(game.snapshot().combo, 1);
-  select(game); submit(game, 'まちがい'); assert.equal(game.snapshot().combo, 0);
+  submit(game, 'まちがい'); assert.equal(game.snapshot().combo, 0);
 });
 
-test('stale session, problem, enemy, attempt and token are rejected', () => {
+test('stale session, problem, enemy and token are rejected', () => {
   const game = create(); game.enter(); const enemy = game.snapshot().enemies[0];
   assert.equal(game.dispatch({ type: 'select', payload: { sessionId: 'old', enemyId: enemy.enemyId, problemId: enemy.problemId } }), false);
   assert.equal(game.dispatch({ type: 'select', payload: { sessionId: 'kd-test', enemyId: enemy.enemyId, problemId: 'old' } }), false);
-  select(game, enemy); const current = game.snapshot().selectedEnemy;
+  const token = game.snapshot().inputToken;
   for (const payload of [
-    { ...current, sessionId: 'old', value: readingFor(enemy) },
-    { ...current, problemId: 'old', value: readingFor(enemy) },
-    { ...current, enemyId: 'old', value: readingFor(enemy) },
-    { ...current, attemptId: 'old', value: readingFor(enemy) },
-    { ...current, token: 'old', value: readingFor(enemy) },
+    { sessionId: 'old', token, value: readingFor(enemy) },
+    { sessionId: 'kd-test', token: 'old', value: readingFor(enemy) },
+    { sessionId: 'kd-test', value: readingFor(enemy) },
   ]) assert.equal(game.dispatch({ type: 'submit', payload }), false);
 });
-
 test('paused Core rejects select and submit', () => {
   const game = create(); game.enter(); const enemy = game.snapshot().enemies[0]; game.setPaused(true);
-  assert.equal(select(game, enemy), false); game.setPaused(false); select(game, enemy); game.setPaused(true);
+  assert.equal(select(game, enemy), false); game.setPaused(false); game.setPaused(true);
   assert.equal(submit(game, readingFor(enemy)), false);
 });
 
@@ -273,11 +275,10 @@ test('result and nested word lists are immutable', () => {
 });
 
 test('exit is idempotent and permanently rejects old callbacks', () => {
-  const game = create(); game.enter(); const enemy = game.snapshot().enemies[0]; select(game, enemy); const old = game.snapshot().selectedEnemy;
+  const game = create(); game.enter(); const enemy = game.snapshot().enemies[0]; const token = game.snapshot().inputToken;
   game.exit(); game.exit(); game.update(9999); const state = game.snapshot(); assert.equal(state.active, false); assert.equal(state.aborted, true); assert.equal(state.enemies.length, 0);
-  assert.equal(game.dispatch({ type: 'submit', payload: { ...old, sessionId: 'kd-test', value: readingFor(enemy) } }), false);
+  assert.equal(game.dispatch({ type: 'submit', payload: { sessionId: 'kd-test', token, value: readingFor(enemy) } }), false);
 });
-
 test('unknown and malformed commands are rejected', () => {
   const game = create(); game.enter(); assert.equal(game.dispatch(null), false); assert.equal(game.dispatch({}), false);
   assert.equal(game.dispatch({ type: 'next', payload: {} }), false);

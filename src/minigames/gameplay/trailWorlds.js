@@ -51,42 +51,6 @@ export function createExplorationWorld(effects, { variation = 0, course = null }
   };
 }
 
-export function createRaceWorld(effects,{bestTimeMs=null,course=null}={}) {
-  const best=Number.isFinite(bestTimeMs)&&bestTimeMs>0?bestTimeMs:null;
-  let leg = 0, speed = 1, energy = 0, tactic = 'charge', boostMs = 0, penaltyMs = 0, cutMs = 0, elapsed = 0, bonus = 0, final = false, shortcuts = 0;
-  const rough = () => [2,5,8].includes(leg);
-  return {
-    act(action) { if (!['charge','push',...(course?.id === 'potato-shortcut' ? ['roll'] : [])].includes(action)) return false; tactic = action; return true; },
-    update(dt) { elapsed += dt; boostMs = Math.max(0, boostMs - dt); },
-    answer(correct, payload, combo) {
-      if (correct) {
-        speed = Math.min(5, speed + .4 + combo * .08);
-        cutMs += Math.round((speed - 1) * 120);
-        if (tactic === 'charge') energy = Math.min(3, energy + 1);
-        const jumped = rough() && energy >= 2 && tactic === 'push';
-        const rolled = course?.id === 'potato-shortcut' && rough() && energy >= 1 && tactic === 'roll';
-        if (jumped) energy -= 2;
-        if (rolled) { energy--; shortcuts++; cutMs += 900; }
-        if (rough() && !jumped && !rolled && !boostMs) penaltyMs += 1800;
-        else if (tactic === 'push' || boostMs) cutMs += boostMs ? 1500 * effects.potency : 600;
-        bonus += Math.round((boostMs ? 14 : 4) + (jumped ? 22 : 0));
-      } else { speed = Math.max(1, speed - .6); penaltyMs += 2500; }
-      leg++;
-    },
-    boost() { boostMs = 6000 * effects.potency; speed = Math.min(5, speed + 1); },
-    complete() { if (final) return; final = true; bonus += Math.max(0, Math.round(140 * (1 - (elapsed + penaltyMs - cutMs) / 120000))); },
-    snapshot() {
-      const timeMs = Math.max(elapsed * .8, elapsed + penaltyMs - cutMs);
-      return { kind:'race', bonus, progress:leg / 10, speed, energy, shortcuts, timeMs, boostMs, danger:rough(),bestTimeMs:best,paceDeltaMs:best&&leg?timeMs-best*leg/10:null,
-        metric:`${(timeMs/1000).toFixed(1)}秒 · 加速 ${speed.toFixed(1)} · 力 ${energy}/3`,
-        caption: boostMs ? `ダッシュ！あと${(boostMs/1000).toFixed(1)}秒` : `${leg >= 8 ? 'ラストスパート！' : rough() ? '障害区間：力2でジャンプ突破' : '直線：ためて、次の障害に備えよう'}`,
-        summary:`コースタイム ${(timeMs/1000).toFixed(1)}秒${course ? ` · 近道 ${shortcuts}回` : ''}${best?` · ベスト比 ${timeMs<best?'−':'+'}${(Math.abs(timeMs-best)/1000).toFixed(1)}秒`:''}`, goal:best?'ベストの平均ペースを追いこそう！':'8問以上正解で、自分のタイムを残そう',
-        actions:[{id:'charge',label:'力をためる',selected:tactic==='charge',enabled:true},{id:'push',label:rough() ? '攻める／ジャンプ' : '攻める／加速',selected:tactic==='push',enabled:true},
-          ...(course?.id === 'potato-shortcut' ? [{id:'roll',label:'ころころ近道（力1）',selected:tactic==='roll',enabled:true,hint:'障害区間で力1を使い、正解すると近道へ'}] : [])] };
-    },
-  };
-}
-
 export function createTreasureWorld(effects,{course=null}={}) {
   let answered = 0, roomCorrect = 0, rooms = 0, chests = 0, bonus = 0, tactic = 'safe', protectedKey = false, streak = 0, keys = 0, usedKeys = 0, keyUsedThisRoom = false, guardedChests = 0;
   const findings=[],steps=[],names=['入口の回廊','ふたつの通路','宝の間','最後の宝物庫'];
