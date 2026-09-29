@@ -26,6 +26,8 @@ import { buildBingoCard } from './kanjiBingo/bingoContent.js';
 import { createMemoryGame } from './kanjiMemory/memoryGame.js';
 import { createMemoryView } from './kanjiMemory/memoryView.js';
 import { buildMemoryRounds } from './kanjiMemory/memoryContent.js';
+import { createShopGame } from './gotomonShop/shopGame.js';
+import { createShopView } from './gotomonShop/shopView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById } from '../loaders/dataLoader.js';
@@ -60,6 +62,15 @@ const memoryContent = ({ random, stageId, focusKanjiIds }) => {
   return { stage: { stageId: stage.stageId, name: stage.name, grade: stage.grade },
     rounds: buildMemoryRounds({ random, focusKanjiIds, stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean),
       gradeKanji: getKanjiByGrade(stage.grade) || [] }) };
+};
+// The shop's customers are the chosen stage's Gotomon; its kanji use the bingo card's checked clues.
+const shopContent = context => {
+  const base = bingoContent(context);
+  if (!base) return null;
+  const stage = stageData.find(item => item.stageId === base.stage.stageId);
+  const customers = (stage?.enemyIdList || []).map(getMonsterById).filter(Boolean)
+    .map(monster => ({ id: monster.id, name: monster.name, imageUrl: gotomonService.getGotomonById(monster.id).imageUrl }));
+  return { ...base, customers };
 };
 const photoRallyContent = ({ sessionId, random, stageId, focusKanjiIds }) => {
   const stage = stageData.find(item => item.stageId === stageId) ?? stageData.find(item => item.stageId === 'hokkaido_area1');
@@ -109,4 +120,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createBingoGame({ ...context, content: bingoContent(context) }), createView: createBingoView }),
   kanjiMemory: Object.freeze({ id: 'kanjiMemory', title: '漢字カードめくり',
     create: context => createMemoryGame({ ...context, content: memoryContent(context) }), createView: createMemoryView }),
+  gotomonShop: Object.freeze({ id: 'gotomonShop', title: 'ゴトモンのおねがい',
+    create: context => createShopGame({ ...context, content: shopContent(context) }), createView: createShopView }),
 });
