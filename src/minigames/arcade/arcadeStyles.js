@@ -49,7 +49,8 @@ export const ARCADE_CSS = `
 .ya-pad button{min-height:clamp(46px,7.2vh,62px);border:0;border-radius:12px;background:#f5f8fa;color:#16242c;font:inherit;font-size:clamp(22px,3.4vw,28px);font-weight:900;box-shadow:0 4px 0 #9fb3bf;cursor:pointer;touch-action:manipulation}
 .ya-pad button:active{transform:translateY(3px);box-shadow:0 1px 0 #9fb3bf}
 .ya-pad .ya-pad-del{font-size:17px;background:#dfe7ec}
-.ya-pad .ya-pad-fire{background:#ffb627;color:#3a2400;box-shadow:0 4px 0 #b57500;font-size:clamp(18px,2.8vw,24px)}
+.ya-pad .ya-pad-fire{background:#ffb627;color:#3a2400;box-shadow:0 4px 0 #b57500;font-size:clamp(18px,2.8vw,24px);white-space:nowrap;padding:0 4px}
+@media (min-width:900px) and (min-aspect-ratio:5/4){.ya-pad .ya-pad-fire{font-size:clamp(14px,1.5vw,19px)}}
 .ya-pad button:disabled{opacity:.5}
 .ya-arcade button:focus-visible{outline:3px solid #ffd54a!important;outline-offset:2px}
 .ya-fx-item{position:absolute;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap}
