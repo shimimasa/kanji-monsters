@@ -166,8 +166,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
     const current = play.snapshot();
     receipt = award({ score: (state.result?.score ?? current.learningPoints) + current.bonus,
       correct: current.correct, maxCombo: current.maxCombo, completed: current.completed,
-      finished: (state.answered ?? state.resolved ?? 0) >= (definition.id === 'kanjiDefense' ? 12 : 10), activeElapsedMs: state.activeElapsedMs, timeMs:current.world?.timeMs,
-      ...(current.world?.photos ? { photos: current.world.photos } : {}), ...(current.world?.cases ? { cases: current.world.cases } : {}) });
+      finished: state.result?.finished ?? (state.answered ?? state.resolved ?? 0) >= (definition.id === 'kanjiDefense' ? 12 : 10), activeElapsedMs: state.activeElapsedMs, timeMs:current.world?.timeMs,
+      ...(current.world?.photos ? { photos: current.world.photos } : {}), ...(current.world?.cases ? { cases: current.world.cases } : {}), ...(state.result?.journey ? { journey: state.result.journey } : {}) });
     if (receipt.ok && receipt.practice) {
       resultTitle.textContent = '復習おつかれさま！';
       reward.textContent = '復習の記録を保存しました。';
@@ -183,6 +183,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
       const newPhotos = value?.duplicate ? [] : value?.newPhotos ?? [], newCases = value?.duplicate ? [] : value?.newCases ?? [];
       memoryNotice.textContent = newPhotos.length ? `アルバムに新しい写真が${newPhotos.length}まい入ったよ！` :
         newCases.length ? `ことわざ図鑑に「解決」の印が${newCases.length}こふえたよ！` :
+        value?.journeyBest ? `${state.stage?.name ?? 'この地方'}のボスの記録が ★${value.journeyBest} になったよ！` :
         memory?.firstFinish ? '思い出がふえた！ はじめて最後まであそんだね。' :
         memory?.newBest ? `この相棒との自己ベスト！ ${memory.bestScore} pt` :
         memory?.firstPlay ? 'このゲームでの、はじめての思い出ができたよ。' : '';

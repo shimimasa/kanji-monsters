@@ -53,6 +53,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     },
     getAlbum: () => getProgress().album ?? {},
     getCaseFiles: () => getProgress().caseFiles ?? {},
+    getJourneys: () => getProgress().journeys ?? {},
     beginPlay({ sessionId, gameId, gotomonId }) {
       if (!sessionId || !gameId || !getOwnedGotomon().some(friend => friend.id === gotomonId)) return null;
       activeTicket = Object.freeze({ sessionId });
@@ -68,7 +69,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
       });
     },
     awardGotomonPlayResult({ owner, sessionId, gameId, gotomonId, score, correct, maxCombo,
-      ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished, photos = null, cases = null }) {
+      ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished, photos = null, cases = null, journey = null }) {
       if (!owner || owner !== read()?.owner || !sessionId || !gameId) return { ok: false };
       const run = ticket && tickets.get(ticket);
       if (ticket && (!run || ticket !== activeTicket || ticket.sessionId !== sessionId || run.owner !== owner ||
@@ -127,12 +128,21 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
               firstAt: entry?.firstAt ?? Math.max(0, Math.floor(now())) };
           }
         }
+        // Trip stamps: the best boss stars per stage (trip sugoroku only).
+        let journeyBest = null;
+        if (run && completed && gameId === 'tripSugoroku' && typeof journey?.stageId === 'string' && journey.stageId && Number.isFinite(Number(journey?.stars))) {
+          const journeys = progress.journeys ??= {};
+          const stars = Math.min(3, Math.max(1, Math.floor(Number(journey.stars)))), entry = journeys[journey.stageId];
+          if (stars > count(entry?.stars)) journeyBest = stars;
+          journeys[journey.stageId] = { stars: Math.max(count(entry?.stars), stars), trips: count(entry?.trips) + 1,
+            firstAt: entry?.firstAt ?? Math.max(0, Math.floor(now())) };
+        }
         const memory = run && completed ? recordCompanionMemory(friend, { gameId, score: points,
           finished: !!memoryFinished, at: Math.max(0, Math.floor(now())) }) : null;
         reward = { earned, friendship: friend.friendship, plays: friend.plays,
           newBest: points > previousBest, bestScore: game.bestScore, medals: [...friend.medals],
           before, after, earnedXP: after.xp - before.xp, levelUp: after.level > before.level, rank,
-          memory, newPhotos, newCases,
+          memory, newPhotos, newCases, journeyBest,
           bestTimeMs:game.bestTimeMs??null,previousTimeMs:previousTime,newTimeBest:validTime&&(!previousTime||roundedTime<previousTime) };
       });
       if (outcome.ok && run) run.receipt = reward;

@@ -17,12 +17,28 @@ import { createKanjiDefenseView } from './kanjiDefense/kanjiDefenseView.js';
 import { createPhotoRallyGame } from './photoRally/photoRallyGame.js';
 import { createProverbDetectiveGame } from './proverbDetective/proverbDetectiveGame.js';
 import { createProverbDetectiveView } from './proverbDetective/proverbDetectiveView.js';
+import { createTripGame } from './tripSugoroku/tripGame.js';
+import { createTripView } from './tripSugoroku/tripView.js';
+import { readingPool } from './photoRally/photoRallyContent.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById } from '../loaders/dataLoader.js';
 import { gotomonService } from './gotomonService.js';
 
 // The rally is built from the loaded game data for the chosen stage.
+// The trip crosses the chosen stage and ends at its boss monster.
+const tripContent = ({ random, stageId, focusKanjiIds }) => {
+  const stage = stageData.find(item => item.stageId === stageId) ?? stageData.find(item => item.stageId === 'hokkaido_area1');
+  if (!stage) return null;
+  const monsters = (stage.enemyIdList || []).map(getMonsterById).filter(Boolean)
+    .map(monster => ({ id: monster.id, name: monster.name, isBoss: !!monster.isBoss, imageUrl: gotomonService.getGotomonById(monster.id).imageUrl }));
+  const boss = monsters.find(monster => monster.isBoss) ?? monsters.at(-1);
+  return { stage: { stageId: stage.stageId, name: stage.name, grade: stage.grade }, focusKanjiIds,
+    boss: boss ? { monsterId: boss.id, name: boss.name, imageUrl: boss.imageUrl } : null,
+    monsters: monsters.filter(monster => monster !== boss),
+    readings: readingPool({ random, focusKanjiIds, stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean),
+      gradeKanji: getKanjiByGrade(stage.grade) || [] }) };
+};
 const photoRallyContent = ({ sessionId, random, stageId, focusKanjiIds }) => {
   const stage = stageData.find(item => item.stageId === stageId) ?? stageData.find(item => item.stageId === 'hokkaido_area1');
   if (!stage) return { stage: null, shots: [] };
@@ -65,4 +81,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createPhotoRallyGame({ ...context, content: photoRallyContent(context) }), createView: createPhotoRallyView }),
   proverbDetective: Object.freeze({ id: 'proverbDetective', title: 'ことわざ探偵',
     create: createProverbDetectiveGame, createView: createProverbDetectiveView }),
+  tripSugoroku: Object.freeze({ id: 'tripSugoroku', title: '旅すごろく',
+    create: context => createTripGame({ ...context, content: tripContent(context) }), createView: createTripView }),
 });

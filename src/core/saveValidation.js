@@ -145,6 +145,17 @@ export function validateSave(save, currentVersion) {
           !Number.isSafeInteger(item.solves) || item.solves < 1 || !Number.isSafeInteger(item.firstAt) || item.firstAt < 0) throw new Error('Invalid case file');
     }
   }
+  // Trip sugoroku stamps: best boss stars per stage id.
+  const journeys = save.player.miniGames?.journeys;
+  if (journeys !== undefined) {
+    requireRecord(journeys, 'journeys');
+    if (Object.keys(journeys).length > 200) throw new Error('Invalid journeys size');
+    for (const item of Object.values(journeys)) {
+      requireRecord(item, 'journey');
+      if (!Number.isInteger(item.stars) || item.stars < 1 || item.stars > 3 ||
+          !Number.isSafeInteger(item.trips) || item.trips < 1 || !Number.isSafeInteger(item.firstAt) || item.firstAt < 0) throw new Error('Invalid journey');
+    }
+  }
   const timed = save.player.miniGames?.timedLearning;
   if (timed !== undefined) {
     requireRecord(timed, 'Timed learning'); requireRecord(timed.items, 'Timed learning items');

@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  tripSugoroku: [
+    { id: 'boss', name: 'ボスを倒す', deadline: 99, target: 1,
+      rule: '道具を集めて、地方のボスを倒そう。', hint: '⭐きらきらはボスに2ダメージ。とっておこう。', value: data => data.world.bossDefeated ? 1 : 0 },
+    { id: 'chain', name: '5問連続で正解', deadline: 99, target: 5,
+      rule: '正解をつないで、旅の追い風に乗ろう。', hint: '🔥ヒントの火で、まよう問題を助けてもらおう。', value: data => data.maxCombo },
+  ],
   kanjiDefense: [
     { id: 'chain', name: '4回連続で読みを正解', deadline: 99, target: 4,
       rule: '読みを4回続けて正解しよう。', hint: '落ち着いて読むことが旅路を守る。', value: data => data.maxCombo },
