@@ -85,6 +85,14 @@ export const ARCADE_CSS = `
 @keyframes ya-nudge{0%,100%{transform:none}30%{transform:translateX(-8px)}60%{transform:translateX(6px)}}
 @keyframes ya-caret{50%{opacity:0}}
 @keyframes ya-glow{from{box-shadow:0 0 4px #ffcf4d}to{box-shadow:0 0 16px #ffcf4d}}
+/* The shell also tags this root .yt-game, and minigame-shell.css / growth-gameplay.css
+   restyle every .yt-game (some by #id) as a light 920px page. Win back the arcade frame. */
+.ya-arcade{background:#0f2530!important;color:#fff!important;padding:0!important}
+.ya-arcade[data-completed=true]{background:#f4f3e5!important;color:#17362f!important}
+.ya-arcade>.ya-shell{max-width:none!important;margin:0!important}
+.ya-arcade .ya-header{background:#0008!important;padding:4px max(10px,env(safe-area-inset-right)) 4px max(12px,env(safe-area-inset-left))!important;border-bottom:0!important}
+.ya-arcade[data-completed=true] .ya-header{background:#17362f!important}
+.ya-arcade .ya-header h1{color:inherit!important;font-size:clamp(17px,2.6vw,24px)!important}
 @media (max-height:560px){.ya-header{min-height:42px}.ya-pad button{min-height:40px;font-size:20px}.ya-entry{min-height:48px;font-size:28px}.ya-dock{gap:5px;padding-top:6px}}
 @media (prefers-reduced-motion:reduce){.ya-arcade *,.ya-arcade *::after{animation:none!important;transition:none!important}.ya-burst,.ya-beam{display:none}}
 `;

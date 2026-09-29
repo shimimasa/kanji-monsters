@@ -68,7 +68,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   if (!arcade) howTo.after(hud);
   const scene = arcade ? null : createCompanionScene({ doc, root, info, gotomon, act: onAct });
   if (scene) hud.after(scene.root);
-  else view.attachCompanion?.(companionPortrait(doc, gotomon, 'ya-companion'));
+  // Not '*-companion': minigame-shell.css hides that suffix for the older games' canvas figures.
+  else view.attachCompanion?.(companionPortrait(doc, gotomon, 'ya-buddy'));
   const sceneCanvas = scene?.root.querySelector('.gt-scene');
   if (!reviewMode && !arcade) {
     root.classList.add('gt-fullscreen-play');
