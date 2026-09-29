@@ -1,9 +1,9 @@
-import { createChestWorld, createMoleWorld, createCartWorld, createStarWorld, createBridgeRunWorld, createPhotoWorld, createCaseWorld, createTripWorld, createBingoWorld, createMemoryWorld } from './quizWorlds.js';
+import { createChestWorld, createMoleWorld, createCartWorld, createStarWorld, createBridgeRunWorld, createPhotoWorld, createCaseWorld, createTripWorld, createBingoWorld, createMemoryWorld, createShopWorld } from './quizWorlds.js';
 import { createDashWorld, createInvaderWorld, createGateWorld } from './arcadeWorlds.js';
 import { createRunChallenge } from './runChallenges.js';
 const worlds={mathSprint:createDashWorld, mathInvader:createInvaderWorld, englishChoice:createChestWorld,
   sentenceOrder:createBridgeRunWorld, timedChoice:createMoleWorld, multiSelect:createStarWorld,
-  asyncChoice:createCartWorld, kanjiDefense:createGateWorld, photoRally:createPhotoWorld, proverbDetective:createCaseWorld, tripSugoroku:createTripWorld, kanjiBingo:createBingoWorld, kanjiMemory:createMemoryWorld};
+  asyncChoice:createCartWorld, kanjiDefense:createGateWorld, photoRally:createPhotoWorld, proverbDetective:createCaseWorld, tripSugoroku:createTripWorld, kanjiBingo:createBingoWorld, kanjiMemory:createMemoryWorld, gotomonShop:createShopWorld};
 
 export function createGameplayRun(gameId,effects,options={}) {
   const world=worlds[gameId]?.(effects,options);

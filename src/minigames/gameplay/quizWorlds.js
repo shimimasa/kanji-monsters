@@ -13,6 +13,7 @@ const KINDS = Object.freeze({
   bridge: { travel: [9000, 14000], label: '橋', unit: '本', verb: 'かけた', skill: '虹のかけ橋', special: '虹の橋' },
   photo: { travel: [6000, 9500], label: '写真', unit: 'まい', verb: '撮った', skill: 'シャッターチャンス', special: 'ベストショット' },
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
+  shop: { travel: [9000, 14000], label: 'おねがい', unit: '人', verb: 'かなえた', skill: '大はんじょう', special: 'ごきげん' },
   memory: { travel: [10000, 15000], label: 'ペア', unit: '組', verb: 'そろえた', skill: 'めくりの達人', special: 'ひらめき' },
   bingo: { travel: [8000, 12000], label: 'ビンゴ', unit: '問', verb: 'あてた', skill: 'ビンゴチャンス', special: 'ラッキー' },
   case: { travel: [14000, 20000], label: '事件', unit: '件', verb: '解決', skill: 'ひらめき', special: '名推理' },
@@ -38,6 +39,8 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let bossDamage = 0;
   // Kanji bingo: completed lines and opened squares, read from the Core (stamps add lines too).
   let bingoLines = 0, bingoMarked = 0;
+  // Gotomon shop: requests served and tips, read from the Core (a later hand-over serves too).
+  let shopServed = 0, shopTips = 0;
   const mark = (type, extra = {}) => { lastEvent = Object.freeze({ id: ++eventSerial, type, ...extra }); };
   const progress = () => clamp(elapsed / travelMs, 0, 1);
   return {
@@ -46,6 +49,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
       const id = state?.problem?.problemId ?? null;
       if (id !== problemId) { problemId = id; elapsed = 0; }
       open = state?.phase === 'answering';
+      if (kind === 'shop' && state?.mode === 'shop') { shopServed = Math.max(shopServed, state.served || 0); shopTips = Math.max(shopTips, state.tips || 0); }
       if (kind === 'bingo' && state?.bingo) { bingoLines = Math.max(bingoLines, state.bingo.lines || 0); bingoMarked = Math.max(bingoMarked, state.bingo.marked || 0); }
     },
     update(dt) { if (open && !review) elapsed = Math.min(travelMs, elapsed + (Number.isFinite(dt) ? Math.max(0, dt) : 0)); },
@@ -92,11 +96,12 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         correct, answered, quick, streak, fever: feverLeft > 0, feverLeft, charged, special, lastEvent, completed,
         photos: [...photos], bestShots: photos.filter(photo => photo.stars === 3).length,
         cases: [...cases], brilliant: cases.filter(item => item.stars === 3).length,
-        bossDamage, bossDefeated: kind === 'trip' && bossDamage >= 5, bingoLines, bingoMarked,
+        bossDamage, bossDefeated: kind === 'trip' && bossDamage >= 5, bingoLines, bingoMarked, shopServed, shopTips,
         metric: `${spec.label} ${correct}`,
         caption: feverLeft ? `${spec.skill}！ あと${feverLeft}回` : charged ? `次の正解で${spec.special}！` : '',
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
+          : kind === 'shop' && shopServed ? `${shopServed}人のおねがいをかなえた · チップ⭐${shopTips}`
           : kind === 'memory' && answered ? `ペアを${answered}組そろえた${correct ? ` · すぐに見つけた ${correct}組` : ''}`
           : kind === 'bingo' ? (bingoLines ? `ビンゴ${bingoLines}列 · ${bingoMarked}マスあけた` : `${bingoMarked}マスあけた · ビンゴまであと少し`)
           : kind === 'case' && cases.length ? `事件を${cases.length}件解決${cases.some(item => item.stars === 3) ? ` · 名推理 ${cases.filter(item => item.stars === 3).length}回` : ''}`
@@ -117,3 +122,4 @@ export const createCaseWorld = (effects, options) => createQuizWorld('case', eff
 export const createTripWorld = (effects, options) => createQuizWorld('trip', effects, options);
 export const createBingoWorld = (effects, options) => createQuizWorld('bingo', effects, options);
 export const createMemoryWorld = (effects, options) => createQuizWorld('memory', effects, options);
+export const createShopWorld = (effects, options) => createQuizWorld('shop', effects, options);
