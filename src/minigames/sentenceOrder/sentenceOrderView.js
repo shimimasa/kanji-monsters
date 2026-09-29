@@ -1,247 +1,221 @@
-import { publish } from '../../core/eventBus.js';
+import { createArcadeFrame, bindArcadeKeys } from '../arcade/arcadeKit.js';
+
 const CSS = `
-#sentenceOrderScreen{position:fixed;inset:0;z-index:100010;background:#f4f7ef;color:#263126;overflow:auto;overscroll-behavior:contain;font:18px system-ui,sans-serif;box-sizing:border-box;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom));touch-action:manipulation}
-#sentenceOrderScreen *{box-sizing:border-box}#sentenceOrderScreen [hidden]{display:none!important}
-#sentenceOrderScreen .so-shell{max-width:760px;margin:0 auto}#sentenceOrderScreen header{display:flex;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:-12px;z-index:2;background:#f4f7ef;padding:4px 0}
-#sentenceOrderScreen h1{font-size:clamp(20px,5vw,28px);margin:0}#sentenceOrderScreen button{min-width:44px;min-height:44px;border:2px solid #57715b;border-radius:11px;background:#fff;color:#263126;font:inherit;padding:9px 13px;cursor:pointer}
-#sentenceOrderScreen button:disabled{opacity:.52;cursor:default}#sentenceOrderScreen button:focus-visible{outline:3px solid #8a4b00;outline-offset:2px}.so-progress{display:flex;justify-content:space-between;gap:12px;margin:10px 0;font-weight:700}.so-pause{color:#795b17;margin:8px 0}
-#sentenceOrderScreen .so-play{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:16px;align-items:start}.so-prompt{text-align:center;margin:8px 0}.so-help{text-align:center;margin:4px 0 10px;color:#495d4d;font-size:15px}
-#sentenceOrderScreen .so-chunks{display:flex;gap:8px;align-items:stretch;justify-content:center;flex-wrap:wrap;margin:10px 0;min-height:58px}.so-chunk{min-height:52px;max-width:100%;overflow-wrap:anywhere}.so-chunk[aria-pressed=true]{background:#fff0cb;border-color:#9b5c00;box-shadow:0 0 0 2px #e2a72e}
-#sentenceOrderScreen .so-moves{display:flex;gap:10px;justify-content:center;margin:10px 0}.so-moves button{flex:0 1 180px}.so-feedback{min-height:54px;margin:9px 0;line-height:1.5}.so-feedback strong{display:block}.so-actions{text-align:center}.so-primary{background:#376a43!important;color:#fff!important;border-color:#376a43!important;min-width:180px!important}
-#sentenceOrderScreen .so-companion{pointer-events:none;text-align:center;margin:0;padding-top:4px;color:#55665a;font-size:14px}.so-companion canvas{display:block;width:180px;height:90px;max-width:100%;margin:auto}.so-result{text-align:center;padding:12px}.so-result h2{font-size:28px}.so-result p{font-size:19px;margin:10px}.so-result strong{display:block;font-size:28px}
-#sentenceOrderScreen .so-hints{border:1px solid #779780;border-radius:12px;padding:10px;margin:10px 0;background:#fffaf0}.so-hints p{margin:8px 0 0;line-height:1.5;font-size:16px;overflow-wrap:anywhere}#sentenceOrderScreen .so-chunk[data-hint=first]::after,#sentenceOrderScreen .so-chunk[data-hint=last]::after{display:block;font-size:13px;font-weight:700;color:#275438}#sentenceOrderScreen .so-chunk[data-hint=first]::after{content:'ヒント：はじめ'}#sentenceOrderScreen .so-chunk[data-hint=last]::after{content:'ヒント：おわり'}
-#sentenceOrderScreen .so-missed{text-align:left;margin-top:18px;overflow-wrap:anywhere}#sentenceOrderScreen .so-missed h3{font-size:20px}#sentenceOrderScreen .so-missed h4{font-size:16px;margin:10px 0 6px}#sentenceOrderScreen .so-missed p{font-size:16px;margin:8px 0;line-height:1.6}.so-missed-list{list-style:none;padding:0}.so-missed-list>li{border-top:1px solid #779780;padding:12px 0}.so-comparison{list-style:none;display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:6px 0}.so-comparison li{border:1px solid #779780;border-radius:8px;padding:6px;font-size:16px;max-width:100%}.so-comparison .so-order-difference{background:#fff0cb;border:2px solid #9b5c00}
-@media(max-width:540px){#sentenceOrderScreen .so-play{grid-template-columns:1fr}.so-companion{padding:0}.so-companion canvas{width:140px;height:70px}.so-chunk{flex:1 1 calc(50% - 8px)}.so-prompt{margin:4px 0}}
-@media(max-height:430px) and (min-width:541px){#sentenceOrderScreen .so-prompt,.so-help,.so-progress,.so-feedback,.so-moves{margin:3px 0}.so-chunk{min-height:44px;padding:5px 9px}.so-companion canvas{width:120px;height:60px}.so-result{padding:4px}}
+#sentenceOrderScreen .ya-field{background:linear-gradient(#9fdcff 0,#d6f1ff 32%,#7cc26b 32.2%,#5fa855 46%,#3f8fc9 46.2%,#2f74b0 100%)}
+#sentenceOrderScreen .so-bank{position:absolute;z-index:2;top:46%;bottom:0;width:17%;background:linear-gradient(#6fb85c 0 14%,#8a6a45 14% 100%);border-top:4px solid #4f9a45}
+#sentenceOrderScreen .so-bank[data-side=left]{left:0;border-radius:0 18px 0 0}
+#sentenceOrderScreen .so-bank[data-side=right]{right:0;border-radius:18px 0 0 0}
+#sentenceOrderScreen .so-waves{position:absolute;left:0;right:0;top:50%;bottom:0;background-image:repeating-linear-gradient(90deg,#ffffff22 0 30px,transparent 30px 90px);opacity:.6;animation:so-flow 3s linear infinite}
+#sentenceOrderScreen .so-slot{position:absolute;z-index:3;top:46%;height:clamp(40px,7%,56px);transform:translateY(-100%);border:3px dashed #ffffffaa;border-radius:8px}
+#sentenceOrderScreen .so-plank{position:absolute;z-index:4;min-height:44px;padding:4px 6px;border:0;border-radius:8px;background:linear-gradient(#e0b46e,#b88340);color:#2a1c10;border-bottom:5px solid #7a5226;font:inherit;font-size:clamp(15px,1.8vw,19px);font-weight:900;line-height:1.2;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 0 #0004;overflow-wrap:anywhere}
+#sentenceOrderScreen .so-plank[data-where=river]{transform:translate(-50%,-50%);animation:so-bob 1.6s ease-in-out infinite alternate;width:max-content;min-width:88px;max-width:34%;padding:6px 12px}
+#sentenceOrderScreen .so-plank[data-where=bridge]{transform:translateY(-100%);min-height:clamp(40px,7%,56px)}
+#sentenceOrderScreen .so-key{font-size:.7em;color:#6b4a2a;margin-right:3px}
+#sentenceOrderScreen .so-plank:focus-visible{outline:3px solid #ffd54a;outline-offset:2px}
+#sentenceOrderScreen .so-plank[data-status=right]{background:linear-gradient(#bff0c8,#7fcf94);border-bottom-color:#2f8a4f}
+#sentenceOrderScreen .so-plank[data-status=fixed]{background:linear-gradient(#cfe8ff,#94c4f0);border-bottom-color:#2a6fb0}
+#sentenceOrderScreen .so-plank[data-rainbow=true]{background:linear-gradient(90deg,#ffb3b3,#ffe08a,#b8f0a8,#a8d8ff,#d8b8ff);border-bottom-color:#7a5aa0}
+#sentenceOrderScreen .so-hero{position:absolute;z-index:5;width:clamp(64px,9vw,92px);height:clamp(64px,9vw,92px);transform:translate(-50%,-100%);top:46%;transition:left .1s linear}
+#sentenceOrderScreen .so-hero .gt-portrait{display:block;width:100%;height:100%;background:none;border:0}
+#sentenceOrderScreen .so-hero .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 3px #0005)}
+#sentenceOrderScreen .so-hero[data-walking=true] .gt-portrait{animation:so-step .35s ease-in-out infinite alternate}
+#sentenceOrderScreen .so-hero[data-fever=true]::after{content:'';position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,#ffd54a66,transparent 70%);animation:ya-glow .4s infinite alternate;z-index:-1}
+#sentenceOrderScreen .so-sentence{margin:0;min-height:2.6em;padding:8px 10px;border-radius:12px;background:#ffffff14;text-align:center;font-size:clamp(20px,2.6vw,26px);font-weight:900;line-height:1.35;color:#fff}
+#sentenceOrderScreen .so-sentence span:not(.so-laid){color:#ffffff55}
+#sentenceOrderScreen .so-feedback{margin:0;text-align:center;font-size:15px;font-weight:700;color:#d8e8f0}
+#sentenceOrderScreen .so-next{min-height:52px;border:0;border-radius:14px;background:#ffb627;color:#3a2400;font:inherit;font-size:20px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer}
+#sentenceOrderScreen .so-review{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+#sentenceOrderScreen .so-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
+#sentenceOrderScreen .so-review li[data-correct=false]{background:#fff3da}
+@keyframes so-bob{from{margin-top:-4px}to{margin-top:4px}}
+@keyframes so-flow{to{background-position-x:90px}}
+@keyframes so-step{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-8%) rotate(4deg)}}
 `;
 
-export function createSentenceOrderView({ document: doc, dispatch, onBack, onReplay, getSnapshot }) {
-  let active = true, root = null, shownProblemId = null, selectedChunkId = null, refocusSelected = false;
-  let hintStep = 0;
-  let displayedResult = null;
+// The companion walks from WALK_FROM to the bank edge while the sentence is open.
+const BRIDGE_FROM = 17, BRIDGE_TO = 83, WALK_FROM = 6, BANK_EDGE = 9, RIVER_Y = 76;
+
+export function createSentenceOrderView({ document: doc, dispatch, onBack, getSnapshot }) {
+  let active = true, problemId = null, lastSeq = -1, lastEventId = 0, placed = 0, crossing = null;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
-  const el = (tag, className = '', text = '') => {
-    const node = doc.createElement(tag); node.className = className; node.textContent = text; return node;
-  };
-  root = el('section'); root.id = 'sentenceOrderScreen'; root.setAttribute('aria-label', '文ならべ');
+  const frame = createArcadeFrame(doc, { id: 'sentenceOrderScreen', title: '文ならべ', theme: 'river' });
+  const { root, world, dock, fx, el } = frame;
   const style = el('style'); style.textContent = CSS; root.append(style);
-  const shell = el('div', 'so-shell'); root.append(shell);
-  const header = el('header'); shell.append(header); header.append(el('h1', '', '文ならべ'));
-  const back = el('button', '', 'もどる'); back.type = 'button'; back.dataset.action = 'back'; header.append(back);
-  on(back, 'click', () => { if (active) onBack(); });
-  const progress = el('div', 'so-progress'), position = el('span'), score = el('span'); progress.append(position, score); shell.append(progress);
-  const pause = el('p', 'so-pause', 'おやすみ中'); pause.hidden = true; shell.append(pause);
-  const play = el('div', 'so-play'), controls = el('div'); shell.append(play); play.append(controls);
-  const prompt = el('p', 'so-prompt'); prompt.dataset.role = 'problem'; controls.append(prompt);
-  const help = el('p', 'so-help', '板をつかんで移動。選んで「左右」でも並べ替えできます。'); controls.append(help);
-  const hints = el('div', 'so-hints'), hintButton = el('button', '', 'ヒント：はじめの言葉');
-  hintButton.type = 'button'; hintButton.dataset.action = 'sentence-hint';
-  const hintText = el('p'); hintText.setAttribute('role', 'status'); hints.append(hintButton, hintText); controls.append(hints);
-  on(hints, 'keydown', event => event.stopPropagation());
-  on(hintButton, 'click', () => {
-    const state = getSnapshot();
-    if (!active || state.mode !== 'review' || state.paused || state.phase !== 'answering' ||
-        !state.attemptId || state.problem?.problemId !== shownProblemId || hintStep >= 2) return;
-    hintStep++; updateHints(state);
-  });
-  const chunkArea = el('div', 'so-chunks'); chunkArea.setAttribute('aria-label', '現在の文節の並び'); controls.append(chunkArea);
-  const chunkButtons = Array.from({ length: 6 }, (_, index) => {
-    const button = el('button', 'so-chunk'); button.type = 'button'; button.dataset.chunkPosition = String(index + 1);
-    chunkArea.append(button); return button;
-  });
-  const select = button => {
-    const state = getSnapshot();
-    if (!active || state.paused || state.phase !== 'answering' || !state.attemptId || button.hidden) return false;
-    selectedChunkId = button.dataset.chunkId; refocusSelected = true; return true;
-  };
-  chunkButtons.forEach(button => on(button, 'click', () => {
-    if (select(button)) updateSelection();
-  }));
-  const identity = state => ({
-    sessionId: state.sessionId, problemId: state.problem.problemId, attemptId: state.attemptId,
-  });
-  let drag = null;
-  on(chunkArea, 'pointerdown', event => {
-    const target = event.target.closest?.('[data-chunk-id]');
-    if (!target || event.button !== 0 || !select(target)) return;
-    drag = { id: target.dataset.chunkId, identity: identity(getSnapshot()), x: event.clientX, y: event.clientY, moved: false, target };
-    target.setPointerCapture?.(event.pointerId); updateSelection();
-  });
-  on(chunkArea, 'pointermove', event => {
-    if (!drag) return;
-    const dx = event.clientX-drag.x, dy=event.clientY-drag.y;
-    if (Math.hypot(dx,dy)>8) drag.moved=true;
-    if (drag.moved) {
-      drag.target.classList.add('gt-dragging'); drag.target.style.translate=`${dx}px ${dy}px`;
-      // Hit-test the other planks, not the lifted piece itself.
-      drag.target.style.pointerEvents='none';
-      const over=doc.elementFromPoint?.(event.clientX,event.clientY)?.closest?.('[data-chunk-id]');
-      drag.target.style.pointerEvents='';
-      for (const node of chunkButtons) node.classList.toggle('gt-drop-target',node===over);
-    }
-  });
-  const endDrag = (event, cancelled = false) => {
-    if (!drag) return;
-    const moving=drag;drag=null;
-    moving.target.style.pointerEvents='none';
-    const over=doc.elementFromPoint?.(event.clientX,event.clientY)?.closest?.('[data-chunk-id]');
-    moving.target.style.pointerEvents='';moving.target.style.translate='';moving.target.classList.remove('gt-dragging');
-    for (const node of chunkButtons) node.classList.remove('gt-drop-target');
-    if (!cancelled && moving.moved && over) {
-      selectedChunkId=moving.id;refocusSelected=true;
-      if(dispatch({type:'place',payload:{...moving.identity,chunkId:moving.id,to:getSnapshot().currentOrder.indexOf(over.dataset.chunkId)}})) {
-        publish('playSE','decide');
-        const landed=chunkButtons.find(node=>node.dataset.chunkId===moving.id);
-        if(landed){landed.classList.remove('gt-landed');void landed.offsetWidth;landed.classList.add('gt-landed');}
-      }
-    }
-  };
-  on(chunkArea,'pointerup',event=>endDrag(event));on(chunkArea,'pointercancel',event=>endDrag(event,true));
-  const move = direction => {
-    const state = getSnapshot();
-    if (!active || state.paused || state.phase !== 'answering' || !state.attemptId || !selectedChunkId) return false;
-    refocusSelected = true;
-    return dispatch({ type: 'reorder', payload: { ...identity(state), chunkId: selectedChunkId, direction } });
-  };
-  const submit = () => {
-    const state = getSnapshot();
-    if (!active || state.paused || state.phase !== 'answering' || !state.attemptId) return false;
-    return dispatch({ type: 'submit', payload: identity(state) });
-  };
-  const moves = el('div', 'so-moves'), left = el('button', '', '← 左へ'), right = el('button', '', '右へ →');
-  left.type = right.type = 'button'; left.dataset.action = 'move-left'; right.dataset.action = 'move-right';
-  moves.append(left, right); controls.append(moves);
-  on(left, 'click', () => move('left')); on(right, 'click', () => move('right'));
-  const feedback = el('p', 'so-feedback'); feedback.setAttribute('aria-live', 'polite'); controls.append(feedback);
-  const actions = el('div', 'so-actions'), submitButton = el('button', 'so-primary', 'これで決定');
-  submitButton.type = 'button'; submitButton.dataset.action = 'submit'; actions.append(submitButton); controls.append(actions);
-  on(submitButton, 'click', submit);
-  const next = el('button', 'so-primary', '次へ'); next.type = 'button'; next.dataset.action = 'next'; actions.append(next);
+  on(frame.back, 'click', () => { if (active) onBack(); });
+  const left = el('div', 'so-bank'); left.dataset.side = 'left';
+  const right = el('div', 'so-bank'); right.dataset.side = 'right';
+  world.append(el('div', 'so-waves'), left, right);
+  const slots = [], planks = new Map();
+  const hero = el('div', 'so-hero'); hero.style.left = `${WALK_FROM}%`; world.append(hero);
+
+  const sentence = el('p', 'so-sentence'); sentence.dataset.role = 'problem';
+  const feedback = el('p', 'so-feedback', '文のはじめの板からタップ！');
+  const next = el('button', 'so-next', 'つぎへ'); next.type = 'button'; next.dataset.action = 'next'; next.hidden = true;
   on(next, 'click', () => {
     const state = getSnapshot();
-    if (active && !state.paused && state.phase === 'feedback') dispatch({
-      type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem.problemId },
-    });
+    if (active && !state.paused && state.phase === 'feedback') dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem?.problemId } });
   });
-  on(doc, 'keydown', event => {
-    if (!active || event.defaultPrevented || event.repeat || event.isComposing ||
-        event.altKey || event.ctrlKey || event.metaKey) return;
-    if (event.key === 'Enter' && ['back', 'next', 'replay'].includes(event.target?.dataset?.action)) return;
-    let accepted = false;
-    if (event.key === 'ArrowLeft') accepted = move('left');
-    else if (event.key === 'ArrowRight') accepted = move('right');
-    else if (event.key === 'Enter') accepted = submit();
-    if (accepted) event.preventDefault();
-  });
-  const companion = el('figure', 'so-companion'), canvas = el('canvas'); canvas.width = 280; canvas.height = 140;
-  canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', '仲間のジャガイモスライム');
-  const caption = el('figcaption', '', 'ジャガイモスライム'); companion.append(canvas, caption); play.append(companion);
-  const result = el('div', 'so-result'); result.hidden = true; shell.append(result); const resultHeading = el('h2'); result.append(resultHeading);
-  const finalFeedback = el('p', 'so-feedback'); finalFeedback.setAttribute('aria-live', 'polite'); result.append(finalFeedback);
-  const missedSection = el('section', 'so-missed'), missedList = el('ol', 'so-missed-list'); missedSection.hidden = true;
-  missedSection.setAttribute('aria-label', '今回まちがえた文の比較');
-  missedSection.append(el('h3', '', '今回まちがえた文'), missedList); result.append(missedSection);
-  const resultCorrect = el('strong'), resultIncorrect = el('strong'), resultAccuracy = el('strong');
-  for (const [label, value] of [['せいかい', resultCorrect], ['まちがい', resultIncorrect], ['せいかいりつ', resultAccuracy]]) {
-    const row = el('p', '', label); row.append(value); result.append(row);
-  }
-  const replay = el('button', 'so-primary', 'もういちど'); replay.type = 'button'; replay.dataset.action = 'replay'; result.append(replay);
-  on(replay, 'click', () => { if (active && !getSnapshot().paused) onReplay(); });
+  dock.append(sentence, feedback, next);
+  const review = el('div', 'ya-learning-result'); review.hidden = true;
+  const reviewList = el('ol', 'so-review'); review.append(el('h3', '', '今回の文'), reviewList); frame.shell.append(review);
   doc.body.append(root);
+  const answers = [];
 
-  const updateSelection = () => {
-    const state = getSnapshot(), selectedIndex = state.currentOrder.indexOf(selectedChunkId);
-    chunkButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.chunkId === selectedChunkId)));
-    const canMove = active && !state.paused && state.phase === 'answering' && selectedIndex >= 0;
-    left.disabled = !canMove || selectedIndex === 0;
-    right.disabled = !canMove || selectedIndex === state.currentOrder.length - 1;
+  const identity = state => ({ sessionId: state.sessionId, problemId: state.problem?.problemId, attemptId: state.attemptId });
+  const textOf = (problem, id) => problem.chunks.find(chunk => chunk.chunkId === id)?.text ?? '';
+  const canPlay = state => active && !state.paused && state.phase === 'answering';
+  // Taking a floating plank lays it on the next free slot of the bridge.
+  function take(chunkId) {
+    const state = getSnapshot();
+    if (!canPlay(state)) return false;
+    const from = state.currentOrder.indexOf(chunkId);
+    if (from < placed) return false;
+    if (from !== placed && dispatch({ type: 'place', payload: { ...identity(state), chunkId, to: placed } }) !== true) return false;
+    placed++;
+    const after = getSnapshot();
+    if (placed >= after.currentOrder.length) dispatch({ type: 'submit', payload: identity(after) });
+    render(getSnapshot());
+    return true;
+  }
+  // Tapping a laid plank sends it, and every plank after it, back to the river.
+  function lift(chunkId) {
+    const state = getSnapshot();
+    if (!canPlay(state)) return false;
+    const at = state.currentOrder.indexOf(chunkId);
+    if (at < 0 || at >= placed) return false;
+    placed = at; render(state); return true;
+  }
+  removes.push(bindArcadeKeys(doc, event => {
+    if (!active || event.repeat) return false;
+    const state = getSnapshot();
+    const index = ['1', '2', '3', '4', '5'].indexOf(event.key);
+    if (index >= 0) { const id = state.currentOrder?.[placed + index]; if (id) take(id); return true; }
+    if (event.key === 'Backspace') { const id = state.currentOrder?.[placed - 1]; if (id) lift(id); return true; }
+    if (event.key === 'Enter' && !next.hidden) { next.click(); return true; }
+    return false;
+  }));
+
+  const build = problem => {
+    for (const node of [...slots, ...planks.values()]) node.remove();
+    slots.length = 0; planks.clear(); placed = 0; crossing = null;
+    const count = problem.chunks.length, width = (BRIDGE_TO - BRIDGE_FROM) / count;
+    for (let i = 0; i < count; i++) {
+      const slot = el('i', 'so-slot'); slot.style.left = `${BRIDGE_FROM + width * i + .4}%`; slot.style.width = `${width - .8}%`;
+      world.append(slot); slots.push(slot);
+    }
+    for (const chunk of problem.chunks) {
+      const node = el('button', 'so-plank'); node.type = 'button'; node.dataset.chunkId = chunk.chunkId;
+      on(node, 'click', () => (node.dataset.where === 'bridge' ? lift(chunk.chunkId) : take(chunk.chunkId)));
+      world.append(node); planks.set(chunk.chunkId, node);
+    }
   };
+  // Draw every plank from the Core order: the first `placed` are on the bridge.
+  function render(state) {
+    const problem = state.problem;
+    if (!problem) return;
+    const order = state.lastAnswer ? (state.lastAnswer.correct ? state.lastAnswer.submittedOrder : state.lastAnswer.correctOrder) : state.currentOrder;
+    const onBridge = state.lastAnswer ? order.length : placed;
+    const count = order.length, width = (BRIDGE_TO - BRIDGE_FROM) / count, pool = order.slice(onBridge);
+    order.forEach((id, index) => {
+      const node = planks.get(id); if (!node) return;
+      node.textContent = '';
+      if (index < onBridge) {
+        node.dataset.where = 'bridge';
+        node.style.left = `${BRIDGE_FROM + width * index + .4}%`; node.style.top = '46%'; node.style.width = `${width - .8}%`;
+        node.append(el('span', '', textOf(problem, id)));
+        node.setAttribute('aria-label', `橋の${index + 1}まいめ ${textOf(problem, id)}。タップで川にもどす`);
+      } else {
+        const slot = index - onBridge;
+        node.dataset.where = 'river';
+        node.style.left = `${BRIDGE_FROM + 13 + (BRIDGE_TO - BRIDGE_FROM - 26) * (pool.length === 1 ? .5 : slot / (pool.length - 1))}%`;
+        node.style.top = `${RIVER_Y + (slot % 2 ? 8 : 0)}%`; node.style.width = '';
+        node.style.animationDelay = `${-slot * .4}s`;
+        node.append(el('span', 'so-key', String(slot + 1)), el('span', '', textOf(problem, id)));
+        node.setAttribute('aria-label', `${slot + 1}番 ${textOf(problem, id)}`);
+      }
+      node.disabled = !canPlay(state);
+    });
+    sentence.textContent = '';
+    const laid = order.slice(0, onBridge).map(id => textOf(problem, id));
+    sentence.append(el('span', 'so-laid', laid.join('')));
+    if (onBridge < count) sentence.append(el('span', '', ' ＿'.repeat(count - onBridge)));
+  }
 
-  const updateHints = state => {
-    hints.hidden = state.mode !== 'review' || !!state.result;
-    hintButton.disabled = state.paused || state.phase !== 'answering' || hintStep >= 2;
-    hintButton.textContent = hintStep === 0 ? 'ヒント：はじめの言葉' : hintStep === 1 ? 'ヒント：おわりの言葉' : 'ヒントを確認したよ';
-    const problem = state.problem, first = problem?.correctOrder[0], last = problem?.correctOrder.at(-1);
-    const textFor = id => problem?.chunks.find(chunk => chunk.chunkId === id)?.text || '';
-    const text = hintStep === 0 ? '困ったら、言葉の位置をたしかめよう。' :
-      `はじめは「${textFor(first)}」。${hintStep > 1 ? `おわりは「${textFor(last)}」。` : ''}自分で並べてみよう。`;
-    if (hintText.textContent !== text) hintText.textContent = text;
-    for (const button of chunkButtons) {
-      const id = button.dataset.chunkId;
-      const marker = state.mode === 'review' && hintStep > 0 && id === first ? 'first' :
-        state.mode === 'review' && hintStep > 1 && id === last ? 'last' : '';
-      button.dataset.hint = marker;
-      button.setAttribute('aria-label', `${textFor(id)}${marker ? `（ヒント：${marker === 'first' ? 'はじめ' : 'おわり'}）` : ''}`);
+  const showAnswer = state => {
+    const answer = state.lastAnswer, problem = state.problem;
+    const rightText = answer.correctOrder.map(id => textOf(problem, id)).join('');
+    answers.push({ text: rightText, correct: answer.correct });
+    crossing = 0;
+    render(state);
+    for (const [id, node] of planks) node.dataset.status = answer.correct ? 'right' : answer.submittedOrder.indexOf(id) === answer.correctOrder.indexOf(id) ? 'right' : 'fixed';
+    if (answer.correct) {
+      fx.pop(50, 30, '橋がつながった！', 'good');
+      feedback.textContent = 'せいかい！ 相棒がわたるよ';
+      frame.announce(`せいかい。${rightText}`);
+    } else {
+      fx.pop(50, 30, '板をならべかえたよ', 'info');
+      feedback.textContent = '青い板は、場所を入れかえたよ。正しい文を読んでみよう';
+      frame.announce(`正しい文は ${rightText}`);
     }
   };
 
   return {
     root,
-    canvas,
-    update(state, companionState) {
+    attachCompanion(portrait) { hero.append(portrait); },
+    focusPlay() { [...planks.values()].find(node => node.dataset.where === 'river')?.focus?.({ preventScroll: true }); },
+    update(state) {
       if (!active) return;
+      frame.setPaused(state.paused && !state.result);
       const problem = state.problem;
-      if (problem && shownProblemId !== problem.problemId) {
-        hintStep = 0;
-        shownProblemId = problem.problemId; selectedChunkId = state.currentOrder[0] ?? null; prompt.textContent = problem.prompt;
+      if (problem && problem.problemId !== problemId) {
+        problemId = problem.problemId; build(problem);
+        feedback.textContent = state.mode === 'review' ? '文のつながりを、相棒とたしかめよう' : '文のはじめの板からタップ！';
       }
-      const chunksById = new Map(problem?.chunks.map(chunk => [chunk.chunkId, chunk]) ?? []);
-      chunkButtons.forEach((button, index) => {
-        const chunkId = state.currentOrder[index], chunk = chunksById.get(chunkId);
-        button.hidden = !chunk; button.disabled = state.paused || state.phase !== 'answering';
-        button.dataset.chunkId = chunkId ?? ''; button.textContent = chunk?.text ?? '';
-      });
-      updateSelection();
-      updateHints(state);
-      if (refocusSelected) {
-        chunkButtons.find(button => button.dataset.chunkId === selectedChunkId)?.focus(); refocusSelected = false;
+      if (state.seq !== lastSeq) {
+        lastSeq = state.seq;
+        if (state.lastAnswer && answers.length < state.answered) showAnswer(state);
       }
-      if (state.lastAnswer) {
-        const correctText = state.lastAnswer.correctOrder.map(chunkId => chunksById.get(chunkId)?.text ?? '').join(' ');
-        feedback.textContent = state.lastAnswer.correct ? 'せいかい！' : `おしい！ 正しい文：${correctText}`;
-      } else feedback.textContent = '';
-      const answering = state.phase === 'answering';
-      submitButton.hidden = !answering; submitButton.disabled = state.paused;
-      next.hidden = state.phase !== 'feedback'; next.disabled = state.paused;
-      pause.hidden = !state.paused;
-      position.textContent = `${Math.min(state.totalQuestions, state.answered + (answering ? 1 : 0))} / ${state.totalQuestions}`;
-      score.textContent = `せいかい ${state.correct}`;
-      controls.hidden = !!state.result; result.hidden = !state.result;
-      play.style.display = state.result ? 'flex' : '';
-      play.style.justifyContent = state.result ? 'center' : '';
-      if (state.result) {
-        if (displayedResult !== state.result) {
-          displayedResult = state.result; missedList.textContent = '';
-          missedSection.hidden = !state.missed?.length;
-          for (const item of state.missed || []) {
-            const row = el('li'); row.dataset.missedContent = item.contentId;
-            row.append(el('h4', '', `第${item.questionNumber}問 · ${item.correctParts.length}ピース`));
-            for (const [label, parts, submitted] of [['あなたの並び', item.submittedParts, true], ['正しい並び', item.correctParts, false]]) {
-              const list = el('ol', 'so-comparison'); list.setAttribute('aria-label', label);
-              row.append(el('p', '', label), list);
-              parts.forEach((text, index) => {
-                const differs = submitted && text !== item.correctParts[index];
-                list.append(el('li', differs ? 'so-order-difference' : '', `${index + 1}. ${text}${differs ? '（位置を確認）' : ''}`));
-              });
-            }
-            row.append(el('p', 'so-missed-explanation', item.explanation)); missedList.append(row);
-          }
+      if (!state.lastAnswer) render(state);
+      else for (const node of planks.values()) node.disabled = true;
+      next.hidden = !(state.mode === 'review' && state.phase === 'feedback');
+      next.disabled = !!state.paused;
+      if (state.result && review.hidden) {
+        review.hidden = false; reviewList.textContent = '';
+        for (const item of answers) {
+          const row = el('li', '', `${item.correct ? '✓' : '☆'} ${item.text}`);
+          row.dataset.correct = String(item.correct); reviewList.append(row);
         }
-        resultHeading.textContent = `${state.totalQuestions}問 おつかれさま！`;
-        resultCorrect.textContent = `${state.result.correct} / ${state.totalQuestions}`;
-        resultIncorrect.textContent = String(state.result.incorrect);
-        resultAccuracy.textContent = `${Math.round(state.result.accuracy * 100)}%`;
-        const correctText = state.lastAnswer?.correctOrder.map(chunkId => chunksById.get(chunkId)?.text ?? '').join(' ');
-        finalFeedback.textContent = state.lastAnswer?.correct ? '最後の問題もせいかい！' : `最後の問題の正しい文：${correctText}`;
       }
-      companion.hidden = !companionState.selected;
-      caption.textContent = companionState.motion?.imageState === 'failed' ? '仲間といっしょに！' : 'ジャガイモスライム';
     },
-    stopInput() {
-      active = false;
-      [...chunkButtons, left, right, submitButton, next, replay, back, hintButton].forEach(button => { button.disabled = true; });
+    present(play, dt, state) {
+      if (!active || !state) return;
+      frame.tick(dt);
+      const w = play.world || {};
+      let x = WALK_FROM + (w.progress ?? 0) * (BANK_EDGE - WALK_FROM);
+      if (crossing !== null) { crossing = Math.min(1, crossing + dt / 420); x = BANK_EDGE + crossing * (95 - BANK_EDGE); }
+      hero.style.left = `${x}%`;
+      hero.dataset.walking = String(crossing !== null ? crossing < 1 : state.phase === 'answering' && !w.arrived && state.mode !== 'review');
+      hero.dataset.fever = String(!!w.fever);
+      if (state.phase === 'answering' && w.arrived && state.mode !== 'review') feedback.textContent = '相棒が川岸で待ってるよ。ゆっくりならべよう';
+      const event = w.lastEvent;
+      if (event && event.id !== lastEventId) {
+        lastEventId = event.id;
+        if (event.type === 'hit') {
+          if (event.special || w.fever) for (const node of planks.values()) node.dataset.rainbow = 'true';
+          if (event.special) fx.banner('虹の橋！', 'great');
+          else if (event.quick) fx.pop(50, 18, '止まらずにわたれた！', 'great');
+        } else if (event.type === 'boost') { fx.banner('虹のかけ橋！', 'great'); fx.flash('great'); }
+      }
+      // Review runs have no goal; only normal play shows the mission.
+      const total = state.totalQuestions || 10, mission = state.mode === 'review' ? null : w.challenge;
+      frame.hud.set({ points: play.learningPoints + play.bonus, comboCount: play.combo,
+        progressValue: (state.answered ?? 0) / total,
+        progressLabel: `橋 ${w.correct ?? 0} · ${Math.min(total, (state.answered ?? 0) + (state.phase === 'answering' ? 1 : 0))}/${total}文`,
+        life: null, gaugeValue: play.gauge, fever: w.fever,
+        missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); root?.remove(); root = null; },
+    stopInput() { active = false; for (const node of planks.values()) node.disabled = true; next.disabled = true; },
+    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

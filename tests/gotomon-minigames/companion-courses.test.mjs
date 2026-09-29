@@ -18,7 +18,7 @@ const runFor = (gameId, companionId, useCourse = true) => {
 test('only the named companion has each special course', () => {
   assert.equal(companionCourse(monster('HKD-E01'), 'mathSprint')?.name, 'ころころ近道');
   assert.equal(companionCourse(monster('HKD-E02'), 'mathInvader')?.name, '黄金の連射');
-  assert.equal(companionCourse(monster('HKD-E03'), 'timedChoice')?.name, 'しずくの灯台');
+  assert.equal(companionCourse(monster('HKD-E03'), 'timedChoice')?.name, 'しずくハンマー');
   assert.equal(companionCourse(monster('HKD-E01'), 'mathInvader'), null);
   assert.equal(companionCourse(monster('HKD-E04'), 'mathSprint'), null);
 });
@@ -58,47 +58,35 @@ test('corn route loads a golden shot after three hits in a row', () => {
   assert.equal(run.snapshot().goldenHits, 1); assert.ok(run.snapshot().bonus - before >= 40);
   assert.equal(run.snapshot().challenge.status, 'achieved');
 });
-test('milk route stores and pours light without creating points', () => {
+test('milk route charges a splash hammer after two hits and a miss drops the charge', () => {
   const run = runFor('timedChoice', 'HKD-E03');
   const normal = runFor('timedChoice', 'HKD-E03', false);
-  assert.equal(normal.act('store-light'), false);
-  assert.equal(run.act('store-light'), true);
-  assert.equal(run.snapshot().light, 45);
-  assert.equal(run.snapshot().bottles, 1);
+  for (const target of [run, normal]) { target.answer(true, {}, 1); target.answer(true, {}, 2); }
+  assert.equal(run.snapshot().charged, true); assert.equal(normal.snapshot().charged, false);
+  // In-play buttons were removed: the charge is used by the next hit on its own.
   assert.equal(run.act('store-light'), false);
-  assert.equal(run.act('pour-light'), true);
-  assert.equal(run.snapshot().light, 70);
-  assert.equal(run.snapshot().bottles, 0);
-  assert.equal(run.snapshot().bonus, 0);
-  assert.equal(run.snapshot().challenge.progress, '0/3');
+  run.answer(false, { reason: 'timeout' }, 0);
+  assert.equal(run.snapshot().charged, false); assert.equal(run.snapshot().special, 0);
+  run.answer(true, {}, 1); run.answer(true, {}, 2);
+  const before = run.snapshot().bonus; run.answer(true, {}, 3);
+  assert.equal(run.snapshot().special, 1); assert.ok(run.snapshot().bonus - before >= 40);
+  assert.equal(run.snapshot().challenge.status, 'achieved');
 });
 
-test('shared treasure, bridge, craft, exploration and defense routes have distinct actions', () => {
-  const treasure = runFor('englishChoice', 'HKD-E01');
-  treasure.answer(true, {}, 1); treasure.answer(true, {}, 2);
-  assert.equal(treasure.snapshot().keys, 1);
-  assert.equal(treasure.act('use-key'), true);
-  treasure.answer(true, {}, 3);
-  assert.equal(treasure.snapshot().challenge.status, 'achieved');
-
-  const bridge = runFor('sentenceOrder', 'AOM-E09');
-  bridge.answer(true, {}, 1); bridge.answer(true, {}, 2);
-  assert.equal(bridge.act('bridge-anchor'), true);
-  bridge.answer(true, {}, 3);
-  assert.equal(bridge.snapshot().anchorBridges, 1);
-
-  const craft = runFor('multiSelect', 'HKD-E04');
-  craft.answer(true, {}, 1); craft.answer(true, {}, 2);
-  assert.equal(craft.act('release-spark'), true);
-  craft.answer(true, {}, 3); craft.answer(true, {}, 4);
-  assert.equal(craft.act('release-spark'), true);
-  assert.equal(craft.snapshot().challenge.status, 'achieved');
-
-  const explore = runFor('asyncChoice', 'HKD-E04');
-  explore.act('route-0'); explore.answer(true, {}, 1); explore.answer(true, {}, 2);
-  assert.equal(explore.act('use-compass'), true);
-  explore.act('route-1'); explore.answer(true, {}, 3); explore.answer(true, {}, 4);
-  assert.equal(explore.snapshot().compassFindings, 1);
+test('shared treasure, bridge, star, cart and defense routes charge and spend on their own', () => {
+  // Each quiz route is automatic: two hits in a row charge it, the next hit spends it.
+  for (const [gameId, companionId, name] of [['englishChoice', 'HKD-E01', '金の宝箱'], ['sentenceOrder', 'AOM-E09', '虹の橋'],
+    ['multiSelect', 'HKD-E04', '流れ星'], ['asyncChoice', 'HKD-E04', '羅針盤の宝']]) {
+    const run = runFor(gameId, companionId), normal = runFor(gameId, companionId, false);
+    assert.equal(run.snapshot().course?.id, companionCourse(monster(companionId), gameId).id, gameId);
+    for (const target of [run, normal]) { target.answer(true, {}, 1); target.answer(true, {}, 2); target.answer(true, {}, 3); }
+    assert.equal(run.snapshot().special, 1, gameId); assert.equal(normal.snapshot().special, 0, gameId);
+    assert.ok(run.snapshot().bonus > normal.snapshot().bonus, gameId);
+    assert.match(run.snapshot().summary, new RegExp(name), gameId);
+    assert.equal(run.act('use-key'), false, gameId);
+    if (gameId !== 'asyncChoice') assert.equal(run.snapshot().challenge.status, 'achieved', gameId);
+    else { run.answer(true, {}, 4); run.answer(true, {}, 5); run.answer(true, {}, 6); assert.equal(run.snapshot().challenge.status, 'achieved', gameId); }
+  }
 
   // The defense ward is automatic: two hits in a row make one, the next hit uses it.
   const defense = runFor('kanjiDefense', 'AOM-E09');

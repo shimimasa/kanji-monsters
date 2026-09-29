@@ -1,87 +1,194 @@
+import { createArcadeFrame, bindArcadeKeys, setVar } from '../arcade/arcadeKit.js';
+
 const CSS = `
-#asyncChoiceScreen{position:fixed;inset:0;z-index:100010;background:#eef5fb;color:#1e3040;overflow:auto;overscroll-behavior:contain;font:18px system-ui,sans-serif;box-sizing:border-box;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom));touch-action:manipulation}
-#asyncChoiceScreen *{box-sizing:border-box}#asyncChoiceScreen [hidden]{display:none!important}.ac-shell{max-width:720px;margin:0 auto}.ac-header{display:flex;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:-12px;z-index:2;background:#eef5fb;padding:4px 0}.ac-header h1{font-size:clamp(20px,5vw,28px);margin:0}#asyncChoiceScreen button{min-width:44px;min-height:44px;border:2px solid #315b8a;border-radius:11px;background:#fff;color:#1e3040;font:inherit;padding:9px 14px;cursor:pointer}#asyncChoiceScreen button:disabled{opacity:.58;cursor:default}#asyncChoiceScreen button:focus-visible{outline:3px solid #a14f19;outline-offset:2px}.ac-status{text-align:center;padding:48px 12px;font-size:22px;font-weight:700}.ac-status small{display:block;font-size:16px;font-weight:400;margin-top:12px}.ac-progress{display:flex;justify-content:space-between;gap:12px;margin:10px 0;font-weight:700}.ac-pause{color:#76501a;margin:8px 0}.ac-play{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:16px;align-items:start}.ac-prompt{font-size:clamp(24px,6vw,38px);font-weight:800;text-align:center;margin:16px 0}.ac-help{text-align:center;color:#50667a}.ac-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ac-choice{width:100%;min-height:56px}.ac-choice[data-status=correct]{background:#d8f1de;border-color:#26703c}.ac-choice[data-status=incorrect]{background:#ffe0dc;border-color:#9b332d}.ac-feedback{min-height:42px;margin:12px 0;line-height:1.5}.ac-primary{background:#315b8a!important;color:#fff!important;border-color:#315b8a!important}.ac-companion{pointer-events:none;text-align:center;margin:0;padding-top:4px;color:#50667a;font-size:14px}.ac-companion canvas{display:block;width:180px;height:90px;max-width:100%;margin:auto}.ac-result{text-align:center;padding:12px}.ac-result h2{font-size:28px}.ac-result strong{display:block;font-size:30px;margin:12px}
-@media(max-width:540px){.ac-play{grid-template-columns:1fr}.ac-companion{padding:0}.ac-companion canvas{width:140px;height:70px}.ac-choices{grid-template-columns:1fr}.ac-choice{min-height:52px}.ac-prompt{margin:8px 0}}
-@media(max-height:430px) and (min-width:541px){.ac-status{padding:18px 8px}.ac-prompt{font-size:27px;margin:3px 0}.ac-help,.ac-progress,.ac-feedback{margin:3px 0}.ac-choice{min-height:44px;padding:5px}.ac-companion canvas{width:120px;height:60px}}
+#asyncChoiceScreen .ya-field{background:radial-gradient(ellipse at 50% 0,#3d5a4a 0,transparent 55%),linear-gradient(#1f2f2a,#2b3f36 40%,#5b4a36 40.3%,#4a3b2a)}
+#asyncChoiceScreen .ac-rock{position:absolute;left:0;right:0;top:0;height:40%;background-image:radial-gradient(ellipse 70px 40px at 50px 100%,#364a40 60%,transparent 62%),radial-gradient(ellipse 50px 30px at 130px 100%,#2e4037 60%,transparent 62%);background-size:180px 100%;background-repeat:repeat-x}
+#asyncChoiceScreen .ac-rails{position:absolute;inset:0;width:100%;height:100%;z-index:1;overflow:visible}
+#asyncChoiceScreen .ac-rails path{fill:none;stroke:#9b8a73;stroke-width:5;stroke-linecap:round;vector-effect:non-scaling-stroke}
+#asyncChoiceScreen .ac-rails path.ac-ties{stroke:#6b5238;stroke-width:14;stroke-dasharray:4 14}
+#asyncChoiceScreen .ac-rails path[data-lit=true]{stroke:#ffd54a}
+#asyncChoiceScreen .ac-tunnel{position:absolute;z-index:3;top:9%;width:min(23%,170px);min-width:44px;min-height:44px;transform:translateX(-50%);padding:0;border:0;background:none;font:inherit;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:4px}
+#asyncChoiceScreen .ac-mouth{width:min(100%,110px);aspect-ratio:1.5;border-radius:50% 50% 6px 6px;background:radial-gradient(ellipse at 50% 90%,#0c1310 55%,#231a12 57%);border:5px solid #6b5238;box-shadow:inset 0 -6px 0 #0006}
+#asyncChoiceScreen .ac-sign{max-width:100%;padding:5px 10px;border-radius:10px;background:#fffdf3;color:#2a1c10;border:3px solid #6b5238;font-size:clamp(15px,2.1vw,21px);font-weight:900;white-space:nowrap;box-shadow:0 3px 0 #0004}
+#asyncChoiceScreen .ac-key{font-size:.65em;color:#8a7358;margin-right:3px}
+#asyncChoiceScreen .ac-tunnel:focus-visible .ac-sign{outline:3px solid #ffd54a;outline-offset:2px}
+#asyncChoiceScreen .ac-tunnel[data-status=correct] .ac-mouth{box-shadow:inset 0 -6px 0 #0006,0 0 0 4px #ffe066,0 0 30px #ffd54a;background:radial-gradient(circle at 50% 70%,#fff3b0,#ffb627 30%,#0c1310 60%)}
+#asyncChoiceScreen .ac-tunnel[data-status=correct] .ac-sign{background:#d7f7df;border-color:#1f9d55}
+#asyncChoiceScreen .ac-tunnel[data-status=chosen] .ac-sign{background:#fff1d6;border-color:#c77f16}
+#asyncChoiceScreen .ac-tunnel[data-status=faded]{opacity:.4}
+#asyncChoiceScreen .ac-cart{position:absolute;z-index:4;width:clamp(84px,12vw,120px);transform:translate(-50%,-100%);transition:left .35s ease-in-out,top .35s ease-in-out}
+#asyncChoiceScreen .ac-cart .gt-portrait{position:relative;z-index:1;display:block;width:78%;height:auto;aspect-ratio:1;margin:0 auto -34%;background:none;border:0}
+#asyncChoiceScreen .ac-cart .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 2px #0006)}
+#asyncChoiceScreen .ac-car{position:relative;z-index:2;display:block;height:clamp(34px,5vw,48px);border-radius:6px 6px 14px 14px;background:linear-gradient(#8a8f96,#5c6168);border:4px solid #3a3e44}
+#asyncChoiceScreen .ac-car::before,#asyncChoiceScreen .ac-car::after{content:'';position:absolute;bottom:-12px;width:18px;height:18px;border-radius:50%;background:#2a2d31;border:3px solid #9aa0a8}
+#asyncChoiceScreen .ac-car::before{left:12%}#asyncChoiceScreen .ac-car::after{right:12%}
+#asyncChoiceScreen .ac-cart[data-moving=true] .ac-car{animation:ac-rattle .18s linear infinite alternate}
+#asyncChoiceScreen .ac-cart[data-fever=true]::after{content:'';position:absolute;inset:-14%;border-radius:50%;background:radial-gradient(circle,#ffd54a66,transparent 70%);animation:ya-glow .4s infinite alternate;z-index:0}
+#asyncChoiceScreen .ac-prompt{margin:0;text-align:center;font-size:clamp(22px,3vw,30px);font-weight:900;line-height:1.35;color:#fff}
+#asyncChoiceScreen .ac-status{margin:0;text-align:center;font-size:18px;font-weight:800;color:#d8e8f0}
+#asyncChoiceScreen .ac-next{min-height:52px;border:0;border-radius:14px;background:#ffb627;color:#3a2400;font:inherit;font-size:20px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer}
+#asyncChoiceScreen .ac-review{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+#asyncChoiceScreen .ac-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
+#asyncChoiceScreen .ac-review li[data-correct=false]{background:#fff3da}
+@keyframes ac-rattle{from{transform:translateY(0)}to{transform:translateY(-2px)}}
 `;
 
-export function createAsyncChoiceView({ document: doc, onBack, onReplay, onNext, onAnswer, getSnapshot }) {
-  let active = true, root = null, shownProblemId = null;
+const EXIT_X = [14, 38, 62, 86];
+// The trunk runs up the middle; the cart rolls from START_Y to the fork at FORK_Y.
+const TRUNK_X = 50, START_Y = 96, FORK_Y = 62, TUNNEL_Y = 30;
+const SVG = 'http://www.w3.org/2000/svg';
+
+export function createAsyncChoiceView({ document: doc, dispatch, onBack, getSnapshot }) {
+  let active = true, problemId = null, lastSeq = -1, lastEventId = 0, choiceIndex = null;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
-  const el = (tag, className = '', text = '') => { const node = doc.createElement(tag); node.className = className; node.textContent = text; return node; };
-  root = el('section'); root.id = 'asyncChoiceScreen'; root.setAttribute('aria-label', 'よみこみクイズ');
+  const frame = createArcadeFrame(doc, { id: 'asyncChoiceScreen', title: 'よみこみクイズ', theme: 'mine' });
+  const { root, world, dock, fx, el } = frame;
   const style = el('style'); style.textContent = CSS; root.append(style);
-  const shell = el('div', 'ac-shell'); root.append(shell);
-  const header = el('header', 'ac-header'); shell.append(header); header.append(el('h1', '', 'よみこみクイズ'));
-  const back = el('button', '', 'もどる'); back.type = 'button'; back.dataset.action = 'back'; header.append(back); on(back, 'click', () => { if (active) onBack(); });
-  const loading = el('div', 'ac-status', '問題を読み込んでいます…'); loading.dataset.role = 'loading'; loading.setAttribute('role', 'status'); loading.append(el('small', '', '少し待ってね'));
-  const failure = el('div', 'ac-status', '問題を読み込めませんでした'); failure.dataset.role = 'failure'; failure.setAttribute('role', 'alert'); failure.append(el('small', '', 'もどって、もう一度ためしてください'));
-  shell.append(loading, failure);
-  const gameArea = el('div'); shell.append(gameArea);
-  const progress = el('div', 'ac-progress'), position = el('span'), score = el('span'); progress.append(position, score); gameArea.append(progress);
-  const pause = el('p', 'ac-pause', 'おやすみ中'); pause.hidden = true; gameArea.append(pause);
-  const play = el('div', 'ac-play'), controls = el('div'); gameArea.append(play); play.append(controls);
-  controls.append(el('p', 'ac-help', '正しいものを一つ選ぼう（数字キーでも選べます）'));
-  const prompt = el('div', 'ac-prompt'); prompt.dataset.role = 'problem'; controls.append(prompt);
-  const choiceArea = el('div', 'ac-choices'); choiceArea.setAttribute('aria-label', '選択肢'); controls.append(choiceArea);
-  const choiceButtons = Array.from({ length: 4 }, (_, index) => {
-    const button = el('button', 'ac-choice'); button.type = 'button'; button.dataset.choiceIndex = String(index + 1); choiceArea.append(button); return button;
-  });
-  const choose = index => {
-    const state = getSnapshot(), choice = state.problem?.choices[index];
-    if (!active || state.paused || state.phase !== 'answering' || !state.attemptId || !choice) return false;
-    return onAnswer({ sessionId: state.sessionId, problemId: state.problem.problemId,
-      attemptId: state.attemptId, choiceId: choice.choiceId });
+  on(frame.back, 'click', () => { if (active) onBack(); });
+  world.append(el('div', 'ac-rock'));
+  // Rails are drawn in a 100x100 box that stretches with the field.
+  const rails = doc.createElementNS ? doc.createElementNS(SVG, 'svg') : el('div');
+  rails.setAttribute('class', 'ac-rails'); rails.setAttribute('viewBox', '0 0 100 100'); rails.setAttribute('preserveAspectRatio', 'none');
+  const railPath = (d, className = '') => {
+    const path = doc.createElementNS ? doc.createElementNS(SVG, 'path') : el('i');
+    path.setAttribute('d', d); if (className) path.setAttribute('class', className); rails.append(path); return path;
   };
-  choiceButtons.forEach((button, index) => on(button, 'click', () => choose(index)));
-  on(doc, 'keydown', event => {
-    if (!active || event.defaultPrevented || event.repeat || event.isComposing || event.altKey || event.ctrlKey || event.metaKey) return;
-    const choiceIndex = ['1', '2', '3', '4'].indexOf(event.key);
-    if (choiceIndex >= 0 && choose(choiceIndex)) event.preventDefault();
+  const trunk = `M ${TRUNK_X} 100 L ${TRUNK_X} ${FORK_Y}`;
+  railPath(trunk, 'ac-ties'); railPath(trunk);
+  const branches = EXIT_X.map(x => {
+    const d = `M ${TRUNK_X} ${FORK_Y} C ${TRUNK_X} ${FORK_Y - 14}, ${x} ${TUNNEL_Y + 16}, ${x} ${TUNNEL_Y}`;
+    railPath(d, 'ac-ties'); return railPath(d);
   });
-  const feedback = el('p', 'ac-feedback'); feedback.setAttribute('aria-live', 'polite'); controls.append(feedback);
-  const next = el('button', 'ac-primary', '次へ'); next.type = 'button'; next.dataset.action = 'next'; controls.append(next);
-  on(next, 'click', () => { const state = getSnapshot(); if (active && state.phase === 'feedback' && !state.paused) onNext(state.sessionId, state.problem.problemId); });
-  const companion = el('figure', 'ac-companion'), canvas = el('canvas'); canvas.width = 280; canvas.height = 140;
-  canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', '仲間のジャガイモスライム');
-  const caption = el('figcaption', '', 'ジャガイモスライム'); companion.append(canvas, caption); play.append(companion);
-  const result = el('div', 'ac-result'); result.hidden = true; shell.append(result); result.append(el('h2', '', '10もん おつかれさま！'));
-  const resultScore = el('strong'); result.append(resultScore);
-  const replay = el('button', 'ac-primary', 'もういちど'); replay.type = 'button'; replay.dataset.action = 'replay'; result.append(replay);
-  on(replay, 'click', () => { if (active && !getSnapshot().paused) onReplay(); });
+  world.append(rails);
+  const tunnels = EXIT_X.map((x, index) => {
+    const node = el('button', 'ac-tunnel'); node.type = 'button'; node.dataset.choiceIndex = String(index + 1);
+    node.style.left = `${x}%`;
+    const sign = el('span', 'ac-sign'); node.append(el('span', 'ac-mouth'), sign);
+    on(node, 'click', () => choose(index));
+    world.append(node);
+    return { node, sign };
+  });
+  const cart = el('div', 'ac-cart'); cart.append(el('span', 'ac-car')); world.append(cart);
+
+  const prompt = el('p', 'ac-prompt'); prompt.dataset.role = 'problem';
+  const loading = el('p', 'ac-status', '問題を読み込んでいます…'); loading.dataset.role = 'loading';
+  loading.setAttribute('role', 'status');
+  const failure = el('p', 'ac-status', '問題を読み込めませんでした。「広場へ」でもどって、もう一度ためしてね。');
+  failure.dataset.role = 'failure'; failure.setAttribute('role', 'alert'); failure.hidden = true;
+  const note = el('p', 'ya-dock-note', '答えの線路をタップ！');
+  const next = el('button', 'ac-next', 'つぎへ'); next.type = 'button'; next.dataset.action = 'next'; next.hidden = true;
+  on(next, 'click', () => {
+    const state = getSnapshot();
+    if (active && !state.paused && state.phase === 'feedback') dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem?.problemId } });
+  });
+  dock.append(loading, failure, prompt, note, next);
+  const review = el('div', 'ya-learning-result'); review.hidden = true;
+  const reviewList = el('ol', 'ac-review'); review.append(el('h3', '', '今回の問題'), reviewList); frame.shell.append(review);
   doc.body.append(root);
+  const answers = [];
+
+  function choose(index) {
+    const state = getSnapshot(), choice = state.problem?.choices[index];
+    if (!active || state.paused || state.phase !== 'answering' || !choice) return false;
+    return dispatch({ type: 'answer', payload: { sessionId: state.sessionId, problemId: state.problem.problemId,
+      attemptId: state.attemptId, choiceId: choice.choiceId } });
+  }
+  removes.push(bindArcadeKeys(doc, event => {
+    if (!active || event.repeat) return false;
+    const index = ['1', '2', '3', '4'].indexOf(event.key);
+    if (index >= 0) { choose(index); return true; }
+    if (event.key === 'Enter' && !next.hidden) { next.click(); return true; }
+    return false;
+  }));
+
+  const placeCart = (x, y) => { cart.style.left = `${x}%`; cart.style.top = `${y}%`; };
+  const showAnswer = state => {
+    const answer = state.lastAnswer, problem = state.problem;
+    const correctIndex = problem.choices.findIndex(choice => choice.choiceId === answer.correctChoiceId);
+    const chosenIndex = problem.choices.findIndex(choice => choice.choiceId === answer.choiceId);
+    const text = problem.choices[correctIndex]?.text ?? '';
+    choiceIndex = chosenIndex;
+    tunnels.forEach(({ node }, index) => { node.dataset.status = index === correctIndex ? 'correct' : index === chosenIndex ? 'chosen' : 'faded'; });
+    branches.forEach((path, index) => path.setAttribute('data-lit', String(index === chosenIndex)));
+    // The cart rides the chosen rail to its tunnel mouth.
+    placeCart(EXIT_X[chosenIndex], TUNNEL_Y + 14);
+    answers.push({ prompt: problem.prompt, text, correct: answer.correct });
+    if (answer.correct) {
+      fx.burst(EXIT_X[correctIndex], TUNNEL_Y, 'good', 1.3);
+      note.textContent = `せいかい！ 答えは「${text}」`;
+      frame.announce(`せいかい。${text}`);
+    } else {
+      fx.pop(EXIT_X[chosenIndex], TUNNEL_Y + 6, 'いきどまり…', 'soft');
+      fx.pop(EXIT_X[correctIndex], TUNNEL_Y + 10, '宝はこっち！', 'info');
+      note.textContent = `答えは「${text}」。次でとりかえそう！`;
+      frame.announce(`答えは ${text}`);
+    }
+  };
 
   return {
-    root, canvas,
-    update(state, companionState) {
+    root,
+    attachCompanion(portrait) { cart.prepend(portrait); },
+    focusPlay() { tunnels[0].node.focus?.({ preventScroll: true }); },
+    update(state) {
       if (!active) return;
-      loading.hidden = state.phase !== 'loading'; failure.hidden = state.phase !== 'failed';
-      const showGame = ['answering', 'feedback', 'completed'].includes(state.phase); gameArea.hidden = !showGame;
+      frame.setPaused(state.paused && !state.result);
+      loading.hidden = !['idle', 'loading', 'ready'].includes(state.phase);
+      failure.hidden = state.phase !== 'failed';
       const problem = state.problem;
-      if (problem && shownProblemId !== problem.problemId) {
-        shownProblemId = problem.problemId; prompt.textContent = problem.prompt;
-        choiceButtons.forEach((button, index) => { const choice = problem.choices[index]; button.hidden = !choice;
-          if (choice) { button.dataset.choiceId = choice.choiceId; button.textContent = `${index + 1}. ${choice.text}`; } });
+      if (problem && problem.problemId !== problemId) {
+        problemId = problem.problemId; choiceIndex = null;
+        prompt.textContent = problem.prompt;
+        tunnels.forEach(({ node, sign }, index) => {
+          const choice = problem.choices[index];
+          node.hidden = !choice; delete node.dataset.status; sign.textContent = '';
+          node.dataset.choiceId = choice?.choiceId ?? '';
+          if (choice) { sign.append(el('span', 'ac-key', String(index + 1)), el('span', '', choice.text)); node.setAttribute('aria-label', `${index + 1}番 ${choice.text}`); }
+        });
+        branches.forEach(path => path.setAttribute('data-lit', 'false'));
+        note.textContent = state.mode === 'review' ? '答えをたしかめよう' : '答えの線路をタップ！';
+      }
+      prompt.hidden = !problem;
+      tunnels.forEach(({ node }) => { if (!problem) node.hidden = true; });
+      if (state.seq !== lastSeq) {
+        lastSeq = state.seq;
+        if (state.lastAnswer && answers.length < state.answered) showAnswer(state);
       }
       const canAnswer = !state.paused && state.phase === 'answering';
-      choiceButtons.forEach(button => { button.disabled = !canAnswer; button.dataset.status = ''; });
-      if (state.lastAnswer) {
-        const correctChoice = problem?.choices.find(choice => choice.choiceId === state.lastAnswer.correctChoiceId);
-        for (const button of choiceButtons) {
-          if (button.dataset.choiceId === state.lastAnswer.correctChoiceId) button.dataset.status = 'correct';
-          else if (button.dataset.choiceId === state.lastAnswer.choiceId) button.dataset.status = 'incorrect';
+      tunnels.forEach(({ node }) => { node.disabled = !canAnswer; });
+      next.hidden = !(state.mode === 'review' && state.phase === 'feedback');
+      next.disabled = !!state.paused;
+      if (state.result && review.hidden) {
+        review.hidden = false; reviewList.textContent = '';
+        for (const item of answers) {
+          const row = el('li', '', `${item.correct ? '✓' : '☆'} ${item.prompt} → ${item.text}`);
+          row.dataset.correct = String(item.correct); reviewList.append(row);
         }
-        feedback.textContent = state.lastAnswer.correct ? '正解！' : `正解は「${correctChoice?.text ?? ''}」です`;
-      } else feedback.textContent = '';
-      next.hidden = state.phase !== 'feedback'; next.disabled = state.paused; pause.hidden = !state.paused;
-      position.textContent = `${Math.min(10, state.answered + (state.phase === 'answering' ? 1 : 0))} / 10`; score.textContent = `正解 ${state.correct}`;
-      result.hidden = !state.result; play.hidden = !!state.result;
-      if (state.result) resultScore.textContent = `${state.result.correct} / 10 正解`;
-      companion.hidden = !companionState.selected || !showGame;
-      caption.textContent = companionState.motion?.imageState === 'failed' ? '仲間といっしょに！' : 'ジャガイモスライム';
+      }
     },
-    stopInput() { active = false; [...choiceButtons, next, replay, back].forEach(button => { button.disabled = true; }); },
-    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); root?.remove(); root = null; },
+    present(play, dt, state) {
+      if (!active || !state) return;
+      frame.tick(dt);
+      const w = play.world || {};
+      if (choiceIndex === null) placeCart(TRUNK_X, START_Y - (w.progress ?? 0) * (START_Y - FORK_Y));
+      cart.dataset.moving = String(choiceIndex === null && state.phase === 'answering' && !w.arrived && state.mode !== 'review');
+      cart.dataset.fever = String(!!w.fever);
+      setVar(cart, '--progress', String(w.progress ?? 0));
+      if (state.phase === 'answering' && w.arrived && state.mode !== 'review') note.textContent = '分かれ道に着いたよ。ゆっくり選ぼう';
+      const event = w.lastEvent;
+      if (event && event.id !== lastEventId) {
+        lastEventId = event.id;
+        if (event.type === 'hit') fx.pop(50, 50, event.special ? '羅針盤の宝！' : event.quick ? 'はやわざ発見！' : '宝石発見！', event.special ? 'great' : 'good');
+        else if (event.type === 'boost') { fx.banner('発見フィーバー！', 'great'); fx.flash('great'); }
+      }
+      const total = state.totalQuestions || 10, mission = w.challenge;
+      frame.hud.set({ points: play.learningPoints + play.bonus, comboCount: play.combo,
+        progressValue: (state.answered ?? 0) / total,
+        progressLabel: `宝石 ${w.correct ?? 0} · ${Math.min(total, (state.answered ?? 0) + (state.phase === 'answering' ? 1 : 0))}/${total}問`,
+        life: null, gaugeValue: play.gauge, fever: w.fever,
+        missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
+    },
+    stopInput() { active = false; tunnels.forEach(({ node }) => { node.disabled = true; }); next.disabled = true; },
+    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

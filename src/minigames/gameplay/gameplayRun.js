@@ -1,10 +1,9 @@
-import { createExplorationWorld, createTreasureWorld } from './trailWorlds.js';
-import { createLanternWorld, createConstellationWorld, createBridgeWorld } from './puzzleWorlds.js';
+import { createChestWorld, createMoleWorld, createCartWorld, createStarWorld, createBridgeRunWorld } from './quizWorlds.js';
 import { createDashWorld, createInvaderWorld, createGateWorld } from './arcadeWorlds.js';
 import { createRunChallenge } from './runChallenges.js';
-const worlds={mathSprint:createDashWorld, mathInvader:createInvaderWorld, englishChoice:createTreasureWorld,
-  sentenceOrder:createBridgeWorld, timedChoice:createLanternWorld, multiSelect:createConstellationWorld,
-  asyncChoice:createExplorationWorld, kanjiDefense:createGateWorld};
+const worlds={mathSprint:createDashWorld, mathInvader:createInvaderWorld, englishChoice:createChestWorld,
+  sentenceOrder:createBridgeRunWorld, timedChoice:createMoleWorld, multiSelect:createStarWorld,
+  asyncChoice:createCartWorld, kanjiDefense:createGateWorld};
 
 export function createGameplayRun(gameId,effects,options={}) {
   const world=worlds[gameId]?.(effects,options);
@@ -34,7 +33,7 @@ export function createGameplayRun(gameId,effects,options={}) {
       if (accepted) challenge?.observeAction(world.snapshot());
       return !!accepted;
     },
-    allow(command){return !(gameId==='asyncChoice' && command?.type==='answer' && world.snapshot().waiting);},
+    allow(){return true;},
     snapshot(){const current=world?.snapshot();return current?{...current,
       ...(challenge ? {challenge:challenge.snapshot()} : {}),
       ...(options.course ? {course:{id:options.course.id,name:options.course.name,description:options.course.description}} : {})} : null;},

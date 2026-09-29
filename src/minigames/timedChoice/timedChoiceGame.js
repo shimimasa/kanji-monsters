@@ -1,10 +1,11 @@
 import { generateTimedChoiceQuestions } from './timedChoiceQuestions.js';
 
 export const TIMED_CHOICE_DEFAULT_DEADLINE_MS = 5000;
+export const TIMED_CHOICE_SLOW_DEADLINE_MS = 8000;
 
 // Nonpersistent Core: time advances only through update(dtMs).
-export function createTimedChoiceGame({ sessionId, random = Math.random, onEvent = () => {},
-  deadlineMs = TIMED_CHOICE_DEFAULT_DEADLINE_MS, reviewContentIds, history } = {}) {
+export function createTimedChoiceGame({ sessionId, random = Math.random, onEvent = () => {}, pace = 'normal',
+  deadlineMs = pace === 'slow' ? TIMED_CHOICE_SLOW_DEADLINE_MS : TIMED_CHOICE_DEFAULT_DEADLINE_MS, reviewContentIds, history } = {}) {
   if (!Number.isFinite(deadlineMs) || deadlineMs <= 0) throw new TypeError('deadlineMs must be positive and finite');
   const questions = generateTimedChoiceQuestions({ sessionId, random, reviewContentIds, history });
   const review = !!reviewContentIds?.length && questions.every(question => reviewContentIds.includes(question.fixtureId));

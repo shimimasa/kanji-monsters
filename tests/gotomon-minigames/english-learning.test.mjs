@@ -96,9 +96,11 @@ test('save validator rejects corrupt learning records and allows legacy saves', 
 });
 test('learning features preserve other five cores/views, reward formulas, kanji save and logger', () => {
   // Sprint, Invader and Defense were later rebuilt as arcade games on purpose; their
-  // behaviour is covered by their own suites instead of this byte freeze.
+  // behaviour is covered by their own suites instead of this byte freeze. The other
+  // quiz games later got arcade views too: their Cores stay frozen here, their views
+  // are covered by the minigame-06/07 suites.
   const games = ['multiSelect', 'asyncChoice'];
-  const files = games.flatMap(id => [`src/minigames/${id}/${id}Game.js`, `src/minigames/${id}/${id}View.js`]);
+  const files = games.map(id => `src/minigames/${id}/${id}Game.js`);
   // Companion play can select a course; grading and growth formulas remain frozen.
   files.push('src/minigames/companionGrowth.js', 'src/minigames/scoreRank.js',
     'src/playtest/developmentLogger.js', 'src/core/saveData.js', 'src/core/learningOutcome.js', 'src/audio/audioManager.js');

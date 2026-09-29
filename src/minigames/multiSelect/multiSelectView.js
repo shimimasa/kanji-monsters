@@ -1,122 +1,206 @@
+import { createArcadeFrame, bindArcadeKeys } from '../arcade/arcadeKit.js';
+
 const CSS = `
-#multiSelectScreen{position:fixed;inset:0;z-index:100010;background:#f4f7ee;color:#23331f;overflow:auto;overscroll-behavior:contain;font:18px system-ui,sans-serif;box-sizing:border-box;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom));touch-action:manipulation}
-#multiSelectScreen *{box-sizing:border-box}#multiSelectScreen [hidden]{display:none!important}.ms-shell{max-width:760px;margin:0 auto}.ms-header{display:flex;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:-12px;z-index:2;background:#f4f7ee;padding:4px 0}.ms-header h1{font-size:clamp(20px,5vw,28px);margin:0}
-#multiSelectScreen button{min-width:44px;min-height:44px;border:2px solid #42633a;border-radius:11px;background:#fff;color:#23331f;font:inherit;padding:9px 14px;cursor:pointer}#multiSelectScreen button:disabled{opacity:.62;cursor:default}#multiSelectScreen button:focus-visible{outline:3px solid #8b4d13;outline-offset:2px}.ms-progress{display:flex;justify-content:space-between;gap:12px;margin:10px 0;font-weight:700}.ms-pause{color:#704b16;margin:8px 0}.ms-play{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:16px;align-items:start}.ms-prompt{font-size:clamp(23px,5vw,34px);font-weight:800;text-align:center;margin:12px 0}.ms-help{text-align:center;margin:5px 0 12px;color:#50634b}.ms-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ms-choice{width:100%;min-height:56px;text-align:left}.ms-choice[aria-pressed=true]{background:#e1f0d9;border-width:4px;padding:7px 12px}.ms-choice[data-status=selected-correct]{background:#d7f3dc;border-color:#27723c}.ms-choice[data-status=selected-wrong]{background:#ffe0dc;border-color:#9b332d}.ms-choice[data-status=missed-correct]{background:#fff3bd;border-color:#8b6811}.ms-actions{display:flex;justify-content:center;margin-top:12px}.ms-primary{background:#376a43!important;color:#fff!important;border-color:#376a43!important;min-width:150px!important}.ms-feedback{min-height:64px;margin:10px 0;line-height:1.5}.ms-feedback strong{display:block;font-size:22px}.ms-companion{pointer-events:none;text-align:center;margin:0;padding-top:4px;color:#50634b;font-size:14px}.ms-companion canvas{display:block;width:180px;height:90px;max-width:100%;margin:auto}.ms-result{text-align:center;padding:12px}.ms-result h2{font-size:28px}.ms-result p{font-size:19px;margin:10px}.ms-result strong{display:block;font-size:26px}
-@media(max-width:540px){.ms-play{grid-template-columns:1fr}.ms-companion{padding:0}.ms-companion canvas{width:140px;height:70px}.ms-choices{grid-template-columns:1fr}.ms-prompt{margin:6px 0}.ms-choice{min-height:52px}}
-@media(max-height:430px) and (min-width:541px){.ms-prompt{font-size:25px;margin:2px 0}.ms-help,.ms-progress,.ms-feedback{margin:3px 0}.ms-choice{min-height:44px;padding:5px}.ms-companion canvas{width:120px;height:60px}.ms-result{padding:4px}}
+#multiSelectScreen .ya-field{background:radial-gradient(ellipse at 70% 110%,#2f5f7a 0,transparent 60%),linear-gradient(#070d24,#10204a 70%,#1c3a5e)}
+#multiSelectScreen .ms-sky{position:absolute;inset:0;background-image:radial-gradient(1.5px 1.5px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 27% 44%,#fffc,transparent),radial-gradient(1.5px 1.5px at 44% 12%,#fff,transparent),radial-gradient(1px 1px at 63% 52%,#fffa,transparent),radial-gradient(1.5px 1.5px at 78% 16%,#fff,transparent),radial-gradient(1px 1px at 90% 46%,#fffc,transparent),radial-gradient(1px 1px at 8% 70%,#fff8,transparent),radial-gradient(1px 1px at 55% 80%,#fff8,transparent)}
+#multiSelectScreen .ms-moon{position:absolute;z-index:1;width:clamp(34px,5vw,54px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fffbe0,#ffe9a0 60%,#e8c870);box-shadow:0 0 30px #ffe9a088;transform:translate(-50%,-50%)}
+#multiSelectScreen .ms-lines{position:absolute;inset:0;width:100%;height:100%;z-index:2;overflow:visible;pointer-events:none}
+#multiSelectScreen .ms-lines line{stroke:#ffe9a0;stroke-width:3;stroke-linecap:round;vector-effect:non-scaling-stroke;opacity:.85}
+#multiSelectScreen .ms-star{position:absolute;z-index:3;transform:translate(-50%,-50%);padding:0;border:0;background:none;font:inherit;color:#fff;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;min-height:44px}
+#multiSelectScreen .ms-tag{padding:1px 8px;border-radius:99px;background:#000a;font-size:13px;font-weight:900;white-space:nowrap}
+#multiSelectScreen .ms-tag:empty{display:none}
+#multiSelectScreen .ms-glyph{display:grid;place-items:center;width:clamp(48px,6.4vw,70px);aspect-ratio:1;font-size:clamp(40px,5.4vw,60px);line-height:1;color:#cfe3ff;text-shadow:0 0 12px #9cc8ff;transition:transform .15s}
+#multiSelectScreen .ms-label{max-width:9.5em;padding:3px 9px;border-radius:10px;background:#0b1633cc;border:2px solid #5d7fb8;font-size:clamp(16px,1.9vw,19px);font-weight:900;line-height:1.2;text-align:center}
+#multiSelectScreen .ms-key{font-size:.7em;color:#9fb6d8;margin-right:3px}
+#multiSelectScreen .ms-star:focus-visible .ms-label{outline:3px solid #ffd54a;outline-offset:2px}
+#multiSelectScreen .ms-star[aria-pressed=true] .ms-glyph{color:#ffe066;text-shadow:0 0 18px #ffd54a,0 0 40px #ffd54a88;transform:scale(1.15)}
+#multiSelectScreen .ms-star[aria-pressed=true] .ms-label{background:#3d2f06e6;border-color:#ffd54a;color:#fff6cc}
+#multiSelectScreen .ms-star[data-status=right] .ms-glyph{color:#ffe066;text-shadow:0 0 22px #ffd54a,0 0 50px #ffd54a}
+#multiSelectScreen .ms-star[data-status=right] .ms-label{background:#15482c;border-color:#5fe08f}
+#multiSelectScreen .ms-star[data-status=missed] .ms-glyph{color:#9cd8ff;animation:ms-pulse .6s ease-in-out infinite alternate}
+#multiSelectScreen .ms-star[data-status=missed] .ms-label{background:#12385a;border-color:#7cc8ff}
+#multiSelectScreen .ms-star[data-status=extra],#multiSelectScreen .ms-star[data-status=rest]{opacity:.4}
+#multiSelectScreen .ms-hero{position:absolute;left:8%;bottom:4%;z-index:4;width:clamp(64px,9vw,92px);height:clamp(64px,9vw,92px)}
+#multiSelectScreen .ms-hero .gt-portrait{display:block;width:100%;height:100%;background:none;border:0}
+#multiSelectScreen .ms-hero .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px #9cc8ff88)}
+#multiSelectScreen .ms-hero[data-fever=true]::after{content:'';position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,#ffd54a66,transparent 70%);animation:ya-glow .4s infinite alternate;z-index:-1}
+#multiSelectScreen .ms-prompt{margin:0;text-align:center;font-size:clamp(22px,3vw,30px);font-weight:900;line-height:1.35;color:#fff}
+#multiSelectScreen .ms-count{margin:0;text-align:center;font-size:16px;font-weight:800;color:#ffe9a0}
+#multiSelectScreen .ms-submit{min-height:56px;border:0;border-radius:14px;background:#ffb627;color:#3a2400;font:inherit;font-size:22px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer}
+#multiSelectScreen .ms-submit:disabled{opacity:.5;cursor:default}
+#multiSelectScreen .ms-review{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+#multiSelectScreen .ms-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
+#multiSelectScreen .ms-review li[data-correct=false]{background:#fff3da}
+@keyframes ms-pulse{from{transform:scale(1)}to{transform:scale(1.18)}}
 `;
 
-export function createMultiSelectView({ document: doc, onBack, onReplay, dispatch, getSnapshot }) {
-  let active = true, root = null, shownProblemId = null;
+// Five resting spots, clear of the HUD band and the companion's corner.
+const SPOTS = [[16, 34], [38, 22], [60, 36], [82, 24], [48, 62]];
+const SVG = 'http://www.w3.org/2000/svg';
+
+export function createMultiSelectView({ document: doc, dispatch, onBack, getSnapshot }) {
+  let active = true, problemId = null, lastSeq = -1, lastEventId = 0, clock = 0, resolved = false;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
-  const el = (tag, className = '', text = '') => {
-    const node = doc.createElement(tag); node.className = className; node.textContent = text; return node;
-  };
-  root = el('section'); root.id = 'multiSelectScreen'; root.setAttribute('aria-label', 'えらんで完成');
+  const frame = createArcadeFrame(doc, { id: 'multiSelectScreen', title: 'えらんで完成', theme: 'night' });
+  const { root, world, dock, fx, el } = frame;
   const style = el('style'); style.textContent = CSS; root.append(style);
-  const shell = el('div', 'ms-shell'); root.append(shell);
-  const header = el('header', 'ms-header'); shell.append(header); header.append(el('h1', '', 'えらんで完成'));
-  const back = el('button', '', 'もどる'); back.type = 'button'; back.dataset.action = 'back'; header.append(back);
-  on(back, 'click', () => { if (active) onBack(); });
-  const progress = el('div', 'ms-progress'), position = el('span'), score = el('span'); progress.append(position, score); shell.append(progress);
-  const pause = el('p', 'ms-pause', 'おやすみ中'); pause.hidden = true; shell.append(pause);
-  const play = el('div', 'ms-play'), controls = el('div'); shell.append(play); play.append(controls);
-  const help = el('p', 'ms-help', 'あてはまるものをすべて選んで、決定しよう（数字キーでも選べます）'); controls.append(help);
-  const prompt = el('div', 'ms-prompt'); prompt.dataset.role = 'problem'; controls.append(prompt);
-  const choiceArea = el('div', 'ms-choices'); choiceArea.setAttribute('aria-label', '選択肢'); controls.append(choiceArea);
-  const choiceButtons = Array.from({ length: 6 }, (_, index) => {
-    const button = el('button', 'ms-choice'); button.type = 'button'; button.dataset.choiceIndex = String(index + 1);
-    button.setAttribute('aria-pressed', 'false'); choiceArea.append(button); return button;
+  on(frame.back, 'click', () => { if (active) onBack(); });
+  const moon = el('i', 'ms-moon');
+  const lines = doc.createElementNS ? doc.createElementNS(SVG, 'svg') : el('div');
+  lines.setAttribute('class', 'ms-lines'); lines.setAttribute('viewBox', '0 0 100 100'); lines.setAttribute('preserveAspectRatio', 'none');
+  world.append(el('div', 'ms-sky'), moon, lines);
+  const stars = SPOTS.map((spot, index) => {
+    const node = el('button', 'ms-star'); node.type = 'button'; node.dataset.choiceIndex = String(index + 1);
+    node.setAttribute('aria-pressed', 'false');
+    // The tag names each star's result in words, not only by colour.
+    const label = el('span', 'ms-label'), tag = el('span', 'ms-tag'); node.append(el('span', 'ms-glyph', '★'), label, tag);
+    on(node, 'click', () => toggle(index));
+    world.append(node);
+    return { node, label, tag, spot, x: spot[0], y: spot[1] };
   });
-  const toggle = index => {
-    const state = getSnapshot(), choice = state.problem?.choices[index];
-    if (!active || state.paused || state.phase !== 'answering' || !state.attemptId || !choice) return false;
-    return dispatch({ type: 'toggle', payload: { sessionId: state.sessionId, problemId: state.problem.problemId,
-      attemptId: state.attemptId, choiceId: choice.choiceId } });
-  };
-  choiceButtons.forEach((button, index) => on(button, 'click', () => toggle(index)));
-  const submit = () => {
-    const state = getSnapshot();
-    if (!active || state.paused || state.phase !== 'answering' || !state.attemptId) return false;
-    return dispatch({ type: 'submit', payload: { sessionId: state.sessionId,
-      problemId: state.problem.problemId, attemptId: state.attemptId } });
-  };
-  const submitButton = el('button', 'ms-primary', '決定'); submitButton.type = 'button'; submitButton.dataset.action = 'submit';
-  const actions = el('div', 'ms-actions'); actions.append(submitButton); controls.append(actions); on(submitButton, 'click', submit);
-  on(doc, 'keydown', event => {
-    if (!active || event.defaultPrevented || event.repeat || event.isComposing ||
-        event.altKey || event.ctrlKey || event.metaKey) return;
-    const choiceIndex = ['1', '2', '3', '4', '5', '6'].indexOf(event.key);
-    if (choiceIndex >= 0 && toggle(choiceIndex)) event.preventDefault();
-    else if (event.key === 'Enter' && submit()) event.preventDefault();
-  });
-  const feedback = el('div', 'ms-feedback'); feedback.setAttribute('aria-live', 'polite'); controls.append(feedback);
-  const feedbackTitle = el('strong'), feedbackDetail = el('span'); feedback.append(feedbackTitle, feedbackDetail);
-  const next = el('button', 'ms-primary', '次へ'); next.type = 'button'; next.dataset.action = 'next'; controls.append(next);
+  const hero = el('div', 'ms-hero'); world.append(hero);
+
+  const prompt = el('p', 'ms-prompt'); prompt.dataset.role = 'problem';
+  const count = el('p', 'ms-count');
+  const note = el('p', 'ya-dock-note', '合う星をぜんぶタップ！'); note.dataset.role = 'feedback';
+  const submit = el('button', 'ms-submit', 'あつめた！'); submit.type = 'button'; submit.dataset.action = 'submit';
+  on(submit, 'click', () => send());
+  // Normal play advances on its own (the shell); the button is the manual path, like the other quiz views.
+  const next = el('button', 'ms-submit', 'つぎへ'); next.type = 'button'; next.dataset.action = 'next'; next.hidden = true;
   on(next, 'click', () => {
     const state = getSnapshot();
-    if (active && state.phase === 'feedback' && !state.paused) dispatch({ type: 'next',
-      payload: { sessionId: state.sessionId, problemId: state.problem.problemId } });
+    if (active && !state.paused && state.phase === 'feedback') dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem?.problemId } });
   });
-  const companion = el('figure', 'ms-companion'), canvas = el('canvas'); canvas.width = 280; canvas.height = 140;
-  canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', '仲間のジャガイモスライム');
-  const caption = el('figcaption', '', 'ジャガイモスライム'); companion.append(canvas, caption); play.append(companion);
-  const result = el('div', 'ms-result'); result.hidden = true; shell.append(result); result.append(el('h2', '', '10もん おつかれさま！'));
-  const resultPoints = el('strong'), resultFull = el('strong'), resultPartial = el('strong'), resultZero = el('strong');
-  for (const [label, value] of [['得点率', resultPoints], ['ぜんぶ正解', resultFull], ['一部正解', resultPartial], ['0点', resultZero]]) {
-    const row = el('p', '', label); row.append(value); result.append(row);
-  }
-  const replay = el('button', 'ms-primary', 'もういちど'); replay.type = 'button'; replay.dataset.action = 'replay'; result.append(replay);
-  on(replay, 'click', () => { if (active && !getSnapshot().paused) onReplay(); });
+  dock.append(prompt, count, note, submit, next);
+  const review = el('div', 'ya-learning-result'); review.hidden = true;
+  const reviewList = el('ol', 'ms-review'); review.append(el('h3', '', '今回のお題'), reviewList); frame.shell.append(review);
   doc.body.append(root);
+  const answers = [];
+
+  const identity = state => ({ sessionId: state.sessionId, problemId: state.problem?.problemId, attemptId: state.attemptId });
+  function toggle(index) {
+    const state = getSnapshot(), choice = state.problem?.choices[index];
+    if (!active || state.paused || state.phase !== 'answering' || !choice) return false;
+    return dispatch({ type: 'toggle', payload: { ...identity(state), choiceId: choice.choiceId } });
+  }
+  function send() {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'answering' || !state.selectedChoiceIds?.length) return false;
+    return dispatch({ type: 'submit', payload: identity(state) });
+  }
+  removes.push(bindArcadeKeys(doc, event => {
+    if (!active || event.repeat) return false;
+    const index = ['1', '2', '3', '4', '5'].indexOf(event.key);
+    if (index >= 0) { toggle(index); return true; }
+    if (event.key === 'Enter') { send(); return true; }
+    return false;
+  }));
+
+  const drawLines = ids => {
+    lines.textContent = '';
+    const points = stars.filter((_, index) => ids.has(getSnapshot().problem?.choices[index]?.choiceId));
+    for (let i = 1; i < points.length; i++) {
+      const line = doc.createElementNS ? doc.createElementNS(SVG, 'line') : el('i');
+      line.setAttribute('x1', String(points[i - 1].x)); line.setAttribute('y1', String(points[i - 1].y));
+      line.setAttribute('x2', String(points[i].x)); line.setAttribute('y2', String(points[i].y));
+      lines.append(line);
+    }
+  };
+  const showAnswer = state => {
+    const answer = state.lastAnswer, problem = state.problem;
+    const chosen = new Set(answer.selectedChoiceIds), right = new Set(answer.correctChoiceIds);
+    const TAGS = { right: 'あつめた！', missed: 'これも仲間', extra: 'べつの星', rest: '' };
+    stars.forEach(({ node, tag }, index) => {
+      const id = problem.choices[index]?.choiceId;
+      node.dataset.status = chosen.has(id) && right.has(id) ? 'right' : right.has(id) ? 'missed' : chosen.has(id) ? 'extra' : 'rest';
+      tag.textContent = TAGS[node.dataset.status];
+    });
+    drawLines(new Set([...chosen].filter(id => right.has(id))));
+    const names = problem.choices.filter(choice => right.has(choice.choiceId)).map(choice => choice.text);
+    answers.push({ prompt: problem.prompt, names, correct: answer.classification === 'fullCorrect' });
+    if (answer.classification === 'fullCorrect') {
+      fx.banner('星座完成！', 'great');
+      note.textContent = `ぜんぶ集めた！ ${names.join('・')}`;
+      frame.announce(`星座完成。${names.join('、')}`);
+    } else {
+      const missing = stars.filter(({ node }) => node.dataset.status === 'missed');
+      missing.forEach(({ x, y }) => fx.pop(x, y - 10, 'これも仲間！', 'info'));
+      note.textContent = `${answer.classification === 'partial' ? 'おしい！ ' : ''}合う星は ${names.join('・')}`;
+      frame.announce(`合う星は ${names.join('、')}`);
+    }
+  };
 
   return {
-    root, canvas,
-    update(state, companionState) {
+    root,
+    attachCompanion(portrait) { hero.append(portrait); },
+    focusPlay() { stars[0].node.focus?.({ preventScroll: true }); },
+    update(state) {
       if (!active) return;
+      frame.setPaused(state.paused && !state.result);
       const problem = state.problem;
-      if (problem && shownProblemId !== problem.problemId) {
-        shownProblemId = problem.problemId; prompt.textContent = problem.prompt;
-        choiceButtons.forEach((button, index) => {
-          const choice = problem.choices[index]; button.hidden = !choice;
-          if (choice) { button.dataset.choiceId = choice.choiceId; button.textContent = `${index + 1}. ${choice.text}`; }
+      if (problem && problem.problemId !== problemId) {
+        problemId = problem.problemId; resolved = false; lines.textContent = '';
+        prompt.textContent = problem.prompt;
+        stars.forEach(({ node, label, tag }, index) => {
+          const choice = problem.choices[index];
+          node.hidden = !choice; delete node.dataset.status; label.textContent = ''; tag.textContent = '';
+          node.dataset.choiceId = choice?.choiceId ?? '';
+          if (choice) { label.append(el('span', 'ms-key', String(index + 1)), el('span', '', choice.text)); node.setAttribute('aria-label', `${index + 1}番 ${choice.text}`); }
         });
+        note.textContent = '合う星をぜんぶタップ！';
       }
-      const selectedIds = new Set(state.selectedChoiceIds), answer = state.lastAnswer;
-      choiceButtons.forEach((button, index) => {
-        const choice = problem?.choices[index], selected = choice && selectedIds.has(choice.choiceId);
-        button.setAttribute('aria-pressed', String(!!selected)); button.disabled = !choice || state.paused || state.phase !== 'answering';
-        button.dataset.status = '';
-        if (choice) button.textContent = `${selected ? '✓ ' : ''}${index + 1}. ${choice.text}`;
-        if (choice && answer) {
-          const correct = answer.correctChoiceIds.includes(choice.choiceId), chosen = answer.selectedChoiceIds.includes(choice.choiceId);
-          button.dataset.status = correct && chosen ? 'selected-correct' : !correct && chosen ? 'selected-wrong' : correct ? 'missed-correct' : '';
-          const marker = correct && chosen ? '○ 選択した正解' : !correct && chosen ? '× 誤って選択' : correct ? '△ 選ばなかった正解' : '・';
-          button.textContent = `${marker} ${choice.text}`;
+      const picked = new Set(state.selectedChoiceIds ?? []);
+      if (state.phase === 'answering') {
+        stars.forEach(({ node }, index) => node.setAttribute('aria-pressed', String(picked.has(problem?.choices[index]?.choiceId))));
+        drawLines(picked);
+      }
+      if (state.seq !== lastSeq) {
+        lastSeq = state.seq;
+        if (state.lastAnswer && answers.length < state.answered) { showAnswer(state); resolved = true; }
+      }
+      const canPlay = !state.paused && state.phase === 'answering';
+      stars.forEach(({ node }) => { node.disabled = !canPlay; });
+      submit.disabled = !canPlay || !picked.size;
+      count.textContent = state.phase === 'answering' ? `集めた星 ${picked.size}こ` : '';
+      if (state.result && review.hidden) {
+        review.hidden = false; reviewList.textContent = '';
+        for (const item of answers) {
+          const row = el('li', '', `${item.correct ? '✓' : '☆'} ${item.prompt}：${item.names.join('・')}`);
+          row.dataset.correct = String(item.correct); reviewList.append(row);
         }
-      });
-      if (answer) {
-        feedbackTitle.textContent = answer.classification === 'fullCorrect' ? 'ぜんぶ正解！' :
-          answer.classification === 'partial' ? '一部正解' : '今回は0点';
-        const correctTexts = problem.choices.filter(choice => answer.correctChoiceIds.includes(choice.choiceId)).map(choice => choice.text);
-        feedbackDetail.textContent = `${answer.earnedPoints} / ${answer.maxPoints}点　正解: ${correctTexts.join('、')}`;
-      } else { feedbackTitle.textContent = ''; feedbackDetail.textContent = ''; }
-      submitButton.hidden = state.phase !== 'answering'; submitButton.disabled = state.paused;
-      next.hidden = state.phase !== 'feedback'; next.disabled = state.paused; pause.hidden = !state.paused;
-      position.textContent = `${Math.min(10, state.answered + (state.phase === 'answering' ? 1 : 0))} / 10`;
-      score.textContent = `合計 ${state.totalPoints} / ${state.maxPoints || 0}点`;
-      controls.hidden = !!state.result; result.hidden = !state.result; play.style.display = state.result ? 'flex' : '';
-      play.style.justifyContent = state.result ? 'center' : '';
-      if (state.result) {
-        resultPoints.textContent = `${Math.round(state.result.scoreRate * 100)}%`;
-        resultFull.textContent = `${state.result.fullCorrect} / 10`;
-        resultPartial.textContent = String(state.result.partial); resultZero.textContent = String(state.result.incorrect);
       }
-      companion.hidden = !companionState.selected;
-      caption.textContent = companionState.motion?.imageState === 'failed' ? '仲間といっしょに！' : 'ジャガイモスライム';
     },
-    stopInput() { active = false; [...choiceButtons, submitButton, next, replay, back].forEach(button => { button.disabled = true; }); },
-    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); root?.remove(); root = null; },
+    present(play, dt, state) {
+      if (!active || !state) return;
+      frame.tick(dt);
+      clock += dt;
+      const w = play.world || {};
+      // Stars sway gently in place; the moon crossing the sky shows the time left for a bright constellation.
+      if (!resolved) stars.forEach((star, index) => {
+        star.x = star.spot[0] + Math.sin(clock / 1400 + index * 1.7) * 2.5;
+        star.y = star.spot[1] + Math.cos(clock / 1700 + index * 2.3) * 2;
+        star.node.style.left = `${star.x}%`; star.node.style.top = `${star.y}%`;
+      });
+      const p = w.progress ?? 0;
+      moon.style.left = `${10 + p * 80}%`; moon.style.top = `${22 - Math.sin(p * Math.PI) * 10}%`;
+      hero.dataset.fever = String(!!w.fever);
+      if (state.phase === 'answering' && w.arrived) note.textContent = '月がしずんだよ。集めたら「あつめた！」';
+      const event = w.lastEvent;
+      if (event && event.id !== lastEventId) {
+        lastEventId = event.id;
+        if (event.type === 'hit' && event.special) fx.banner('流れ星！', 'great');
+        else if (event.type === 'hit' && event.quick) fx.pop(50, 12, 'かがやく星座！', 'great');
+        else if (event.type === 'boost') { fx.banner('星のきらめき！', 'great'); fx.flash('great'); }
+      }
+      const mission = w.challenge;
+      frame.hud.set({ points: play.learningPoints + play.bonus, comboCount: play.combo,
+        progressValue: (state.answered ?? 0) / 10,
+        progressLabel: `星座 ${w.correct ?? 0} · ${Math.min(10, (state.answered ?? 0) + (state.phase === 'answering' ? 1 : 0))}/10問`,
+        life: null, gaugeValue: play.gauge, fever: w.fever,
+        missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
+    },
+    stopInput() { active = false; stars.forEach(({ node }) => { node.disabled = true; }); submit.disabled = true; next.disabled = true; },
+    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

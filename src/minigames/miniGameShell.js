@@ -18,7 +18,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   if (!root?.querySelector) return { update() {}, dispose() {} };
   const info = gameExperiences[definition.id], shell = root.querySelector('[class$="-shell"]');
   // Arcade views draw their own world and HUD; the shell adds no in-play menus.
-  const arcade = !!info.arcade && !reviewMode;
+  // arcadeView: the view draws its own world (also in review). arcade: in-play automation.
+  const arcadeView = !!info.arcade, arcade = arcadeView && !reviewMode;
   root.classList.add('yt-game'); root.dataset.experience = info.scene;
   root.style.setProperty('--accent', info.color);
   const header = root.querySelector('header');
@@ -47,7 +48,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   const howToList = element(doc, 'ol');
   for (const step of info.howTo) howToList.append(element(doc, 'li', '', step));
   howTo.append(howToSummary, howToList);
-  if (!arcade) soundPanel.after(howTo);
+  if (!arcadeView) soundPanel.after(howTo);
   howTo.addEventListener('keydown', event => event.stopPropagation());
   howTo.addEventListener('toggle', () => {
     if (howTo.open && !state?.paused && !state?.result) {
@@ -65,13 +66,13 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   const skill = button(doc, '', onBoost, 'gt-button gt-skill'); skill.dataset.action = 'boost';
   const gauge = element(doc, 'meter'); gauge.min = 0; gauge.max = 3; gauge.value = 0; gauge.setAttribute('aria-label', '相棒ゲージ');
   const skillLabel = element(doc, 'span'); skill.append(gauge, skillLabel); hud.append(skill);
-  if (!arcade) howTo.after(hud);
-  const scene = arcade ? null : createCompanionScene({ doc, root, info, gotomon, act: onAct });
+  if (!arcadeView) howTo.after(hud);
+  const scene = arcadeView ? null : createCompanionScene({ doc, root, info, gotomon, act: onAct });
   if (scene) hud.after(scene.root);
   // Not '*-companion': minigame-shell.css hides that suffix for the older games' canvas figures.
   else view.attachCompanion?.(companionPortrait(doc, gotomon, 'ya-buddy'));
   const sceneCanvas = scene?.root.querySelector('.gt-scene');
-  if (!reviewMode && !arcade) {
+  if (!reviewMode && !arcadeView) {
     root.classList.add('gt-fullscreen-play');
     const arena = root.querySelector('.mi-board, .kd-board') || sceneCanvas;
     const playControls = root.querySelector('.ms-play > div, .ec-play > div, .so-play > div, .tc-play > div, .ac-play > div, .mi-controls, .kd-controls');
@@ -260,7 +261,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
         const rank = scoreRank(definition.id, points, current.correct);
         rankLabel.textContent = `${rank.rank} RANK`; rankLabel.dataset.rank = rank.rank;
         nextGoal.textContent = reviewing ? `${state.correct} / ${state.totalQuestions}${definition.id === 'sentenceOrder' ? '文' : '語'}に正解。${getReviewCount() ? 'もう一度たしかめよう。' : '今回の復習はできたね！'}` : rank.next ? rank.goal : current.world?.goal || '次は自己ベストをこえよう';
-        const challenge = current.world?.challenge;
+        const challenge = reviewing ? null : current.world?.challenge;
         challengeResult.hidden = !challenge;
         if (challenge) {
           challengeResult.textContent = challenge.status === 'achieved' ? challenge.message : `今回の目標「${challenge.name}」は次の挑戦へ。`;

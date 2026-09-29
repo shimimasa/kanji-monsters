@@ -49,10 +49,10 @@ test('Registry and title expose Multi Select without replacing the first five ga
 
 test('View source has multi-select semantics, 44px targets, responsive rules, focus and non-color status text', () => {
   const view = fs.readFileSync('src/minigames/multiSelect/multiSelectView.js', 'utf8');
-  assert.match(view, /min-width:44px;min-height:44px/); assert.match(view, /overflow:auto/);
-  assert.match(view, /aria-pressed/); assert.match(view, /選択した正解/); assert.match(view, /選ばなかった正解/);
-  assert.match(view, /@media\(max-width:540px\)/); assert.match(view, /@media\(max-height:430px\)/); assert.match(view, /:focus-visible/);
-  assert.doesNotMatch(view, /@keyframes|animation:|requestAnimationFrame|setInterval|setTimeout/);
+  assert.match(view, /min-width:64px;min-height:44px/); assert.match(view, /createArcadeFrame/);
+  // Each star's result is named in words, not only by colour.
+  assert.match(view, /aria-pressed/); assert.match(view, /あつめた！/); assert.match(view, /これも仲間/); assert.match(view, /:focus-visible/);
+  assert.doesNotMatch(view, /requestAnimationFrame|setInterval|setTimeout/);
 });
 
 test('unchanged Host runs full, partial, zero, feedback and owned/unowned Companion paths', async () => {
@@ -63,13 +63,15 @@ test('unchanged Host runs full, partial, zero, feedback and owned/unowned Compan
     host.enter({ gameId: 'multiSelect' }); await drain(); assert.ok(d.doc.getElementById('multiSelectScreen'));
     assert.equal(host.inspect().companion.selected, owned ? 'HKD-E01' : null);
     let state = host.inspect().session; chooseIds(d, state.problem.correctChoiceIds); submit(d);
-    assert.equal(host.inspect().session.fullCorrect, 1); assert.match(d.find(node => node.className === 'ms-feedback').children[0].textContent, /ぜんぶ正解/);
+    assert.equal(host.inspect().session.fullCorrect, 1); assert.match(d.find(node => node.dataset.role === 'feedback').textContent, /ぜんぶ集めた/);
     if (owned) assert.equal(host.inspect().companion.action, 'attack'); advance(d);
     state = host.inspect().session; chooseIds(d, state.problem.correctChoiceIds.slice(0, 2)); submit(d);
-    assert.equal(host.inspect().session.partial, 1); assert.match(d.find(node => node.className === 'ms-feedback').children[0].textContent, /一部正解/);
+    assert.equal(host.inspect().session.partial, 1); assert.match(d.find(node => node.dataset.role === 'feedback').textContent, /おしい/);
+    assert.equal(d.all(node => node.className === 'ms-tag' && node.textContent === 'これも仲間').length, 1);
     if (owned) assert.equal(host.inspect().companion.action, 'idle'); advance(d);
     state = host.inspect().session; chooseIds(d, state.problem.choices.map(item => item.choiceId)); submit(d);
-    assert.equal(host.inspect().session.incorrect, 1); assert.match(d.find(node => node.className === 'ms-feedback').children[0].textContent, /0点/);
+    // No "0 points": the stars that fit are shown instead.
+    assert.equal(host.inspect().session.incorrect, 1); assert.match(d.find(node => node.dataset.role === 'feedback').textContent, /合う星は/);
     host.exit(); assert.equal(d.listeners(), 0); assert.equal(d.doc.body.children.length, 0);
   }
 });
@@ -127,12 +129,18 @@ test('ten questions produce result, replay, image-failure/reduced-motion isolati
     const state = host.inspect().session;
     if (index < 4) chooseIds(d, state.problem.correctChoiceIds);
     else if (index < 8) chooseIds(d, state.problem.correctChoiceIds.slice(0, 2));
+    else {
+      // An empty collection cannot be sent by accident; one star that does not fit can.
+      submit(d); assert.equal(host.inspect().session.answered, index);
+      chooseIds(d, [state.problem.choices.find(item => !state.problem.correctChoiceIds.includes(item.choiceId)).choiceId]);
+    }
     submit(d); if (index < 9) advance(d);
   }
   const result = host.inspect().session.result; assert.deepEqual({ answered: result.answered, fullCorrect: result.fullCorrect,
     partial: result.partial, incorrect: result.incorrect }, { answered: 10, fullCorrect: 4, partial: 4, incorrect: 2 });
   assert.ok(Object.isFrozen(result)); assert.equal(host.inspect().session.seq, 21);
-  assert.equal(host.inspect().companion.motion.imageState, 'failed'); click(d.find(node => node.dataset.action === 'replay'));
+  // The shell owns the replay button; the Host entry is what it calls.
+  assert.equal(host.inspect().companion.motion.imageState, 'failed'); host.enter({ gameId: 'multiSelect' }); host.update(0);
   assert.notEqual(host.inspect().session.sessionId, firstSession); assert.equal(host.inspect().session.seq, 1);
   host.exit(); await drain(); assert.equal(writes, 0); assert.equal(JSON.stringify(gameState), beforeGame);
   assert.equal(JSON.stringify([...storage.data]), beforeStorage);

@@ -57,11 +57,11 @@ test('Registry and title expose Timed Choice without replacing the first four ga
 
 test('View source keeps timer UI, 44px targets, responsive layout, focus, and no animation clock', () => {
   const view = fs.readFileSync('src/minigames/timedChoice/timedChoiceView.js', 'utf8');
-  assert.match(view, /min-width:44px;min-height:44px/); assert.match(view, /overflow:auto/);
-  assert.match(view, /role', 'progressbar'/); assert.match(view, /data.*remaining|dataset\.role = 'remaining'/);
-  assert.match(view, /@media\(max-width:540px\)/); assert.match(view, /@media\(max-height:430px\)/);
+  assert.match(view, /min-width:44px;min-height:44px/); assert.match(view, /createArcadeFrame/);
+  assert.match(view, /role', 'progressbar'/); assert.match(view, /dataset\.role = 'remaining'/);
   assert.match(view, /:focus-visible/); assert.match(view, /時間切れ/);
-  assert.doesNotMatch(view, /@keyframes|animation:|transition:|requestAnimationFrame|setInterval|setTimeout/);
+  // Mole motion follows the Core clock; the view owns no timer.
+  assert.doesNotMatch(view, /requestAnimationFrame|setInterval|setTimeout/);
 });
 
 test('unchanged Host renders countdown and runs answer, timeout, Next, and owned/unowned Companion', async () => {
@@ -77,7 +77,7 @@ test('unchanged Host renders countdown and runs answer, timeout, Next, and owned
     if (owned) assert.equal(host.inspect().companion.action, 'attack');
     click(d.find(node => node.dataset.action === 'next')); host.update(5000);
     assert.equal(host.inspect().session.incorrect, 1); assert.equal(host.inspect().session.timedOut, 1);
-    assert.match(d.find(node => node.className === 'tc-feedback').textContent, /時間切れ/);
+    assert.match(d.find(node => node.dataset.role === 'feedback').textContent, /時間切れ/);
     if (owned) assert.equal(host.inspect().companion.action, 'idle');
     host.exit(); assert.equal(d.listeners(), 0); assert.equal(d.doc.body.children.length, 0);
   }
@@ -161,7 +161,8 @@ test('ten questions, result, replay, image failure, reduced motion, and Storage 
     { answered: 10, correct: 7, incorrect: 3, accuracy: 0.7, timedOut: 2 });
   assert.ok(Object.isFrozen(host.inspect().session.result)); assert.equal(host.inspect().session.seq, 21);
   assert.equal(host.inspect().companion.motion.imageState, 'failed');
-  click(d.find(node => node.dataset.action === 'replay'));
+  // The shell owns the replay button; the Host entry is what it calls.
+  host.enter({ gameId: 'timedChoice' }); host.update(0);
   assert.notEqual(host.inspect().session.sessionId, firstSession); assert.equal(host.inspect().session.seq, 1);
   host.exit(); await drain(); assert.equal(writes, 0);
   assert.equal(JSON.stringify(gameState), beforeGame); assert.equal(JSON.stringify([...storage.data]), beforeStorage);

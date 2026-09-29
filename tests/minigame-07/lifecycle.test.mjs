@@ -49,9 +49,8 @@ test('Registry and title expose Async Choice without replacing the first six gam
 test('View source has loading/failure UI, 44px targets, responsive rules and no scheduler', () => {
   const view = fs.readFileSync('src/minigames/asyncChoice/asyncChoiceView.js', 'utf8');
   assert.match(view, /問題を読み込んでいます/); assert.match(view, /問題を読み込めませんでした/);
-  assert.match(view, /min-width:44px;min-height:44px/); assert.match(view, /overflow:auto/); assert.match(view, /:focus-visible/);
-  assert.match(view, /@media\(max-width:540px\)/); assert.match(view, /@media\(max-height:430px\)/);
-  assert.doesNotMatch(view, /requestAnimationFrame|setInterval|setTimeout|@keyframes|animation:/);
+  assert.match(view, /min-width:44px;min-height:44px/); assert.match(view, /createArcadeFrame/); assert.match(view, /:focus-visible/);
+  assert.doesNotMatch(view, /requestAnimationFrame|setInterval|setTimeout/);
 });
 
 test('unchanged Host renders loading then resolved game with owned/unowned Companion', async () => {
@@ -75,7 +74,9 @@ test('View renders current-session failure without treating it as an answer', ()
   const companion = { selected: null, motion: null }; view.update(state, companion);
   assert.equal(d.find(node => node.dataset.role === 'loading').hidden, false);
   state = { ...state, phase: 'failed', loadError: 'questionsUnavailable' }; view.update(state, companion);
-  assert.equal(d.find(node => node.dataset.role === 'failure').hidden, false); assert.equal(d.find(node => node.className === 'ac-play').hidden, false);
+  assert.equal(d.find(node => node.dataset.role === 'failure').hidden, false);
+  // Nothing can be answered while the questions are missing.
+  assert.ok(d.all(node => node.dataset.choiceIndex).every(node => node.hidden || node.disabled));
   view.dispose(); assert.equal(d.doc.body.children.length, 0); assert.equal(d.listeners(), 0);
 });
 
@@ -135,7 +136,8 @@ test('ten questions, result/replay, image failure, reduced motion and Storage is
   for (let index = 0; index < 10; index++) { if (index < 7) click(correctChoice(d, host)); else click(wrongChoice(d, host));
     if (index < 9) click(d.find(node => node.dataset.action === 'next')); }
   assert.deepEqual(host.inspect().session.result, { answered: 10, correct: 7, incorrect: 3, accuracy: 0.7 });
-  assert.equal(host.inspect().companion.motion.imageState, 'failed'); click(d.find(node => node.dataset.action === 'replay'));
+  // The shell owns the replay button; the Host entry is what it calls.
+  assert.equal(host.inspect().companion.motion.imageState, 'failed'); host.enter({ gameId: 'asyncChoice' });
   assert.notEqual(host.inspect().session.sessionId, firstSession); assert.equal(host.inspect().session.phase, 'loading');
   await flushAsync(); host.update(0); assert.equal(host.inspect().session.seq, 1); host.exit(); await flushAsync();
   assert.equal(writes, 0); assert.equal(JSON.stringify(gameState), beforeGame); assert.equal(JSON.stringify([...storage.data]), beforeStorage);

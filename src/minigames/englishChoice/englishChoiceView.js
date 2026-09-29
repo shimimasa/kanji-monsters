@@ -1,127 +1,174 @@
-import { createChoiceHint } from '../choiceHint.js';
-import { createChoiceComparison } from '../choiceComparison.js';
+import { createArcadeFrame, bindArcadeKeys } from '../arcade/arcadeKit.js';
+
 const CSS = `
-#englishChoiceScreen{position:fixed;inset:0;z-index:100010;background:#f5f1ff;color:#29233a;overflow:auto;overscroll-behavior:contain;font:18px system-ui,sans-serif;box-sizing:border-box;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom));touch-action:manipulation}
-#englishChoiceScreen *{box-sizing:border-box}#englishChoiceScreen [hidden]{display:none!important}
-#englishChoiceScreen .ec-shell{max-width:720px;margin:0 auto}#englishChoiceScreen header{display:flex;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:-12px;z-index:2;background:#f5f1ff;padding:4px 0}
-#englishChoiceScreen h1{font-size:clamp(19px,4.8vw,27px);margin:0}#englishChoiceScreen button{min-width:44px;min-height:44px;border:2px solid #74658f;border-radius:11px;background:#fff;color:#29233a;font:inherit;padding:9px 14px;cursor:pointer}
-#englishChoiceScreen button:disabled{opacity:.55;cursor:default}#englishChoiceScreen button:focus-visible{outline:3px solid #19766d;outline-offset:2px}.ec-progress{display:flex;justify-content:space-between;gap:12px;margin:10px 0;font-weight:700}.ec-pause{color:#6b527b;margin:8px 0}
-#englishChoiceScreen .ec-play{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:16px;align-items:start}.ec-prompt{font-size:clamp(34px,9vw,54px);font-weight:800;text-align:center;margin:10px 0 16px;letter-spacing:.5px}.ec-help{text-align:center;margin:5px 0 12px;color:#594d6e}
-#englishChoiceScreen .ec-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ec-choice{width:100%;min-height:56px}.ec-choice[data-status=correct]{background:#d9f4df;border-color:#237340}.ec-choice[data-status=incorrect]{background:#ffe1df;border-color:#a53730}.ec-feedback{min-height:32px;margin:10px 0;line-height:1.5}.ec-primary{background:#60468a!important;color:#fff!important;border-color:#60468a!important}
-#englishChoiceScreen .ec-companion{pointer-events:none;text-align:center;margin:0;padding-top:4px;color:#65587b;font-size:14px}.ec-companion canvas{display:block;width:180px;height:90px;max-width:100%;margin:auto}.ec-result{text-align:center;padding:12px}.ec-result h2{font-size:28px}.ec-result p{font-size:19px;margin:10px}.ec-result strong{display:block;font-size:28px}
-@media(max-width:540px){#englishChoiceScreen .ec-play{grid-template-columns:1fr}.ec-companion{padding:0}.ec-companion canvas{width:140px;height:70px}.ec-prompt{margin:4px 0 10px}.ec-choice{min-height:52px}}
-@media(max-height:430px) and (min-width:541px){#englishChoiceScreen .ec-prompt{font-size:34px;margin:2px 0}.ec-help,.ec-progress,.ec-feedback{margin:3px 0}.ec-choice{min-height:44px;padding:5px}.ec-companion canvas{width:130px;height:65px}.ec-result{padding:4px}}
+#englishChoiceScreen .ya-field{background:radial-gradient(ellipse at 50% 0,#6b4fa3 0,transparent 60%),linear-gradient(#2a1d4a,#3b2a5e 70%,#4a3526 70.3%,#35251a)}
+#englishChoiceScreen .ec-torch{position:absolute;top:18%;width:14px;height:40px;border-radius:4px;background:#6d4b2a}
+#englishChoiceScreen .ec-torch::after{content:'';position:absolute;left:50%;top:-26px;width:26px;height:30px;transform:translateX(-50%);border-radius:50% 50% 45% 45%;background:radial-gradient(circle at 50% 70%,#fff3b0,#ffb627 45%,#ff7a3900 72%);animation:ec-flame .5s ease-in-out infinite alternate}
+#englishChoiceScreen .ec-lane{position:absolute;top:0;bottom:30%;width:2px;background:linear-gradient(#ffffff00,#ffffff22);transform:translateX(-50%)}
+#englishChoiceScreen .ec-chest{position:absolute;z-index:4;width:min(22%,170px);transform:translate(-50%,0);padding:0;border:0;background:none;font:inherit;color:#2a1c10;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:4px}
+#englishChoiceScreen .ec-box{position:relative;width:min(100%,92px);aspect-ratio:1.35;border-radius:10px 10px 6px 6px;background:linear-gradient(#b0732f,#8a5522);border:3px solid #5c3514;box-shadow:0 5px 0 #0005}
+#englishChoiceScreen .ec-box::before{content:'';position:absolute;left:-3px;right:-3px;top:-3px;height:42%;border-radius:12px 12px 3px 3px;background:linear-gradient(#c98a3d,#9c6128);border:3px solid #5c3514;transform-origin:50% 0;transition:transform .25s}
+#englishChoiceScreen .ec-box::after{content:'';position:absolute;left:50%;top:32%;width:16px;height:18px;transform:translateX(-50%);border-radius:3px;background:#ffd54a;border:2px solid #7a5200}
+#englishChoiceScreen .ec-label{max-width:100%;padding:5px 10px;border-radius:12px;background:#fffdf3;border:3px solid #5c3514;font-size:clamp(15px,2.2vw,22px);font-weight:900;line-height:1.15;white-space:nowrap;box-shadow:0 3px 0 #0004}
+#englishChoiceScreen .ec-key{font-size:.7em;color:#7a6a58;margin-right:4px}
+#englishChoiceScreen .ec-chest:focus-visible .ec-label{outline:3px solid #ffd54a;outline-offset:2px}
+#englishChoiceScreen .ec-chest[data-status=correct] .ec-box::before{transform:rotateX(70deg) translateY(-8px)}
+#englishChoiceScreen .ec-chest[data-status=correct] .ec-box{box-shadow:0 0 0 4px #ffe066,0 0 30px #ffd54a}
+#englishChoiceScreen .ec-chest[data-status=correct] .ec-label{background:#d7f7df;border-color:#1f9d55}
+#englishChoiceScreen .ec-chest[data-status=empty] .ec-box::before{transform:rotateX(70deg) translateY(-8px)}
+#englishChoiceScreen .ec-chest[data-status=empty]{opacity:.7}
+#englishChoiceScreen .ec-chest[data-status=faded]{opacity:.35}
+#englishChoiceScreen .ec-chest[data-arrived=true]:not([data-status]) .ec-box{animation:ec-wobble .9s ease-in-out infinite}
+#englishChoiceScreen .ec-hero{position:absolute;left:50%;bottom:4%;z-index:5;width:clamp(70px,10vw,100px);height:clamp(70px,10vw,100px);transform:translateX(-50%)}
+#englishChoiceScreen .ec-hero .gt-portrait{display:block;width:100%;height:100%;background:none;border:0}
+#englishChoiceScreen .ec-hero .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 3px #0006)}
+#englishChoiceScreen .ec-hero[data-fever=true]::after{content:'';position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,#ffd54a66,transparent 70%);animation:ya-glow .4s infinite alternate;z-index:-1}
+#englishChoiceScreen .ec-word{margin:0;text-align:center;font-size:clamp(34px,5.4vw,52px);font-weight:900;letter-spacing:.02em;color:#fff;font-family:system-ui,"Segoe UI",sans-serif}
+#englishChoiceScreen .ec-ask{margin:0;text-align:center;font-size:15px;font-weight:700;color:#d8c8ff}
+#englishChoiceScreen .ec-next{min-height:52px;border:0;border-radius:14px;background:#ffb627;color:#3a2400;font:inherit;font-size:20px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer}
+#englishChoiceScreen .ec-review{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+#englishChoiceScreen .ec-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
+#englishChoiceScreen .ec-review li[data-correct=false]{background:#fff3da}
+@keyframes ec-flame{from{transform:translateX(-50%) scale(.92)}to{transform:translateX(-50%) scale(1.08)}}
+@keyframes ec-wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
 `;
 
-export function createEnglishChoiceView({ document: doc, onBack, onReplay, onNext, onAnswer, getSnapshot }) {
-  let active = true, root = null, shownProblemId = null;
+const LANE_X = [12.5, 37.5, 62.5, 87.5];
+// Chests fall from the top band (kept clear for the HUD) to just above the companion.
+const TOP_Y = 14, BOTTOM_Y = 58;
+
+export function createEnglishChoiceView({ document: doc, dispatch, onBack, getSnapshot }) {
+  let active = true, problemId = null, lastSeq = -1, lastEventId = 0;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
-  const el = (tag, className = '', text = '') => {
-    const node = doc.createElement(tag); node.className = className; node.textContent = text; return node;
-  };
-  root = el('section'); root.id = 'englishChoiceScreen'; root.setAttribute('aria-label', 'えいたんご4たく');
+  const frame = createArcadeFrame(doc, { id: 'englishChoiceScreen', title: 'えいたんご4たく', theme: 'treasure' });
+  const { root, world, dock, fx, el } = frame;
   const style = el('style'); style.textContent = CSS; root.append(style);
-  const shell = el('div', 'ec-shell'); root.append(shell);
-  const header = el('header'); shell.append(header); header.append(el('h1', '', 'えいたんご4たく'));
-  const back = el('button', '', 'もどる'); back.type = 'button'; back.dataset.action = 'back'; header.append(back);
-  on(back, 'click', () => { if (active) onBack(); });
-  const progress = el('div', 'ec-progress'), position = el('span'), score = el('span'); progress.append(position, score); shell.append(progress);
-  const pause = el('p', 'ec-pause', 'おやすみ中'); pause.hidden = true; shell.append(pause);
-  const play = el('div', 'ec-play'), controls = el('div'); shell.append(play); play.append(controls);
-  const help = el('p', 'ec-help', 'いみを えらんでね'); controls.append(help);
-  const prompt = el('div', 'ec-prompt'); prompt.dataset.role = 'problem'; controls.append(prompt);
-  const choiceArea = el('div', 'ec-choices'); choiceArea.setAttribute('aria-label', 'こたえの候補'); controls.append(choiceArea);
-  const choiceButtons = Array.from({ length: 4 }, (_, index) => {
-    const button = el('button', 'ec-choice'); button.type = 'button'; button.dataset.choiceIndex = String(index + 1);
-    choiceArea.append(button); return button;
+  on(frame.back, 'click', () => { if (active) onBack(); });
+  for (const x of [4, 96]) { const torch = el('i', 'ec-torch'); torch.style.left = `${x}%`; world.append(torch); }
+  for (const x of LANE_X) { const lane = el('i', 'ec-lane'); lane.style.left = `${x}%`; world.append(lane); }
+  const chests = LANE_X.map((x, index) => {
+    const node = el('button', 'ec-chest'); node.type = 'button'; node.dataset.choiceIndex = String(index + 1);
+    node.style.left = `${x}%`; node.style.top = `${TOP_Y}%`;
+    const label = el('span', 'ec-label'); node.append(el('span', 'ec-box'), label);
+    on(node, 'click', () => choose(index));
+    world.append(node);
+    return { node, label };
   });
-  const hint = createChoiceHint({ doc, container: controls, getSnapshot, onChange: () => updateChoices(getSnapshot()) });
-  const updateChoices = state => {
-    hint.update(state);
-    const canAnswer = !state.paused && state.phase === 'answering';
-    choiceButtons.forEach(button => {
-      button.hidden = hint.excludes(state, button.dataset.choiceId);
-      button.disabled = !canAnswer || button.hidden; button.dataset.status = '';
-    });
-  };
-  const choose = index => {
-    const state = getSnapshot(), choice = state.problem?.choices[index];
-    if (!active || state.paused || state.phase !== 'answering' || !state.attemptId || !choice || hint.excludes(state, choice.choiceId)) return false;
-    return onAnswer({
-      sessionId: state.sessionId, problemId: state.problem.problemId,
-      attemptId: state.attemptId, choiceId: choice.choiceId,
-    });
-  };
-  choiceButtons.forEach((button, index) => on(button, 'click', () => choose(index)));
-  on(doc, 'keydown', event => {
-    if (!active || event.defaultPrevented || event.repeat || event.isComposing ||
-        event.altKey || event.ctrlKey || event.metaKey) return;
-    const index = ['1', '2', '3', '4'].indexOf(event.key);
-    if (index >= 0 && choose(index)) event.preventDefault();
-  });
-  const feedback = el('p', 'ec-feedback'); feedback.setAttribute('aria-live', 'polite'); controls.append(feedback);
-  const next = el('button', 'ec-primary', '次へ'); next.type = 'button'; next.dataset.action = 'next'; controls.append(next);
+  const hero = el('div', 'ec-hero'); world.append(hero);
+
+  const word = el('p', 'ec-word'); word.dataset.role = 'problem'; word.lang = 'en';
+  const ask = el('p', 'ec-ask', 'の いみは？');
+  const note = el('p', 'ya-dock-note', '意味の合う宝箱をタップ！');
+  const next = el('button', 'ec-next', 'つぎへ'); next.type = 'button'; next.dataset.action = 'next'; next.hidden = true;
   on(next, 'click', () => {
     const state = getSnapshot();
-    if (active && state.phase === 'feedback' && !state.paused) onNext(state.sessionId, state.problem.problemId);
+    if (active && !state.paused && state.phase === 'feedback') dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem?.problemId } });
   });
-  const companion = el('figure', 'ec-companion'), canvas = el('canvas'); canvas.width = 280; canvas.height = 140;
-  canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', '仲間のジャガイモスライム');
-  const caption = el('figcaption', '', 'ジャガイモスライム'); companion.append(canvas, caption); play.append(companion);
-  const result = el('div', 'ec-result'), resultTitle = el('h2', '', '10もん おつかれさま！'); result.hidden = true; shell.append(result); result.append(resultTitle);
-  const resultCorrect = el('strong'), resultIncorrect = el('strong'), resultAccuracy = el('strong');
-  const comparison = createChoiceComparison(doc, 'ec-missed'); result.append(comparison.root);
-  for (const [label, value] of [['せいかい', resultCorrect], ['まちがい', resultIncorrect], ['せいかいりつ', resultAccuracy]]) {
-    const row = el('p', '', label); row.append(value); result.append(row);
-  }
-  const replay = el('button', 'ec-primary', 'もういちど'); replay.type = 'button'; replay.dataset.action = 'replay'; result.append(replay);
-  on(replay, 'click', () => { if (active && !getSnapshot().paused) onReplay(); });
+  dock.append(word, ask, note, next);
+  const review = el('div', 'ya-learning-result'); review.hidden = true;
+  const reviewList = el('ol', 'ec-review'); review.append(el('h3', '', '今回のことば'), reviewList); frame.shell.append(review);
   doc.body.append(root);
+  const answers = [];
+
+  function choose(index) {
+    const state = getSnapshot(), choice = state.problem?.choices[index];
+    if (!active || state.paused || state.phase !== 'answering' || !choice) return false;
+    return dispatch({ type: 'answer', payload: { sessionId: state.sessionId, problemId: state.problem.problemId,
+      attemptId: state.attemptId, choiceId: choice.choiceId } });
+  }
+  removes.push(bindArcadeKeys(doc, event => {
+    if (!active || event.repeat) return false;
+    const index = ['1', '2', '3', '4'].indexOf(event.key);
+    if (index >= 0) { choose(index); return true; }
+    if (event.key === 'Enter' && !next.hidden) { next.click(); return true; }
+    return false;
+  }));
+
+  const showAnswer = state => {
+    const answer = state.lastAnswer, problem = state.problem;
+    const correctIndex = problem.choices.findIndex(choice => choice.choiceId === answer.correctChoiceId);
+    const chosenIndex = problem.choices.findIndex(choice => choice.choiceId === answer.choiceId);
+    const meaning = problem.choices[correctIndex]?.text ?? '';
+    chests.forEach(({ node }, index) => {
+      node.dataset.status = index === correctIndex ? 'correct' : index === chosenIndex ? 'empty' : 'faded';
+    });
+    const top = parseFloat(chests[correctIndex].node.style.top) || TOP_Y;
+    answers.push({ word: problem.prompt, meaning, correct: answer.correct });
+    if (answer.correct) {
+      fx.burst(LANE_X[correctIndex], top + 6, 'good', 1.2);
+      note.textContent = `せいかい！ ${problem.prompt} は「${meaning}」`;
+      frame.announce(`せいかい。${problem.prompt} は ${meaning}`);
+    } else {
+      fx.pop(LANE_X[chosenIndex], top, 'からっぽ…', 'soft');
+      fx.pop(LANE_X[correctIndex], top - 6, `宝はこっち！`, 'info');
+      note.textContent = `${problem.prompt} は「${meaning}」。次でとりかえそう！`;
+      frame.announce(`${problem.prompt} は ${meaning}`);
+    }
+  };
 
   return {
     root,
-    canvas,
-    update(state, companionState) {
+    attachCompanion(portrait) { hero.append(portrait); },
+    focusPlay() { chests[0].node.focus?.({ preventScroll: true }); },
+    update(state) {
       if (!active) return;
+      frame.setPaused(state.paused && !state.result);
       const problem = state.problem;
-      if (problem && shownProblemId !== problem.problemId) {
-        shownProblemId = problem.problemId; prompt.textContent = problem.prompt;
-        problem.choices.forEach((choice, index) => {
-          choiceButtons[index].textContent = `${index + 1}. ${choice.text}`;
-          choiceButtons[index].dataset.choiceId = choice.choiceId;
+      if (problem && problem.problemId !== problemId) {
+        problemId = problem.problemId;
+        word.textContent = problem.prompt;
+        chests.forEach(({ node, label }, index) => {
+          const choice = problem.choices[index];
+          node.hidden = !choice; delete node.dataset.status;
+          label.textContent = '';
+          node.dataset.choiceId = choice?.choiceId ?? '';
+          if (choice) { label.append(el('span', 'ec-key', String(index + 1)), el('span', '', choice.text)); node.setAttribute('aria-label', `${index + 1}番 ${choice.text}`); }
         });
+        note.textContent = state.mode === 'review' ? '意味をたしかめよう' : '意味の合う宝箱をタップ！';
       }
-      updateChoices(state);
-      if (state.lastAnswer) {
-        const correctChoice = problem?.choices.find(choice => choice.choiceId === state.lastAnswer.correctChoiceId);
-        for (const button of choiceButtons) {
-          if (button.dataset.choiceId === state.lastAnswer.correctChoiceId) button.dataset.status = 'correct';
-          else if (button.dataset.choiceId === state.lastAnswer.choiceId) button.dataset.status = 'incorrect';
+      if (state.seq !== lastSeq) {
+        lastSeq = state.seq;
+        if (state.lastAnswer && answers.length < state.answered) showAnswer(state);
+      }
+      const canAnswer = active && !state.paused && state.phase === 'answering';
+      chests.forEach(({ node }) => { node.disabled = !canAnswer; });
+      next.hidden = !(state.mode === 'review' && state.phase === 'feedback');
+      next.disabled = !!state.paused;
+      if (state.result && review.hidden) {
+        review.hidden = false; reviewList.textContent = '';
+        for (const item of answers) {
+          const row = el('li', '', `${item.correct ? '✓' : '☆'} ${item.word} = ${item.meaning}`);
+          row.dataset.correct = String(item.correct); reviewList.append(row);
         }
-        feedback.textContent = state.lastAnswer.correct
-          ? state.mode === 'review' ? `せいかい！「${problem?.prompt ?? ''}」は「${correctChoice?.text ?? ''}」` : 'せいかい！'
-          : `こたえは「${correctChoice?.text ?? ''}」だよ`;
-      } else feedback.textContent = '';
-      next.hidden = state.phase !== 'feedback'; next.disabled = state.paused;
-      pause.hidden = !state.paused;
-      const total = state.totalQuestions ?? 10;
-      position.textContent = `${state.mode === 'review' ? '復習 ' : ''}${Math.min(total, state.answered + (state.phase === 'answering' ? 1 : 0))} / ${total}`;
-      score.textContent = `せいかい ${state.correct}`;
-      controls.hidden = !!state.result; result.hidden = !state.result;
-      play.style.display = state.result ? 'flex' : '';
-      play.style.justifyContent = state.result ? 'center' : '';
-      if (state.result) {
-        resultTitle.textContent = `${total}もん おつかれさま！`;
-        resultCorrect.textContent = `${state.result.correct} / ${total}`;
-        resultIncorrect.textContent = String(state.result.incorrect);
-        resultAccuracy.textContent = `${Math.round(state.result.accuracy * 100)}%`;
-        comparison.update(state);
       }
-      companion.hidden = !companionState.selected;
-      caption.textContent = companionState.motion?.imageState === 'failed' ? '仲間といっしょに！' : 'ジャガイモスライム';
     },
-    stopInput() { active = false; hint.stopInput(); choiceButtons.forEach(button => { button.disabled = true; }); },
-    dispose() { this.stopInput(); hint.dispose(); removes.splice(0).forEach(remove => remove()); root?.remove(); root = null; },
+    present(play, dt, state) {
+      if (!active || !state) return;
+      frame.tick(dt);
+      const w = play.world || {};
+      // Chests stay where they were caught once the question is answered.
+      if (state.phase === 'answering' || !state.lastAnswer) {
+        const y = TOP_Y + (w.progress ?? 0) * (BOTTOM_Y - TOP_Y);
+        chests.forEach(({ node }) => { node.style.top = `${y}%`; node.dataset.arrived = String(!!w.arrived); });
+      }
+      hero.dataset.fever = String(!!w.fever);
+      const event = w.lastEvent;
+      if (event && event.id !== lastEventId) {
+        lastEventId = event.id;
+        if (event.type === 'hit') fx.pop(50, 70, event.special ? '金の宝箱！' : event.quick ? 'はやわざキャッチ！' : 'キャッチ！', event.special ? 'great' : 'good');
+        else if (event.type === 'boost') { fx.banner('おたからフィーバー！', 'great'); fx.flash('great'); }
+      }
+      // Review runs have no goal; only normal play shows the mission.
+      const mission = state.mode === 'review' ? null : w.challenge;
+      frame.hud.set({ points: play.learningPoints + play.bonus, comboCount: play.combo,
+        progressValue: (state.answered ?? 0) / (state.totalQuestions || 10),
+        progressLabel: `宝箱 ${w.correct ?? 0} · ${Math.min(state.totalQuestions || 10, (state.answered ?? 0) + (state.phase === 'answering' ? 1 : 0))}/${state.totalQuestions || 10}問`,
+        life: null, gaugeValue: play.gauge, fever: w.fever,
+        missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
+      if (state.phase === 'answering' && w.arrived && state.mode !== 'review') note.textContent = '宝箱が着いたよ。ゆっくり選ぼう';
+    },
+    stopInput() { active = false; chests.forEach(({ node }) => { node.disabled = true; }); next.disabled = true; },
+    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

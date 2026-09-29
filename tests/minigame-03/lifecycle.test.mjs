@@ -120,9 +120,9 @@ test('result, replay, late callback, and Core/Storage isolation hold through Hos
   }
   assert.deepEqual(host.inspect().session.result, { answered: 10, correct: 10, incorrect: 0, accuracy: 1 });
   assert.equal(host.inspect().session.seq, 21);
-  const replay = d.find(node => node.dataset.action === 'replay'); click(replay);
+  // The shell owns the replay button; the Host entry is what it calls.
+  host.enter({ gameId: 'englishChoice' }); host.update(0);
   assert.notEqual(host.inspect().session.sessionId, first.sessionId); assert.equal(host.inspect().session.seq, 1);
-  click(replay); assert.equal(host.inspect().session.seq, 1);
   host.exit(); await drain(); assert.equal(writes, 0);
   assert.equal(JSON.stringify(gameState), beforeGame); assert.equal(JSON.stringify([...storage.data]), beforeStorage);
 });
