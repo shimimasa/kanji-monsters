@@ -21,7 +21,7 @@ const CSS = `
 #kanjiDefenseScreen .kd-body img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 3px #0005)}
 #kanjiDefenseScreen .kd-body .kd-fallback{display:grid;place-items:center;width:100%;height:100%;font-size:40px}
 #kanjiDefenseScreen .kd-monster[data-target=true] .kd-sign{border-color:#ff9f1c;box-shadow:0 4px 0 #b86a00,0 0 0 4px #ffe08a}
-#kanjiDefenseScreen .kd-monster[data-target=true]::before{content:'ねらい';position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:900;color:#fff;background:#ff9f1c;border-radius:99px;padding:2px 8px}
+#kanjiDefenseScreen .kd-monster[data-target=true]::before{content:'ねらい';position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:900;color:#fff;background:#ff9f1c;border-radius:99px;padding:2px 8px;white-space:nowrap}
 #kanjiDefenseScreen .kd-monster[data-danger=true] .kd-sign{animation:kd-pulse .8s ease-in-out infinite alternate}
 #kanjiDefenseScreen .kd-monster[data-hit=true]{animation:ya-nudge .35s ease-out}
 #kanjiDefenseScreen .kd-hint{position:absolute;top:-58px;left:50%;transform:translateX(-50%);padding:4px 10px;border-radius:10px;background:#1b3550;color:#fff;font-size:15px;font-weight:800;white-space:nowrap}
@@ -29,7 +29,8 @@ const CSS = `
 #kanjiDefenseScreen .kd-target strong{font-size:clamp(26px,4vw,34px);color:#fff;letter-spacing:.06em}
 #kanjiDefenseScreen .kd-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
 #kanjiDefenseScreen .kd-form input{min-width:0;height:60px;border:0;border-radius:14px;padding:0 14px;background:#fff;color:#16242c;font:inherit;font-size:clamp(24px,3.6vw,30px);font-weight:800;box-shadow:inset 0 -4px 0 #0002;-webkit-user-select:text;user-select:text}
-#kanjiDefenseScreen .kd-form input.ya-miss{animation:ya-nudge .35s ease-out;background:#ffe6b3}
+#kanjiDefenseScreen .kd-form input.ya-miss{animation:ya-nudge .35s ease-out}
+#kanjiDefenseScreen .kd-form input::placeholder{font-size:.62em;font-weight:700;color:#8aa0ad}
 #kanjiDefenseScreen .kd-form button{height:60px;border:0;border-radius:14px;padding:0 18px;background:#ffb627;color:#3a2400;font:inherit;font-size:20px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer}
 #kanjiDefenseScreen .kd-form button:disabled,#kanjiDefenseScreen .kd-form input:disabled{opacity:.55}
 #kanjiDefenseScreen .kd-words{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left}
@@ -43,6 +44,9 @@ const CSS = `
 
 const LANE_X = [20, 50, 80];
 const HERO = { x: 50, y: 90 };
+// Monsters enter on the road, below the HUD, so the kanji sign is readable from the start.
+const START_Y = 26;
+const laneY = progress => START_Y + progress * (100 - START_Y);
 
 export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSnapshot }) {
   let active = true, composing = false, lastAttemptSerial = 0, lastResolutionSerial = 0, lastBoosts = 0, moodMs = 0, hint = null;
@@ -113,7 +117,7 @@ export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSna
         });
         world.append(node); entry = { node }; enemyNodes.set(enemy.enemyId, entry);
       }
-      entry.node.style.top = `${enemy.progress * 100}%`;
+      entry.node.style.top = `${laneY(enemy.progress)}%`;
       setVar(entry.node, '--scale', String(.78 + enemy.progress * .35));
       entry.node.style.zIndex = String(3 + Math.round(enemy.progress * 10));
       entry.node.dataset.target = String(state.targetId === enemy.enemyId);
@@ -144,7 +148,7 @@ export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSna
     const resolution = state.lastResolution;
     if (resolution && resolution.serial !== lastResolutionSerial) {
       lastResolutionSerial = resolution.serial;
-      const x = LANE_X[resolution.lane], y = resolution.progress * 100;
+      const x = LANE_X[resolution.lane], y = laneY(resolution.progress);
       if (resolution.outcome === 'correct') {
         fx.beam(HERO.x, HERO.y, x, y - 6, 'good'); fx.burst(x, y - 6, 'good', 1.3);
         fx.pop(x, y - 16, `${resolution.prompt}＝${resolution.reading}`, 'good');
