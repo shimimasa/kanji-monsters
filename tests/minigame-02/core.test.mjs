@@ -20,7 +20,7 @@ const clearAll = game => {
 };
 
 test('registry retains Sprint and Invader definitions when later entries are added', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally']);
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective']);
   for (const id of ['mathSprint', 'mathInvader']) {
     assert.equal(miniGameRegistry[id].id, id);
     assert.equal(typeof miniGameRegistry[id].create, 'function');

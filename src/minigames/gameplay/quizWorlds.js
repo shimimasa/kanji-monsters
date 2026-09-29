@@ -12,6 +12,7 @@ const KINDS = Object.freeze({
   stars: { travel: [12000, 18000], label: '星座', unit: 'つ', verb: '完成', skill: '星のきらめき', special: '流れ星' },
   bridge: { travel: [9000, 14000], label: '橋', unit: '本', verb: 'かけた', skill: '虹のかけ橋', special: '虹の橋' },
   photo: { travel: [6000, 9500], label: '写真', unit: 'まい', verb: '撮った', skill: 'シャッターチャンス', special: 'ベストショット' },
+  case: { travel: [14000, 20000], label: '事件', unit: '件', verb: '解決', skill: 'ひらめき', special: '名推理' },
 });
 
 // Two correct answers in a row charge the companion's course; the next correct
@@ -28,7 +29,8 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let bonus = 0, correct = 0, answered = 0, quick = 0, streak = 0, feverLeft = 0, charged = false, special = 0;
   let lastEvent = null, eventSerial = 0, completed = false;
   // Photo rally: each correct shot keeps a photo whose stars follow how early it was taken.
-  const photos = [];
+  // Proverb detective: every solved case is filed; first-try, pre-hint solves earn the most stars.
+  const photos = [], cases = [];
   const mark = (type, extra = {}) => { lastEvent = Object.freeze({ id: ++eventSerial, type, ...extra }); };
   const progress = () => clamp(elapsed / travelMs, 0, 1);
   return {
@@ -46,6 +48,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
       const early = 1 - progress();
       if (!success) {
         streak = 0; charged = false;
+        if (kind === 'case' && payload?.caseId) cases.push(Object.freeze({ caseId: payload.caseId, stars: 1 }));
         // Partly right choices (e.g. some of the stars) still light up a little.
         const partial = clamp(Number(payload?.score) || 0, 0, 1);
         if (partial > 0) bonus += Math.round(partial * 15);
@@ -65,6 +68,10 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         stars = early >= .6 ? 3 : early >= .25 ? 2 : 1;
         photos.push(Object.freeze({ monsterId: payload.monsterId, stars }));
       }
+      if (kind === 'case' && payload?.caseId) {
+        stars = early >= .5 ? 3 : 2;
+        cases.push(Object.freeze({ caseId: payload.caseId, stars }));
+      }
       mark('hit', { points, quick: early >= .5, special: used, stars });
     },
     boost() { feverLeft = 3; mark('boost'); },
@@ -74,10 +81,12 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
       return { kind, bonus, progress: p, arrived: p >= 1, travelMs, pace: slow ? 'slow' : 'normal', review,
         correct, answered, quick, streak, fever: feverLeft > 0, feverLeft, charged, special, lastEvent, completed,
         photos: [...photos], bestShots: photos.filter(photo => photo.stars === 3).length,
+        cases: [...cases], brilliant: cases.filter(item => item.stars === 3).length,
         metric: `${spec.label} ${correct}`,
         caption: feverLeft ? `${spec.skill}！ あと${feverLeft}回` : charged ? `次の正解で${spec.special}！` : '',
         // Never lead with a zero: a run without hits still reads as time played together.
-        summary: correct ? `${spec.label}を${correct}${spec.unit}${spec.verb}${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
+        summary: kind === 'case' && cases.length ? `事件を${cases.length}件解決${cases.some(item => item.stars === 3) ? ` · 名推理 ${cases.filter(item => item.stars === 3).length}回` : ''}`
+          : correct ? `${spec.label}を${correct}${spec.unit}${spec.verb}${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
           : `相棒といっしょに、さいごまで${answered}問あそんだ`,
         goal: 'はやく答えるほど、得点がのびる' };
     },
@@ -90,3 +99,4 @@ export const createCartWorld = (effects, options) => createQuizWorld('cart', eff
 export const createStarWorld = (effects, options) => createQuizWorld('stars', effects, options);
 export const createBridgeRunWorld = (effects, options) => createQuizWorld('bridge', effects, options);
 export const createPhotoWorld = (effects, options) => createQuizWorld('photo', effects, options);
+export const createCaseWorld = (effects, options) => createQuizWorld('case', effects, options);

@@ -15,6 +15,8 @@ import { createAsyncChoiceView } from './asyncChoice/asyncChoiceView.js';
 import { createKanjiDefenseGame } from './kanjiDefense/kanjiDefenseGame.js';
 import { createKanjiDefenseView } from './kanjiDefense/kanjiDefenseView.js';
 import { createPhotoRallyGame } from './photoRally/photoRallyGame.js';
+import { createProverbDetectiveGame } from './proverbDetective/proverbDetectiveGame.js';
+import { createProverbDetectiveView } from './proverbDetective/proverbDetectiveView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById } from '../loaders/dataLoader.js';
@@ -61,4 +63,6 @@ export const miniGameRegistry = Object.freeze({
     create: createKanjiDefenseGame, createView: createKanjiDefenseView }),
   photoRally: Object.freeze({ id: 'photoRally', title: 'ゴトモン写真ラリー',
     create: context => createPhotoRallyGame({ ...context, content: photoRallyContent(context) }), createView: createPhotoRallyView }),
+  proverbDetective: Object.freeze({ id: 'proverbDetective', title: 'ことわざ探偵',
+    create: createProverbDetectiveGame, createView: createProverbDetectiveView }),
 });

@@ -50,6 +50,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '5まい連続で撮る', deadline: 99, target: 5,
       rule: '正しい読みを続けて、写真を5まい続けて撮ろう。', hint: 'まちがえても、次からまたつなげられる。', value: data => data.maxCombo },
   ],
+  proverbDetective: [
+    { id: 'brilliant', name: '名推理を3回', deadline: 99, target: 3,
+      rule: '虫めがねのヒントが出る前に、1回で正しいことわざを当てよう。', hint: '話の中で、いちばん大事なことは何か考えよう。', value: data => data.world.brilliant || 0 },
+    { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
+      rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
+  ],
   kanjiDefense: [
     { id: 'chain', name: '4回連続で読みを正解', deadline: 99, target: 4,
       rule: '読みを4回続けて正解しよう。', hint: '落ち着いて読むことが旅路を守る。', value: data => data.maxCombo },

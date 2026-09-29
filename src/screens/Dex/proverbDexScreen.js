@@ -19,7 +19,21 @@
 import { publish } from '../../core/eventBus.js';
 import { gameState } from '../../core/gameState.js';
 import { loadProverbs } from '../../loaders/dataLoader.js';
-import { toDisplayReading } from '../../utils/romaji.js';
+import { toDisplayReading, romajiToKana } from '../../utils/romaji.js';
+import { PROVERB_CASES } from '../../minigames/proverbDetective/proverbCases.js';
+import { gotomonService } from '../../minigames/gotomonService.js';
+
+// Readings checked by hand for the proverb detective cases.
+const CHECKED_READINGS = new Map(PROVERB_CASES.map(item => [item.id, item.reading]));
+// Romaji spells the particles は/を/へ as they sound (wa/wo/he); write them as particles.
+const PARTICLES = { wa: 'は', wo: 'を', he: 'へ' };
+function proverbReading(p) {
+  if (CHECKED_READINGS.has(p.id)) return CHECKED_READINGS.get(p.id);
+  const raw = String(p.reading || '');
+  if (!/[a-z]/i.test(raw)) return toDisplayReading(raw);
+  const kana = raw.trim().split(/\s+/).map(token => PARTICLES[token.toLowerCase()] ?? romajiToKana(token));
+  return kana.every(Boolean) ? kana.join('') : toDisplayReading(raw);
+}
 
 /** 出す範囲。既定は小学生 */
 const LEVELS = [
@@ -62,6 +76,7 @@ const proverbDexScreen = {
     // データは開いた時に初めて取りに行く
     loadProverbs().then(list => {
       this.proverbs = Array.isArray(list) ? list : [];
+      try { this.caseFiles = gotomonService.getCaseFiles(); } catch { this.caseFiles = {}; }
       this._renderList();
     });
 
@@ -243,7 +258,7 @@ const proverbDexScreen = {
     // データの reading は 400件中388件がローマ字で入っている。
     // 漢字が読めない子に読み方を渡すのが役目なのに、ローマ字では役に立たない
     // （ローマ字を習うのは3年生）。ひらがなに直してから出す。
-    const readingText = toDisplayReading(p.reading);
+    const readingText = proverbReading(p);
     const reading = document.createElement('div');
     reading.textContent = readingText || '';
     Object.assign(reading.style, { fontSize: '15px', opacity: '0.9' });
@@ -259,6 +274,14 @@ const proverbDexScreen = {
     card.appendChild(reading);
     card.appendChild(text);
     card.appendChild(meaning);
+    // Solved in the proverb detective mini-game: a small badge with the best stars.
+    const solved = this.caseFiles?.[String(p.id)];
+    if (solved) {
+      const badge = document.createElement('div');
+      badge.textContent = `🔍 解決 ${'★'.repeat(solved.stars)}${'☆'.repeat(3 - solved.stars)}`;
+      Object.assign(badge.style, { marginTop: '6px', fontSize: '13px', fontWeight: 'bold', color: '#ffe066' });
+      card.appendChild(badge);
+    }
 
     if (p.example_sentence) {
       const example = document.createElement('div');

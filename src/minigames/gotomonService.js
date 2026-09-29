@@ -52,6 +52,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
       return [...new Set(['hokkaido_area1', ...(Array.isArray(cleared) ? cleared.filter(id => typeof id === 'string') : [])])];
     },
     getAlbum: () => getProgress().album ?? {},
+    getCaseFiles: () => getProgress().caseFiles ?? {},
     beginPlay({ sessionId, gameId, gotomonId }) {
       if (!sessionId || !gameId || !getOwnedGotomon().some(friend => friend.id === gotomonId)) return null;
       activeTicket = Object.freeze({ sessionId });
@@ -67,7 +68,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
       });
     },
     awardGotomonPlayResult({ owner, sessionId, gameId, gotomonId, score, correct, maxCombo,
-      ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished, photos = null }) {
+      ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished, photos = null, cases = null }) {
       if (!owner || owner !== read()?.owner || !sessionId || !gameId) return { ok: false };
       const run = ticket && tickets.get(ticket);
       if (ticket && (!run || ticket !== activeTicket || ticket.sessionId !== sessionId || run.owner !== owner ||
@@ -112,12 +113,26 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
               firstAt: entry?.firstAt ?? Math.max(0, Math.floor(now())) };
           }
         }
+        // Case files keep each solved proverb's best stars (proverb detective only).
+        const newCases = [];
+        if (run && completed && gameId === 'proverbDetective' && Array.isArray(cases)) {
+          const files = progress.caseFiles ??= {};
+          for (const item of cases.slice(0, 10)) {
+            const key = String(item?.caseId ?? '');
+            if (!/^\d+$/.test(key) || !Number.isFinite(Number(item?.stars))) continue;
+            const stars = Math.min(3, Math.max(1, Math.floor(Number(item.stars))));
+            const entry = files[key];
+            if (!entry) newCases.push(key);
+            files[key] = { stars: Math.max(count(entry?.stars), stars), solves: count(entry?.solves) + 1,
+              firstAt: entry?.firstAt ?? Math.max(0, Math.floor(now())) };
+          }
+        }
         const memory = run && completed ? recordCompanionMemory(friend, { gameId, score: points,
           finished: !!memoryFinished, at: Math.max(0, Math.floor(now())) }) : null;
         reward = { earned, friendship: friend.friendship, plays: friend.plays,
           newBest: points > previousBest, bestScore: game.bestScore, medals: [...friend.medals],
           before, after, earnedXP: after.xp - before.xp, levelUp: after.level > before.level, rank,
-          memory, newPhotos,
+          memory, newPhotos, newCases,
           bestTimeMs:game.bestTimeMs??null,previousTimeMs:previousTime,newTimeBest:validTime&&(!previousTime||roundedTime<previousTime) };
       });
       if (outcome.ok && run) run.receipt = reward;

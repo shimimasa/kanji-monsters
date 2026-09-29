@@ -74,6 +74,7 @@
 .yt-album-card[data-taken=false]{background:#eef1ec;color:#6b7a70}.yt-album-unknown{display:grid;place-items:center;width:84px;height:84px;border-radius:50%;background:#d7ddd5;font-size:38px;font-weight:900;color:#9aa69c}
 .yt-album-stars{color:#e0a800;letter-spacing:1px}.yt-album-more{width:100%;text-align:left;font-size:13px}.yt-album-more summary{cursor:pointer;font-weight:700;text-align:center}.yt-album-trivia{color:#4a5e52}
 .yt-album-summary{font-weight:800;margin:8px 0}
+.yt-card-art[data-scene=case]{background:radial-gradient(ellipse 30% 26% at 50% 56%,#fffdf6 60%,transparent 62%),linear-gradient(#241a33,#3b2a5e 70%,#3b2a22 70%)}
 .yt-hub .yt-card-icon{margin:0;font-size:clamp(40px,6vw,58px);color:#fff;text-shadow:0 4px 0 #0003;z-index:1}
 .yt-card-art[data-scene=race] .yt-card-icon,.yt-card-art[data-scene=defend] .yt-card-icon{color:var(--accent);text-shadow:0 3px 0 #fff8}
 .yt-card-badge{position:absolute;top:8px;left:8px;z-index:1;padding:3px 9px;border-radius:99px;background:#ffcf3d;color:#4a2c00;font-size:12px;font-weight:900;letter-spacing:.06em;box-shadow:0 2px 0 #0003}
