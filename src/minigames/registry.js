@@ -23,6 +23,9 @@ import { readingPool } from './photoRally/photoRallyContent.js';
 import { createBingoGame } from './kanjiBingo/bingoGame.js';
 import { createBingoView } from './kanjiBingo/bingoView.js';
 import { buildBingoCard } from './kanjiBingo/bingoContent.js';
+import { createMemoryGame } from './kanjiMemory/memoryGame.js';
+import { createMemoryView } from './kanjiMemory/memoryView.js';
+import { buildMemoryRounds } from './kanjiMemory/memoryContent.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById } from '../loaders/dataLoader.js';
@@ -48,6 +51,14 @@ const bingoContent = ({ random, stageId, focusKanjiIds }) => {
   if (!stage) return null;
   return { stage: { stageId: stage.stageId, name: stage.name, grade: stage.grade },
     card: buildBingoCard({ random, focusKanjiIds, stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean),
+      gradeKanji: getKanjiByGrade(stage.grade) || [] }) };
+};
+// The memory cards come from the chosen stage's kanji too.
+const memoryContent = ({ random, stageId, focusKanjiIds }) => {
+  const stage = stageData.find(item => item.stageId === stageId) ?? stageData.find(item => item.stageId === 'hokkaido_area1');
+  if (!stage) return null;
+  return { stage: { stageId: stage.stageId, name: stage.name, grade: stage.grade },
+    rounds: buildMemoryRounds({ random, focusKanjiIds, stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean),
       gradeKanji: getKanjiByGrade(stage.grade) || [] }) };
 };
 const photoRallyContent = ({ sessionId, random, stageId, focusKanjiIds }) => {
@@ -96,4 +107,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createTripGame({ ...context, content: tripContent(context) }), createView: createTripView }),
   kanjiBingo: Object.freeze({ id: 'kanjiBingo', title: '漢字ビンゴ',
     create: context => createBingoGame({ ...context, content: bingoContent(context) }), createView: createBingoView }),
+  kanjiMemory: Object.freeze({ id: 'kanjiMemory', title: '漢字カードめくり',
+    create: context => createMemoryGame({ ...context, content: memoryContent(context) }), createView: createMemoryView }),
 });

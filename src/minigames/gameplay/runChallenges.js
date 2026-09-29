@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  kanjiMemory: [
+    { id: 'sharp', name: 'すぐに見つけるペア8組', deadline: 99, target: 8,
+      rule: '一度見たカードの場所をおぼえて、まよわずペアにしよう。', hint: '読みのカードは、声に出さずに読んでおぼえよう。', value: data => data.correct },
+    { id: 'chain', name: '4組連続でそろえる', deadline: 99, target: 4,
+      rule: 'ペアを4組続けてそろえよう。', hint: '👀のぞき見は、カードがたくさん残っているときに使うと強い。', value: data => data.maxCombo },
+  ],
   kanjiBingo: [
     { id: 'lines', name: 'ビンゴを2列', deadline: 99, target: 2,
       rule: 'たて・よこ・ななめを2列そろえよう。', hint: '⭐スタンプは、リーチの列に使うとそろいやすい。', value: data => data.world.bingoLines || 0 },

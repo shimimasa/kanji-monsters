@@ -13,6 +13,7 @@ const KINDS = Object.freeze({
   bridge: { travel: [9000, 14000], label: '橋', unit: '本', verb: 'かけた', skill: '虹のかけ橋', special: '虹の橋' },
   photo: { travel: [6000, 9500], label: '写真', unit: 'まい', verb: '撮った', skill: 'シャッターチャンス', special: 'ベストショット' },
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
+  memory: { travel: [10000, 15000], label: 'ペア', unit: '組', verb: 'そろえた', skill: 'めくりの達人', special: 'ひらめき' },
   bingo: { travel: [8000, 12000], label: 'ビンゴ', unit: '問', verb: 'あてた', skill: 'ビンゴチャンス', special: 'ラッキー' },
   case: { travel: [14000, 20000], label: '事件', unit: '件', verb: '解決', skill: 'ひらめき', special: '名推理' },
 });
@@ -96,6 +97,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         caption: feverLeft ? `${spec.skill}！ あと${feverLeft}回` : charged ? `次の正解で${spec.special}！` : '',
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
+          : kind === 'memory' && answered ? `ペアを${answered}組そろえた${correct ? ` · すぐに見つけた ${correct}組` : ''}`
           : kind === 'bingo' ? (bingoLines ? `ビンゴ${bingoLines}列 · ${bingoMarked}マスあけた` : `${bingoMarked}マスあけた · ビンゴまであと少し`)
           : kind === 'case' && cases.length ? `事件を${cases.length}件解決${cases.some(item => item.stars === 3) ? ` · 名推理 ${cases.filter(item => item.stars === 3).length}回` : ''}`
           : correct ? `${spec.label}を${correct}${spec.unit}${spec.verb}${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
@@ -114,3 +116,4 @@ export const createPhotoWorld = (effects, options) => createQuizWorld('photo', e
 export const createCaseWorld = (effects, options) => createQuizWorld('case', effects, options);
 export const createTripWorld = (effects, options) => createQuizWorld('trip', effects, options);
 export const createBingoWorld = (effects, options) => createQuizWorld('bingo', effects, options);
+export const createMemoryWorld = (effects, options) => createQuizWorld('memory', effects, options);
