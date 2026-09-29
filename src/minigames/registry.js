@@ -34,6 +34,9 @@ import { buildSortPuzzles } from './kanjiSort/sortContent.js';
 import { createTossGame } from './gotomonToss/tossGame.js';
 import { createTossView } from './gotomonToss/tossView.js';
 import { buildTossProblems, TOSS_BASKETS } from './gotomonToss/tossContent.js';
+import { createFishGame } from './gotomonFishing/fishGame.js';
+import { createFishView } from './gotomonFishing/fishView.js';
+import { buildFishProblems, FISH_SWIMMERS } from './gotomonFishing/fishContent.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById } from '../loaders/dataLoader.js';
@@ -77,18 +80,22 @@ const sortContent = ({ random, stageId, focusKanjiIds }) => {
     puzzles: buildSortPuzzles({ random, focusKanjiIds, stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean),
       gradeKanji: getKanjiByGrade(stage.grade) || [] }) };
 };
-// The baskets are carried by the child's own Gotomon; a small collection borrows
-// Hokkaido's. The calculations are made for the run (たし算・ひき算 or かけ算).
-const tossContent = ({ sessionId, random, mathLevel }) => {
+// Gotomon who play along in the toss and the fishing: the child's own, with
+// Hokkaido's filling in for a small collection.
+const playfulGotomon = (random, count) => {
   let owned = [];
   try { owned = gotomonService.getOwnedGotomon().filter(item => item.imageUrl); } catch { owned = []; }
   const home = stageData.find(item => item.stageId === 'hokkaido_area1');
   const borrowed = (home?.enemyIdList || []).map(id => gotomonService.getGotomonById(id)).filter(item => item.imageUrl && !owned.some(own => own.id === item.id));
-  const carriers = [...owned, ...borrowed].slice(0, TOSS_BASKETS * 3);
-  for (let i = carriers.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [carriers[i], carriers[j]] = [carriers[j], carriers[i]]; }
-  return { level: mathLevel === 'times' ? 'times' : 'addsub', carriers: carriers.slice(0, TOSS_BASKETS).map(item => ({ id: item.id, name: item.name, imageUrl: item.imageUrl })),
-    problems: buildTossProblems({ sessionId, random, level: mathLevel }) };
+  const pool = [...owned, ...borrowed].slice(0, count * 3);
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  return pool.slice(0, count).map(item => ({ id: item.id, name: item.name, imageUrl: item.imageUrl }));
 };
+// The calculations are made for the run (たし算・ひき算 or かけ算).
+const tossContent = ({ sessionId, random, mathLevel }) => ({ level: mathLevel === 'times' ? 'times' : 'addsub',
+  carriers: playfulGotomon(random, TOSS_BASKETS), problems: buildTossProblems({ sessionId, random, level: mathLevel }) });
+// The words come from the English vocabulary of 宝箱キャッチ.
+const fishContent = ({ sessionId, random }) => ({ carriers: playfulGotomon(random, FISH_SWIMMERS), problems: buildFishProblems({ sessionId, random }) });
 // The shop's customers are the chosen stage's Gotomon; its kanji use the bingo card's checked clues.
 const shopContent = context => {
   const base = bingoContent(context);
@@ -152,4 +159,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createSortGame({ ...context, content: sortContent(context) }), createView: createSortView }),
   gotomonToss: Object.freeze({ id: 'gotomonToss', title: 'ゴトモン玉入れ',
     create: context => createTossGame({ ...context, content: tossContent(context) }), createView: createTossView }),
+  gotomonFishing: Object.freeze({ id: 'gotomonFishing', title: 'ゴトモンつり',
+    create: context => createFishGame({ ...context, content: fishContent(context) }), createView: createFishView }),
 });

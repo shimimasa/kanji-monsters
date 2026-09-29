@@ -13,6 +13,7 @@ const KINDS = Object.freeze({
   bridge: { travel: [9000, 14000], label: '橋', unit: '本', verb: 'かけた', skill: '虹のかけ橋', special: '虹の橋' },
   photo: { travel: [6000, 9500], label: '写真', unit: 'まい', verb: '撮った', skill: 'シャッターチャンス', special: 'ベストショット' },
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
+  fish: { travel: [7000, 11000], label: 'つり', unit: '匹', verb: 'つった', skill: '大漁フィーバー', special: '大物' },
   toss: { travel: [6000, 9500], label: '玉', unit: '球', verb: '入れた', skill: '玉入れフィーバー', special: 'ナイスシュート' },
   sort: { travel: [9000, 14000], label: 'パズル', unit: 'こ', verb: '完成', skill: 'ならべ名人', special: 'ぴったり' },
   shop: { travel: [9000, 14000], label: 'おねがい', unit: '人', verb: 'かなえた', skill: '大はんじょう', special: 'ごきげん' },
@@ -106,6 +107,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         caption: feverLeft ? `${spec.skill}！ あと${feverLeft}回` : charged ? `次の正解で${spec.special}！` : '',
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
+          : kind === 'fish' && correct ? `ゴトモンを${answered}匹つった · 1回でつれた ${correct}匹`
           : kind === 'toss' && correct ? `玉を${answered}球入れた · 1回で入った ${correct}球`
           : kind === 'sort' && sortSolved ? `パズルを${sortSolved}こ完成 · ⭐${sortStars}`
           : kind === 'shop' && shopServed ? `${shopServed}人のおねがいをかなえた · チップ⭐${shopTips}`
@@ -132,3 +134,4 @@ export const createMemoryWorld = (effects, options) => createQuizWorld('memory',
 export const createShopWorld = (effects, options) => createQuizWorld('shop', effects, options);
 export const createSortWorld = (effects, options) => createQuizWorld('sort', effects, options);
 export const createTossWorld = (effects, options) => createQuizWorld('toss', effects, options);
+export const createFishWorld = (effects, options) => createQuizWorld('fish', effects, options);

@@ -80,6 +80,28 @@ const Speech = {
     }
   },
 
+  /**
+   * 英単語を英語の声で読む（ゴトモンつり）。設定・使えない端末の扱いは speak と同じ。
+   * 英語の声が無い端末では、ブラウザの既定の声に lang だけ伝える。
+   * @param {string} text 英単語
+   */
+  speakEnglish(text) {
+    if (!text || !this.isSupported() || !this.isEnabled()) return;
+    try {
+      const synth = window.speechSynthesis;
+      synth.cancel();
+      const utter = new SpeechSynthesisUtterance(String(text));
+      utter.lang = 'en-US';
+      utter.rate = 0.8;
+      const voices = synth.getVoices() || [];
+      const voice = voices.find(v => v.lang === 'en-US') || voices.find(v => (v.lang || '').toLowerCase().startsWith('en'));
+      if (voice) utter.voice = voice;
+      synth.speak(utter);
+    } catch {
+      // 声が出せなくてもゲームは続く
+    }
+  },
+
   cancel() {
     if (!this.isSupported()) return;
     try { window.speechSynthesis.cancel(); } catch {}
