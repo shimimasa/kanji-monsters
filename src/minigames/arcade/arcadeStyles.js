@@ -43,7 +43,7 @@ export const ARCADE_CSS = `
 .ya-entry{display:flex;align-items:center;justify-content:center;gap:10px;min-height:64px;border-radius:14px;background:#fff;color:#16242c;font-size:clamp(30px,5vw,44px);font-weight:900;font-variant-numeric:tabular-nums;box-shadow:inset 0 -4px 0 #0002}
 .ya-entry[data-empty=true]::after{content:'';width:3px;height:1em;background:#16242c;animation:ya-caret 1s steps(1) infinite}
 .ya-entry[data-empty=true] span{color:#8aa0ad;font-size:.5em;font-weight:700}
-.ya-entry.ya-miss{animation:ya-nudge .35s ease-out;background:#ffe6b3}
+.ya-entry.ya-miss{animation:ya-nudge .35s ease-out}
 .ya-dock-note{margin:0;min-height:1.5em;text-align:center;font-size:15px;font-weight:700;color:#d8e8f0}
 .ya-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .ya-pad button{min-height:clamp(46px,7.2vh,62px);border:0;border-radius:12px;background:#f5f8fa;color:#16242c;font:inherit;font-size:clamp(22px,3.4vw,28px);font-weight:900;box-shadow:0 4px 0 #9fb3bf;cursor:pointer;touch-action:manipulation}
