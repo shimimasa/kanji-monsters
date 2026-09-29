@@ -49,10 +49,8 @@ test('all120 defense readings are accepted by actual Core, katakana and whitespa
     const enemy=game.snapshot().enemies[0];
     if(!seen.has(enemy.fixtureId)) {
       const item=defense.find(q=>q.fixtureId===enemy.fixtureId);assert.ok(item);
-      game.dispatch({type:'select',payload:{sessionId:'defense-120',enemyId:enemy.enemyId,problemId:enemy.problemId}});
-      const target=game.snapshot().selectedEnemy;
       const value=[...item.acceptedReadings[0]].map(c=>String.fromCodePoint(c.codePointAt(0)+0x60)).join(' ');
-      const command={type:'submit',payload:{sessionId:'defense-120',enemyId:target.enemyId,problemId:target.problemId,attemptId:target.attemptId,token:target.token,value:`　${value}　`}};
+      const command={type:'submit',payload:{sessionId:'defense-120',token:game.snapshot().inputToken,value:`　${value}　`}};
       assert.equal(game.dispatch(command),true,item.prompt);assert.equal(game.snapshot().correct,1,item.prompt);assert.equal(game.dispatch(command),false);
       seen.add(enemy.fixtureId);
     }
@@ -64,9 +62,8 @@ test('defense completes twelve new-bank encounters with default rules',()=> {
   const game=miniGameRegistry.kanjiDefense.create({sessionId:'finish-120',random:seeded(91)});game.enter();
   for(let i=0;i<12;i++) {
     if(!game.snapshot().enemies.length)game.update(game.snapshot().rules.emptySpawnDelayMs);
-    const enemy=game.snapshot().enemies[0];game.dispatch({type:'select',payload:{sessionId:'finish-120',enemyId:enemy.enemyId,problemId:enemy.problemId}});
-    const target=game.snapshot().selectedEnemy;
-    game.dispatch({type:'submit',payload:{sessionId:'finish-120',enemyId:target.enemyId,problemId:target.problemId,attemptId:target.attemptId,token:target.token,value:defense.find(q=>q.fixtureId===target.fixtureId).acceptedReadings[0]}});
+    const target=game.snapshot().targetEnemy;
+    game.dispatch({type:'submit',payload:{sessionId:'finish-120',token:game.snapshot().inputToken,value:defense.find(q=>q.fixtureId===target.fixtureId).acceptedReadings[0]}});
   }
   assert.ok(game.snapshot().result);assert.equal(game.snapshot().correct,12);game.exit();
 });

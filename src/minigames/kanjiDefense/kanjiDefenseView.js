@@ -1,210 +1,214 @@
+import { restartClass, toggleClass, setVar, createArcadeFrame } from '../arcade/arcadeKit.js';
+
 const CSS = `
-#kanjiDefenseScreen{position:fixed;inset:0;z-index:100010;overflow:auto;overscroll-behavior:contain;background:#10263c;color:#f8fbff;font:16px system-ui,sans-serif;padding:8px max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom));box-sizing:border-box;touch-action:manipulation}
-#kanjiDefenseScreen *{box-sizing:border-box}#kanjiDefenseScreen [hidden]{display:none!important}
-#kanjiDefenseScreen .kd-shell{width:min(920px,100%);margin:auto}#kanjiDefenseScreen header{display:flex;align-items:center;justify-content:space-between;gap:8px}#kanjiDefenseScreen h1{font-size:clamp(21px,5vw,32px);margin:2px 0;color:#fff3a6}
-#kanjiDefenseScreen button{min-width:44px;min-height:44px;border:2px solid #d7e6f5;border-radius:10px;background:#f8fbff;color:#10263c;font:inherit;font-weight:700;padding:7px 10px;cursor:pointer}#kanjiDefenseScreen button:disabled{opacity:.48;cursor:default}#kanjiDefenseScreen button:focus-visible,#kanjiDefenseScreen input:focus-visible{outline:4px solid #ffda44;outline-offset:2px}
-#kanjiDefenseScreen .kd-hud{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}.kd-stat{background:#203c55;border:1px solid #6f91ad;border-radius:8px;padding:5px;text-align:center;font-weight:800}.kd-stat small{display:block;font-size:11px;color:#c9dfef}.kd-silent{font-size:12px;text-align:right;color:#c9dfef;margin:0}
-#kanjiDefenseScreen .kd-pause{position:sticky;top:4px;z-index:9;background:#fff3a6;color:#332900;border:2px solid #7a6200;border-radius:8px;text-align:center;padding:6px;font-weight:900;margin:4px 0}
-#kanjiDefenseScreen .kd-main{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:8px}.kd-board{position:relative;display:grid;grid-template-columns:repeat(3,1fr);height:clamp(220px,42vh,380px);border:3px solid #8fb5cc;border-radius:14px;overflow:hidden;background:linear-gradient(#88c7ec 0%,#d8f1d0 72%,#76583d 73%,#3c2b20 100%)}.kd-board::after{content:'防衛ライン';position:absolute;left:0;right:0;bottom:5%;border-top:4px dashed #fff3a6;color:#fff3a6;text-align:center;font-size:12px;font-weight:900;pointer-events:none}
-#kanjiDefenseScreen .kd-lane{position:relative;border-right:2px dashed rgba(255,255,255,.55);min-width:0}.kd-lane:last-child{border-right:0}.kd-lane-label{position:absolute;z-index:1;top:3px;left:50%;transform:translateX(-50%);background:#10263ccc;border-radius:99px;padding:2px 8px;font-size:12px;pointer-events:none}
-#kanjiDefenseScreen .kd-monster{position:absolute;left:5%;width:90%;min-width:0;transform:translateY(-50%);padding:4px 3px;background:#fff9e9e8;box-shadow:0 4px 10px #0005;transition:top 90ms linear}.kd-monster[aria-pressed=true]{border:4px solid #ffb300;background:#fff!important}.kd-marker{display:block;font-size:11px;color:#6a3e00;min-height:15px}.kd-monster[aria-pressed=true] .kd-marker::before{content:'▶ 選択中 '}.kd-monster img{display:block;width:52px;height:42px;object-fit:contain;margin:auto}.kd-fallback{display:block;font-size:30px;line-height:42px}.kd-prompt{display:block;font-size:clamp(18px,4vw,27px);line-height:1.05}.kd-threat{display:block;font-size:12px;color:#30495e}.kd-threat[data-level=danger]{color:#9c1d16;font-weight:900}
-#kanjiDefenseScreen .kd-companion{text-align:center;margin:0;color:#dbeeff;align-self:end}.kd-companion canvas{display:block;width:140px;height:70px;max-width:100%;margin:auto}.kd-companion figcaption{font-size:11px}
-#kanjiDefenseScreen .kd-instruction{margin:6px 0;min-height:24px;font-weight:750}.kd-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;margin:6px 0}.kd-target{grid-column:1/-1;min-height:24px;font-weight:800;color:#fff3a6}.kd-controls input{width:100%;min-width:0;height:48px;border:3px solid #8fb5cc;border-radius:10px;background:#fff;color:#10263c;font:24px system-ui;padding:4px 10px}.kd-primary{background:#f0a000!important;color:#211600!important;border-color:#fff3a6!important}.kd-feedback{min-height:26px;margin:5px 0;padding:4px 8px;border-radius:7px;background:#203c55}.kd-result{background:#f8fbff;color:#10263c;border-radius:14px;padding:12px;text-align:center}.kd-result h2{margin:4px}.kd-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.kd-result strong{display:block;font-size:24px}.kd-word-columns{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left}.kd-word-columns section{background:#edf4f8;border-radius:8px;padding:7px}.kd-word-columns h3{margin:0 0 4px;font-size:15px}.kd-word-columns p{margin:0;line-height:1.5}
-@media(max-width:580px){#kanjiDefenseScreen .kd-main{grid-template-columns:1fr}.kd-companion{display:none}.kd-board{height:290px}.kd-hud{font-size:14px}.kd-stat{padding:4px 2px}.kd-monster img{width:44px;height:36px}.kd-prompt{font-size:20px}}
-@media(max-height:650px){#kanjiDefenseScreen{font-size:14px}.kd-board{height:190px}.kd-monster img{display:none}.kd-fallback{display:none}.kd-prompt{font-size:18px}.kd-hud{margin:2px 0}.kd-controls{margin:3px 0}.kd-feedback,.kd-instruction{margin:2px 0}.kd-companion{display:none}}
-@media(max-height:430px) and (min-width:581px){#kanjiDefenseScreen .kd-main{grid-template-columns:minmax(0,1fr) 90px}.kd-board{height:140px}.kd-companion canvas{width:90px;height:45px}.kd-result{padding:6px}.kd-word-columns{display:none}}
-@media(prefers-reduced-motion:reduce){#kanjiDefenseScreen .kd-monster{transition:none}}
+#kanjiDefenseScreen .ya-field{background:linear-gradient(#7cc4ea 0,#bfe6f5 16%,#9fd38a 17%,#7fc06a 60%,#6aa957 100%)}
+#kanjiDefenseScreen .kd-forest{position:absolute;left:0;right:0;top:9%;height:12%;background:radial-gradient(circle at 10% 100%,#2f7a47 0 40%,transparent 41%),radial-gradient(circle at 30% 100%,#3c8a52 0 46%,transparent 47%),radial-gradient(circle at 52% 100%,#2f7a47 0 42%,transparent 43%),radial-gradient(circle at 74% 100%,#3c8a52 0 48%,transparent 49%),radial-gradient(circle at 93% 100%,#2f7a47 0 40%,transparent 41%)}
+#kanjiDefenseScreen .kd-path{position:absolute;top:18%;bottom:0;width:22%;transform:translateX(-50%);background:linear-gradient(#d8c28a,#c9ae70);clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);opacity:.9}
+#kanjiDefenseScreen .kd-gate{position:absolute;left:0;right:0;bottom:0;height:14%;background:linear-gradient(#8a6a4a,#5c4330);border-top:5px solid #d9b67a;box-shadow:0 -4px 0 #0002}
+#kanjiDefenseScreen .kd-gate::before{content:'';position:absolute;left:0;right:0;top:-24px;height:18px;background:repeating-linear-gradient(90deg,#8a6a4a 0 26px,transparent 26px 40px)}
+#kanjiDefenseScreen .kd-guard{position:absolute;left:0;right:0;bottom:14%;height:6px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 4%}
+#kanjiDefenseScreen .kd-guard i{border-radius:6px;background:#fff3a6;box-shadow:0 0 12px #fff3a6;transition:opacity .3s}
+#kanjiDefenseScreen .kd-guard i.off{opacity:.2;box-shadow:none}
+#kanjiDefenseScreen .kd-hero{position:absolute;left:50%;bottom:2%;width:clamp(70px,10vw,104px);height:clamp(70px,10vw,104px);transform:translateX(-50%);z-index:5}
+#kanjiDefenseScreen .kd-hero .gt-portrait{display:block;width:100%;height:100%;background:none;border:0}
+#kanjiDefenseScreen .kd-hero .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 5px #0008)}
+#kanjiDefenseScreen .kd-hero[data-mood=cast] .gt-portrait{animation:iv-cast .3s ease-out}
+#kanjiDefenseScreen .kd-hero[data-fever=true]::after{content:'';position:absolute;inset:-20%;border-radius:50%;background:radial-gradient(circle,#fff38a88,transparent 70%);animation:ya-glow .5s infinite alternate}
+#kanjiDefenseScreen .kd-monster{position:absolute;z-index:3;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-78%) scale(var(--scale,1));transform-origin:50% 100%;padding:0;border:0;background:none;font:inherit;cursor:pointer;touch-action:manipulation;transition:top .12s linear}
+#kanjiDefenseScreen .kd-sign{position:relative;padding:4px 12px 5px;border-radius:10px;background:#fffdf3;color:#2a1c10;border:3px solid #8a6a4a;font-size:clamp(24px,3.6vw,36px);font-weight:900;line-height:1.1;box-shadow:0 4px 0 #5c4330;white-space:nowrap}
+#kanjiDefenseScreen .kd-sign::after{content:'';position:absolute;left:50%;bottom:-12px;width:4px;height:10px;margin-left:-2px;background:#8a6a4a}
+#kanjiDefenseScreen .kd-body{width:clamp(64px,9vw,96px);height:clamp(58px,8vw,86px);margin-top:8px;animation:kd-walk .7s ease-in-out infinite alternate}
+#kanjiDefenseScreen .kd-body img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 3px #0005)}
+#kanjiDefenseScreen .kd-body .kd-fallback{display:grid;place-items:center;width:100%;height:100%;font-size:40px}
+#kanjiDefenseScreen .kd-monster[data-target=true] .kd-sign{border-color:#ff9f1c;box-shadow:0 4px 0 #b86a00,0 0 0 4px #ffe08a}
+#kanjiDefenseScreen .kd-monster[data-target=true]::before{content:'ねらい';position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:900;color:#fff;background:#ff9f1c;border-radius:99px;padding:2px 8px;white-space:nowrap}
+#kanjiDefenseScreen .kd-monster[data-danger=true] .kd-sign{animation:kd-pulse .8s ease-in-out infinite alternate}
+#kanjiDefenseScreen .kd-monster[data-hit=true]{animation:ya-nudge .35s ease-out}
+#kanjiDefenseScreen .kd-hint{position:absolute;top:-58px;left:50%;transform:translateX(-50%);padding:4px 10px;border-radius:10px;background:#1b3550;color:#fff;font-size:15px;font-weight:800;white-space:nowrap}
+#kanjiDefenseScreen .kd-target{display:flex;align-items:center;justify-content:center;gap:10px;margin:0;min-height:44px;font-size:16px;color:#d8e8f0}
+#kanjiDefenseScreen .kd-target strong{font-size:clamp(26px,4vw,34px);color:#fff;letter-spacing:.06em}
+#kanjiDefenseScreen .kd-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+#kanjiDefenseScreen .kd-form input{min-width:0;height:60px;border:0;border-radius:14px;padding:0 14px;background:#fff;color:#16242c;font:inherit;font-size:clamp(24px,3.6vw,30px);font-weight:800;box-shadow:inset 0 -4px 0 #0002;-webkit-user-select:text;user-select:text}
+#kanjiDefenseScreen .kd-form input.ya-miss{animation:ya-nudge .35s ease-out}
+#kanjiDefenseScreen .kd-form input::placeholder{font-size:.62em;font-weight:700;color:#8aa0ad}
+#kanjiDefenseScreen .kd-form button{height:60px;border:0;border-radius:14px;padding:0 18px;background:#ffb627;color:#3a2400;font:inherit;font-size:20px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer}
+#kanjiDefenseScreen .kd-form button:disabled,#kanjiDefenseScreen .kd-form input:disabled{opacity:.55}
+#kanjiDefenseScreen .kd-words{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left}
+#kanjiDefenseScreen .kd-words section{background:#edf4f8;border-radius:10px;padding:8px}
+#kanjiDefenseScreen .kd-words h4{margin:0 0 4px;font-size:15px}#kanjiDefenseScreen .kd-words p{margin:0;line-height:1.6}
+@keyframes kd-walk{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-4px) rotate(3deg)}}
+@keyframes kd-pulse{from{box-shadow:0 4px 0 #5c4330}to{box-shadow:0 4px 0 #5c4330,0 0 0 5px #ffd16699}}
+@keyframes iv-cast{0%{transform:none}40%{transform:translateY(-10px) scale(1.08)}100%{transform:none}}
+@media (max-height:560px){#kanjiDefenseScreen .kd-form input,#kanjiDefenseScreen .kd-form button{height:48px}#kanjiDefenseScreen .kd-sign{font-size:22px}}
 `;
 
-export function createKanjiDefenseView({ document: doc, dispatch, onBack, onReplay, getSnapshot }) {
-  let active = true, composing = false, boundAttemptId = null, root = null;
-  const removes = [], enemyNodes = new Map();
-  const on = (target, type, handler) => {
-    target.addEventListener(type, handler);
-    removes.push(() => target.removeEventListener(type, handler));
-  };
-  const el = (tag, className = '', text = '') => {
-    const node = doc.createElement(tag);
-    node.className = className;
-    node.textContent = text;
-    return node;
-  };
-  const sendSelection = enemy => {
-    if (!active || !enemy) return false;
-    const accepted = dispatch({
-      type: 'select',
-      payload: { sessionId: getSnapshot().sessionId, enemyId: enemy.enemyId, problemId: enemy.problemId },
-    });
-    if (accepted) input.focus?.();
+const LANE_X = [20, 50, 80];
+const HERO = { x: 50, y: 90 };
+// Monsters enter on the road, below the HUD, so the kanji sign is readable from the start.
+const START_Y = 26;
+const laneY = progress => START_Y + progress * (100 - START_Y);
+
+export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSnapshot }) {
+  let active = true, composing = false, lastAttemptSerial = 0, lastResolutionSerial = 0, lastBoosts = 0, moodMs = 0, hint = null;
+  const removes = [];
+  const on = (target, type, handler) => { target.addEventListener(type, handler); removes.push(() => target.removeEventListener(type, handler)); };
+  const frame = createArcadeFrame(doc, { id: 'kanjiDefenseScreen', title: '漢字防衛隊', theme: 'meadow' });
+  const { root, world, dock, fx, el } = frame;
+  const style = el('style'); style.textContent = CSS; root.append(style);
+  on(frame.back, 'click', () => { if (active) onBack(); });
+  world.append(el('div', 'kd-forest'));
+  LANE_X.forEach((x, lane) => { const path = el('div', 'kd-path'); path.dataset.lane = String(lane); path.style.left = `${x}%`; world.append(path); });
+  const guard = el('div', 'kd-guard'); const lights = [0, 1, 2].map(() => { const node = el('i'); guard.append(node); return node; });
+  const hero = el('div', 'kd-hero');
+  world.append(el('div', 'kd-gate'), guard, hero);
+
+  const target = el('p', 'kd-target');
+  const form = el('div', 'kd-form');
+  const input = el('input'); input.type = 'text'; input.inputMode = 'text'; input.autocomplete = 'off'; input.maxLength = 16;
+  input.setAttribute('autocapitalize', 'off'); input.setAttribute('spellcheck', 'false');
+  input.setAttribute('aria-label', '漢字の読み（ひらがな）'); input.setAttribute('enterkeyhint', 'done'); input.placeholder = 'よみを ひらがなで';
+  const submit = el('button', '', 'こうげき'); submit.type = 'button'; submit.dataset.action = 'answer';
+  form.append(input, submit);
+  const note = el('p', 'ya-dock-note', '同じ読みのモンスターに、自動で命中するよ');
+  dock.append(target, form, note);
+  const review = el('div', 'ya-learning-result'); review.hidden = true;
+  const words = el('div', 'kd-words');
+  const strongBox = el('section'), weakBox = el('section');
+  const strongWords = el('p'), weakWords = el('p');
+  strongBox.append(el('h4', '', 'よめたことば'), strongWords); weakBox.append(el('h4', '', 'もう一度見たいことば'), weakWords);
+  words.append(strongBox, weakBox); review.append(words); frame.shell.append(review);
+  doc.body.append(root);
+
+  const send = () => {
+    const state = getSnapshot();
+    if (!active || composing || state.paused || state.phase !== 'playing') return false;
+    if (!input.value.trim()) { restartClass(input, 'ya-miss'); return false; }
+    const accepted = dispatch({ type: 'submit', payload: { sessionId: state.sessionId, token: state.inputToken, value: input.value } });
+    if (accepted) input.value = '';
     return accepted;
   };
-  const sendSubmit = () => {
-    const state = getSnapshot();
-    const enemy = state.selectedEnemy;
-    if (!active || composing || state.paused || state.phase !== 'playing' || !enemy) return false;
-    return dispatch({
-      type: 'submit',
-      payload: {
-        sessionId: state.sessionId,
-        enemyId: enemy.enemyId,
-        problemId: enemy.problemId,
-        attemptId: enemy.attemptId,
-        token: enemy.token,
-        value: input.value,
-      },
-    });
-  };
-
-  root = el('section');
-  root.id = 'kanjiDefenseScreen';
-  root.setAttribute('aria-label', '漢字防衛隊');
-  const style = el('style'); style.textContent = CSS; root.append(style);
-  const shell = el('div', 'kd-shell'); root.append(shell);
-  const header = el('header'); shell.append(header);
-  header.append(el('h1', '', '漢字防衛隊'));
-  const back = el('button', '', 'もどる'); back.type = 'button'; back.dataset.action = 'back'; header.append(back);
-  on(back, 'click', () => { if (active) onBack(); });
-
-  const hud = el('div', 'kd-hud'); shell.append(hud);
-  const makeStat = label => { const box = el('div', 'kd-stat'); box.append(el('small', '', label)); const value = el('span'); box.append(value); hud.append(box); return value; };
-  const life = makeStat('旅路ライフ'), combo = makeStat('コンボ'), score = makeStat('スコア'), progress = makeStat('防衛');
-  const silent = el('p', 'kd-silent', '🔇 音なしで遊べます'); shell.append(silent);
-  const pause = el('p', 'kd-pause', '一時停止中'); pause.hidden = true; shell.append(pause);
-
-  const main = el('div', 'kd-main'), board = el('div', 'kd-board'); board.dataset.role = 'defense-board';
-  const lanes = [0, 1, 2].map(index => {
-    const lane = el('div', 'kd-lane'); lane.dataset.lane = String(index); lane.append(el('span', 'kd-lane-label', `${index + 1}番`)); board.append(lane); return lane;
-  });
-  main.append(board);
-  const companion = el('figure', 'kd-companion'), canvas = el('canvas'); canvas.width = 280; canvas.height = 140;
-  canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', '旅の仲間');
-  const caption = el('figcaption', '', '旅の仲間'); companion.append(canvas, caption); main.append(companion); shell.append(main);
-  const instruction = el('p', 'kd-instruction', 'せまるMonsterを選び、漢字の読みを入力しよう。'); instruction.setAttribute('aria-live', 'polite'); shell.append(instruction);
-  const controls = el('div', 'kd-controls'), target = el('div', 'kd-target', 'Monsterを選んでね'); controls.append(target);
-  const input = el('input'); input.type = 'text'; input.inputMode = 'text'; input.autocomplete = 'off'; input.maxLength = 16;
-  input.setAttribute('aria-label', '選んだ漢字の読み'); input.setAttribute('enterkeyhint', 'done'); controls.append(input);
-  const submit = el('button', 'kd-primary', 'よみで攻撃'); submit.type = 'button'; submit.dataset.action = 'answer'; controls.append(submit); shell.append(controls);
-  const feedback = el('p', 'kd-feedback'); feedback.setAttribute('aria-live', 'polite'); shell.append(feedback);
   on(input, 'compositionstart', () => { composing = true; });
   on(input, 'compositionend', () => { composing = false; });
   on(input, 'keydown', event => {
-    if (event.key !== 'Enter' || event.repeat || event.isComposing || composing || event.ctrlKey || event.altKey || event.metaKey) return;
-    event.preventDefault?.();
-    sendSubmit();
+    if (event.key !== 'Enter' || event.repeat || event.isComposing || composing || event.keyCode === 229) return;
+    event.preventDefault?.(); send();
   });
-  on(submit, 'click', sendSubmit);
-  on(doc, 'keydown', event => {
-    if (!active || event.target === input || event.repeat || event.isComposing || event.ctrlKey || event.altKey || event.metaKey) return;
-    if (!['1', '2', '3'].includes(event.key)) return;
-    const state = getSnapshot();
-    const enemy = state.enemies.find(candidate => candidate.lane === Number(event.key) - 1);
-    if (enemy && !state.paused) {
-      event.preventDefault?.();
-      sendSelection(enemy);
-    }
-  });
+  on(submit, 'click', send);
 
-  const result = el('section', 'kd-result'); result.hidden = true; result.setAttribute('aria-label', '防衛結果'); shell.append(result);
-  const resultTitle = el('h2'), resultGrid = el('div', 'kd-result-grid'); result.append(resultTitle, resultGrid);
-  const resultValues = {};
-  for (const [key, label] of [['score', 'スコア'], ['correct', '撃退'], ['maxCombo', '最大コンボ']]) {
-    const box = el('div'); box.append(el('small', '', label)); const value = el('strong'); box.append(value); resultGrid.append(box); resultValues[key] = value;
-  }
-  const words = el('div', 'kd-word-columns');
-  const strongBox = el('section'), weakBox = el('section'); strongBox.append(el('h3', '', '強かったことば')); weakBox.append(el('h3', '', 'もう一度見たいことば'));
-  const strongWords = el('p'), weakWords = el('p'); strongBox.append(strongWords); weakBox.append(weakWords); words.append(strongBox, weakBox); result.append(words);
-  const replay = el('button', 'kd-primary', 'もう一度守る'); replay.type = 'button'; replay.dataset.action = 'replay'; result.append(replay);
-  on(replay, 'click', () => { if (active && !getSnapshot().paused) onReplay(); });
-  doc.body.append(root);
-
-  const createEnemyNode = enemy => {
-    const node = el('button', 'kd-monster'); node.type = 'button'; node.dataset.enemyId = enemy.enemyId;
-    const marker = el('span', 'kd-marker'), image = el('img'), fallback = el('span', 'kd-fallback', '👾'); fallback.hidden = true;
-    image.src = enemy.imageUrl; image.alt = ''; image.setAttribute('aria-hidden', 'true');
-    const prompt = el('strong', 'kd-prompt'), threat = el('span', 'kd-threat'); node.append(marker, image, fallback, prompt, threat);
-    on(image, 'error', () => { image.hidden = true; fallback.hidden = false; });
-    on(node, 'click', () => {
-      const current = getSnapshot().enemies.find(candidate => candidate.enemyId === enemy.enemyId && candidate.problemId === enemy.problemId);
-      if (current && !getSnapshot().paused) sendSelection(current);
-    });
-    lanes[enemy.lane].append(node);
-    return { node, marker, image, fallback, prompt, threat, lane: enemy.lane };
-  };
+  const enemyNodes = new Map();
   const syncEnemies = state => {
     const live = new Set(state.enemies.map(enemy => enemy.enemyId));
     for (const [id, entry] of enemyNodes) if (!live.has(id)) { entry.node.remove(); enemyNodes.delete(id); }
     for (const enemy of state.enemies) {
       let entry = enemyNodes.get(enemy.enemyId);
-      if (!entry) { entry = createEnemyNode(enemy); enemyNodes.set(enemy.enemyId, entry); }
-      entry.node.style.top = `${Math.round(enemy.progress * 100)}%`;
+      if (!entry) {
+        const node = el('button', 'kd-monster'); node.type = 'button'; node.dataset.enemyId = enemy.enemyId;
+        const sign = el('span', 'kd-sign', enemy.prompt), body = el('span', 'kd-body');
+        const image = el('img'); image.src = enemy.imageUrl; image.alt = ''; image.setAttribute('aria-hidden', 'true');
+        const fallback = el('span', 'kd-fallback', '👾'); fallback.hidden = true;
+        on(image, 'error', () => { image.hidden = true; fallback.hidden = false; });
+        body.append(image, fallback); node.append(sign, body);
+        node.style.left = `${LANE_X[enemy.lane]}%`;
+        on(node, 'click', () => {
+          const current = getSnapshot();
+          if (!active || current.paused) return;
+          dispatch({ type: 'select', payload: { sessionId: current.sessionId, enemyId: enemy.enemyId, problemId: enemy.problemId } });
+          input.focus?.();
+        });
+        world.append(node); entry = { node }; enemyNodes.set(enemy.enemyId, entry);
+      }
+      entry.node.style.top = `${laneY(enemy.progress)}%`;
+      setVar(entry.node, '--scale', String(.78 + enemy.progress * .35));
+      entry.node.style.zIndex = String(3 + Math.round(enemy.progress * 10));
+      entry.node.dataset.target = String(state.targetId === enemy.enemyId);
+      entry.node.dataset.danger = String(enemy.progress >= .7);
       entry.node.disabled = state.paused || state.phase !== 'playing';
-      entry.node.setAttribute('aria-pressed', String(state.selectedEnemyId === enemy.enemyId));
       entry.node.setAttribute('aria-label', `${enemy.lane + 1}番、${enemy.monsterName}、${enemy.prompt}、${enemy.threat}`);
-      entry.marker.textContent = state.selectedEnemyId === enemy.enemyId ? '選択中' : '';
-      entry.prompt.textContent = enemy.prompt;
-      entry.threat.textContent = enemy.threat;
-      entry.threat.dataset.level = enemy.threat === '危険' ? 'danger' : 'normal';
+    }
+  };
+  const showHint = (enemyId, text) => {
+    hint?.remove(); hint = null;
+    const entry = enemyNodes.get(enemyId);
+    if (!entry || !text) return;
+    hint = el('span', 'kd-hint', `ヒント：${text}`); entry.node.append(hint);
+  };
+  const reactToEvents = state => {
+    const attempt = state.lastAttempt;
+    if (attempt && attempt.serial !== lastAttemptSerial) {
+      lastAttemptSerial = attempt.serial;
+      if (!attempt.correct && attempt.retryAvailable) {
+        const entry = enemyNodes.get(attempt.enemyId);
+        if (entry) { entry.node.dataset.hit = 'false'; void entry.node.offsetWidth; entry.node.dataset.hit = 'true'; }
+        showHint(attempt.enemyId, attempt.hint);
+        restartClass(input, 'ya-miss');
+        note.textContent = `おしい！「${attempt.prompt}」のヒント：${attempt.hint}`;
+        frame.announce(`おしい。ヒント ${attempt.hint}`);
+      }
+    }
+    const resolution = state.lastResolution;
+    if (resolution && resolution.serial !== lastResolutionSerial) {
+      lastResolutionSerial = resolution.serial;
+      const x = LANE_X[resolution.lane], y = laneY(resolution.progress);
+      if (resolution.outcome === 'correct') {
+        fx.beam(HERO.x, HERO.y, x, y - 6, 'good'); fx.burst(x, y - 6, 'good', 1.3);
+        fx.pop(x, y - 16, `${resolution.prompt}＝${resolution.reading}`, 'good');
+        hero.dataset.mood = 'cast'; moodMs = 300;
+        note.textContent = state.combo >= 3 ? `${state.combo}連続撃退！` : `撃退！「${resolution.prompt}」は「${resolution.reading}」`;
+        frame.announce(`撃退。${resolution.prompt}、${resolution.reading}`);
+      } else if (resolution.outcome === 'attemptsExhausted') {
+        fx.pop(x, y - 16, `よみは「${resolution.reading}」`, 'info');
+        note.textContent = `「${resolution.prompt}」は「${resolution.reading}」と読むよ。覚えておこう！`;
+        frame.announce(`${resolution.prompt} は ${resolution.reading} と読みます`);
+      } else {
+        fx.pop(x, 80, `${resolution.prompt}＝${resolution.reading}`, 'info'); fx.flash('soft');
+        note.textContent = `門が守ったよ。「${resolution.prompt}」は「${resolution.reading}」`;
+        frame.announce(`門が守りました。${resolution.prompt} は ${resolution.reading}`);
+      }
+      hint?.remove(); hint = null;
     }
   };
 
   return {
     root,
-    canvas,
-    update(state, companionState) {
+    attachCompanion(portrait) { hero.append(portrait); },
+    focusPlay() { input.focus?.({ preventScroll: true }); },
+    update(state) {
       if (!active) return;
+      frame.setPaused(state.paused && !state.result);
       syncEnemies(state);
-      life.textContent = `${'♥'.repeat(state.life)}${'♡'.repeat(3 - state.life)}`;
-      combo.textContent = `${state.combo}連続`;
-      score.textContent = String(state.score);
-      progress.textContent = `${state.resolved}/${state.rules.totalEncounters}`;
-      pause.hidden = !state.paused;
-      board.setAttribute('aria-busy', String(state.paused));
-      if (state.selectedEnemy?.attemptId !== boundAttemptId) {
-        boundAttemptId = state.selectedEnemy?.attemptId ?? null;
-        input.value = '';
-      }
-      const canAnswer = state.phase === 'playing' && !state.paused && !!state.selectedEnemy;
-      input.disabled = !canAnswer;
-      submit.disabled = !canAnswer;
-      target.textContent = state.selectedEnemy
-        ? `選択：${state.selectedEnemy.monsterName}「${state.selectedEnemy.prompt}」`
-        : 'Monsterを選んでね（キーボードは1・2・3）';
-      if (state.result) instruction.textContent = state.result.outcome === 'defended' ? '旅路を守りきった！' : 'ここまで守ったことばを確認しよう。';
-      else if (state.act === 1) instruction.textContent = 'Monsterを選び、表示されたことばの読みを入力しよう。';
-      else instruction.textContent = `${state.waveLabel}：防衛ラインに近いMonsterから読もう。`;
-      if (state.lastAttempt && !state.lastAttempt.correct && state.lastAttempt.retryAvailable) feedback.textContent = `もう一度！ ヒント：${state.lastAttempt.hint}`;
-      else if (state.lastResolution?.outcome === 'correct') feedback.textContent = `${state.lastResolution.prompt}を撃退！`;
-      else if (state.lastResolution) feedback.textContent = `「${state.lastResolution.prompt}」の読みは「${state.lastResolution.reading}」`;
-      else feedback.textContent = '正しく読むと、ことばバリアを破れるよ。';
-      companion.hidden = !companionState?.selected;
-      caption.textContent = companionState?.motion?.imageState === 'failed' ? '仲間は画像なしでも応援中' : '旅の仲間';
-      board.hidden = !!state.result;
-      controls.hidden = !!state.result;
-      instruction.hidden = !!state.result;
-      feedback.hidden = !!state.result;
-      silent.hidden = !!state.result;
-      result.hidden = !state.result;
-      if (state.result) {
-        resultTitle.textContent = state.result.outcome === 'defended' ? '防衛成功！' : '防衛記録';
-        resultValues.score.textContent = String(state.result.score);
-        resultValues.correct.textContent = `${state.result.correct}/${state.result.resolved}`;
-        resultValues.maxCombo.textContent = String(state.result.maxCombo);
+      reactToEvents(state);
+      lights.forEach((node, index) => toggleClass(node, 'off', index >= state.life));
+      const aimed = state.targetEnemy;
+      target.textContent = '';
+      if (aimed) target.append(el('span', '', 'ねらい'), el('strong', '', aimed.prompt));
+      else target.append(el('span', '', state.result ? 'おつかれさま！' : 'モンスターを待っているよ'));
+      const canAnswer = state.phase === 'playing' && !state.paused;
+      input.disabled = !canAnswer; submit.disabled = !canAnswer;
+      if (state.result && review.hidden) {
+        review.hidden = false;
         strongWords.textContent = state.result.strongWords.join('・') || '次の挑戦で見つけよう';
-        weakWords.textContent = state.result.weakWords.join('・') || 'なし';
+        weakWords.textContent = state.result.wordsPracticed.filter(item => item.outcome !== 'correct' || item.wrongAttempts > 0)
+          .map(item => `${item.prompt}（${item.reading}）`).join('・') || 'なし';
       }
     },
-    stopInput() {
-      active = false;
-      composing = false;
-      input.disabled = true;
-      submit.disabled = true;
+    present(play, dt, state) {
+      if (!active) return;
+      frame.tick(dt);
+      moodMs = Math.max(0, moodMs - dt); if (!moodMs) hero.dataset.mood = '';
+      const w = play.world || {};
+      hero.dataset.fever = String(!!w.fever);
+      if (play.boosts !== lastBoosts) { if (play.boosts > lastBoosts) { fx.banner('相棒エール！', 'great'); fx.flash('great'); } lastBoosts = play.boosts; }
+      const total = state?.rules?.totalEncounters ?? 12, resolved = state?.resolved ?? 0;
+      const mission = w.challenge;
+      frame.hud.set({ points: (state?.score ?? play.learningPoints) + play.bonus, comboCount: play.combo,
+        progressValue: resolved / total, progressLabel: `撃退 ${state?.correct ?? 0} · のこり ${total - resolved}`,
+        life: state?.life ?? 3, maxLife: 3, lifeLabel: '門', gaugeValue: play.gauge, fever: w.fever,
+        missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
+    stopInput() { active = false; composing = false; input.disabled = true; submit.disabled = true; },
     dispose() {
-      this.stopInput();
-      removes.splice(0).forEach(remove => remove());
-      enemyNodes.clear();
-      root?.remove();
-      root = null;
+      this.stopInput(); removes.splice(0).forEach(remove => remove());
+      enemyNodes.clear(); frame.dispose();
     },
   };
 }

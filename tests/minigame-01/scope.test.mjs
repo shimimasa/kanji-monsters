@@ -20,7 +20,12 @@ test('all Motion source and battle remain exactly at adopted checkpoint; no runt
   assert.equal(git('diff',sha,'--name-only','--','public').trim(),'');
 });
 test('mini-game source has no scheduler, battle bridge, Storage writes or kanji mutations',()=>{
-  for(const p of MINI_GAME_ADDITIONS.filter(p=>p.startsWith('src/'))){
+  // The sprint input helper was removed with the arcade rebuild; the shared arcade kit replaces it.
+  const sources=[...MINI_GAME_ADDITIONS.filter(p=>p.startsWith('src/')&&fs.existsSync(p)),
+    'src/minigames/arcade/arcadeKit.js','src/minigames/arcade/arcadeStyles.js','src/minigames/gameplay/arcadeWorlds.js',
+    'src/minigames/mathInvader/mathInvaderGame.js','src/minigames/mathInvader/mathInvaderView.js',
+    'src/minigames/kanjiDefense/kanjiDefenseGame.js','src/minigames/kanjiDefense/kanjiDefenseView.js'];
+  for(const p of sources){
     const source=fs.readFileSync(p,'utf8');
     assert.doesNotMatch(source,/\b(?:requestAnimationFrame|setInterval|setTimeout)\s*\(/,p);
     assert.doesNotMatch(source,/battleMotionBridge|battleScreen|\b(?:localStorage|sessionStorage)\b|saveNow\s*\(|saveGameData\s*\(/,p);

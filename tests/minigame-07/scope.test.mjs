@@ -63,7 +63,9 @@ test('loading/failure emit no new LearningEvent and envelope source stays exact'
 
 test('production loader is local-only and source owns no scheduler, Storage, save, or global async manager', () => {
   for (const path of MINIGAME_07_ADDITIONS.filter(path => path.startsWith('src/'))) {
-    const source = read(path); assert.doesNotMatch(source, /fetch\s*\(|XMLHttpRequest|WebSocket|EventSource|Firebase|https?:\/\//, path);
+    // The SVG namespace URI names an XML vocabulary; it is never requested.
+    const source = read(path).replaceAll("'http://www.w3.org/2000/svg'", "'svg-namespace'");
+    assert.doesNotMatch(source, /fetch\s*\(|XMLHttpRequest|WebSocket|EventSource|Firebase|https?:\/\//, path);
     assert.doesNotMatch(source, /Date\.now|performance\.now|requestAnimationFrame|setInterval|setTimeout|Worker\s*\(/, path);
     assert.doesNotMatch(source, /localStorage|sessionStorage|saveNow\s*\(|saveGameData\s*\(|battleMotionBridge|battleScreen/, path);
     assert.doesNotMatch(source, /MiniGameResult|AsyncManager|CancellationRegistry/, path);

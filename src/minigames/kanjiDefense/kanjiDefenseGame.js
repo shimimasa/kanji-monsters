@@ -10,10 +10,11 @@ export const KANJI_DEFENSE_RULES = Object.freeze({
   act1SpawnMs: 3200,
   act2SpawnMs: 4700,
   act3SpawnMs: 3700,
-  act1SpeedPerMs: 0.000005,
-  act2SpeedPerMs: 0.000006,
-  act3SpeedPerMs: 0.000007,
-  selectedSpeedFactor: 0.35,
+  act1SpeedPerMs: 0.000027,
+  act2SpeedPerMs: 0.000031,
+  act3SpeedPerMs: 0.000036,
+  targetSpeedFactor: 0.6,
+  slowPaceFactor: 0.6,
   maxSimulationStepMs: 250,
   maxAttempts: 2,
 });
@@ -30,28 +31,33 @@ const freezeArray = values => Object.freeze(values.map(value => Object.freeze({ 
 function validateRules(rules) {
   const positive = ['totalEncounters', 'maxMonsters', 'startingLife', 'gateProgress', 'emptySpawnDelayMs',
     'act1SpawnMs', 'act2SpawnMs', 'act3SpawnMs', 'act1SpeedPerMs', 'act2SpeedPerMs', 'act3SpeedPerMs',
-    'maxSimulationStepMs', 'maxAttempts'];
+    'slowPaceFactor', 'maxSimulationStepMs', 'maxAttempts'];
   for (const key of positive) if (!Number.isFinite(rules[key]) || rules[key] <= 0) throw new TypeError(`invalid rule: ${key}`);
   if (rules.totalEncounters !== 12 || rules.maxMonsters !== 3 || rules.startingLife !== 3 ||
       rules.maxAttempts !== 2 || rules.spawnProgress < 0 || rules.gateProgress <= rules.spawnProgress ||
-      rules.selectedSpeedFactor < 0 || rules.selectedSpeedFactor > 1) throw new TypeError('invalid MVP rules');
+      rules.targetSpeedFactor <= 0 || rules.targetSpeedFactor > 1 || rules.slowPaceFactor > 1) throw new TypeError('invalid MVP rules');
 }
 
+// Monsters keep walking while play runs. A typed reading hits the Monster it
+// reads; a Monster reaching the gate reveals its reading and dims one guard
+// light. The route never breaks: all twelve encounters are always played.
 export function createKanjiDefenseGame({ sessionId, random = Math.random, onEvent = () => {},
-  content, monsters, rules: ruleOverrides = {} } = {}) {
+  content, monsters, pace = 'normal', rules: ruleOverrides = {} } = {}) {
   if (typeof sessionId !== 'string' || !sessionId) throw new TypeError('sessionId is required');
   const rules = Object.freeze({ ...KANJI_DEFENSE_RULES, ...ruleOverrides });
   validateRules(rules);
+  const paceFactor = pace === 'slow' ? rules.slowPaceFactor : 1;
   const encounters = buildKanjiDefenseSession({ random, content, monsters, count: rules.totalEncounters });
   let active = true, paused = false, notifying = false, observer = onEvent;
   let phase = 'ready', seq = 0, activeElapsedMs = 0, spawnElapsedMs = 0;
-  let encounterCursor = 0, monsterSerial = 0, attemptSerial = 0, projectileSerial = 0;
-  let enemies = [], projectiles = [], selectedEnemyId = null;
+  let encounterCursor = 0, monsterSerial = 0, inputSerial = 0, projectileSerial = 0;
+  let enemies = [], projectiles = [], explicitTargetId = null, inputToken = null;
   let life = rules.startingLife, correct = 0, incorrect = 0, resolved = 0, wrongAttempts = 0;
   let combo = 0, maxCombo = 0, score = 0, result = null, aborted = false, completeEmitted = false;
   let lastAttempt = null, lastResolution = null, practice = [];
 
-  const selectedEnemy = () => enemies.find(enemy => enemy.enemyId === selectedEnemyId) ?? null;
+  const frontmost = () => enemies.reduce((best, enemy) => !best || enemy.progress > best.progress ? enemy : best, null);
+  const target = () => enemies.find(enemy => enemy.enemyId === explicitTargetId) ?? frontmost();
   const nextEncounter = () => encounters[encounterCursor] ?? null;
   const threatLabel = progress => progress >= 0.7 ? '危険' : progress >= 0.48 ? '近い' : '接近中';
   const publicEnemy = enemy => Object.freeze({
@@ -70,8 +76,6 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
     region: enemy.monster.region,
     imageUrl: enemy.monster.imageUrl,
     wrongAttempts: enemy.wrongAttempts,
-    attemptId: enemy.attemptId,
-    token: enemy.token,
   });
   const makeResult = outcome => {
     const strongWords = practice.filter(item => item.outcome === 'correct' && item.wrongAttempts === 0)
@@ -96,14 +100,15 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
   };
   const snapshot = () => {
     const enemySnapshots = enemies.map(publicEnemy);
-    const target = enemySnapshots.find(enemy => enemy.enemyId === selectedEnemyId) ?? null;
+    const aimed = target();
     const currentAct = encounterCursor === 0 ? 1 : actFor(Math.min(encounterCursor, rules.totalEncounters));
     return Object.freeze({
-      gameId: 'kanjiDefense', mode: 'grade4GoldenMvp', sessionId, phase, paused, active, aborted,
+      gameId: 'kanjiDefense', mode: 'arcade', sessionId, phase, paused, active, aborted, pace: pace === 'slow' ? 'slow' : 'normal',
       seq, activeElapsedMs, act: currentAct, waveLabel: `第${currentAct}波`,
       life, correct, incorrect, resolved, wrongAttempts, combo, maxCombo, score,
       spawned: encounterCursor, remaining: rules.totalEncounters - encounterCursor,
-      selectedEnemyId, selectedEnemy: target,
+      inputToken, explicitTargetId, targetId: aimed?.enemyId ?? null,
+      targetEnemy: enemySnapshots.find(enemy => enemy.enemyId === aimed?.enemyId) ?? null,
       enemies: Object.freeze(enemySnapshots),
       projectiles: freezeArray(projectiles),
       lastAttempt, lastResolution, result,
@@ -128,11 +133,7 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
     } catch { /* Presentation observers cannot roll back committed learning state. */ }
     finally { notifying = false; }
   };
-  const issueAttempt = enemy => {
-    const attemptId = `${sessionId}:${enemy.enemyId}:attempt:${++attemptSerial}`;
-    enemy.attemptId = attemptId;
-    enemy.token = `${attemptId}:token`;
-  };
+  const renewInput = () => { inputToken = `${sessionId}:input:${++inputSerial}`; };
   const chooseLane = () => {
     const occupied = new Set(enemies.map(enemy => enemy.lane));
     const sample = Number(random());
@@ -161,8 +162,6 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
       content: encounter.content,
       monster: encounter.monster,
       wrongAttempts: 0,
-      attemptId: null,
-      token: null,
     };
     enemies.push(enemy);
     spawnElapsedMs = 0;
@@ -176,17 +175,8 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
     });
     return true;
   };
-  const finishIfReady = outcome => {
-    if (result) return;
-    if (life > 0 && resolved < rules.totalEncounters) return;
-    phase = 'completed';
-    selectedEnemyId = null;
-    result = makeResult(outcome);
-  };
   const commitTerminal = (enemy, { success, reason }) => {
-    enemy.attemptId = null;
-    enemy.token = null;
-    if (selectedEnemyId === enemy.enemyId) selectedEnemyId = null;
+    if (explicitTargetId === enemy.enemyId) explicitTargetId = null;
     enemies = enemies.filter(candidate => candidate !== enemy);
     resolved++;
     if (success) {
@@ -209,15 +199,22 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
       wrongAttempts: enemy.wrongAttempts,
     });
     practice = [...practice, record];
-    lastResolution = Object.freeze({ ...record, monsterName: enemy.monster.name, lane: enemy.lane });
+    lastResolution = Object.freeze({ ...record, monsterName: enemy.monster.name, lane: enemy.lane,
+      progress: enemy.progress, serial: resolved });
     if (success) {
       projectiles.push({
         projectileId: `${sessionId}:projectile:${++projectileSerial}`,
         lane: enemy.lane,
         targetProgress: enemy.progress,
-        remainingMs: 360,
-        durationMs: 360,
+        remainingMs: 300,
+        durationMs: 300,
       });
+    }
+    if (resolved === rules.totalEncounters) {
+      phase = 'completed';
+      explicitTargetId = null;
+      inputToken = null;
+      result = makeResult('defended');
     }
     return {
       type: success ? 'correct' : 'incorrect',
@@ -243,21 +240,15 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
   };
   const resolveTerminal = (enemy, resolution) => {
     if (!enemies.includes(enemy) || result) return false;
-    const events = [commitTerminal(enemy, resolution)];
-    if (life === 0) {
-      for (const remaining of [...enemies]) events.push(commitTerminal(remaining, { success: false, reason: 'routeBroken' }));
-      finishIfReady('routeBroken');
-    } else if (resolved === rules.totalEncounters) {
-      finishIfReady('defended');
-    }
-    for (const event of events) notify(event.type, event.problemId, event.payload);
+    const event = commitTerminal(enemy, resolution);
+    notify(event.type, event.problemId, event.payload);
     if (result) emitComplete();
     return true;
   };
   const maybeSpawn = () => {
     const encounter = nextEncounter();
     if (!encounter || phase !== 'playing') return false;
-    const needed = enemies.length === 0 ? rules.emptySpawnDelayMs : spawnDelayFor(encounter.encounterNumber, rules);
+    const needed = enemies.length === 0 ? rules.emptySpawnDelayMs : spawnDelayFor(encounter.encounterNumber, rules) / paceFactor;
     return spawnElapsedMs >= needed ? spawnOne() : false;
   };
 
@@ -265,6 +256,7 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
     enter() {
       if (!active || phase !== 'ready' || notifying) return false;
       phase = 'playing';
+      renewInput();
       spawnElapsedMs = rules.emptySpawnDelayMs;
       return spawnOne();
     },
@@ -278,8 +270,11 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
       spawnElapsedMs += dt;
       if (dt > 0 && enemies.length) {
         const step = Math.min(dt, rules.maxSimulationStepMs);
-        const factor = selectedEnemyId ? rules.selectedSpeedFactor : 1;
-        for (const enemy of enemies) enemy.progress = Math.min(rules.gateProgress, enemy.progress + step * speedFor(enemy.act, rules) * factor);
+        const aimed = target();
+        for (const enemy of enemies) {
+          const factor = (enemy === aimed ? rules.targetSpeedFactor : 1) * paceFactor;
+          enemy.progress = Math.min(rules.gateProgress, enemy.progress + step * speedFor(enemy.act, rules) * factor);
+        }
         while (active && phase === 'playing') {
           const escaped = enemies.find(enemy => enemy.progress >= rules.gateProgress);
           if (!escaped) break;
@@ -291,55 +286,47 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
     setPaused(value) {
       if (active) paused = !!value;
     },
+    // Optional: tapping a Monster aims at it (and slows only that Monster).
     select({ sessionId: sourceSession, enemyId, problemId } = {}) {
       if (!active || paused || notifying || phase !== 'playing' || sourceSession !== sessionId) return false;
       const enemy = enemies.find(candidate => candidate.enemyId === enemyId && candidate.problemId === problemId);
-      if (!enemy) return false;
-      if (selectedEnemyId === enemyId && enemy.attemptId && enemy.token) return false;
-      const previous = selectedEnemy();
-      if (previous) {
-        previous.attemptId = null;
-        previous.token = null;
-      }
-      selectedEnemyId = enemyId;
-      issueAttempt(enemy);
+      if (!enemy || explicitTargetId === enemyId) return false;
+      explicitTargetId = enemyId;
       return true;
     },
-    submit({ sessionId: sourceSession, enemyId, problemId, attemptId, token, value } = {}) {
-      if (!active || paused || notifying || phase !== 'playing' || sourceSession !== sessionId || selectedEnemyId !== enemyId) return false;
-      const enemy = selectedEnemy();
-      if (!enemy || enemy.problemId !== problemId || enemy.attemptId !== attemptId || enemy.token !== token) return false;
+    submit({ sessionId: sourceSession, token, value } = {}) {
+      if (!active || paused || notifying || phase !== 'playing' || sourceSession !== sessionId ||
+          !inputToken || token !== inputToken || !enemies.length) return false;
       const reading = normalizeKanjiDefenseReading(value);
       if (!reading) return false;
-
-      const committedAttempt = enemy.attemptId;
-      enemy.attemptId = null;
-      enemy.token = null;
-      const isCorrect = enemy.content.acceptedReadings.includes(reading);
-      if (isCorrect) {
-        lastAttempt = Object.freeze({ enemyId, problemId, attemptId: committedAttempt, value: reading, correct: true });
-        return resolveTerminal(enemy, { success: true, reason: 'defeated' });
+      renewInput(); // Consume before counters and before observer notification.
+      const aimed = target();
+      const matches = enemies.filter(enemy => enemy.content.acceptedReadings.includes(reading))
+        .sort((a, b) => b.progress - a.progress);
+      const hit = matches.includes(aimed) ? aimed : matches[0];
+      if (hit) {
+        lastAttempt = Object.freeze({ enemyId: hit.enemyId, problemId: hit.problemId, value: reading, correct: true, serial: inputSerial });
+        return resolveTerminal(hit, { success: true, reason: 'defeated' });
       }
 
-      enemy.wrongAttempts++;
+      aimed.wrongAttempts++;
       wrongAttempts++;
       combo = 0;
+      const retryAvailable = aimed.wrongAttempts < rules.maxAttempts;
       lastAttempt = Object.freeze({
-        enemyId,
-        problemId,
-        attemptId: committedAttempt,
+        enemyId: aimed.enemyId,
+        problemId: aimed.problemId,
+        prompt: aimed.content.prompt,
         value: reading,
         correct: false,
-        retryAvailable: enemy.wrongAttempts < rules.maxAttempts,
-        hint: enemy.wrongAttempts < rules.maxAttempts
-          ? `${enemy.content.acceptedReadings[0][0]}…（${[...enemy.content.acceptedReadings[0]].length}文字）`
+        serial: inputSerial,
+        retryAvailable,
+        hint: retryAvailable
+          ? `${aimed.content.acceptedReadings[0][0]}…（${[...aimed.content.acceptedReadings[0]].length}文字）`
           : null,
       });
-      if (enemy.wrongAttempts < rules.maxAttempts) {
-        issueAttempt(enemy);
-        return true;
-      }
-      return resolveTerminal(enemy, { success: false, reason: 'attemptsExhausted' });
+      if (retryAvailable) return true;
+      return resolveTerminal(aimed, { success: false, reason: 'attemptsExhausted' });
     },
     dispatch(command) {
       if (!command || typeof command !== 'object') return false;
@@ -352,11 +339,8 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
       if (!active) return;
       active = false;
       aborted = phase !== 'completed';
-      selectedEnemyId = null;
-      for (const enemy of enemies) {
-        enemy.attemptId = null;
-        enemy.token = null;
-      }
+      explicitTargetId = null;
+      inputToken = null;
       enemies = [];
       projectiles = [];
       observer = null;

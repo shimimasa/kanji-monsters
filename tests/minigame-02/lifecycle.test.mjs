@@ -34,6 +34,12 @@ function dom() {
     listeners: () => nodes.reduce((count, node) => count + [...node.listeners.values()].reduce((sum, set) => sum + set.size, 0), 0) };
 }
 const click = node => node.dispatchEvent(new Event('click'));
+// Answers go through the on-screen pad: digits, then the fire button.
+const fire = (d, value) => {
+  for (const digit of String(value)) click(d.find(node => node.dataset.digit === digit));
+  click(d.find(node => node.dataset.action === 'answer'));
+};
+const entry = d => d.find(node => node.className === 'ya-entry');
 
 test('one Host enters and exits Sprint then Invader without gameId-specific setup', () => {
   const d = dom(); let id = 0;
@@ -46,36 +52,43 @@ test('one Host enters and exits Sprint then Invader without gameId-specific setu
   assert.equal(d.listeners(), 0);
 });
 
-test('Invader Host supports select, answer, projectile-independent next enemy and Companion mapping', async () => {
+test('Invader Host answers through the pad, hits the matching enemy and maps the Companion', async () => {
   const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win,
     collection: () => ['HKD-E01'], makeSessionId: () => 'owned', random: () => 0,
     loadImage: () => image, reduced: () => false });
   host.enter({ gameId: 'mathInvader' }); await drain(); host.update(900);
-  const enemies = d.all(node => node.dataset.enemyId); assert.equal(enemies.length, 2); click(enemies[0]); host.update(0);
-  let state = host.inspect().session, input = d.find(node => node.tagName === 'INPUT'); input.value = String(state.selectedEnemy.answer);
-  click(d.find(node => node.dataset.action === 'answer')); host.update(0);
+  assert.equal(d.all(node => node.dataset.enemyId).length, 1);
+  let state = host.inspect().session; fire(d, state.targetEnemy.answer); host.update(0);
   assert.equal(host.inspect().session.resolved, 1); assert.equal(host.inspect().session.projectiles.length, 1);
-  assert.equal(host.inspect().companion.action, 'attack');
-  click(d.all(node => node.dataset.enemyId)[0]); host.update(0); state = host.inspect().session;
-  input = d.find(node => node.tagName === 'INPUT'); input.value = String(state.selectedEnemy.answer);
-  click(d.find(node => node.dataset.action === 'answer')); host.update(0);
+  assert.equal(host.inspect().companion.action, 'attack'); assert.equal(entry(d).textContent, '');
+  host.update(700); state = host.inspect().session; assert.equal(state.enemies.length, 1);
+  fire(d, state.targetEnemy.answer); host.update(0);
   assert.equal(host.inspect().session.resolved, 2);
   host.exit(); assert.equal(d.listeners(), 0); assert.equal(d.doc.body.children.length, 0);
 });
 
-test('visibility and manual pause remain distinct from answer pause and retain input', () => {
+test('tapping an enemy aims at it without stopping the fall', () => {
   const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win, collection: () => [],
-    makeSessionId: () => 'pause', random: () => 0, reduced: () => false });
-  host.enter({ gameId: 'mathInvader' }); click(d.find(node => node.dataset.enemyId)); host.update(0);
-  const input = d.find(node => node.tagName === 'INPUT'); input.value = '7'; const y = host.inspect().session.enemies[0].y;
-  host.update(500); assert.equal(host.inspect().session.enemies[0].y, y); assert.equal(host.inspect().session.activeElapsedMs, 500);
-  host.setPaused(true); d.doc.hidden = true; d.doc.dispatchEvent(new Event('visibilitychange')); host.update(500);
-  assert.equal(host.inspect().session.activeElapsedMs, 500); assert.equal(input.value, '7'); assert.equal(input.disabled, true);
-  d.doc.hidden = false; d.doc.dispatchEvent(new Event('visibilitychange')); assert.equal(host.inspect().session.paused, true);
-  host.setPaused(false); assert.equal(host.inspect().session.paused, false); assert.equal(host.inspect().session.answerPaused, true);
+    makeSessionId: () => 'aim', random: () => 0, reduced: () => false });
+  host.enter({ gameId: 'mathInvader' }); host.update(3600);
+  const [, second] = host.inspect().session.enemies; assert.ok(second);
+  click(d.all(node => node.dataset.enemyId).find(node => node.dataset.enemyId === second.enemyId)); host.update(0);
+  assert.equal(host.inspect().session.targetId, second.enemyId);
+  const y = host.inspect().session.enemies[1].y; host.update(500); assert.ok(host.inspect().session.enemies[1].y > y);
   host.exit();
 });
-
+test('visibility and manual pause stay distinct, freeze the fall and keep the typed answer', () => {
+  const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win, collection: () => [],
+    makeSessionId: () => 'pause', random: () => 0, reduced: () => false });
+  host.enter({ gameId: 'mathInvader' }); click(d.find(node => node.dataset.digit === '7')); host.update(500);
+  const y = host.inspect().session.enemies[0].y; assert.equal(host.inspect().session.activeElapsedMs, 500);
+  host.setPaused(true); d.doc.hidden = true; d.doc.dispatchEvent(new Event('visibilitychange')); host.update(500);
+  assert.equal(host.inspect().session.activeElapsedMs, 500); assert.equal(host.inspect().session.enemies[0].y, y);
+  assert.equal(entry(d).textContent, '7'); assert.equal(d.find(node => node.dataset.action === 'answer').disabled, true);
+  d.doc.hidden = false; d.doc.dispatchEvent(new Event('visibilitychange')); assert.equal(host.inspect().session.paused, true);
+  host.setPaused(false); assert.equal(host.inspect().session.paused, false); assert.equal(entry(d).textContent, '7');
+  host.exit();
+});
 test('shared Companion handles owned, unowned, pending, failure and reduced motion for Invader events', async () => {
   const absent = createCompanionAdapter({ sessionId: 'i', ownedMonsterIds: [], loadImage: () => image });
   absent.observe({ sessionId: 'i', seq: 1, type: 'correct' }); assert.equal(absent.inspect().hostCount, 0); absent.dispose();
@@ -99,9 +112,7 @@ test('ten Invader enter/exit cycles leave no RAF, interval, listener, DOM, enemy
     random: () => 0, loadImage: () => new Promise(() => {}), reduced: () => false });
   for (let i = 0; i < 10; i++) {
     host.enter({ gameId: 'mathInvader' }); host.update(900);
-    const enemy = d.find(node => node.dataset.enemyId); click(enemy); host.update(0);
-    const state = host.inspect().session, input = d.find(node => node.tagName === 'INPUT'); input.value = String(state.selectedEnemy.answer);
-    click(d.find(node => node.dataset.action === 'answer')); host.update(0);
+    fire(d, host.inspect().session.targetEnemy.answer); host.update(0);
     assert.equal(host.inspect().session.resolved, 1); assert.equal(host.inspect().session.projectiles.length, 1);
     const oldButton = d.find(node => node.dataset.action === 'answer'); host.exit(); host.exit(); host.update(1000); await drain();
     click(oldButton); assert.equal(host.inspect().valid, false); assert.equal(host.inspect().session, null);
@@ -119,11 +130,7 @@ test('Invader session never changes kanji Core or Storage and creates no key', a
   const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win, makeSessionId: () => 'isolation',
     random: () => 0, loadImage: () => Promise.reject(Error('missing')), reduced: () => true });
   host.enter({ gameId: 'mathInvader' }); await drain(); host.update(0);
-  for (let i = 0; i < 3; i++) {
-    if (!host.inspect().session.selectedEnemy) click(d.find(node => node.dataset.enemyId));
-    host.update(0); const state = host.inspect().session, input = d.find(node => node.tagName === 'INPUT');
-    input.value = String(state.selectedEnemy.answer + 1); click(d.find(node => node.dataset.action === 'answer')); host.update(0);
-  }
-  assert.equal(host.inspect().session.result.outcome, 'gameOver'); host.exit();
+  for (let i = 0; i < 3; i++) { fire(d, host.inspect().session.targetEnemy.answer + 1); host.update(0); }
+  assert.equal(host.inspect().session.incorrect, 3); assert.equal(host.inspect().session.result, null); host.exit();
   assert.equal(writes, 0); assert.equal(JSON.stringify(gameState), beforeGame); assert.equal(JSON.stringify([...storage.data]), beforeStorage);
 });

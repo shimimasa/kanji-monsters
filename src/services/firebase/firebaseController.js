@@ -13,6 +13,7 @@ import { withDeadline } from '../../core/asyncDeadline.js';
 let auth  = null;
 let db    = null;
 let currentUser = null;
+let persistenceDb = null;
 
 function buildProfileSummaryFromSave(save) {
   const name = save?.player?.name;
@@ -52,8 +53,17 @@ export function initializeFirebaseServices() {
         db   = firebase.firestore();
 
         // Firestore のオフライン永続化を有効化（オフライン時もキャッシュを参照）
-        db.enablePersistence({ synchronizeTabs: true })
-          .catch(err => console.warn('Firestore persistence error:', err));
+        // 新規セーブの起動では復旧確認と背後の接続で2回呼ばれる。2回目は Firestore が
+        // 起動済みで同期的に例外になり、初期化失敗の alert を出していたので1回に限る。
+        if (persistenceDb !== db) {
+          persistenceDb = db;
+          try {
+            db.enablePersistence({ synchronizeTabs: true })
+              .catch(err => console.warn('Firestore persistence error:', err));
+          } catch (err) {
+            console.warn('Firestore persistence error:', err);
+          }
+        }
 
         console.log('Firebase Auth / Firestore を取得しました');
         return true;

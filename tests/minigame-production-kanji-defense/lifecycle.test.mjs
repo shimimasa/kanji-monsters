@@ -62,13 +62,13 @@ const createHost = (d, options = {}) => createMiniGameHost({
 });
 const choose = (d, host, enemy = host.inspect().session.enemies[0]) => {
   const node = d.all(candidate => candidate.dataset.enemyId).find(candidate => candidate.dataset.enemyId === enemy.enemyId);
-  click(node); return host.inspect().session.selectedEnemy;
+  click(node); return host.inspect().session.targetEnemy;
 };
 const answer = (d, host, value) => {
   const input = d.find(node => node.tagName === 'INPUT'); input.value = value;
   click(d.find(node => node.dataset.action === 'answer'));
 };
-const defeat = (d, host) => { const enemy = host.inspect().session.enemies[0]; choose(d, host, enemy); answer(d, host, readingFor(enemy)); };
+const defeat = (d, host) => { const enemy = host.inspect().session.enemies[0]; answer(d, host, readingFor(enemy)); };
 
 test('registry and title expose the independent Flagship Definition', () => {
   assert.deepEqual(Object.keys(miniGameRegistry.kanjiDefense).sort(), ['create', 'createView', 'id', 'title']);
@@ -93,30 +93,30 @@ test('pointer selection focuses kana input and a correct answer defeats the targ
   host.exit();
 });
 
-test('keyboard lane shortcut selects a target and Enter submits after composition', () => {
+test('Enter in the reading field attacks the Monster with that reading without choosing first', () => {
   const d = dom(), host = createHost(d); host.enter({ gameId: 'kanjiDefense' }); const enemy = host.inspect().session.enemies[0];
-  dispatchKey(d.doc, String(enemy.lane + 1)); assert.equal(host.inspect().session.selectedEnemyId, enemy.enemyId);
+  assert.equal(host.inspect().session.explicitTargetId, null); assert.equal(host.inspect().session.targetId, enemy.enemyId);
   const input = d.find(node => node.tagName === 'INPUT'); input.value = readingFor(enemy); dispatchKey(input, 'Enter');
-  assert.equal(host.inspect().session.correct, 1); host.exit();
+  assert.equal(host.inspect().session.correct, 1); assert.equal(input.value, ''); host.exit();
 });
-
 test('IME composing Enter and repeated Enter never submit', () => {
-  const d = dom(), host = createHost(d); host.enter({ gameId: 'kanjiDefense' }); const enemy = host.inspect().session.enemies[0]; choose(d, host, enemy);
+  const d = dom(), host = createHost(d); host.enter({ gameId: 'kanjiDefense' }); const enemy = host.inspect().session.enemies[0];
   const input = d.find(node => node.tagName === 'INPUT'); input.value = readingFor(enemy); dispatchComposition(input, 'compositionstart');
   dispatchKey(input, 'Enter', { isComposing: true }); assert.equal(host.inspect().session.resolved, 0);
   dispatchComposition(input, 'compositionend'); dispatchKey(input, 'Enter', { repeat: true }); assert.equal(host.inspect().session.resolved, 0);
-  dispatchKey(input, 'Enter'); assert.equal(host.inspect().session.resolved, 1); dispatchKey(input, 'Enter'); assert.equal(host.inspect().session.resolved, 1); host.exit();
+  dispatchKey(input, 'Enter'); assert.equal(host.inspect().session.resolved, 1);
+  input.value = readingFor(enemy); dispatchKey(input, 'Enter'); assert.equal(host.inspect().session.resolved, 1); host.exit();
 });
 
 test('wrong answer keeps Monster, shows hint, then retry succeeds', () => {
-  const d = dom(), host = createHost(d); host.enter({ gameId: 'kanjiDefense' }); const enemy = host.inspect().session.enemies[0]; choose(d, host, enemy);
+  const d = dom(), host = createHost(d); host.enter({ gameId: 'kanjiDefense' }); const enemy = host.inspect().session.enemies[0];
   answer(d, host, 'まちがい'); assert.equal(host.inspect().session.resolved, 0); assert.equal(host.inspect().session.life, 3);
-  const feedback = d.find(node => node.className === 'kd-feedback'); assert.match(feedback.textContent, /もう一度/);
+  const note = d.find(node => node.className === 'ya-dock-note'); assert.match(note.textContent, /おしい！.*ヒント/);
+  assert.ok(d.find(node => node.className === 'kd-hint'));
   answer(d, host, readingFor(enemy)); assert.equal(host.inspect().session.correct, 1); host.exit();
 });
-
 test('manual and visibility pause OR freezes movement and rejects input while preserving text', () => {
-  const d = dom(), host = createHost(d); host.enter({ gameId: 'kanjiDefense' }); const enemy = host.inspect().session.enemies[0]; choose(d, host, enemy);
+  const d = dom(), host = createHost(d); host.enter({ gameId: 'kanjiDefense' }); choose(d, host);
   const input = d.find(node => node.tagName === 'INPUT'); input.value = 'かんじ'; const before = host.inspect().session.enemies[0].progress;
   host.setPaused(true); d.doc.hidden = true; d.doc.dispatchEvent(new Event('visibilitychange')); host.update(1000);
   assert.equal(host.inspect().session.enemies[0].progress, before); assert.equal(input.value, 'かんじ'); assert.equal(input.disabled, true);
@@ -149,11 +149,12 @@ test('Companion owned, unowned, failure and reduced motion remain display-only',
   assert.equal(owned.inspect().action, 'attack'); assert.equal(owned.inspect().motion.imageState, 'failed'); owned.dispose();
 });
 
-test('twelve encounters render immutable result, strong/weak words and replay a new session', () => {
+test('twelve encounters render immutable result, strong/weak words and a new session starts fresh', () => {
   const d = dom(); let serial = 0; const host = createHost(d, { makeSessionId: () => `kd-${++serial}` }); host.enter({ gameId: 'kanjiDefense' });
   for (let index = 0; index < 12; index++) { defeat(d, host); if (index < 11) host.update(800); }
   const first = host.inspect().session; assert.ok(first.result); assert.equal(first.result.strongWords.length, 12);
-  const replay = d.find(node => node.dataset.action === 'replay'); click(replay); assert.equal(host.inspect().session.sessionId, 'kd-2');
+  const review = d.find(node => node.className === 'ya-learning-result'); assert.equal(review.hidden, false);
+  host.enter({ gameId: 'kanjiDefense' }); assert.equal(host.inspect().session.sessionId, 'kd-2');
   assert.equal(host.inspect().session.resolved, 0); assert.equal(d.all(node => node.dataset.enemyId).length, 1); host.exit();
 });
 
@@ -183,9 +184,10 @@ test('session performs no direct Storage write or deletion', t => {
   const d = dom(), host = createHost(d); host.enter({ gameId: 'kanjiDefense' }); defeat(d, host); host.exit(); assert.equal(writes, 0);
 });
 
-test('responsive, focus, touch target, non-color and reduced-motion rules exist in production CSS', () => {
+test('responsive, focus, non-color and reduced-motion rules exist in production CSS', () => {
   const source = fs.readFileSync('src/minigames/kanjiDefense/kanjiDefenseView.js', 'utf8');
-  assert.match(source, /min-width:44px;min-height:44px/); assert.match(source, /:focus-visible/);
-  assert.match(source, /@media\(max-width:580px\)/); assert.match(source, /@media\(max-height:430px\).*\.kd-board\{height:140px\}/);
-  assert.match(source, /@media\(prefers-reduced-motion:reduce\)/); assert.match(source, /選択中/); assert.match(source, /危険/);
+  const shared = fs.readFileSync('src/minigames/arcade/arcadeStyles.js', 'utf8');
+  assert.match(shared, /min-width:44px/); assert.match(shared, /:focus-visible/);
+  assert.match(shared, /@media \(prefers-reduced-motion:reduce\)/); assert.match(shared, /@media \(min-width:900px\)/);
+  assert.match(source, /@media \(max-height:560px\)/); assert.match(source, /ねらい/);
 });

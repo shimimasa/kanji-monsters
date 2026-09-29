@@ -1,146 +1,199 @@
-import { bindMathSprintInput } from '../mathSprint/mathSprintInput.js';
+import { restartClass, toggleClass, setVar, createArcadeFrame, createNumberPad, bindArcadeKeys } from '../arcade/arcadeKit.js';
+import { MATH_INVADER_RULES } from './mathInvaderGame.js';
 
 const CSS = `
-#mathInvaderScreen{position:fixed;inset:0;z-index:100010;background:#eef4fb;color:#202b38;overflow:auto;overscroll-behavior:contain;font:17px system-ui,sans-serif;box-sizing:border-box;padding:10px max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom));touch-action:manipulation}
-#mathInvaderScreen *{box-sizing:border-box}#mathInvaderScreen [hidden]{display:none!important}
-#mathInvaderScreen .mi-shell{max-width:780px;margin:0 auto}#mathInvaderScreen header{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:-10px;z-index:5;background:#eef4fb;padding:4px 0}
-#mathInvaderScreen h1{font-size:clamp(19px,4.8vw,27px);margin:0}#mathInvaderScreen button{min-width:44px;min-height:44px;border:1px solid #62758a;border-radius:9px;background:#fff;color:#202b38;font:inherit;padding:7px 12px;cursor:pointer}
-#mathInvaderScreen button:disabled{opacity:.48;cursor:default}#mathInvaderScreen button:focus-visible,#mathInvaderScreen input:focus-visible{outline:3px solid #196a83;outline-offset:2px}
-#mathInvaderScreen .mi-hud{display:flex;justify-content:space-between;gap:12px;margin:8px 0;font-weight:700}.mi-pause{margin:5px 0;color:#694c16}
-#mathInvaderScreen .mi-layout{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:12px}.mi-board{position:relative;height:270px;border:2px solid #7892aa;border-radius:12px;background:linear-gradient(#d9ecff,#fff);overflow:hidden}
-#mathInvaderScreen .mi-board::after{content:'';position:absolute;left:0;right:0;bottom:18px;border-top:2px dashed #a86b5e}.mi-enemy{position:absolute;width:26%;min-width:70px;transform:translateY(-50%);font-weight:700;background:#fff4dc!important;z-index:2}.mi-enemy[aria-pressed=true]{background:#ffe08a!important;border:3px solid #9c6100}
-#mathInvaderScreen .mi-projectile{position:absolute;width:9px;height:18px;border-radius:8px;background:#2f86db;box-shadow:0 0 8px #fff;transform:translate(-50%,-50%);pointer-events:none;z-index:3}
-#mathInvaderScreen .mi-companion{pointer-events:none;text-align:center;margin:0;padding:6px 0;color:#56697d}.mi-companion canvas{display:block;width:180px;height:90px;max-width:100%;margin:auto}
-#mathInvaderScreen .mi-instruction{margin:8px 0;min-height:26px}.mi-controls{max-width:520px;margin:8px auto}.mi-selected{font-size:24px;font-weight:700;margin:6px 0}.mi-answer-row{display:flex;gap:8px}.mi-answer-row input{min-width:0;width:100%;height:48px;border:2px solid #62758a;border-radius:9px;font:25px system-ui;padding:4px 10px;background:#fff;color:#202b38}.mi-primary{background:#315b8a!important;color:#fff!important;border-color:#315b8a!important;white-space:nowrap}
-#mathInvaderScreen .mi-pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0}.mi-pad button{font-size:20px;padding:5px}.mi-delete{grid-column:span 2;font-size:16px!important}.mi-feedback{min-height:26px;margin:6px 0;line-height:1.4}.mi-result{text-align:center;padding:12px}.mi-result h2{font-size:28px}.mi-result p{font-size:19px;margin:10px}.mi-result strong{display:block;font-size:26px}
-@media(max-width:560px){#mathInvaderScreen .mi-layout{grid-template-columns:1fr}.mi-companion{position:static;width:auto;padding:0}.mi-companion canvas{width:120px;height:60px}.mi-board{height:245px}.mi-pad{grid-template-columns:repeat(3,1fr)}.mi-delete{grid-column:span 2}.mi-hud{padding-right:0}}
-@media(max-height:430px) and (min-width:561px){#mathInvaderScreen .mi-board{height:190px}.mi-companion canvas{width:140px;height:70px}.mi-pad{grid-template-columns:repeat(11,1fr)}.mi-delete{grid-column:span 1}.mi-pad button{padding:3px}.mi-controls{margin-top:4px}}
+#mathInvaderScreen .ya-field{background:radial-gradient(ellipse at 50% 120%,#3b2a7a 0,transparent 60%),linear-gradient(#060b24,#131d4a 60%,#23205a)}
+#mathInvaderScreen .iv-stars,#mathInvaderScreen .iv-stars2{position:absolute;inset:-50% 0 0;background-image:radial-gradient(1.5px 1.5px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 90px 120px,#cde,transparent),radial-gradient(2px 2px at 160px 60px,#fff9,transparent),radial-gradient(1px 1px at 230px 170px,#fff,transparent);background-size:260px 200px;animation:iv-drift 18s linear infinite;opacity:.8}
+#mathInvaderScreen .iv-stars2{background-size:180px 150px;animation-duration:9s;opacity:.45}
+#mathInvaderScreen .iv-lane{position:absolute;top:0;bottom:12%;width:1px;background:linear-gradient(#ffffff00,#ffffff22)}
+#mathInvaderScreen .iv-barrier{position:absolute;left:4%;right:4%;height:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;transform:translateY(-50%)}
+#mathInvaderScreen .iv-barrier i{border-radius:8px;background:linear-gradient(90deg,#63e6ff,#b4f5ff);box-shadow:0 0 16px #63e6ff;transition:opacity .3s,filter .3s}
+#mathInvaderScreen .iv-barrier i.off{opacity:.18;filter:grayscale(1);box-shadow:none}
+#mathInvaderScreen .iv-turret{position:absolute;left:50%;bottom:1.5%;width:clamp(74px,11vw,110px);height:clamp(74px,11vw,110px);transform:translateX(-50%);z-index:4}
+#mathInvaderScreen .iv-turret::before{content:'';position:absolute;left:12%;right:12%;bottom:0;height:34%;border-radius:40px 40px 10px 10px;background:linear-gradient(#8fa4c9,#4f5f86);box-shadow:0 0 0 3px #c9d6f0 inset}
+#mathInvaderScreen .iv-turret .gt-portrait{position:absolute;inset:0 0 18% 0;display:block;width:auto;height:auto;background:none;border:0}
+#mathInvaderScreen .iv-turret .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 6px #000a)}
+#mathInvaderScreen .iv-turret[data-mood=fire] .gt-portrait{animation:iv-recoil .25s ease-out}
+#mathInvaderScreen .iv-turret[data-mood=miss] .gt-portrait{animation:ya-nudge .35s ease-out}
+#mathInvaderScreen .iv-turret[data-fever=true]::after{content:'';position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,#ffd54a66,transparent 70%);animation:ya-glow .5s infinite alternate}
+#mathInvaderScreen .iv-enemy{position:absolute;z-index:3;transform:translate(-50%,-50%);min-width:clamp(118px,17vw,170px);padding:0;border:0;background:none;color:#fff;font:inherit;cursor:pointer;touch-action:manipulation;transition:top .1s linear}
+#mathInvaderScreen .iv-ship{position:relative;display:block;padding:18px 14px 12px;border-radius:50% 50% 40% 40%/60% 60% 40% 40%;background:radial-gradient(ellipse at 50% 20%,#b3ffcf 0 18%,transparent 19%),linear-gradient(#42d392,#1e8a5e);box-shadow:0 6px 0 #135a3e,0 0 18px #42d39288;animation:iv-sway 2.6s ease-in-out infinite alternate}
+#mathInvaderScreen .iv-enemy[data-wave="1"] .iv-ship{background:radial-gradient(ellipse at 50% 20%,#ffe0b3 0 18%,transparent 19%),linear-gradient(#ffa24c,#d4621d);box-shadow:0 6px 0 #8a3c0c,0 0 18px #ffa24c88}
+#mathInvaderScreen .iv-enemy[data-wave="2"] .iv-ship{background:radial-gradient(ellipse at 50% 20%,#ffd1f4 0 18%,transparent 19%),linear-gradient(#f06ad0,#a3319a);box-shadow:0 6px 0 #6a1a65,0 0 18px #f06ad088}
+#mathInvaderScreen .iv-enemy[data-boss=true]{min-width:clamp(180px,26vw,260px)}
+#mathInvaderScreen .iv-enemy[data-boss=true] .iv-ship{padding:30px 18px 20px;background:radial-gradient(ellipse at 50% 18%,#fff3 0 16%,transparent 17%),linear-gradient(#8e5cff,#4b21b8);box-shadow:0 8px 0 #2a0f75,0 0 30px #a57dff;animation-duration:3.4s}
+#mathInvaderScreen .iv-enemy[data-boss=true] .iv-ship::before{content:'BOSS';position:absolute;top:4px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:900;letter-spacing:.2em;color:#ffe066}
+#mathInvaderScreen .iv-question{display:block;font-size:clamp(22px,3.4vw,32px);font-weight:900;white-space:nowrap;text-shadow:0 2px 0 #0006;font-variant-numeric:tabular-nums}
+#mathInvaderScreen .iv-enemy[data-boss=true] .iv-question{font-size:clamp(28px,4.4vw,42px)}
+#mathInvaderScreen .iv-enemy[data-target=true]::after{content:'';position:absolute;inset:-12px -10px;border:3px dashed #ffe066;border-radius:24px;animation:iv-lock 1s ease-in-out infinite;pointer-events:none}
+#mathInvaderScreen .iv-enemy[data-danger=true] .iv-ship{outline:3px solid #ffd166;outline-offset:3px}
+#mathInvaderScreen .iv-enemy[data-hit=true] .iv-ship{animation:ya-nudge .35s ease-out}
+#mathInvaderScreen .iv-enemy:disabled{cursor:default}
+#mathInvaderScreen .iv-review{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+#mathInvaderScreen .iv-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
+#mathInvaderScreen .iv-review li[data-outcome=escaped]{background:#fff3da}
+@keyframes iv-drift{to{transform:translateY(50%)}}
+@keyframes iv-sway{from{transform:translateX(-6px) rotate(-2deg)}to{transform:translateX(6px) rotate(2deg)}}
+@keyframes iv-lock{50%{opacity:.4;transform:scale(1.06)}}
+@keyframes iv-recoil{0%{transform:translateY(0)}35%{transform:translateY(8px) scale(.95)}100%{transform:none}}
 `;
 
-export function createMathInvaderView({ document: doc, onBack, onReplay, onSubmit, onSelect, getSnapshot }) {
-  let active = true, binding = null, boundAttemptId = null, root = null;
-  const removes = [], enemyNodes = new Map(), projectileNodes = new Map();
+const LANE_X = [20, 50, 80];
+const TURRET = { x: 50, y: 90 };
+
+export function createMathInvaderView({ document: doc, dispatch, onBack, getSnapshot }) {
+  let active = true, entry = '', lastAttemptSerial = 0, lastEscapeSerial = 0, lastSpawned = 0, lastBoosts = 0, moodMs = 0;
+  const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
-  const el = (tag, className = '', text = '') => {
-    const node = doc.createElement(tag); node.className = className; node.textContent = text; return node;
-  };
-  root = el('section'); root.id = 'mathInvaderScreen'; root.setAttribute('aria-label', 'けいさんインベーダー');
+  const frame = createArcadeFrame(doc, { id: 'mathInvaderScreen', title: 'けいさんインベーダー', theme: 'space' });
+  const { root, world, dock, fx, el } = frame;
   const style = el('style'); style.textContent = CSS; root.append(style);
-  const shell = el('div', 'mi-shell'); root.append(shell);
-  const header = el('header'); shell.append(header); header.append(el('h1', '', 'けいさんインベーダー'));
-  const back = el('button', '', 'もどる'); back.type = 'button'; back.dataset.action = 'back'; header.append(back);
-  on(back, 'click', () => { if (active) onBack(); });
-  const hud = el('div', 'mi-hud'), life = el('span'), progress = el('span'); hud.append(life, progress); shell.append(hud);
-  const pause = el('p', 'mi-pause', 'おやすみ中'); pause.hidden = true; shell.append(pause);
-  const layout = el('div', 'mi-layout'), board = el('div', 'mi-board'); board.dataset.role = 'enemy-area'; layout.append(board);
-  const companion = el('figure', 'mi-companion'), canvas = el('canvas'); canvas.width = 280; canvas.height = 140;
-  canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', '仲間のジャガイモスライム');
-  const caption = el('figcaption', '', 'ジャガイモスライム'); companion.append(canvas, caption); layout.append(companion); shell.append(layout);
-  const instruction = el('p', 'mi-instruction', 'てきを えらんでね'); instruction.setAttribute('aria-live', 'polite'); shell.append(instruction);
-  const controls = el('div', 'mi-controls'), selected = el('div', 'mi-selected'); controls.append(selected);
-  const row = el('div', 'mi-answer-row'), input = el('input'); input.type = 'text'; input.inputMode = 'numeric';
-  input.autocomplete = 'off'; input.maxLength = 16; input.setAttribute('aria-label', 'こたえ'); input.setAttribute('enterkeyhint', 'done');
-  const submit = el('button', 'mi-primary', '回答'); submit.type = 'button'; submit.dataset.action = 'answer'; row.append(input, submit); controls.append(row);
-  const pad = el('div', 'mi-pad'); pad.setAttribute('aria-label', '数字パッド'); controls.append(pad);
-  const canAnswer = () => {
-    const state = getSnapshot(); return active && state.phase === 'playing' && !!state.selectedEnemy && !state.paused;
+  on(frame.back, 'click', () => { if (active) onBack(); });
+  world.append(el('div', 'iv-stars'), el('div', 'iv-stars2'));
+  for (const x of LANE_X) { const lane = el('i', 'iv-lane'); lane.style.left = `${x}%`; world.append(lane); }
+  const barrier = el('div', 'iv-barrier'); barrier.style.top = `${MATH_INVADER_RULES.barrierY * 100 + 2}%`;
+  // Ships fly between a top band kept clear for the HUD (two rows on phones) and the barrier.
+  const fieldY = y => {
+    const top = Math.min(10000 / (world.clientHeight || 600), 30), limit = MATH_INVADER_RULES.barrierY;
+    return top + (Math.min(y, limit) / limit) * (limit * 100 - top);
   };
-  for (const digit of ['1','2','3','4','5','6','7','8','9','0','削除']) {
-    const button = el('button', digit === '削除' ? 'mi-delete' : '', digit); button.type = 'button'; button.dataset.digit = digit; pad.append(button);
-    on(button, 'click', () => {
-      if (!canAnswer() || binding?.composing()) return;
-      input.value = digit === '削除' ? input.value.slice(0, -1) : (input.value + digit).slice(0, 16);
-    });
-  }
-  const feedback = el('p', 'mi-feedback'); feedback.setAttribute('aria-live', 'polite'); controls.append(feedback); shell.append(controls);
-  const result = el('div', 'mi-result'); result.hidden = true; shell.append(result);
-  const resultTitle = el('h2'), resultCorrect = el('strong'), resultIncorrect = el('strong'), resultResolved = el('strong');
-  result.append(resultTitle);
-  for (const [label, value] of [['せいかい', resultCorrect], ['まちがい', resultIncorrect], ['かいけつ', resultResolved]]) {
-    const p = el('p', '', label); p.append(value); result.append(p);
-  }
-  const replay = el('button', 'mi-primary', 'もういちど'); replay.type = 'button'; replay.dataset.action = 'replay'; result.append(replay);
-  on(replay, 'click', () => { if (active && !getSnapshot().paused) onReplay(); });
+  const shields = [0, 1, 2].map(() => { const node = el('i'); barrier.append(node); return node; });
+  const turret = el('div', 'iv-turret'); world.append(barrier, turret);
+
+  const display = el('div', 'ya-entry'); display.setAttribute('aria-live', 'polite'); display.setAttribute('aria-label', 'こたえ');
+  const note = el('p', 'ya-dock-note');
+  const pad = createNumberPad(doc, { on,
+    onDigit: digit => { if (canAnswer() && entry.length < 3) { entry += digit; renderEntry(); } },
+    onDelete: () => { if (canAnswer()) { entry = entry.slice(0, -1); renderEntry(); } },
+    onFire: () => fire(),
+  });
+  dock.append(display, note, pad.root);
+  const review = el('div', 'ya-learning-result'); review.hidden = true;
+  const reviewList = el('ol', 'iv-review'); review.append(el('h3', '', '今回の計算'), reviewList); frame.shell.append(review);
   doc.body.append(root);
 
+  const canAnswer = () => { const state = getSnapshot(); return active && state.phase === 'playing' && !state.paused; };
+  const renderEntry = () => {
+    display.dataset.empty = String(!entry);
+    display.textContent = '';
+    if (entry) display.textContent = entry;
+    else display.append(el('span', '', '答えの数字を入力'));
+  };
+  const fire = () => {
+    const state = getSnapshot();
+    if (!canAnswer() || !entry) { if (!entry) restartClass(display, 'ya-miss'); return false; }
+    const accepted = dispatch({ type: 'submit', payload: { sessionId: state.sessionId, token: state.inputToken, value: entry } });
+    if (accepted) { entry = ''; renderEntry(); }
+    return accepted;
+  };
+  removes.push(bindArcadeKeys(doc, event => {
+    if (!active) return false;
+    if (/^[0-9]$/.test(event.key)) { if (canAnswer() && entry.length < 3) { entry += event.key; renderEntry(); } return true; }
+    if (event.key === 'Backspace') { if (canAnswer()) { entry = entry.slice(0, -1); renderEntry(); } return true; }
+    if (event.key === 'Enter' && !event.repeat) { fire(); return true; }
+    return false;
+  }));
+  renderEntry();
+
+  const enemyNodes = new Map();
   const syncEnemies = state => {
     const live = new Set(state.enemies.map(enemy => enemy.enemyId));
-    for (const [id, entry] of enemyNodes) if (!live.has(id)) { entry.node.remove(); enemyNodes.delete(id); }
+    for (const [id, node] of enemyNodes) if (!live.has(id)) { node.remove(); enemyNodes.delete(id); }
     for (const enemy of state.enemies) {
-      let entry = enemyNodes.get(enemy.enemyId);
-      if (!entry) {
-        const node = el('button', 'mi-enemy'); node.type = 'button'; node.dataset.enemyId = enemy.enemyId;
-        const handler = () => {
+      let node = enemyNodes.get(enemy.enemyId);
+      if (!node) {
+        node = el('button', 'iv-enemy'); node.type = 'button'; node.dataset.enemyId = enemy.enemyId;
+        const ship = el('span', 'iv-ship'); ship.append(el('span', 'iv-question', `${enemy.question} = ?`)); node.append(ship);
+        node.dataset.wave = String(enemy.wave); node.dataset.boss = String(enemy.boss);
+        node.style.left = `${LANE_X[enemy.lane]}%`;
+        node.setAttribute('aria-label', `${enemy.question}。タップでねらう`);
+        on(node, 'click', () => {
           const current = getSnapshot();
           if (!active || current.paused) return;
-          onSelect({ sessionId: current.sessionId, enemyId: enemy.enemyId, problemId: enemy.problemId });
-          input.focus?.();
-        };
-        on(node, 'click', handler); board.append(node); entry = { node }; enemyNodes.set(enemy.enemyId, entry);
+          dispatch({ type: 'select', payload: { sessionId: current.sessionId, enemyId: enemy.enemyId, problemId: enemy.problemId } });
+        });
+        world.append(node); enemyNodes.set(enemy.enemyId, node);
       }
-      entry.node.textContent = `${enemy.question} = ?`;
-      entry.node.style.left = `${5 + enemy.lane * 32}%`; entry.node.style.top = `${enemy.y * 100}%`;
-      entry.node.disabled = state.paused || state.phase !== 'playing';
-      entry.node.setAttribute('aria-pressed', String(state.selectedEnemyId === enemy.enemyId));
+      node.style.top = `${fieldY(enemy.y)}%`;
+      node.dataset.target = String(state.targetId === enemy.enemyId);
+      node.dataset.danger = String(enemy.y >= .62);
+      node.disabled = state.paused || state.phase !== 'playing';
     }
   };
-  const syncProjectiles = state => {
-    const live = new Set(state.projectiles.map(projectile => projectile.projectileId));
-    for (const [id, node] of projectileNodes) if (!live.has(id)) { node.remove(); projectileNodes.delete(id); }
-    for (const projectile of state.projectiles) {
-      let node = projectileNodes.get(projectile.projectileId);
-      if (!node) { node = el('i', 'mi-projectile'); board.append(node); projectileNodes.set(projectile.projectileId, node); }
-      const progressValue = 1 - projectile.remainingMs / projectile.durationMs;
-      const bottom = 0.88, y = bottom + (projectile.targetY - bottom) * progressValue;
-      node.style.left = `${18 + projectile.lane * 32}%`; node.style.top = `${y * 100}%`;
+  const reactToEvents = state => {
+    const attempt = state.lastAttempt;
+    if (attempt && attempt.serial !== lastAttemptSerial) {
+      lastAttemptSerial = attempt.serial;
+      const x = LANE_X[attempt.lane], y = fieldY(attempt.y);
+      if (attempt.correct) {
+        fx.beam(TURRET.x, TURRET.y, x, y, attempt.boss ? 'great' : 'good');
+        fx.burst(x, y, attempt.boss ? 'great' : 'good', attempt.boss ? 2 : 1);
+        fx.pop(x, y - 6, attempt.boss ? 'ボス撃破！' : `${attempt.question} = ${attempt.value}`, attempt.boss ? 'great' : 'good');
+        if (attempt.boss) { fx.banner('ボス撃破！', 'great'); fx.flash('great'); }
+        turret.dataset.mood = 'fire'; moodMs = 260;
+        note.textContent = state.streak >= 3 ? `${state.streak}連続！ その調子！` : '命中！';
+        frame.announce(`命中。${attempt.question} は ${attempt.value}`);
+      } else {
+        fx.pop(TURRET.x, 74, 'おしい！', 'soft'); fx.shake();
+        const node = enemyNodes.get(attempt.enemyId);
+        if (node) { node.dataset.hit = 'false'; void node.offsetWidth; node.dataset.hit = 'true'; }
+        restartClass(display, 'ya-miss');
+        turret.dataset.mood = 'miss'; moodMs = 350;
+        note.textContent = `${attempt.value} ではなかったよ。もう一度！`;
+        frame.announce(`${attempt.value} ではありません`);
+      }
+    }
+    const escape = state.lastEscape;
+    if (escape && escape.serial !== lastEscapeSerial) {
+      lastEscapeSerial = escape.serial;
+      fx.pop(LANE_X[escape.lane], MATH_INVADER_RULES.barrierY * 100 - 4, `${escape.question} = ${escape.answer}`, 'info');
+      fx.flash('soft');
+      note.textContent = `バリアが守ったよ。${escape.question} = ${escape.answer}`;
+      frame.announce(`バリアが守りました。${escape.question} は ${escape.answer}`);
+    }
+    if (state.spawned !== lastSpawned) {
+      if (state.enemies.some(enemy => enemy.boss) && lastSpawned < state.total) { fx.banner('ボス登場！', 'great'); frame.announce('ボスが出てきた'); }
+      lastSpawned = state.spawned;
     }
   };
 
   return {
     root,
-    canvas,
-    update(state, companionState) {
+    attachCompanion(portrait) { turret.append(portrait); },
+    update(state) {
       if (!active) return;
-      syncEnemies(state); syncProjectiles(state);
-      life.textContent = `ライフ ${'●'.repeat(state.life)}${'○'.repeat(3 - state.life)}`;
-      progress.textContent = `かいけつ ${state.resolved} / 10`;
-      pause.hidden = !state.paused; board.setAttribute('aria-busy', String(state.simulationPaused));
-      const target = state.selectedEnemy;
-      if (target?.attemptId !== boundAttemptId) {
-        binding?.dispose(); binding = null; boundAttemptId = target?.attemptId ?? null; input.value = '';
-        if (target?.attemptId) {
-          binding = bindMathSprintInput(input, submit, {
-            sessionId: state.sessionId, enemyId: target.enemyId, problemId: target.problemId,
-            attemptId: target.attemptId, token: target.token,
-          }, onSubmit, canAnswer);
+      frame.setPaused(state.paused && !state.result);
+      syncEnemies(state);
+      reactToEvents(state);
+      shields.forEach((node, index) => toggleClass(node, 'off', index >= state.life));
+      const disabled = state.paused || state.phase !== 'playing';
+      pad.setEnabled(!disabled);
+      if (!note.textContent) note.textContent = '同じ答えの敵に、自動で命中するよ';
+      if (state.result && review.hidden) {
+        review.hidden = false; reviewList.textContent = '';
+        for (const item of state.solved) {
+          const row = el('li', '', `${item.outcome === 'correct' ? '✓' : '☆'} ${item.question} = ${item.answer}`);
+          row.dataset.outcome = item.outcome; reviewList.append(row);
         }
       }
-      controls.hidden = !target || !!state.result;
-      selected.textContent = target ? `${target.question} = ?` : '';
-      const disabled = state.paused || !target || state.phase !== 'playing';
-      input.disabled = disabled; submit.disabled = disabled;
-      for (const button of pad.children) button.disabled = disabled;
-      if (state.result) instruction.textContent = state.result.outcome === 'clear' ? 'クリア！' : 'ゲームオーバー';
-      else if (state.lastAttempt && !state.lastAttempt.correct) instruction.textContent = `ちがうよ。ライフ ${state.life}`;
-      else instruction.textContent = target ? 'こたえを にゅうりょくしてね' : 'てきを えらんでね';
-      feedback.textContent = state.lastAttempt ? (state.lastAttempt.correct ? 'せいかい！' : 'もういちど こたえよう') : '';
-      board.hidden = !!state.result; instruction.hidden = !!state.result; controls.hidden = !target || !!state.result;
-      layout.style.display = state.result ? 'flex' : '';
-      layout.style.justifyContent = state.result ? 'center' : '';
-      result.hidden = !state.result;
-      if (state.result) {
-        resultTitle.textContent = state.result.outcome === 'clear' ? 'クリア！' : 'ゲームオーバー';
-        resultCorrect.textContent = String(state.result.correct);
-        resultIncorrect.textContent = String(state.result.incorrect);
-        resultResolved.textContent = `${state.result.resolved} / 10`;
-      }
-      companion.hidden = !companionState.selected;
-      caption.textContent = companionState.motion?.imageState === 'failed' ? '仲間といっしょに！' : 'ジャガイモスライム';
     },
-    stopInput() { binding?.dispose(); binding = null; active = false; },
+    present(play, dt, state) {
+      if (!active) return;
+      frame.tick(dt);
+      moodMs = Math.max(0, moodMs - dt); if (!moodMs) turret.dataset.mood = '';
+      const w = play.world || {};
+      turret.dataset.fever = String(!!w.fever);
+      if (play.boosts !== lastBoosts) { if (play.boosts > lastBoosts) { fx.banner('相棒の連射！', 'great'); fx.flash('great'); } lastBoosts = play.boosts; }
+      const mission = w.challenge;
+      frame.hud.set({ points: (state?.score ?? play.learningPoints) + play.bonus, comboCount: play.combo,
+        progressValue: (state?.resolved ?? 0) / 10, progressLabel: `撃破 ${state?.correct ?? 0} · のこり ${10 - (state?.resolved ?? 0)}`,
+        life: state?.life ?? 3, maxLife: 3, lifeLabel: 'バリア', gaugeValue: play.gauge, fever: w.fever,
+        missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
+    },
+    stopInput() { active = false; pad.setEnabled(false); },
     dispose() {
       this.stopInput(); removes.splice(0).forEach(remove => remove());
-      enemyNodes.clear(); projectileNodes.clear(); root?.remove(); root = null;
+      enemyNodes.clear(); frame.dispose();
     },
   };
 }

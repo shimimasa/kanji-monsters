@@ -1,69 +1,74 @@
 // Optional goals are local to a run. They guide play without changing answers or scores.
 const GOALS = Object.freeze({
+  // Arcade goals run for the whole session (deadline 99), so nothing is marked
+  // "missed" in the middle of play.
   mathSprint: [
-    { id: 'jump', name: '障害を2回ジャンプ', deadline: 9, target: 2,
-      rule: '力を2ためて、障害区間で「攻める」を選ぼう。', hint: '障害は3・6・9区間目。', value: data => data.jumps },
-    { id: 'pace', name: '7問目までに加速3.5', deadline: 7, target: 3.5,
-      rule: '正解を重ねてスピードを上げよう。', hint: '間違えるとスピードが下がる。', value: data => data.world.speed || 0 },
+    { id: 'clean', name: '止まらずに5回ジャンプ', deadline: 99, target: 5,
+      rule: 'ハードルに着く前に答えて、止まらずにとびこえよう。', hint: '早めに答えるほど、走り続けられる。', value: data => data.world.cleanJumps || 0 },
+    { id: 'chain', name: '5回連続でジャンプ', deadline: 99, target: 5,
+      rule: '正解をつないで、ハードルを続けてとびこえよう。', hint: 'まちがえても、次からまたつなげられる。', value: data => data.maxCombo },
   ],
   mathInvader: [
-    { id: 'priority', name: '手前の敵を3回ねらう', deadline: 8, target: 3,
-      rule: '迫っている敵を選び、計算を正解しよう。', hint: '近い敵は目印がつく。', value: data => data.priorityHits },
-    { id: 'chain', name: '4回連続で撃破', deadline: 8, target: 4,
-      rule: '正解をつなげて連続撃破しよう。', hint: '敵を選んでから計算に集中。', value: data => data.maxCombo },
+    { id: 'chain', name: '4回連続で撃破', deadline: 99, target: 4,
+      rule: '正解をつなげて連続撃破しよう。', hint: '近い敵から順にねらうと、つなげやすい。', value: data => data.maxCombo },
+    { id: 'boss', name: 'ボスをいっぱつで撃破', deadline: 99, target: 1,
+      rule: '最後に出てくるボスを、1回で撃ちぬこう。', hint: 'ボスはゆっくり。落ち着いて計算しよう。', value: data => data.world.bossFirstTry ? 1 : 0 },
   ],
   englishChoice: [
-    { id: 'rare', name: 'レア宝箱を1つ発見', deadline: 6, target: 1,
-      rule: 'レアな道を選び、部屋の問題をすべて正解しよう。', hint: '部屋の途中では道を変えられない。',
-      value: data => data.world.findings?.filter(item => item.kind === 'rare').length || 0 },
-    { id: 'chests', name: '3部屋で宝箱を発見', deadline: 9, target: 3,
-      rule: '最初の3部屋で宝箱を集めよう。', hint: '安全な道でも宝箱は見つかる。', value: data => data.world.chests || 0 },
+    { id: 'quick', name: 'はやわざキャッチ5回', deadline: 99, target: 5,
+      rule: '宝箱が半分まで来る前に、正しい宝箱をキャッチしよう。', hint: '単語を見たら、すぐに意味を思い出そう。', value: data => data.world.quick || 0 },
+    { id: 'chain', name: '5回連続でキャッチ', deadline: 99, target: 5,
+      rule: '正解をつないで、宝箱を続けてキャッチしよう。', hint: 'まちがえても、次からまたつなげられる。', value: data => data.maxCombo },
   ],
   sentenceOrder: [
-    { id: 'chain', name: '3つの文を連続完成', deadline: 6, target: 3,
-      rule: '正しい文を3回続けてつくろう。', hint: '言葉のつながりを読んでから決定。', value: data => data.maxCombo },
-    { id: 'rainbow', name: '虹の橋を2本かける', deadline: 8, target: 2,
-      rule: '連続正解や相棒技で虹の橋をつくろう。', hint: '3連続正解でも虹の橋になる。', value: data => data.world.special || 0 },
+    { id: 'chain', name: '3つの文を連続完成', deadline: 99, target: 3,
+      rule: '正しい文を3回続けてつくろう。', hint: '言葉のつながりを読んでから板をえらぼう。', value: data => data.maxCombo },
+    { id: 'quick', name: '相棒を止めずに3回わたらせる', deadline: 99, target: 3,
+      rule: '相棒が川岸に着く前に、橋を完成させよう。', hint: '文のはじめになる板から探そう。', value: data => data.world.quick || 0 },
   ],
   timedChoice: [
-    { id: 'towers', name: '8問目までに灯台を3つ', deadline: 8, target: 3,
-      rule: '正解で光を回復し、灯台へ分けよう。', hint: '光が35以上なら灯台に灯せる。', value: data => data.world.towers || 0 },
-    { id: 'balance', name: '灯台2つと光40を残す', deadline: 8, target: 3,
-      rule: '灯台を2つ灯し、光を40以上保とう。', hint: '光が減る前に答え、技も使ってみよう。',
-      value: data => Math.min(2, data.world.towers || 0) + ((data.world.light || 0) >= 40 ? 1 : 0) },
+    { id: 'quick', name: 'すばやく5回たたく', deadline: 99, target: 5,
+      rule: 'もぐらが出てすぐに、正しい読みをたたこう。', hint: '言葉を見たら、声に出さずに読んでみよう。', value: data => data.world.quick || 0 },
+    { id: 'chain', name: '4回連続でたたく', deadline: 99, target: 4,
+      rule: '正しい読みを4回続けてたたこう。', hint: 'あわてず、読みをたしかめてからたたこう。', value: data => data.maxCombo },
+  ],
+  multiSelect: [
+    { id: 'perfect', name: '星座を3つ完成', deadline: 99, target: 3,
+      rule: 'お題に合う星をぜんぶ集めて、星座を3つ完成させよう。', hint: '合わない星は、集めずに見送ろう。', value: data => data.correct },
+    { id: 'chain', name: '2回連続で星座を完成', deadline: 99, target: 2,
+      rule: '星座を2回続けて完成させよう。', hint: '「あつめた！」の前に、もう一度お題を読もう。', value: data => data.maxCombo },
   ],
   asyncChoice: [
-    { id: 'rare', name: '遺跡でレア発見', deadline: 6, target: 1,
-      rule: '林道と海辺で手がかりを集め、遺跡を調べよう。', hint: '遺跡は手がかり2つと2問正解で特別な発見。', value: data => data.world.rare || 0 },
-    { id: 'rumor', name: '3地点目までにうわさの場所へ', deadline: 6, target: 1,
-      rule: '地図の☆の場所を早めに調べよう。', hint: '行き先はつながった道から選ぶ。',
-      value: data => { const index = data.world.path?.indexOf(data.world.featured) ?? -1;
-        return index >= 0 && index < 3 && (data.world.findings?.[index]?.points || 0) >= 25 ? 1 : 0; } },
+    { id: 'chain', name: '4回連続で正しい線路', deadline: 99, target: 4,
+      rule: '正しい線路を4回続けてえらぼう。', hint: '問題をよく読んでから線路をタップ。', value: data => data.maxCombo },
+    { id: 'quick', name: 'はやわざ発見5回', deadline: 99, target: 5,
+      rule: 'トロッコが分かれ道の半分まで来る前に、線路をえらぼう。', hint: 'わかる問題は、すぐにタップしよう。', value: data => data.world.quick || 0 },
   ],
   kanjiDefense: [
-    { id: 'chain', name: '4回連続で読みを正解', deadline: 8, target: 4,
-      rule: '敵を選び、読みを4回続けて正解しよう。', hint: '落ち着いて読むことが旅路を守る。', value: data => data.maxCombo },
-    { id: 'clear', name: '12問で9問正解', deadline: 12, target: 9,
-      rule: '最後まで進み、9問以上の読みを正解しよう。', hint: '間違えた読みは結果で確かめられる。', value: data => data.correct },
+    { id: 'chain', name: '4回連続で読みを正解', deadline: 99, target: 4,
+      rule: '読みを4回続けて正解しよう。', hint: '落ち着いて読むことが旅路を守る。', value: data => data.maxCombo },
+    { id: 'clear', name: '12体中9体を撃退', deadline: 99, target: 9,
+      rule: '最後まで守り、9体以上を読みで撃退しよう。', hint: '読めなかった字は結果で確かめられる。', value: data => data.correct },
   ],
 });
 
 const COURSE_GOALS = Object.freeze({
-  'potato-shortcut': { id: 'shortcut', name: '近道を2回見つける', deadline: 9, target: 2,
-    rule: '障害区間で力1を使って転がり、正解して近道へ。', hint: '3・6・9区間目が障害。', value: data => data.world.shortcuts || 0 },
-  'corn-barrage': { id: 'golden', name: '黄金弾を1発当てる', deadline: 8, target: 1,
-    rule: '手前の敵を3回倒して粒を集め、黄金弾を装填しよう。', hint: '装填後の次の正解で命中。', value: data => data.world.goldenHits || 0 },
-  'milk-lantern': { id: 'drops', name: 'しずくで灯台を3つ', deadline: 8, target: 3,
-    rule: 'しずくを使い、問題に答えながら灯台を3つ灯そう。', hint: 'しずくは問題ごとに1つ蓄えられる。',
-    value: data => data.world.poured ? data.world.towers || 0 : 0 },
-  'treasure-key': { id: 'key', name: '鍵で宝箱を守る', deadline: 9, target: 1,
-    rule: '2回続けて正解し、作った鍵で宝箱を見つけよう。', hint: '鍵は部屋の途中でも使える。', value: data => data.world.guardedChests || 0 },
-  'bridge-anchor': { id: 'anchor', name: '支えで虹の橋をかける', deadline: 8, target: 1,
-    rule: '文を続けて完成し、支えを使って次の橋を虹色に。', hint: '支えを使った次の文を正解しよう。', value: data => data.world.anchorBridges || 0 },
-  'explorer-compass': { id: 'compass', name: '羅針盤で2地点発見', deadline: 8, target: 2,
-    rule: '2問続けて正解し、次の探索で羅針盤を使おう。', hint: '地点を選ぶ前に使える。', value: data => data.world.compassFindings || 0 },
-  'defense-ward': { id: 'ward', name: '札で2回読みを正解', deadline: 12, target: 2,
-    rule: '2回続けて正解して札を作り、次の読みに使おう。', hint: '札は次の正解で力になる。', value: data => data.world.wardHits || 0 },
+  'potato-shortcut': { id: 'shortcut', name: 'ころころ近道を2回', deadline: 99, target: 2,
+    rule: '2回続けて正解ジャンプすると、転がって近道できる。', hint: '早めに答えて、ジャンプをつなげよう。', value: data => data.world.shortcuts || 0 },
+  'corn-barrage': { id: 'golden', name: '黄金弾を1発当てる', deadline: 99, target: 1,
+    rule: '3回続けて撃破すると、次の一発が黄金弾になる。', hint: '黄金弾は次の正解で自動で撃てる。', value: data => data.world.goldenHits || 0 },
+  'milk-lantern': { id: 'splash', name: 'しずくハンマーを1回', deadline: 99, target: 1,
+    rule: '2回続けて正解すると、次のひとたたきがしずくハンマーになる。', hint: 'しずくハンマーは次の正解で自動で使われる。', value: data => data.world.special || 0 },
+  'treasure-key': { id: 'gold', name: '金の宝箱を1つ', deadline: 99, target: 1,
+    rule: '2回続けて正解すると、ひみつの鍵で次の宝箱が金の宝箱になる。', hint: '鍵は次の正解で自動で使われる。', value: data => data.world.special || 0 },
+  'bridge-anchor': { id: 'rainbow', name: '虹の橋を1本', deadline: 99, target: 1,
+    rule: '2つの文を続けて完成させると、次の橋が虹の橋になる。', hint: '虹の支えは次の正解で自動で使われる。', value: data => data.world.special || 0 },
+  'explorer-compass': { id: 'compass', name: '羅針盤の宝を2つ', deadline: 99, target: 2,
+    rule: '2回続けて正しい線路をえらぶと、羅針盤が次の宝を大きくする。', hint: '羅針盤は次の正解で自動で使われる。', value: data => data.world.special || 0 },
+  'star-reserve': { id: 'shooting', name: '流れ星を1つ', deadline: 99, target: 1,
+    rule: '星座を2つ続けて完成させると、次の星座に流れ星がかかる。', hint: 'たくわえた光は次の完成で自動で使われる。', value: data => data.world.special || 0 },
+  'defense-ward': { id: 'ward', name: '札で2回撃退', deadline: 99, target: 2,
+    rule: '2回続けて正解すると札ができ、次の撃退が強くなる。', hint: '札は次の正解で自動で使われる。', value: data => data.world.wardHits || 0 },
 });
 
 export function createRunChallenge(gameId, variation = 0, course = null) {
@@ -72,7 +77,7 @@ export function createRunChallenge(gameId, variation = 0, course = null) {
   const courseGoal = COURSE_GOALS[course?.id];
   const goals = courseGoal ? [courseGoal, ...base] : base;
   let selected = courseGoal || goals[Math.abs(variation) % goals.length];
-  const data = { answered: 0, correct: 0, maxCombo: 0, jumps: 0, priorityHits: 0, world: {} };
+  const data = { answered: 0, correct: 0, maxCombo: 0, world: {} };
   let status = 'active', achievedAt = null;
   const evaluate = () => {
     if (status !== 'active') return;
@@ -86,9 +91,7 @@ export function createRunChallenge(gameId, variation = 0, course = null) {
       selected = goal; evaluate(); return true;
     },
     observeAction(world) { data.world = world; evaluate(); },
-    observeAnswer({ correct, combo, before, world, state }) {
-      if (correct && gameId === 'mathSprint' && before.danger && before.energy >= 2 && before.actions?.some(action => action.id === 'push' && action.selected)) data.jumps++;
-      if (correct && gameId === 'mathInvader' && state?.selectedEnemy?.enemyId && state.selectedEnemy.enemyId === before.priority) data.priorityHits++;
+    observeAnswer({ correct, combo, world }) {
       data.answered++; if (correct) data.correct++;
       data.maxCombo = Math.max(data.maxCombo, combo || 0);
       data.world = world; evaluate();
@@ -104,7 +107,7 @@ export function createRunChallenge(gameId, variation = 0, course = null) {
           selected: goal === selected, enabled: data.answered === 0 })),
         message: status === 'achieved' ? `目標達成！「${selected.name}」` :
           status === 'missed' ? `「${selected.name}」は次の挑戦へ。` : `${selected.rule} あと${remaining}問。`,
-        next: status === 'achieved' ? '次は別の目標を選んで挑戦しよう。' : selected.hint };
+        next: status === 'achieved' ? '次は別の目標にも挑戦しよう。' : selected.hint };
     },
   };
 }

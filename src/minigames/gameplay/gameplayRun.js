@@ -1,26 +1,31 @@
-import { createExplorationWorld, createRaceWorld, createTreasureWorld } from './trailWorlds.js';
-import { createLanternWorld, createConstellationWorld, createBridgeWorld } from './puzzleWorlds.js';
-import { createShootingWorld, createDefenseWorld } from './battleWorlds.js';
+import { createChestWorld, createMoleWorld, createCartWorld, createStarWorld, createBridgeRunWorld } from './quizWorlds.js';
+import { createDashWorld, createInvaderWorld, createGateWorld } from './arcadeWorlds.js';
 import { createRunChallenge } from './runChallenges.js';
-const worlds={mathSprint:createRaceWorld, mathInvader:createShootingWorld, englishChoice:createTreasureWorld,
-  sentenceOrder:createBridgeWorld, timedChoice:createLanternWorld, multiSelect:createConstellationWorld,
-  asyncChoice:createExplorationWorld, kanjiDefense:createDefenseWorld};
+const worlds={mathSprint:createDashWorld, mathInvader:createInvaderWorld, englishChoice:createChestWorld,
+  sentenceOrder:createBridgeRunWorld, timedChoice:createMoleWorld, multiSelect:createStarWorld,
+  asyncChoice:createCartWorld, kanjiDefense:createGateWorld};
 
 export function createGameplayRun(gameId,effects,options={}) {
   const world=worlds[gameId]?.(effects,options);
   const challenge=createRunChallenge(gameId,options.variation,options.course);
   if (challenge && world) challenge.observeAction(world.snapshot());
-  let state=null, completed=false;
+  let state=null, completed=false, challengeClosed=false;
+  // A world may keep playing its finish (e.g. the runner reaching the goal)
+  // after the Core completes; the goal closes once that finish is over.
+  const closeChallenge=()=>{if(!challengeClosed&&!world?.snapshot().holdResult){challengeClosed=true;challenge?.complete();}};
   return {
     context(next){state=next;world?.context?.(next);},
-    update(dt){if(!completed && state && !state.paused){world?.update?.(dt,state);if(world)challenge?.observeAction(world.snapshot());}},
+    update(dt){
+      if(!state || state.paused)return;
+      if(!completed){world?.update?.(dt,state);if(world)challenge?.observeAction(world.snapshot());}
+      else if(world?.snapshot().holdResult){world.update?.(dt,state);challenge?.observeAction(world.snapshot());closeChallenge();}
+    },
     answer(correct,payload,combo){
-      const before=world?.snapshot()??{};
       world?.answer(correct,payload,combo);
-      challenge?.observeAnswer({correct,combo,before,world:world.snapshot(),state});
+      challenge?.observeAnswer({correct,combo,world:world.snapshot()});
     },
     boost(){world?.boost();if(world)challenge?.observeAction(world.snapshot());},
-    complete(){if(completed)return;completed=true;world?.complete?.();challenge?.complete();},
+    complete(){if(completed)return;completed=true;world?.complete?.();closeChallenge();},
     act(action){
       if (!world||!state||state.paused||completed||typeof action!=='string'||!['answering','playing'].includes(state.phase)) return false;
       if (action.startsWith('run-goal-')) return !!challenge?.choose(action);
@@ -28,7 +33,7 @@ export function createGameplayRun(gameId,effects,options={}) {
       if (accepted) challenge?.observeAction(world.snapshot());
       return !!accepted;
     },
-    allow(command){return !(gameId==='asyncChoice' && command?.type==='answer' && world.snapshot().waiting);},
+    allow(){return true;},
     snapshot(){const current=world?.snapshot();return current?{...current,
       ...(challenge ? {challenge:challenge.snapshot()} : {}),
       ...(options.course ? {course:{id:options.course.id,name:options.course.name,description:options.course.description}} : {})} : null;},

@@ -7,13 +7,19 @@ import { friendshipTitle } from './companionGrowth.js';
 import { scoreRank } from './scoreRank.js';
 import { createFindings } from './scenePolish.js';
 
-export function createMiniGameShell({ doc, view, definition, gotomon, play, reviewMode = false, onPause, onBoost, onAct, onAdvance, onBack, onReplay, award,
+// Intro cards are shown once per game per page load; replays start directly.
+const seenIntros = new Set();
+
+export function createMiniGameShell({ doc, view, definition, gotomon, play, reviewMode = false, pace = 'normal', course = null, onPause, onBoost, onAct, onAdvance, onBack, onReplay, award,
   onReview, onNormalPlay, onNotebook, onRetryMistakes, getMistakeCount = () => 0, getReviewCount = () => 0,
   getLearningSaveStatus = () => ({ failed: false, pending: 0 }), onRetryLearningSave }) {
   const root = view.root;
   // Headless contract fixtures supply only the v1 view interface.
   if (!root?.querySelector) return { update() {}, dispose() {} };
   const info = gameExperiences[definition.id], shell = root.querySelector('[class$="-shell"]');
+  // Arcade views draw their own world and HUD; the shell adds no in-play menus.
+  // arcadeView: the view draws its own world (also in review). arcade: in-play automation.
+  const arcadeView = !!info.arcade, arcade = arcadeView && !reviewMode;
   root.classList.add('yt-game'); root.dataset.experience = info.scene;
   root.style.setProperty('--accent', info.color);
   const header = root.querySelector('header');
@@ -42,7 +48,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   const howToList = element(doc, 'ol');
   for (const step of info.howTo) howToList.append(element(doc, 'li', '', step));
   howTo.append(howToSummary, howToList);
-  soundPanel.after(howTo);
+  if (!arcadeView) soundPanel.after(howTo);
   howTo.addEventListener('keydown', event => event.stopPropagation());
   howTo.addEventListener('toggle', () => {
     if (howTo.open && !state?.paused && !state?.result) {
@@ -59,10 +65,14 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   hud.append(name, score, combo);
   const skill = button(doc, '', onBoost, 'gt-button gt-skill'); skill.dataset.action = 'boost';
   const gauge = element(doc, 'meter'); gauge.min = 0; gauge.max = 3; gauge.value = 0; gauge.setAttribute('aria-label', '相棒ゲージ');
-  const skillLabel = element(doc, 'span'); skill.append(gauge, skillLabel); hud.append(skill); howTo.after(hud);
-  const scene = createCompanionScene({ doc, root, info, gotomon, act: onAct }); hud.after(scene.root);
-  const sceneCanvas = scene.root.querySelector('.gt-scene');
-  if (!reviewMode) {
+  const skillLabel = element(doc, 'span'); skill.append(gauge, skillLabel); hud.append(skill);
+  if (!arcadeView) howTo.after(hud);
+  const scene = arcadeView ? null : createCompanionScene({ doc, root, info, gotomon, act: onAct });
+  if (scene) hud.after(scene.root);
+  // Not '*-companion': minigame-shell.css hides that suffix for the older games' canvas figures.
+  else view.attachCompanion?.(companionPortrait(doc, gotomon, 'ya-buddy'));
+  const sceneCanvas = scene?.root.querySelector('.gt-scene');
+  if (!reviewMode && !arcadeView) {
     root.classList.add('gt-fullscreen-play');
     const arena = root.querySelector('.mi-board, .kd-board') || sceneCanvas;
     const playControls = root.querySelector('.ms-play > div, .ec-play > div, .so-play > div, .tc-play > div, .ac-play > div, .mi-controls, .kd-controls');
@@ -75,14 +85,15 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
     const worldActions = scene.root.querySelector('.gt-world-actions');
     if (worldActions && worldActions.parentElement !== arena) arena.append(worldActions);
   }
-  const help = element(doc, 'p', 'gt-help', info.goal); scene.root.after(help);
+  const help = element(doc, 'p', 'gt-help', info.goal); if (scene) scene.root.after(help);
   const saveAlert = element(doc, 'div', 'gt-learning-save-alert');
   saveAlert.hidden = true;
   saveAlert.setAttribute('role', 'alert');
   const saveAlertText = element(doc, 'p');
   const saveAlertRetry = button(doc, 'いま保存をやり直す', () => onRetryLearningSave?.(), 'gt-button');
   saveAlertRetry.dataset.action = 'retry-learning-save';
-  saveAlert.append(saveAlertText, saveAlertRetry); help.after(saveAlert);
+  saveAlert.append(saveAlertText, saveAlertRetry);
+  if (scene) help.after(saveAlert); else soundPanel.after(saveAlert);
   const sentenceExplanation = definition.id === 'sentenceOrder' ? element(doc, 'p', 'gt-sentence-explanation') : null;
   if (sentenceExplanation) { sentenceExplanation.hidden = true; sentenceExplanation.setAttribute('role', 'status'); root.querySelector('.so-feedback')?.after(sentenceExplanation); }
   // Keyboard activation of shell controls must not submit the game's answer.
@@ -125,6 +136,32 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   let state = null, receipt = null, resultShown = false, soundAnswers=0,soundBoosts=0,soundComplete=false;
   let helpAutoPaused = false;
   let feedbackId = null, feedbackMs = 0;
+  let introOpen = false;
+  if (arcade && !seenIntros.has(definition.id)) {
+    const intro = element(doc, 'div', 'ya-intro');
+    intro.setAttribute('role', 'dialog'); intro.setAttribute('aria-modal', 'true');
+    intro.setAttribute('aria-label', `${definition.title}のあそびかた`);
+    const card = element(doc, 'div', 'ya-intro-card');
+    const steps = element(doc, 'ol');
+    info.howTo.forEach((step, index) => { const item = element(doc, 'li'); item.append(element(doc, 'b', '', String(index + 1)), element(doc, 'span', '', step)); steps.append(item); });
+    const meta = element(doc, 'div', 'ya-intro-meta');
+    meta.append(element(doc, 'span', pace === 'slow' ? 'ya-pace-slow' : '', pace === 'slow' ? 'ゆっくりモード' : 'ふつうのはやさ'));
+    const mission = play.snapshot().world?.challenge;
+    if (mission) meta.append(element(doc, 'span', '', `ミッション：${mission.name}`));
+    if (course) meta.append(element(doc, 'span', '', `★ ${course.name}`));
+    const start = button(doc, 'スタート！', () => {
+      if (!introOpen) return;
+      introOpen = false; seenIntros.add(definition.id); intro.remove(); onPause(false); view.focusPlay?.();
+    }, 'ya-intro-start');
+    start.dataset.action = 'start-play';
+    card.append(element(doc, 'div', 'ya-intro-icon', info.icon), element(doc, 'h2', '', definition.title),
+      element(doc, 'p', 'ya-intro-tagline', info.description), steps, meta, start);
+    if (info.controlsNote) card.append(element(doc, 'p', 'ya-intro-note', info.controlsNote));
+    intro.append(card);
+    // Keys inside the card never reach the game's document key bindings.
+    intro.addEventListener('keydown', event => event.stopPropagation());
+    root.append(intro); introOpen = true; onPause(true); start.focus?.({ preventScroll: true });
+  }
   function commit() {
     const current = play.snapshot();
     receipt = award({ score: (state.result?.score ?? current.learningPoints) + current.bonus,
@@ -159,24 +196,34 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
         sentenceExplanation.textContent = state.problem?.explanation || '';
         if (state.result && sentenceExplanation.parentNode !== resultDetails) resultDetails.append(sentenceExplanation);
       }
-      root.dataset.paused = String(state.paused); root.dataset.completed = String(!!state.result);
+      // A world may hold the result briefly (the runner still crossing the goal).
+      const showResult = !!state.result && !(arcade && current.world?.holdResult);
+      root.dataset.paused = String(state.paused); root.dataset.completed = String(showResult);
       // Pause owns all play input, while navigation, sound and resume remain active.
       for (const child of shell.children) {
         if (![header, soundPanel, howTo].includes(child)) child.inert = !!state.paused;
       }
-      pause.textContent = howTo.open ? 'あそびかた確認中' : state.paused ? '再開' : '一時停止'; pause.disabled = !!state.result || howTo.open;
+      pause.textContent = introOpen ? 'じゅんび中' : howTo.open ? 'あそびかた確認中' : state.paused ? '再開' : '一時停止';
+      pause.disabled = !!state.result || howTo.open || introOpen;
       howTo.hidden = !!state.result;
+      // Arcade: the companion's skill fires on its own as a fever when the gauge fills.
+      // The Host re-renders after an accepted boost, so this pass stops here.
+      if (arcade && current.gauge >= 3 && !state.paused && !state.result && !introOpen && onBoost()) return;
       gauge.value = Math.min(3, current.gauge); skill.disabled = state.paused || !!state.result || current.gauge < 3;
       skillLabel.textContent = info.scene==='lantern'?(current.gauge>=3?'光をひらく！':'正解で光がたまる'):current.gauge >= 3 ? `${info.skill} · ${info.scene==='craft'?'2ルートへ光':info.effect}` : `${info.skill} ${Math.floor(current.gauge)}/3`;
       skill.title = `${current.growth.description}・技 ${current.skillPoints}pt＋ゲーム固有効果`;
       score.textContent = `${(state.score ?? current.learningPoints) + current.bonus} pt`;
       combo.textContent = `${current.combo} COMBO`;
-      scene.update(state, current, dt);
-      if (state.mode !== 'review' && state.phase === 'feedback' && !state.paused && (state.lastAnswer?.correct || state.lastAnswer?.classification === 'fullCorrect')) {
+      scene?.update(state, current, dt);
+      view.present?.(play.snapshot(), dt, state);
+      const answeredWell = state.lastAnswer?.correct || state.lastAnswer?.classification === 'fullCorrect';
+      const advanceAfter = state.mode === 'review' || state.phase !== 'feedback' || state.paused ? null
+        : answeredWell ? (arcade ? 450 : 600) : arcade ? 1400 : null;
+      if (advanceAfter !== null) {
         const id = state.problem?.problemId;
         if (feedbackId !== id) { feedbackId = id; feedbackMs = 0; }
         feedbackMs += dt;
-        if (feedbackMs >= 600 && onAdvance) { feedbackMs = -Infinity; onAdvance(state); return; }
+        if (feedbackMs >= advanceAfter && onAdvance) { feedbackMs = -Infinity; onAdvance(state); return; }
       }
       help.hidden = !!state.result; hud.hidden = !!state.result;
       const learningSave = getLearningSaveStatus();
@@ -184,7 +231,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
       if (!saveAlert.hidden) saveAlertText.textContent = `${learningSave.pending}問の記録を保存できていません。「いま保存をやり直す」を押してください。画面を閉じると未保存の記録は失われます。`;
       saveAlertRetry.disabled = !!state.paused;
       if (state.mode === 'review') {
-        scene.root.hidden = true; skill.hidden = true; score.hidden = true; combo.hidden = true;
+        if (scene) scene.root.hidden = true;
+        skill.hidden = true; score.hidden = true; combo.hidden = true;
         help.textContent = definition.id === 'sentenceOrder' ? '文のつながりを、相棒とたしかめよう。' : 'ことばを、相棒とたしかめよう。';
       }
       if (soundAnswers!==current.answered||soundBoosts!==current.boosts||soundComplete!==current.completed) {
@@ -193,8 +241,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
         else if (current.reaction === 'incorrect') publish('playSE', 'wrong');
         else if (current.reaction === 'partial') publish('playSE','decide');
       }
-      result.hidden = !state.result;
-      if (state.result) {
+      result.hidden = !showResult;
+      if (showResult) {
         if (!receipt) commit();
         const reviewing = state.mode === 'review';
         growthResult.root.hidden = reviewing;
@@ -213,7 +261,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
         const rank = scoreRank(definition.id, points, current.correct);
         rankLabel.textContent = `${rank.rank} RANK`; rankLabel.dataset.rank = rank.rank;
         nextGoal.textContent = reviewing ? `${state.correct} / ${state.totalQuestions}${definition.id === 'sentenceOrder' ? '文' : '語'}に正解。${getReviewCount() ? 'もう一度たしかめよう。' : '今回の復習はできたね！'}` : rank.next ? rank.goal : current.world?.goal || '次は自己ベストをこえよう';
-        const challenge = current.world?.challenge;
+        const challenge = reviewing ? null : current.world?.challenge;
         challengeResult.hidden = !challenge;
         if (challenge) {
           challengeResult.textContent = challenge.status === 'achieved' ? challenge.message : `今回の目標「${challenge.name}」は次の挑戦へ。`;
@@ -224,7 +272,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
         findings?.update(current.world?.findings);
         resultScore.textContent = `${points} pt`;
         stats.textContent = reviewing ? '相棒と、ことばをたしかめたよ。' : `${current.world?.course ? `${current.world.course.name} · ` : ''}${current.world?.summary || ''}${receipt?.reward?.newTimeBest?' · タイム更新！':''}`;
-        result.dataset.world=info.scene;result.dataset.triumph=String(info.scene==='craft'?current.world?.completed===3:info.scene==='shoot'?current.world?.bossHp===0:info.scene==='defend'?state.life>0:current.correct>=8);
+        result.dataset.world=info.scene;result.dataset.triumph=String(info.scene==='craft'?current.world?.completed===3:info.scene==='shoot'?!!current.world?.bossDown:info.scene==='defend'?state.life>0:current.correct>=8);
         replay.disabled = state.paused;
         if (!resultShown) { resultShown = true; root.scrollTop = 0; (onNotebook && receipt?.ok ? notebook : replay).focus({ preventScroll: true }); }
       }

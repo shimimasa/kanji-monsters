@@ -1,141 +1,194 @@
-import { createChoiceHint } from '../choiceHint.js';
-import { createChoiceComparison } from '../choiceComparison.js';
+import { createArcadeFrame, bindArcadeKeys, setVar } from '../arcade/arcadeKit.js';
+
 const CSS = `
-#timedChoiceScreen{position:fixed;inset:0;z-index:100010;background:#fff7e8;color:#332814;overflow:auto;overscroll-behavior:contain;font:18px system-ui,sans-serif;box-sizing:border-box;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom));touch-action:manipulation}
-#timedChoiceScreen *{box-sizing:border-box}#timedChoiceScreen [hidden]{display:none!important}
-#timedChoiceScreen .tc-shell{max-width:720px;margin:0 auto}#timedChoiceScreen header{display:flex;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:-12px;z-index:2;background:#fff7e8;padding:4px 0}
-#timedChoiceScreen h1{font-size:clamp(20px,5vw,28px);margin:0}#timedChoiceScreen button{min-width:44px;min-height:44px;border:2px solid #8a6422;border-radius:11px;background:#fff;color:#332814;font:inherit;padding:9px 14px;cursor:pointer}
-#timedChoiceScreen button:disabled{opacity:.55;cursor:default}#timedChoiceScreen button:focus-visible{outline:3px solid #176b73;outline-offset:2px}.tc-progress{display:flex;justify-content:space-between;gap:12px;margin:10px 0;font-weight:700}.tc-pause{color:#7a531a;margin:8px 0}
-#timedChoiceScreen .tc-play{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:16px;align-items:start}.tc-timer-label{text-align:center;font-weight:800;margin:5px 0}.tc-timer-track{height:14px;border:1px solid #80632f;border-radius:10px;background:#eadfc8;overflow:hidden}.tc-timer-bar{height:100%;width:100%;background:#d47920}
-#timedChoiceScreen .tc-prompt{font-size:clamp(28px,7vw,46px);font-weight:800;text-align:center;margin:12px 0}.tc-help{text-align:center;margin:5px 0 12px;color:#66532f}.tc-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tc-choice{width:100%;min-height:56px}.tc-choice[data-status=correct]{background:#d9f4df;border-color:#237340}.tc-choice[data-status=incorrect]{background:#ffe1df;border-color:#a53730}.tc-feedback{min-height:38px;margin:10px 0;line-height:1.5}.tc-primary{background:#9a5518!important;color:#fff!important;border-color:#9a5518!important}
-#timedChoiceScreen .tc-companion{pointer-events:none;text-align:center;margin:0;padding-top:4px;color:#66583b;font-size:14px}.tc-companion canvas{display:block;width:180px;height:90px;max-width:100%;margin:auto}.tc-result{text-align:center;padding:12px}.tc-result h2{font-size:28px}.tc-result p{font-size:19px;margin:10px}.tc-result strong{display:block;font-size:28px}
-@media(max-width:540px){#timedChoiceScreen .tc-play{grid-template-columns:1fr}.tc-companion{padding:0}.tc-companion canvas{width:140px;height:70px}.tc-prompt{margin:6px 0}.tc-choice{min-height:52px}}
-@media(max-height:430px) and (min-width:541px){#timedChoiceScreen .tc-prompt{font-size:30px;margin:2px 0}.tc-help,.tc-progress,.tc-feedback,.tc-timer-label{margin:3px 0}.tc-choice{min-height:44px;padding:5px}.tc-companion canvas{width:120px;height:60px}.tc-result{padding:4px}}
+#timedChoiceScreen .ya-field{background:linear-gradient(#9fdcff 0,#d6f1ff 30%,#8fd07a 30.2%,#6fb85c 100%)}
+#timedChoiceScreen .tc-hedge{position:absolute;left:0;right:0;top:24%;height:12%;background-image:radial-gradient(ellipse 60px 40px at 40px 100%,#4f9a45 60%,transparent 62%);background-size:90px 100%;background-repeat:repeat-x}
+#timedChoiceScreen .tc-hole{position:absolute;z-index:2;width:min(21%,150px);aspect-ratio:2.6;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#2b1a0d 55%,#5a3a1f 57%,#7a5230 70%,transparent 72%)}
+#timedChoiceScreen .tc-mole{position:absolute;z-index:3;width:min(21%,150px);height:min(34%,190px);min-width:44px;min-height:44px;transform:translate(-50%,-100%);padding:0;border:0;background:none;font:inherit;cursor:pointer;touch-action:manipulation;overflow:hidden;-webkit-clip-path:inset(-60px -20px 0 -20px);clip-path:inset(-60px -20px 0 -20px)}
+#timedChoiceScreen .tc-body{position:absolute;left:50%;bottom:0;width:66%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;transform:translate(-50%,calc(var(--down,1) * 100%));transition:transform .08s linear}
+#timedChoiceScreen .tc-card{position:relative;z-index:2;margin-bottom:-6px;padding:4px 10px;border-radius:10px;background:#fffdf3;color:#2a1c10;border:3px solid #6b4a2a;font-size:clamp(16px,2.4vw,24px);font-weight:900;white-space:nowrap;box-shadow:0 3px 0 #0003}
+#timedChoiceScreen .tc-key{font-size:.65em;color:#8a7358;margin-right:3px}
+#timedChoiceScreen .tc-head{position:relative;width:100%;flex:1;border-radius:48% 48% 12% 12%;background:radial-gradient(circle at 34% 34%,#2a1c10 5%,transparent 6%),radial-gradient(circle at 66% 34%,#2a1c10 5%,transparent 6%),radial-gradient(ellipse at 50% 52%,#f7a6a6 8%,transparent 9%),radial-gradient(ellipse at 50% 60%,#d9b08c 22%,transparent 23%),linear-gradient(#8a5a36,#6d4527)}
+#timedChoiceScreen .tc-mole[data-status=hit] .tc-head{background:radial-gradient(circle at 34% 34%,#2a1c10 2%,transparent 7%),radial-gradient(circle at 66% 34%,#2a1c10 2%,transparent 7%),radial-gradient(ellipse at 50% 60%,#d9b08c 22%,transparent 23%),linear-gradient(#8a5a36,#6d4527);animation:tc-squash .3s ease-out}
+#timedChoiceScreen .tc-mole[data-status=hit] .tc-card{background:#d7f7df;border-color:#1f9d55}
+#timedChoiceScreen .tc-mole[data-status=answer] .tc-card{background:#e4f4ff;border-color:#2a6fb0;box-shadow:0 0 0 4px #bfe3ff}
+#timedChoiceScreen .tc-mole[data-status=miss] .tc-card{background:#fff1d6;border-color:#c77f16}
+#timedChoiceScreen .tc-mole:focus-visible .tc-card{outline:3px solid #ffd54a;outline-offset:2px}
+#timedChoiceScreen .tc-hero{position:absolute;left:50%;bottom:3%;z-index:5;width:clamp(64px,9vw,92px);height:clamp(64px,9vw,92px);transform:translateX(-50%)}
+#timedChoiceScreen .tc-hero .gt-portrait{display:block;width:100%;height:100%;background:none;border:0}
+#timedChoiceScreen .tc-hero .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 3px #0005)}
+#timedChoiceScreen .tc-hero[data-fever=true]::after{content:'';position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,#ffd54a66,transparent 70%);animation:ya-glow .4s infinite alternate;z-index:-1}
+#timedChoiceScreen .tc-word{margin:0;text-align:center;font-size:clamp(40px,6vw,60px);font-weight:900;color:#fff;letter-spacing:.04em}
+#timedChoiceScreen .tc-ask{margin:0;text-align:center;font-size:15px;font-weight:700;color:#ffe2b8}
+#timedChoiceScreen .tc-timer{height:12px;border-radius:99px;background:#ffffff22;overflow:hidden}
+#timedChoiceScreen .tc-timer i{display:block;height:100%;width:calc(var(--left,1) * 100%);background:linear-gradient(90deg,#ffb627,#ffe066);border-radius:inherit}
+#timedChoiceScreen .tc-timer[data-low=true] i{background:linear-gradient(90deg,#ff7a59,#ffb627)}
+#timedChoiceScreen .tc-remaining{margin:0;text-align:center;font-size:14px;font-weight:700;color:#ffe2b8;font-variant-numeric:tabular-nums}
+#timedChoiceScreen .tc-next{min-height:52px;border:0;border-radius:14px;background:#ffb627;color:#3a2400;font:inherit;font-size:20px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer}
+#timedChoiceScreen .tc-review{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+#timedChoiceScreen .tc-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
+#timedChoiceScreen .tc-review li[data-correct=false]{background:#fff3da}
+@keyframes tc-squash{0%{transform:scaleY(1)}40%{transform:scaleY(.7) translateY(12%)}100%{transform:scaleY(1)}}
 `;
 
-export function createTimedChoiceView({ document: doc, onBack, onReplay, onNext, onAnswer, getSnapshot }) {
-  let active = true, root = null, shownProblemId = null;
+const HOLE_X = [14, 38, 62, 86], HOLE_Y = 66;
+
+// How far a mole is hidden (1 = in the hole) for the time spent on the question.
+const moleDown = (elapsed, deadline) => {
+  if (!Number.isFinite(deadline)) return Math.max(0, 1 - elapsed / 300);
+  const rise = Math.max(0, 1 - elapsed / 300), sink = Math.max(0, (elapsed - (deadline - 700)) / 700);
+  return Math.min(1, Math.max(rise, sink * .55));
+};
+
+export function createTimedChoiceView({ document: doc, dispatch, onBack, getSnapshot }) {
+  let active = true, problemId = null, lastSeq = -1, lastEventId = 0, resolved = false;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
-  const el = (tag, className = '', text = '') => {
-    const node = doc.createElement(tag); node.className = className; node.textContent = text; return node;
-  };
-  root = el('section'); root.id = 'timedChoiceScreen'; root.setAttribute('aria-label', 'タイムことば');
+  const frame = createArcadeFrame(doc, { id: 'timedChoiceScreen', title: 'タイムことば', theme: 'garden' });
+  const { root, world, dock, fx, el } = frame;
   const style = el('style'); style.textContent = CSS; root.append(style);
-  const shell = el('div', 'tc-shell'); root.append(shell);
-  const header = el('header'); shell.append(header); header.append(el('h1', '', 'タイムことば'));
-  const back = el('button', '', 'もどる'); back.type = 'button'; back.dataset.action = 'back'; header.append(back);
-  on(back, 'click', () => { if (active) onBack(); });
-  const progress = el('div', 'tc-progress'), position = el('span'), score = el('span'); progress.append(position, score); shell.append(progress);
-  const pause = el('p', 'tc-pause', 'おやすみ中'); pause.hidden = true; shell.append(pause);
-  const play = el('div', 'tc-play'), controls = el('div'); shell.append(play); play.append(controls);
-  const timerLabel = el('p', 'tc-timer-label'); timerLabel.dataset.role = 'remaining'; controls.append(timerLabel);
-  const timerTrack = el('div', 'tc-timer-track'); timerTrack.setAttribute('role', 'progressbar');
-  timerTrack.setAttribute('aria-valuemin', '0'); const timerBar = el('div', 'tc-timer-bar'); timerTrack.append(timerBar); controls.append(timerTrack);
-  const help = el('p', 'tc-help', '時間内に よみを えらんでね'); controls.append(help);
-  const prompt = el('div', 'tc-prompt'); prompt.dataset.role = 'problem'; controls.append(prompt);
-  const choiceArea = el('div', 'tc-choices'); choiceArea.setAttribute('aria-label', 'こたえの候補'); controls.append(choiceArea);
-  const choiceButtons = Array.from({ length: 4 }, (_, index) => {
-    const button = el('button', 'tc-choice'); button.type = 'button'; button.dataset.choiceIndex = String(index + 1);
-    choiceArea.append(button); return button;
+  on(frame.back, 'click', () => { if (active) onBack(); });
+  world.append(el('div', 'tc-hedge'));
+  const moles = HOLE_X.map((x, index) => {
+    const hole = el('i', 'tc-hole'); hole.style.left = `${x}%`; hole.style.top = `${HOLE_Y}%`;
+    const node = el('button', 'tc-mole'); node.type = 'button'; node.dataset.choiceIndex = String(index + 1);
+    node.style.left = `${x}%`; node.style.top = `${HOLE_Y}%`;
+    const body = el('span', 'tc-body'), card = el('span', 'tc-card');
+    body.append(card, el('span', 'tc-head')); node.append(body);
+    on(node, 'click', () => choose(index));
+    world.append(hole, node);
+    return { node, body, card };
   });
-  const hint = createChoiceHint({ doc, container: controls, getSnapshot, onChange: () => updateChoices(getSnapshot()) });
-  const updateChoices = state => {
-    hint.update(state);
-    const canAnswer = !state.paused && state.phase === 'answering';
-    choiceButtons.forEach(button => {
-      button.hidden = hint.excludes(state, button.dataset.choiceId);
-      button.disabled = !canAnswer || button.hidden; button.dataset.status = '';
-    });
-  };
-  const choose = index => {
-    const state = getSnapshot(), choice = state.problem?.choices[index];
-    if (!active || state.paused || state.phase !== 'answering' || !state.attemptId || !choice || hint.excludes(state, choice.choiceId)) return false;
-    return onAnswer({
-      sessionId: state.sessionId, problemId: state.problem.problemId,
-      attemptId: state.attemptId, choiceId: choice.choiceId,
-    });
-  };
-  choiceButtons.forEach((button, index) => on(button, 'click', () => choose(index)));
-  on(doc, 'keydown', event => {
-    if (!active || event.defaultPrevented || event.repeat || event.isComposing ||
-        event.altKey || event.ctrlKey || event.metaKey) return;
-    const choiceIndex = ['1', '2', '3', '4'].indexOf(event.key);
-    if (choiceIndex >= 0 && choose(choiceIndex)) event.preventDefault();
-  });
-  const feedback = el('p', 'tc-feedback'); feedback.setAttribute('aria-live', 'polite'); controls.append(feedback);
-  const next = el('button', 'tc-primary', '次へ'); next.type = 'button'; next.dataset.action = 'next'; controls.append(next);
+  const hero = el('div', 'tc-hero'); world.append(hero);
+
+  const word = el('p', 'tc-word'); word.dataset.role = 'problem';
+  const ask = el('p', 'tc-ask', 'の よみは？');
+  const timer = el('div', 'tc-timer'); timer.append(el('i'));
+  timer.setAttribute('role', 'progressbar'); timer.setAttribute('aria-label', 'のこり時間'); timer.setAttribute('aria-valuemin', '0'); timer.setAttribute('aria-valuemax', '100');
+  const remaining = el('p', 'tc-remaining'); remaining.dataset.role = 'remaining';
+  const note = el('p', 'ya-dock-note', '正しい読みのもぐらをたたこう！'); note.dataset.role = 'feedback';
+  const next = el('button', 'tc-next', 'つぎへ'); next.type = 'button'; next.dataset.action = 'next'; next.hidden = true;
   on(next, 'click', () => {
     const state = getSnapshot();
-    if (active && state.phase === 'feedback' && !state.paused) onNext(state.sessionId, state.problem.problemId);
+    if (active && !state.paused && state.phase === 'feedback') dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem?.problemId } });
   });
-  const companion = el('figure', 'tc-companion'), canvas = el('canvas'); canvas.width = 280; canvas.height = 140;
-  canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', '仲間のジャガイモスライム');
-  const caption = el('figcaption', '', 'ジャガイモスライム'); companion.append(canvas, caption); play.append(companion);
-  const result = el('div', 'tc-result'), resultTitle = el('h2', '', '10もん おつかれさま！'); result.hidden = true; shell.append(result); result.append(resultTitle);
-  const comparison = createChoiceComparison(doc, 'tc-missed'); result.append(comparison.root);
-  const resultCorrect = el('strong'), resultIncorrect = el('strong'), resultTimedOut = el('strong'), resultAccuracy = el('strong');
-  for (const [label, value] of [['せいかい', resultCorrect], ['まちがい', resultIncorrect], ['時間切れ', resultTimedOut], ['せいかいりつ', resultAccuracy]]) {
-    const row = el('p', '', label); row.append(value); result.append(row);
-  }
-  const replay = el('button', 'tc-primary', 'もういちど'); replay.type = 'button'; replay.dataset.action = 'replay'; result.append(replay);
-  on(replay, 'click', () => { if (active && !getSnapshot().paused) onReplay(); });
+  dock.append(word, ask, timer, remaining, note, next);
+  const review = el('div', 'ya-learning-result'); review.hidden = true;
+  const reviewList = el('ol', 'tc-review'); review.append(el('h3', '', '今回のことば'), reviewList); frame.shell.append(review);
   doc.body.append(root);
+  const answers = [];
+
+  function choose(index) {
+    const state = getSnapshot(), choice = state.problem?.choices[index];
+    if (!active || state.paused || state.phase !== 'answering' || !choice) return false;
+    return dispatch({ type: 'answer', payload: { sessionId: state.sessionId, problemId: state.problem.problemId,
+      attemptId: state.attemptId, choiceId: choice.choiceId } });
+  }
+  removes.push(bindArcadeKeys(doc, event => {
+    if (!active || event.repeat) return false;
+    const index = ['1', '2', '3', '4'].indexOf(event.key);
+    if (index >= 0) { choose(index); return true; }
+    if (event.key === 'Enter' && !next.hidden) { next.click(); return true; }
+    return false;
+  }));
+
+  const wordOf = prompt => prompt.match(/「(.+?)」/)?.[1] ?? prompt;
+  const showAnswer = state => {
+    const answer = state.lastAnswer, problem = state.problem;
+    const correctIndex = problem.choices.findIndex(choice => choice.choiceId === answer.correctChoiceId);
+    const chosenIndex = problem.choices.findIndex(choice => choice.choiceId === answer.choiceId);
+    const reading = problem.choices[correctIndex]?.text ?? '';
+    const shown = wordOf(problem.prompt);
+    moles.forEach(({ node }, index) => {
+      if (index === correctIndex) node.dataset.status = answer.correct ? 'hit' : 'answer';
+      else if (index === chosenIndex) node.dataset.status = 'miss';
+      else node.dataset.status = 'hide';
+    });
+    answers.push({ word: shown, reading, correct: answer.correct });
+    if (answer.correct) {
+      fx.pop(HOLE_X[correctIndex], HOLE_Y - 34, 'ポカッ！', 'good'); fx.burst(HOLE_X[correctIndex], HOLE_Y - 20, 'good', 1.1);
+      note.textContent = `せいかい！「${shown}」は「${reading}」`;
+      frame.announce(`せいかい。${shown}、${reading}`);
+    } else {
+      const timeout = !answer.choiceId;
+      if (!timeout) fx.pop(HOLE_X[chosenIndex], HOLE_Y - 30, 'スカッ', 'soft');
+      fx.pop(HOLE_X[correctIndex], HOLE_Y - 40, `こたえは ${reading}`, 'info');
+      note.textContent = `${timeout ? '時間切れ。' : ''}「${shown}」は「${reading}」と読むよ`;
+      frame.announce(`${shown} は ${reading} と読みます`);
+    }
+  };
 
   return {
     root,
-    canvas,
-    update(state, companionState) {
+    attachCompanion(portrait) { hero.append(portrait); },
+    focusPlay() { moles[0].node.focus?.({ preventScroll: true }); },
+    update(state) {
       if (!active) return;
+      frame.setPaused(state.paused && !state.result);
       const problem = state.problem;
-      if (problem && shownProblemId !== problem.problemId) {
-        shownProblemId = problem.problemId; prompt.textContent = problem.prompt;
-        problem.choices.forEach((choice, index) => {
-          choiceButtons[index].textContent = `${index + 1}. ${choice.text}`;
-          choiceButtons[index].dataset.choiceId = choice.choiceId;
+      if (problem && problem.problemId !== problemId) {
+        problemId = problem.problemId; resolved = false;
+        word.textContent = wordOf(problem.prompt);
+        moles.forEach(({ node, card }, index) => {
+          const choice = problem.choices[index];
+          node.hidden = !choice; delete node.dataset.status; card.textContent = '';
+          node.dataset.choiceId = choice?.choiceId ?? '';
+          if (choice) { card.append(el('span', 'tc-key', String(index + 1)), el('span', '', choice.text)); node.setAttribute('aria-label', `${index + 1}番 ${choice.text}`); }
         });
+        note.textContent = state.mode === 'review' ? '時間を気にせず、読みをたしかめよう' : '正しい読みのもぐらをたたこう！';
       }
-      updateChoices(state);
-      if (state.lastAnswer) {
-        const correctChoice = problem?.choices.find(choice => choice.choiceId === state.lastAnswer.correctChoiceId);
-        for (const button of choiceButtons) {
-          if (button.dataset.choiceId === state.lastAnswer.correctChoiceId) button.dataset.status = 'correct';
-          else if (button.dataset.choiceId === state.lastAnswer.choiceId) button.dataset.status = 'incorrect';
+      if (state.seq !== lastSeq) {
+        lastSeq = state.seq;
+        if (state.lastAnswer && answers.length < state.answered) { showAnswer(state); resolved = true; }
+      }
+      const canAnswer = !state.paused && state.phase === 'answering';
+      moles.forEach(({ node }) => { node.disabled = !canAnswer; });
+      timer.hidden = remaining.hidden = state.mode === 'review';
+      // The countdown comes straight from the Core clock.
+      const elapsed = state.problemElapsedMs ?? 0, deadline = state.deadlineMs;
+      const left = Number.isFinite(deadline) && state.phase === 'answering' ? Math.max(0, 1 - elapsed / deadline) : resolved ? 0 : 1;
+      setVar(timer, '--left', String(left)); timer.dataset.low = String(left < .3);
+      timer.setAttribute('aria-valuenow', String(Math.round(left * 100)));
+      remaining.textContent = Number.isFinite(deadline) && state.phase === 'answering' ? `のこり ${(Math.max(0, deadline - elapsed) / 1000).toFixed(1)} 秒` : '';
+      next.hidden = !(state.mode === 'review' && state.phase === 'feedback');
+      next.disabled = !!state.paused;
+      if (state.result && review.hidden) {
+        review.hidden = false; reviewList.textContent = '';
+        for (const item of answers) {
+          const row = el('li', '', `${item.correct ? '✓' : '☆'} ${item.word}（${item.reading}）`);
+          row.dataset.correct = String(item.correct); reviewList.append(row);
         }
-        feedback.textContent = state.lastAnswer.reason === 'timeout'
-          ? `時間切れ。こたえは「${correctChoice?.text ?? ''}」だよ`
-          : state.lastAnswer.correct
-            ? state.mode === 'review' ? `せいかい！「${problem?.prompt ?? ''}」は「${correctChoice?.text ?? ''}」` : 'せいかい！'
-            : `こたえは「${correctChoice?.text ?? ''}」だよ`;
-      } else feedback.textContent = '';
-      const remaining = Math.max(0, state.remainingMs);
-      const percent = state.deadlineMs > 0 ? Math.min(100, remaining / state.deadlineMs * 100) : 0;
-      timerLabel.textContent = `のこり ${(remaining / 1000).toFixed(1)} 秒`;
-      timerTrack.setAttribute('aria-valuemax', String(state.deadlineMs));
-      timerTrack.setAttribute('aria-valuenow', String(Math.round(remaining)));
-      timerBar.style.width = `${percent}%`;
-      timerTrack.hidden = state.phase !== 'answering' || state.mode === 'review'; timerLabel.hidden = state.phase !== 'answering' || state.mode === 'review';
-      help.textContent = state.mode === 'review' ? '時間制限なし。ゆっくり よみを えらんでね' : '時間内に よみを えらんでね';
-      next.hidden = state.phase !== 'feedback'; next.disabled = state.paused;
-      pause.hidden = !state.paused;
-      const total = state.totalQuestions ?? 10;
-      position.textContent = `${state.mode === 'review' ? '復習 ' : ''}${Math.min(total, state.answered + (state.phase === 'answering' ? 1 : 0))} / ${total}`;
-      score.textContent = `せいかい ${state.correct}`;
-      controls.hidden = !!state.result; result.hidden = !state.result;
-      play.style.display = state.result ? 'flex' : '';
-      play.style.justifyContent = state.result ? 'center' : '';
-      if (state.result) {
-        resultTitle.textContent = `${total}もん おつかれさま！`;
-        resultCorrect.textContent = `${state.result.correct} / ${total}`;
-        comparison.update(state);
-        resultIncorrect.textContent = String(state.result.incorrect);
-        resultTimedOut.textContent = String(state.result.timedOut);
-        resultAccuracy.textContent = `${Math.round(state.result.accuracy * 100)}%`;
       }
-      companion.hidden = !companionState.selected;
-      caption.textContent = companionState.motion?.imageState === 'failed' ? '仲間といっしょに！' : 'ジャガイモスライム';
     },
-    stopInput() { active = false; hint.stopInput(); [...choiceButtons, next, replay, back].forEach(button => { button.disabled = true; }); },
-    dispose() { this.stopInput(); hint.dispose(); removes.splice(0).forEach(remove => remove()); root?.remove(); root = null; },
+    present(play, dt, state) {
+      if (!active || !state) return;
+      frame.tick(dt);
+      const w = play.world || {};
+      const elapsed = state.problemElapsedMs ?? 0, deadline = state.deadlineMs;
+      const down = resolved ? null : moleDown(elapsed, deadline);
+      moles.forEach(({ node, body }) => {
+        const status = node.dataset.status;
+        // After an answer only the right mole stays up to show the reading.
+        const value = down ?? (status === 'hit' || status === 'answer' ? 0 : status === 'miss' ? .35 : 1);
+        setVar(body, '--down', String(value));
+      });
+      hero.dataset.fever = String(!!w.fever);
+      const event = w.lastEvent;
+      if (event && event.id !== lastEventId) {
+        lastEventId = event.id;
+        if (event.type === 'hit' && event.special) fx.banner('しずくハンマー！', 'great');
+        else if (event.type === 'hit' && event.quick) fx.pop(50, 30, 'すばやい！', 'great');
+        else if (event.type === 'boost') { fx.banner('もぐらフィーバー！', 'great'); fx.flash('great'); }
+      }
+      // Review runs have no goal; only normal play shows the mission.
+      const mission = state.mode === 'review' ? null : w.challenge;
+      frame.hud.set({ points: play.learningPoints + play.bonus, comboCount: play.combo,
+        progressValue: (state.answered ?? 0) / (state.totalQuestions || 10),
+        progressLabel: `ポカッ ${w.correct ?? 0} · ${Math.min(state.totalQuestions || 10, (state.answered ?? 0) + (state.phase === 'answering' ? 1 : 0))}/${state.totalQuestions || 10}問`,
+        life: null, gaugeValue: play.gauge, fever: w.fever,
+        missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
+    },
+    stopInput() { active = false; moles.forEach(({ node }) => { node.disabled = true; }); next.disabled = true; },
+    dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

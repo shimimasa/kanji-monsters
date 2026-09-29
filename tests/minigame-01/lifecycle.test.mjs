@@ -81,19 +81,19 @@ test('real Host/View: ten enter/exit, visibility buffer, no RAF/interval, no lis
     assert.equal(d.doc.getElementById('mathSprintScreen').style.height,'423px');
     d.win.navigator.virtualKeyboard.boundingRect={height:0,y:723};
     d.win.navigator.virtualKeyboard.dispatchEvent(new Event('geometrychange'));
-    const input=d.find(n=>n.tagName==='INPUT');input.value=String(session.problem.answer);
+    for(const digit of String(session.problem.answer))click(d.find(n=>n.dataset.digit===digit));
+    const entry=d.find(n=>n.className==='ya-entry');assert.equal(entry.textContent,String(session.problem.answer));
     d.doc.hidden=true;d.doc.dispatchEvent(new Event('visibilitychange'));host.update(500);
-    assert.equal(host.inspect().session.activeElapsedMs,0);assert.equal(input.disabled,true);assert.equal(input.value,String(session.problem.answer));
+    assert.equal(host.inspect().session.activeElapsedMs,0);assert.equal(d.find(n=>n.dataset.action==='answer').disabled,true);assert.equal(entry.textContent,String(session.problem.answer));
     click(d.find(n=>n.dataset.action==='answer'));assert.equal(host.inspect().session.answered,0);
     host.setPaused(true);d.doc.hidden=false;d.doc.dispatchEvent(new Event('visibilitychange'));assert.equal(host.inspect().session.paused,true);
     host.setPaused(false);click(d.find(n=>n.dataset.action==='answer'));host.update(0);
     assert.equal(host.inspect().session.answered,1);assert.equal(host.inspect().companion.action,'attack');
-    click(d.find(n=>n.dataset.action==='next'));host.update(0);assert.equal(host.inspect().session.phase,'answering');
-    assert.notEqual(host.inspect().session.token,session.token);
-    const oldInput=input,oldButton=d.find(n=>n.dataset.action==='answer');
+    assert.equal(host.inspect().session.phase,'feedback');
+    const oldButton=d.find(n=>n.dataset.action==='answer');
     click(d.find(n=>n.dataset.action==='back'));host.exit();host.update(50);await drain();
     assert.equal(host.inspect().valid,false);assert.equal(host.inspect().companion,null);assert.equal(d.listeners(),0);assert.equal(d.doc.body.children.length,0);
-    click(oldButton);oldInput.dispatchEvent(Object.assign(new Event('keydown'),{key:'Enter'}));assert.equal(host.inspect().session,null);
+    click(oldButton);d.doc.dispatchEvent(Object.assign(new Event('keydown'),{key:'Enter'}));assert.equal(host.inspect().session,null);
   }
   assert.equal(back,10);
 });
@@ -104,19 +104,20 @@ test('real Host/View: image failure fallback, full result, replay new identity/s
   const beforeGame=JSON.stringify(gameState),beforeStorage=JSON.stringify([...storage.data]);
   let writes=0;
   t.mock.method(storage,'setItem',()=>{writes++;throw Error('Storage write forbidden');});t.mock.method(storage,'removeItem',()=>{writes++;throw Error('Storage delete forbidden');});
+  // Stand-in for the real shell: advance after each answer, as its auto-advance does.
+  const makeShell=({onAdvance})=>({update(state){if(state.phase==='feedback')onAdvance(state);},dispose(){}});
   const d=dom();let id=0;const host=createMiniGameHost({document:d.doc,window:d.win,makeSessionId:()=>`replay-${++id}`,random:()=>0,
-    loadImage:()=>Promise.reject(Error('missing')),reduced:()=>true});
+    loadImage:()=>Promise.reject(Error('missing')),reduced:()=>true,makeShell});
   host.enter();await drain();host.update(0);assert.equal(host.inspect().companion.motion.imageState,'failed');
-  assert.equal(d.find(n=>n.tagName==='FIGCAPTION').textContent,'仲間といっしょに！');
   const first=host.inspect().session;
   for(let i=0;i<10;i++){
-    const s=host.inspect().session;d.find(n=>n.tagName==='INPUT').value=String(s.problem.answer+(i===3?1:0));
+    const s=host.inspect().session;
+    for(const digit of String(s.problem.answer+(i===3?1:0)))click(d.find(n=>n.dataset.digit===digit));
     click(d.find(n=>n.dataset.action==='answer'));host.update(16);
-    if(i<9){click(d.find(n=>n.dataset.action==='next'));host.update(0);}
   }
   assert.equal(host.inspect().session.result.correct,9);assert.equal(host.inspect().session.seq,21);
-  const replay=d.find(n=>n.dataset.action==='replay');click(replay);host.update(0);
+  assert.equal(d.find(n=>n.className==='ya-learning-result').hidden,false);
+  host.enter();host.update(0);
   assert.notEqual(host.inspect().session.sessionId,first.sessionId);assert.notEqual(host.inspect().session.token,first.token);assert.equal(host.inspect().session.seq,1);
-  click(replay);assert.equal(host.inspect().session.seq,1);
   host.exit();await drain();assert.equal(d.listeners(),0);assert.equal(writes,0);assert.equal(JSON.stringify(gameState),beforeGame);assert.equal(JSON.stringify([...storage.data]),beforeStorage);
 });
