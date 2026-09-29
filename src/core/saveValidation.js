@@ -134,6 +134,17 @@ export function validateSave(save, currentVersion) {
           !Number.isSafeInteger(photo.shots) || photo.shots < 1 || !Number.isSafeInteger(photo.firstAt) || photo.firstAt < 0) throw new Error('Invalid album photo');
     }
   }
+  // Proverb detective case files: best stars per solved proverb id.
+  const caseFiles = save.player.miniGames?.caseFiles;
+  if (caseFiles !== undefined) {
+    requireRecord(caseFiles, 'case files');
+    if (Object.keys(caseFiles).length > 400) throw new Error('Invalid case files size');
+    for (const [id, item] of Object.entries(caseFiles)) {
+      requireRecord(item, 'case file');
+      if (!/^\d+$/.test(id) || !Number.isInteger(item.stars) || item.stars < 1 || item.stars > 3 ||
+          !Number.isSafeInteger(item.solves) || item.solves < 1 || !Number.isSafeInteger(item.firstAt) || item.firstAt < 0) throw new Error('Invalid case file');
+    }
+  }
   const timed = save.player.miniGames?.timedLearning;
   if (timed !== undefined) {
     requireRecord(timed, 'Timed learning'); requireRecord(timed.items, 'Timed learning items');
