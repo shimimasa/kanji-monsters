@@ -104,7 +104,7 @@ export function createRunChallenge(gameId, variation = 0, course = null) {
           selected: goal === selected, enabled: data.answered === 0 })),
         message: status === 'achieved' ? `目標達成！「${selected.name}」` :
           status === 'missed' ? `「${selected.name}」は次の挑戦へ。` : `${selected.rule} あと${remaining}問。`,
-        next: status === 'achieved' ? '次は別の目標を選んで挑戦しよう。' : selected.hint };
+        next: status === 'achieved' ? '次は別の目標にも挑戦しよう。' : selected.hint };
     },
   };
 }
