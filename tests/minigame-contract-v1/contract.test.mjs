@@ -8,8 +8,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('all twelve definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo']);
+test('all thirteen definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -193,6 +193,9 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
           : id === 'photoRally' || id === 'kanjiBingo'
             ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: before.problem?.problemId ?? null,
               attemptId: before.attemptId, choiceId: before.problem?.correctChoiceId ?? null } }
+          // Card flipping is built from stage data too; its command is a flip.
+          : id === 'kanjiMemory'
+            ? { type: 'flip', payload: { sessionId: before.sessionId, attemptId: before.attemptId, cardId: before.cards[0]?.cardId ?? null } }
           // The trip starts on the map, so its first command is a move.
           : id === 'tripSugoroku'
             ? { type: 'move', payload: { sessionId: before.sessionId, nodeId: before.map[0][0].nodeId } }
