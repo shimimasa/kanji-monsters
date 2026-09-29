@@ -1,9 +1,9 @@
-import { createChestWorld, createMoleWorld, createCartWorld, createStarWorld, createBridgeRunWorld } from './quizWorlds.js';
+import { createChestWorld, createMoleWorld, createCartWorld, createStarWorld, createBridgeRunWorld, createPhotoWorld } from './quizWorlds.js';
 import { createDashWorld, createInvaderWorld, createGateWorld } from './arcadeWorlds.js';
 import { createRunChallenge } from './runChallenges.js';
 const worlds={mathSprint:createDashWorld, mathInvader:createInvaderWorld, englishChoice:createChestWorld,
   sentenceOrder:createBridgeRunWorld, timedChoice:createMoleWorld, multiSelect:createStarWorld,
-  asyncChoice:createCartWorld, kanjiDefense:createGateWorld};
+  asyncChoice:createCartWorld, kanjiDefense:createGateWorld, photoRally:createPhotoWorld};
 
 export function createGameplayRun(gameId,effects,options={}) {
   const world=worlds[gameId]?.(effects,options);

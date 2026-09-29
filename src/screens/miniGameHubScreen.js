@@ -11,6 +11,15 @@ import { hubRecommendations } from '../minigames/hubRecommendations.js';
 import { createCompanionMemoryDialog } from '../ui/companionMemoryDialog.js';
 import { createLearningNotebookDialog } from '../ui/learningNotebookDialog.js';
 import { companionCourse } from '../minigames/companionCourses.js';
+import { createPhotoAlbumDialog } from '../ui/photoAlbumDialog.js';
+import { stageData, getMonsterById } from '../loaders/dataLoader.js';
+
+// Photo rally spots: elementary stages the child has reached in the adventure.
+const rallyStages = () => {
+  const visited = new Set(gotomonService.getVisitedStageIds());
+  return stageData.filter(stage => stage.grade <= 6 && visited.has(stage.stageId) && stage.enemyIdList?.length);
+};
+const monsterInfo = id => ({ ...gotomonService.getGotomonById(id), desc: getMonsterById(id)?.desc || '', trivia: getMonsterById(id)?.trivia || '' });
 
 const PACE_KEY = 'yomitabi.minigamePace';
 const readPace = () => { try { return localStorage.getItem(PACE_KEY) === 'slow' ? 'slow' : 'normal'; } catch { return 'normal'; } };
@@ -32,7 +41,9 @@ const hub = {
     }
     const notebook = button(doc, '学習ノート', () => this.showLearningNotebook());
     notebook.dataset.action = 'learning-notebook';
-    tools.append(notebook, button(doc, 'タイトルへ', () => publish('changeScreen', 'title')));
+    const albumButton = button(doc, 'アルバム', () => this.showAlbum());
+    albumButton.dataset.action = 'photo-album';
+    tools.append(albumButton, notebook, button(doc, 'タイトルへ', () => publish('changeScreen', 'title')));
     header.append(heading, tools); wrap.append(header);
     // The companion is one slim bar: every game is played with it, so cards don't repeat it.
     const banner = element(doc, 'div', 'yt-friend-banner');
@@ -108,6 +119,12 @@ const hub = {
       onClose: () => this.root?.querySelector('[data-action=memories]')?.focus() });
     this.dialog = dialog; this.root.append(dialog); dialog.showModal();
   },
+  showAlbum() {
+    this.dialog?.close(); this.dialog?.remove();
+    const dialog = createPhotoAlbumDialog({ doc: document, service: gotomonService, stages: rallyStages(), monsterInfo,
+      onClose: () => this.root?.querySelector('[data-action=photo-album]')?.focus() });
+    this.dialog = dialog; this.root.append(dialog); dialog.showModal();
+  },
   selectGame(definition, playOptions = {}) {
     if (PLAYTEST_ENABLED) trackPlaytest('gameChosen', {gameId:definition.id});
     this.dialog?.remove();
@@ -137,6 +154,20 @@ const hub = {
       }
       select.onchange = () => { sentenceLevel = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', 'どちらも10問。挑戦コースは10文を順番を変えて出題します。得点・ランク・相棒の記録は共通です。'));
+    }
+    let stageId = null;
+    if (definition.id === 'photoRally') {
+      const stages = rallyStages(), album = gotomonService.getAlbum();
+      const label = element(doc, 'label', 'yt-memory-picker', '撮影する場所');
+      const select = element(doc, 'select'); select.setAttribute('aria-label', '撮影する場所');
+      for (const stage of stages) {
+        const taken = stage.enemyIdList.filter(id => album[id]).length;
+        const option = element(doc, 'option', '', `${stage.name}（写真 ${taken}/${stage.enemyIdList.length}）`); option.value = stage.stageId; select.append(option);
+      }
+      // Start at the most recently reached place.
+      stageId = stages.at(-1)?.stageId ?? null; select.value = stageId ?? '';
+      select.onchange = () => { stageId = select.value; }; label.append(select);
+      dialog.append(label, element(doc, 'p', 'yt-note', '本編で行ったことのある場所で撮影できます。冒険を進めると、撮影できる場所がふえます。'));
     }
     // Real-time games offer ゆっくり: slower enemies/runner for children who need time.
     let pace = readPace();
@@ -171,7 +202,8 @@ const hub = {
       dialog.close(); publish('changeScreen', { name: 'miniGame', props: { ...playOptions, gameId: definition.id, gotomonId: selectedId,
         courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
         ...(gameExperiences[definition.id].paced ? { pace } : {}),
-        ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}) } });
+        ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
+        ...(definition.id === 'photoRally' ? { stageId } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');
     const stats = gotomonService.getProgress().companions ?? {};

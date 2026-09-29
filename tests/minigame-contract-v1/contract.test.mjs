@@ -8,8 +8,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('all eight definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense']);
+test('all nine definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -189,6 +189,10 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
         : id === 'englishChoice' || id === 'timedChoice'
           ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: before.problem.problemId,
             attemptId: before.attemptId, choiceId: before.problem.correctChoiceId } }
+          // The photo rally is built from loaded stage data; without it there is no shot to replay.
+          : id === 'photoRally'
+            ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: before.problem?.problemId ?? null,
+              attemptId: before.attemptId, choiceId: before.problem?.correctChoiceId ?? null } }
           : id === 'asyncChoice'
             ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: null,
               attemptId: null, choiceId: null } }

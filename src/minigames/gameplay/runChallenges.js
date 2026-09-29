@@ -44,6 +44,12 @@ const GOALS = Object.freeze({
     { id: 'quick', name: 'はやわざ発見5回', deadline: 99, target: 5,
       rule: 'トロッコが分かれ道の半分まで来る前に、線路をえらぼう。', hint: 'わかる問題は、すぐにタップしよう。', value: data => data.world.quick || 0 },
   ],
+  photoRally: [
+    { id: 'best', name: 'ベストショット3まい', deadline: 99, target: 3,
+      rule: 'ゴトモンが顔を出してすぐに読みを選び、★3の写真を撮ろう。', hint: '文を読んで、漢字の読みを思い出そう。', value: data => data.world.bestShots || 0 },
+    { id: 'chain', name: '5まい連続で撮る', deadline: 99, target: 5,
+      rule: '正しい読みを続けて、写真を5まい続けて撮ろう。', hint: 'まちがえても、次からまたつなげられる。', value: data => data.maxCombo },
+  ],
   kanjiDefense: [
     { id: 'chain', name: '4回連続で読みを正解', deadline: 99, target: 4,
       rule: '読みを4回続けて正解しよう。', hint: '落ち着いて読むことが旅路を守る。', value: data => data.maxCombo },

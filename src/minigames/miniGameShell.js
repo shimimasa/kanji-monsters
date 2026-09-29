@@ -166,7 +166,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
     const current = play.snapshot();
     receipt = award({ score: (state.result?.score ?? current.learningPoints) + current.bonus,
       correct: current.correct, maxCombo: current.maxCombo, completed: current.completed,
-      finished: (state.answered ?? state.resolved ?? 0) >= (definition.id === 'kanjiDefense' ? 12 : 10), activeElapsedMs: state.activeElapsedMs, timeMs:current.world?.timeMs });
+      finished: (state.answered ?? state.resolved ?? 0) >= (definition.id === 'kanjiDefense' ? 12 : 10), activeElapsedMs: state.activeElapsedMs, timeMs:current.world?.timeMs,
+      ...(current.world?.photos ? { photos: current.world.photos } : {}) });
     if (receipt.ok && receipt.practice) {
       resultTitle.textContent = '復習おつかれさま！';
       reward.textContent = '復習の記録を保存しました。';
@@ -179,7 +180,9 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
       record.textContent = `${value?.newBest ? '✦ 自己ベスト！ ' : 'BEST '}${value?.bestScore ?? ''}`;
       result.dataset.newBest = String(!!value?.newBest);
       const memory = !value?.duplicate && value?.memory;
-      memoryNotice.textContent = memory?.firstFinish ? '思い出がふえた！ はじめて最後まであそんだね。' :
+      const newPhotos = value?.duplicate ? [] : value?.newPhotos ?? [];
+      memoryNotice.textContent = newPhotos.length ? `アルバムに新しい写真が${newPhotos.length}まい入ったよ！` :
+        memory?.firstFinish ? '思い出がふえた！ はじめて最後まであそんだね。' :
         memory?.newBest ? `この相棒との自己ベスト！ ${memory.bestScore} pt` :
         memory?.firstPlay ? 'このゲームでの、はじめての思い出ができたよ。' : '';
       memoryNotice.hidden = !memoryNotice.textContent;
