@@ -118,9 +118,20 @@ export function validateSave(save, currentVersion) {
     requireRecord(activity, 'hub activity');
     ids(activity.startedGames, 'started games');
     if (activity.version !== 1 || typeof activity.lastGameId !== 'string' || !activity.lastGameId ||
-        !Array.isArray(activity.startedGames) || activity.startedGames.length > 8 ||
+        !Array.isArray(activity.startedGames) || activity.startedGames.length > 32 ||
         new Set(activity.startedGames).size !== activity.startedGames.length || !activity.startedGames.includes(activity.lastGameId)) {
       throw new Error('Invalid hub activity');
+    }
+  }
+  // Photo rally album: best photo per monster id.
+  const album = save.player.miniGames?.album;
+  if (album !== undefined) {
+    requireRecord(album, 'photo album');
+    if (Object.keys(album).length > 2000) throw new Error('Invalid photo album size');
+    for (const photo of Object.values(album)) {
+      requireRecord(photo, 'album photo');
+      if (!Number.isInteger(photo.stars) || photo.stars < 1 || photo.stars > 3 ||
+          !Number.isSafeInteger(photo.shots) || photo.shots < 1 || !Number.isSafeInteger(photo.firstAt) || photo.firstAt < 0) throw new Error('Invalid album photo');
     }
   }
   const timed = save.player.miniGames?.timedLearning;

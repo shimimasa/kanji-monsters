@@ -11,6 +11,7 @@ const KINDS = Object.freeze({
   cart: { travel: [8000, 12000], label: '宝石', unit: 'こ', verb: '発見', skill: '発見フィーバー', special: '羅針盤の宝' },
   stars: { travel: [12000, 18000], label: '星座', unit: 'つ', verb: '完成', skill: '星のきらめき', special: '流れ星' },
   bridge: { travel: [9000, 14000], label: '橋', unit: '本', verb: 'かけた', skill: '虹のかけ橋', special: '虹の橋' },
+  photo: { travel: [6000, 9500], label: '写真', unit: 'まい', verb: '撮った', skill: 'シャッターチャンス', special: 'ベストショット' },
 });
 
 // Two correct answers in a row charge the companion's course; the next correct
@@ -26,6 +27,8 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let problemId = null, elapsed = 0, open = false, review = false;
   let bonus = 0, correct = 0, answered = 0, quick = 0, streak = 0, feverLeft = 0, charged = false, special = 0;
   let lastEvent = null, eventSerial = 0, completed = false;
+  // Photo rally: each correct shot keeps a photo whose stars follow how early it was taken.
+  const photos = [];
   const mark = (type, extra = {}) => { lastEvent = Object.freeze({ id: ++eventSerial, type, ...extra }); };
   const progress = () => clamp(elapsed / travelMs, 0, 1);
   return {
@@ -57,7 +60,12 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
       if (charged) { points += 40; special++; charged = false; used = true; }
       else if (courseOn && streak % 2 === 0) charged = true;
       bonus += points;
-      mark('hit', { points, quick: early >= .5, special: used });
+      let stars = null;
+      if (kind === 'photo' && payload?.monsterId) {
+        stars = early >= .6 ? 3 : early >= .25 ? 2 : 1;
+        photos.push(Object.freeze({ monsterId: payload.monsterId, stars }));
+      }
+      mark('hit', { points, quick: early >= .5, special: used, stars });
     },
     boost() { feverLeft = 3; mark('boost'); },
     complete() { completed = true; },
@@ -65,6 +73,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
       const p = progress();
       return { kind, bonus, progress: p, arrived: p >= 1, travelMs, pace: slow ? 'slow' : 'normal', review,
         correct, answered, quick, streak, fever: feverLeft > 0, feverLeft, charged, special, lastEvent, completed,
+        photos: [...photos], bestShots: photos.filter(photo => photo.stars === 3).length,
         metric: `${spec.label} ${correct}`,
         caption: feverLeft ? `${spec.skill}！ あと${feverLeft}回` : charged ? `次の正解で${spec.special}！` : '',
         // Never lead with a zero: a run without hits still reads as time played together.
@@ -80,3 +89,4 @@ export const createMoleWorld = (effects, options) => createQuizWorld('mole', eff
 export const createCartWorld = (effects, options) => createQuizWorld('cart', effects, options);
 export const createStarWorld = (effects, options) => createQuizWorld('stars', effects, options);
 export const createBridgeRunWorld = (effects, options) => createQuizWorld('bridge', effects, options);
+export const createPhotoWorld = (effects, options) => createQuizWorld('photo', effects, options);

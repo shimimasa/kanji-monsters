@@ -14,6 +14,21 @@ import { createAsyncChoiceGame } from './asyncChoice/asyncChoiceGame.js';
 import { createAsyncChoiceView } from './asyncChoice/asyncChoiceView.js';
 import { createKanjiDefenseGame } from './kanjiDefense/kanjiDefenseGame.js';
 import { createKanjiDefenseView } from './kanjiDefense/kanjiDefenseView.js';
+import { createPhotoRallyGame } from './photoRally/photoRallyGame.js';
+import { createPhotoRallyView } from './photoRally/photoRallyView.js';
+import { buildPhotoRally } from './photoRally/photoRallyContent.js';
+import { stageData, getKanjiById, getKanjiByGrade, getMonsterById } from '../loaders/dataLoader.js';
+import { gotomonService } from './gotomonService.js';
+
+// The rally is built from the loaded game data for the chosen stage.
+const photoRallyContent = ({ sessionId, random, stageId, focusKanjiIds }) => {
+  const stage = stageData.find(item => item.stageId === stageId) ?? stageData.find(item => item.stageId === 'hokkaido_area1');
+  if (!stage) return { stage: null, shots: [] };
+  return buildPhotoRally({ sessionId, random, stage, focusKanjiIds,
+    stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean),
+    gradeKanji: getKanjiByGrade(stage.grade) || [],
+    monsters: (stage.enemyIdList || []).map(getMonsterById).filter(Boolean).map(monster => ({ ...monster, imageUrl: gotomonService.getGotomonById(monster.id).imageUrl })) });
+};
 
 function withCommandAdapter(createView) {
   return context => createView({
@@ -44,4 +59,6 @@ export const miniGameRegistry = Object.freeze({
     create: createAsyncChoiceGame, createView: createAsyncChoiceView }),
   kanjiDefense: Object.freeze({ id: 'kanjiDefense', title: '漢字防衛隊',
     create: createKanjiDefenseGame, createView: createKanjiDefenseView }),
+  photoRally: Object.freeze({ id: 'photoRally', title: 'ゴトモン写真ラリー',
+    create: context => createPhotoRallyGame({ ...context, content: photoRallyContent(context) }), createView: createPhotoRallyView }),
 });

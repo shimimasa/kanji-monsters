@@ -39,6 +39,19 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     getOwnedGotomon, getSelectedGotomon, getGotomonById, getProgress,
     getGrowth: id => growthStatus(getProgress().companions?.[id]),
     getOwner: () => read()?.owner ?? null,
+    // Kanji this child is still learning: review queue, recent slips and more misses than hits.
+    getFocusKanjiIds() {
+      const study = read()?.snapshot.player.study ?? {};
+      const weak = Object.entries(study.answers ?? {}).filter(([, stats]) => count(stats?.incorrect) > 0 && count(stats?.incorrect) >= count(stats?.correct)).map(([id]) => id);
+      const ids = [...(Array.isArray(study.reviewQueue) ? study.reviewQueue : []), ...(Array.isArray(study.wrongKanji) ? study.wrongKanji : []), ...weak];
+      return [...new Set(ids.filter(id => typeof id === 'string'))];
+    },
+    // Photo rally spots: stages cleared in the adventure, plus the first one for everyone.
+    getVisitedStageIds() {
+      const cleared = read()?.snapshot.player.progress?.clearedStages;
+      return [...new Set(['hokkaido_area1', ...(Array.isArray(cleared) ? cleared.filter(id => typeof id === 'string') : [])])];
+    },
+    getAlbum: () => getProgress().album ?? {},
     beginPlay({ sessionId, gameId, gotomonId }) {
       if (!sessionId || !gameId || !getOwnedGotomon().some(friend => friend.id === gotomonId)) return null;
       activeTicket = Object.freeze({ sessionId });
@@ -54,7 +67,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
       });
     },
     awardGotomonPlayResult({ owner, sessionId, gameId, gotomonId, score, correct, maxCombo,
-      ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished }) {
+      ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished, photos = null }) {
       if (!owner || owner !== read()?.owner || !sessionId || !gameId) return { ok: false };
       const run = ticket && tickets.get(ticket);
       if (ticket && (!run || ticket !== activeTicket || ticket.sessionId !== sessionId || run.owner !== owner ||
@@ -86,12 +99,25 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         friend.plays = count(friend.plays) + 1; friend.friendship = count(friend.friendship) + earned;
         friend.medals ??= [];
         if (friend.plays >= 5 && !friend.medals.includes('five-plays')) friend.medals.push('five-plays');
+        // Album pages keep each monster's best photo; only a real, completed rally adds to them.
+        const newPhotos = [];
+        if (run && completed && gameId === 'photoRally' && Array.isArray(photos)) {
+          const album = progress.album ??= {};
+          for (const photo of photos.slice(0, 10)) {
+            const stars = Math.min(3, Math.max(1, Math.floor(Number(photo?.stars) || 0)));
+            if (typeof photo?.monsterId !== 'string' || !photo.monsterId || !Number.isFinite(Number(photo?.stars))) continue;
+            const entry = album[photo.monsterId];
+            if (!entry) newPhotos.push(photo.monsterId);
+            album[photo.monsterId] = { stars: Math.max(count(entry?.stars), stars), shots: count(entry?.shots) + 1,
+              firstAt: entry?.firstAt ?? Math.max(0, Math.floor(now())) };
+          }
+        }
         const memory = run && completed ? recordCompanionMemory(friend, { gameId, score: points,
           finished: !!memoryFinished, at: Math.max(0, Math.floor(now())) }) : null;
         reward = { earned, friendship: friend.friendship, plays: friend.plays,
           newBest: points > previousBest, bestScore: game.bestScore, medals: [...friend.medals],
           before, after, earnedXP: after.xp - before.xp, levelUp: after.level > before.level, rank,
-          memory,
+          memory, newPhotos,
           bestTimeMs:game.bestTimeMs??null,previousTimeMs:previousTime,newTimeBest:validTime&&(!previousTime||roundedTime<previousTime) };
       });
       if (outcome.ok && run) run.receipt = reward;

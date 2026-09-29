@@ -92,7 +92,9 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       play = createCompanionPlay(sessionId, doc.querySelector && !makeView
         ? { gameId: definition.id, growth, support: gotomon?.support?.id, bestTimeMs: service.getProgress().games?.[definition.id]?.bestTimeMs, course, pace } : {});
       companion = makeCompanion({ sessionId, ownedMonsterIds: owned, selectedId: gotomon?.id, loadImage });
-      game = definition.create({ sessionId, random, history, reviewContentIds, sentenceLevel: nextProps.sentenceLevel, pace, onEvent: event => {
+      // stageId and focusKanjiIds serve content built from the adventure (photo rally); other games ignore them.
+      game = definition.create({ sessionId, random, history, reviewContentIds, sentenceLevel: nextProps.sentenceLevel, pace,
+        stageId: nextProps.stageId, focusKanjiIds: service.getFocusKanjiIds?.() ?? [], onEvent: event => {
         if (valid) { companion?.observe(event); play?.observe(event); }
         if (valid) learningRun?.observe(event);
         if (valid && wordLearning) runMistakes.observe(event);
