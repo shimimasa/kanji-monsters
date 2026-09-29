@@ -25,7 +25,7 @@ const CSS = `
 #mathInvaderScreen .iv-enemy[data-boss=true] .iv-ship::before{content:'BOSS';position:absolute;top:4px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:900;letter-spacing:.2em;color:#ffe066}
 #mathInvaderScreen .iv-question{display:block;font-size:clamp(22px,3.4vw,32px);font-weight:900;white-space:nowrap;text-shadow:0 2px 0 #0006;font-variant-numeric:tabular-nums}
 #mathInvaderScreen .iv-enemy[data-boss=true] .iv-question{font-size:clamp(28px,4.4vw,42px)}
-#mathInvaderScreen .iv-enemy[data-target=true]::after{content:'';position:absolute;inset:-12px -10px;border:3px dashed #ffe066;border-radius:24px;animation:iv-lock 1.4s linear infinite;pointer-events:none}
+#mathInvaderScreen .iv-enemy[data-target=true]::after{content:'';position:absolute;inset:-12px -10px;border:3px dashed #ffe066;border-radius:24px;animation:iv-lock 1s ease-in-out infinite;pointer-events:none}
 #mathInvaderScreen .iv-enemy[data-danger=true] .iv-ship{outline:3px solid #ffd166;outline-offset:3px}
 #mathInvaderScreen .iv-enemy[data-hit=true] .iv-ship{animation:ya-nudge .35s ease-out}
 #mathInvaderScreen .iv-enemy:disabled{cursor:default}
@@ -34,7 +34,7 @@ const CSS = `
 #mathInvaderScreen .iv-review li[data-outcome=escaped]{background:#fff3da}
 @keyframes iv-drift{to{transform:translateY(50%)}}
 @keyframes iv-sway{from{transform:translateX(-6px) rotate(-2deg)}to{transform:translateX(6px) rotate(2deg)}}
-@keyframes iv-lock{to{transform:rotate(360deg)}}
+@keyframes iv-lock{50%{opacity:.4;transform:scale(1.06)}}
 @keyframes iv-recoil{0%{transform:translateY(0)}35%{transform:translateY(8px) scale(.95)}100%{transform:none}}
 `;
 
@@ -52,6 +52,11 @@ export function createMathInvaderView({ document: doc, dispatch, onBack, getSnap
   world.append(el('div', 'iv-stars'), el('div', 'iv-stars2'));
   for (const x of LANE_X) { const lane = el('i', 'iv-lane'); lane.style.left = `${x}%`; world.append(lane); }
   const barrier = el('div', 'iv-barrier'); barrier.style.top = `${MATH_INVADER_RULES.barrierY * 100 + 2}%`;
+  // Ships fly between a top band kept clear for the HUD (two rows on phones) and the barrier.
+  const fieldY = y => {
+    const top = Math.min(10000 / (world.clientHeight || 600), 30), limit = MATH_INVADER_RULES.barrierY;
+    return top + (Math.min(y, limit) / limit) * (limit * 100 - top);
+  };
   const shields = [0, 1, 2].map(() => { const node = el('i'); barrier.append(node); return node; });
   const turret = el('div', 'iv-turret'); world.append(barrier, turret);
 
@@ -109,7 +114,7 @@ export function createMathInvaderView({ document: doc, dispatch, onBack, getSnap
         });
         world.append(node); enemyNodes.set(enemy.enemyId, node);
       }
-      node.style.top = `${enemy.y * 100}%`;
+      node.style.top = `${fieldY(enemy.y)}%`;
       node.dataset.target = String(state.targetId === enemy.enemyId);
       node.dataset.danger = String(enemy.y >= .62);
       node.disabled = state.paused || state.phase !== 'playing';
@@ -119,7 +124,7 @@ export function createMathInvaderView({ document: doc, dispatch, onBack, getSnap
     const attempt = state.lastAttempt;
     if (attempt && attempt.serial !== lastAttemptSerial) {
       lastAttemptSerial = attempt.serial;
-      const x = LANE_X[attempt.lane], y = attempt.y * 100;
+      const x = LANE_X[attempt.lane], y = fieldY(attempt.y);
       if (attempt.correct) {
         fx.beam(TURRET.x, TURRET.y, x, y, attempt.boss ? 'great' : 'good');
         fx.burst(x, y, attempt.boss ? 'great' : 'good', attempt.boss ? 2 : 1);
