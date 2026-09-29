@@ -1,0 +1,3 @@
+# run-all-tests.sh must stay LF for bash, and the baseline must match its LF output.
+*.sh text eol=lf
+*.txt text eol=lf
