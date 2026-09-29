@@ -8,8 +8,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('all eleven definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku']);
+test('all twelve definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -189,8 +189,8 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
         : id === 'englishChoice' || id === 'timedChoice' || id === 'proverbDetective'
           ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: before.problem.problemId,
             attemptId: before.attemptId, choiceId: before.problem.correctChoiceId } }
-          // The photo rally is built from loaded stage data; without it there is no shot to replay.
-          : id === 'photoRally'
+          // The photo rally and the bingo card are built from loaded stage data; without it there is no question to replay.
+          : id === 'photoRally' || id === 'kanjiBingo'
             ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: before.problem?.problemId ?? null,
               attemptId: before.attemptId, choiceId: before.problem?.correctChoiceId ?? null } }
           // The trip starts on the map, so its first command is a move.

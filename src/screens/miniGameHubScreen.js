@@ -156,22 +156,22 @@ const hub = {
         element(doc, 'p', 'yt-note', 'どちらも10問。挑戦コースは10文を順番を変えて出題します。得点・ランク・相棒の記録は共通です。'));
     }
     let stageId = null;
-    if (['photoRally', 'tripSugoroku'].includes(definition.id)) {
+    if (['photoRally', 'tripSugoroku', 'kanjiBingo'].includes(definition.id)) {
       const stages = rallyStages(), album = gotomonService.getAlbum(), journeys = gotomonService.getJourneys();
-      const trip = definition.id === 'tripSugoroku';
-      const place = trip ? '旅する地方' : '撮影する場所';
+      const trip = definition.id === 'tripSugoroku', bingo = definition.id === 'kanjiBingo';
+      const place = bingo ? 'ビンゴの漢字の地方' : trip ? '旅する地方' : '撮影する場所';
       const label = element(doc, 'label', 'yt-memory-picker', place);
       const select = element(doc, 'select'); select.setAttribute('aria-label', place);
       for (const stage of stages) {
         const taken = stage.enemyIdList.filter(id => album[id]).length;
         const stars = journeys[stage.stageId]?.stars ?? 0;
-        const option = element(doc, 'option', '', trip ? `${stage.name}（ボス ${stars ? '★'.repeat(stars) + '☆'.repeat(3 - stars) : 'まだ'}）`
+        const option = element(doc, 'option', '', bingo ? stage.name : trip ? `${stage.name}（ボス ${stars ? '★'.repeat(stars) + '☆'.repeat(3 - stars) : 'まだ'}）`
           : `${stage.name}（写真 ${taken}/${stage.enemyIdList.length}）`); option.value = stage.stageId; select.append(option);
       }
       // Start at the most recently reached place.
       stageId = stages.at(-1)?.stageId ?? null; select.value = stageId ?? '';
       select.onchange = () => { stageId = select.value; }; label.append(select);
-      dialog.append(label, element(doc, 'p', 'yt-note', trip ? '本編で行ったことのある地方を旅できます。最後にその地方のボスが待っています。'
+      dialog.append(label, element(doc, 'p', 'yt-note', bingo ? 'その地方で習う漢字でビンゴカードを作ります。冒険を進めると、選べる地方がふえます。' : trip ? '本編で行ったことのある地方を旅できます。最後にその地方のボスが待っています。'
         : '本編で行ったことのある場所で撮影できます。冒険を進めると、撮影できる場所がふえます。'));
     }
     // Real-time games offer ゆっくり: slower enemies/runner for children who need time.
@@ -208,7 +208,7 @@ const hub = {
         courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
         ...(gameExperiences[definition.id].paced ? { pace } : {}),
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
-        ...(['photoRally', 'tripSugoroku'].includes(definition.id) ? { stageId } : {}) } });
+        ...(['photoRally', 'tripSugoroku', 'kanjiBingo'].includes(definition.id) ? { stageId } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');
     const stats = gotomonService.getProgress().companions ?? {};

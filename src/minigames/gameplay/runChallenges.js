@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  kanjiBingo: [
+    { id: 'lines', name: 'ビンゴを2列', deadline: 99, target: 2,
+      rule: 'たて・よこ・ななめを2列そろえよう。', hint: '⭐スタンプは、リーチの列に使うとそろいやすい。', value: data => data.world.bingoLines || 0 },
+    { id: 'chain', name: '5問連続で正解', deadline: 99, target: 5,
+      rule: '1回で当てるのを5回つなげよう。', hint: 'よみの問題は、文を声に出さずに読んでみよう。', value: data => data.maxCombo },
+  ],
   tripSugoroku: [
     { id: 'boss', name: 'ボスを倒す', deadline: 99, target: 1,
       rule: '道具を集めて、地方のボスを倒そう。', hint: '⭐きらきらはボスに2ダメージ。とっておこう。', value: data => data.world.bossDefeated ? 1 : 0 },
