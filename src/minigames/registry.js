@@ -20,6 +20,9 @@ import { createProverbDetectiveView } from './proverbDetective/proverbDetectiveV
 import { createTripGame } from './tripSugoroku/tripGame.js';
 import { createTripView } from './tripSugoroku/tripView.js';
 import { readingPool } from './photoRally/photoRallyContent.js';
+import { createBingoGame } from './kanjiBingo/bingoGame.js';
+import { createBingoView } from './kanjiBingo/bingoView.js';
+import { buildBingoCard } from './kanjiBingo/bingoContent.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById } from '../loaders/dataLoader.js';
@@ -37,6 +40,14 @@ const tripContent = ({ random, stageId, focusKanjiIds }) => {
     boss: boss ? { monsterId: boss.id, name: boss.name, imageUrl: boss.imageUrl } : null,
     monsters: monsters.filter(monster => monster !== boss),
     readings: readingPool({ random, focusKanjiIds, stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean),
+      gradeKanji: getKanjiByGrade(stage.grade) || [] }) };
+};
+// The bingo card comes from the chosen stage's kanji (the grade's fill the rest).
+const bingoContent = ({ random, stageId, focusKanjiIds }) => {
+  const stage = stageData.find(item => item.stageId === stageId) ?? stageData.find(item => item.stageId === 'hokkaido_area1');
+  if (!stage) return null;
+  return { stage: { stageId: stage.stageId, name: stage.name, grade: stage.grade },
+    card: buildBingoCard({ random, focusKanjiIds, stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean),
       gradeKanji: getKanjiByGrade(stage.grade) || [] }) };
 };
 const photoRallyContent = ({ sessionId, random, stageId, focusKanjiIds }) => {
@@ -83,4 +94,6 @@ export const miniGameRegistry = Object.freeze({
     create: createProverbDetectiveGame, createView: createProverbDetectiveView }),
   tripSugoroku: Object.freeze({ id: 'tripSugoroku', title: '旅すごろく',
     create: context => createTripGame({ ...context, content: tripContent(context) }), createView: createTripView }),
+  kanjiBingo: Object.freeze({ id: 'kanjiBingo', title: '漢字ビンゴ',
+    create: context => createBingoGame({ ...context, content: bingoContent(context) }), createView: createBingoView }),
 });

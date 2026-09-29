@@ -74,6 +74,7 @@
 .yt-album-card[data-taken=false]{background:#eef1ec;color:#6b7a70}.yt-album-unknown{display:grid;place-items:center;width:84px;height:84px;border-radius:50%;background:#d7ddd5;font-size:38px;font-weight:900;color:#9aa69c}
 .yt-album-stars{color:#e0a800;letter-spacing:1px}.yt-album-more{width:100%;text-align:left;font-size:13px}.yt-album-more summary{cursor:pointer;font-weight:700;text-align:center}.yt-album-trivia{color:#4a5e52}
 .yt-album-summary{font-weight:800;margin:8px 0}
+.yt-card-art[data-scene=bingo]{background:radial-gradient(circle at 76% 34%,#ff8a3d 0 9%,transparent 10%),radial-gradient(circle at 64% 58%,#4fb0ff 0 7%,transparent 8%),linear-gradient(90deg,transparent 12%,#fffdf6 12% 14%,transparent 14% 26%,#fffdf6 26% 28%,transparent 28% 40%,#fffdf6 40% 42%,transparent 42%) 0 20%/100% 60% no-repeat,radial-gradient(circle at 50% 30%,#fff3c9,#f0a868)}
 .yt-card-art[data-scene=trip]{background:radial-gradient(circle at 78% 30%,#c0392b 7%,transparent 8%),repeating-linear-gradient(90deg,#e8d6a8 0 22px,#d9c28a 22px 44px) 0 60%/100% 16% no-repeat,linear-gradient(#9fdcff 0 46%,#8cc27a 46%)}
 .yt-card-art[data-scene=case]{background:radial-gradient(ellipse 30% 26% at 50% 56%,#fffdf6 60%,transparent 62%),linear-gradient(#241a33,#3b2a5e 70%,#3b2a22 70%)}
 .yt-hub .yt-card-icon{margin:0;font-size:clamp(40px,6vw,58px);color:#fff;text-shadow:0 4px 0 #0003;z-index:1}
