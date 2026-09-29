@@ -28,6 +28,9 @@ import { createMemoryView } from './kanjiMemory/memoryView.js';
 import { buildMemoryRounds } from './kanjiMemory/memoryContent.js';
 import { createShopGame } from './gotomonShop/shopGame.js';
 import { createShopView } from './gotomonShop/shopView.js';
+import { createSortGame } from './kanjiSort/sortGame.js';
+import { createSortView } from './kanjiSort/sortView.js';
+import { buildSortPuzzles } from './kanjiSort/sortContent.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById } from '../loaders/dataLoader.js';
@@ -61,6 +64,14 @@ const memoryContent = ({ random, stageId, focusKanjiIds }) => {
   if (!stage) return null;
   return { stage: { stageId: stage.stageId, name: stage.name, grade: stage.grade },
     rounds: buildMemoryRounds({ random, focusKanjiIds, stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean),
+      gradeKanji: getKanjiByGrade(stage.grade) || [] }) };
+};
+// The puzzle cards come from the chosen stage's kanji too.
+const sortContent = ({ random, stageId, focusKanjiIds }) => {
+  const stage = stageData.find(item => item.stageId === stageId) ?? stageData.find(item => item.stageId === 'hokkaido_area1');
+  if (!stage) return null;
+  return { stage: { stageId: stage.stageId, name: stage.name, grade: stage.grade },
+    puzzles: buildSortPuzzles({ random, focusKanjiIds, stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean),
       gradeKanji: getKanjiByGrade(stage.grade) || [] }) };
 };
 // The shop's customers are the chosen stage's Gotomon; its kanji use the bingo card's checked clues.
@@ -122,4 +133,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createMemoryGame({ ...context, content: memoryContent(context) }), createView: createMemoryView }),
   gotomonShop: Object.freeze({ id: 'gotomonShop', title: 'ゴトモンのおねがい',
     create: context => createShopGame({ ...context, content: shopContent(context) }), createView: createShopView }),
+  kanjiSort: Object.freeze({ id: 'kanjiSort', title: '漢字ならべパズル',
+    create: context => createSortGame({ ...context, content: sortContent(context) }), createView: createSortView }),
 });

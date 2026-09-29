@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  kanjiSort: [
+    { id: 'stars', name: '⭐を18こ', deadline: 99, target: 18,
+      rule: 'カードを1回で正しい場所に入れると、パズルの⭐がふえるよ。', hint: 'まよったら、画数を指で数えたり、読みを声に出さずに読んだりしよう。', value: data => data.world.sortStars || 0 },
+    { id: 'chain', name: '6回連続で1回で置く', deadline: 99, target: 6,
+      rule: 'つぎに入るカードを、まちがえずに6回続けて置こう。', hint: 'ルールの「→」の向きを見てから選ぼう。', value: data => data.maxCombo },
+  ],
   gotomonShop: [
     { id: 'tips', name: 'チップ⭐を25こ', deadline: 99, target: 25,
       rule: 'お客さんがごきげんなうちに、正しい漢字をわたそう。', hint: 'わかるおねがいから先にかなえると、みんなごきげん。', value: data => data.world.shopTips || 0 },

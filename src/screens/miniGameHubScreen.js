@@ -156,10 +156,10 @@ const hub = {
         element(doc, 'p', 'yt-note', 'どちらも10問。挑戦コースは10文を順番を変えて出題します。得点・ランク・相棒の記録は共通です。'));
     }
     let stageId = null;
-    if (['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop'].includes(definition.id)) {
+    if (['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id)) {
       const stages = rallyStages(), album = gotomonService.getAlbum(), journeys = gotomonService.getJourneys();
-      const trip = definition.id === 'tripSugoroku', bingo = ['kanjiBingo', 'kanjiMemory', 'gotomonShop'].includes(definition.id);
-      const place = bingo ? ({ kanjiMemory: 'カードの漢字の地方', gotomonShop: 'お店をひらく地方' }[definition.id] ?? 'ビンゴの漢字の地方') : trip ? '旅する地方' : '撮影する場所';
+      const trip = definition.id === 'tripSugoroku', bingo = ['kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id);
+      const place = bingo ? ({ kanjiMemory: 'カードの漢字の地方', gotomonShop: 'お店をひらく地方', kanjiSort: 'パズルの漢字の地方' }[definition.id] ?? 'ビンゴの漢字の地方') : trip ? '旅する地方' : '撮影する場所';
       const label = element(doc, 'label', 'yt-memory-picker', place);
       const select = element(doc, 'select'); select.setAttribute('aria-label', place);
       for (const stage of stages) {
@@ -208,7 +208,7 @@ const hub = {
         courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
         ...(gameExperiences[definition.id].paced ? { pace } : {}),
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
-        ...(['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop'].includes(definition.id) ? { stageId } : {}) } });
+        ...(['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id) ? { stageId } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');
     const stats = gotomonService.getProgress().companions ?? {};

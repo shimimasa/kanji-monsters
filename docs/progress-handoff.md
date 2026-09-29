@@ -1,6 +1,66 @@
 # 作業引き継ぎ / 再開ガイド
 
-> ## ミニゲーム作り直し（2026-09-28〜29・ブランチ `feature/content-bank-120`・未push）
+> ## いまの状態（2026-09-30 更新・ここから再開）
+>
+> **15本目「漢字ならべパズル」（`kanjiSort`）をローカルにコミット済み・未push**（本番は下の14本のまま）。
+> 8問。画数の少ない順／読みのあいうえお順が交互（4枚×4問→5枚×4問）。つぎに入るカードをタップ、最後の1枚は自動。
+> ちがうカードには「「校」は10画。もっと画数の少ない…」「「小さな」の「小」は「ちい」…」と手がかり → 正解が光る。
+> 読みは例文の読み（写真ラリーと同じ603件）で決め、カードに文節（例:「左がわを」）を添える。1問の中は最初の音がすべてちがう
+> （濁音は清音あつかい）。1年生は「どの読みでも最初の音が同じ」漢字が80字中3字しかないため、この方式にした。
+> ⭐は1問につき まちがい0回=3・1回=2・2回以上=1。完成した列は「さっきのパズル」として次の問題の上に残る。
+>
+>
+> **ミニゲームは14本すべて本番公開済み**（`main` = `2c93818`、Vercel 本番 yomitabi.gamanavi.com）。
+> 作業ブランチは `feature/content-bank-120`（main と同じ内容まで push 済み）。
+> 流れ: ユーザーが「PRを作ってマージして本番に出して」と言ったら `gh pr create` → `gh pr merge --merge`
+> → Vercel が自動で本番デプロイ。**push・PR はユーザーの指示があるときだけ**。
+>
+> ### 14本の一覧（registry の id ／ 遊び）
+> - 最初の8本（アーケード化済み）: mathSprint スプリント／mathInvader インベーダー／kanjiDefense 漢字防衛隊／
+>   englishChoice 宝箱キャッチ／timedChoice もぐらたたき／asyncChoice トロッコ探検／multiSelect ほし集め／
+>   sentenceOrder ことばトレイン（PR #24, #25）
+> - 本編と結びつけた新作（成果は図鑑・アルバムなどだけ。**本編の強さには影響させない**＝ユーザー決定）:
+>   - `photoRally` ゴトモン写真ラリー（PR #26）… 読みで撮影、アルバムに記録
+>   - `proverbDetective` ことわざ探偵（PR #27）… 90件、ことわざ図鑑に「解決」印
+>   - `tripSugoroku` 旅すごろく（PR #28）… 分かれ道→道具→地方のボス。記録は `miniGames.journeys`
+>   - `kanjiBingo` 漢字ビンゴ（PR #29）… 読み・**意味**で呼び出し。漢字データの meaning を初めて使用
+>   - `kanjiMemory` 漢字カードめくり（PR #30）… 漢字↔読み、漢字↔意味の神経衰弱
+>   - `gotomonShop` ゴトモンのおねがい（PR #31）… お客さんのおねがいに漢字をわたすお店屋さん
+>
+> ### 次の一手（候補）
+> - ユーザーに実機（タブレット）で遊んでもらい、感想をもらって直す。
+> - 新作の候補（ユーザーに選んでもらう形で進めてきた）: 漢字しりとり（1字の読みでつなぐ形。熟語データは無い）。
+> - 先生に確認してもらう資料: `docs/photo-rally-reading-check.csv`（写真ラリー等で使う「例文の読み」603件）。
+>   戻ってきたら修正を反映する（読みは `src/minigames/photoRally/photoRallyContent.js` の contextReading が
+>   例文から取り出している）。
+> - 以前から残っている小さな点: 結果画面でもヘッダーに「一時停止」が残る。スプリントの「ベスト」表示が問題札に重なる。
+>
+> ### 新しいミニゲームを足すときの型（毎回この順で作った）
+> 1. `src/minigames/<id>/` に Core（`xxxGame.js`：enter/update/setPaused/snapshot/dispatch/exit、時間は持たない）
+>    と View（`xxxView.js`：`arcade/arcadeKit.js` の createArcadeFrame を使う）。問題は地方の漢字から作る
+>    （`registry.js` の各 content 関数。答えが1つに決まる手がかりは `kanjiBingo/bingoContent.js` の buildBingoCard を再利用できる）。
+> 2. つなぎ込み: `registry.js`、`gameplay/quizWorlds.js`（kind と結果の一言）、`gameplay/gameplayRun.js`、
+>    `gameExperiences.js`（カード・遊び方）、`gameplay/runChallenges.js`（目標2つ）、
+>    `screens/miniGameHubScreen.js`（地方えらび）、`public/adventure.css`（カード絵 data-scene）。
+> 3. テスト: `tests/gotomon-minigames/<name>.test.mjs` を新設。既存テスト11ファイルの registry 一覧の末尾に id を追加、
+>    `tests/minigame-contract-v1/contract.test.mjs` の exit テストに分岐を追加（本数の文言も更新）。
+> 4. 落とし穴（どれも実際に踏んだ）:
+>    - **ボタンの中身を毎フレーム作り直すと指のタップが消える** → 変化したときだけ書き換える。
+>    - **シェルの自動「次へ」は同じ problemId では二度動かない** → 再挑戦があるゲームは試行ごとに problemId を変える。
+>    - 学習の記録（correct/incorrect イベント）は1問につき1回。はずれ・再挑戦は別のイベント名にする。
+>    - 前向きな言い方だけ（「しっぱい」「0点」は出さない、まちがいの数を突きつけない）。
+>    - テスト用の簡易DOMは文字列の append と querySelector を持たない → span で包む・要素の参照を持っておく。
+>    - class 名を `-companion` / `-shell` で終わらせない（共通CSSに巻き込まれる）。
+>    - src の改行コードは CRLF/LF が混在。書き戻しで全行差分にしない（`git diff --numstat` で確認）。
+>
+> ### 確認のしかた
+> - ブラウザ: `scripts/playtest-cdp/README.md`（headless Chrome を CDP で操作。指に近いタップで確認する）。
+> - テスト: `bash scripts/playtest-cdp/run-all-tests.sh` → 最後に `SAME-FAILS` と出ればよい
+>   （落ちるのは既知のバイト凍結・許可リスト系ゲート40件だけ。一覧は `baseline-failures.txt`）。
+> - 作業ツリーにある未追跡の `YOMITABI_*.md` などのレポート群、`scripts/deploy-vercel-preview.ps1`、
+>   `.firebase/hosting.*.cache` の変更は、このミニゲーム作業とは無関係（触っていない）。
+
+> ## それ以前: ミニゲーム作り直し（2026-09-28〜29）
 >
 > **状態**: **8本すべてアーケード化済み**（2026-09-29）。ローカルにコミット済み・未push。
 > ユーザーは3本を見て「とてもよい出来」と判断し、残り5本へ進むよう指示した → 5385a7a で完了。
