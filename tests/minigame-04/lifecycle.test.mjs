@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import { installStorage } from '../phase-a/storage-helper.mjs';
 import { createMiniGameHost } from '../../src/minigames/miniGameHost.js';
 import { miniGameRegistry } from '../../src/minigames/registry.js';
+import { createSentenceOrderGame } from '../../src/minigames/sentenceOrder/sentenceOrderGame.js';
 import { getDefaultSave, saveNow } from '../../src/core/saveData.js';
 import { gameState, loadGameData } from '../../src/core/gameState.js';
 
@@ -41,11 +42,12 @@ const key = (doc, value, options = {}) => doc.dispatchEvent(Object.assign(new Ev
   key: value, repeat: false, isComposing: false, altKey: false, ctrlKey: false, metaKey: false, ...options,
 }));
 const chunk = (d, chunkId) => d.find(node => node.dataset.chunkId === chunkId);
-// Planks are laid by tapping them in sentence order; the last plank submits.
+// Planks are tapped one at a time; each tap is judged against the next word.
 function layThroughView(d, host, order = host.inspect().session.problem.correctOrder) {
   for (const id of order) click(chunk(d, id));
 }
-const wrongOrder = state => [...state.problem.correctOrder].reverse();
+// One early tap on the second word, then the sentence in order: finished, but not first-try correct.
+const withSlip = state => [state.problem.correctOrder[1], ...state.problem.correctOrder];
 
 test('Registry and title retain Sentence Order when the fifth game is added', () => {
   assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense']);
@@ -62,7 +64,29 @@ test('View source keeps 44px targets, focus, answer feedback, and no scheduler o
   assert.doesNotMatch(view, /setTimeout|setInterval|requestAnimationFrame/);
 });
 
-test('unchanged Host lays planks, gives correct/incorrect feedback, Next, and owned/unowned Companion', async () => {
+test('Core lay judges one plank at a time; a slip keeps the sentence honest and a hint follows two slips', () => {
+  const game = createSentenceOrderGame({ sessionId: 'lay', random: () => .3 }); game.enter();
+  let state = game.snapshot(); const identity = s => ({ sessionId: s.sessionId, problemId: s.problem.problemId, attemptId: s.attemptId });
+  const [first, second, third] = state.problem.correctOrder;
+  assert.equal(game.dispatch({ type: 'lay', payload: { ...identity(state), chunkId: second } }), true);
+  assert.deepEqual(game.snapshot().laid, []); assert.equal(game.snapshot().lastStep.ok, false); assert.equal(game.snapshot().hintChunkId, null);
+  game.dispatch({ type: 'lay', payload: { ...identity(state), chunkId: third } });
+  assert.equal(game.snapshot().hintChunkId, first);
+  for (const id of [first, second]) game.dispatch({ type: 'lay', payload: { ...identity(state), chunkId: id } });
+  assert.equal(game.dispatch({ type: 'lay', payload: { ...identity(state), chunkId: first } }), false);
+  assert.equal(game.snapshot().answered, 0);
+  game.dispatch({ type: 'lay', payload: { ...identity(state), chunkId: third } });
+  state = game.snapshot();
+  assert.equal(state.answered, 1); assert.equal(state.lastAnswer.correct, false); assert.equal(state.lastAnswer.misses, 2);
+  assert.equal(state.missed.length, 1); assert.equal(state.missed[0].submittedParts.length, 1);
+  game.setPaused(true); assert.equal(game.dispatch({ type: 'lay', payload: { ...identity(state), chunkId: first } }), false); game.setPaused(false);
+  game.next(identity(state)); state = game.snapshot();
+  for (const id of state.problem.correctOrder) game.dispatch({ type: 'lay', payload: { ...identity(state), chunkId: id } });
+  assert.equal(game.snapshot().lastAnswer.correct, true); assert.equal(game.snapshot().lastAnswer.misses, 0);
+  assert.equal(game.snapshot().correct, 1);
+});
+
+test('unchanged Host judges each tap, gives correct/incorrect feedback, Next, and owned/unowned Companion', async () => {
   for (const owned of [true, false]) {
     const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win,
       collection: () => owned ? ['HKD-E01'] : [], makeSessionId: () => `owned-${owned}`,
@@ -72,31 +96,32 @@ test('unchanged Host lays planks, gives correct/incorrect feedback, Next, and ow
     assert.equal(host.inspect().companion.selected, owned ? 'HKD-E01' : null);
     const correctOrder = host.inspect().session.problem.correctOrder;
     click(chunk(d, correctOrder[0])); assert.equal(chunk(d, correctOrder[0]).dataset.where, 'bridge');
+    // A word that comes later stays in the river; a second slip lights the next word.
+    click(chunk(d, correctOrder[2])); assert.equal(chunk(d, correctOrder[2]).dataset.where, 'river');
     assert.equal(host.inspect().session.answered, 0);
-    // Tapping a laid plank sends it back to the river without answering.
-    click(chunk(d, correctOrder[0])); assert.equal(chunk(d, correctOrder[0]).dataset.where, 'river');
-    layThroughView(d, host); assert.equal(host.inspect().session.correct, 1);
-    if (owned) assert.equal(host.inspect().companion.action, 'attack');
-    click(d.find(node => node.dataset.action === 'next')); layThroughView(d, host, wrongOrder(host.inspect().session));
-    assert.equal(host.inspect().session.incorrect, 1); assert.match(d.find(node => node.className === 'so-feedback').textContent, /正しい文/);
+    click(chunk(d, correctOrder[2])); assert.equal(chunk(d, correctOrder[1]).dataset.hint, 'true');
+    layThroughView(d, host, correctOrder.slice(1)); assert.equal(host.inspect().session.incorrect, 1);
+    assert.match(d.find(node => node.className === 'so-feedback').textContent, /正しい文/);
     if (owned) assert.equal(host.inspect().companion.action, 'idle');
+    click(d.find(node => node.dataset.action === 'next')); layThroughView(d, host);
+    assert.equal(host.inspect().session.correct, 1);
+    if (owned) assert.equal(host.inspect().companion.action, 'attack');
     host.exit(); assert.equal(d.listeners(), 0); assert.equal(d.doc.body.children.length, 0);
   }
 });
 
-test('keyboard and pointer share Core identity gates for laying, lifting, repeat, pause, and double submit', () => {
+test('keyboard and pointer share Core identity gates for laying, repeat, pause, and a finished sentence', () => {
   const d = dom(); const host = createMiniGameHost({ document: d.doc, window: d.win, collection: () => [],
     makeSessionId: () => 'keyboard', random: () => 0, reduced: () => false });
   host.enter({ gameId: 'sentenceOrder' }); const state = host.inspect().session;
-  const first = state.currentOrder[1]; key(d.doc, '2');
-  assert.equal(host.inspect().session.currentOrder[0], first); assert.equal(chunk(d, first).dataset.where, 'bridge');
-  key(d.doc, '1', { repeat: true }); assert.equal(chunk(d, host.inspect().session.currentOrder[1]).dataset.where, 'river');
-  key(d.doc, 'Backspace'); assert.equal(chunk(d, first).dataset.where, 'river');
-  host.setPaused(true); key(d.doc, '1'); click(chunk(d, state.currentOrder[0]));
-  assert.equal(d.all(node => node.dataset.where === 'bridge').length, 0); host.setPaused(false);
-  for (let i = 0; i < state.currentOrder.length; i++) key(d.doc, '1');
-  assert.equal(host.inspect().session.answered, 1);
-  key(d.doc, '1'); click(chunk(d, state.currentOrder[0])); assert.equal(host.inspect().session.answered, 1); host.exit();
+  const keyFor = id => String(state.currentOrder.indexOf(id) + 1), [first, ...rest] = state.problem.correctOrder;
+  key(d.doc, keyFor(first), { repeat: true }); assert.deepEqual(host.inspect().session.laid, []);
+  host.setPaused(true); key(d.doc, keyFor(first)); click(chunk(d, first));
+  assert.deepEqual(host.inspect().session.laid, []); host.setPaused(false);
+  key(d.doc, keyFor(first)); assert.deepEqual(host.inspect().session.laid, [first]);
+  for (const id of rest) key(d.doc, keyFor(id));
+  assert.equal(host.inspect().session.answered, 1); assert.equal(host.inspect().session.correct, 1);
+  key(d.doc, keyFor(first)); click(chunk(d, first)); assert.equal(host.inspect().session.answered, 1); host.exit();
 });
 
 test('visibility and manual pause compose and freeze active elapsed time', () => {
@@ -120,8 +145,8 @@ test('replay and repeated enter/exit reject stale and disposed callbacks with no
     random: () => 0, loadImage: () => new Promise(() => {}), reduced: () => false });
   for (let index = 0; index < 10; index++) {
     host.enter({ gameId: 'sentenceOrder' }); const state = host.inspect().session;
-    const oldPlank = chunk(d, state.currentOrder[0]);
-    layThroughView(d, host, state.currentOrder); assert.equal(host.inspect().session.answered, 1); host.exit(); host.exit(); await drain();
+    const oldPlank = chunk(d, state.problem.correctOrder[0]);
+    layThroughView(d, host); assert.equal(host.inspect().session.answered, 1); host.exit(); host.exit(); await drain();
     click(oldPlank); key(d.doc, '1'); assert.equal(host.inspect().valid, false); assert.equal(host.inspect().session, null);
     assert.equal(host.inspect().companion, null); assert.equal(d.doc.body.children.length, 0); assert.equal(d.listeners(), 0);
   }
@@ -140,7 +165,7 @@ test('ten questions, immutable result, replay, image failure, reduced motion, an
   host.enter({ gameId: 'sentenceOrder' }); await drain(); const firstSession = host.inspect().session.sessionId;
   for (let index = 0; index < 10; index++) {
     const state = host.inspect().session;
-    layThroughView(d, host, index === 4 ? wrongOrder(state) : state.problem.correctOrder);
+    layThroughView(d, host, index === 4 ? withSlip(state) : state.problem.correctOrder);
     if (index < 9) click(d.find(node => node.dataset.action === 'next'));
   }
   assert.deepEqual(host.inspect().session.result, { answered: 10, correct: 9, incorrect: 1, accuracy: 0.9 });

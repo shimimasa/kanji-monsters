@@ -9,12 +9,17 @@ export function createSentenceOrderGame({ sessionId, random = Math.random, onEve
   let phase = 'ready', index = -1, attemptId = null, seq = 0, activeElapsedMs = 0;
   let answered = 0, correct = 0, incorrect = 0, result = null, lastAnswer = null, aborted = false;
   let currentOrder = Object.freeze([]), completeEmitted = false;
+  // Step play (lay): planks are judged one at a time; a sentence counts as correct
+  // only when every plank was right the first time.
+  let laid = [], stepMisses = 0, misses = 0, firstMiss = null, lastStep = null, stepSerial = 0;
   const missed = [];
 
   const currentProblem = () => questions[index] ?? null;
   const snapshot = () => Object.freeze({
     gameId: 'sentenceOrder', mode: reviewing ? 'review' : 'tenQuestions', totalQuestions, sentenceLevel, sessionId, phase, paused, active, aborted,
     problem: currentProblem(), attemptId, currentOrder, seq, activeElapsedMs,
+    laid: Object.freeze([...laid]), lastStep,
+    hintChunkId: stepMisses >= 2 ? currentProblem()?.correctOrder[laid.length] ?? null : null,
     answered, correct, incorrect, result, lastAnswer, missed: Object.freeze([...missed]),
   });
   const notify = (type, payload = {}) => {
@@ -35,6 +40,7 @@ export function createSentenceOrderGame({ sessionId, random = Math.random, onEve
     const problem = currentProblem();
     attemptId = `${sessionId}:sentence-attempt:${index + 1}`;
     currentOrder = Object.freeze([...problem.initialOrder]);
+    laid = []; stepMisses = 0; misses = 0; firstMiss = null; lastStep = null;
     phase = 'answering'; lastAnswer = null;
     notify('problemPresented', {
       skillId: problem.skillId,
@@ -51,6 +57,41 @@ export function createSentenceOrderGame({ sessionId, random = Math.random, onEve
     const { sessionId: sourceSession, problemId, attemptId: sourceAttempt } = identity;
     return active && !paused && !notifying && phase === 'answering' && !!attemptId &&
       sourceSession === sessionId && problemId === currentProblem()?.problemId && sourceAttempt === attemptId;
+  };
+
+  const commit = (submittedOrder, isCorrect, extra = {}) => {
+    const problem = currentProblem();
+    const committedAttempt = attemptId;
+    attemptId = null; // Consume exactly once before score and observer notification.
+    answered++;
+    if (isCorrect) correct++;
+    else {
+      incorrect++;
+      const textFor = id => problem.chunks.find(chunk => chunk.chunkId === id).text;
+      missed.push(Object.freeze({ contentId: problem.fixtureId, questionNumber: answered,
+        submittedParts: Object.freeze(submittedOrder.map(textFor)),
+        correctParts: Object.freeze(problem.correctOrder.map(textFor)),
+        explanation: problem.explanation || '正しい文を声に出して読み、言葉のつながりをたしかめよう。' }));
+    }
+    lastAnswer = Object.freeze({
+      attemptId: committedAttempt,
+      submittedOrder,
+      correctOrder: problem.correctOrder,
+      correct: isCorrect,
+      ...extra,
+    });
+    phase = answered === totalQuestions ? 'completed' : 'feedback';
+    if (phase === 'completed') result = Object.freeze({ answered, correct, incorrect, accuracy: correct / totalQuestions });
+    notify(isCorrect ? 'correct' : 'incorrect', {
+      contentId: problem.fixtureId,
+      attemptId: committedAttempt,
+      skillId: problem.skillId,
+      submittedOrder,
+      correctOrder: problem.correctOrder,
+      ...extra,
+    });
+    if (result) complete();
+    return true;
   };
 
   return {
@@ -91,36 +132,23 @@ export function createSentenceOrderGame({ sessionId, random = Math.random, onEve
           new Set(currentOrder).size !== problem.correctOrder.length ||
           currentOrder.some(chunkId => !problem.correctOrder.includes(chunkId))) return false;
 
-      const committedAttempt = attemptId;
-      attemptId = null; // Consume exactly once before score and observer notification.
       const submittedOrder = Object.freeze([...currentOrder]);
-      const isCorrect = submittedOrder.every((chunkId, orderIndex) => chunkId === problem.correctOrder[orderIndex]);
-      answered++;
-      if (isCorrect) correct++;
-      else {
-        incorrect++;
-        const textFor = id => problem.chunks.find(chunk => chunk.chunkId === id).text;
-        missed.push(Object.freeze({ contentId: problem.fixtureId, questionNumber: answered,
-          submittedParts: Object.freeze(submittedOrder.map(textFor)),
-          correctParts: Object.freeze(problem.correctOrder.map(textFor)),
-          explanation: problem.explanation || '正しい文を声に出して読み、言葉のつながりをたしかめよう。' }));
+      return commit(submittedOrder, submittedOrder.every((chunkId, orderIndex) => chunkId === problem.correctOrder[orderIndex]));
+    },
+    // Lays the next plank. A wrong plank is accepted as a try (it stays in the river);
+    // the sentence commits once every plank is laid.
+    lay(payload = {}) {
+      if (!payload || typeof payload !== 'object') return false;
+      const { chunkId, ...identity } = payload;
+      const problem = currentProblem();
+      if (!matchesIdentity(identity) || !problem.correctOrder.includes(chunkId) || laid.includes(chunkId)) return false;
+      const ok = chunkId === problem.correctOrder[laid.length];
+      if (ok) { laid.push(chunkId); stepMisses = 0; }
+      else { misses++; stepMisses++; if (!firstMiss) firstMiss = [...laid, chunkId]; }
+      lastStep = Object.freeze({ serial: ++stepSerial, chunkId, ok });
+      if (laid.length === problem.correctOrder.length) {
+        return commit(Object.freeze(firstMiss ?? [...laid]), misses === 0, { misses });
       }
-      lastAnswer = Object.freeze({
-        attemptId: committedAttempt,
-        submittedOrder,
-        correctOrder: problem.correctOrder,
-        correct: isCorrect,
-      });
-      phase = answered === totalQuestions ? 'completed' : 'feedback';
-      if (phase === 'completed') result = Object.freeze({ answered, correct, incorrect, accuracy: correct / totalQuestions });
-      notify(isCorrect ? 'correct' : 'incorrect', {
-        contentId: problem.fixtureId,
-        attemptId: committedAttempt,
-        skillId: problem.skillId,
-        submittedOrder,
-        correctOrder: problem.correctOrder,
-      });
-      if (result) complete();
       return true;
     },
     next(payload = {}) {
@@ -135,6 +163,7 @@ export function createSentenceOrderGame({ sessionId, random = Math.random, onEve
       if (command.type === 'reorder') return this.reorder(command.payload);
       if (command.type === 'place') return this.place(command.payload);
       if (command.type === 'submit') return this.submit(command.payload);
+      if (command.type === 'lay') return this.lay(command.payload);
       if (command.type === 'next') return this.next(command.payload);
       return false;
     },
