@@ -64,6 +64,8 @@ import { COLORING_PICTURES as coloringPictures } from './gotomonColoring/picture
 import { createDrumGame } from './gotomonDrum/drumGame.js';
 import { createDrumView } from './gotomonDrum/drumView.js';
 import { buildDrumQuestions } from './gotomonDrum/drumContent.js';
+import { createRaceGame } from './gotomonRace/raceGame.js';
+import { createRaceView } from './gotomonRace/raceView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -136,7 +138,7 @@ const shooterContent = ({ sessionId, random, mode, focusKanjiIds }) => {
   return { mode: 'kanji', waves: stage ? buildShooterWaves({ sessionId, random, mode: 'kanji', focusKanjiIds,
     stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
 };
-// The slash game: kanji readings from the stage reached last, English words, or sums.
+// The slash game and the race: kanji readings from the stage reached last, English words, or sums.
 const slashContent = ({ sessionId, random, mode, focusKanjiIds }) => {
   const kind = ['english', 'math'].includes(mode) ? mode : 'kanji';
   if (kind !== 'kanji') return { mode: kind, problems: buildSlashProblems({ sessionId, random, mode: kind }) };
@@ -266,4 +268,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createColoringGame({ ...context, content: coloringContent(context) }), createView: createColoringView }),
   gotomonDrum: Object.freeze({ id: 'gotomonDrum', title: 'ゴトモン・リズムたいこ',
     create: context => createDrumGame({ ...context, content: drumContent(context) }), createView: createDrumView }),
+  gotomonRace: Object.freeze({ id: 'gotomonRace', title: 'ゴトモン・レース',
+    create: context => createRaceGame({ ...context, content: slashContent(context) }), createView: createRaceView }),
 });

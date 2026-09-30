@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonRace: [
+    { id: 'sharp', name: '1回でダッシュ10問', deadline: 99, target: 10,
+      rule: 'ゲートが来る前に、答えのレーンへ移ろう。', hint: 'もんだいはずっと出ているよ。ゲートが遠いうちに考えよう。', value: data => data.correct },
+    { id: 'chain', name: '5問連続でダッシュ', deadline: 99, target: 5,
+      rule: '1回で正解を5回つなげて、ライバルをぬこう。', hint: '移ったら、レーンのふだをもう一度たしかめよう。', value: data => data.maxCombo },
+  ],
   gotomonDrum: [
     { id: 'sharp', name: '1回で正解10問', deadline: 99, target: 10,
       rule: 'ふだを よく読んで、そうか ちがうか 答えよう。', hint: 'ふだが来る前に、答えを決めておこう。', value: data => data.correct },
