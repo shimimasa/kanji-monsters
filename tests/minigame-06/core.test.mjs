@@ -70,7 +70,7 @@ test('scorer rejects unknown identities and malformed answer universes', () => {
 
 test('registry has eight exact definitions and Multi Select keeps the v1 instance shape', () => {
   assert.deepEqual(Object.keys(miniGameRegistry),
-    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor', 'gotomonSnake', 'gotomonParts', 'gotomonSlash', 'gotomonColoring', 'gotomonDrum', 'gotomonRace', 'gotomonMerge']);
+    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor', 'gotomonSnake', 'gotomonParts', 'gotomonSlash', 'gotomonColoring', 'gotomonDrum', 'gotomonRace', 'gotomonMerge', 'gotomonLink']);
   assert.deepEqual(Object.keys(miniGameRegistry.multiSelect), ['id', 'title', 'create', 'createView']);
   const game = create();
   for (const method of ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit']) assert.equal(typeof game[method], 'function');

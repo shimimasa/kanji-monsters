@@ -15,6 +15,7 @@ const KINDS = Object.freeze({
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
   slash: { travel: [6000, 9500], label: 'くす玉', unit: 'こ', verb: 'パカッ', skill: 'スラッシュフィーバー', special: 'いっとう両断' },
   coloring: { travel: [5000, 8000], label: 'マス', unit: 'マス', verb: 'ぬった', skill: 'ぬりぬりフィーバー', special: 'ぴったり色' },
+  link: { travel: [9000, 13000], label: '線', unit: '本', verb: 'つないだ', skill: 'つなぎフィーバー', special: 'ぴったり' },
   merge: { travel: [8000, 12000], label: 'タイル', unit: '問', verb: 'こたえた', skill: 'がったいフィーバー', special: 'ぴったり' },
   race: { travel: [5200, 7200], label: 'ゲート', unit: '問', verb: 'くぐった', skill: 'レースフィーバー', special: 'ロケットダッシュ' },
   drum: { travel: [4800, 6000], label: 'ふだ', unit: '問', verb: 'たたいた', skill: 'おまつりフィーバー', special: 'かんぺき' },
@@ -49,7 +50,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let bonus = 0, correct = 0, answered = 0, quick = 0, streak = 0, feverLeft = 0, charged = false, special = 0;
   let lastEvent = null, eventSerial = 0, completed = false;
   // Some games keep their ending on screen for a moment before the results (the finished picture, the last dance, the finish line, the last board).
-  const HOLD = { coloring: 2600, drum: 1800, race: 1800, merge: 2000 };
+  const HOLD = { coloring: 2600, drum: 1800, race: 1800, merge: 2000, link: 1200 };
   let holdLeft = HOLD[kind] ?? 0;
   // Photo rally: each correct shot keeps a photo whose stars follow how early it was taken.
   // Proverb detective: every solved case is filed; first-try, pre-hint solves earn the most stars.
@@ -140,6 +141,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
           : kind === 'mole' && correct ? `ゴトモン${correct}匹とハイタッチ${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
+          : kind === 'link' && answered ? `${answered}本 つないだ · 1回で ${correct}本`
           : kind === 'merge' && answered ? `いちばん大きい ${mergeBest} · 合体 ${mergeJoined}回 · ${answered}問中 ${correct}問せいかい`
           : kind === 'race' && answered ? `${racePlace ? `${racePlace}位でゴール · ` : ''}ゲート${answered}問 · 1回で正解 ${correct}問`
           : kind === 'drum' && answered ? `${answered}問 たたいた · 1回で正解 ${correct}問`
@@ -194,3 +196,4 @@ export const createColoringWorld = (effects, options) => createQuizWorld('colori
 export const createDrumWorld = (effects, options) => createQuizWorld('drum', effects, options);
 export const createRaceWorld = (effects, options) => createQuizWorld('race', effects, options);
 export const createMergeWorld = (effects, options) => createQuizWorld('merge', effects, options);
+export const createLinkWorld = (effects, options) => createQuizWorld('link', effects, options);

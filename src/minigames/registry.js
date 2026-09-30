@@ -68,6 +68,9 @@ import { createRaceGame } from './gotomonRace/raceGame.js';
 import { createRaceView } from './gotomonRace/raceView.js';
 import { createMergeGame } from './gotomonMerge/mergeGame.js';
 import { createMergeView } from './gotomonMerge/mergeView.js';
+import { createLinkGame } from './gotomonLink/linkGame.js';
+import { createLinkView } from './gotomonLink/linkView.js';
+import { buildLinkRounds } from './gotomonLink/linkContent.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -160,6 +163,17 @@ const drumContent = ({ sessionId, random, mode, focusKanjiIds }) => {
   const stage = [...visited].reverse().map(id => stageData.find(item => item.stageId === id)).find(Boolean)
     ?? stageData.find(item => item.stageId === 'hokkaido_area1');
   return { mode: kind, questions: stage ? buildDrumQuestions({ sessionId, random, mode: kind, focusKanjiIds,
+    stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
+};
+// The lines join kanji of the stage reached last (読み, then 意味), English words, or sums.
+const linkContent = ({ random, mode, focusKanjiIds }) => {
+  const kind = ['english', 'math'].includes(mode) ? mode : 'kanji';
+  if (kind !== 'kanji') return { mode: kind, rounds: buildLinkRounds({ random, mode: kind }) };
+  let visited = ['hokkaido_area1'];
+  try { visited = gotomonService.getVisitedStageIds?.() ?? visited; } catch { /* keep Hokkaido */ }
+  const stage = [...visited].reverse().map(id => stageData.find(item => item.stageId === id)).find(Boolean)
+    ?? stageData.find(item => item.stageId === 'hokkaido_area1');
+  return { mode: kind, rounds: stage ? buildLinkRounds({ random, mode: kind, focusKanjiIds,
     stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
 };
 // The colouring picture is a Gotomon the child has caught, else one met on the
@@ -274,4 +288,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createRaceGame({ ...context, content: slashContent(context) }), createView: createRaceView }),
   gotomonMerge: Object.freeze({ id: 'gotomonMerge', title: 'けいさん2048',
     create: context => createMergeGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createMergeView }),
+  gotomonLink: Object.freeze({ id: 'gotomonLink', title: '線つなぎ',
+    create: context => createLinkGame({ ...context, content: linkContent(context) }), createView: createLinkView }),
 });
