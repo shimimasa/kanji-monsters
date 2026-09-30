@@ -44,6 +44,9 @@ import { createBubbleGame, BUBBLE_RULES } from './gotomonBubble/bubbleGame.js';
 import { createBubbleView } from './gotomonBubble/bubbleView.js';
 import { createPuyoGame } from './gotomonPuyo/puyoGame.js';
 import { createPuyoView } from './gotomonPuyo/puyoView.js';
+import { createShooterGame } from './gotomonShooter/shooterGame.js';
+import { createShooterView } from './gotomonShooter/shooterView.js';
+import { buildShooterWaves } from './gotomonShooter/shooterContent.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -105,6 +108,17 @@ const tossContent = ({ sessionId, random, mathLevel }) => ({ level: mathLevel ==
 const fishContent = ({ sessionId, random }) => ({ carriers: playfulGotomon(random, FISH_SWIMMERS), problems: buildFishProblems({ sessionId, random }) });
 // The trapped Gotomon are the child's own (Hokkaido's fill in); the board is built by the Core.
 const bubbleContent = ({ random, mathLevel }) => ({ level: mathLevel === 'times' ? 'times' : 'addsub', carriers: playfulGotomon(random, BUBBLE_RULES.trapped) });
+// The shooter asks English words, or readings of kanji from the stage the child
+// reached most recently; each reading on a plate fits only one of the chosen kanji.
+const shooterContent = ({ sessionId, random, mode, focusKanjiIds }) => {
+  if (mode !== 'kanji') return { mode: 'english', waves: buildShooterWaves({ sessionId, random, mode: 'english' }) };
+  let visited = ['hokkaido_area1'];
+  try { visited = gotomonService.getVisitedStageIds?.() ?? visited; } catch { /* keep Hokkaido */ }
+  const stage = [...visited].reverse().map(id => stageData.find(item => item.stageId === id)).find(Boolean)
+    ?? stageData.find(item => item.stageId === 'hokkaido_area1');
+  return { mode: 'kanji', waves: stage ? buildShooterWaves({ sessionId, random, mode: 'kanji', focusKanjiIds,
+    stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
+};
 // Gotomon from every prefecture ask to be taken home; hints come from their notes.
 const deliveryContent = ({ sessionId, random, region }) => {
   const monsters = getAllMonsterIds().map(id => getMonsterById(id)).filter(Boolean);
@@ -183,4 +197,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createBubbleGame({ ...context, content: bubbleContent(context) }), createView: createBubbleView }),
   gotomonPuyo: Object.freeze({ id: 'gotomonPuyo', title: 'けいさんぷよ',
     create: context => createPuyoGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createPuyoView }),
+  gotomonShooter: Object.freeze({ id: 'gotomonShooter', title: 'ゴトモン・シューター',
+    create: context => createShooterGame({ ...context, content: shooterContent(context) }), createView: createShooterView }),
 });

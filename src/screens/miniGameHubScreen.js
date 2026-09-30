@@ -165,6 +165,16 @@ const hub = {
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
     }
+    let mode = 'english';
+    if (definition.id === 'gotomonShooter') {
+      const label = element(doc, 'label', 'yt-memory-picker', 'ビームでこたえる問題');
+      const select = element(doc, 'select'); select.setAttribute('aria-label', 'ビームでこたえる問題');
+      for (const [value, text] of [['english', '英語（意味・英単語）'], ['kanji', '漢字の読み（さいごに行った地方の漢字）']]) {
+        const option = element(doc, 'option', '', text); option.value = value; select.append(option);
+      }
+      select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
+        element(doc, 'p', 'yt-note', 'どちらも12問。ふだを持っているのは、旅で出会ったゴトモンたちです。'));
+    }
     let region = 'all';
     if (definition.id === 'gotomonDelivery') {
       const label = element(doc, 'label', 'yt-memory-picker', 'とどける地方');
@@ -231,6 +241,7 @@ const hub = {
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
         ...(['gotomonToss', 'gotomonBubble', 'gotomonPuyo'].includes(definition.id) ? { mathLevel } : {}),
         ...(definition.id === 'gotomonDelivery' ? { region } : {}),
+        ...(definition.id === 'gotomonShooter' ? { mode } : {}),
         ...(['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id) ? { stageId } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');
