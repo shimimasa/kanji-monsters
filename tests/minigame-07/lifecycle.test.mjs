@@ -41,7 +41,7 @@ const wrongChoice = (d, host) => { const state = host.inspect().session;
   return choice(d, state.problem.choices.find(item => item.choiceId !== state.problem.correctChoiceId).choiceId); };
 
 test('Registry and title expose Async Choice without replacing the first six games', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor', 'gotomonSnake', 'gotomonParts']);
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor', 'gotomonSnake', 'gotomonParts', 'gotomonSlash']);
   const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8'); assert.match(title, /publish\('changeScreen', 'miniGameHub'\)/);
   assert.equal(miniGameRegistry.asyncChoice.title, 'よみこみクイズ');
 });

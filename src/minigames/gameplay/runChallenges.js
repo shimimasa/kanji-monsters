@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonSlash: [
+    { id: 'sharp', name: '1回で切る10問', deadline: 99, target: 10,
+      rule: '答えのくす玉だけをねらって切ろう。', hint: 'くす玉はてっぺんで少しゆっくりになるよ。そこをねらおう。', value: data => data.correct },
+    { id: 'chain', name: '5問連続で1回で切る', deadline: 99, target: 5,
+      rule: '1回で切るのを5回つなげよう。', hint: 'ほかのくす玉にふれないように、短くスッと切ろう。', value: data => data.maxCombo },
+  ],
   gotomonParts: [
     { id: 'sharp', name: '1回で合体8字', deadline: 99, target: 8,
       rule: 'つくる漢字をよく見て、あいぼうのパーツをさがそう。', hint: '漢字の左や上にあるパーツが、ヒントになるよ。', value: data => data.correct },

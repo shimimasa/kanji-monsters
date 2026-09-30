@@ -28,6 +28,8 @@ export function kanjiCells({ random = Math.random, stageKanji = [], gradeKanji =
   const picked = [];
   for (const { kanji, context } of readingPool({ random, stageKanji, gradeKanji, focusKanjiIds }).ordered) {
     if (picked.length >= size) break;
+    // Plates are all hiragana: a katakana reading would stand out from the others.
+    if (context.katakana) continue;
     const reading = toHira(context.reading), own = readingsOf(kanji);
     if (picked.some(item => item.kanji === kanji.kanji || readingsOf(item.source).has(reading) || own.has(toHira(item.reading.reading)))) continue;
     picked.push({ source: kanji, cellId: `k${picked.length}`, kanjiId: kanji.id, kanji: kanji.kanji,

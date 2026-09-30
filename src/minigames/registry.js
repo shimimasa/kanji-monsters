@@ -55,6 +55,9 @@ import { createSnakeGame } from './gotomonSnake/snakeGame.js';
 import { createSnakeView } from './gotomonSnake/snakeView.js';
 import { createPartsGame } from './gotomonParts/partsGame.js';
 import { createPartsView } from './gotomonParts/partsView.js';
+import { createSlashGame } from './gotomonSlash/slashGame.js';
+import { createSlashView } from './gotomonSlash/slashView.js';
+import { buildSlashProblems } from './gotomonSlash/slashContent.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -125,6 +128,17 @@ const shooterContent = ({ sessionId, random, mode, focusKanjiIds }) => {
   const stage = [...visited].reverse().map(id => stageData.find(item => item.stageId === id)).find(Boolean)
     ?? stageData.find(item => item.stageId === 'hokkaido_area1');
   return { mode: 'kanji', waves: stage ? buildShooterWaves({ sessionId, random, mode: 'kanji', focusKanjiIds,
+    stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
+};
+// The slash game: kanji readings from the stage reached last, English words, or sums.
+const slashContent = ({ sessionId, random, mode, focusKanjiIds }) => {
+  const kind = ['english', 'math'].includes(mode) ? mode : 'kanji';
+  if (kind !== 'kanji') return { mode: kind, problems: buildSlashProblems({ sessionId, random, mode: kind }) };
+  let visited = ['hokkaido_area1'];
+  try { visited = gotomonService.getVisitedStageIds?.() ?? visited; } catch { /* keep Hokkaido */ }
+  const stage = [...visited].reverse().map(id => stageData.find(item => item.stageId === id)).find(Boolean)
+    ?? stageData.find(item => item.stageId === 'hokkaido_area1');
+  return { mode: kind, problems: stage ? buildSlashProblems({ sessionId, random, mode: kind, focusKanjiIds,
     stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
 };
 // Gotomon from every prefecture ask to be taken home; hints come from their notes.
@@ -215,4 +229,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createSnakeGame({ ...context, content: null }), createView: createSnakeView }),
   gotomonParts: Object.freeze({ id: 'gotomonParts', title: '漢字パーツ落とし',
     create: context => createPartsGame({ ...context, content: { mode: context.mode === 'all' ? 'all' : 'easy' } }), createView: createPartsView }),
+  gotomonSlash: Object.freeze({ id: 'gotomonSlash', title: 'ゴトモン・スラッシュ',
+    create: context => createSlashGame({ ...context, content: slashContent(context) }), createView: createSlashView }),
 });
