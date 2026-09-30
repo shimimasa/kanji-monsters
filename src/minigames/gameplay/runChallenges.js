@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonMeteor: [
+    { id: 'sharp', name: '1回でげいげき10こ', deadline: 99, target: 10,
+      rule: '答えを出してから、その数字の基地をタップしよう。', hint: 'いん石はゆっくり落ちてくる。あわてなくて大丈夫。', value: data => data.correct },
+    { id: 'chain', name: '5こ連続でげいげき', deadline: 99, target: 5,
+      rule: '1回でげいげきするのを5回つなげよう。', hint: '3つの基地の数字を先に見ておこう。', value: data => data.maxCombo },
+  ],
   gotomonBreakout: [
     { id: 'sharp', name: 'ねらいどおり8問', deadline: 99, target: 8,
       rule: 'ちがうブロックに3回当たる前に、答えのブロックをわろう。', hint: 'パドルのはしで打つと、ななめにねらえるよ。', value: data => data.correct },
