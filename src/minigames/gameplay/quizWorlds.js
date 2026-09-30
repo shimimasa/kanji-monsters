@@ -15,6 +15,7 @@ const KINDS = Object.freeze({
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
   slash: { travel: [6000, 9500], label: 'くす玉', unit: 'こ', verb: 'パカッ', skill: 'スラッシュフィーバー', special: 'いっとう両断' },
   coloring: { travel: [5000, 8000], label: 'マス', unit: 'マス', verb: 'ぬった', skill: 'ぬりぬりフィーバー', special: 'ぴったり色' },
+  drum: { travel: [4800, 6000], label: 'ふだ', unit: '問', verb: 'たたいた', skill: 'おまつりフィーバー', special: 'かんぺき' },
   parts: { travel: [9000, 14000], label: '漢字', unit: '字', verb: 'くみたてた', skill: 'がったいフィーバー', special: 'ぴったり' },
   snake: { travel: [14000, 22000], label: '英単語', unit: '語', verb: 'つづった', skill: 'スペルフィーバー', special: 'ノーミス' },
   meteor: { travel: [6000, 10000], label: 'いん石', unit: 'こ', verb: 'げいげき', skill: 'スターげいげき', special: 'ながれ星' },
@@ -45,8 +46,9 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let problemId = null, elapsed = 0, open = false, review = false;
   let bonus = 0, correct = 0, answered = 0, quick = 0, streak = 0, feverLeft = 0, charged = false, special = 0;
   let lastEvent = null, eventSerial = 0, completed = false;
-  // The colouring keeps its finished picture on screen for a moment before the results.
-  let holdLeft = kind === 'coloring' ? 2600 : 0;
+  // The colouring keeps its finished picture, and the drum its last dance, on screen for a moment before the results.
+  const HOLD = { coloring: 2600, drum: 1800 };
+  let holdLeft = HOLD[kind] ?? 0;
   // Photo rally: each correct shot keeps a photo whose stars follow how early it was taken.
   // Proverb detective: every solved case is filed; first-try, pre-hint solves earn the most stars.
   const photos = [], cases = [];
@@ -121,7 +123,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
       const p = progress();
       return { kind, bonus, progress: p, arrived: p >= 1, travelMs, pace: slow ? 'slow' : 'normal', review,
         correct, answered, quick, streak, fever: feverLeft > 0, feverLeft, charged, special, lastEvent, completed,
-        ...(kind === 'coloring' ? { holdResult: completed && holdLeft > 0 } : {}),
+        ...(kind in HOLD ? { holdResult: completed && holdLeft > 0 } : {}),
         photos: [...photos], bestShots: photos.filter(photo => photo.stars === 3).length,
         cases: [...cases], brilliant: cases.filter(item => item.stars === 3).length,
         bossDamage, bossDefeated: kind === 'trip' && bossDamage >= 5, bingoLines, bingoMarked, shopServed, shopTips, sortSolved, sortStars, bubbleBroken, bubbleFreed, puyoHatched, puyoChain,
@@ -130,6 +132,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
           : kind === 'mole' && correct ? `ゴトモン${correct}匹とハイタッチ${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
+          : kind === 'drum' && answered ? `${answered}問 たたいた · 1回で正解 ${correct}問`
           : kind === 'coloring' && answered ? `${answered}マス ぬった · 1回で答え ${correct}マス`
           : kind === 'slash' && answered ? `くす玉を${answered}こ パカッ · 1回で答え ${correct}こ`
           : kind === 'parts' && answered ? `漢字を${answered}字くみたてた${correct ? ` · 1回で合体 ${correct}字` : ''}`
@@ -178,3 +181,4 @@ export const createSnakeWorld = (effects, options) => createQuizWorld('snake', e
 export const createPartsWorld = (effects, options) => createQuizWorld('parts', effects, options);
 export const createSlashWorld = (effects, options) => createQuizWorld('slash', effects, options);
 export const createColoringWorld = (effects, options) => createQuizWorld('coloring', effects, options);
+export const createDrumWorld = (effects, options) => createQuizWorld('drum', effects, options);

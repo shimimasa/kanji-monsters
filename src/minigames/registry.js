@@ -61,6 +61,9 @@ import { buildSlashProblems } from './gotomonSlash/slashContent.js';
 import { createColoringGame } from './gotomonColoring/coloringGame.js';
 import { createColoringView } from './gotomonColoring/coloringView.js';
 import { COLORING_PICTURES as coloringPictures } from './gotomonColoring/pictures.js';
+import { createDrumGame } from './gotomonDrum/drumGame.js';
+import { createDrumView } from './gotomonDrum/drumView.js';
+import { buildDrumQuestions } from './gotomonDrum/drumContent.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -142,6 +145,17 @@ const slashContent = ({ sessionId, random, mode, focusKanjiIds }) => {
   const stage = [...visited].reverse().map(id => stageData.find(item => item.stageId === id)).find(Boolean)
     ?? stageData.find(item => item.stageId === 'hokkaido_area1');
   return { mode: kind, problems: stage ? buildSlashProblems({ sessionId, random, mode: kind, focusKanjiIds,
+    stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
+};
+// The drum asks そう？ちがう？ about kanji readings from the stage reached last, English words, or sums.
+const drumContent = ({ sessionId, random, mode, focusKanjiIds }) => {
+  const kind = ['english', 'math'].includes(mode) ? mode : 'kanji';
+  if (kind !== 'kanji') return { mode: kind, questions: buildDrumQuestions({ sessionId, random, mode: kind }) };
+  let visited = ['hokkaido_area1'];
+  try { visited = gotomonService.getVisitedStageIds?.() ?? visited; } catch { /* keep Hokkaido */ }
+  const stage = [...visited].reverse().map(id => stageData.find(item => item.stageId === id)).find(Boolean)
+    ?? stageData.find(item => item.stageId === 'hokkaido_area1');
+  return { mode: kind, questions: stage ? buildDrumQuestions({ sessionId, random, mode: kind, focusKanjiIds,
     stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
 };
 // The colouring picture is a Gotomon the child has caught, else one met on the
@@ -250,4 +264,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createSlashGame({ ...context, content: slashContent(context) }), createView: createSlashView }),
   gotomonColoring: Object.freeze({ id: 'gotomonColoring', title: 'ゴトモンぬりえ',
     create: context => createColoringGame({ ...context, content: coloringContent(context) }), createView: createColoringView }),
+  gotomonDrum: Object.freeze({ id: 'gotomonDrum', title: 'ゴトモン・リズムたいこ',
+    create: context => createDrumGame({ ...context, content: drumContent(context) }), createView: createDrumView }),
 });

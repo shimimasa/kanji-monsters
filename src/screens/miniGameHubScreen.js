@@ -165,15 +165,16 @@ const hub = {
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'どちらも12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonColoring' ? 'ぬりえになるのは、きみがつかまえたゴトモン（まだいなければ旅で出会ったゴトモン）です。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
     }
-    let mode = definition.id === 'gotomonParts' ? 'easy' : definition.id === 'gotomonSlash' ? 'kanji' : 'english';
-    if (definition.id === 'gotomonSlash') {
-      const label = element(doc, 'label', 'yt-memory-picker', '切るもんだい');
-      const select = element(doc, 'select'); select.setAttribute('aria-label', '切るもんだい');
+    let mode = definition.id === 'gotomonParts' ? 'easy' : ['gotomonSlash', 'gotomonDrum'].includes(definition.id) ? 'kanji' : 'english';
+    if (['gotomonSlash', 'gotomonDrum'].includes(definition.id)) {
+      const drum = definition.id === 'gotomonDrum', labelText = drum ? 'たいこのもんだい' : '切るもんだい';
+      const label = element(doc, 'label', 'yt-memory-picker', labelText);
+      const select = element(doc, 'select'); select.setAttribute('aria-label', labelText);
       for (const [value, text] of [['kanji', '漢字の読み（さいごに行った地方の漢字）'], ['english', '英語（意味・英単語）'], ['math', '算数（たし算・ひき算）']]) {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
       select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', 'どれも12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'どれも12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
     }
     if (definition.id === 'gotomonParts') {
       const label = element(doc, 'label', 'yt-memory-picker', 'くみたてる漢字');
@@ -259,7 +260,7 @@ const hub = {
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
         ...(['gotomonToss', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout', 'gotomonMeteor', 'gotomonColoring'].includes(definition.id) ? { mathLevel } : {}),
         ...(definition.id === 'gotomonDelivery' ? { region } : {}),
-        ...(['gotomonShooter', 'gotomonParts', 'gotomonSlash'].includes(definition.id) ? { mode } : {}),
+        ...(['gotomonShooter', 'gotomonParts', 'gotomonSlash', 'gotomonDrum'].includes(definition.id) ? { mode } : {}),
         ...(['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id) ? { stageId } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');
