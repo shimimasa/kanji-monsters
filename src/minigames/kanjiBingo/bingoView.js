@@ -1,4 +1,5 @@
 import { createArcadeFrame, restartClass } from '../arcade/arcadeKit.js';
+import { castAt } from '../gotomonCast.js';
 import { BINGO_CELLS, BINGO_LINES } from './bingoContent.js';
 
 const CSS = `
@@ -34,13 +35,19 @@ const CSS = `
 #kanjiBingoScreen .kb-review{margin:0;padding:0;list-style:none;display:grid;gap:6px}
 #kanjiBingoScreen .kb-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
 #kanjiBingoScreen .kb-review li[data-correct=false]{background:#fff3da}
+#kanjiBingoScreen .kb-sticker{position:absolute;z-index:3;width:22%;aspect-ratio:1;transform:translate(-50%,-50%) rotate(-8deg);border-radius:50%;background:#fffdf6e6;box-shadow:0 0 0 4px #ffc400,0 4px 8px #0005;pointer-events:none;animation:kb-stick .45s ease-out}
+#kanjiBingoScreen .kb-sticker img{width:100%;height:100%;object-fit:contain}
+@keyframes kb-stick{from{transform:translate(-50%,-50%) scale(2) rotate(20deg);opacity:0}}
 @keyframes kb-stamp{from{transform:scale(1.8);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes kb-reach{from{transform:none}to{transform:translateY(-3px)}}
 @keyframes kb-cheer{0%,100%{transform:none}40%{transform:translateY(-14px)}}
 @keyframes kb-miss{0%,100%{transform:none}30%{transform:translateX(-6px)}60%{transform:translateX(5px)}}
 `;
 
-export function createBingoView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createBingoView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
+  // Every bingo line earns a Gotomon sticker, stuck on the middle of that line.
+  const stickers = new Map();
+  let lastSticker = null;
   let active = true, stampNote = false, cardKey = null, clueKey = null, lastSeq = -1, lastEventId = 0;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
@@ -102,6 +109,17 @@ export function createBingoView({ document: doc, dispatch, onBack, getSnapshot }
       state.card.forEach((cell, index) => { cells[index].textContent = cell.kanji; cells[index].dataset.cellId = cell.cellId; });
     }
     const inLine = new Set(state.lines.flatMap(line => BINGO_LINES[line]));
+    for (const line of state.lines) {
+      if (stickers.has(line)) continue;
+      const who = castAt(cast?.wild, stickers.size);
+      stickers.set(line, who);
+      if (!who) continue;
+      const spots = BINGO_LINES[line], side = Math.sqrt(BINGO_CELLS);
+      const x = spots.reduce((sum, i) => sum + (i % side) + .5, 0) / spots.length / side * 100;
+      const y = spots.reduce((sum, i) => sum + Math.floor(i / side) + .5, 0) / spots.length / side * 100;
+      const sticker = el('span', 'kb-sticker'), img = el('img'); img.alt = who.name; img.src = who.imageUrl; sticker.append(img);
+      sticker.style.left = `${x}%`; sticker.style.top = `${y}%`; card.append(sticker); lastSticker = who;
+    }
     const reach = new Set();
     for (const line of BINGO_LINES) {
       const open = line.filter(index => !state.marked[index]);
@@ -147,7 +165,7 @@ export function createBingoView({ document: doc, dispatch, onBack, getSnapshot }
     const clueText = problem.kind === 'reading' ? problem.clue.reading : problem.clue.meaning;
     answers.push({ text: `${problem.kanji}（${clueText}）`, correct: answer.correct });
     if (answer.correct) {
-      note.textContent = answer.newLines ? `ビンゴ！ ${answer.lines}列そろった！` : answer.earnedStamp ? 'せいかい！ ⭐スタンプを手に入れた！' : 'せいかい！';
+      note.textContent = answer.newLines ? `ビンゴ！ ${answer.lines}列そろった！${lastSticker ? ` ${lastSticker.name}のシールをもらった！` : ''}` : answer.earnedStamp ? 'せいかい！ ⭐スタンプを手に入れた！' : 'せいかい！';
       fx.burst(50, 50, answer.newLines ? 'great' : 'good', answer.newLines ? 1.6 : 1);
       if (answer.newLines) { fx.banner(answer.lines > 1 ? `${answer.lines}列ビンゴ！` : 'ビンゴ！', 'great'); fx.flash('great'); }
     } else {

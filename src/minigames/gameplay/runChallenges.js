@@ -27,9 +27,9 @@ const GOALS = Object.freeze({
       rule: '相棒が川岸に着く前に、橋を完成させよう。', hint: '文のはじめになる板から探そう。', value: data => data.world.quick || 0 },
   ],
   timedChoice: [
-    { id: 'quick', name: 'すばやく5回たたく', deadline: 99, target: 5,
+    { id: 'quick', name: 'すばやく5回タッチ', deadline: 99, target: 5,
       rule: 'もぐらが出てすぐに、正しい読みをたたこう。', hint: '言葉を見たら、声に出さずに読んでみよう。', value: data => data.world.quick || 0 },
-    { id: 'chain', name: '4回連続でたたく', deadline: 99, target: 4,
+    { id: 'chain', name: '4回連続でタッチ', deadline: 99, target: 4,
       rule: '正しい読みを4回続けてたたこう。', hint: 'あわてず、読みをたしかめてからたたこう。', value: data => data.maxCombo },
   ],
   multiSelect: [

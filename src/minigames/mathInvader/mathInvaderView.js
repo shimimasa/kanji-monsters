@@ -1,4 +1,5 @@
 import { restartClass, toggleClass, setVar, createArcadeFrame, createNumberPad, bindArcadeKeys } from '../arcade/arcadeKit.js';
+import { castAt } from '../gotomonCast.js';
 import { MATH_INVADER_RULES } from './mathInvaderGame.js';
 
 const CSS = `
@@ -23,6 +24,8 @@ const CSS = `
 #mathInvaderScreen .iv-enemy[data-boss=true]{min-width:clamp(180px,26vw,260px)}
 #mathInvaderScreen .iv-enemy[data-boss=true] .iv-ship{padding:30px 18px 20px;background:radial-gradient(ellipse at 50% 18%,#fff3 0 16%,transparent 17%),linear-gradient(#8e5cff,#4b21b8);box-shadow:0 8px 0 #2a0f75,0 0 30px #a57dff;animation-duration:3.4s}
 #mathInvaderScreen .iv-enemy[data-boss=true] .iv-ship::before{content:'BOSS';position:absolute;top:4px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:900;letter-spacing:.2em;color:#ffe066}
+#mathInvaderScreen .iv-mon{display:block;width:clamp(48px,7vw,72px);height:clamp(48px,7vw,72px);margin:-34px auto 2px;object-fit:contain;filter:drop-shadow(0 3px 2px #0007)}
+#mathInvaderScreen .iv-enemy[data-boss=true] .iv-mon{width:clamp(80px,11vw,120px);height:clamp(80px,11vw,120px);margin-top:-54px}
 #mathInvaderScreen .iv-question{display:block;font-size:clamp(22px,3.4vw,32px);font-weight:900;white-space:nowrap;text-shadow:0 2px 0 #0006;font-variant-numeric:tabular-nums}
 #mathInvaderScreen .iv-enemy[data-boss=true] .iv-question{font-size:clamp(28px,4.4vw,42px)}
 #mathInvaderScreen .iv-enemy[data-target=true]::after{content:'';position:absolute;inset:-12px -10px;border:3px dashed #ffe066;border-radius:24px;animation:iv-lock 1s ease-in-out infinite;pointer-events:none}
@@ -41,7 +44,10 @@ const CSS = `
 const LANE_X = [20, 50, 80];
 const TURRET = { x: 50, y: 90 };
 
-export function createMathInvaderView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createMathInvaderView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
+  // Wild Gotomon ride the ships; the boss ship carries a stage boss.
+  let shipSerial = 0;
+  const riders = new Map();
   let active = true, entry = '', lastAttemptSerial = 0, lastEscapeSerial = 0, lastSpawned = 0, lastBoosts = 0, moodMs = 0;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
@@ -103,7 +109,10 @@ export function createMathInvaderView({ document: doc, dispatch, onBack, getSnap
       let node = enemyNodes.get(enemy.enemyId);
       if (!node) {
         node = el('button', 'iv-enemy'); node.type = 'button'; node.dataset.enemyId = enemy.enemyId;
-        const ship = el('span', 'iv-ship'); ship.append(el('span', 'iv-question', `${enemy.question} = ?`)); node.append(ship);
+        const ship = el('span', 'iv-ship'), rider = enemy.boss ? cast?.boss ?? castAt(cast?.wild, shipSerial) : castAt(cast?.wild, shipSerial);
+        shipSerial++;
+        if (rider) { const img = el('img', 'iv-mon'); img.alt = ''; img.src = rider.imageUrl; ship.append(img); node.dataset.rider = rider.name; riders.set(enemy.enemyId, rider.name); }
+        ship.append(el('span', 'iv-question', `${enemy.question} = ?`)); node.append(ship);
         node.dataset.wave = String(enemy.wave); node.dataset.boss = String(enemy.boss);
         node.style.left = `${LANE_X[enemy.lane]}%`;
         node.setAttribute('aria-label', `${enemy.question}。タップでねらう`);
@@ -131,7 +140,8 @@ export function createMathInvaderView({ document: doc, dispatch, onBack, getSnap
         fx.pop(x, y - 6, attempt.boss ? 'ボス撃破！' : `${attempt.question} = ${attempt.value}`, attempt.boss ? 'great' : 'good');
         if (attempt.boss) { fx.banner('ボス撃破！', 'great'); fx.flash('great'); }
         turret.dataset.mood = 'fire'; moodMs = 260;
-        note.textContent = state.streak >= 3 ? `${state.streak}連続！ その調子！` : '命中！';
+        const rider = riders.get(attempt.enemyId);
+        note.textContent = state.streak >= 3 ? `${state.streak}連続！ その調子！` : rider ? `${rider}に命中！ おとなしくなった` : '命中！';
         frame.announce(`命中。${attempt.question} は ${attempt.value}`);
       } else {
         fx.pop(TURRET.x, 74, 'おしい！', 'soft'); fx.shake();

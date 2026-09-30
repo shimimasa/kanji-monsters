@@ -1,4 +1,5 @@
 import { createArcadeFrame, bindArcadeKeys } from '../arcade/arcadeKit.js';
+import { castAt } from '../gotomonCast.js';
 
 const CSS = `
 #englishChoiceScreen .ya-field{background:radial-gradient(ellipse at 50% 0,#6b4fa3 0,transparent 60%),linear-gradient(#2a1d4a,#3b2a5e 70%,#4a3526 70.3%,#35251a)}
@@ -15,6 +16,9 @@ const CSS = `
 #englishChoiceScreen .ec-chest[data-status=correct] .ec-box::before{transform:rotateX(70deg) translateY(-8px)}
 #englishChoiceScreen .ec-chest[data-status=correct] .ec-box{box-shadow:0 0 0 4px #ffe066,0 0 30px #ffd54a}
 #englishChoiceScreen .ec-chest[data-status=correct] .ec-label{background:#d7f7df;border-color:#1f9d55}
+#englishChoiceScreen .ec-mon{position:absolute;left:50%;top:-8px;width:70%;aspect-ratio:1;object-fit:contain;transform:translate(-50%,0) scale(.3);opacity:0;pointer-events:none;filter:drop-shadow(0 4px 4px #0006);z-index:2}
+#englishChoiceScreen .ec-chest[data-status=correct] .ec-mon{animation:ec-out .6s ease-out forwards}
+@keyframes ec-out{0%{transform:translate(-50%,0) scale(.3);opacity:0}60%{transform:translate(-50%,-80%) scale(1.1);opacity:1}100%{transform:translate(-50%,-60%) scale(1);opacity:1}}
 #englishChoiceScreen .ec-chest[data-status=empty] .ec-box::before{transform:rotateX(70deg) translateY(-8px)}
 #englishChoiceScreen .ec-chest[data-status=empty]{opacity:.7}
 #englishChoiceScreen .ec-chest[data-status=faded]{opacity:.35}
@@ -37,7 +41,9 @@ const LANE_X = [12.5, 37.5, 62.5, 87.5];
 // Chests fall from the top band (kept clear for the HUD) to just above the companion.
 const TOP_Y = 14, BOTTOM_Y = 58;
 
-export function createEnglishChoiceView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createEnglishChoiceView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
+  // A Gotomon waits in the treasure chest and jumps out when it opens.
+  let chestSerial = 0, hiding = null;
   let active = true, problemId = null, lastSeq = -1, lastEventId = 0;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
@@ -50,10 +56,10 @@ export function createEnglishChoiceView({ document: doc, dispatch, onBack, getSn
   const chests = LANE_X.map((x, index) => {
     const node = el('button', 'ec-chest'); node.type = 'button'; node.dataset.choiceIndex = String(index + 1);
     node.style.left = `${x}%`; node.style.top = `${TOP_Y}%`;
-    const label = el('span', 'ec-label'); node.append(el('span', 'ec-box'), label);
+    const label = el('span', 'ec-label'), mon = el('img', 'ec-mon'); mon.alt = ''; mon.hidden = true; node.append(mon, el('span', 'ec-box'), label);
     on(node, 'click', () => choose(index));
     world.append(node);
-    return { node, label };
+    return { node, label, mon };
   });
   const hero = el('div', 'ec-hero'); world.append(hero);
 
@@ -97,7 +103,7 @@ export function createEnglishChoiceView({ document: doc, dispatch, onBack, getSn
     answers.push({ word: problem.prompt, meaning, correct: answer.correct });
     if (answer.correct) {
       fx.burst(LANE_X[correctIndex], top + 6, 'good', 1.2);
-      note.textContent = `せいかい！ ${problem.prompt} は「${meaning}」`;
+      note.textContent = `せいかい！ ${problem.prompt} は「${meaning}」${hiding ? `。宝箱から${hiding.name}が出てきた！` : ''}`;
       frame.announce(`せいかい。${problem.prompt} は ${meaning}`);
     } else {
       fx.pop(LANE_X[chosenIndex], top, 'からっぽ…', 'soft');
@@ -118,8 +124,10 @@ export function createEnglishChoiceView({ document: doc, dispatch, onBack, getSn
       if (problem && problem.problemId !== problemId) {
         problemId = problem.problemId;
         word.textContent = problem.prompt;
-        chests.forEach(({ node, label }, index) => {
+        hiding = castAt(cast?.wild, chestSerial++);
+        chests.forEach(({ node, label, mon }, index) => {
           const choice = problem.choices[index];
+          if (mon) { mon.hidden = !hiding; if (hiding) mon.src = hiding.imageUrl; }
           node.hidden = !choice; delete node.dataset.status;
           label.textContent = '';
           node.dataset.choiceId = choice?.choiceId ?? '';

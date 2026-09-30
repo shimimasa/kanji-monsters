@@ -1,4 +1,5 @@
 import { createArcadeFrame, bindArcadeKeys } from '../arcade/arcadeKit.js';
+import { castAt } from '../gotomonCast.js';
 
 const CSS = `
 #multiSelectScreen .ya-field{background:radial-gradient(ellipse at 70% 110%,#2f5f7a 0,transparent 60%),linear-gradient(#070d24,#10204a 70%,#1c3a5e)}
@@ -12,6 +13,9 @@ const CSS = `
 #multiSelectScreen .ms-glyph{display:grid;place-items:center;width:clamp(48px,6.4vw,70px);aspect-ratio:1;font-size:clamp(40px,5.4vw,60px);line-height:1;color:#cfe3ff;text-shadow:0 0 12px #9cc8ff;transition:transform .15s}
 #multiSelectScreen .ms-label{max-width:9.5em;padding:3px 9px;border-radius:10px;background:#0b1633cc;border:2px solid #5d7fb8;font-size:clamp(16px,1.9vw,19px);font-weight:900;line-height:1.2;text-align:center}
 #multiSelectScreen .ms-key{font-size:.7em;color:#9fb6d8;margin-right:3px}
+#multiSelectScreen .ms-sign{position:absolute;z-index:1;width:clamp(120px,22vw,220px);aspect-ratio:1;transform:translate(-50%,-50%);object-fit:contain;opacity:0;pointer-events:none;filter:brightness(0) invert(1) drop-shadow(0 0 10px #ffe066) drop-shadow(0 0 24px #ffd54a)}
+#multiSelectScreen .ms-sign[data-shown=true]{animation:ms-sign 2.6s ease-out forwards}
+@keyframes ms-sign{0%{opacity:0;transform:translate(-50%,-50%) scale(.7)}25%{opacity:.6;transform:translate(-50%,-50%) scale(1)}70%{opacity:.5}100%{opacity:0;transform:translate(-50%,-50%) scale(1.05)}}
 #multiSelectScreen .ms-star:focus-visible .ms-label{outline:3px solid #ffd54a;outline-offset:2px}
 #multiSelectScreen .ms-star[aria-pressed=true] .ms-glyph{color:#ffe066;text-shadow:0 0 18px #ffd54a,0 0 40px #ffd54a88;transform:scale(1.15)}
 #multiSelectScreen .ms-star[aria-pressed=true] .ms-label{background:#3d2f06e6;border-color:#ffd54a;color:#fff6cc}
@@ -38,7 +42,9 @@ const CSS = `
 const SPOTS = [[16, 34], [38, 22], [60, 36], [82, 24], [48, 62]];
 const SVG = 'http://www.w3.org/2000/svg';
 
-export function createMultiSelectView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createMultiSelectView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
+  // A finished constellation becomes a Gotomon shape in the sky.
+  let signSerial = 0;
   let active = true, problemId = null, lastSeq = -1, lastEventId = 0, clock = 0, resolved = false;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
@@ -49,7 +55,8 @@ export function createMultiSelectView({ document: doc, dispatch, onBack, getSnap
   const moon = el('i', 'ms-moon');
   const lines = doc.createElementNS ? doc.createElementNS(SVG, 'svg') : el('div');
   lines.setAttribute('class', 'ms-lines'); lines.setAttribute('viewBox', '0 0 100 100'); lines.setAttribute('preserveAspectRatio', 'none');
-  world.append(el('div', 'ms-sky'), moon, lines);
+  const sign = el('img', 'ms-sign'); sign.alt = ''; sign.hidden = true;
+  world.append(el('div', 'ms-sky'), sign, moon, lines);
   const stars = SPOTS.map((spot, index) => {
     const node = el('button', 'ms-star'); node.type = 'button'; node.dataset.choiceIndex = String(index + 1);
     node.setAttribute('aria-pressed', 'false');
@@ -120,7 +127,13 @@ export function createMultiSelectView({ document: doc, dispatch, onBack, getSnap
     const names = problem.choices.filter(choice => right.has(choice.choiceId)).map(choice => choice.text);
     answers.push({ prompt: problem.prompt, names, correct: answer.classification === 'fullCorrect' });
     if (answer.classification === 'fullCorrect') {
-      fx.banner('星座完成！', 'great');
+      const shape = castAt(cast?.wild, signSerial++), lit = stars.filter(({ node }) => node.dataset.status === 'right');
+      if (shape && lit.length) {
+        sign.src = shape.imageUrl; sign.hidden = false;
+        sign.style.left = `${lit.reduce((sum, star) => sum + star.x, 0) / lit.length}%`; sign.style.top = `${lit.reduce((sum, star) => sum + star.y, 0) / lit.length}%`;
+        sign.dataset.shown = 'false'; void sign.offsetWidth; sign.dataset.shown = 'true';
+      }
+      fx.banner(shape ? `${shape.name}座 完成！` : '星座完成！', 'great');
       note.textContent = `ぜんぶ集めた！ ${names.join('・')}`;
       frame.announce(`星座完成。${names.join('、')}`);
     } else {
@@ -142,6 +155,7 @@ export function createMultiSelectView({ document: doc, dispatch, onBack, getSnap
       if (problem && problem.problemId !== problemId) {
         problemId = problem.problemId; resolved = false; lines.textContent = '';
         prompt.textContent = problem.prompt;
+        // The last constellation's Gotomon keeps fading out into the next question.
         stars.forEach(({ node, label, tag }, index) => {
           const choice = problem.choices[index];
           node.hidden = !choice; delete node.dataset.status; label.textContent = ''; tag.textContent = '';

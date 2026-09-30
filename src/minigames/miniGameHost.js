@@ -17,6 +17,7 @@ import { hubActivityService } from './hubActivityService.js';
 import { notebookContext } from './learningNotebook.js';
 import { createRunMistakes } from './runMistakes.js';
 import { companionCourse } from './companionCourses.js';
+import { castForPlay } from './gotomonCast.js';
 
 const layout = Object.freeze({ imageRect: { x: 20, y: 10, width: 240, height: 120 },
   clipRect: { x: 24, y: 14, width: 232, height: 112 } });
@@ -127,7 +128,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
         host.exit(); publish('changeScreen', { name: 'miniGameHub', props: { notebookContext: returnContext } });
       } : null;
       view = createView({ document: doc, getSnapshot: () => current.snapshot(),
-        dispatch,
+        dispatch, cast: doc.querySelector && !makeView ? castForPlay(service, Math.random, gotomon?.id) : undefined,
         onBack: goBack, onReplay: replay });
       shell = makeShell({ doc, view, definition, gotomon, play, reviewMode: !!nextProps.review, pace, course,
         onPause: value => host.setPaused(value), onBack: goBack, onReplay: replay,

@@ -1,4 +1,5 @@
 import { createArcadeFrame, restartClass } from '../arcade/arcadeKit.js';
+import { castAt } from '../gotomonCast.js';
 
 const CSS = `
 #kanjiMemoryScreen .ya-field{background:radial-gradient(circle at 50% 20%,#e9f7ff 0,#b8e0f5 45%,#7fb8dd 100%)}
@@ -14,6 +15,9 @@ const CSS = `
 #kanjiMemoryScreen .mm-card[data-face=kanji] .mm-face{font-size:clamp(30px,6.4vmin,60px);line-height:1}
 #kanjiMemoryScreen .mm-card[data-face=reading] .mm-face{font-size:clamp(18px,3.4vmin,30px);color:#7a3d00;background:#fff6dc}
 #kanjiMemoryScreen .mm-card[data-face=meaning] .mm-face{font-size:clamp(13px,2.2vmin,17px);color:#0d4a6b;background:#eaf6ff}
+#kanjiMemoryScreen .mm-back img{width:62%;height:62%;object-fit:contain;opacity:.55;filter:grayscale(.3) drop-shadow(0 2px 2px #0005)}
+#kanjiMemoryScreen .mm-badge{position:absolute;right:-8px;top:-10px;width:44%;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 2px 2px #0006);animation:mm-badge .45s ease-out}
+@keyframes mm-badge{from{transform:scale(0) rotate(-30deg)}to{transform:none}}
 #kanjiMemoryScreen .mm-card[data-matched=true] .mm-face{border-color:#37c871;box-shadow:0 5px 0 #1f9d55}
 #kanjiMemoryScreen .mm-card.mm-pair .mm-face{animation:mm-pair .45s ease-out}
 #kanjiMemoryScreen .mm-card.mm-miss .mm-face{animation:mm-miss .4s ease-out}
@@ -38,7 +42,11 @@ const CSS = `
 `;
 const ROUND_NAMES = Object.freeze({ reading: '漢字と読み', meaning: '漢字と意味' });
 
-export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
+  // Every card back shows the same Gotomon (so backs never tell pairs apart);
+  // a found pair brings out a Gotomon of its own.
+  const emblem = castAt(cast?.friends, 0) ?? castAt(cast?.wild, 0);
+  let pairSerial = 0;
   let active = true, shownTries = 0, roundKey = null, lastSeq = -1, lastEventId = 0, lastPeeking = false, doneShown = false;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
@@ -87,7 +95,8 @@ export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot 
 
   const makeCard = index => {
     const node = el('button', 'mm-card'); node.type = 'button';
-    const inner = el('span', 'mm-inner'), back = el('span', 'mm-back', '？'), face = el('span', 'mm-face');
+    const inner = el('span', 'mm-inner'), back = el('span', 'mm-back', emblem ? '' : '？'), face = el('span', 'mm-face');
+    if (emblem) { const img = el('img'); img.alt = ''; img.src = emblem.imageUrl; back.append(img); }
     inner.append(back, face); node.append(inner);
     on(node, 'click', () => flip(index)); board.append(node);
     return { node, face };
@@ -101,7 +110,7 @@ export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot 
       cards.forEach(({ node, face }, index) => {
         const card = state.cards[index];
         node.hidden = !card; if (!card) return;
-        face.textContent = card.text; node.dataset.face = card.face; node.dataset.cardId = card.cardId;
+        face.textContent = card.text; node.dataset.face = card.face; node.dataset.cardId = card.cardId; delete node.dataset.badged;
       });
       found.textContent = 'ペアを見つけると、ここに漢字の使い方が出るよ';
       if (state.round > 0) { fx.banner(`ラウンド${state.round + 1} ${ROUND_NAMES[state.roundKind]}！`, 'great'); }
@@ -140,9 +149,14 @@ export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot 
       const pair = state.pairs.find(item => item.pairId === answer.pairId);
       if (pair) { showFound(pair, state.roundKind); answers.push({ text: `${pair.kanji}（${pair.text}）`, correct: answer.correct }); }
       upCards.forEach(({ node }) => restartClass(node, 'mm-pair'));
+      const friend = castAt(cast?.wild, pairSerial++);
+      if (friend) upCards.forEach(({ node, face }) => {
+        if (node.dataset.badged) return;
+        const img = el('img', 'mm-badge'); img.alt = ''; img.src = friend.imageUrl; face.append(img); node.dataset.badged = 'true';
+      });
       restartClass(buddy, 'mm-cheer');
       fx.burst(50, 50, answer.roundDone ? 'great' : 'good', answer.roundDone ? 1.6 : 1);
-      note.textContent = answer.roundDone ? 'ぜんぶそろった！' : answer.earnedPeek ? 'ペア！ 👀のぞき見がふえた！' : 'ペア！';
+      note.textContent = answer.roundDone ? 'ぜんぶそろった！' : answer.earnedPeek ? 'ペア！ 👀のぞき見がふえた！' : friend ? `ペア！ ${friend.name}が出てきた！` : 'ペア！';
     } else {
       upCards.forEach(({ node }) => restartClass(node, 'mm-miss'));
       note.textContent = 'ちがうペアだった。場所をおぼえておこう！';

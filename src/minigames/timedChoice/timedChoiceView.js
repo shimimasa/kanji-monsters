@@ -1,4 +1,5 @@
 import { createArcadeFrame, bindArcadeKeys, setVar } from '../arcade/arcadeKit.js';
+import { castAt } from '../gotomonCast.js';
 
 const CSS = `
 #timedChoiceScreen .ya-field{background:linear-gradient(#9fdcff 0,#d6f1ff 30%,#8fd07a 30.2%,#6fb85c 100%)}
@@ -9,6 +10,10 @@ const CSS = `
 #timedChoiceScreen .tc-card{position:relative;z-index:2;margin-bottom:-6px;padding:4px 10px;border-radius:10px;background:#fffdf3;color:#2a1c10;border:3px solid #6b4a2a;font-size:clamp(16px,2.4vw,24px);font-weight:900;white-space:nowrap;box-shadow:0 3px 0 #0003}
 #timedChoiceScreen .tc-key{font-size:.65em;color:#8a7358;margin-right:3px}
 #timedChoiceScreen .tc-head{position:relative;width:100%;flex:1;border-radius:48% 48% 12% 12%;background:radial-gradient(circle at 34% 34%,#2a1c10 5%,transparent 6%),radial-gradient(circle at 66% 34%,#2a1c10 5%,transparent 6%),radial-gradient(ellipse at 50% 52%,#f7a6a6 8%,transparent 9%),radial-gradient(ellipse at 50% 60%,#d9b08c 22%,transparent 23%),linear-gradient(#8a5a36,#6d4527)}
+#timedChoiceScreen .tc-head[data-gotomon=true]{background:none}
+#timedChoiceScreen .tc-mon{position:absolute;left:50%;bottom:-6%;width:118%;height:112%;transform:translateX(-50%);object-fit:contain;object-position:50% 100%;filter:drop-shadow(0 3px 2px #0005)}
+#timedChoiceScreen .tc-mole[data-status=hit] .tc-mon{animation:tc-squash .3s ease-out}
+#timedChoiceScreen .tc-mole[data-status=hit] .tc-head[data-gotomon=true]{background:none}
 #timedChoiceScreen .tc-mole[data-status=hit] .tc-head{background:radial-gradient(circle at 34% 34%,#2a1c10 2%,transparent 7%),radial-gradient(circle at 66% 34%,#2a1c10 2%,transparent 7%),radial-gradient(ellipse at 50% 60%,#d9b08c 22%,transparent 23%),linear-gradient(#8a5a36,#6d4527);animation:tc-squash .3s ease-out}
 #timedChoiceScreen .tc-mole[data-status=hit] .tc-card{background:#d7f7df;border-color:#1f9d55}
 #timedChoiceScreen .tc-mole[data-status=answer] .tc-card{background:#e4f4ff;border-color:#2a6fb0;box-shadow:0 0 0 4px #bfe3ff}
@@ -40,7 +45,10 @@ const moleDown = (elapsed, deadline) => {
   return Math.min(1, Math.max(rise, sink * .55));
 };
 
-export function createTimedChoiceView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createTimedChoiceView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
+  // Gotomon peek out of the holes instead of moles; a different set each word.
+  let peekSerial = 0;
+  const friendly = !!cast?.wild?.length;
   let active = true, problemId = null, lastSeq = -1, lastEventId = 0, resolved = false;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
@@ -53,11 +61,12 @@ export function createTimedChoiceView({ document: doc, dispatch, onBack, getSnap
     const hole = el('i', 'tc-hole'); hole.style.left = `${x}%`; hole.style.top = `${HOLE_Y}%`;
     const node = el('button', 'tc-mole'); node.type = 'button'; node.dataset.choiceIndex = String(index + 1);
     node.style.left = `${x}%`; node.style.top = `${HOLE_Y}%`;
-    const body = el('span', 'tc-body'), card = el('span', 'tc-card');
-    body.append(card, el('span', 'tc-head')); node.append(body);
+    const body = el('span', 'tc-body'), card = el('span', 'tc-card'), head = el('span', 'tc-head'), mon = el('img', 'tc-mon');
+    mon.alt = ''; if (friendly) { head.dataset.gotomon = 'true'; head.append(mon); }
+    body.append(card, head); node.append(body);
     on(node, 'click', () => choose(index));
     world.append(hole, node);
-    return { node, body, card };
+    return { node, body, card, mon };
   });
   const hero = el('div', 'tc-hero'); world.append(hero);
 
@@ -106,7 +115,7 @@ export function createTimedChoiceView({ document: doc, dispatch, onBack, getSnap
     });
     answers.push({ word: shown, reading, correct: answer.correct });
     if (answer.correct) {
-      fx.pop(HOLE_X[correctIndex], HOLE_Y - 34, 'ポカッ！', 'good'); fx.burst(HOLE_X[correctIndex], HOLE_Y - 20, 'good', 1.1);
+      fx.pop(HOLE_X[correctIndex], HOLE_Y - 34, friendly ? 'ハイタッチ！' : 'ポカッ！', 'good'); fx.burst(HOLE_X[correctIndex], HOLE_Y - 20, 'good', 1.1);
       note.textContent = `せいかい！「${shown}」は「${reading}」`;
       frame.announce(`せいかい。${shown}、${reading}`);
     } else {
@@ -129,13 +138,15 @@ export function createTimedChoiceView({ document: doc, dispatch, onBack, getSnap
       if (problem && problem.problemId !== problemId) {
         problemId = problem.problemId; resolved = false;
         word.textContent = wordOf(problem.prompt);
-        moles.forEach(({ node, card }, index) => {
-          const choice = problem.choices[index];
+        const round = peekSerial++;
+        moles.forEach(({ node, card, mon }, index) => {
+          const choice = problem.choices[index], peeker = castAt(cast?.wild, round * HOLE_X.length + index);
+          if (friendly && peeker) { mon.src = peeker.imageUrl; node.dataset.gotomon = peeker.name; }
           node.hidden = !choice; delete node.dataset.status; card.textContent = '';
           node.dataset.choiceId = choice?.choiceId ?? '';
           if (choice) { card.append(el('span', 'tc-key', String(index + 1)), el('span', '', choice.text)); node.setAttribute('aria-label', `${index + 1}番 ${choice.text}`); }
         });
-        note.textContent = state.mode === 'review' ? '時間を気にせず、読みをたしかめよう' : '正しい読みのもぐらをたたこう！';
+        note.textContent = state.mode === 'review' ? '時間を気にせず、読みをたしかめよう' : friendly ? '正しい読みのゴトモンに ハイタッチしよう！' : '正しい読みのもぐらをたたこう！';
       }
       if (state.seq !== lastSeq) {
         lastSeq = state.seq;
@@ -178,13 +189,13 @@ export function createTimedChoiceView({ document: doc, dispatch, onBack, getSnap
         lastEventId = event.id;
         if (event.type === 'hit' && event.special) fx.banner('しずくハンマー！', 'great');
         else if (event.type === 'hit' && event.quick) fx.pop(50, 30, 'すばやい！', 'great');
-        else if (event.type === 'boost') { fx.banner('もぐらフィーバー！', 'great'); fx.flash('great'); }
+        else if (event.type === 'boost') { fx.banner(friendly ? 'ゴトモンフィーバー！' : 'もぐらフィーバー！', 'great'); fx.flash('great'); }
       }
       // Review runs have no goal; only normal play shows the mission.
       const mission = state.mode === 'review' ? null : w.challenge;
       frame.hud.set({ points: play.learningPoints + play.bonus, comboCount: play.combo,
         progressValue: (state.answered ?? 0) / (state.totalQuestions || 10),
-        progressLabel: `ポカッ ${w.correct ?? 0} · ${Math.min(state.totalQuestions || 10, (state.answered ?? 0) + (state.phase === 'answering' ? 1 : 0))}/${state.totalQuestions || 10}問`,
+        progressLabel: `${friendly ? 'タッチ' : 'ポカッ'} ${w.correct ?? 0} · ${Math.min(state.totalQuestions || 10, (state.answered ?? 0) + (state.phase === 'answering' ? 1 : 0))}/${state.totalQuestions || 10}問`,
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },

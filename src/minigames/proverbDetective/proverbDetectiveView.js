@@ -1,4 +1,5 @@
 import { createArcadeFrame, bindArcadeKeys, setVar, restartClass } from '../arcade/arcadeKit.js';
+import { castAt } from '../gotomonCast.js';
 import { CASE_MASK } from './proverbCases.js';
 
 const CSS = `
@@ -26,6 +27,12 @@ const CSS = `
 #proverbDetectiveScreen .pd-hero::before{content:'🔍';position:absolute;left:-26%;top:20%;font-size:30px;filter:drop-shadow(0 2px 2px #0006)}
 #proverbDetectiveScreen .pd-hero[data-fever=true]::after{content:'';position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,#ffd54a66,transparent 70%);animation:ya-glow .4s infinite alternate;z-index:-1}
 #proverbDetectiveScreen .pd-ask{margin:0;text-align:center;font-size:15px;font-weight:800;color:#e6d8ff}
+#proverbDetectiveScreen .pd-helper{position:absolute;left:4%;bottom:6%;z-index:3;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
+#proverbDetectiveScreen .pd-helper img{width:clamp(64px,9vw,96px);height:clamp(64px,9vw,96px);object-fit:contain;filter:drop-shadow(0 4px 3px #0005)}
+#proverbDetectiveScreen .pd-helper span{padding:1px 8px;border-radius:8px;background:#fffdf3;color:#2a1c10;font-size:11px;font-weight:900}
+#proverbDetectiveScreen .pd-helper.pd-cheer img{animation:pd-cheer .45s ease-out 2}
+@media (max-width:640px){#proverbDetectiveScreen .pd-helper{left:2%;bottom:2%}#proverbDetectiveScreen .pd-helper img{width:44px;height:44px}#proverbDetectiveScreen .pd-helper span{display:none}}
+@keyframes pd-cheer{0%,100%{transform:none}50%{transform:translateY(-22px) rotate(-6deg)}}
 #proverbDetectiveScreen .pd-suspects{display:grid;gap:8px}
 #proverbDetectiveScreen .pd-suspect{min-height:56px;padding:8px 12px;border:0;border-radius:14px;background:#f5f2fa;color:#241a33;font:inherit;font-size:clamp(17px,2vw,21px);font-weight:900;text-align:left;box-shadow:0 4px 0 #a99bc0;cursor:pointer;touch-action:manipulation;line-height:1.3}
 #proverbDetectiveScreen .pd-suspect small{font-size:.6em;color:#7a6a90;margin-right:6px}
@@ -45,7 +52,9 @@ const CSS = `
 // The meaning hint shows once the hint meter fills (half the case time).
 const HINT_AT = .5;
 
-export function createProverbDetectiveView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createProverbDetectiveView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
+  // One of the child's Gotomon works as the detective's assistant for the whole run.
+  const assistant = castAt(cast?.friends, 0) ?? castAt(cast?.wild, 0);
   let active = true, problemId = null, lastSeq = -1, lastEventId = 0, lastTrySerial = 0, hintShown = false;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
@@ -64,6 +73,8 @@ export function createProverbDetectiveView({ document: doc, dispatch, onBack, ge
   memo.append(stamp, memoTitle, clues, question, hintbar, hint, solved);
   const hero = el('div', 'pd-hero');
   world.append(el('i', 'pd-window'), client, memo, hero);
+  const helper = el('div', 'pd-helper');
+  if (assistant) { const img = el('img'); img.alt = ''; img.src = assistant.imageUrl; helper.append(img, el('span', '', `助手 ${assistant.name}`)); world.append(helper); }
 
   const ask = el('p', 'pd-ask', 'ぴったりのことわざを指名しよう！');
   const suspectsBox = el('div', 'pd-suspects');
@@ -138,6 +149,7 @@ export function createProverbDetectiveView({ document: doc, dispatch, onBack, ge
     solved.append(el('strong', '', problem.text), el('span', '', `よみ：${problem.reading}`), el('p', '', `いみ：${problem.meaning}`));
     solved.hidden = false; stamp.hidden = false; restartClass(stamp, 'pd-press');
     note.textContent = answer.correct ? 'みごとな推理！ 事件解決！' : '事件解決！ いみをもう一度読んでおこう。';
+    if (assistant) { restartClass(helper, 'pd-cheer'); fx.pop(12, 62, `${assistant.name}「さすが名探偵！」`, 'great'); }
     frame.announce(`事件解決。${problem.text}。${problem.meaning}`);
   };
 
