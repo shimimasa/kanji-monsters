@@ -66,6 +66,8 @@ import { createDrumView } from './gotomonDrum/drumView.js';
 import { buildDrumQuestions } from './gotomonDrum/drumContent.js';
 import { createRaceGame } from './gotomonRace/raceGame.js';
 import { createRaceView } from './gotomonRace/raceView.js';
+import { createMergeGame } from './gotomonMerge/mergeGame.js';
+import { createMergeView } from './gotomonMerge/mergeView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -270,4 +272,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createDrumGame({ ...context, content: drumContent(context) }), createView: createDrumView }),
   gotomonRace: Object.freeze({ id: 'gotomonRace', title: 'ゴトモン・レース',
     create: context => createRaceGame({ ...context, content: slashContent(context) }), createView: createRaceView }),
+  gotomonMerge: Object.freeze({ id: 'gotomonMerge', title: 'けいさん2048',
+    create: context => createMergeGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createMergeView }),
 });
