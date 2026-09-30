@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonLink: [
+    { id: 'sharp', name: '1回でつなぐ8本', deadline: 99, target: 8,
+      rule: 'よく見てから、線をひこう。', hint: 'わかるものから先につなぐと、のこりがへって考えやすいよ。', value: data => data.correct },
+    { id: 'chain', name: '4本連続で1回でつなぐ', deadline: 99, target: 4,
+      rule: '1回でつなぐのを4回つなげよう。', hint: 'まよったら、ほかのカードをつないでからもどってこよう。', value: data => data.maxCombo },
+  ],
   gotomonMerge: [
     { id: 'sharp', name: '1回で正解12問', deadline: 99, target: 12,
       rule: '「？」のタイルの計算を、よく考えて答えよう。', hint: 'えらぶ前に、頭の中でもう一度計算してみよう。', value: data => data.correct },
