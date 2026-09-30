@@ -165,6 +165,17 @@ const hub = {
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
     }
+    let region = 'all';
+    if (definition.id === 'gotomonDelivery') {
+      const label = element(doc, 'label', 'yt-memory-picker', 'とどける地方');
+      const select = element(doc, 'select'); select.setAttribute('aria-label', 'とどける地方');
+      for (const [value, text] of [['all', '全国'], ['hokkaido-tohoku', '北海道・東北地方'], ['kanto', '関東地方'], ['chubu', '中部地方'],
+        ['kinki', '近畿地方'], ['chugoku-shikoku', '中国・四国地方'], ['kyushu-okinawa', '九州・沖縄地方']]) {
+        const option = element(doc, 'option', '', text); option.value = value; select.append(option);
+      }
+      select.onchange = () => { region = select.value; }; label.append(select); dialog.append(label,
+        element(doc, 'p', 'yt-note', 'どの地方でも10こ。地方をえらぶと、その地方の都道府県だけが出ます。'));
+    }
     let stageId = null;
     if (['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id)) {
       const stages = rallyStages(), album = gotomonService.getAlbum(), journeys = gotomonService.getJourneys();
@@ -219,6 +230,7 @@ const hub = {
         ...(gameExperiences[definition.id].paced ? { pace } : {}),
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
         ...(definition.id === 'gotomonToss' ? { mathLevel } : {}),
+        ...(definition.id === 'gotomonDelivery' ? { region } : {}),
         ...(['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id) ? { stageId } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');

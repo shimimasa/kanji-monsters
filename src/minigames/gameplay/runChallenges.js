@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonDelivery: [
+    { id: 'sharp', name: '1回でとどける8こ', deadline: 99, target: 8,
+      rule: 'ヒントをよく読んで、ふるさとの都道府県をえらぼう。', hint: '名物や場所の名前が、ふるさとの大きな手がかりだよ。', value: data => data.correct },
+    { id: 'chain', name: '4こ連続で1回でとどける', deadline: 99, target: 4,
+      rule: '1回でとどけるのを4回つなげよう。', hint: '地図の場所も見て、どの地方か考えよう。', value: data => data.maxCombo },
+  ],
   gotomonFishing: [
     { id: 'sharp', name: '1回でつる10匹', deadline: 99, target: 10,
       rule: 'ふだをよく読んでから、合うゴトモンをつろう。', hint: '🔊で英語を聞いてから、ふだを見くらべよう。', value: data => data.correct },
