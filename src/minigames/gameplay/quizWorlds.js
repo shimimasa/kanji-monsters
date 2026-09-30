@@ -13,6 +13,7 @@ const KINDS = Object.freeze({
   bridge: { travel: [9000, 14000], label: '橋', unit: '本', verb: 'かけた', skill: '虹のかけ橋', special: '虹の橋' },
   photo: { travel: [6000, 9500], label: '写真', unit: 'まい', verb: '撮った', skill: 'シャッターチャンス', special: 'ベストショット' },
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
+  breakout: { travel: [14000, 22000], label: 'ブロック', unit: '問', verb: 'パカーン', skill: 'パカーンフィーバー', special: 'ナイスショット' },
   shooter: { travel: [7000, 11000], label: 'なかま', unit: 'ひき', verb: 'ふやした', skill: 'なかよしフィーバー', special: 'スターショット' },
   puyo: { travel: [9000, 14000], label: 'たまご', unit: '組', verb: 'つんだ', skill: 'ぷよフィーバー', special: 'れんさ' },
   bubble: { travel: [10000, 15000], label: '泡', unit: '発', verb: 'うった', skill: 'バブルフィーバー', special: 'れんさ' },
@@ -118,6 +119,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
           : kind === 'mole' && correct ? `ゴトモン${correct}匹とハイタッチ${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
+          : kind === 'breakout' && answered ? `答えのブロックを${answered}こ パカーン · ゴトモンが${answered}ひき出てきた${correct ? ` · ねらいどおり ${correct}こ` : ''}`
           : kind === 'shooter' && correct ? `${answered}ひきと なかよくなった · 1回でなかまにした ${correct}ひき`
           : kind === 'puyo' && answered ? `たまごを${answered}組つんだ${puyoHatched ? ` · ゴトモンが${puyoHatched}ひき うまれた` : ''}${puyoChain >= 2 ? ` · 最大${puyoChain}れんさ` : ''}`
           : kind === 'bubble' && bubbleBroken ? `泡を${bubbleBroken}こ わった${bubbleFreed ? ` · ゴトモンを${bubbleFreed}ひき たすけた` : ''}`
@@ -154,3 +156,4 @@ export const createDeliveryWorld = (effects, options) => createQuizWorld('delive
 export const createBubbleWorld = (effects, options) => createQuizWorld('bubble', effects, options);
 export const createPuyoWorld = (effects, options) => createQuizWorld('puyo', effects, options);
 export const createShooterWorld = (effects, options) => createQuizWorld('shooter', effects, options);
+export const createBreakoutWorld = (effects, options) => createQuizWorld('breakout', effects, options);

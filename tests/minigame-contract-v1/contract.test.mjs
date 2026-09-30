@@ -8,8 +8,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('all twenty-one definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter']);
+test('all twenty-two definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -196,6 +196,9 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
           // Card flipping is built from stage data too; its command is a flip.
           : id === 'kanjiMemory'
             ? { type: 'flip', payload: { sessionId: before.sessionId, attemptId: before.attemptId, cardId: before.cards[0]?.cardId ?? null } }
+          // The breakout launches its ball.
+          : id === 'gotomonBreakout'
+            ? { type: 'launch', payload: { sessionId: before.sessionId, attemptId: before.attemptId } }
           // The shooter fires a beam.
           : id === 'gotomonShooter'
             ? { type: 'fire', payload: { sessionId: before.sessionId, attemptId: before.attemptId } }
