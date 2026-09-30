@@ -8,8 +8,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('all nineteen definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble']);
+test('all twenty definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -196,6 +196,9 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
           // Card flipping is built from stage data too; its command is a flip.
           : id === 'kanjiMemory'
             ? { type: 'flip', payload: { sessionId: before.sessionId, attemptId: before.attemptId, cardId: before.cards[0]?.cardId ?? null } }
+          // The egg puzzle drops its pair.
+          : id === 'gotomonPuyo'
+            ? { type: 'drop', payload: { sessionId: before.sessionId, attemptId: before.attemptId } }
           // The bubble shooter shoots at an angle.
           : id === 'gotomonBubble'
             ? { type: 'shoot', payload: { sessionId: before.sessionId, attemptId: before.attemptId, angle: Math.PI / 2 } }

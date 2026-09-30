@@ -42,6 +42,8 @@ import { createDeliveryView } from './gotomonDelivery/deliveryView.js';
 import { buildDeliveries } from './gotomonDelivery/deliveryContent.js';
 import { createBubbleGame, BUBBLE_RULES } from './gotomonBubble/bubbleGame.js';
 import { createBubbleView } from './gotomonBubble/bubbleView.js';
+import { createPuyoGame } from './gotomonPuyo/puyoGame.js';
+import { createPuyoView } from './gotomonPuyo/puyoView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -179,4 +181,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createDeliveryGame({ ...context, content: deliveryContent(context) }), createView: createDeliveryView }),
   gotomonBubble: Object.freeze({ id: 'gotomonBubble', title: 'ゴトモン・バブル',
     create: context => createBubbleGame({ ...context, content: bubbleContent(context) }), createView: createBubbleView }),
+  gotomonPuyo: Object.freeze({ id: 'gotomonPuyo', title: 'けいさんぷよ',
+    create: context => createPuyoGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createPuyoView }),
 });
