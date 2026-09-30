@@ -1,9 +1,9 @@
-import { createChestWorld, createMoleWorld, createCartWorld, createStarWorld, createBridgeRunWorld, createPhotoWorld, createCaseWorld, createTripWorld, createBingoWorld, createMemoryWorld, createShopWorld, createSortWorld, createTossWorld, createFishWorld } from './quizWorlds.js';
+import { createChestWorld, createMoleWorld, createCartWorld, createStarWorld, createBridgeRunWorld, createPhotoWorld, createCaseWorld, createTripWorld, createBingoWorld, createMemoryWorld, createShopWorld, createSortWorld, createTossWorld, createFishWorld, createDeliveryWorld } from './quizWorlds.js';
 import { createDashWorld, createInvaderWorld, createGateWorld } from './arcadeWorlds.js';
 import { createRunChallenge } from './runChallenges.js';
 const worlds={mathSprint:createDashWorld, mathInvader:createInvaderWorld, englishChoice:createChestWorld,
   sentenceOrder:createBridgeRunWorld, timedChoice:createMoleWorld, multiSelect:createStarWorld,
-  asyncChoice:createCartWorld, kanjiDefense:createGateWorld, photoRally:createPhotoWorld, proverbDetective:createCaseWorld, tripSugoroku:createTripWorld, kanjiBingo:createBingoWorld, kanjiMemory:createMemoryWorld, gotomonShop:createShopWorld, kanjiSort:createSortWorld, gotomonToss:createTossWorld, gotomonFishing:createFishWorld};
+  asyncChoice:createCartWorld, kanjiDefense:createGateWorld, photoRally:createPhotoWorld, proverbDetective:createCaseWorld, tripSugoroku:createTripWorld, kanjiBingo:createBingoWorld, kanjiMemory:createMemoryWorld, gotomonShop:createShopWorld, kanjiSort:createSortWorld, gotomonToss:createTossWorld, gotomonFishing:createFishWorld, gotomonDelivery:createDeliveryWorld};
 
 export function createGameplayRun(gameId,effects,options={}) {
   const world=worlds[gameId]?.(effects,options);

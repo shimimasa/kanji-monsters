@@ -37,9 +37,12 @@ import { buildTossProblems, TOSS_BASKETS } from './gotomonToss/tossContent.js';
 import { createFishGame } from './gotomonFishing/fishGame.js';
 import { createFishView } from './gotomonFishing/fishView.js';
 import { buildFishProblems, FISH_SWIMMERS } from './gotomonFishing/fishContent.js';
+import { createDeliveryGame } from './gotomonDelivery/deliveryGame.js';
+import { createDeliveryView } from './gotomonDelivery/deliveryView.js';
+import { buildDeliveries } from './gotomonDelivery/deliveryContent.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
-import { stageData, getKanjiById, getKanjiByGrade, getMonsterById } from '../loaders/dataLoader.js';
+import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
 import { gotomonService } from './gotomonService.js';
 
 // The rally is built from the loaded game data for the chosen stage.
@@ -96,6 +99,13 @@ const tossContent = ({ sessionId, random, mathLevel }) => ({ level: mathLevel ==
   carriers: playfulGotomon(random, TOSS_BASKETS), problems: buildTossProblems({ sessionId, random, level: mathLevel }) });
 // The words come from the English vocabulary of 宝箱キャッチ.
 const fishContent = ({ sessionId, random }) => ({ carriers: playfulGotomon(random, FISH_SWIMMERS), problems: buildFishProblems({ sessionId, random }) });
+// Gotomon from every prefecture ask to be taken home; hints come from their notes.
+const deliveryContent = ({ sessionId, random, region }) => {
+  const monsters = getAllMonsterIds().map(id => getMonsterById(id)).filter(Boolean);
+  const regionId = region || 'all';
+  const deliveries = buildDeliveries({ sessionId, random, monsters, regionId });
+  return { regionId, deliveries: deliveries && deliveries.map(item => ({ ...item, imageUrl: gotomonService.getGotomonById(item.monsterId).imageUrl })) };
+};
 // The shop's customers are the chosen stage's Gotomon; its kanji use the bingo card's checked clues.
 const shopContent = context => {
   const base = bingoContent(context);
@@ -161,4 +171,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createTossGame({ ...context, content: tossContent(context) }), createView: createTossView }),
   gotomonFishing: Object.freeze({ id: 'gotomonFishing', title: 'ゴトモンつり',
     create: context => createFishGame({ ...context, content: fishContent(context) }), createView: createFishView }),
+  gotomonDelivery: Object.freeze({ id: 'gotomonDelivery', title: 'ゴトモン宅配便',
+    create: context => createDeliveryGame({ ...context, content: deliveryContent(context) }), createView: createDeliveryView }),
 });

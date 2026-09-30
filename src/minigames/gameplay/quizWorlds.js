@@ -13,6 +13,7 @@ const KINDS = Object.freeze({
   bridge: { travel: [9000, 14000], label: '橋', unit: '本', verb: 'かけた', skill: '虹のかけ橋', special: '虹の橋' },
   photo: { travel: [6000, 9500], label: '写真', unit: 'まい', verb: '撮った', skill: 'シャッターチャンス', special: 'ベストショット' },
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
+  delivery: { travel: [12000, 18000], label: 'おとどけ', unit: 'こ', verb: 'とどけた', skill: 'スピード配達', special: '速達' },
   fish: { travel: [7000, 11000], label: 'つり', unit: '匹', verb: 'つった', skill: '大漁フィーバー', special: '大物' },
   toss: { travel: [6000, 9500], label: '玉', unit: '球', verb: '入れた', skill: '玉入れフィーバー', special: 'ナイスシュート' },
   sort: { travel: [9000, 14000], label: 'パズル', unit: 'こ', verb: '完成', skill: 'ならべ名人', special: 'ぴったり' },
@@ -107,6 +108,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         caption: feverLeft ? `${spec.skill}！ あと${feverLeft}回` : charged ? `次の正解で${spec.special}！` : '',
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
+          : kind === 'delivery' && correct ? `ふるさとに${answered}こ とどけた · 1回でとどいた ${correct}こ`
           : kind === 'fish' && correct ? `ゴトモンを${answered}匹つった · 1回でつれた ${correct}匹`
           : kind === 'toss' && correct ? `玉を${answered}球入れた · 1回で入った ${correct}球`
           : kind === 'sort' && sortSolved ? `パズルを${sortSolved}こ完成 · ⭐${sortStars}`
@@ -135,3 +137,4 @@ export const createShopWorld = (effects, options) => createQuizWorld('shop', eff
 export const createSortWorld = (effects, options) => createQuizWorld('sort', effects, options);
 export const createTossWorld = (effects, options) => createQuizWorld('toss', effects, options);
 export const createFishWorld = (effects, options) => createQuizWorld('fish', effects, options);
+export const createDeliveryWorld = (effects, options) => createQuizWorld('delivery', effects, options);
