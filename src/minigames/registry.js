@@ -53,6 +53,8 @@ import { createMeteorGame } from './gotomonMeteor/meteorGame.js';
 import { createMeteorView } from './gotomonMeteor/meteorView.js';
 import { createSnakeGame } from './gotomonSnake/snakeGame.js';
 import { createSnakeView } from './gotomonSnake/snakeView.js';
+import { createPartsGame } from './gotomonParts/partsGame.js';
+import { createPartsView } from './gotomonParts/partsView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -211,4 +213,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createMeteorGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createMeteorView }),
   gotomonSnake: Object.freeze({ id: 'gotomonSnake', title: 'スペルスネーク',
     create: context => createSnakeGame({ ...context, content: null }), createView: createSnakeView }),
+  gotomonParts: Object.freeze({ id: 'gotomonParts', title: '漢字パーツ落とし',
+    create: context => createPartsGame({ ...context, content: { mode: context.mode === 'all' ? 'all' : 'easy' } }), createView: createPartsView }),
 });

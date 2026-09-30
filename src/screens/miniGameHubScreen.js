@@ -165,7 +165,16 @@ const hub = {
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'どちらも12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
     }
-    let mode = 'english';
+    let mode = definition.id === 'gotomonParts' ? 'easy' : 'english';
+    if (definition.id === 'gotomonParts') {
+      const label = element(doc, 'label', 'yt-memory-picker', 'くみたてる漢字');
+      const select = element(doc, 'select'); select.setAttribute('aria-label', 'くみたてる漢字');
+      for (const [value, text] of [['easy', '1・2年の漢字'], ['all', '1〜6年の漢字（ぜんぶ）']]) {
+        const option = element(doc, 'option', '', text); option.value = value; select.append(option);
+      }
+      select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
+        element(doc, 'p', 'yt-note', 'どちらも10字。パーツを持っているのは、きみが旅で出会ったゴトモンたちです。'));
+    }
     if (definition.id === 'gotomonShooter') {
       const label = element(doc, 'label', 'yt-memory-picker', 'ビームでこたえる問題');
       const select = element(doc, 'select'); select.setAttribute('aria-label', 'ビームでこたえる問題');
@@ -241,7 +250,7 @@ const hub = {
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
         ...(['gotomonToss', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout', 'gotomonMeteor'].includes(definition.id) ? { mathLevel } : {}),
         ...(definition.id === 'gotomonDelivery' ? { region } : {}),
-        ...(definition.id === 'gotomonShooter' ? { mode } : {}),
+        ...(['gotomonShooter', 'gotomonParts'].includes(definition.id) ? { mode } : {}),
         ...(['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id) ? { stageId } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');
