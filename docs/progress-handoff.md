@@ -1,6 +1,32 @@
 # 作業引き継ぎ / 再開ガイド
 
-> ## いまの状態（2026-09-30 更新・ここから再開）
+> ## 次回はここから（2026-09-30 最終更新）
+>
+> **状況**: ミニゲームは全34本が本番公開済み（最新 PR #52、`main` = `0032bd0`）。ユーザーに出した案はすべて作り終えた。
+> ブランチ `feature/content-bank-120` には、引き継ぎ資料の更新と確認用ツールの追加だけがローカルコミットで積んである（未push）。
+> **pushとPRは、ユーザーが「PRを作ってマージして本番に出して」と言ったときだけ**（1回の承認は次回に持ち越さない）。
+>
+> **次の一手の候補**（ユーザーに聞いて決める）
+> 1. タブレット実機で遊んでもらった感想から調整する。特に未確認なのは: リズムたいこの音（WebAudio合成、ヘッドレスでは聞けない）、
+>    漢字オセロの強さ（シミュレーションのみ）、ゴトモン迷路の512幅（答えている間は迷路が小さくなる）、ゴトモンさがしの難しさ。
+> 2. 新しいミニゲーム案を出して選んでもらう（これまで「ゲームの種類で面白いもの」を7〜9案出し、ユーザーが1つずつ選ぶ流れ）。
+> 3. 本編側の宿題（下の「5. 未決定事項」: Firestoreルールが最優先、デプロイ一本化）。
+>
+> **新しいミニゲームの作り方（この型で34本作った）**
+> - `src/minigames/<gameId>/` に Core（DOMなし・`enter/update/setPaused/snapshot/dispatch/exit`）と View（`createArcadeFrame`）。
+>   問題は既存の問題づくりを再利用（`gotomonSlash/slashContent.js` が漢字の読み・英語・算数の3モードを1つの形で出す）。
+> - つなぎ込み（毎回同じ）: `registry.js`・`gameExperiences.js`（**`scene` 名は既存と重ねない**、テストで検出）・
+>   `gameplay/gameplayRun.js`・`gameplay/quizWorlds.js`（KINDS・まとめ文・必要なら `HOLD`）・`gameplay/runChallenges.js`・
+>   `screens/miniGameHubScreen.js`（`mode`/`mathLevel` の選択）・`public/adventure.css`（カード絵）・
+>   テスト11ファイルのレジストリ一覧・`tests/minigame-contract-v1/contract.test.mjs`（本数の英語と exit 用コマンド）。
+>   つなぎ込みは python スクリプト（Write で書く。bash の heredoc にかぎかっこを入れると壊れる）で、全置換の一致を assert してから書く。
+> - 学習結果は1問1回（最初の答え）。再挑戦は別イベント名、試行ごとに problemId を変える。まちがいでも前向きな文言。
+> - 物理・対戦・順位のあるものは、正答率ごとの結果をシミュレーションで確かめてから出す（レース・オセロ・迷路で実際に問題が見つかった）。
+> - 確認: `tests/gotomon-minigames/<name>.test.mjs` → `bash scripts/playtest-cdp/run-all-tests.sh`（`SAME-FAILS` で合格）→
+>   `npm run build` → プレビュー＋ヘッドレスChromeで `scripts/playtest-cdp/`（README.md の手順とボット）。1280と512の両幅で見る。
+> - コミット本文には確認したことを数値つきで書く。本番に出したら、この資料の該当行を「本番公開済み（PR #, main = ）」に直す。
+>
+> ## いまの状態（2026-09-30 更新）
 >
 > **34本目「ゴトモン迷路」（`gotomonMaze`）も本番公開済み**（PR #52、`main` = `0032bd0`）。7×7の迷路（毎回ランダム、道は1本）を相棒で歩く。
 > マスをタップすると自動で歩き（矢印・スワイプ・矢印キーでも1マス）、道のとちゅうの「？」のとびら4つで問題（4択）。正解であく、
