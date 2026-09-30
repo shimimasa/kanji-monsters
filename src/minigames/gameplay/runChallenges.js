@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonSnake: [
+    { id: 'clean', name: 'まちがいなし6語', deadline: 99, target: 6,
+      rule: '左の文字から順番に、正しく食べていこう。', hint: 'まわり道してもいいよ。光っている文字だけをめざそう。', value: data => data.correct },
+    { id: 'chain', name: '4語連続でまちがいなし', deadline: 99, target: 4,
+      rule: 'まちがいなしでつづるのを4回つなげよう。', hint: 'はしから出ると反対がわにもどるよ。近道に使おう。', value: data => data.maxCombo },
+  ],
   gotomonMeteor: [
     { id: 'sharp', name: '1回でげいげき10こ', deadline: 99, target: 10,
       rule: '答えを出してから、その数字の基地をタップしよう。', hint: 'いん石はゆっくり落ちてくる。あわてなくて大丈夫。', value: data => data.correct },

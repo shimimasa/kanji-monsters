@@ -30,8 +30,12 @@ test('every view accepts a Gotomon cast, and plays on without one', () => {
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     for (const given of [cast, undefined]) {
       const doc = fakeDocument();
-      const view = definition.createView({ document: doc, dispatch: () => false, onBack() {}, onReplay() {}, getSnapshot: () => ({}), cast: given });
+      const game = definition.create({ sessionId: `${id}-cameo`, random: () => 0.25, onEvent() {} });
+      const view = definition.createView({ document: doc, dispatch: () => false, onBack() {}, onReplay() {}, getSnapshot: () => game.snapshot(), cast: given });
       assert.ok(view.root, id);
+      // The snapshot before the game starts must render too (it can hold empty lists).
+      view.update(game.snapshot());
+      game.exit();
       view.dispose?.();
     }
   }
