@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonMerge: [
+    { id: 'sharp', name: '1回で正解12問', deadline: 99, target: 12,
+      rule: '「？」のタイルの計算を、よく考えて答えよう。', hint: 'えらぶ前に、頭の中でもう一度計算してみよう。', value: data => data.correct },
+    { id: 'chain', name: '6問連続で正解', deadline: 99, target: 6,
+      rule: '正解を6回つなげよう。', hint: 'あわてなくて大丈夫。時間せいげんはないよ。', value: data => data.maxCombo },
+  ],
   gotomonRace: [
     { id: 'sharp', name: '1回でダッシュ10問', deadline: 99, target: 10,
       rule: 'ゲートが来る前に、答えのレーンへ移ろう。', hint: 'もんだいはずっと出ているよ。ゲートが遠いうちに考えよう。', value: data => data.correct },
