@@ -20,7 +20,7 @@ const clearAll = game => {
 };
 
 test('registry retains Sprint and Invader definitions when later entries are added', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor', 'gotomonSnake', 'gotomonParts', 'gotomonSlash', 'gotomonColoring', 'gotomonDrum', 'gotomonRace', 'gotomonMerge', 'gotomonLink', 'gotomonOthello', 'gotomonSeek']);
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor', 'gotomonSnake', 'gotomonParts', 'gotomonSlash', 'gotomonColoring', 'gotomonDrum', 'gotomonRace', 'gotomonMerge', 'gotomonLink', 'gotomonOthello', 'gotomonSeek', 'gotomonMaze']);
   for (const id of ['mathSprint', 'mathInvader']) {
     assert.equal(miniGameRegistry[id].id, id);
     assert.equal(typeof miniGameRegistry[id].create, 'function');

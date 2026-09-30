@@ -75,6 +75,8 @@ import { createOthelloGame } from './gotomonOthello/othelloGame.js';
 import { createOthelloView } from './gotomonOthello/othelloView.js';
 import { createSeekGame } from './gotomonSeek/seekGame.js';
 import { createSeekView } from './gotomonSeek/seekView.js';
+import { createMazeGame } from './gotomonMaze/mazeGame.js';
+import { createMazeView } from './gotomonMaze/mazeView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -147,7 +149,7 @@ const shooterContent = ({ sessionId, random, mode, focusKanjiIds }) => {
   return { mode: 'kanji', waves: stage ? buildShooterWaves({ sessionId, random, mode: 'kanji', focusKanjiIds,
     stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
 };
-// The slash game, the race and hide-and-seek: kanji readings from the stage reached last, English words, or sums.
+// The slash game, the race, hide-and-seek and the maze: kanji readings from the stage reached last, English words, or sums.
 const slashContent = ({ sessionId, random, mode, focusKanjiIds }) => {
   const kind = ['english', 'math'].includes(mode) ? mode : 'kanji';
   if (kind !== 'kanji') return { mode: kind, problems: buildSlashProblems({ sessionId, random, mode: kind }) };
@@ -310,4 +312,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createOthelloGame({ ...context, content: othelloContent(context) }), createView: createOthelloView }),
   gotomonSeek: Object.freeze({ id: 'gotomonSeek', title: 'ゴトモンさがし',
     create: context => createSeekGame({ ...context, content: slashContent(context) }), createView: createSeekView }),
+  gotomonMaze: Object.freeze({ id: 'gotomonMaze', title: 'ゴトモン迷路',
+    create: context => createMazeGame({ ...context, content: slashContent(context) }), createView: createMazeView }),
 });
