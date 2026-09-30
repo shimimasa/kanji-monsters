@@ -7,7 +7,7 @@ const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const KINDS = Object.freeze({
   // travel: how long the targets take to arrive (normal / slow pace), in ms.
   chest: { travel: [7000, 11000], label: '宝箱', unit: 'つ', verb: 'キャッチ', skill: 'おたからフィーバー', special: '金の宝箱' },
-  mole: { travel: [5000, 8000], label: 'もぐら', unit: '匹', verb: 'たたいた', skill: 'もぐらフィーバー', special: 'しずくハンマー' },
+  mole: { travel: [5000, 8000], label: 'ゴトモン', unit: '匹', verb: 'ハイタッチ', skill: 'ゴトモンフィーバー', special: 'しずくハンマー' },
   cart: { travel: [8000, 12000], label: '宝石', unit: 'こ', verb: '発見', skill: '発見フィーバー', special: '羅針盤の宝' },
   stars: { travel: [12000, 18000], label: '星座', unit: 'つ', verb: '完成', skill: '星のきらめき', special: '流れ星' },
   bridge: { travel: [9000, 14000], label: '橋', unit: '本', verb: 'かけた', skill: '虹のかけ橋', special: '虹の橋' },
@@ -112,6 +112,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         caption: feverLeft ? `${spec.skill}！ あと${feverLeft}回` : charged ? `次の正解で${spec.special}！` : '',
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
+          : kind === 'mole' && correct ? `ゴトモン${correct}匹とハイタッチ${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
           : kind === 'bubble' && bubbleBroken ? `泡を${bubbleBroken}こ わった${bubbleFreed ? ` · ゴトモンを${bubbleFreed}ひき たすけた` : ''}`
           : kind === 'delivery' && correct ? `ふるさとに${answered}こ とどけた · 1回でとどいた ${correct}こ`
           : kind === 'fish' && correct ? `ゴトモンを${answered}匹つった · 1回でつれた ${correct}匹`

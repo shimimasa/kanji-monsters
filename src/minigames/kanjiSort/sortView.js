@@ -1,5 +1,6 @@
 import { createArcadeFrame, restartClass } from '../arcade/arcadeKit.js';
 import { SORT_SIZES } from './sortContent.js';
+import { castAt } from '../gotomonCast.js';
 
 const MAX_CARDS = Math.max(...SORT_SIZES);
 const CSS = `
@@ -13,6 +14,11 @@ const CSS = `
 #kanjiSortScreen .ks-slot[data-filled=true]{border-style:solid;border-color:#5b3a8c;background:#fffdf6;box-shadow:0 4px 0 #c9b98f}
 #kanjiSortScreen .ks-slot[data-next=true]{border-color:#ff9f1c;background:#fff3d6;animation:ks-wait 1s ease-in-out infinite alternate}
 #kanjiSortScreen .ks-slot.ks-in{animation:ks-in .35s ease-out}
+#kanjiSortScreen .ks-holder{position:absolute;left:50%;top:92%;width:46%;aspect-ratio:1;transform:translateX(-50%);object-fit:contain;filter:drop-shadow(0 3px 2px #0004);pointer-events:none}
+#kanjiSortScreen .ks-slot[data-filled=true] .ks-holder{animation:ks-hold .5s ease-out}
+#kanjiSortScreen .ks-rail[data-done=true] .ks-holder{animation:ks-hold .45s ease-in-out 3}
+@keyframes ks-hold{0%,100%{transform:translateX(-50%)}45%{transform:translate(-50%,-26%) rotate(-6deg)}}
+#kanjiSortScreen .ks-rail{padding-bottom:clamp(36px,8vh,64px)}
 #kanjiSortScreen .ks-order{position:absolute;left:6px;top:4px;font-size:12px;font-weight:900;color:#8a6a3a}
 #kanjiSortScreen .ks-slot-kanji{font-size:clamp(30px,5vw,54px);font-weight:900;line-height:1}
 #kanjiSortScreen .ks-slot-label{min-height:1.3em;font-size:clamp(12px,1.6vw,16px);font-weight:900;color:#5b3a8c}
@@ -53,7 +59,9 @@ const labelOf = (kind, card) => kind === 'strokes' ? `${card.strokes}画` : card
 const wordOf = card => card.word ? `${card.word.before}${card.kanji}${card.word.after}` : card.kanji;
 const readingText = card => card.word ? `「${wordOf(card)}」の「${card.kanji}」は「${card.reading}」` : `「${card.kanji}」は「${card.reading}」`;
 
-export function createSortView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createSortView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
+  // A Gotomon waits under each place in the row and cheers when its card arrives.
+  let holderSerial = 0;
   let active = true, lastSeq = -1, lastEventId = 0, puzzleKey = null, doneShown = false, shownAttempt = null;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
@@ -69,8 +77,9 @@ export function createSortView({ document: doc, dispatch, onBack, getSnapshot })
   const rail = el('div', 'ks-rail'); rail.setAttribute('aria-label', 'ならべた漢字');
   const slots = Array.from({ length: MAX_CARDS }, (_, index) => {
     const node = el('div', 'ks-slot'), kanji = el('span', 'ks-slot-kanji'), label = el('span', 'ks-slot-label');
-    node.append(el('span', 'ks-order', String(index + 1)), kanji, label); rail.append(node);
-    return { node, kanji, label, key: null };
+    const holder = el('img', 'ks-holder'); holder.alt = ''; holder.hidden = true;
+    node.append(el('span', 'ks-order', String(index + 1)), kanji, label, holder); rail.append(node);
+    return { node, kanji, label, holder, key: null };
   });
   const ends = el('div', 'ks-ends'); const firstEnd = el('span'), lastEnd = el('span'); ends.append(firstEnd, lastEnd);
   const buddy = el('div', 'ks-buddy');
@@ -129,8 +138,10 @@ export function createSortView({ document: doc, dispatch, onBack, getSnapshot })
     slots.forEach((slot, index) => {
       slot.node.hidden = index >= state.cards.length; slot.key = null;
       slot.kanji.textContent = ''; slot.label.textContent = '';
+      const who = castAt(cast?.wild, holderSerial * 5 + index);
+      slot.holder.hidden = !who; if (who) slot.holder.src = who.imageUrl;
     });
-    tray.dataset.count = String(state.cards.length);
+    tray.dataset.count = String(state.cards.length); rail.dataset.done = 'false'; holderSerial++;
   };
   const renderRow = state => {
     const byId = new Map(state.cards.map(card => [card.cardId, card]));
@@ -171,7 +182,7 @@ export function createSortView({ document: doc, dispatch, onBack, getSnapshot })
       const at = ((state.placed.length - 0.5) / state.cards.length) * 100;
       fx.burst(Math.max(10, Math.min(90, at)), 45, answer.finished ? 'great' : 'good', answer.finished ? 1.5 : 1);
       if (answer.finished) {
-        fx.banner('かんせい！', 'great');
+        fx.banner('かんせい！', 'great'); rail.dataset.done = 'true';
         const row = [...state.cards].sort((a, b) => a.rank - b.rank).map(card => state.kind === 'strokes' ? `${card.kanji}（${card.strokes}画）` : `${wordOf(card)}（${card.reading}）`).join(' → ');
         finished.push(`${RULES[state.kind].rule}：${row}`);
         prev.textContent = `さっきのパズル ✓ ${row}`; prev.hidden = false;

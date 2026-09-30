@@ -1,4 +1,5 @@
 import { createArcadeFrame, bindArcadeKeys, setVar } from '../arcade/arcadeKit.js';
+import { castAt } from '../gotomonCast.js';
 
 const CSS = `
 #asyncChoiceScreen .ya-field{background:radial-gradient(ellipse at 50% 0,#3d5a4a 0,transparent 55%),linear-gradient(#1f2f2a,#2b3f36 40%,#5b4a36 40.3%,#4a3b2a)}
@@ -9,6 +10,10 @@ const CSS = `
 #asyncChoiceScreen .ac-rails path[data-lit=true]{stroke:#ffd54a}
 #asyncChoiceScreen .ac-tunnel{position:absolute;z-index:3;top:9%;width:min(23%,170px);min-width:44px;min-height:44px;transform:translateX(-50%);padding:0;border:0;background:none;font:inherit;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:4px}
 #asyncChoiceScreen .ac-mouth{width:min(100%,110px);aspect-ratio:1.5;border-radius:50% 50% 6px 6px;background:radial-gradient(ellipse at 50% 90%,#0c1310 55%,#231a12 57%);border:5px solid #6b5238;box-shadow:inset 0 -6px 0 #0006}
+#asyncChoiceScreen .ac-mouth{position:relative}
+#asyncChoiceScreen .ac-mon{position:absolute;left:50%;bottom:0;width:62%;aspect-ratio:1;transform:translateX(-50%);object-fit:contain;object-position:50% 100%;opacity:.55;filter:brightness(.55) drop-shadow(0 2px 2px #0006);transition:opacity .2s}
+#asyncChoiceScreen .ac-tunnel[data-status=correct] .ac-mon{opacity:1;filter:drop-shadow(0 3px 3px #0006);animation:ac-hop .6s ease-out}
+@keyframes ac-hop{0%{transform:translateX(-50%)}45%{transform:translate(-50%,-30%) scale(1.15)}100%{transform:translateX(-50%)}}
 #asyncChoiceScreen .ac-sign{max-width:100%;padding:5px 10px;border-radius:10px;background:#fffdf3;color:#2a1c10;border:3px solid #6b5238;font-size:clamp(15px,2.1vw,21px);font-weight:900;white-space:nowrap;box-shadow:0 3px 0 #0004}
 #asyncChoiceScreen .ac-key{font-size:.65em;color:#8a7358;margin-right:3px}
 #asyncChoiceScreen .ac-tunnel:focus-visible .ac-sign{outline:3px solid #ffd54a;outline-offset:2px}
@@ -38,7 +43,9 @@ const EXIT_X = [14, 38, 62, 86];
 const TRUNK_X = 50, START_Y = 96, FORK_Y = 62, TUNNEL_Y = 30;
 const SVG = 'http://www.w3.org/2000/svg';
 
-export function createAsyncChoiceView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createAsyncChoiceView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
+  // A Gotomon waits in each tunnel; the one in the right tunnel comes out to greet the cart.
+  let tunnelSerial = 0, greeter = null;
   let active = true, problemId = null, lastSeq = -1, lastEventId = 0, choiceIndex = null;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
@@ -64,10 +71,11 @@ export function createAsyncChoiceView({ document: doc, dispatch, onBack, getSnap
   const tunnels = EXIT_X.map((x, index) => {
     const node = el('button', 'ac-tunnel'); node.type = 'button'; node.dataset.choiceIndex = String(index + 1);
     node.style.left = `${x}%`;
-    const sign = el('span', 'ac-sign'); node.append(el('span', 'ac-mouth'), sign);
+    const sign = el('span', 'ac-sign'), mouth = el('span', 'ac-mouth'), mon = el('img', 'ac-mon');
+    mon.alt = ''; mon.hidden = true; mouth.append(mon); node.append(mouth, sign);
     on(node, 'click', () => choose(index));
     world.append(node);
-    return { node, sign };
+    return { node, sign, mon };
   });
   const cart = el('div', 'ac-cart'); cart.append(el('span', 'ac-car')); world.append(cart);
 
@@ -108,6 +116,7 @@ export function createAsyncChoiceView({ document: doc, dispatch, onBack, getSnap
     const correctIndex = problem.choices.findIndex(choice => choice.choiceId === answer.correctChoiceId);
     const chosenIndex = problem.choices.findIndex(choice => choice.choiceId === answer.choiceId);
     const text = problem.choices[correctIndex]?.text ?? '';
+    greeter = tunnels[correctIndex]?.mon?.hidden === false ? tunnels[correctIndex].mon.dataset.name : null;
     choiceIndex = chosenIndex;
     tunnels.forEach(({ node }, index) => { node.dataset.status = index === correctIndex ? 'correct' : index === chosenIndex ? 'chosen' : 'faded'; });
     branches.forEach((path, index) => path.setAttribute('data-lit', String(index === chosenIndex)));
@@ -116,7 +125,7 @@ export function createAsyncChoiceView({ document: doc, dispatch, onBack, getSnap
     answers.push({ prompt: problem.prompt, text, correct: answer.correct });
     if (answer.correct) {
       fx.burst(EXIT_X[correctIndex], TUNNEL_Y, 'good', 1.3);
-      note.textContent = `せいかい！ 答えは「${text}」`;
+      note.textContent = `せいかい！ 答えは「${text}」${greeter ? `。トンネルで${greeter}が待ってたよ！` : ''}`;
       frame.announce(`せいかい。${text}`);
     } else {
       fx.pop(EXIT_X[chosenIndex], TUNNEL_Y + 6, 'いきどまり…', 'soft');
@@ -139,8 +148,10 @@ export function createAsyncChoiceView({ document: doc, dispatch, onBack, getSnap
       if (problem && problem.problemId !== problemId) {
         problemId = problem.problemId; choiceIndex = null;
         prompt.textContent = problem.prompt;
-        tunnels.forEach(({ node, sign }, index) => {
-          const choice = problem.choices[index];
+        const round = tunnelSerial++;
+        tunnels.forEach(({ node, sign, mon }, index) => {
+          const choice = problem.choices[index], waiting = castAt(cast?.wild, round * EXIT_X.length + index);
+          mon.hidden = !waiting; if (waiting) { mon.src = waiting.imageUrl; mon.dataset.name = waiting.name; }
           node.hidden = !choice; delete node.dataset.status; sign.textContent = '';
           node.dataset.choiceId = choice?.choiceId ?? '';
           if (choice) { sign.append(el('span', 'ac-key', String(index + 1)), el('span', '', choice.text)); node.setAttribute('aria-label', `${index + 1}番 ${choice.text}`); }

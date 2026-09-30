@@ -1,4 +1,5 @@
 import { restartClass, toggleClass, setVar, createArcadeFrame, createNumberPad, bindArcadeKeys } from '../arcade/arcadeKit.js';
+import { castAt } from '../gotomonCast.js';
 
 const CSS = `
 #mathSprintScreen .ya-field{background:linear-gradient(#8fd3ff 0,#d9f2ff 52%,#b6e3a0 52.2%,#8cc86f 70%)}
@@ -29,6 +30,9 @@ const CSS = `
 #mathSprintScreen .sp-hurdle[data-state=active] .sp-sign{font-size:clamp(22px,3.4vw,32px);border-color:#ff9f1c;box-shadow:0 4px 0 #b86a00,0 0 0 4px #ffe08a;animation:sp-float 1s ease-in-out infinite alternate}
 #mathSprintScreen .sp-hurdle[data-state=ready] .sp-sign{background:#d7f7df;border-color:#1f9d55}
 #mathSprintScreen .sp-hurdle[data-state=knocked] .sp-sign{background:#fff1d6;border-color:#c77f16}
+#mathSprintScreen .sp-fan{position:absolute;bottom:34px;left:-52px;opacity:.95;width:clamp(36px,5vw,52px);height:clamp(36px,5vw,52px);object-fit:contain;filter:drop-shadow(0 3px 2px #0004)}
+#mathSprintScreen .sp-hurdle[data-state=ready] .sp-fan,#mathSprintScreen .sp-hurdle[data-state=passed] .sp-fan{animation:sp-cheer .45s ease-in-out infinite alternate}
+#mathSprintScreen .sp-goalmon{position:absolute;bottom:0;left:22px;width:clamp(64px,9vw,96px);height:clamp(64px,9vw,96px);object-fit:contain;filter:drop-shadow(0 4px 3px #0005)}
 #mathSprintScreen .sp-finish{position:absolute;bottom:31%;width:14px;height:48%;transform:translateX(-50%);background:repeating-linear-gradient(0deg,#16242c 0 12px,#fff 12px 24px);z-index:2}
 #mathSprintScreen .sp-finish::after{content:'GOAL';position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-weight:900;color:#16242c;background:#ffe066;border-radius:6px;padding:2px 8px}
 #mathSprintScreen .sp-question{margin:0;text-align:center;font-size:clamp(28px,4.6vw,42px);font-weight:900;font-variant-numeric:tabular-nums;color:#fff}
@@ -39,12 +43,13 @@ const CSS = `
 @keyframes sp-jump{0%{transform:none}45%{transform:translateY(-70%) rotate(-10deg)}100%{transform:none}}
 @keyframes sp-trip{0%{transform:none}30%{transform:rotate(18deg) translateY(6px)}100%{transform:none}}
 @keyframes sp-float{from{transform:translate(-50%,-8px)}to{transform:translate(-50%,-14px)}}
+@keyframes sp-cheer{from{transform:none}to{transform:translateY(-10px) rotate(-6deg)}}
 @keyframes sp-lines{to{transform:translateX(-20px)}}
 `;
 
 const RUNNER_X = 24, PERCENT_PER_M = 1.5;
 
-export function createMathSprintView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createMathSprintView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
   let active = true, entry = '', lastSeq = -1, lastEventId = 0, problemId = null;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
@@ -55,10 +60,17 @@ export function createMathSprintView({ document: doc, dispatch, onBack, getSnaps
   const clouds = el('div', 'sp-clouds'), hills = el('div', 'sp-hills');
   world.append(el('div', 'sp-sun'), clouds, hills, el('div', 'sp-track'));
   const lines = el('div', 'sp-lines'); world.append(lines);
-  const hurdles = Array.from({ length: 10 }, () => {
-    const node = el('div', 'sp-hurdle'), sign = el('span', 'sp-sign', '?'); node.append(sign); world.append(node); return { node, sign };
+  const hurdles = Array.from({ length: 10 }, (_, index) => {
+    const node = el('div', 'sp-hurdle'), sign = el('span', 'sp-sign', '?'); node.append(sign);
+    // A wild Gotomon cheers beside each hurdle and jumps for joy once it is cleared.
+    const fan = castAt(cast?.wild, index);
+    if (fan) { const img = el('img', 'sp-fan'); img.alt = ''; img.src = fan.imageUrl; node.append(img); }
+    world.append(node); return { node, sign };
   });
   const finish = el('div', 'sp-finish'); world.append(finish);
+  // A boss Gotomon waits at the goal.
+  const host = cast?.boss ?? castAt(cast?.wild, 99);
+  if (host) { const img = el('img', 'sp-goalmon'); img.alt = ''; img.src = host.imageUrl; finish.append(img); }
   const ghost = el('div', 'sp-ghost'); ghost.append(el('span', '', 'ベスト')); ghost.hidden = true; world.append(ghost);
   const runner = el('div', 'sp-runner'); runner.style.left = `${RUNNER_X}%`;
   const bubble = el('span', 'sp-bubble', 'こたえて ジャンプ！'); bubble.hidden = true; runner.append(bubble); world.append(runner);
@@ -135,7 +147,7 @@ export function createMathSprintView({ document: doc, dispatch, onBack, getSnaps
     else if (event.type === 'shortcut') { fx.pop(RUNNER_X, 44, 'ころころ近道！', 'great'); fx.burst(RUNNER_X, 62, 'great'); }
     else if (event.type === 'trip') fx.pop(RUNNER_X, 44, 'よいしょ！', 'soft');
     else if (event.type === 'boost') { fx.banner('ゴトモンダッシュ！', 'great'); fx.flash('great'); }
-    else if (event.type === 'finish') { fx.banner(`ゴール！ ${((w.timeMs ?? 0) / 1000).toFixed(1)}秒`, 'great'); fx.flash('great'); frame.announce('ゴール'); }
+    else if (event.type === 'finish') { fx.banner(`ゴール！ ${((w.timeMs ?? 0) / 1000).toFixed(1)}秒`, 'great'); fx.flash('great'); frame.announce('ゴール'); if (host) fx.pop(60, 30, `${host.name}「ゴールおめでとう！」`, 'great'); }
   };
 
   return {

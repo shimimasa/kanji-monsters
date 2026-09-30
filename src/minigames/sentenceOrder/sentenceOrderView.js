@@ -1,4 +1,5 @@
 import { createArcadeFrame, bindArcadeKeys, restartClass } from '../arcade/arcadeKit.js';
+import { castAt } from '../gotomonCast.js';
 
 const CSS = `
 #sentenceOrderScreen .ya-field{background:linear-gradient(#9fdcff 0,#d6f1ff 32%,#7cc26b 32.2%,#5fa855 46%,#3f8fc9 46.2%,#2f74b0 100%)}
@@ -21,6 +22,10 @@ const CSS = `
 #sentenceOrderScreen .so-hero .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 3px #0005)}
 #sentenceOrderScreen .so-hero[data-walking=true] .gt-portrait{animation:so-step .35s ease-in-out infinite alternate}
 #sentenceOrderScreen .so-hero[data-fever=true]::after{content:'';position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,#ffd54a66,transparent 70%);animation:ya-glow .4s infinite alternate;z-index:-1}
+#sentenceOrderScreen .so-friend{position:absolute;z-index:6;right:2%;top:46%;width:clamp(60px,8vw,88px);aspect-ratio:1;transform:translateY(-100%);object-fit:contain;filter:drop-shadow(0 5px 3px #0005);animation:so-wave 1.2s ease-in-out infinite alternate}
+#sentenceOrderScreen .so-friend[data-met=true]{animation:so-met .5s ease-out 3}
+@keyframes so-wave{from{transform:translateY(-100%) rotate(-4deg)}to{transform:translateY(-104%) rotate(4deg)}}
+@keyframes so-met{0%,100%{transform:translateY(-100%)}50%{transform:translateY(-135%)}}
 #sentenceOrderScreen .so-sentence{margin:0;min-height:2.6em;padding:8px 10px;border-radius:12px;background:#ffffff14;text-align:center;font-size:clamp(20px,2.6vw,26px);font-weight:900;line-height:1.35;color:#fff}
 #sentenceOrderScreen .so-blanks{color:#ffffff55}
 #sentenceOrderScreen .so-feedback{margin:0;text-align:center;font-size:15px;font-weight:700;color:#d8e8f0}
@@ -39,7 +44,9 @@ const BRIDGE_FROM = 17, BRIDGE_TO = 83, STREAM_FROM = 24, STREAM_TO = 76, LANES 
 const WALK_FROM = 6, BANK_EDGE = 9;
 const STREAM_SPEED = { normal: 4, slow: 2.4 }; // percent of the field per second
 
-export function createSentenceOrderView({ document: doc, dispatch, onBack, getSnapshot }) {
+export function createSentenceOrderView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
+  // A Gotomon waits across the river; the companion crosses the finished bridge to meet it.
+  let friendSerial = 0, friendName = '';
   let active = true, problemId = null, lastSeq = -1, lastEventId = 0, lastStepSerial = 0, laidShown = -1;
   let crossing = null, drift = 0;
   const removes = [];
@@ -52,6 +59,7 @@ export function createSentenceOrderView({ document: doc, dispatch, onBack, getSn
   const right = el('div', 'so-bank'); right.dataset.side = 'right';
   world.append(el('div', 'so-waves'), left, right);
   const hero = el('div', 'so-hero'); hero.style.left = `${WALK_FROM}%`; world.append(hero);
+  const friend = el('img', 'so-friend'); friend.alt = ''; friend.hidden = true; world.append(friend);
   // Built once per sentence: taps never land on a node that is being replaced.
   let slots = [], planks = [];
 
@@ -133,7 +141,8 @@ export function createSentenceOrderView({ document: doc, dispatch, onBack, getSn
     crossing = 0;
     if (answer.correct) {
       fx.pop(50, 26, '橋がつながった！', 'good');
-      feedback.textContent = 'せいかい！ 相棒がわたるよ';
+      feedback.textContent = friendName && !friend.hidden ? `せいかい！ 相棒がわたって、${friendName}に会いに行くよ` : 'せいかい！ 相棒がわたるよ';
+      if (!friend.hidden) friend.dataset.met = 'true';
       frame.announce(`せいかい。${text}`);
     } else {
       fx.pop(50, 26, '橋ができた！', 'info');
@@ -152,6 +161,9 @@ export function createSentenceOrderView({ document: doc, dispatch, onBack, getSn
       const problem = state.problem;
       if (problem && problem.problemId !== problemId) {
         problemId = problem.problemId; build(problem, state.currentOrder);
+        const waiting = castAt(cast?.wild, friendSerial++);
+        friend.hidden = !waiting || state.mode === 'review'; friend.dataset.met = 'false'; friendName = waiting?.name ?? '';
+        if (waiting) friend.src = waiting.imageUrl;
         feedback.textContent = state.mode === 'review' ? '文のつながりを、相棒とたしかめよう' : '文のはじめの言葉をタップ！';
       }
       if (!problem) return;

@@ -135,7 +135,7 @@ test('quiz worlds never lead with zero in the result summary',()=>{
   const world=createQuizWorld('mole',effects);world.context({phase:'answering',problem:{problemId:'p'}});
   world.answer(false,{reason:'timeout'},0);world.answer(false,{reason:'timeout'},0);
   assert.doesNotMatch(world.snapshot().summary,/0匹/);assert.match(world.snapshot().summary,/2問あそんだ/);
-  world.answer(true,{},1);assert.match(world.snapshot().summary,/もぐらを1匹たたいた/);
+  world.answer(true,{},1);assert.match(world.snapshot().summary,/ゴトモン1匹とハイタッチ/);
 });
 test('answering before the hurdle beats waiting at it; a slip only slows the runner',()=>{
   const early=createDashWorld(effects),late=createDashWorld(effects);
