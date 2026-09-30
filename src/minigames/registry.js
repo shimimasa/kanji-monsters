@@ -71,6 +71,8 @@ import { createMergeView } from './gotomonMerge/mergeView.js';
 import { createLinkGame } from './gotomonLink/linkGame.js';
 import { createLinkView } from './gotomonLink/linkView.js';
 import { buildLinkRounds } from './gotomonLink/linkContent.js';
+import { createOthelloGame } from './gotomonOthello/othelloGame.js';
+import { createOthelloView } from './gotomonOthello/othelloView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -175,6 +177,18 @@ const linkContent = ({ random, mode, focusKanjiIds }) => {
     ?? stageData.find(item => item.stageId === 'hokkaido_area1');
   return { mode: kind, rounds: stage ? buildLinkRounds({ random, mode: kind, focusKanjiIds,
     stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
+};
+// Othello asks kanji readings of the stage reached last: two sets of the slash game's
+// problems, so a long game does not run out.
+const othelloContent = ({ sessionId, random, focusKanjiIds }) => {
+  let visited = ['hokkaido_area1'];
+  try { visited = gotomonService.getVisitedStageIds?.() ?? visited; } catch { /* keep Hokkaido */ }
+  const stage = [...visited].reverse().map(id => stageData.find(item => item.stageId === id)).find(Boolean)
+    ?? stageData.find(item => item.stageId === 'hokkaido_area1');
+  if (!stage) return null;
+  const kanji = { mode: 'kanji', focusKanjiIds, stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] };
+  const first = buildSlashProblems({ sessionId: `${sessionId}:a`, random, ...kanji }), second = buildSlashProblems({ sessionId: `${sessionId}:b`, random, ...kanji });
+  return first && second ? { problems: [...first, ...second] } : null;
 };
 // The colouring picture is a Gotomon the child has caught, else one met on the
 // stages visited, else any; its grid of three colours was made from its image.
@@ -290,4 +304,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createMergeGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createMergeView }),
   gotomonLink: Object.freeze({ id: 'gotomonLink', title: '線つなぎ',
     create: context => createLinkGame({ ...context, content: linkContent(context) }), createView: createLinkView }),
+  gotomonOthello: Object.freeze({ id: 'gotomonOthello', title: '漢字オセロ',
+    create: context => createOthelloGame({ ...context, content: othelloContent(context) }), createView: createOthelloView }),
 });

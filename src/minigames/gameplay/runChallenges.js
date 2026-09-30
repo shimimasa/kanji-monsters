@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonOthello: [
+    { id: 'sharp', name: '1回で正解12問', deadline: 99, target: 12,
+      rule: '読みに正解して、石をたくさんおこう。', hint: '例文を読むと、読みがわかりやすいよ。', value: data => data.correct },
+    { id: 'chain', name: '4問連続で正解', deadline: 99, target: 4,
+      rule: '正解をつなげて、ほしの石を2こつくろう。', hint: 'すみのマスは、ひっくり返されにくいよ。', value: data => data.maxCombo },
+  ],
   gotomonLink: [
     { id: 'sharp', name: '1回でつなぐ8本', deadline: 99, target: 8,
       rule: 'よく見てから、線をひこう。', hint: 'わかるものから先につなぐと、のこりがへって考えやすいよ。', value: data => data.correct },
