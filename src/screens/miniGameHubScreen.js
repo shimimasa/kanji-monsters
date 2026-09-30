@@ -156,14 +156,14 @@ const hub = {
         element(doc, 'p', 'yt-note', 'どちらも10問。挑戦コースは10文を順番を変えて出題します。得点・ランク・相棒の記録は共通です。'));
     }
     let mathLevel = 'addsub';
-    if (definition.id === 'gotomonToss') {
+    if (['gotomonToss', 'gotomonBubble'].includes(definition.id)) {
       const label = element(doc, 'label', 'yt-memory-picker', 'けいさんのもんだい');
       const select = element(doc, 'select'); select.setAttribute('aria-label', 'けいさんのもんだい');
       for (const [value, text] of [['addsub', 'たし算・ひき算（20まで）'], ['times', 'かけ算（九九 2〜9の段）']]) {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
     }
     let region = 'all';
     if (definition.id === 'gotomonDelivery') {
@@ -229,7 +229,7 @@ const hub = {
         courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
         ...(gameExperiences[definition.id].paced ? { pace } : {}),
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
-        ...(definition.id === 'gotomonToss' ? { mathLevel } : {}),
+        ...(['gotomonToss', 'gotomonBubble'].includes(definition.id) ? { mathLevel } : {}),
         ...(definition.id === 'gotomonDelivery' ? { region } : {}),
         ...(['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id) ? { stageId } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;

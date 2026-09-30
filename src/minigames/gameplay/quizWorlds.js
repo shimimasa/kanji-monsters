@@ -13,6 +13,7 @@ const KINDS = Object.freeze({
   bridge: { travel: [9000, 14000], label: '橋', unit: '本', verb: 'かけた', skill: '虹のかけ橋', special: '虹の橋' },
   photo: { travel: [6000, 9500], label: '写真', unit: 'まい', verb: '撮った', skill: 'シャッターチャンス', special: 'ベストショット' },
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
+  bubble: { travel: [10000, 15000], label: '泡', unit: '発', verb: 'うった', skill: 'バブルフィーバー', special: 'れんさ' },
   delivery: { travel: [12000, 18000], label: 'おとどけ', unit: 'こ', verb: 'とどけた', skill: 'スピード配達', special: '速達' },
   fish: { travel: [7000, 11000], label: 'つり', unit: '匹', verb: 'つった', skill: '大漁フィーバー', special: '大物' },
   toss: { travel: [6000, 9500], label: '玉', unit: '球', verb: '入れた', skill: '玉入れフィーバー', special: 'ナイスシュート' },
@@ -45,6 +46,8 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let bingoLines = 0, bingoMarked = 0;
   // Gotomon shop: requests served and tips, read from the Core (a later hand-over serves too).
   let shopServed = 0, shopTips = 0;
+  // Bubbles: popped and fallen bubbles and freed Gotomon, read from the Core.
+  let bubbleBroken = 0, bubbleFreed = 0;
   // Kanji puzzles: finished puzzles and stars, read from the Core.
   let sortSolved = 0, sortStars = 0;
   const mark = (type, extra = {}) => { lastEvent = Object.freeze({ id: ++eventSerial, type, ...extra }); };
@@ -55,6 +58,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
       const id = state?.problem?.problemId ?? null;
       if (id !== problemId) { problemId = id; elapsed = 0; }
       open = state?.phase === 'answering';
+      if (kind === 'bubble' && state?.mode === 'bubble') { bubbleBroken = Math.max(bubbleBroken, (state.popped || 0) + (state.dropped || 0)); bubbleFreed = Math.max(bubbleFreed, state.freed?.length || 0); }
       if (kind === 'sort' && state?.mode === 'sort') { sortSolved = Math.max(sortSolved, state.solved || 0); sortStars = Math.max(sortStars, state.stars || 0); }
       if (kind === 'shop' && state?.mode === 'shop') { shopServed = Math.max(shopServed, state.served || 0); shopTips = Math.max(shopTips, state.tips || 0); }
       if (kind === 'bingo' && state?.bingo) { bingoLines = Math.max(bingoLines, state.bingo.lines || 0); bingoMarked = Math.max(bingoMarked, state.bingo.marked || 0); }
@@ -103,11 +107,12 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         correct, answered, quick, streak, fever: feverLeft > 0, feverLeft, charged, special, lastEvent, completed,
         photos: [...photos], bestShots: photos.filter(photo => photo.stars === 3).length,
         cases: [...cases], brilliant: cases.filter(item => item.stars === 3).length,
-        bossDamage, bossDefeated: kind === 'trip' && bossDamage >= 5, bingoLines, bingoMarked, shopServed, shopTips, sortSolved, sortStars,
+        bossDamage, bossDefeated: kind === 'trip' && bossDamage >= 5, bingoLines, bingoMarked, shopServed, shopTips, sortSolved, sortStars, bubbleBroken, bubbleFreed,
         metric: `${spec.label} ${correct}`,
         caption: feverLeft ? `${spec.skill}！ あと${feverLeft}回` : charged ? `次の正解で${spec.special}！` : '',
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
+          : kind === 'bubble' && bubbleBroken ? `泡を${bubbleBroken}こ わった${bubbleFreed ? ` · ゴトモンを${bubbleFreed}ひき たすけた` : ''}`
           : kind === 'delivery' && correct ? `ふるさとに${answered}こ とどけた · 1回でとどいた ${correct}こ`
           : kind === 'fish' && correct ? `ゴトモンを${answered}匹つった · 1回でつれた ${correct}匹`
           : kind === 'toss' && correct ? `玉を${answered}球入れた · 1回で入った ${correct}球`
@@ -138,3 +143,4 @@ export const createSortWorld = (effects, options) => createQuizWorld('sort', eff
 export const createTossWorld = (effects, options) => createQuizWorld('toss', effects, options);
 export const createFishWorld = (effects, options) => createQuizWorld('fish', effects, options);
 export const createDeliveryWorld = (effects, options) => createQuizWorld('delivery', effects, options);
+export const createBubbleWorld = (effects, options) => createQuizWorld('bubble', effects, options);
