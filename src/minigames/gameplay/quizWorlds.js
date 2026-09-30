@@ -13,6 +13,7 @@ const KINDS = Object.freeze({
   bridge: { travel: [9000, 14000], label: '橋', unit: '本', verb: 'かけた', skill: '虹のかけ橋', special: '虹の橋' },
   photo: { travel: [6000, 9500], label: '写真', unit: 'まい', verb: '撮った', skill: 'シャッターチャンス', special: 'ベストショット' },
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
+  parts: { travel: [9000, 14000], label: '漢字', unit: '字', verb: 'くみたてた', skill: 'がったいフィーバー', special: 'ぴったり' },
   snake: { travel: [14000, 22000], label: '英単語', unit: '語', verb: 'つづった', skill: 'スペルフィーバー', special: 'ノーミス' },
   meteor: { travel: [6000, 10000], label: 'いん石', unit: 'こ', verb: 'げいげき', skill: 'スターげいげき', special: 'ながれ星' },
   breakout: { travel: [14000, 22000], label: 'ブロック', unit: '問', verb: 'パカーン', skill: 'パカーンフィーバー', special: 'ナイスショット' },
@@ -121,6 +122,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
           : kind === 'mole' && correct ? `ゴトモン${correct}匹とハイタッチ${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
+          : kind === 'parts' && answered ? `漢字を${answered}字くみたてた${correct ? ` · 1回で合体 ${correct}字` : ''}`
           : kind === 'snake' && answered ? `英単語を${answered}語つづった${correct ? ` · まちがいなし ${correct}語` : ''}`
           : kind === 'meteor' && answered ? `いん石を${answered}こ むかえた${correct ? ` · 1回でげいげき ${correct}こ` : ''}`
           : kind === 'breakout' && answered ? `答えのブロックを${answered}こ パカーン · ゴトモンが${answered}ひき出てきた${correct ? ` · ねらいどおり ${correct}こ` : ''}`
@@ -163,3 +165,4 @@ export const createShooterWorld = (effects, options) => createQuizWorld('shooter
 export const createBreakoutWorld = (effects, options) => createQuizWorld('breakout', effects, options);
 export const createMeteorWorld = (effects, options) => createQuizWorld('meteor', effects, options);
 export const createSnakeWorld = (effects, options) => createQuizWorld('snake', effects, options);
+export const createPartsWorld = (effects, options) => createQuizWorld('parts', effects, options);
