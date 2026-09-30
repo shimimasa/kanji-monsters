@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonShooter: [
+    { id: 'sharp', name: '1回でなかまにする10ひき', deadline: 99, target: 10,
+      rule: 'ふだをよく読んでから、答えのゴトモンの下へ行ってうとう。', hint: 'ビームはまっすぐ上に飛ぶよ。ゴトモンのま下からうとう。', value: data => data.correct },
+    { id: 'chain', name: '5回連続で1回でなかまにする', deadline: 99, target: 5,
+      rule: '1回でなかまにするのを5回つなげよう。', hint: 'ゴトモンはゆっくりおりてくる。あわてなくて大丈夫。', value: data => data.maxCombo },
+  ],
   gotomonPuyo: [
     { id: 'hatch', name: 'ゴトモンを4ひき うまれさせる', deadline: 99, target: 4,
       rule: '同じ答えのたまごを3つつなげて、かえそう。', hint: 'たまごの答えを先に出してから、どの列におくか決めよう。', value: data => data.world.puyoHatched || 0 },
