@@ -15,6 +15,7 @@ const KINDS = Object.freeze({
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
   slash: { travel: [6000, 9500], label: 'くす玉', unit: 'こ', verb: 'パカッ', skill: 'スラッシュフィーバー', special: 'いっとう両断' },
   coloring: { travel: [5000, 8000], label: 'マス', unit: 'マス', verb: 'ぬった', skill: 'ぬりぬりフィーバー', special: 'ぴったり色' },
+  race: { travel: [5200, 7200], label: 'ゲート', unit: '問', verb: 'くぐった', skill: 'レースフィーバー', special: 'ロケットダッシュ' },
   drum: { travel: [4800, 6000], label: 'ふだ', unit: '問', verb: 'たたいた', skill: 'おまつりフィーバー', special: 'かんぺき' },
   parts: { travel: [9000, 14000], label: '漢字', unit: '字', verb: 'くみたてた', skill: 'がったいフィーバー', special: 'ぴったり' },
   snake: { travel: [14000, 22000], label: '英単語', unit: '語', verb: 'つづった', skill: 'スペルフィーバー', special: 'ノーミス' },
@@ -47,7 +48,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let bonus = 0, correct = 0, answered = 0, quick = 0, streak = 0, feverLeft = 0, charged = false, special = 0;
   let lastEvent = null, eventSerial = 0, completed = false;
   // The colouring keeps its finished picture, and the drum its last dance, on screen for a moment before the results.
-  const HOLD = { coloring: 2600, drum: 1800 };
+  const HOLD = { coloring: 2600, drum: 1800, race: 1800 };
   let holdLeft = HOLD[kind] ?? 0;
   // Photo rally: each correct shot keeps a photo whose stars follow how early it was taken.
   // Proverb detective: every solved case is filed; first-try, pre-hint solves earn the most stars.
@@ -64,6 +65,8 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let puyoHatched = 0, puyoChain = 0;
   // Kanji puzzles: finished puzzles and stars, read from the Core.
   let sortSolved = 0, sortStars = 0;
+  // Race: the place at the finish, read from the Core.
+  let racePlace = null;
   const mark = (type, extra = {}) => { lastEvent = Object.freeze({ id: ++eventSerial, type, ...extra }); };
   const progress = () => clamp(elapsed / travelMs, 0, 1);
   return {
@@ -74,6 +77,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
       open = state?.phase === 'answering';
       if (kind === 'puyo' && state?.mode === 'puyo') { puyoHatched = Math.max(puyoHatched, state.hatched || 0); puyoChain = Math.max(puyoChain, state.bestChain || 0); }
       if (kind === 'bubble' && state?.mode === 'bubble') { bubbleBroken = Math.max(bubbleBroken, (state.popped || 0) + (state.dropped || 0)); bubbleFreed = Math.max(bubbleFreed, state.freed?.length || 0); }
+      if (kind === 'race' && state?.mode === 'race' && state.result) racePlace = state.result.place;
       if (kind === 'sort' && state?.mode === 'sort') { sortSolved = Math.max(sortSolved, state.solved || 0); sortStars = Math.max(sortStars, state.stars || 0); }
       if (kind === 'shop' && state?.mode === 'shop') { shopServed = Math.max(shopServed, state.served || 0); shopTips = Math.max(shopTips, state.tips || 0); }
       if (kind === 'bingo' && state?.bingo) { bingoLines = Math.max(bingoLines, state.bingo.lines || 0); bingoMarked = Math.max(bingoMarked, state.bingo.marked || 0); }
@@ -132,6 +136,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
           : kind === 'mole' && correct ? `ゴトモン${correct}匹とハイタッチ${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
+          : kind === 'race' && answered ? `${racePlace ? `${racePlace}位でゴール · ` : ''}ゲート${answered}問 · 1回で正解 ${correct}問`
           : kind === 'drum' && answered ? `${answered}問 たたいた · 1回で正解 ${correct}問`
           : kind === 'coloring' && answered ? `${answered}マス ぬった · 1回で答え ${correct}マス`
           : kind === 'slash' && answered ? `くす玉を${answered}こ パカッ · 1回で答え ${correct}こ`
@@ -182,3 +187,4 @@ export const createPartsWorld = (effects, options) => createQuizWorld('parts', e
 export const createSlashWorld = (effects, options) => createQuizWorld('slash', effects, options);
 export const createColoringWorld = (effects, options) => createQuizWorld('coloring', effects, options);
 export const createDrumWorld = (effects, options) => createQuizWorld('drum', effects, options);
+export const createRaceWorld = (effects, options) => createQuizWorld('race', effects, options);
