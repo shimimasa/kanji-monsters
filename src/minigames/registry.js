@@ -49,6 +49,8 @@ import { createShooterView } from './gotomonShooter/shooterView.js';
 import { buildShooterWaves } from './gotomonShooter/shooterContent.js';
 import { createBreakoutGame } from './gotomonBreakout/breakoutGame.js';
 import { createBreakoutView } from './gotomonBreakout/breakoutView.js';
+import { createMeteorGame } from './gotomonMeteor/meteorGame.js';
+import { createMeteorView } from './gotomonMeteor/meteorView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -203,4 +205,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createShooterGame({ ...context, content: shooterContent(context) }), createView: createShooterView }),
   gotomonBreakout: Object.freeze({ id: 'gotomonBreakout', title: 'ゴトモン・ブロックくずし',
     create: context => createBreakoutGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createBreakoutView }),
+  gotomonMeteor: Object.freeze({ id: 'gotomonMeteor', title: 'いん石げいげき',
+    create: context => createMeteorGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createMeteorView }),
 });
