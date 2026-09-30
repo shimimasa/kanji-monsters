@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonColoring: [
+    { id: 'sharp', name: '1回でぬる20マス', deadline: 99, target: 20,
+      rule: '答えが色の数になるマスだけをぬろう。', hint: 'タップする前に、マスの計算を頭の中でしてみよう。', value: data => data.correct },
+    { id: 'chain', name: '10マス連続で1回でぬる', deadline: 99, target: 10,
+      rule: '1回でぬるのを10回つなげよう。', hint: 'わからないマスは、あとまわしにしても大丈夫。', value: data => data.maxCombo },
+  ],
   gotomonSlash: [
     { id: 'sharp', name: '1回で切る10問', deadline: 99, target: 10,
       rule: '答えのくす玉だけをねらって切ろう。', hint: 'くす玉はてっぺんで少しゆっくりになるよ。そこをねらおう。', value: data => data.correct },

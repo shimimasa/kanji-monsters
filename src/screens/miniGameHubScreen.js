@@ -156,14 +156,14 @@ const hub = {
         element(doc, 'p', 'yt-note', 'どちらも10問。挑戦コースは10文を順番を変えて出題します。得点・ランク・相棒の記録は共通です。'));
     }
     let mathLevel = 'addsub';
-    if (['gotomonToss', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout', 'gotomonMeteor'].includes(definition.id)) {
+    if (['gotomonToss', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout', 'gotomonMeteor', 'gotomonColoring'].includes(definition.id)) {
       const label = element(doc, 'label', 'yt-memory-picker', 'けいさんのもんだい');
       const select = element(doc, 'select'); select.setAttribute('aria-label', 'けいさんのもんだい');
       for (const [value, text] of [['addsub', 'たし算・ひき算（20まで）'], ['times', 'かけ算（九九 2〜9の段）']]) {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'どちらも12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'どちらも12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonColoring' ? 'ぬりえになるのは、きみがつかまえたゴトモン（まだいなければ旅で出会ったゴトモン）です。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
     }
     let mode = definition.id === 'gotomonParts' ? 'easy' : definition.id === 'gotomonSlash' ? 'kanji' : 'english';
     if (definition.id === 'gotomonSlash') {
@@ -257,7 +257,7 @@ const hub = {
         courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
         ...(gameExperiences[definition.id].paced ? { pace } : {}),
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
-        ...(['gotomonToss', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout', 'gotomonMeteor'].includes(definition.id) ? { mathLevel } : {}),
+        ...(['gotomonToss', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout', 'gotomonMeteor', 'gotomonColoring'].includes(definition.id) ? { mathLevel } : {}),
         ...(definition.id === 'gotomonDelivery' ? { region } : {}),
         ...(['gotomonShooter', 'gotomonParts', 'gotomonSlash'].includes(definition.id) ? { mode } : {}),
         ...(['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id) ? { stageId } : {}) } });

@@ -58,6 +58,9 @@ import { createPartsView } from './gotomonParts/partsView.js';
 import { createSlashGame } from './gotomonSlash/slashGame.js';
 import { createSlashView } from './gotomonSlash/slashView.js';
 import { buildSlashProblems } from './gotomonSlash/slashContent.js';
+import { createColoringGame } from './gotomonColoring/coloringGame.js';
+import { createColoringView } from './gotomonColoring/coloringView.js';
+import { COLORING_PICTURES as coloringPictures } from './gotomonColoring/pictures.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -140,6 +143,20 @@ const slashContent = ({ sessionId, random, mode, focusKanjiIds }) => {
     ?? stageData.find(item => item.stageId === 'hokkaido_area1');
   return { mode: kind, problems: stage ? buildSlashProblems({ sessionId, random, mode: kind, focusKanjiIds,
     stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
+};
+// The colouring picture is a Gotomon the child has caught, else one met on the
+// stages visited, else any; its grid of three colours was made from its image.
+const coloringContent = ({ random, mathLevel }) => {
+  const has = id => Object.hasOwn(coloringPictures, id) && getMonsterById(id);
+  let owned = [], visited = ['hokkaido_area1'];
+  try { owned = gotomonService.getOwnedGotomon().map(item => item.id).filter(has); } catch { owned = []; }
+  try { visited = gotomonService.getVisitedStageIds?.() ?? visited; } catch { /* keep Hokkaido */ }
+  const met = visited.flatMap(id => stageData.find(item => item.stageId === id)?.enemyIdList || []).filter(has);
+  const pool = owned.length ? owned : met.length ? met : Object.keys(coloringPictures).filter(has);
+  if (!pool.length) return null;
+  const id = pool[Math.floor(random() * pool.length)], [grid, ...palette] = coloringPictures[id];
+  return { level: mathLevel === 'times' ? 'times' : 'addsub',
+    picture: { id, name: getMonsterById(id).name, grid, palette, imageUrl: gotomonService.getGotomonById(id).imageUrl } };
 };
 // Gotomon from every prefecture ask to be taken home; hints come from their notes.
 const deliveryContent = ({ sessionId, random, region }) => {
@@ -231,4 +248,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createPartsGame({ ...context, content: { mode: context.mode === 'all' ? 'all' : 'easy' } }), createView: createPartsView }),
   gotomonSlash: Object.freeze({ id: 'gotomonSlash', title: 'ゴトモン・スラッシュ',
     create: context => createSlashGame({ ...context, content: slashContent(context) }), createView: createSlashView }),
+  gotomonColoring: Object.freeze({ id: 'gotomonColoring', title: 'ゴトモンぬりえ',
+    create: context => createColoringGame({ ...context, content: coloringContent(context) }), createView: createColoringView }),
 });
