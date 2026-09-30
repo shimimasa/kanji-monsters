@@ -59,7 +59,7 @@ test('generator validates random input without retries', () => {
 });
 
 test('registry retains Sentence Order and its instance shape when the fifth definition is added', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor']);
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor', 'gotomonSnake']);
   assert.deepEqual(Object.keys(miniGameRegistry.sentenceOrder), ['id', 'title', 'create', 'createView']);
   const game = create();
   for (const method of ['enter', 'update', 'setPaused', 'snapshot', 'dispatch', 'exit']) {

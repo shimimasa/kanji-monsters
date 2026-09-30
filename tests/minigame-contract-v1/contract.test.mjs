@@ -8,8 +8,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('all twenty-three definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor']);
+test('all twenty-four definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor', 'gotomonSnake']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -196,6 +196,9 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
           // Card flipping is built from stage data too; its command is a flip.
           : id === 'kanjiMemory'
             ? { type: 'flip', payload: { sessionId: before.sessionId, attemptId: before.attemptId, cardId: before.cards[0]?.cardId ?? null } }
+          // The snake turns.
+          : id === 'gotomonSnake'
+            ? { type: 'turn', payload: { sessionId: before.sessionId, attemptId: before.attemptId, to: 'up' } }
           // Meteor defence fires from a base.
           : id === 'gotomonMeteor'
             ? { type: 'fire', payload: { sessionId: before.sessionId, attemptId: before.attemptId, baseId: before.bases[0]?.baseId ?? null } }

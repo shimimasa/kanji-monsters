@@ -51,6 +51,8 @@ import { createBreakoutGame } from './gotomonBreakout/breakoutGame.js';
 import { createBreakoutView } from './gotomonBreakout/breakoutView.js';
 import { createMeteorGame } from './gotomonMeteor/meteorGame.js';
 import { createMeteorView } from './gotomonMeteor/meteorView.js';
+import { createSnakeGame } from './gotomonSnake/snakeGame.js';
+import { createSnakeView } from './gotomonSnake/snakeView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -207,4 +209,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createBreakoutGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createBreakoutView }),
   gotomonMeteor: Object.freeze({ id: 'gotomonMeteor', title: 'いん石げいげき',
     create: context => createMeteorGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createMeteorView }),
+  gotomonSnake: Object.freeze({ id: 'gotomonSnake', title: 'スペルスネーク',
+    create: context => createSnakeGame({ ...context, content: null }), createView: createSnakeView }),
 });
