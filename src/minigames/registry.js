@@ -40,6 +40,8 @@ import { buildFishProblems, FISH_SWIMMERS } from './gotomonFishing/fishContent.j
 import { createDeliveryGame } from './gotomonDelivery/deliveryGame.js';
 import { createDeliveryView } from './gotomonDelivery/deliveryView.js';
 import { buildDeliveries } from './gotomonDelivery/deliveryContent.js';
+import { createBubbleGame, BUBBLE_RULES } from './gotomonBubble/bubbleGame.js';
+import { createBubbleView } from './gotomonBubble/bubbleView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -99,6 +101,8 @@ const tossContent = ({ sessionId, random, mathLevel }) => ({ level: mathLevel ==
   carriers: playfulGotomon(random, TOSS_BASKETS), problems: buildTossProblems({ sessionId, random, level: mathLevel }) });
 // The words come from the English vocabulary of 宝箱キャッチ.
 const fishContent = ({ sessionId, random }) => ({ carriers: playfulGotomon(random, FISH_SWIMMERS), problems: buildFishProblems({ sessionId, random }) });
+// The trapped Gotomon are the child's own (Hokkaido's fill in); the board is built by the Core.
+const bubbleContent = ({ random, mathLevel }) => ({ level: mathLevel === 'times' ? 'times' : 'addsub', carriers: playfulGotomon(random, BUBBLE_RULES.trapped) });
 // Gotomon from every prefecture ask to be taken home; hints come from their notes.
 const deliveryContent = ({ sessionId, random, region }) => {
   const monsters = getAllMonsterIds().map(id => getMonsterById(id)).filter(Boolean);
@@ -173,4 +177,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createFishGame({ ...context, content: fishContent(context) }), createView: createFishView }),
   gotomonDelivery: Object.freeze({ id: 'gotomonDelivery', title: 'ゴトモン宅配便',
     create: context => createDeliveryGame({ ...context, content: deliveryContent(context) }), createView: createDeliveryView }),
+  gotomonBubble: Object.freeze({ id: 'gotomonBubble', title: 'ゴトモン・バブル',
+    create: context => createBubbleGame({ ...context, content: bubbleContent(context) }), createView: createBubbleView }),
 });

@@ -49,7 +49,7 @@ const wrongChoice = (d, host) => {
 
 test('Registry and title expose Timed Choice without replacing the first four games', () => {
   assert.deepEqual(Object.keys(miniGameRegistry),
-    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery']);
+    ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble']);
   const title = fs.readFileSync('src/screens/titleScreen.js', 'utf8');
   assert.match(title, /publish\('changeScreen', 'miniGameHub'\)/);
   assert.match(fs.readFileSync('src/screens/miniGameHubScreen.js', 'utf8'), /Object.values\(miniGameRegistry\)/);
