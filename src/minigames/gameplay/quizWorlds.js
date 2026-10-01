@@ -15,6 +15,7 @@ const KINDS = Object.freeze({
   trip: { travel: [9000, 13000], label: '旅', unit: '問', verb: '進んだ', skill: '旅の追い風', special: '追い風' },
   slash: { travel: [6000, 9500], label: 'くす玉', unit: 'こ', verb: 'パカッ', skill: 'スラッシュフィーバー', special: 'いっとう両断' },
   coloring: { travel: [5000, 8000], label: 'マス', unit: 'マス', verb: 'ぬった', skill: 'ぬりぬりフィーバー', special: 'ぴったり色' },
+  tag: { travel: [8000, 11000], label: 'ふだ', unit: '問', verb: 'とった', skill: 'おにごっこフィーバー', special: 'パワーアップ' },
   jump: { travel: [7000, 10000], label: '雲', unit: 'こ', verb: 'のった', skill: 'ジャンプフィーバー', special: 'スーパージャンプ' },
   maze: { travel: [9000, 13000], label: 'とびら', unit: 'こ', verb: 'あけた', skill: '迷路フィーバー', special: 'いっぱつ' },
   seek: { travel: [8000, 12000], label: 'ゴトモン', unit: '回', verb: 'みつけた', skill: 'さがしフィーバー', special: 'はやみつけ' },
@@ -54,7 +55,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let bonus = 0, correct = 0, answered = 0, quick = 0, streak = 0, feverLeft = 0, charged = false, special = 0;
   let lastEvent = null, eventSerial = 0, completed = false;
   // Some games keep their ending on screen for a moment before the results (the finished picture, the last dance, the finish line, the last board).
-  const HOLD = { coloring: 2600, drum: 1800, race: 1800, merge: 2000, link: 1200, othello: 2200, maze: 1200, jump: 1200 };
+  const HOLD = { coloring: 2600, drum: 1800, race: 1800, merge: 2000, link: 1200, othello: 2200, maze: 1200, jump: 1200, tag: 1000 };
   let holdLeft = HOLD[kind] ?? 0;
   // Photo rally: each correct shot keeps a photo whose stars follow how early it was taken.
   // Proverb detective: every solved case is filed; first-try, pre-hint solves earn the most stars.
@@ -81,6 +82,8 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let mazeFriends = 0;
   // Jump: the stars and balloon friends, read from the Core.
   let jumpStars = 0, jumpFriends = 0;
+  // Tag: the friends made, read from the Core.
+  let tagFriends = 0;
   const mark = (type, extra = {}) => { lastEvent = Object.freeze({ id: ++eventSerial, type, ...extra }); };
   const progress = () => clamp(elapsed / travelMs, 0, 1);
   return {
@@ -93,6 +96,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
       if (kind === 'bubble' && state?.mode === 'bubble') { bubbleBroken = Math.max(bubbleBroken, (state.popped || 0) + (state.dropped || 0)); bubbleFreed = Math.max(bubbleFreed, state.freed?.length || 0); }
       if (kind === 'race' && state?.mode === 'race' && state.result) racePlace = state.result.place;
       if (kind === 'othello' && state?.mode === 'othello' && state.result) othelloEnd = state.result;
+      if (kind === 'tag' && state?.mode === 'tag') tagFriends = Math.max(tagFriends, state.friends || 0);
       if (kind === 'jump' && state?.mode === 'jump') { jumpStars = Math.max(jumpStars, state.starsTaken || 0); jumpFriends = Math.max(jumpFriends, state.friends || 0); }
       if (kind === 'maze' && state?.mode === 'maze') mazeFriends = Math.max(mazeFriends, state.friendsMet || 0);
       if (kind === 'merge' && state?.mode === 'merge') { mergeBest = Math.max(mergeBest, state.best || 0); mergeJoined = Math.max(mergeJoined, state.merges || 0); }
@@ -154,6 +158,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
           : kind === 'mole' && correct ? `ゴトモン${correct}匹とハイタッチ${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
+          : kind === 'tag' && answered ? `ふだを${answered}問 とった · 1回で ${correct}問${tagFriends ? ` · なかま ${tagFriends}ひき` : ''}`
           : kind === 'jump' && answered ? `雲を${answered}こ のぼった · 1回で ${correct}こ · ⭐${jumpStars}${jumpFriends ? ` · なかま ${jumpFriends}ひき` : ''}`
           : kind === 'maze' && answered ? `とびらを${answered}こ あけた · 1回で ${correct}こ · なかま ${mazeFriends}ひき`
           : kind === 'seek' && answered ? `${answered}回 みつけた · 1回で ${correct}回`
@@ -218,3 +223,4 @@ export const createOthelloWorld = (effects, options) => createQuizWorld('othello
 export const createSeekWorld = (effects, options) => createQuizWorld('seek', effects, options);
 export const createMazeWorld = (effects, options) => createQuizWorld('maze', effects, options);
 export const createJumpWorld = (effects, options) => createQuizWorld('jump', effects, options);
+export const createTagWorld = (effects, options) => createQuizWorld('tag', effects, options);

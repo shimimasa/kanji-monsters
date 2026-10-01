@@ -79,6 +79,8 @@ import { createMazeGame } from './gotomonMaze/mazeGame.js';
 import { createMazeView } from './gotomonMaze/mazeView.js';
 import { createJumpGame } from './gotomonJump/jumpGame.js';
 import { createJumpView } from './gotomonJump/jumpView.js';
+import { createTagGame } from './gotomonTag/tagGame.js';
+import { createTagView } from './gotomonTag/tagView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -151,7 +153,7 @@ const shooterContent = ({ sessionId, random, mode, focusKanjiIds }) => {
   return { mode: 'kanji', waves: stage ? buildShooterWaves({ sessionId, random, mode: 'kanji', focusKanjiIds,
     stageKanji: (stage.kanjiPoolIdList || []).map(getKanjiById).filter(Boolean), gradeKanji: getKanjiByGrade(stage.grade) || [] }) : null };
 };
-// The slash game, the race, hide-and-seek, the maze and the jump: kanji readings from the stage reached last, English words, or sums.
+// The slash game, the race, hide-and-seek, the maze, the jump and tag: kanji readings from the stage reached last, English words, or sums.
 const slashContent = ({ sessionId, random, mode, focusKanjiIds }) => {
   const kind = ['english', 'math'].includes(mode) ? mode : 'kanji';
   if (kind !== 'kanji') return { mode: kind, problems: buildSlashProblems({ sessionId, random, mode: kind }) };
@@ -318,4 +320,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createMazeGame({ ...context, content: slashContent(context) }), createView: createMazeView }),
   gotomonJump: Object.freeze({ id: 'gotomonJump', title: 'ゴトモン・ジャンプ',
     create: context => createJumpGame({ ...context, content: slashContent(context) }), createView: createJumpView }),
+  gotomonTag: Object.freeze({ id: 'gotomonTag', title: 'ゴトモンおにごっこ',
+    create: context => createTagGame({ ...context, content: slashContent(context) }), createView: createTagView }),
 });
