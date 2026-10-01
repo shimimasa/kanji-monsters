@@ -1,5 +1,5 @@
 // node jumpbot.mjs <seconds> [wrongCount]: holds a finger on the tower (real mouse press + moves) and
-// steers the companion: to the answer cloud (算数: computed) when the row is near, else to the highest ledge in reach.
+// steers the companion to the highest ledge in reach; when the row is near, taps the answer cloud (算数: computed).
 const [secs = '150', wrongs = '0'] = process.argv.slice(2);
 const list = await (await fetch('http://127.0.0.1:9333/json')).json();
 const page = list.find(t => t.type === 'page' && t.url.includes('4173'));
@@ -12,7 +12,7 @@ const probe = `(()=>{const s=document.querySelector('#gotomonJumpScreen');if(!s)
 const t=s.querySelector('.jp-tower').getBoundingClientRect();const pl=s.querySelector('.jp-player').getBoundingClientRect();
 const p=s.querySelector('.jp-prompt')?.firstChild?.textContent||'';let ans=null;
 if(/=/.test(p)){const q=p.replace('= ?','').replace('−','-').replace('×','*');ans=String(eval(q));}
-const clouds=[...s.querySelectorAll('.jp-cloud')].map(c=>{const r=c.getBoundingClientRect();return {text:c.querySelector('span')?.textContent,x:r.x+r.width/2,y:r.y+r.height*0.45,hint:c.dataset.hint==='true',gone:c.dataset.gone==='true'}});
+const clouds=[...s.querySelectorAll('.jp-cloud')].map(c=>{const r=c.getBoundingClientRect();return {text:c.querySelector('span')?.textContent,x:r.x+r.width/2,y:r.y+r.height*0.45,hint:c.dataset.hint==='true',gone:c.dataset.gone==='true',chosen:c.dataset.chosen==='true'}});
 const ledges=[...s.querySelectorAll('.jp-ledge')].filter(l=>l.dataset.locked!=='true').map(l=>{const r=l.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y}});
 return {p,ans,t:[t.x,t.y,t.width,t.height],px:pl.x+pl.width/2,py:pl.bottom,clouds,ledges,title:s.querySelector('.jp-title')?.textContent}})()`;
 const end = Date.now() + Number(secs) * 1000;
@@ -36,6 +36,12 @@ while (Date.now() < end) {
     if (wrong < Number(wrongs) && !live.some(c => c.hint) && wrongKey !== key) { pick = live.find(c => c.text !== r.ans) ?? pick; wrongKey = key; wrong++; }
     else if (wrongKey === key && !live.some(c => c.hint)) pick = live.find(c => c.text !== r.ans) ?? pick;
     toX = pick?.x ?? null;
+    // The answer is a tap on its cloud; then the companion glides onto it.
+    if (pick && !pick.chosen) {
+      if (down) { await press('mouseReleased', toX, ty + th / 2); down = false; }
+      await press('mousePressed', pick.x, pick.y); await new Promise(res => setTimeout(res, 60)); await press('mouseReleased', pick.x, pick.y);
+      continue;
+    }
   } else {
     const reach = r.ledges.filter(l => l.y > r.py - th * 0.27 && l.y < ty + th - 4 && l.y > ty).sort((a, b) => a.y - b.y);
     toX = reach[0]?.x ?? null;

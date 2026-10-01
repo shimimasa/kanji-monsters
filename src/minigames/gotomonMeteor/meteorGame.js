@@ -22,7 +22,9 @@ function take(random) {
 // or the one tapped). A wrong base only says so and the right base glows; a meteor that
 // lands is caught by the shield and shows its answer — no game over. Every meteor on
 // the field has its answer on a base; bases no meteor needs get new likely numbers.
-// One learning result per meteor: the first shot at it, or landing before any.
+// One learning result per meteor: the first shot at it. A meteor that lands before any
+// shot at it records nothing (with two falling at once, the child may well have been busy
+// with the other one); the shield shows its answer and it is counted as unanswered.
 export function createMeteorGame({ sessionId, random = Math.random, onEvent = () => {}, content, pace = 'normal' }) {
   const level = content?.level === 'times' ? 'times' : 'addsub';
   const problems = content?.problems ?? buildTossProblems({ sessionId, random, level });
@@ -30,7 +32,7 @@ export function createMeteorGame({ sessionId, random = Math.random, onEvent = ()
   const spawnEvery = R.spawnEveryMs[pace === 'slow' ? 'slow' : 'normal'];
   let active = true, paused = false, notifying = false, observer = onEvent;
   let phase = 'ready', seq = 0, activeElapsedMs = 0, cursor = 0, spawnMs = 0, shotSerial = 0, landSerial = 0;
-  let answered = 0, correct = 0, incorrect = 0, defended = 0, shielded = 0, resolved = 0;
+  let answered = 0, correct = 0, incorrect = 0, unanswered = 0, defended = 0, shielded = 0, resolved = 0;
   let result = null, lastShot = null, lastLanding = null, aborted = false, completeEmitted = false, explicitTarget = null;
   let meteors = [];
   const bases = R.bases.map((x, i) => ({ baseId: `${sessionId}:base:${i}`, slot: i, x, number: null, version: 0 }));
@@ -111,7 +113,7 @@ export function createMeteorGame({ sessionId, random = Math.random, onEvent = ()
   };
   const complete = () => {
     phase = 'completed'; meteors = []; explicitTarget = null;
-    result = Object.freeze({ answered, correct, incorrect, accuracy: answered ? correct / answered : 0, defended, shielded, finished: true });
+    result = Object.freeze({ answered, correct, incorrect, unanswered, accuracy: answered ? correct / answered : 0, defended, shielded, finished: true });
     if (!completeEmitted) { completeEmitted = true; notify('sessionComplete', null, result); }
   };
 
@@ -127,11 +129,12 @@ export function createMeteorGame({ sessionId, random = Math.random, onEvent = ()
       for (const meteor of meteors) meteor.y += fallPerMs * dt;
       for (const meteor of meteors.filter(m => m.y >= R.groundY)) {
         if (phase !== 'answering') break;
-        // The shield catches it and shows the answer.
-        const first = judge(meteor, false, 'landed'); shielded++;
-        lastLanding = Object.freeze({ landing: ++landSerial, meteorId: meteor.meteorId, x: meteor.x, question: meteor.question, answer: meteor.answer });
+        // The shield catches it and shows the answer; not shot at, it is no answer.
+        const unshot = !meteor.judged; shielded++;
+        if (unshot) { meteor.judged = true; unanswered++; }
+        lastLanding = Object.freeze({ landing: ++landSerial, meteorId: meteor.meteorId, x: meteor.x, question: meteor.question, answer: meteor.answer, unshot });
         // Report before removing: the last meteor's removal ends the run.
-        if (first) notify('incorrect', meteor, { contentId: meteor.problemId, skillId: meteor.skillId, reason: 'landed', answer: meteor.answer });
+        if (unshot) notify('landed', meteor, { contentId: meteor.problemId, skillId: meteor.skillId, reason: 'landed', answer: meteor.answer });
         remove(meteor);
       }
       if (phase !== 'answering') return;

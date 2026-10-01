@@ -11,6 +11,7 @@ import { hubRecommendations } from '../minigames/hubRecommendations.js';
 import { createCompanionMemoryDialog } from '../ui/companionMemoryDialog.js';
 import { createLearningNotebookDialog } from '../ui/learningNotebookDialog.js';
 import { companionCourse } from '../minigames/companionCourses.js';
+import { HUB_SUBJECTS, NEWEST, hubSections, choiceSubjects, modeForSubject } from '../minigames/hubCatalog.js';
 import { createPhotoAlbumDialog } from '../ui/photoAlbumDialog.js';
 import { stageData, getMonsterById } from '../loaders/dataLoader.js';
 
@@ -24,6 +25,10 @@ const monsterInfo = id => ({ ...gotomonService.getGotomonById(id), desc: getMons
 const PACE_KEY = 'yomitabi.minigamePace';
 const readPace = () => { try { return localStorage.getItem(PACE_KEY) === 'slow' ? 'slow' : 'normal'; } catch { return 'normal'; } };
 const writePace = value => { try { localStorage.setItem(PACE_KEY, value); } catch { /* A preference only. */ } };
+// The subject tab last chosen in the square.
+const SUBJECT_KEY = 'yomitabi.hubSubject';
+const readSubject = () => { try { const v = localStorage.getItem(SUBJECT_KEY); return HUB_SUBJECTS.some(item => item.id === v) ? v : 'all'; } catch { return 'all'; } };
+const writeSubject = value => { try { localStorage.setItem(SUBJECT_KEY, value); } catch { /* A preference only. */ } };
 
 const hub = {
   enter(props = {}) {
@@ -59,27 +64,7 @@ const hub = {
     const reviewCount = englishLearningService.getReviewIds().length, progress = gotomonService.getProgress();
     const suggestions = hubRecommendations({ gameIds: Object.keys(miniGameRegistry), progress, reviewCount,
       sentenceReviewCount: sentenceLearningService.getReviewIds().length, timedReviewCount: timedLearningService.getReviewIds().length });
-    const grid = element(doc, 'div', 'yt-game-grid');
-    for (const definition of Object.values(miniGameRegistry)) {
-      const info = gameExperiences[definition.id], card = button(doc, '', () => this.selectGame(definition), 'yt-game-card');
-      card.dataset.gameId = definition.id; card.dataset.arcade = String(!!info.arcade); card.style.setProperty('--accent', info.color);
-      const stats = progress.games?.[definition.id];
-      const art = element(doc, 'span', 'yt-card-art'); art.dataset.scene = info.scene;
-      art.append(element(doc, 'span', 'yt-card-icon', info.icon));
-      if (info.badge) art.append(element(doc, 'span', 'yt-card-badge', info.badge));
-      if (stats?.bestRank) { const medal = element(doc, 'span', 'yt-card-medal', stats.bestRank); medal.dataset.rank = stats.bestRank; art.append(medal); }
-      const body = element(doc, 'span', 'yt-card-body');
-      body.append(element(doc, 'strong', 'yt-card-title', definition.title), element(doc, 'span', 'yt-card-description', info.description));
-      const tags = element(doc, 'span', 'yt-card-meta');
-      for (const tag of [info.genre, info.difficulty, info.time]) tags.append(element(doc, 'span', '', tag));
-      body.append(tags);
-      const featuredCourse = companionCourse(selected, definition.id);
-      if (featuredCourse) body.append(element(doc, 'span', 'yt-card-course', `★ 得意コース：${featuredCourse.name}`));
-      body.append(element(doc, 'small', 'yt-card-record', stats ? `BEST ${stats.bestScore} pt · ${stats.plays}回あそんだ` : 'はじめての記録をつくろう'));
-      card.append(art, body);
-      grid.append(card);
-    }
-    wrap.append(grid);
+    // Today's picks come first (they used to sit under all forty cards, out of sight).
     if (selected && suggestions.length) {
       const recommendation = element(doc, 'section', 'yt-recommendations');
       recommendation.setAttribute('aria-label', '今日のおすすめ');
@@ -98,9 +83,53 @@ const hub = {
       recommendation.append(list);
       wrap.append(recommendation);
     }
+    // The games, by what the child wants to practice: a tab per subject (kept for next time),
+    // and on ぜんぶ a section per subject, then the games where the subject is chosen.
+    const games = new Map(Object.values(miniGameRegistry).map(definition => [definition.id, definition]));
+    let subject = readSubject();
+    const makeCard = definition => {
+      const info = gameExperiences[definition.id], card = button(doc, '', () => this.selectGame(definition, { subject }), 'yt-game-card');
+      card.dataset.gameId = definition.id; card.dataset.arcade = String(!!info.arcade); card.style.setProperty('--accent', info.color);
+      const stats = progress.games?.[definition.id];
+      const art = element(doc, 'span', 'yt-card-art'); art.dataset.scene = info.scene;
+      art.append(element(doc, 'span', 'yt-card-icon', info.icon));
+      // NEW only on the newest games, until they are played.
+      if (NEWEST.includes(definition.id) && !stats) art.append(element(doc, 'span', 'yt-card-badge', 'NEW'));
+      if (stats?.bestRank) { const medal = element(doc, 'span', 'yt-card-medal', stats.bestRank); medal.dataset.rank = stats.bestRank; art.append(medal); }
+      const body = element(doc, 'span', 'yt-card-body');
+      body.append(element(doc, 'strong', 'yt-card-title', definition.title), element(doc, 'span', 'yt-card-description', info.description));
+      const tags = element(doc, 'span', 'yt-card-meta');
+      for (const tag of [info.time, info.difficulty]) tags.append(element(doc, 'span', '', tag));
+      if (subject === 'all' && choiceSubjects(definition.id).length) tags.append(element(doc, 'span', 'yt-card-choice', choiceSubjects(definition.id).length === 3 ? '3教科' : '2教科'));
+      body.append(tags);
+      const featuredCourse = companionCourse(selected, definition.id);
+      if (featuredCourse) body.append(element(doc, 'span', 'yt-card-course', `★ 得意コース：${featuredCourse.name}`));
+      body.append(element(doc, 'small', 'yt-card-record', stats ? `BEST ${stats.bestScore} pt · ${stats.plays}回` : 'はじめての記録をつくろう'));
+      card.append(art, body);
+      return card;
+    };
+    const tabs = element(doc, 'div', 'yt-subject-tabs'); tabs.setAttribute('role', 'group'); tabs.setAttribute('aria-label', 'あそぶ 教科');
+    const shelf = element(doc, 'div', 'yt-game-shelf');
+    const tabButtons = HUB_SUBJECTS.map(item => {
+      const tab = button(doc, item.label, () => { subject = item.id; writeSubject(subject); render(); }, 'yt-subject-tab');
+      tab.dataset.subject = item.id; tabs.append(tab); return tab;
+    });
+    const render = () => {
+      while (shelf.firstChild) shelf.firstChild.remove();
+      for (const section of hubSections(subject)) {
+        const block = element(doc, 'section', 'yt-game-section'); block.dataset.section = section.id;
+        block.append(element(doc, 'h2', 'yt-section-title', `${section.title}（${section.games.length}）`));
+        const grid = element(doc, 'div', 'yt-game-grid');
+        for (const id of section.games) { const definition = games.get(id); if (definition) grid.append(makeCard(definition)); }
+        block.append(grid); shelf.append(block);
+      }
+      tabButtons.forEach(tab => tab.setAttribute('aria-pressed', String(tab.dataset.subject === subject)));
+    };
+    render();
+    wrap.append(tabs, shelf);
     wrap.append(element(doc, 'p', 'yt-note', '遊ぶと相棒が成長し、技が少し強くなる。新しい仲間は、本編の新しい土地で。'));
     root.append(wrap); doc.body.append(root); this.root = root; this.restore = isolateScreen(doc, root);
-    grid.querySelector('button').focus({ preventScroll: true });
+    tabs.querySelector('[aria-pressed=true]')?.focus({ preventScroll: true });
     if (PLAYTEST_ENABLED) trackPlaytest('hubShown', {});
     if (props?.notebookContext) this.showLearningNotebook(props.notebookContext);
   },
@@ -174,6 +203,9 @@ const hub = {
       for (const [value, text] of [['kanji', link ? '漢字（読み・意味、さいごに行った地方の漢字）' : '漢字の読み（さいごに行った地方の漢字）'], ['english', link ? '英語（英単語と意味）' : '英語（意味・英単語）'], ['math', '算数（たし算・ひき算）']]) {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
+      // Opened from a subject tab: that subject is chosen already.
+      const preset = modeForSubject(definition.id, playOptions.subject);
+      if (preset) { mode = preset; select.value = preset; }
       select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', trace ? 'どれも12問。漢字は読み、英語は英単語の つづり、算数は 答えの 数字を なぞります。もんだいを 出すのは、きみが旅で出会ったゴトモンたちです。' : land ? 'どれも12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'どれも12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'どれも12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'どれも12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'どれも12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'どれも12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'どれも12問。いっしょに走るのは相棒、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'どれも12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
     }
@@ -192,6 +224,8 @@ const hub = {
       for (const [value, text] of [['english', '英語（意味・英単語）'], ['kanji', '漢字の読み（さいごに行った地方の漢字）']]) {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
+      const preset = modeForSubject(definition.id, playOptions.subject);
+      if (preset) { mode = preset; select.value = preset; }
       select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', 'どちらも12問。ふだを持っているのは、旅で出会ったゴトモンたちです。'));
     }

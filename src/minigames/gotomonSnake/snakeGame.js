@@ -2,7 +2,8 @@ import { ENGLISH_CHOICE_FIXTURE } from '../englishChoice/englishChoiceQuestions.
 
 export const SNAKE_RULES = Object.freeze({
   columns: 9, rows: 7, words: 8, minLength: 3, maxLength: 6, decoys: 3,
-  // A snake can run into a letter by accident, so the second wrong letter marks a miss.
+  // A wrong letter counts only when the snake turned toward it (see aimed below); the second
+  // such letter marks a miss.
   slipsAllowed: 2,
   // One step per this many ms (normal / ゆっくり).
   stepMs: Object.freeze({ normal: 430, slow: 680 }),
@@ -33,8 +34,12 @@ export function pickSnakeWords({ random = Math.random, words = ENGLISH_CHOICE_FI
 // whose edges wrap and whose body can be crossed, so it can never crash. Wild Gotomon
 // hold letters; the child steers into the next letter of the word (shown with its
 // meaning), and each letter eaten joins the body. A wrong letter says what it was, the
-// next letter glows, and a new decoy appears elsewhere. One learning result per word:
-// found when spelled with at most one wrong letter, missed at the second.
+// next letter glows, and a new decoy appears elsewhere. A wrong letter is a slip only when
+// the child turned toward it (the first letter ahead after a turn); one met by going on
+// straight is told but not counted, so a late or clumsy turn is no spelling slip (a bot
+// that knew every word but turned late had 1.2 of 8 words recorded missed before, 0.8 now;
+// a bot that spelled every word wrong is still caught on 6.9 of 8).
+// One learning result per word: found when spelled with at most one counted slip, missed at the second.
 export function createSnakeGame({ sessionId, random = Math.random, onEvent = () => {}, content, pace = 'normal' }) {
   const words = content?.words ?? pickSnakeWords({ random });
   const stepMs = R.stepMs[pace === 'slow' ? 'slow' : 'normal'];
@@ -42,7 +47,7 @@ export function createSnakeGame({ sessionId, random = Math.random, onEvent = () 
   let phase = 'ready', seq = 0, activeElapsedMs = 0, index = 0, spelled = 0, wrongs = 0, judged = false, tokenSerial = 0, slipSerial = 0, doneSerial = 0;
   let answered = 0, correct = 0, incorrect = 0, eaten = 0;
   let result = null, lastAnswer = null, lastSlip = null, aborted = false, completeEmitted = false, problem = null, attemptId = null, hintTokenId = null;
-  let snake = [], direction = 'right', turnTo = null, elapsed = 0, tokens = [];
+  let snake = [], direction = 'right', turnTo = null, elapsed = 0, tokens = [], aimedId = null;
   const missed = [];
 
   const current = () => words?.[index] ?? null;
@@ -90,7 +95,7 @@ export function createSnakeGame({ sessionId, random = Math.random, onEvent = () 
     finally { notifying = false; }
   };
   const startWord = at => {
-    index = at; spelled = 0; wrongs = 0; judged = false; hintTokenId = null; tokens = [];
+    index = at; spelled = 0; wrongs = 0; judged = false; hintTokenId = null; tokens = []; aimedId = null;
     const head = snake[0] ?? { c: Math.floor(R.columns / 2), r: Math.floor(R.rows / 2) };
     snake = [{ c: head.c, r: head.r, letter: null }];
     stock();
@@ -109,7 +114,7 @@ export function createSnakeGame({ sessionId, random = Math.random, onEvent = () 
     tokens = tokens.filter(other => other !== token);
     const want = nextLetter(), item = current();
     if (token.letter === want) {
-      spelled++; eaten++; hintTokenId = null;
+      spelled++; eaten++; hintTokenId = null; aimedId = null;
       snake.push({ ...snake[snake.length - 1], letter: token.letter });
       if (spelled >= item.word.length) {
         const first = !judged;
@@ -121,8 +126,9 @@ export function createSnakeGame({ sessionId, random = Math.random, onEvent = () 
       }
       stock(); return;
     }
-    wrongs++;
-    lastSlip = Object.freeze({ slip: ++slipSerial, letter: token.letter, expected: want, c: token.c, r: token.r });
+    const counted = token.tokenId === aimedId;
+    if (counted) wrongs++;
+    lastSlip = Object.freeze({ slip: ++slipSerial, letter: token.letter, expected: want, c: token.c, r: token.r, counted });
     stock(); hintTokenId = tokens.find(other => other.letter === want)?.tokenId ?? null;
     if (!judged && wrongs >= R.slipsAllowed) {
       judged = true; answered++; incorrect++;
@@ -131,7 +137,18 @@ export function createSnakeGame({ sessionId, random = Math.random, onEvent = () 
     }
   };
   const step = () => {
-    if (turnTo) { direction = turnTo; turnTo = null; }
+    if (turnTo) {
+      if (turnTo !== direction) {
+        // The letter the child turned toward: the first one ahead in the new way (round the wrap once).
+        const [tc, tr] = DIRECTIONS[turnTo], from = snake[0], reach = tc ? R.columns : R.rows;
+        aimedId = null;
+        for (let k = 1; k < reach && !aimedId; k++) {
+          const at = tokens.find(t => t.c === (from.c + tc * k + R.columns * k) % R.columns && t.r === (from.r + tr * k + R.rows * k) % R.rows);
+          if (at) aimedId = at.tokenId;
+        }
+      }
+      direction = turnTo; turnTo = null;
+    }
     const [dc, dr] = DIRECTIONS[direction], head = snake[0];
     const c = (head.c + dc + R.columns) % R.columns, r = (head.r + dr + R.rows) % R.rows;
     // The body follows the head, each segment keeping its letter.

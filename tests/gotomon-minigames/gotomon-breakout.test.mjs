@@ -21,12 +21,14 @@ function newBreakout({ seed = 3, level = 'addsub', pace = 'normal' } = {}) {
       game.update(16);
     }
   };
-  return { game, events, sessionId, act, next, play };
+  // Taps the block with the answer (or another one), as the child does first.
+  const choose = (pick = s => s.blocks.find(b => b.number === s.problem.answer)) => act('choose', { blockId: pick(game.snapshot()).blockId });
+  return { game, events, sessionId, act, next, play, choose };
 }
 
 test('every question writes the answer on exactly one reachable block', () => {
   for (const level of ['addsub', 'times']) {
-    const { game, next, play } = newBreakout({ level, seed: 5 });
+    const { game, next, play, choose } = newBreakout({ level, seed: 5 });
     while (game.snapshot().phase !== 'completed') {
       const s = game.snapshot();
       const answers = s.blocks.filter(b => b.number === s.problem.answer);
@@ -34,7 +36,7 @@ test('every question writes the answer on exactly one reachable block', () => {
       const [a] = answers;
       assert.ok(!s.blocks.some(b => b.column === a.column && b.row > a.row), 'nothing below the answer');
       assert.ok(s.blocks.every(b => Number.isInteger(b.number) && b.number >= 0));
-      play(4 * 60 * 1000); next();
+      choose(); play(4 * 60 * 1000); next();
     }
   }
 });
@@ -42,10 +44,11 @@ test('every question writes the answer on exactly one reachable block', () => {
 test('the ball never gets stuck: every run finishes, and only answers break', () => {
   for (const level of ['addsub', 'times']) {
     for (const seed of [1, 2, 3, 4]) {
-      const { game, events, next, play } = newBreakout({ level, seed });
+      const { game, events, next, play, choose } = newBreakout({ level, seed });
       let guard = 0;
       while (game.snapshot().phase !== 'completed' && guard++ < 40) {
         const before = game.snapshot().blocks.length;
+        assert.equal(choose(), true);
         play(4 * 60 * 1000);
         const s = game.snapshot();
         assert.equal(s.phase, 'feedback', `${level} ${seed}: question ${s.question + 1} was solved in time`);
@@ -61,27 +64,37 @@ test('the ball never gets stuck: every run finishes, and only answers break', ()
   }
 });
 
-test('three stray blocks count as a miss once; the answer then glows', () => {
-  const { game, events, play } = newBreakout({ seed: 6 });
+test('the first tapped block is the answer: a wrong one names its number and the answer glows; bounces never count', () => {
+  const { game, events, play, choose, act } = newBreakout({ seed: 6 });
+  const s0 = game.snapshot();
+  assert.equal(choose(s => s.blocks.find(b => b.number !== s.problem.answer)), true);
+  let s = game.snapshot();
+  assert.equal(s.lastChoice.correct, false);
+  assert.equal(s.blocks.find(b => b.blockId === s.hintId)?.number, s0.problem.answer);
+  assert.equal(s.ball.held, true); assert.equal(act('launch'), false, 'the ball waits for the answer');
+  assert.equal(s.missed.length, 1);
+  assert.equal(choose(), true);
+  s = game.snapshot();
+  assert.equal(s.chosenId, s.blocks.find(b => b.number === s.problem.answer).blockId);
+  assert.equal(choose(), false, 'chosen: no more taps');
+  // Play without aiming: many stray bounces, but no more results; after three the companion aims at the chosen block.
   play(3 * 60 * 1000, { aim: false });
   const judged = events.filter(event => ['correct', 'incorrect'].includes(event.type));
-  assert.ok(judged.length <= 1);
-  if (judged[0]?.type === 'incorrect') {
-    assert.ok(game.snapshot().misses >= R.missesAllowed || game.snapshot().phase === 'feedback');
-    assert.ok(game.snapshot().missed.length === 1);
-  }
-  // A glowing hint names the answer block.
-  const { game: g2, play: p2 } = newBreakout({ seed: 8 });
-  for (let t = 0; t < 3 * 60 * 1000 && g2.snapshot().misses < R.missesAllowed && g2.snapshot().phase === 'answering'; t += 2000) p2(2000, { aim: false });
-  if (g2.snapshot().phase === 'answering') {
-    const s = g2.snapshot();
-    assert.equal(s.blocks.find(b => b.blockId === s.hintId)?.number, s.problem.answer);
-  }
+  assert.deepEqual(judged.map(e => e.type), ['incorrect']);
+  assert.equal(game.snapshot().answered, 1);
+  assert.equal(game.snapshot().phase, 'feedback');
+  assert.equal(game.snapshot().lastAnswer.first, false);
+  // Right the first time: correct, and the stray bounces before the break change nothing.
+  const other = newBreakout({ seed: 8 });
+  other.choose(); other.play(3 * 60 * 1000, { aim: false });
+  assert.deepEqual(other.events.filter(event => ['correct', 'incorrect'].includes(event.type)).map(e => e.type), ['correct']);
+  assert.equal(other.game.snapshot().lastAnswer.first, true);
 });
 
 test('once the answer glows, a paddle bounce heads straight for it, so nobody stays stuck', () => {
   for (const seed of [12, 13, 14]) {
-    const { game, act } = newBreakout({ seed });
+    const { game, act, choose } = newBreakout({ seed });
+    choose();
     // Follow the ball dead-centre without aiming: the help must bring the answer down.
     for (let t = 0; t < 5 * 60 * 1000 && game.snapshot().phase === 'answering'; t += 16) {
       act('steer', { x: game.snapshot().ball.x }); game.update(16);
@@ -90,13 +103,17 @@ test('once the answer glows, a paddle bounce heads straight for it, so nobody st
   }
 });
 
-test('the ball waits on the paddle, launches by itself or on a tap, and comes back when dropped', () => {
-  const { game, act } = newBreakout({ seed: 9 });
+test('the ball waits on the paddle until the answer is chosen, then launches by itself or on a tap, and comes back when dropped', () => {
+  const { game, act, choose } = newBreakout({ seed: 9 });
   assert.equal(game.snapshot().ball.held, true);
+  for (let t = 0; t < R.autoLaunchMs * 3; t += 16) game.update(16);
+  assert.equal(game.snapshot().ball.held, true, 'no launch before a choice');
   act('steer', { x: 2 }); game.update(16);
   assert.equal(game.snapshot().ball.x, game.snapshot().paddle.x);
+  choose();
   assert.equal(act('launch'), true); assert.equal(game.snapshot().ball.held, false);
   const other = newBreakout({ seed: 10 });
+  other.choose();
   for (let t = 0; t < R.autoLaunchMs + 50; t += 16) other.game.update(16);
   assert.equal(other.game.snapshot().ball.held, false);
   // Paddle away from the ball: it drops and comes back held; no game over.
@@ -113,7 +130,8 @@ test('the ball waits on the paddle, launches by itself or on a tap, and comes ba
 
 test('old attempts and paused commands are refused', () => {
   const { game, sessionId, act } = newBreakout({ seed: 11 });
-  game.setPaused(true); assert.equal(act('launch'), false); assert.equal(act('steer', { x: 3 }), false); game.setPaused(false);
+  game.setPaused(true); assert.equal(act('launch'), false); assert.equal(act('steer', { x: 3 }), false); assert.equal(act('choose', { blockId: game.snapshot().blocks[0].blockId }), false); game.setPaused(false);
+  assert.equal(act('choose', { blockId: 'nope' }), false);
   assert.equal(game.dispatch({ type: 'launch', payload: { sessionId, attemptId: 'old' } }), false);
   assert.equal(act('steer', { x: Number.NaN }), false);
 });
@@ -122,5 +140,5 @@ test('the breakout world summarises broken answer blocks', () => {
   const world = createQuizWorld('breakout', growthStatus().effects);
   world.context({ mode: 'breakout', phase: 'answering', problem: { problemId: 'p' } });
   world.answer(true, {}, 1); world.answer(false, {}, 0);
-  assert.match(world.snapshot().summary, /答えのブロックを2こ パカーン · ゴトモンが2ひき出てきた · ねらいどおり 1こ/);
+  assert.match(world.snapshot().summary, /答えのブロックを2こ パカーン · ゴトモンが2ひき出てきた · 1回で えらべた 1こ/);
 });

@@ -14,12 +14,15 @@ function newJump({ seed = 3, mode = 'math', pace = 'normal' } = {}) {
   assert.equal(game.enter(), true);
   const g = 2 * R.jump / R.apexSec[pace] ** 2;
   const steerTo = toX => game.dispatch({ type: 'move', payload: { sessionId, attemptId: game.snapshot().attemptId, dir: 0, toX } });
+  const choose = plateId => game.dispatch({ type: 'choose', payload: { sessionId, attemptId: game.snapshot().attemptId, plateId } });
   // A climbing player: aims for the highest ledge in reach, and for a cloud once the row is in reach.
   // pick(state) names the cloud's plate (default: the answer).
   const tick = (pick = s => s.problem.answerId) => {
     const s = game.snapshot();
     const apex = s.vy > 0 ? s.y + s.vy * s.vy / (2 * g) : s.y;
     let toX = null;
+    // The child taps the cloud (once the row is in sight) and the companion glides onto it.
+    if (s.row && s.problem && s.chosenPlateId !== pick(s) && !s.row.plates.find(p => p.plateId === pick(s))?.gone && apex >= s.row.y - 0.4) choose(pick(s));
     if (s.row && s.problem && apex >= s.row.y + 0.02) toX = s.row.plates.find(p => p.plateId === pick(s))?.x ?? null;
     else {
       const ok = s.ledges.filter(l => !l.locked && l.y <= apex - 0.02 && l.y > s.camera + 0.01).sort((a, b) => b.y - a.y);
@@ -32,7 +35,7 @@ function newJump({ seed = 3, mode = 'math', pace = 'normal' } = {}) {
     for (let t = 0; t < limit && (game.snapshot().lastLanding?.landing ?? 0) === n && game.snapshot().phase === 'answering'; t += 16) tick(pick);
     return game.snapshot().lastLanding;
   };
-  return { game, events, sessionId, tick, untilLanding, steerTo };
+  return { game, events, sessionId, tick, untilLanding, steerTo, choose };
 }
 
 test('each row has four clouds, one of them the answer, high above the start', () => {
@@ -112,15 +115,36 @@ test('twelve rows to the goal in every mode and pace, with slips on the way; eve
   }
 });
 
-test('a child who never steers still reaches every row and the goal (big bounces when stuck)', () => {
+test('a child who never steers nor taps still reaches the goal, but no landing of theirs is recorded as an answer', () => {
   for (const seed of [1, 2, 3, 4, 5]) {
-    const { game } = newJump({ seed });
-    for (let t = 0; t < 10 * 60000 && game.snapshot().phase === 'answering'; t += 16) game.update(16);
+    const { game, events } = newJump({ seed });
+    for (let t = 0; t < 15 * 60000 && game.snapshot().phase === 'answering'; t += 16) game.update(16);
     const end = game.snapshot();
     assert.equal(end.phase, 'completed', `seed ${seed}`);
-    assert.equal(end.result.answered, 12);
-    assert.ok(end.activeElapsedMs < 4 * 60000, `seed ${seed} took ${end.activeElapsedMs}`);
+    // Big bounces bring the companion to each row; with no choice the answer glows, then the companion chooses it.
+    assert.equal(end.result.answered, 0); assert.equal(end.result.unanswered, 12);
+    assert.equal(events.filter(e => e.type === 'correct' || e.type === 'incorrect').length, 0);
+    assert.ok(end.activeElapsedMs < 9 * 60000, `seed ${seed} took ${end.activeElapsedMs}`);
   }
+});
+
+test('landing on a cloud that was not chosen is just a bounce; the choice may change until the landing', () => {
+  const { game, events, choose } = newJump({ seed: 4 });
+  // Steer under a wrong cloud without choosing anything: no landing is ever an answer.
+  for (let t = 0; t < 20000; t += 16) {
+    const s = game.snapshot();
+    const wrong = s.row.plates.find(p => p.plateId !== s.problem.answerId);
+    game.dispatch({ type: 'move', payload: { sessionId: s.sessionId, attemptId: s.attemptId, dir: 0, toX: wrong.x } });
+    game.update(16);
+    if (s.revealAfter) break;
+  }
+  assert.equal(events.filter(e => ['correct', 'incorrect'].includes(e.type)).length, 0);
+  assert.equal(game.snapshot().lastLanding, null);
+  const s = game.snapshot();
+  const [a, b] = s.row.plates;
+  assert.equal(choose(a.plateId), true); assert.equal(game.snapshot().chosenPlateId, a.plateId);
+  assert.equal(choose(b.plateId), true); assert.equal(game.snapshot().chosenPlateId, b.plateId);
+  assert.equal(choose('nope'), false);
 });
 
 test('commands are refused while paused, with a stale attempt, or from another session', () => {

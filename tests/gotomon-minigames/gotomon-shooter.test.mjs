@@ -43,10 +43,21 @@ test('both modes make waves of four plates with one answer', () => {
       for (const wave of waves) {
         assert.equal(wave.plates.length, SHOOTER_FORMATION);
         assert.equal(new Set(wave.plates.map(plate => plate.text)).size, SHOOTER_FORMATION);
-        // Only the answer's plate is a reading of the kanji shown.
-        const readings = readingsOf(kanji[wave.contentId]);
-        const fits = wave.plates.filter(plate => readings.has(toHira(plate.text)));
-        assert.deepEqual(fits.map(plate => plate.contentId), [wave.contentId], `${wave.prompt}: ${wave.plates.map(p => p.text)}`);
+        // The plates ask for the reading in this sentence: besides the answer, only the plate of
+        // "another reading" is a reading of the kanji shown, and it is of the other kind (音 / 訓).
+        const k = kanji[wave.contentId], readings = readingsOf(k);
+        const fits = wave.plates.filter(plate => readings.has(toHira(plate.text)) && !plate.contentId.endsWith(':slip'));
+        assert.deepEqual(fits.map(plate => plate.contentId).sort(), [wave.contentId, ...(wave.plates.some(p => p.contentId.endsWith(':alt')) ? [`${wave.contentId}:alt`] : [])].sort(), `${wave.prompt}: ${wave.plates.map(p => p.text)}`);
+        assert.equal(wave.plates.filter(plate => plate.contentId === wave.contentId).length, 1);
+        const alt = wave.plates.find(plate => plate.contentId.endsWith(':alt'));
+        if (alt) {
+          const on = new Set((k.onyomi || []).map(toHira)), answer = toHira(wave.meaning);
+          const answerOn = [...on].some(r => r === answer || (answer.endsWith('っ') && r.startsWith(answer.slice(0, -1))));
+          assert.equal(on.has(alt.text), !answerOn, `${wave.prompt}: ${alt.text} is the other kind`);
+        }
+        // A writing slip is never a reading of the kanji.
+        const slip = wave.plates.find(plate => plate.contentId.endsWith(':slip'));
+        if (slip) assert.equal(readings.has(slip.text), false, `${wave.prompt}: ${slip.text}`);
       }
     }
   }

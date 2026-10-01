@@ -5,8 +5,8 @@ export const BREAKOUT_RULES = Object.freeze({
   width: 10, height: 13, columns: 6, rows: 4, maxRows: 6, blockTop: 1.1, blockHeight: 0.9, gap: 0.12,
   paddleY: 12, paddleWidth: 2.6, paddleHeight: 0.35, ballRadius: 0.24,
   speedPerMs: Object.freeze({ normal: 0.0068, slow: 0.0044 }), step: 8,
-  // Three other blocks may be hit before a question counts as missed: the ball bounces
-  // around, and a stray bounce is no slip in the calculation.
+  // After this many other blocks are hit, the companion aims the ball at the chosen block
+  // (a stray bounce is play, never a learning result).
   missesAllowed: 3, questions: 12, refillBelow: 12, autoLaunchMs: 1600,
 });
 const R = BREAKOUT_RULES;
@@ -24,12 +24,15 @@ const shuffled = (items, random) => {
 };
 
 // Nonpersistent Core: a breakout game. A calculation is asked; numbered blocks sit at
-// the top and the child bounces a ball off a paddle. Only the block with the answer
-// breaks — with its neighbours, freeing a Gotomon — and the next question comes; other
-// blocks just bounce the ball back and show their number. A dropped ball comes back to
-// the paddle: there is no game over. One learning result per question: found when the
-// answer breaks before the ball has hit three other blocks; after that, the answer glows
-// and the companion aims the next bounce off the paddle straight at it.
+// the top. The child first taps the block with the answer (that is the answer: hitting
+// blocks with a ball shows how well one aims, not what one knows, so a bounce is never a
+// learning result). A wrong block says its number and the answer's block glows; the
+// ball waits on the paddle until the answer's block is chosen. Then the child bounces the
+// ball off a paddle: only the chosen block breaks — with its neighbours, freeing a
+// Gotomon — and the next question comes; other blocks just bounce the ball back. After
+// three of those the companion aims the next bounce off the paddle straight at it. A
+// dropped ball comes back to the paddle: there is no game over. One learning result per
+// question, on its first chosen block.
 export function createBreakoutGame({ sessionId, random = Math.random, onEvent = () => {}, content, pace = 'normal' }) {
   const level = content?.level === 'times' ? 'times' : 'addsub';
   const questions = content?.questions ?? buildTossProblems({ sessionId, random, level });
@@ -38,7 +41,7 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
   let phase = 'ready', seq = 0, activeElapsedMs = 0, index = 0, blockSerial = 0, hitSerial = 0, version = 0;
   let answered = 0, correct = 0, incorrect = 0, broken = 0, freed = 0, misses = 0, judged = false, drops = 0, assisted = 0;
   let result = null, lastAnswer = null, lastBounce = null, aborted = false, completeEmitted = false, problem = null, attemptId = null, hintId = null;
-  let paddleX = R.width / 2, ball = null, waitMs = 0, blocks = [], touching = null;
+  let paddleX = R.width / 2, ball = null, waitMs = 0, blocks = [], touching = null, chosenId = null, lastChoice = null, firstRight = false;
   const missedList = [];
 
   const current = () => questions?.[index] ?? null;
@@ -76,7 +79,7 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
     gameId: 'gotomonBreakout', mode: 'breakout', sessionId, phase, paused, active, aborted, seq, activeElapsedMs, level, version,
     blocks: Object.freeze(blocks.map(block => Object.freeze({ ...block, x: colX(block.column), y: rowY(block.row), w: blockWidth, h: R.blockHeight }))),
     ball: ball ? Object.freeze({ ...ball }) : null, paddle: Object.freeze({ x: paddleX, y: R.paddleY, w: R.paddleWidth, h: R.paddleHeight }),
-    hintId, misses, assisted, question: index, questions: questions ? questions.length : 0, broken, freed, drops, lastBounce,
+    hintId, chosenId, lastChoice, misses, assisted, question: index, questions: questions ? questions.length : 0, broken, freed, drops, lastBounce,
     problem, attemptId, answered, correct, incorrect, result, lastAnswer, missed: Object.freeze([...missedList]),
   });
   const notify = (type, payload = {}) => {
@@ -90,18 +93,14 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
     finally { notifying = false; }
   };
   const startQuestion = at => {
-    index = at; misses = 0; judged = false; hintId = null;
+    index = at; misses = 0; judged = false; hintId = null; chosenId = null;
     if (blocks.length < R.refillBelow && Math.max(-1, ...blocks.map(block => block.row)) < R.maxRows - 1) addRow();
     label();
     const item = current();
     problem = Object.freeze({ problemId: `${item.problemId}:0`, contentId: item.problemId, skillId: item.skillId, question: item.question, answer: item.answer });
     attemptId = `${problem.problemId}:attempt`; lastAnswer = null; phase = 'answering';
-    // A new row may come down onto the ball: then it goes back to the paddle.
-    const inside = ball && !ball.held && blocks.some(block => {
-      const bx = colX(block.column), by = rowY(block.row);
-      return ball.x > bx - R.ballRadius && ball.x < bx + blockWidth + R.ballRadius && ball.y > by - R.ballRadius && ball.y < by + R.blockHeight + R.ballRadius;
-    });
-    if (!ball || ball.held || inside) resetBall();
+    // The ball waits on the paddle until the answer's block is chosen.
+    resetBall();
     notify('problemPresented', { skillId: item.skillId });
   };
   const complete = () => {
@@ -109,22 +108,31 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
     result = Object.freeze({ answered, correct, incorrect, accuracy: answered ? correct / answered : 0, broken, freed, drops, finished: true });
     if (!completeEmitted) { completeEmitted = true; notify('sessionComplete', result); }
   };
-  const judge = right => {
-    if (judged) return; judged = true; answered++;
+  const judge = (right, chosen) => {
+    if (judged) return; judged = true; answered++; firstRight = right;
     if (right) correct++;
     else {
-      incorrect++; hintId = answerBlock()?.blockId ?? null;
-      missedList.push(Object.freeze({ contentId: current().problemId, question: current().question, answer: current().answer, questionNumber: answered }));
+      incorrect++;
+      missedList.push(Object.freeze({ contentId: current().problemId, question: current().question, answer: current().answer, chosen, questionNumber: answered }));
     }
-    notify(right ? 'correct' : 'incorrect', { attemptId, contentId: current().problemId, skillId: current().skillId, misses });
+    notify(right ? 'correct' : 'incorrect', { attemptId, contentId: current().problemId, skillId: current().skillId, chosen });
+  };
+  // Tapping a block: the answer for this question (the first tap counts).
+  const choose = block => {
+    const item = current(), right = block.number === item.answer;
+    judge(right, block.number);
+    lastChoice = Object.freeze({ choice: ++hitSerial, blockId: block.blockId, number: block.number, correct: right,
+      x: colX(block.column) + blockWidth / 2, y: rowY(block.row) + R.blockHeight / 2 });
+    if (right) { chosenId = block.blockId; hintId = null; waitMs = R.autoLaunchMs - 400; }
+    else hintId = answerBlock()?.blockId ?? null;
   };
   const hitBlock = block => {
     const item = current();
-    if (block.number === item.answer) {
+    if (block.blockId === chosenId) {
       // The answer breaks with its neighbours; a Gotomon comes out.
       const around = blocks.filter(other => Math.abs(other.row - block.row) + Math.abs(other.column - block.column) <= 1);
       blocks = blocks.filter(other => !around.includes(other)); broken += around.length; freed++;
-      const first = !judged; judge(true);
+      const first = firstRight;
       lastAnswer = Object.freeze({ attemptId, hit: ++hitSerial, correct: true, first, question: item.question, answer: item.answer,
         x: colX(block.column) + blockWidth / 2, y: rowY(block.row) + R.blockHeight / 2, broken: Object.freeze(around.map(other => other.blockId)) });
       attemptId = null; phase = 'feedback'; version++;
@@ -133,7 +141,7 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
     }
     misses++;
     lastBounce = Object.freeze({ bounce: ++hitSerial, blockId: block.blockId, number: block.number, x: colX(block.column) + blockWidth / 2, y: rowY(block.row) + R.blockHeight / 2 });
-    if (misses >= R.missesAllowed) judge(false);
+    if (misses >= R.missesAllowed) hintId = chosenId;
   };
   const stepBall = dt => {
     if (ball.held) { ball.x = paddleX; return; }
@@ -192,7 +200,7 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
       const dt = Math.max(0, dtMs);
       activeElapsedMs += dt;
       if (phase !== 'answering' || notifying) return;
-      if (ball.held && (waitMs += dt) >= R.autoLaunchMs) launch();
+      if (ball.held && chosenId && (waitMs += dt) >= R.autoLaunchMs) launch();
       for (let left = Math.min(dt, 100); left > 0 && phase === 'answering'; left -= R.step) stepBall(Math.min(left, R.step));
     },
     setPaused(value) { if (active) paused = !!value; },
@@ -201,8 +209,15 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
       paddleX = Math.min(R.width - R.paddleWidth / 2, Math.max(R.paddleWidth / 2, x)); return true;
     },
     launch({ sessionId: s, attemptId: a } = {}) {
-      if (!active || paused || notifying || phase !== 'answering' || s !== sessionId || a !== attemptId) return false;
+      if (!active || paused || notifying || phase !== 'answering' || s !== sessionId || a !== attemptId || !chosenId) return false;
       return launch();
+    },
+    // Taps a block as the answer (until the answer's block is chosen).
+    choose({ sessionId: s, attemptId: a, blockId } = {}) {
+      if (!active || paused || notifying || phase !== 'answering' || s !== sessionId || a !== attemptId || chosenId) return false;
+      const block = blocks.find(b => b.blockId === blockId);
+      if (!block) return false;
+      choose(block); return true;
     },
     next({ sessionId: sourceSession } = {}) {
       if (!active || paused || notifying || sourceSession !== sessionId || phase !== 'feedback') return false;
@@ -213,7 +228,7 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
     },
     dispatch(command) {
       if (!command || typeof command !== 'object') return false;
-      if (['steer', 'launch', 'next'].includes(command.type)) return this[command.type](command.payload);
+      if (['steer', 'launch', 'next', 'choose'].includes(command.type)) return this[command.type](command.payload);
       return false;
     },
     snapshot,

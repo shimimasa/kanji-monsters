@@ -27,9 +27,14 @@ const shuffled = (items, random) => {
 // each gate shows four plates, one per lane. Moving into the lane of the answer before
 // the gate gives a dash; another lane slows the runner a little, shows what its plate
 // was, and the same question comes at the next gate with the answer's lane glowing.
+// A gate counts only when the child has chosen a lane for it (a tap, even on the lane
+// already taken): a runner who simply has not decided yet when the gate comes ("まにあわな
+// かった") records nothing, and the same question comes again at the next gate, still as a
+// first try. After two such gates the answer's lane glows, after three the companion takes
+// it; a question whose answer was shown that way records no result.
 // Three rival Gotomon run alongside and keep the race close. After twelve questions the
 // finish line comes; there is no game over. One learning result per question, on its
-// first gate; each gate is its own problem id.
+// first chosen gate; each gate is its own problem id.
 export function createRaceGame({ sessionId, random = Math.random, onEvent = () => {}, content, pace = 'normal' }) {
   const problems = content?.problems ?? null;
   const slow = pace === 'slow';
@@ -37,7 +42,7 @@ export function createRaceGame({ sessionId, random = Math.random, onEvent = () =
   const boostLength = R.boost.share * gateMs, slowLength = R.slow.share * gateMs;
   let active = true, paused = false, notifying = false, observer = onEvent;
   let phase = 'ready', seq = 0, activeElapsedMs = 0, index = 0, tries = 0, gateSerial = 0;
-  let distance = 0, lane = 1, boostMs = 0, slowMs = 0, gate = null, finishAt = null, hintPlateId = null;
+  let distance = 0, lane = 1, boostMs = 0, slowMs = 0, gate = null, finishAt = null, hintPlateId = null, chose = false, late = 0, revealed = false, unanswered = 0;
   let answered = 0, correct = 0, incorrect = 0, dashes = 0;
   let result = null, lastGate = null, aborted = false, completeEmitted = false, problem = null, attemptId = null;
   let rivals = [];
@@ -48,7 +53,7 @@ export function createRaceGame({ sessionId, random = Math.random, onEvent = () =
   const place = () => 1 + rivals.filter(rival => rival.distance > distance).length;
   const snapshot = () => Object.freeze({
     gameId: 'gotomonRace', mode: 'race', sessionId, phase, paused, active, aborted, seq, activeElapsedMs, pace: slow ? 'slow' : 'normal',
-    distance, lane, lanes: R.lanes, speed: speed(), plainSpeed: plain, boostMs, slowMs, finishAt, hintPlateId, place: place(),
+    distance, lane, chose, late, lanes: R.lanes, speed: speed(), plainSpeed: plain, boostMs, slowMs, finishAt, hintPlateId, place: place(),
     gate: gate ? Object.freeze({ ...gate, plates: Object.freeze(gate.plates.map(plate => Object.freeze({ ...plate }))) }) : null,
     rivals: Object.freeze(rivals.map(rival => Object.freeze({ ...rival }))),
     problemIndex: index, total: problems ? problems.length : 0, dashes,
@@ -68,18 +73,31 @@ export function createRaceGame({ sessionId, random = Math.random, onEvent = () =
   const openGate = at => {
     const item = current();
     gate = { gateId: `${sessionId}:gate:${++gateSerial}`, at, plates: shuffled(item.plates, random) };
-    problem = Object.freeze({ problemId: `${item.problemId}:${tries}`, contentId: item.contentId, skillId: item.skillId, kind: item.kind,
+    chose = false;
+    problem = Object.freeze({ problemId: `${item.problemId}:${tries}${late ? `:late${late}` : ''}`, contentId: item.contentId, skillId: item.skillId, kind: item.kind,
       prompt: item.prompt, sentence: item.sentence ?? null, answerId: item.answerId, explain: item.explain,
       choices: Object.freeze(gate.plates.map(plate => Object.freeze({ choiceId: plate.plateId, text: plate.text }))), correctChoiceId: item.answerId });
     attemptId = `${problem.problemId}:attempt`;
   };
   const complete = () => {
     phase = 'completed'; problem = null; attemptId = null; gate = null; hintPlateId = null;
-    result = Object.freeze({ answered, correct, incorrect, accuracy: answered ? correct / answered : 0, dashes, place: place(), finished: true });
+    result = Object.freeze({ answered, correct, incorrect, unanswered, accuracy: answered ? correct / answered : 0, dashes, place: place(), finished: true });
     if (!completeEmitted) { completeEmitted = true; notify('sessionComplete', result); }
   };
   const passGate = () => {
-    const item = current(), plate = gate.plates[lane], right = plate.plateId === item.answerId, first = tries === 0;
+    // No lane chosen for this gate: nothing is recorded, the question comes again.
+    if (!chose) {
+      const item = current(), at = gate.at;
+      late++; slowMs = 0; boostMs = 0;
+      if (late >= 2 && tries === 0 && !revealed) { revealed = true; hintPlateId = item.answerId; }
+      lastGate = Object.freeze({ gate: gateSerial, late: true, lane, correct: null, first: false });
+      openGate(at + 1);
+      // Third gate in a row without a choice: the companion takes the answer's lane.
+      if (late >= 3) { lane = gate.plates.findIndex(p => p.plateId === item.answerId); chose = true; }
+      return;
+    }
+    const item = current(), plate = gate.plates[lane], right = plate.plateId === item.answerId, first = tries === 0 && !revealed;
+    if (tries === 0 && revealed) unanswered++;
     const problemId = problem.problemId, committedAttempt = attemptId;
     if (first) { answered++; if (right) correct++; else incorrect++; }
     const answer = item.plates.find(p => p.plateId === item.answerId);
@@ -90,13 +108,13 @@ export function createRaceGame({ sessionId, random = Math.random, onEvent = () =
       dashes++; boostMs = boostLength; slowMs = 0; hintPlateId = null;
       notify(first ? 'correct' : 'passed', payload, problemId);
       if (index + 1 >= problems.length) { gate = null; problem = null; attemptId = `${sessionId}:finish`; finishAt = at + R.finishAfter; return; }
-      index++; tries = 0; openGate(at + 1);
+      index++; tries = 0; late = 0; revealed = false; openGate(at + 1);
       notify('problemPresented', { skillId: current().skillId, kind: current().kind });
     } else {
       slowMs = slowLength; boostMs = 0; hintPlateId = item.answerId;
       if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: plate.text, explain: item.explain, questionNumber: answered }));
       notify(first ? 'incorrect' : 'retry', payload, problemId);
-      tries++; openGate(at + 1);
+      tries++; late = 0; openGate(at + 1);
     }
   };
 
@@ -129,8 +147,9 @@ export function createRaceGame({ sessionId, random = Math.random, onEvent = () =
     // Moves the runner to a lane (0 is the left).
     steer({ sessionId: s, attemptId: a, lane: to } = {}) {
       if (!active || paused || notifying || phase !== 'answering' || s !== sessionId || a !== attemptId) return false;
-      if (!Number.isInteger(to) || to < 0 || to >= R.lanes || to === lane) return false;
-      lane = to; return true;
+      if (!Number.isInteger(to) || to < 0 || to >= R.lanes) return false;
+      // A tap on the lane already taken also chooses it for this gate.
+      lane = to; chose = true; return true;
     },
     dispatch(command) {
       if (!command || typeof command !== 'object') return false;

@@ -67,15 +67,16 @@ test('a wrong base is one learning result and lights the right one; the meteor k
   assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, 1);
 });
 
-test('a meteor that lands is caught by the shield; left alone, the run still ends', () => {
+test('a meteor that lands before any shot is caught by the shield and records nothing; left alone, the run still ends', () => {
   const { game, events, run } = newMeteor({ seed: 7 });
   run(R.fallMs.normal + 200);
   assert.ok(game.snapshot().shielded >= 1);
   assert.ok(game.snapshot().lastLanding);
-  assert.equal(events.find(event => event.type === 'incorrect')?.payload.reason, 'landed');
+  assert.equal(events.find(event => event.type === 'landed')?.payload.reason, 'landed');
+  assert.equal(events.filter(event => event.type === 'incorrect' || event.type === 'correct').length, 0, 'no shot, no learning result');
   run(10 * 60 * 1000);
   const { result } = game.snapshot();
-  assert.equal(result.answered, 12); assert.equal(result.shielded, 12);
+  assert.equal(result.answered, 0); assert.equal(result.unanswered, 12); assert.equal(result.shielded, 12);
   // ゆっくり falls slower.
   const slow = newMeteor({ pace: 'slow' }), fast = newMeteor();
   slow.run(3000); fast.run(3000);
