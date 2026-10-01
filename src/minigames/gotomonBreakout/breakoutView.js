@@ -21,6 +21,8 @@ const CSS = `
 #gotomonBreakoutScreen .bk-free img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 3px #0006)}
 #gotomonBreakoutScreen .bk-title{margin:0;text-align:center;font-size:14px;font-weight:900;color:#cfe9d8}
 #gotomonBreakoutScreen .bk-question{margin:0;padding:10px 12px;border-radius:14px;background:#ffffff14;color:#fff;text-align:center;font-size:clamp(32px,5vw,46px);font-weight:900;font-variant-numeric:tabular-nums}
+#gotomonBreakoutScreen .bk-block[data-chosen=true]{box-shadow:inset 0 -4px 0 #0002,0 0 0 4px #ffd54a,0 0 14px #ffd54a}
+#gotomonBreakoutScreen .bk-block[data-wrong=true]{filter:grayscale(.7);opacity:.6}
 #gotomonBreakoutScreen .bk-launch{min-height:52px;border:0;border-radius:14px;background:#ffb627;color:#3a2400;font:inherit;font-size:20px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer;touch-action:manipulation}
 #gotomonBreakoutScreen .bk-launch[hidden]{display:none}
 #gotomonBreakoutScreen .bk-review{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
@@ -35,7 +37,7 @@ const CSS = `
 `;
 
 export function createBreakoutView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
-  let active = true, lastSeq = -1, lastEventId = 0, doneShown = false, shownHit = 0, shownBounce = 0, version = -1, questionKey = null, freeSerial = 0;
+  let active = true, lastSeq = -1, lastEventId = 0, doneShown = false, shownHit = 0, shownBounce = 0, shownChoice = 0, version = -1, questionKey = null, freeSerial = 0;
   const removes = [], transient = [], answers = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'gotomonBreakoutScreen', title: 'ゴトモン・ブロックくずし', theme: 'breakout' });
@@ -73,10 +75,18 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
     if (!active || state.paused || state.phase !== 'feedback') return false;
     return dispatch({ type: 'next', payload: { sessionId: state.sessionId } });
   }
-  // The paddle follows the finger; a tap also sends a waiting ball off.
+  // A tap on a block chooses it as the answer (until the answer's block is chosen); anywhere
+  // else the paddle follows the finger, and a tap sends a waiting ball off.
   const xOf = event => { const box = board.getBoundingClientRect?.(); return box?.width && Number.isFinite(event?.clientX) ? (event.clientX - box.left) / box.width * R.width : null; };
+  const yOf = event => { const box = board.getBoundingClientRect?.(); return box?.height && Number.isFinite(event?.clientY) ? (event.clientY - box.top) / box.height * R.height : null; };
+  const wrongIds = new Set();
   let dragging = false;
-  on(board, 'pointerdown', event => { dragging = true; const x = xOf(event); if (x !== null) command('steer', { x }); if (session().ball?.held) command('launch'); });
+  on(board, 'pointerdown', event => {
+    const state = session(), x = xOf(event), y = yOf(event);
+    const block = !state.chosenId && x !== null && y !== null ? state.blocks.find(b => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) : null;
+    if (block) { command('choose', { blockId: block.blockId }); return; }
+    dragging = true; if (x !== null) command('steer', { x }); if (state.ball?.held) command('launch');
+  });
   on(board, 'pointermove', event => { if (!dragging && event.pointerType !== 'mouse') return; const x = xOf(event); if (x !== null) command('steer', { x }); });
   on(board, 'pointerup', () => { dragging = false; });
   on(board, 'pointercancel', () => { dragging = false; });
@@ -108,22 +118,34 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
     }
   };
   const renderPlay = state => {
-    for (const [id, node] of nodes) { const hint = String(state.phase === 'answering' && state.hintId === id); if (node.dataset.hint !== hint) node.dataset.hint = hint; }
+    for (const [id, node] of nodes) {
+      const hint = String(state.phase === 'answering' && state.hintId === id), chosen = String(state.chosenId === id), wrong = String(wrongIds.has(id) && !state.chosenId);
+      if (node.dataset.hint !== hint) node.dataset.hint = hint;
+      if (node.dataset.chosen !== chosen) node.dataset.chosen = chosen;
+      if (node.dataset.wrong !== wrong) node.dataset.wrong = wrong;
+    }
     paddle.style.left = px(state.paddle.x); paddle.style.top = py(state.paddle.y); paddle.style.width = px(state.paddle.w);
     ballNode.hidden = !state.ball;
     if (state.ball) { ballNode.style.left = px(state.ball.x); ballNode.style.top = py(state.ball.y); }
-    launchButton.hidden = !(state.ball?.held && state.phase === 'answering');
+    launchButton.hidden = !(state.ball?.held && state.phase === 'answering' && state.chosenId);
     const titleText = state.phase === 'completed' ? '' : `もんだい ${Math.min(state.questions, state.question + 1)}/${state.questions}　たすけたゴトモン ${state.freed}`;
     if (title.textContent !== titleText) title.textContent = titleText;
     if (state.problem && questionKey !== state.problem.contentId) {
       questionKey = state.problem.contentId; question.textContent = `${state.problem.question} = ?`;
-      note.textContent = 'パドルをうごかして、答えのブロックにボールを当てよう';
+      note.textContent = 'まず、答えの ブロックを タップしよう'; wrongIds.clear();
+    }
+    const choice = state.lastChoice;
+    if (choice && choice.choice !== shownChoice) {
+      shownChoice = choice.choice;
+      if (choice.correct) note.textContent = `「${choice.number}」に けってい！ パドルで ボールを 当てて わろう`;
+      else { wrongIds.add(choice.blockId); const node = nodes.get(choice.blockId); if (node) restartClass(node, 'bk-bump'); note.textContent = `「${choice.number}」は ${state.problem.question} の答えじゃないよ。光っている ブロックを タップしよう`; }
+      frame.announce(note.textContent);
     }
     const bounce = state.lastBounce;
     if (bounce && bounce.bounce !== shownBounce && state.phase === 'answering') {
       shownBounce = bounce.bounce;
       const node = nodes.get(bounce.blockId); if (node) restartClass(node, 'bk-bump');
-      note.textContent = state.hintId ? `「${bounce.number}」だったよ。光っているブロックが ${state.problem.question} の答え！ 相棒がねらいを手伝うよ` : `コツン！「${bounce.number}」は ${state.problem.question} の答えじゃないよ`;
+      note.textContent = state.hintId ? 'コツン！ 相棒が ねらいを 手伝うよ' : 'コツン！ えらんだ ブロックを ねらおう';
     }
   };
   const showAnswer = state => {

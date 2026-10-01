@@ -126,7 +126,7 @@ export function createMeteorView({ document: doc, dispatch, onBack, getSnapshot,
   const showLanding = state => {
     const landing = state.lastLanding;
     restartClass(shield, 'mt-block'); fx.pop(landing.x * 100, R.groundY * 100 - 8, 'シールド！', 'info');
-    note.textContent = `シールドが守ったよ。${landing.question} = ${landing.answer} だったよ`;
+    note.textContent = `シールドが守ったよ。${landing.question} = ${landing.answer}。つぎは うってみよう`;
     answers.push({ text: `${landing.question} = ${landing.answer}`, correct: false });
     frame.announce(note.textContent);
   };

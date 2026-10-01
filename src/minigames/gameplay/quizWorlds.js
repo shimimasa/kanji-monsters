@@ -192,7 +192,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
           : kind === 'parts' && answered ? `漢字を${answered}字くみたてた${correct ? ` · 1回で合体 ${correct}字` : ''}`
           : kind === 'snake' && answered ? `英単語を${answered}語つづった${correct ? ` · まちがいなし ${correct}語` : ''}`
           : kind === 'meteor' && answered ? `いん石を${answered}こ むかえた${correct ? ` · 1回でげいげき ${correct}こ` : ''}`
-          : kind === 'breakout' && answered ? `答えのブロックを${answered}こ パカーン · ゴトモンが${answered}ひき出てきた${correct ? ` · ねらいどおり ${correct}こ` : ''}`
+          : kind === 'breakout' && answered ? `答えのブロックを${answered}こ パカーン · ゴトモンが${answered}ひき出てきた${correct ? ` · 1回で えらべた ${correct}こ` : ''}`
           : kind === 'shooter' && correct ? `${answered}ひきと なかよくなった · 1回でなかまにした ${correct}ひき`
           : kind === 'puyo' && answered ? `たまごを${answered}組つんだ${puyoHatched ? ` · ゴトモンが${puyoHatched}ひき うまれた` : ''}${puyoChain >= 2 ? ` · 最大${puyoChain}れんさ` : ''}`
           : kind === 'bubble' && bubbleBroken ? `泡を${bubbleBroken}こ わった${bubbleFreed ? ` · ゴトモンを${bubbleFreed}ひき たすけた` : ''}`

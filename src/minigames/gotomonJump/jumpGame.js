@@ -17,6 +17,9 @@ export const JUMP_RULES = Object.freeze({
   bigBounceAfter: 2,
   // After a slip, with no steering for this long, the companion drifts to the glowing cloud.
   helpAfterMs: 5000,
+  // A child who reaches the row but chooses no cloud: after this long the answer's cloud glows
+  // (and after helpAfterMs more the companion chooses it; that question then records no result).
+  revealAfterMs: 15000,
   // Moving ledges from this part on, springs from this one; stars and a balloon friend in every part.
   movingFrom: 3, springFrom: 1, stars: 3,
 });
@@ -75,10 +78,15 @@ function buildTower(problems, random, sessionId) {
 // steers it left and right (the tower's sides join). On top of each part waits a row of
 // four clouds, each with a Gotomon holding a plate. Landing on the answer's cloud sends
 // the companion high up to the next part; another cloud puffs away, shows what its
-// plate was, the companion falls back, and the answer's cloud glows. Until the row is
+// plate was, the companion falls back, and the answer's cloud glows. A cloud is the
+// answer only when the child has tapped it (until the landing the choice may change):
+// the companion then glides onto it from as high as the row can be reached. A cloud not
+// chosen is just a ledge, so a landing by a slip of the steering is never an answer (a
+// clumsy bot that knew every answer had 2.8 of 12 recorded wrong before). Until the row is
 // answered nothing above it can be reached. A trampoline at the bottom of the view
 // catches every fall (no game over), and after two falls in a row it bounces the
-// companion up to the clouds. Stars and Gotomon with balloons wait along the way.
+// companion up to the clouds. After a slip and a long rest the companion chooses the
+// glowing cloud by itself. Stars and Gotomon with balloons wait along the way.
 // One learning result per row, on its first cloud; every landing is its own problem id.
 export function createJumpGame({ sessionId, random = Math.random, onEvent = () => {}, content, pace = 'normal' }) {
   const problems = content?.problems ?? null;
@@ -90,8 +98,8 @@ export function createJumpGame({ sessionId, random = Math.random, onEvent = () =
   let active = true, paused = false, notifying = false, observer = onEvent;
   let phase = 'ready', seq = 0, activeElapsedMs = 0, index = 0, tries = 0, landingSerial = 0;
   let tower = null, x = 0.5, y = 0, vy = 0, camera = 0, steer = { dir: 0, toX: null }, idleMs = 0, falls = 0, stuck = 0, best = 0, bounces = 0, goalAt = null;
-  let answered = 0, correct = 0, incorrect = 0, starsTaken = 0, friends = 0, superJumps = 0;
-  let hintPlateId = null, puffed = [], result = null, lastLanding = null, lastPickup = null, aborted = false, completeEmitted = false;
+  let answered = 0, correct = 0, incorrect = 0, starsTaken = 0, friends = 0, superJumps = 0, revealed = false, unanswered = 0, atRowMs = 0;
+  let hintPlateId = null, chosenPlateId = null, puffed = [], result = null, lastLanding = null, lastPickup = null, aborted = false, completeEmitted = false;
   let problem = null, attemptId = null;
   const missed = [];
 
@@ -100,7 +108,7 @@ export function createJumpGame({ sessionId, random = Math.random, onEvent = () =
   const cloudX = i => (i + 0.5) / R.clouds;
   const snapshot = () => Object.freeze({
     gameId: 'gotomonJump', mode: 'jump', sessionId, phase, paused, active, aborted, seq, activeElapsedMs, pace: slow ? 'slow' : 'normal',
-    x, y, vy, camera, rising: vy > 0, goalY: tower?.goalY ?? null, goalAt, hintPlateId, puffed: Object.freeze([...puffed]),
+    x, y, vy, camera, rising: vy > 0, goalY: tower?.goalY ?? null, goalAt, hintPlateId, chosenPlateId, puffed: Object.freeze([...puffed]),
     ledges: Object.freeze((tower?.ledges ?? []).filter(ledge => ledge.y > camera - 0.2 && ledge.y < camera + 1.4)
       .map(ledge => Object.freeze({ ...ledge, locked: ledge.part > index }))),
     row: row() ? Object.freeze({ rowId: row().rowId, part: row().part, y: row().y, plates: Object.freeze(row().plates.map((plate, i) => Object.freeze({ ...plate, x: cloudX(i), gone: puffed.includes(plate.plateId) }))) }) : null,
@@ -128,20 +136,22 @@ export function createJumpGame({ sessionId, random = Math.random, onEvent = () =
   };
   const complete = () => {
     phase = 'completed'; problem = null; attemptId = null; hintPlateId = null;
-    result = Object.freeze({ answered, correct, incorrect, accuracy: answered ? correct / answered : 0, superJumps, stars: starsTaken, friends, finished: true });
+    result = Object.freeze({ answered, correct, incorrect, unanswered, accuracy: answered ? correct / answered : 0, superJumps, stars: starsTaken, friends, finished: true });
     if (!completeEmitted) { completeEmitted = true; notify('sessionComplete', result); }
   };
   // A landing on a cloud of the row: the answer for this try.
   const land = plate => {
-    const item = current(), right = plate.plateId === item.answerId, first = tries === 0;
+    const item = current(), right = plate.plateId === item.answerId, first = tries === 0 && !revealed;
+    if (tries === 0 && revealed) unanswered++;
     const problemId = problem.problemId, committedAttempt = attemptId;
     if (first) { answered++; if (right) correct++; else incorrect++; }
     const answer = item.plates.find(p => p.plateId === item.answerId);
+    chosenPlateId = null;
     lastLanding = Object.freeze({ landing: ++landingSerial, correct: right, first, x: wrap(x), y: row().y, text: plate.text, note: plate.note, answer: answer.text, explain: item.explain, part: index });
     const payload = { attemptId: committedAttempt, contentId: item.contentId, skillId: item.skillId, chosen: plate.plateId };
     stuck = 0;
     if (right) {
-      best = row().y; superJumps++; vy = launch(R.superJump); hintPlateId = null; puffed = []; idleMs = 0;
+      best = row().y; superJumps++; vy = launch(R.superJump); hintPlateId = null; puffed = []; idleMs = 0; revealed = false; atRowMs = 0;
       notify(first ? 'correct' : 'passed', payload, problemId);
       if (index + 1 >= problems.length) { problem = null; attemptId = `${sessionId}:goal`; goalAt = tower.goalY; index++; return; }
       index++; tries = 0; present();
@@ -171,13 +181,21 @@ export function createJumpGame({ sessionId, random = Math.random, onEvent = () =
       ledge.x += ledge.vx * dt;
       if (ledge.x < 0.15 || ledge.x > 0.85) { ledge.vx = -ledge.vx; ledge.x = Math.min(0.85, Math.max(0.15, ledge.x)); }
     }
-    // Sideways: toward the finger, or along the arrow; after a slip, a long rest drifts to the glowing cloud.
+    // Sideways: toward the finger, or along the arrow; after a slip, a long rest chooses the glowing cloud.
     let target = steer.toX;
-    if (steer.dir === 0 && target === null && hintPlateId && idleMs >= R.helpAfterMs && r) target = cloudX(r.plates.findIndex(p => p.plateId === hintPlateId));
-    if (steer.dir !== 0) x += steer.dir * runSpeed * dt;
+    if (steer.dir === 0 && target === null && hintPlateId && idleMs >= R.helpAfterMs && r && !chosenPlateId) chosenPlateId = hintPlateId;
+    // At the row for a long time without a choice (and no answer yet): the answer's cloud glows.
+    if (r && !chosenPlateId && tries === 0 && y >= r.y - 0.35) atRowMs += dt * 1000;
+    if (r && !revealed && tries === 0 && atRowMs >= R.revealAfterMs) { revealed = true; hintPlateId = current().answerId; idleMs = 0; }
+    // A chosen cloud: once the row can be reached, the companion glides onto it.
+    const chosenAt = r && chosenPlateId ? r.plates.findIndex(p => p.plateId === chosenPlateId) : -1;
+    const apexY = y + Math.max(0, vy) ** 2 / (2 * gravity);
+    const gliding = chosenAt >= 0 && apexY >= r.y;
+    if (gliding) target = cloudX(chosenAt);
+    if (steer.dir !== 0 && !gliding) x += steer.dir * runSpeed * dt;
     else if (target !== null) {
       let d = wrap(target) - wrap(x);
-      if (steer.toX === null) { if (d > 0.5) d -= 1; if (d < -0.5) d += 1; }
+      if (steer.toX === null || gliding) { if (d > 0.5) d -= 1; if (d < -0.5) d += 1; }
       x += Math.max(-runSpeed * dt, Math.min(runSpeed * dt, d * 10 * dt));
     }
     x = wrap(x);
@@ -190,7 +208,9 @@ export function createJumpGame({ sessionId, random = Math.random, onEvent = () =
       // Clouds of the row first (they sit above the ledges under them).
       if (r && before >= r.y && y <= r.y) {
         const i = r.plates.findIndex((plate, k) => !puffed.includes(plate.plateId) && across(x, cloudX(k)) <= R.cloudW / 2 + reach * 0.4);
-        if (i >= 0) { y = r.y; land(r.plates[i]); return; }
+        // Only the chosen cloud is an answer; the others hold the companion like a ledge.
+        if (i >= 0 && r.plates[i].plateId === chosenPlateId) { y = r.y; land(r.plates[i]); return; }
+        if (i >= 0) { y = r.y; bounce(y, R.jump); return; }
       }
       for (const ledge of tower.ledges) {
         if (ledge.part > index || before < ledge.y || y > ledge.y) continue;
@@ -248,8 +268,16 @@ export function createJumpGame({ sessionId, random = Math.random, onEvent = () =
       if (![-1, 0, 1].includes(dir) || (toX !== null && !(Number.isFinite(toX) && toX >= 0 && toX <= 1))) return false;
       steer = { dir, toX }; return true;
     },
+    // Taps a cloud of the row as the answer (may change until the landing).
+    choose({ sessionId: s, attemptId: a, plateId } = {}) {
+      if (!active || paused || notifying || phase !== 'answering' || s !== sessionId || a !== attemptId) return false;
+      const r = row();
+      if (!r || !r.plates.some(p => p.plateId === plateId) || puffed.includes(plateId)) return false;
+      chosenPlateId = plateId; idleMs = 0; return true;
+    },
     dispatch(command) {
       if (!command || typeof command !== 'object') return false;
+      if (command.type === 'choose') return this.choose(command.payload);
       if (command.type === 'move') return this.move(command.payload);
       return false;
     },

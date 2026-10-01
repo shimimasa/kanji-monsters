@@ -86,6 +86,21 @@ test('a wrong letter says so and lights the next one; the second wrong letter ma
   assert.equal(events.at(-1).type, 'spelled');
 });
 
+test('a wrong letter met by going straight on is told but not counted; one the snake turned toward is', () => {
+  // Never turn: the snake runs straight and meets whatever lies in its rows; none of it counts.
+  for (const seed of [2, 5, 9]) {
+    const { game } = newSnake({ seed });
+    for (let t = 0; t < 60000 && game.snapshot().phase === 'answering'; t += 16) game.update(16);
+    const s = game.snapshot();
+    if (s.lastSlip) assert.equal(s.lastSlip.counted, false, `seed ${seed}`);
+    assert.equal(s.incorrect, 0, `seed ${seed}: straight runs are no spelling slips`);
+  }
+  // Turning toward wrong letters counts: the second one marks the word missed.
+  const { game, play } = newSnake({ seed: 7 });
+  play(60000, st => st.tokens.find(t => t.letter !== st.next)?.letter);
+  assert.equal(game.snapshot().incorrect, 1);
+});
+
 test('edges wrap and the body can be crossed: the snake never crashes; ゆっくり is slower; pause stops it', () => {
   const { game, turn } = newSnake({ seed: 7 });
   turn('left');

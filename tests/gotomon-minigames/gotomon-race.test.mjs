@@ -16,7 +16,8 @@ function newRace({ seed = 3, mode = 'math', pace = 'normal' } = {}) {
   const answerLane = () => { const s = game.snapshot(); return s.gate.plates.findIndex(p => p.plateId === s.problem.answerId); };
   const toGate = () => { const id = game.snapshot().gate?.gateId; for (let t = 0; t < 30000 && game.snapshot().gate?.gateId === id && game.snapshot().phase === 'answering'; t += 16) game.update(16); };
   // Drives one gate: into the given lane (or the answer's), then through it.
-  const drive = (wrong = false) => { const lane = answerLane(); const to = wrong ? (lane + 1) % R.lanes : lane; if (game.snapshot().lane !== to) assert.equal(steer(to), true); toGate(); };
+  // (A tap chooses the lane for this gate, even the lane already taken.)
+  const drive = (wrong = false) => { const lane = answerLane(); const to = wrong ? (lane + 1) % R.lanes : lane; assert.equal(steer(to), true); toGate(); };
   return { game, events, steer, drive, toGate, answerLane, sessionId };
 }
 
@@ -75,6 +76,33 @@ test('after twelve questions the finish line comes; answering well wins, many sl
       assert.equal(new Set(ids).size, ids.length);
     }
   }
+});
+
+test('a gate reached before any lane was chosen records nothing; the question comes again as a first try', () => {
+  const { game, events, drive, toGate, steer, answerLane } = newRace({ seed: 5 });
+  // Already in the answer's lane by chance, but no tap: not an answer.
+  const lane = answerLane();
+  if (game.snapshot().lane !== lane) { steer(lane); }
+  const first = game.snapshot().problem;
+  // A new gate resets the choice: let one pass without tapping.
+  toGate();
+  let s = game.snapshot();
+  if (s.answered === 0) {
+    assert.equal(s.lastGate.late, true);
+    assert.equal(s.problem.contentId, first.contentId); assert.notEqual(s.problem.problemId, first.problemId);
+    assert.equal(s.hintPlateId, null); assert.equal(s.slowMs, 0);
+  }
+  // Gates without a choice: after two the answer glows, after three the companion takes it; no result is recorded for it.
+  const { game: g2, events: e2 } = newRace({ seed: 6 });
+  const id0 = g2.snapshot().problem.contentId;
+  for (let k = 0; k < 4; k++) { const gid = g2.snapshot().gate.gateId; for (let t = 0; t < 30000 && g2.snapshot().gate?.gateId === gid; t += 16) g2.update(16); }
+  s = g2.snapshot();
+  assert.equal(s.answered, 0);
+  assert.equal(s.problemIndex, 1, 'after three gates without a choice the companion took the answer lane at the fourth');
+  assert.equal(s.result, null);
+  assert.deepEqual(e2.filter(e => ['correct', 'incorrect', 'passed'].includes(e.type)).map(e => e.type), ['passed']);
+  assert.notEqual(s.problem.contentId, id0);
+  void events; void drive;
 });
 
 test('rivals stay near the runner', () => {

@@ -165,10 +165,10 @@ const GOALS = Object.freeze({
       rule: '1回でげいげきするのを5回つなげよう。', hint: '3つの基地の数字を先に見ておこう。', value: data => data.maxCombo },
   ],
   gotomonBreakout: [
-    { id: 'sharp', name: 'ねらいどおり8問', deadline: 99, target: 8,
-      rule: 'ちがうブロックに3回当たる前に、答えのブロックをわろう。', hint: 'パドルのはしで打つと、ななめにねらえるよ。', value: data => data.correct },
-    { id: 'chain', name: '4問連続でねらいどおり', deadline: 99, target: 4,
-      rule: 'ねらいどおりにわるのを4回つなげよう。', hint: '先に答えを出して、ブロックの場所をたしかめてから打とう。', value: data => data.maxCombo },
+    { id: 'sharp', name: '1回でえらぶ8問', deadline: 99, target: 8,
+      rule: '答えのブロックを、1回で タップしよう。', hint: '計算してから、答えの数字を さがそう。', value: data => data.correct },
+    { id: 'chain', name: '4問連続で1回で', deadline: 99, target: 4,
+      rule: '1回で正解を4回つなげよう。', hint: 'あわてず、計算を たしかめてから タップしよう。', value: data => data.maxCombo },
   ],
   gotomonShooter: [
     { id: 'sharp', name: '1回でなかまにする10ひき', deadline: 99, target: 10,

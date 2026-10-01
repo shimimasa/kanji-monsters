@@ -153,7 +153,10 @@ export function createRaceView({ document: doc, dispatch, onBack, getSnapshot, c
   };
   const showGate = state => {
     const gate = state.lastGate, x = laneX(gate.lane);
-    if (gate.correct) {
+    if (gate.late) {
+      fx.pop(x, RUNNER_Y - 18, 'もう一度！', 'soft');
+      note.textContent = state.hintPlateId ? 'まにあわなかった！ 光っている レーンを タップしよう' : 'まにあわなかった！ 次の ゲートで もう一度。レーンを タップして えらぼう';
+    } else if (gate.correct) {
       restartClass(runner, 'rc-hop');
       fx.burst(x, RUNNER_Y - 8, gate.first ? 'great' : 'good', gate.first ? 1.4 : 1.1);
       fx.pop(x, RUNNER_Y - 18, 'ダッシュ！', 'great');

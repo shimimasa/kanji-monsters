@@ -36,7 +36,7 @@ const CSS = `
 @keyframes gs-leave{to{transform:translate(-50%,-260%) scale(.6);opacity:0}}
 @keyframes gs-friend{0%,100%{transform:translate(-50%,-50%)}40%{transform:translate(-50%,-50%) scale(1.25)}}
 `;
-const KIND_TEXT = Object.freeze({ en2ja: 'この英語の意味のふだに ビーム！', ja2en: 'これを英語で言うと？ そのふだに ビーム！', kanji: 'この漢字の読みのふだに ビーム！' });
+const KIND_TEXT = Object.freeze({ en2ja: 'この英語の意味のふだに ビーム！', ja2en: 'これを英語で言うと？ そのふだに ビーム！', kanji: 'この文での 読みのふだに ビーム！' });
 
 export function createShooterView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
   let active = true, lastSeq = -1, lastEventId = 0, waveKey = null, doneShown = false, shownHit = 0, pointer = null, sayWord = '';
@@ -155,7 +155,7 @@ export function createShooterView({ document: doc, dispatch, onBack, getSnapshot
     } else {
       if (item) restartClass(item.node, 'gs-leave');
       const plate = answer.plate;
-      note.textContent = answer.kind === 'kanji' ? `そのふだは「${plate.text}」（${plate.word}の読み）。光っているふだをねらおう`
+      note.textContent = answer.kind === 'kanji' ? `そのふだは「${plate.text}」（${plate.note ?? `${plate.word}の読み`}）。光っているふだをねらおう`
         : `${name ?? 'そのゴトモン'}のふだは「${plate.word} ＝ ${plate.meaning}」だったよ。光っているふだをねらおう`;
     }
     frame.announce(note.textContent);

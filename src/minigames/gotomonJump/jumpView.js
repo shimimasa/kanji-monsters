@@ -17,6 +17,7 @@ const CSS = `
 #gotomonJumpScreen .jp-cloud{width:${R.cloudW * 100}%;height:clamp(40px,9%,64px);margin-bottom:calc(clamp(40px,9%,64px) * -0.55);display:grid;place-items:center;border-radius:40px;background:#fff;box-shadow:0 5px 0 #b8d4ea,inset 0 -6px 0 #e3f0fa;color:#1b2a36;font-size:clamp(14px,2.6vh,24px);font-weight:900;line-height:1.05;text-align:center;padding:0 4px;z-index:3}
 #gotomonJumpScreen .jp-cloud img{position:absolute;left:50%;bottom:78%;width:clamp(34px,7vh,56px);height:clamp(34px,7vh,56px);transform:translateX(-50%);object-fit:contain;filter:drop-shadow(0 3px 2px #0004);animation:jp-bob 1.1s ease-in-out infinite alternate}
 #gotomonJumpScreen .jp-cloud[data-hint=true]{box-shadow:0 5px 0 #1f9d55,0 0 0 5px #37c871,0 0 22px #37c871;animation:jp-glow .7s ease-in-out infinite alternate}
+#gotomonJumpScreen .jp-cloud[data-chosen=true]{box-shadow:0 5px 0 #f59f00,0 0 0 5px #ffd43b,0 0 18px #ffd43b}
 #gotomonJumpScreen .jp-cloud[data-gone=true]{opacity:0;transform:translateX(-50%) scale(1.4);transition:opacity .35s,transform .35s}
 #gotomonJumpScreen .jp-ceiling{left:0!important;right:0;transform:none;height:6px;background:repeating-linear-gradient(90deg,#ff7a7a 0 12%,#ffd166 0 24%,#7ed957 0 36%,#6ac6ff 0 48%,#b48cff 0 60%);opacity:.55;z-index:1}
 #gotomonJumpScreen .jp-star{width:clamp(22px,4.4vh,36px);font-size:clamp(20px,4vh,32px);line-height:1;text-align:center;z-index:2;animation:jp-bob .9s ease-in-out infinite alternate}
@@ -77,7 +78,25 @@ export function createJumpView({ document: doc, dispatch, onBack, getSnapshot, c
     if (!active || state.paused || state.phase !== 'answering') return false;
     return dispatch({ type: 'move', payload: { sessionId: state.sessionId, attemptId: state.attemptId, dir, toX } });
   };
-  on(tower, 'pointerdown', event => { event.preventDefault?.(); held = 'finger'; steer(0, towerX(event)); });
+  // A tap on a cloud chooses it as the answer (the companion glides onto it); elsewhere the finger steers.
+  const choose = plateId => {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'answering') return false;
+    const ok = dispatch({ type: 'choose', payload: { sessionId: state.sessionId, attemptId: state.attemptId, plateId } });
+    if (ok) { note.textContent = 'その雲に きめた！ 相棒が おりていくよ'; frame.announce(note.textContent); }
+    return ok;
+  };
+  const cloudAt = event => cloudNodes.find(node => {
+    if (node.dataset.gone === 'true') return false;
+    const r = node.getBoundingClientRect?.();
+    return r?.width && event.clientX >= r.left - 6 && event.clientX <= r.right + 6 && event.clientY >= r.top - 40 && event.clientY <= r.bottom + 6;
+  });
+  on(tower, 'pointerdown', event => {
+    event.preventDefault?.();
+    const cloud = cloudAt(event);
+    if (cloud) { choose(cloud.dataset.plate); return; }
+    held = 'finger'; steer(0, towerX(event));
+  });
   on(doc, 'pointermove', event => { if (held === 'finger') steer(0, towerX(event)); });
   const release = () => { if (held) { held = null; steer(0, null); arrows.forEach(button => { button.dataset.held = 'false'; }); } };
   on(doc, 'pointerup', release); on(doc, 'pointercancel', release);
@@ -91,12 +110,14 @@ export function createJumpView({ document: doc, dispatch, onBack, getSnapshot, c
     on(button, 'pointerdown', event => { event.preventDefault?.(); held = 'arrow'; button.dataset.held = 'true'; steer(dir, null); });
     pad.append(button); arrows.push(button);
   }
-  const help = el('p', 'jp-help', '塔をゆびで おさえると、そっちへ うごくよ。はしと はしは つながっている！');
+  const help = el('p', 'jp-help', '塔をゆびで おさえると、そっちへ うごくよ。答えの雲は タップして えらぼう！');
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
   dock.append(title, prompt, pad, help, note);
   doc.body.append(root);
 
   removes.push(bindArcadeKeys(doc, event => {
+    const n = Number(event.key);
+    if (n >= 1 && n <= R.clouds) { const plate = getSnapshot().row?.plates[n - 1]; if (plate) choose(plate.plateId); return true; }
     const dir = { ArrowLeft: -1, ArrowRight: 1 }[event.key];
     if (!dir) return false;
     if (!event.repeat) { held = 'key'; steer(dir, null); }
@@ -146,8 +167,9 @@ export function createJumpView({ document: doc, dispatch, onBack, getSnapshot, c
     row.plates.forEach((plate, i) => {
       const node = cloudNodes[i]; if (!node) return;
       at(node, plate.x, row.y, state.camera);
-      const hint = String(plate.plateId === state.hintPlateId), gone = String(plate.gone);
+      const hint = String(plate.plateId === state.hintPlateId), gone = String(plate.gone), chosen = String(plate.plateId === state.chosenPlateId);
       if (node.dataset.hint !== hint) node.dataset.hint = hint;
+      if (node.dataset.chosen !== chosen) node.dataset.chosen = chosen;
       if (node.dataset.gone !== gone) node.dataset.gone = gone;
     });
   };
