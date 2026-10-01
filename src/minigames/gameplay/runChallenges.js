@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonJump: [
+    { id: 'sharp', name: '1回でのる10の雲', deadline: 99, target: 10,
+      rule: '答えの雲に、1回で おりよう。', hint: '雲に とどく前に、答えを きめておこう。', value: data => data.correct },
+    { id: 'chain', name: '4つ連続で1回で', deadline: 99, target: 4,
+      rule: '1回で正解を4回つなげよう。', hint: 'ジャンプの とちゅうで、答えの雲の 上へ うごこう。', value: data => data.maxCombo },
+  ],
   gotomonMaze: [
     { id: 'sharp', name: '1回であける10とびら', deadline: 99, target: 10,
       rule: 'とびらのもんだいに、1回で正解しよう。', hint: 'とびらの前で「とびらからはなれる」を押すと、先に まわりを見られるよ。', value: data => data.correct },
