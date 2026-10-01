@@ -1,3 +1,5 @@
+import { buildTarget } from '../buildReview.js';
+
 export const JUMP_RULES = Object.freeze({
   // Four answer clouds per row, across the tower (x is 0..1 of its width; y is in tower heights, up).
   clouds: 4, cloudW: 0.23,
@@ -159,7 +161,7 @@ export function createJumpGame({ sessionId, random = Math.random, onEvent = () =
     } else {
       // The cloud puffs away and the companion falls through it.
       puffed = [...puffed, plate.plateId]; hintPlateId = item.answerId; idleMs = 0;
-      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: plate.text, explain: item.explain, questionNumber: answered }));
+      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: plate.text, explain: item.explain, build: buildTarget(item), questionNumber: answered }));
       notify(first ? 'incorrect' : 'retry', payload, problemId);
       tries++; present();
     }

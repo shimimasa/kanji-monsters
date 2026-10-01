@@ -30,6 +30,9 @@ const KANA_FILL = 'あいうえおかきくけこさしすせそたちつてと�
 const LETTER_FILL = 'aeioustrnlhdcmpgbfwy';
 const DIGITS = '0123456789';
 const lookalikes = (ch, families) => families.filter(f => f.includes(ch)).flatMap(f => [...f]).filter(c => c !== ch);
+// For other games' practice (組み立てて ふくしゅう): look-alikes of a letter, and the fill letters of a script.
+export const lookalikesOf = (ch, script) => lookalikes(ch, script === 'kana' ? KANA_FAMILIES : script === 'letters' ? LETTER_FAMILIES : []);
+export const fillLetters = script => [...(script === 'kana' ? KANA_FILL : script === 'letters' ? LETTER_FILL : DIGITS)];
 
 // Turns the shared 4-plate questions into words to trace. 漢字: the reading (kana). 英語: the English
 // word, always asked from its meaning (「夜」は英語で？), since a meaning may hold kanji. 算数: the

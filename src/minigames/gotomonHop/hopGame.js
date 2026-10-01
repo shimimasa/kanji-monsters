@@ -1,3 +1,5 @@
+import { buildTarget } from '../buildReview.js';
+
 export const HOP_RULES = Object.freeze({
   // The course: 9 columns, 8 rows from the bottom. Rows: start, two roads, the middle bank,
   // two river lanes, the far bank, and the four homes (one plate each) above it.
@@ -178,7 +180,7 @@ export function createHopGame({ sessionId, random = Math.random, onEvent = () =>
     } else {
       // The home tells its plate and stays shut; the companion stays on the bank in front of it.
       home.gone = true; hintPlateId = item.answerId;
-      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: home.text, explain: item.explain, questionNumber: answered }));
+      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: home.text, explain: item.explain, build: buildTarget(item), questionNumber: answered }));
       notify(first ? 'incorrect' : 'retry', payload, problemId);
       tries++; present();
     }

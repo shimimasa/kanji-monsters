@@ -1,3 +1,5 @@
+import { buildTarget } from '../buildReview.js';
+
 export const LAND_RULES = Object.freeze({
   // A stage is a strip of tiles 9 high; the ground is 2 tiles high. Tile (c, r) covers x c..c+1, y r..r+1.
   rows: 9, base: 2,
@@ -197,7 +199,7 @@ export function createLandGame({ sessionId, random = Math.random, onEvent = () =
       attemptId = `${problemId}:warp`;
     } else {
       door.gone = true; hintPlateId = item.answerId;
-      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: door.text, explain: item.explain, questionNumber: answered }));
+      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: door.text, explain: item.explain, build: buildTarget(item), questionNumber: answered }));
       notify(first ? 'incorrect' : 'retry', payload, problemId);
       tries++; present();
     }

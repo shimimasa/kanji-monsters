@@ -1,3 +1,5 @@
+import { buildTarget } from '../buildReview.js';
+
 export const RACE_RULES = Object.freeze({
   lanes: 4, rivals: 3,
   // Time from one gate to the next at plain speed (normal / ゆっくり), in ms.
@@ -112,7 +114,7 @@ export function createRaceGame({ sessionId, random = Math.random, onEvent = () =
       notify('problemPresented', { skillId: current().skillId, kind: current().kind });
     } else {
       slowMs = slowLength; boostMs = 0; hintPlateId = item.answerId;
-      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: plate.text, explain: item.explain, questionNumber: answered }));
+      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: plate.text, explain: item.explain, build: buildTarget(item), questionNumber: answered }));
       notify(first ? 'incorrect' : 'retry', payload, problemId);
       tries++; late = 0; openGate(at + 1);
     }
