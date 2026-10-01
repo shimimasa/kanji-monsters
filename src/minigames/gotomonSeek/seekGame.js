@@ -1,3 +1,5 @@
+import { buildTarget } from '../buildReview.js';
+
 export const SEEK_RULES = Object.freeze({
   // Hiding places across the scene (x, y as 0..1 of the field), and how many Gotomon hide.
   spots: Object.freeze([
@@ -115,7 +117,7 @@ export function createSeekGame({ sessionId, random = Math.random, onEvent = () =
         notify(first ? 'correct' : 'found', payload);
       } else {
         hider.state = 'wrong'; hintHiderId = answer.hiderId;
-        if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: hider.text, explain: item.explain, questionNumber: answered }));
+        if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: hider.text, explain: item.explain, build: buildTarget(item), questionNumber: answered }));
         notify(first ? 'incorrect' : 'retry', payload);
         const shown = lastTap; tries++; openTry(); lastTap = shown;
       }

@@ -1,3 +1,5 @@
+import { buildTarget } from '../buildReview.js';
+
 export const GOLF_RULES = Object.freeze({
   // The course is W wide and 1 high; the tee is on the left, the four cups on the right.
   W: 1.6, tee: Object.freeze([0.15, 0.5]),
@@ -229,7 +231,7 @@ export function createGolfGame({ sessionId, random = Math.random, onEvent = () =
       // The cup tells its plate and stays shut; the ball goes back to where it was hit from.
       cup.gone = true; hintPlateId = item.answerId;
       ball = { x: from[0], y: from[1], vx: 0, vy: 0 };
-      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: cup.text, explain: item.explain, questionNumber: answered }));
+      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: cup.text, explain: item.explain, build: buildTarget(item), questionNumber: answered }));
       toChoosing();
       notify(first ? 'incorrect' : 'retry', payload, problemId);
       tries++; present();

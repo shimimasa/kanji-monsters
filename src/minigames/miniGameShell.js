@@ -6,6 +6,7 @@ import { createGrowthResult } from './growthResult.js';
 import { friendshipTitle } from './companionGrowth.js';
 import { scoreRank } from './scoreRank.js';
 import { createFindings } from './scenePolish.js';
+import { createBuildReviewPanel } from './buildReviewPanel.js';
 
 // Intro cards are shown once per game per page load; replays start directly.
 const seenIntros = new Set();
@@ -124,7 +125,9 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   stats.className='gt-world-result';
   result.append(rankLabel, portrait, resultName, resultTitle, stats);
   if(findings)result.append(findings.root);
-  result.append(growthResult.root,memoryNotice,challengeResult,nextGoal,resultActions,reward,retrySave);
+  // The run's missed questions, built again from letter cards (games whose missed list carries `build`).
+  const buildReview = createBuildReviewPanel(doc);
+  result.append(growthResult.root,memoryNotice,challengeResult,nextGoal,buildReview.root,resultActions,reward,retrySave);
   shell.append(result);
   const legacyResult = root.querySelector('[class$="-result"]:not(.gt-result)');
   if (legacyResult) legacyResult.classList.add('gt-learning-result');
@@ -274,6 +277,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
           challengeResult.dataset.status = challenge.status;
           nextGoal.textContent = challenge.next;
         }
+        if (reviewing) buildReview.hide(); else buildReview.sync(state.missed, state.sessionId);
         growthResult.update(state.paused ? 0 : dt);
         findings?.update(current.world?.findings);
         resultScore.textContent = `${points} pt`;

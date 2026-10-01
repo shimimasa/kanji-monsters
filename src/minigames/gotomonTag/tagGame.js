@@ -1,3 +1,5 @@
+import { buildTarget } from '../buildReview.js';
+
 export const TAG_RULES = Object.freeze({
   // The field: # wall, . path (with a sparkle), P a pocket at the edge where a plate waits.
   // Loops everywhere and no dead ends, so the chasers can always be dodged.
@@ -136,7 +138,7 @@ export function createTagGame({ sessionId, random = Math.random, onEvent = () =>
       index++; tries = 0;
     } else {
       plate.gone = true; hintPlateId = item.answerId;
-      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: plate.text, explain: item.explain, questionNumber: answered }));
+      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: plate.text, explain: item.explain, build: buildTarget(item), questionNumber: answered }));
       notify(first ? 'incorrect' : 'retry', payload, problemId);
       tries++; present();
     }

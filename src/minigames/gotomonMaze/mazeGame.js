@@ -1,3 +1,5 @@
+import { buildTarget } from '../buildReview.js';
+
 export const MAZE_RULES = Object.freeze({
   size: 7, floors: 3, doorsPerFloor: 4, friendsPerFloor: 2,
   // One step along the maze, and how long a finished floor stays before the next (ms).
@@ -191,7 +193,7 @@ export function createMazeGame({ sessionId, random = Math.random, onEvent = () =
         // The companion steps through the open door.
         player = door.cell; steps++; walkState(); arrive();
       } else {
-        if (first) missed.push(Object.freeze({ contentId: problem.contentId, prompt: problem.prompt, chosen: choice.text, explain: problem.explain, questionNumber: answered }));
+        if (first) missed.push(Object.freeze({ contentId: problem.contentId, prompt: problem.prompt, chosen: choice.text, explain: problem.explain, build: buildTarget(problem), questionNumber: answered }));
         hintChoiceId = problem.correctChoiceId;
         notify(first ? 'incorrect' : 'retry', payload);
         tries++; ask(door);

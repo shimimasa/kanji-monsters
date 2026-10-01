@@ -1,4 +1,5 @@
 import { SLASH_PLATES } from './slashContent.js';
+import { buildTarget } from '../buildReview.js';
 
 // Field coordinates run 0..1 across and down.
 export const SLASH_RULES = Object.freeze({
@@ -95,7 +96,7 @@ export function createSlashGame({ sessionId, random = Math.random, onEvent = () 
     } else {
       ball.state = 'knocked'; ball.vx = (ball.x < 0.5 ? -1 : 1) * 0.0004; ball.vy = Math.max(ball.vy, 0);
       hintPlateId = item.answerId;
-      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: ball.text, explain: item.explain, questionNumber: answered }));
+      if (first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.prompt, chosen: ball.text, explain: item.explain, build: buildTarget(item), questionNumber: answered }));
       notify(first ? 'incorrect' : 'retry', payload);
       // The next try keeps this answer to show what the ball said.
       const shown = lastAnswer; tries++; openTry(); lastAnswer = shown;

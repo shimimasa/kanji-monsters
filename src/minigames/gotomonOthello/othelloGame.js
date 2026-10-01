@@ -1,3 +1,5 @@
+import { buildTarget } from '../buildReview.js';
+
 
 
 export const OTHELLO_RULES = Object.freeze({
@@ -151,7 +153,7 @@ export function createOthelloGame({ sessionId, random = Math.random, onEvent = (
       starNow = right && streak % R.starEvery === 0;
       lastAnswer = Object.freeze({ answer: answered, correct: right, chosen: choice.text, note: choice.note, explain: problem.explain,
         answerText: problem.choices.find(item => item.choiceId === problem.correctChoiceId).text });
-      if (!right) missed.push(Object.freeze({ contentId: problem.contentId, prompt: problem.prompt, chosen: choice.text, explain: problem.explain, questionNumber: answered }));
+      if (!right) missed.push(Object.freeze({ contentId: problem.contentId, prompt: problem.prompt, chosen: choice.text, explain: problem.explain, build: buildTarget(problem), questionNumber: answered }));
       const payload = { attemptId, contentId: problem.contentId, skillId: problem.skillId, chosen: choiceId };
       if (right) { phase = 'placing'; attemptId = `${problem.problemId}:place`; } else rivalTurn(R.afterSlipMs);
       notify(right ? 'correct' : 'incorrect', payload);
