@@ -165,17 +165,17 @@ const hub = {
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'どちらも12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonColoring' ? 'ぬりえになるのは、きみがつかまえたゴトモン（まだいなければ旅で出会ったゴトモン）です。' : definition.id === 'gotomonMerge' ? 'どちらも16問。タイルの数が大きくなると、旅で出会ったゴトモンにかわります。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
     }
-    let mode = definition.id === 'gotomonParts' ? 'easy' : ['gotomonSlash', 'gotomonDrum', 'gotomonRace', 'gotomonLink', 'gotomonSeek', 'gotomonMaze', 'gotomonJump', 'gotomonTag', 'gotomonGolf', 'gotomonHop', 'gotomonLand'].includes(definition.id) ? 'kanji' : 'english';
-    if (['gotomonSlash', 'gotomonDrum', 'gotomonRace', 'gotomonLink', 'gotomonSeek', 'gotomonMaze', 'gotomonJump', 'gotomonTag', 'gotomonGolf', 'gotomonHop', 'gotomonLand'].includes(definition.id)) {
-      const drum = definition.id === 'gotomonDrum', race = definition.id === 'gotomonRace', link = definition.id === 'gotomonLink', seek = definition.id === 'gotomonSeek', maze = definition.id === 'gotomonMaze', jump = definition.id === 'gotomonJump', tag = definition.id === 'gotomonTag', golf = definition.id === 'gotomonGolf', hop = definition.id === 'gotomonHop', land = definition.id === 'gotomonLand';
-      const labelText = drum ? 'たいこのもんだい' : race ? 'レースのもんだい' : link ? 'つなぐもの' : seek ? 'さがすもんだい' : maze ? 'とびらのもんだい' : jump ? '雲のもんだい' : tag ? 'ふだのもんだい' : golf ? '旗のもんだい' : hop ? 'おうちのもんだい' : land ? 'ステージのもんだい' : '切るもんだい';
+    let mode = definition.id === 'gotomonParts' ? 'easy' : ['gotomonSlash', 'gotomonDrum', 'gotomonRace', 'gotomonLink', 'gotomonSeek', 'gotomonMaze', 'gotomonJump', 'gotomonTag', 'gotomonGolf', 'gotomonHop', 'gotomonLand', 'gotomonTrace'].includes(definition.id) ? 'kanji' : 'english';
+    if (['gotomonSlash', 'gotomonDrum', 'gotomonRace', 'gotomonLink', 'gotomonSeek', 'gotomonMaze', 'gotomonJump', 'gotomonTag', 'gotomonGolf', 'gotomonHop', 'gotomonLand', 'gotomonTrace'].includes(definition.id)) {
+      const drum = definition.id === 'gotomonDrum', race = definition.id === 'gotomonRace', link = definition.id === 'gotomonLink', seek = definition.id === 'gotomonSeek', maze = definition.id === 'gotomonMaze', jump = definition.id === 'gotomonJump', tag = definition.id === 'gotomonTag', golf = definition.id === 'gotomonGolf', hop = definition.id === 'gotomonHop', land = definition.id === 'gotomonLand', trace = definition.id === 'gotomonTrace';
+      const labelText = drum ? 'たいこのもんだい' : race ? 'レースのもんだい' : link ? 'つなぐもの' : seek ? 'さがすもんだい' : maze ? 'とびらのもんだい' : jump ? '雲のもんだい' : tag ? 'ふだのもんだい' : golf ? '旗のもんだい' : hop ? 'おうちのもんだい' : land ? 'ステージのもんだい' : trace ? 'なぞるもんだい' : '切るもんだい';
       const label = element(doc, 'label', 'yt-memory-picker', labelText);
       const select = element(doc, 'select'); select.setAttribute('aria-label', labelText);
       for (const [value, text] of [['kanji', link ? '漢字（読み・意味、さいごに行った地方の漢字）' : '漢字の読み（さいごに行った地方の漢字）'], ['english', link ? '英語（英単語と意味）' : '英語（意味・英単語）'], ['math', '算数（たし算・ひき算）']]) {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
       select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', land ? 'どれも12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'どれも12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'どれも12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'どれも12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'どれも12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'どれも12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'どれも12問。いっしょに走るのは相棒、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'どれも12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', trace ? 'どれも12問。漢字は読み、英語は英単語の つづり、算数は 答えの 数字を なぞります。もんだいを 出すのは、きみが旅で出会ったゴトモンたちです。' : land ? 'どれも12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'どれも12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'どれも12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'どれも12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'どれも12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'どれも12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'どれも12問。いっしょに走るのは相棒、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'どれも12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
     }
     if (definition.id === 'gotomonParts') {
       const label = element(doc, 'label', 'yt-memory-picker', 'くみたてる漢字');
@@ -261,7 +261,7 @@ const hub = {
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
         ...(['gotomonToss', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout', 'gotomonMeteor', 'gotomonColoring', 'gotomonMerge'].includes(definition.id) ? { mathLevel } : {}),
         ...(definition.id === 'gotomonDelivery' ? { region } : {}),
-        ...(['gotomonShooter', 'gotomonParts', 'gotomonSlash', 'gotomonDrum', 'gotomonRace', 'gotomonLink', 'gotomonSeek', 'gotomonMaze', 'gotomonJump', 'gotomonTag', 'gotomonGolf', 'gotomonHop', 'gotomonLand'].includes(definition.id) ? { mode } : {}),
+        ...(['gotomonShooter', 'gotomonParts', 'gotomonSlash', 'gotomonDrum', 'gotomonRace', 'gotomonLink', 'gotomonSeek', 'gotomonMaze', 'gotomonJump', 'gotomonTag', 'gotomonGolf', 'gotomonHop', 'gotomonLand', 'gotomonTrace'].includes(definition.id) ? { mode } : {}),
         ...(['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id) ? { stageId } : {}) } });
     }, 'yt-primary'); begin.dataset.action = 'start-game'; begin.disabled = !owned.length;
     const grid = element(doc, 'div', 'yt-picker-grid');

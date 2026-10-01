@@ -16,6 +16,7 @@ const KINDS = Object.freeze({
   slash: { travel: [6000, 9500], label: 'くす玉', unit: 'こ', verb: 'パカッ', skill: 'スラッシュフィーバー', special: 'いっとう両断' },
   coloring: { travel: [5000, 8000], label: 'マス', unit: 'マス', verb: 'ぬった', skill: 'ぬりぬりフィーバー', special: 'ぴったり色' },
   tag: { travel: [8000, 11000], label: 'ふだ', unit: '問', verb: 'とった', skill: 'おにごっこフィーバー', special: 'パワーアップ' },
+  trace: { travel: [9000, 13000], label: 'ことば', unit: '問', verb: 'つくった', skill: 'なぞりフィーバー', special: '⭐3' },
   land: { travel: [9000, 12000], label: 'とびら', unit: '問', verb: 'くぐった', skill: 'ぼうけんフィーバー', special: 'ゴール' },
   hop: { travel: [9000, 12000], label: 'おうち', unit: '問', verb: 'かえった', skill: 'ぴょんぴょんフィーバー', special: 'ただいま' },
   golf: { travel: [9000, 12000], label: 'カップ', unit: 'こ', verb: 'いれた', skill: 'ゴルフフィーバー', special: 'ホールインワン' },
@@ -58,7 +59,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let bonus = 0, correct = 0, answered = 0, quick = 0, streak = 0, feverLeft = 0, charged = false, special = 0;
   let lastEvent = null, eventSerial = 0, completed = false;
   // Some games keep their ending on screen for a moment before the results (the finished picture, the last dance, the finish line, the last board).
-  const HOLD = { coloring: 2600, drum: 1800, race: 1800, merge: 2000, link: 1200, othello: 2200, maze: 1200, jump: 1200, tag: 1000, golf: 1000, hop: 1000, land: 1000 };
+  const HOLD = { coloring: 2600, drum: 1800, race: 1800, merge: 2000, link: 1200, othello: 2200, maze: 1200, jump: 1200, tag: 1000, golf: 1000, hop: 1000, land: 1000, trace: 1000 };
   let holdLeft = HOLD[kind] ?? 0;
   // Photo rally: each correct shot keeps a photo whose stars follow how early it was taken.
   // Proverb detective: every solved case is filed; first-try, pre-hint solves earn the most stars.
@@ -93,6 +94,8 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
   let hopStars = 0, hopFriends = 0;
   // Side-scroller: the stars and friends, read from the Core.
   let landStars = 0, landFriends = 0;
+  // Tracing: the stars and the review round, read from the Core.
+  let traceStars = 0, traceReviewed = 0, traceReviewCorrect = 0;
   const mark = (type, extra = {}) => { lastEvent = Object.freeze({ id: ++eventSerial, type, ...extra }); };
   const progress = () => clamp(elapsed / travelMs, 0, 1);
   return {
@@ -105,6 +108,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
       if (kind === 'bubble' && state?.mode === 'bubble') { bubbleBroken = Math.max(bubbleBroken, (state.popped || 0) + (state.dropped || 0)); bubbleFreed = Math.max(bubbleFreed, state.freed?.length || 0); }
       if (kind === 'race' && state?.mode === 'race' && state.result) racePlace = state.result.place;
       if (kind === 'othello' && state?.mode === 'othello' && state.result) othelloEnd = state.result;
+      if (kind === 'trace' && state?.mode === 'trace') { traceStars = Math.max(traceStars, state.stars || 0); traceReviewed = Math.max(traceReviewed, state.reviewed || 0); traceReviewCorrect = Math.max(traceReviewCorrect, state.reviewCorrect || 0); }
       if (kind === 'land' && state?.mode === 'land') { landStars = Math.max(landStars, state.starsTaken || 0); landFriends = Math.max(landFriends, state.friends || 0); }
       if (kind === 'hop' && state?.mode === 'hop') { hopStars = Math.max(hopStars, state.starsTaken || 0); hopFriends = Math.max(hopFriends, state.friends || 0); }
       if (kind === 'golf' && state?.mode === 'golf') golfHoleInOnes = Math.max(golfHoleInOnes, state.holeInOnes || 0);
@@ -170,6 +174,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
         // Never lead with a zero: a run without hits still reads as time played together.
         summary: kind === 'trip' ? `${correct ? `${correct}問正解` : `${answered}問に挑戦`} · ボスに${bossDamage}ダメージ${bossDamage >= 5 ? ' · ボス撃破！' : ` · あと${5 - bossDamage}でボス撃破`}`
           : kind === 'mole' && correct ? `ゴトモン${correct}匹とハイタッチ${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
+          : kind === 'trace' && answered ? `${answered}問 なぞって つくった · 1回で ${correct}問 · ⭐${traceStars}${traceReviewed ? ` · ふくしゅう ${traceReviewCorrect}/${traceReviewed}` : ''}`
           : kind === 'land' && answered ? `${answered}ステージ クリア · 1回で 答えの とびら ${correct}回 · ⭐${landStars}${landFriends ? ` · なかま ${landFriends}ひき` : ''}`
           : kind === 'hop' && answered ? `${answered}回 わたった · 1回で 答えの おうち ${correct}回 · ⭐${hopStars}${hopFriends ? ` · なかま ${hopFriends}ひき` : ''}`
           : kind === 'golf' && answered ? `${answered}ホール クリア · 1回で 答えの旗 ${correct}こ${golfHoleInOnes ? ` · ホールインワン ${golfHoleInOnes}回` : ''}`
@@ -242,3 +247,4 @@ export const createTagWorld = (effects, options) => createQuizWorld('tag', effec
 export const createGolfWorld = (effects, options) => createQuizWorld('golf', effects, options);
 export const createHopWorld = (effects, options) => createQuizWorld('hop', effects, options);
 export const createLandWorld = (effects, options) => createQuizWorld('land', effects, options);
+export const createTraceWorld = (effects, options) => createQuizWorld('trace', effects, options);
