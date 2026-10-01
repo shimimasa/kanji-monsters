@@ -56,6 +56,12 @@ const GOALS = Object.freeze({
     { id: 'chain', name: '4件連続で1回で解決', deadline: 99, target: 4,
       rule: '容疑者をまちがえずに、4件続けて解決しよう。', hint: 'まよったら、ヒントの意味を読んでから指名しよう。', value: data => data.maxCombo },
   ],
+  gotomonGolf: [
+    { id: 'sharp', name: '1回でえらぶ10の旗', deadline: 99, target: 10,
+      rule: '答えの旗を、1回で えらぼう。', hint: '打つ前なら、旗は えらびなおせるよ。', value: data => data.correct },
+    { id: 'chain', name: '4ホール連続で1回で', deadline: 99, target: 4,
+      rule: '1回で正解を4回つなげよう。', hint: '例文を 読んでから 旗を えらぼう。', value: data => data.maxCombo },
+  ],
   gotomonTag: [
     { id: 'sharp', name: '1回でとる10のふだ', deadline: 99, target: 10,
       rule: '答えのふだを、1回で とろう。', hint: '走りだす前に、答えを きめておこう。', value: data => data.correct },

@@ -170,7 +170,9 @@ export function createGolfGame({ sessionId, random = Math.random, onEvent = () =
       W: R.W, tee: R.tee,
       hole: h ? Object.freeze({ name: h.name, flip: h.flip, walls: h.walls,
         cups: Object.freeze(h.cups.map(({ near, ...cup }) => Object.freeze(cup))),
-        bumpers: Object.freeze(bumpersAt(h, worldMs).map(b => Object.freeze(b))) }) : null,
+        bumpers: Object.freeze(bumpersAt(h, worldMs).map(b => Object.freeze(b))),
+        // The course as stepBall reads it (with the cups above), for the aiming guide's tracePath.
+        course: Object.freeze({ walls: h.walls, bumpers: h.bumpers, movers: h.movers }) }) : null,
       ball: ball ? Object.freeze({ x: ball.x, y: ball.y, moving: phase === 'rolling' }) : null,
       chosenPlateId: chosen?.plateId ?? null, canChoose: (phase === 'choosing' || phase === 'aiming') && !shotSinceChoice,
       shots, totalShots, holeInOnes, helped, hintPlateId, problemIndex: Math.min(index, problems ? problems.length - 1 : 0), total: problems ? problems.length : 0,

@@ -81,6 +81,8 @@ import { createJumpGame } from './gotomonJump/jumpGame.js';
 import { createJumpView } from './gotomonJump/jumpView.js';
 import { createTagGame } from './gotomonTag/tagGame.js';
 import { createTagView } from './gotomonTag/tagView.js';
+import { createGolfGame } from './gotomonGolf/golfGame.js';
+import { createGolfView } from './gotomonGolf/golfView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -322,4 +324,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createJumpGame({ ...context, content: slashContent(context) }), createView: createJumpView }),
   gotomonTag: Object.freeze({ id: 'gotomonTag', title: 'ゴトモンおにごっこ',
     create: context => createTagGame({ ...context, content: slashContent(context) }), createView: createTagView }),
+  gotomonGolf: Object.freeze({ id: 'gotomonGolf', title: 'ゴトモン・ミニゴルフ',
+    create: context => createGolfGame({ ...context, content: slashContent(context) }), createView: createGolfView }),
 });
