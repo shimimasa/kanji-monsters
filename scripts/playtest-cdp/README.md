@@ -41,6 +41,7 @@ npm パッケージは追加していません（Node 22 の fetch / WebSocket �
   | linkbot | 線つなぎ（第3引数 `tap` でタップ→タップ） | つなぐもの math |
   | seekbot | ゴトモンさがし | さがすもんだい math |
   | mazebot | ゴトモン迷路 | とびらのもんだい math |
+  | jumpbot | ゴトモン・ジャンプ（塔を指でおさえたまま動かす） | 雲のもんだい math |
   | othbot | 漢字オセロ（読みは分からないので答えはランダム） | （なし） |
 - 画面幅を変えたら最後に `node cdp.mjs viewport 1280 800` で戻す。
 
