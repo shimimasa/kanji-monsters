@@ -62,6 +62,7 @@ test('a wrong suspect is ruled out, play goes on, and only a first-try solve cou
   }
   assert.deepEqual({ ...game.snapshot().result }, { answered: 10, correct: 6, incorrect: 4, accuracy: .6 });
   assert.equal(game.snapshot().missed.length, 4); assert.equal(game.snapshot().missed[0].tries, 2);
+  assert.ok(game.snapshot().missed.every(m => m.build.answer === m.reading && m.build.prompt === `「${m.text}」の よみは？` && m.build.note.includes(m.meaning)));
   // One learning outcome per case: wrong tries add no extra events.
   assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, 10);
   assert.ok(events.filter(event => event.type === 'incorrect').every(event => event.payload.caseId && event.payload.tries === 2));

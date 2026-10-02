@@ -90,7 +90,7 @@ export function createDrumGame({ sessionId, random = Math.random, onEvent = () =
     note.state = right ? 'hit' : 'miss';
     if (right) { drumCombo++; bestDrumCombo = Math.max(bestDrumCombo, drumCombo); if (grade === 'great') greats++; joined++; } else drumCombo = 0;
     if (first) { answered++; if (right) correct++; else incorrect++; }
-    if (!right && first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.statement, chosen: drum === 'don' ? 'そう' : 'ちがう', explain: item.explain, questionNumber: answered }));
+    if (!right && first) missed.push(Object.freeze({ contentId: item.contentId, prompt: item.statement, chosen: drum === 'don' ? 'そう' : 'ちがう', explain: item.explain, build: item.build ?? null, questionNumber: answered }));
     lastHit = Object.freeze({ hit: hitSerial, noteId: note.noteId, kind: 'quiz', drum, right, grade, quiz: true, first, truth: item.truth,
       statement: item.statement, shown: item.shown, shownNote: item.shownNote, answer: item.answer, explain: item.explain });
     const payload = { attemptId, contentId: item.contentId, skillId: item.skillId, chosen: drum, truth: item.truth };

@@ -1,4 +1,5 @@
 import { buildTossProblems, nearbyNumbers } from '../gotomonToss/tossContent.js';
+import { equationTarget } from '../buildReview.js';
 
 // Board units: 10 wide, 13 tall; the view keeps this shape.
 export const BREAKOUT_RULES = Object.freeze({
@@ -113,7 +114,8 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
     if (right) correct++;
     else {
       incorrect++;
-      missedList.push(Object.freeze({ contentId: current().problemId, question: current().question, answer: current().answer, chosen, questionNumber: answered }));
+      missedList.push(Object.freeze({ contentId: current().problemId, question: current().question, answer: current().answer, chosen, questionNumber: answered,
+        build: equationTarget({ question: current().question, answer: current().answer, others: [chosen] }) }));
     }
     notify(right ? 'correct' : 'incorrect', { attemptId, contentId: current().problemId, skillId: current().skillId, chosen });
   };

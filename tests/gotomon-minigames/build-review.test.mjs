@@ -12,6 +12,13 @@ import { buildPhotoRally } from '../../src/minigames/photoRally/photoRallyConten
 import { createEnglishChoiceGame } from '../../src/minigames/englishChoice/englishChoiceGame.js';
 import { createTimedChoiceGame } from '../../src/minigames/timedChoice/timedChoiceGame.js';
 import { lookalikesOf } from '../../src/minigames/gotomonTrace/traceGame.js';
+import { partsTarget, placeTarget } from '../../src/minigames/buildReview.js';
+import { KANJI_PARTS } from '../../src/minigames/gotomonParts/partsData.js';
+import { PREFECTURES } from '../../src/minigames/gotomonDelivery/prefectures.js';
+import { PROVERB_CASES } from '../../src/minigames/proverbDetective/proverbCases.js';
+import { buildDrumQuestions } from '../../src/minigames/gotomonDrum/drumContent.js';
+import { buildLinkRounds } from '../../src/minigames/gotomonLink/linkContent.js';
+import { linkBuildTarget } from '../../src/minigames/gotomonLink/linkGame.js';
 
 const seeded = seed => () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
 const grade1 = JSON.parse(readFileSync(new URL('../../public/data/kanji_g1_proto.json', import.meta.url), 'utf8'));
@@ -220,4 +227,46 @@ test('for the record: how many questions of each source can come back to build',
     assert.ok(equationTarget({ question: item.question, answer: item.answer })); times++;
   }
   assert.equal(times, 240);
+});
+
+test('the rest: every proverb, kanji-parts row and prefecture can be built, with four other cards on the table', () => {
+  const table = (target, seed) => {
+    const tiles = buildTiles(target, seeded(seed)), rest = [...tiles];
+    for (const ch of target.answer) rest.splice(rest.indexOf(ch), 1);
+    assert.equal(rest.length, R.extra, target.answer); assert.equal(new Set(rest).size, R.extra);
+    assert.ok(rest.every(ch => ![...target.answer].includes(ch)));
+    return tiles;
+  };
+  let longest = 0;
+  for (const [i, item] of PROVERB_CASES.entries()) {
+    const t = readingTarget({ word: item.text, reading: item.reading, note: `いみ：${item.meaning}` });
+    assert.ok(t, item.text); table(t, i + 1); longest = Math.max(longest, [...t.answer].length);
+  }
+  const allParts = [...new Set(KANJI_PARTS.flatMap(item => item.parts))];
+  for (const [i, item] of KANJI_PARTS.entries()) {
+    const t = partsTarget({ ...item, others: [allParts[i % allParts.length]], fill: allParts });
+    assert.ok(t, item.kanji); assert.equal(t.answer, item.parts.join('')); table(t, i + 1);
+  }
+  const names = PREFECTURES.map(p => p.fullName);
+  for (const [i, p] of PREFECTURES.entries()) {
+    const t = placeTarget({ name: 'ゴトモン', fullName: p.fullName, others: names.slice(i, i + 3), fill: names });
+    assert.equal(t.answer, p.fullName); table(t, i + 1);
+  }
+  assert.equal(partsTarget({ kanji: '休', parts: ['亻', '木'], layout: 'x' }), null);
+  console.log(`build review: ${PROVERB_CASES.length} proverbs (longest reading ${longest} kana), ${KANJI_PARTS.length} kanji parts, ${PREFECTURES.length} prefectures`);
+});
+
+test('the rest: the drum and the link game carry what to build for every question that has one', () => {
+  for (const mode of ['kanji', 'english', 'math']) {
+    for (let seed = 1; seed <= 10; seed++) {
+      assert.ok(buildDrumQuestions({ sessionId: 'd', random: seeded(seed), mode, gradeKanji: grade1 }).every(q => q.build?.answer), `drum ${mode}`);
+      for (const round of buildLinkRounds({ random: seeded(seed), mode, gradeKanji: grade1 })) {
+        for (const pair of round.pairs) {
+          const t = linkBuildTarget(round.kind, pair);
+          if (round.kind === 'meaning') assert.equal(t, null);
+          else assert.ok(t?.answer, `${mode} ${round.kind} ${pair.left}`);
+        }
+      }
+    }
+  }
 });

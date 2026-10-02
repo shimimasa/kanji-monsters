@@ -66,6 +66,8 @@ test('a wrong answer comes round once more; the retry is not a second learning r
   assert.equal(hit(rightDrum(questions, note) === 'don' ? 'ka' : 'don'), true);
   let s = game.snapshot();
   assert.equal(s.incorrect, 1); assert.equal(s.missed.length, 1);
+  // The question comes back to build (here 算数: the whole number sentence).
+  assert.equal(s.missed[0].build, questions[note.index].build); assert.ok(s.missed[0].build.answer.endsWith(`=${questions[note.index].answer}`));
   assert.equal(s.lastHit.explain, questions[note.index].explain);
   const again = s.notes.filter(n => n.kind === 'quiz' && n.index === note.index && n.state === 'coming');
   assert.equal(again.length, 1, 'it is queued again');

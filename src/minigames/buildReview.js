@@ -9,15 +9,18 @@ export const BUILD_REVIEW = Object.freeze({
 
 const SIGNS = ['+', '−', '×'];
 const KANA = /^[ぁ-んァ-ヶー]+$/;
-const target = ({ prompt, sentence = null, script, answer, accept = [], decoys = [], explain = null }) => Object.freeze({
-  prompt, sentence: sentence ? Object.freeze({ before: sentence.before ?? '', after: sentence.after ?? '' }) : null, script, answer,
-  accept: Object.freeze([...new Set(accept)].filter(a => a !== answer)), decoys: Object.freeze([...new Set(decoys)]), explain });
+// `note` is a line under the question (a proverb's meaning, a Gotomon's hint); `fill` the cards
+// that fill the table when the decoys run short (default: the script's letters).
+const target = ({ prompt, sentence = null, note = null, script, answer, accept = [], decoys = [], fill = null, explain = null }) => Object.freeze({
+  prompt, sentence: sentence ? Object.freeze({ before: sentence.before ?? '', after: sentence.after ?? '' }) : null, note, script, answer,
+  accept: Object.freeze([...new Set(accept)].filter(a => a !== answer)), decoys: Object.freeze([...new Set(decoys)]),
+  fill: fill ? Object.freeze([...new Set(fill)]) : null, explain });
 
 // 漢字: the reading of a kanji (in its sentence when there is one) or of a word, in kana.
 // `others` are the other choices of the game (their letters go on the table).
-export function readingTarget({ word, reading, sentence = null, others = [] } = {}) {
+export function readingTarget({ word, reading, sentence = null, note = null, others = [] } = {}) {
   if (!word || !KANA.test(reading ?? '')) return null;
-  return target({ prompt: sentence ? `「${word}」は この文で どう読む？` : `「${word}」の よみは？`, sentence, script: 'kana', answer: reading,
+  return target({ prompt: sentence ? `「${word}」は この文で どう読む？` : `「${word}」の よみは？`, sentence, note, script: 'kana', answer: reading,
     decoys: others.flatMap(t => [...String(t ?? '')]).filter(ch => KANA.test(ch)), explain: `「${word}」は「${reading}」` });
 }
 
@@ -41,6 +44,22 @@ export function equationTarget({ question, answer, others = [] } = {}) {
   return target({ prompt: `「${a} ${sign} ${b}」の しきと こたえを ならべよう`, script: 'equation', answer: `${a}${sign}${b}=${value}`,
     accept: sign === '−' ? [] : [`${b}${sign}${a}=${value}`], decoys: others.flatMap(t => [...String(t ?? '')]).filter(ch => /\d/.test(ch)),
     explain: `${a} ${sign} ${b} = ${value}` });
+}
+
+// 漢字パーツ: the two parts of a kanji in the order they are written (left → right,
+// top → bottom, outside → inside). `others` are other parts (the one the child chose first).
+const PART_ORDER = { lr: 'ひだり → みぎ', tb: 'うえ → した', out: 'そと → なか' };
+export function partsTarget({ kanji, reading = null, parts = [], layout, others = [], fill = [] } = {}) {
+  if (!kanji || parts.length !== 2 || !PART_ORDER[layout]) return null;
+  return target({ prompt: `「${kanji}」の パーツを ${PART_ORDER[layout]} の じゅんに ならべよう`, note: reading ? `（${reading}）` : null,
+    script: 'parts', answer: parts.join(''), decoys: others, fill, explain: `${parts.join(' と ')} で「${kanji}」` });
+}
+
+// 都道府県: a prefecture's full name (北海道, 東京都 …) from kanji cards.
+export function placeTarget({ name, fullName, note = null, others = [], fill = [] } = {}) {
+  if (!name || !fullName) return null;
+  return target({ prompt: `${name}の ふるさとは どこ？ 名前を ならべよう`, note, script: 'place', answer: fullName,
+    decoys: others.flatMap(t => [...String(t ?? '')]), fill: fill.flatMap(t => [...String(t ?? '')]), explain: `${name}の ふるさとは ${fullName}` });
 }
 
 // What to build for a missed 4-plate question (the shared problems of the slash game and its kin):
@@ -80,7 +99,7 @@ export function buildTiles(target, random) {
   const add = ch => { if (pick.length < BUILD_REVIEW.extra && ch && !seen.has(ch)) { seen.add(ch); pick.push(ch); } };
   for (const ch of shuffled(answer.flatMap(c => lookOf(c, target.script)), random)) add(ch);
   for (const ch of shuffled(target.decoys, random)) add(ch);
-  for (const ch of shuffled(fillLetters(target.script), random)) add(ch);
+  for (const ch of shuffled(target.fill ?? fillLetters(target.script), random)) add(ch);
   return shuffled([...answer, ...pick], random);
 }
 
@@ -124,7 +143,8 @@ export function createBuildReview({ missed = [], random = Math.random } = {}) {
   return {
     snapshot: () => Object.freeze({
       status, total: items.length, index: at, solved, firstTry, tries,
-      prompt: items[at]?.target.prompt ?? null, sentence: items[at]?.target.sentence ?? null, script: items[at]?.target.script ?? null,
+      prompt: items[at]?.target.prompt ?? null, sentence: items[at]?.target.sentence ?? null, note: items[at]?.target.note ?? null,
+      script: items[at]?.target.script ?? null,
       chosen: items[at]?.chosen ?? null, explain: items[at]?.target.explain ?? null,
       length: items[at] ? answer().length : 0,
       tiles: Object.freeze([...tiles]), placed: Object.freeze([...placed]),

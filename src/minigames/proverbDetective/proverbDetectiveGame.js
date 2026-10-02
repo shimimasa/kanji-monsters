@@ -1,4 +1,5 @@
 import { PROVERB_CASES } from './proverbCases.js';
+import { readingTarget } from '../buildReview.js';
 
 export const DETECTIVE_CASES = 10;
 
@@ -87,7 +88,8 @@ export function createProverbDetectiveGame({ sessionId, random = Math.random, on
       else {
         incorrect++;
         missed.push(Object.freeze({ contentId: problem.contentId, text: problem.text, reading: problem.reading, meaning: problem.meaning,
-          questionNumber: answered, tries: ruledOut.length + 1 }));
+          questionNumber: answered, tries: ruledOut.length + 1,
+          build: readingTarget({ word: problem.text, reading: problem.reading, note: `いみ：${problem.meaning}` }) }));
       }
       lastAnswer = Object.freeze({ attemptId: committedAttempt, choiceId, correctChoiceId: problem.correctChoiceId, correct: firstTry,
         tries: ruledOut.length + 1 });

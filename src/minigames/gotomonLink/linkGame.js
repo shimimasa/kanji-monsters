@@ -1,3 +1,11 @@
+import { readingTarget, wordTarget, equationTarget } from '../buildReview.js';
+
+// The 「もじを ならべて ふくしゅう」 of a missed line: 漢字 readings in their sentence, English words
+// from their meaning, sums as the whole number sentence. Meanings of kanji are not built.
+export const linkBuildTarget = (kind, pair) => kind === 'reading' ? readingTarget({ word: pair.left, reading: pair.right, sentence: pair.sentence })
+  : kind === 'meaning' ? null : kind.startsWith('words') ? wordTarget({ word: pair.left, meaning: pair.right })
+  : equationTarget({ question: pair.left, answer: pair.right });
+
 function take(random) {
   const value = random();
   if (!Number.isFinite(value) || value < 0 || value >= 1) throw new RangeError('random must be in [0, 1)');
@@ -97,7 +105,8 @@ export function createLinkGame({ sessionId, random = Math.random, onEvent = () =
       if (fits) { left.linked = true; right.linked = true; left.hint = false; joined++; }
       else {
         left.hint = true;
-        if (first) missed.push(Object.freeze({ contentId: pair.contentId, prompt: left.text, chosen: right.text, explain: pair.explain, questionNumber: answered }));
+        if (first) missed.push(Object.freeze({ contentId: pair.contentId, prompt: left.text, chosen: right.text, explain: pair.explain, questionNumber: answered,
+          build: linkBuildTarget(round().kind, pair) }));
       }
       notify(first ? (fits ? 'correct' : 'incorrect') : (fits ? 'joined' : 'retry'), payload, problemId);
       if (lefts.every(item => item.linked)) { phase = 'cleared'; clearMs = LINK_CLEAR_MS; problem = null; attemptId = null; return true; }

@@ -75,6 +75,9 @@ test('a wrong base is one learning result; the part comes back and the partner g
   const want = partnerColumn(), wrong = (want + 1) % R.columns;
   act('move', { column: wrong }); act('drop');
   assert.equal(game.snapshot().lastAnswer.correct, false); assert.equal(events.at(-1).type, 'incorrect');
+  const slip = game.snapshot().missed.at(-1), made = game.snapshot().lastAnswer;
+  assert.equal(slip.build.answer, made.parts.join('')); assert.equal(slip.build.script, 'parts');
+  assert.ok(slip.build.decoys.includes(slip.chosen), 'the part dropped on comes back as a card');
   next();
   const s = game.snapshot();
   assert.equal(s.phase, 'answering'); assert.equal(s.hintColumn, want); assert.equal(s.falling.y, R.startY);
