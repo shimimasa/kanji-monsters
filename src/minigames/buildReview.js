@@ -11,8 +11,11 @@ const SIGNS = ['+', '−', '×'];
 const KANA = /^[ぁ-んァ-ヶー]+$/;
 // `note` is a line under the question (a proverb's meaning, a Gotomon's hint); `fill` the cards
 // that fill the table when the decoys run short (default: the script's letters).
-const target = ({ prompt, sentence = null, note = null, script, answer, accept = [], decoys = [], fill = null, explain = null }) => Object.freeze({
+// `frame` (proverbs): the written kana stay in place and only the kanji's readings are built —
+// [{ kanji: '能', size: 2 }, { kana: 'ある' }, …]; `answer` is then the built letters alone.
+const target = ({ prompt, sentence = null, note = null, script, answer, accept = [], decoys = [], fill = null, explain = null, frame = null }) => Object.freeze({
   prompt, sentence: sentence ? Object.freeze({ before: sentence.before ?? '', after: sentence.after ?? '' }) : null, note, script, answer,
+  frame: frame ? Object.freeze(frame.map(part => Object.freeze({ ...part }))) : null,
   accept: Object.freeze([...new Set(accept)].filter(a => a !== answer)), decoys: Object.freeze([...new Set(decoys)]),
   fill: fill ? Object.freeze([...new Set(fill)]) : null, explain });
 
@@ -53,6 +56,37 @@ export function partsTarget({ kanji, reading = null, parts = [], layout, others 
   if (!kanji || parts.length !== 2 || !PART_ORDER[layout]) return null;
   return target({ prompt: `「${kanji}」の パーツを ${PART_ORDER[layout]} の じゅんに ならべよう`, note: reading ? `（${reading}）` : null,
     script: 'parts', answer: parts.join(''), decoys: others, fill, explain: `${parts.join(' と ')} で「${kanji}」` });
+}
+
+// The ways to give each kanji run of `text` a part of `reading`, keeping the written kana in place
+// (猫に小判 / ねこにこばん → [ねこ, こばん]). Usually only one; 鬼に金棒 has two (お|にかなぼう, おに|かなぼう).
+const HIRA = /^[ぁ-んー]+$/;
+export function kanjiSplits(text, reading) {
+  const runs = String(text ?? '').match(/[ぁ-んー]+|[^ぁ-んー]+/g) ?? [], out = [];
+  const go = (i, at, acc) => {
+    if (out.length > 8) return;
+    if (i === runs.length) { if (at === reading.length) out.push(acc); return; }
+    if (HIRA.test(runs[i])) { if (reading.startsWith(runs[i], at)) go(i + 1, at + runs[i].length, acc); return; }
+    for (let end = at + 1; end <= reading.length; end++) go(i + 1, end, [...acc, reading.slice(at, end)]);
+  };
+  go(0, 0, []);
+  return { runs, ways: out };
+}
+
+// ことわざ: its reading, built only where kanji are written (能ある鷹は爪を隠す → □□ある□□は□□を□□す),
+// with the meaning under the question. `split` settles a proverb that can be split two ways.
+// Without one clear split the whole reading is built.
+export function proverbTarget({ text, reading, meaning = null, split = null } = {}) {
+  const note = meaning ? `いみ：${meaning}` : null;
+  const whole = readingTarget({ word: text, reading, note });
+  if (!whole) return null;
+  const { runs, ways } = kanjiSplits(text, reading);
+  const way = ways.length === 1 ? ways[0] : ways.find(w => split && w.join('/') === split.join('/'));
+  if (!way || runs.every(r => HIRA.test(r))) return whole;
+  let k = 0;
+  const frame = runs.map(r => (HIRA.test(r) ? { kana: r } : { kanji: r, size: [...way[k++]].length }));
+  return target({ prompt: `「${text}」の よみは？ 漢字の ところを ならべよう`, note, script: 'kana', answer: way.join(''), frame,
+    explain: `「${text}」は「${reading}」` });
 }
 
 // 都道府県: a prefecture's full name (北海道, 東京都 …) from kanji cards.
@@ -144,6 +178,7 @@ export function createBuildReview({ missed = [], random = Math.random } = {}) {
     snapshot: () => Object.freeze({
       status, total: items.length, index: at, solved, firstTry, tries,
       prompt: items[at]?.target.prompt ?? null, sentence: items[at]?.target.sentence ?? null, note: items[at]?.target.note ?? null,
+      frame: items[at]?.target.frame ?? null,
       script: items[at]?.target.script ?? null,
       chosen: items[at]?.chosen ?? null, explain: items[at]?.target.explain ?? null,
       length: items[at] ? answer().length : 0,

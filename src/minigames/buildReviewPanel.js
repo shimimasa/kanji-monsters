@@ -3,6 +3,13 @@ import { createBuildReview } from './buildReview.js';
 
 // The result screen's 「もじを ならべて ふくしゅう」: the run's missed questions once more, built
 // from letter cards (createBuildReview). It opens only when the child asks; nothing is recorded.
+// A proverb's built letters sit under their kanji (frame); the written kana stay in place.
+const letterAt = (frame, k) => {
+  for (const part of frame) if (part.kanji) { if (k < part.size) return { kanji: part.kanji, at: k + 1 }; k -= part.size; }
+  return null;
+};
+const spellOut = (frame, letters) => { let k = 0; const list = [...letters]; return frame.map(p => p.kana ?? list.slice(k, k += p.size).join('')).join(''); };
+
 export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
   const root = element(doc, 'section', 'gt-build-review'); root.hidden = true;
   root.setAttribute('aria-label', 'もじを ならべて ふくしゅう');
@@ -35,14 +42,24 @@ export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
     sentence.replaceChildren(...(s.sentence ? [element(doc, 'span', '', s.sentence.before), element(doc, 'b', '', s.prompt.match(/「(.+?)」/)?.[1] ?? ''), element(doc, 'span', '', s.sentence.after)] : []));
     // A number sentence (6+9=15) is counted in cards, kanji parts in pieces, a word in letters.
     const unit = s.script === 'equation' ? '番目' : s.script === 'parts' ? 'つ目' : '文字目';
-    root.dataset.script = s.script ?? '';
-    slots.replaceChildren(...Array.from({ length: s.length }, (_, k) => {
+    root.dataset.script = s.script ?? ''; root.dataset.frame = String(!!s.frame);
+    const where = k => { const w = s.frame && letterAt(s.frame, k); return w ? `「${w.kanji}」の ${w.at}文字目` : `${k + 1}${unit}`; };
+    const spell = letters => (s.frame ? spellOut(s.frame, letters) : letters);
+    const made = Array.from({ length: s.length }, (_, k) => {
       const filled = k < s.placed.length;
       const slot = button(doc, filled ? s.tiles[s.placed[k]] : '', () => { if (review.unplace(k)) render(); }, 'gt-build-slot');
       slot.disabled = !filled || s.status !== 'building';
-      slot.setAttribute('aria-label', filled ? `${k + 1}${unit} ${s.tiles[s.placed[k]]}（おすと もどす）` : `${k + 1}${unit}`);
+      slot.setAttribute('aria-label', filled ? `${where(k)} ${s.tiles[s.placed[k]]}（おすと もどす）` : where(k));
       return slot;
-    }));
+    });
+    let at = 0;
+    slots.replaceChildren(...(!s.frame ? made : s.frame.map(part => {
+      if (part.kana) return element(doc, 'span', 'gt-build-fixed', part.kana);
+      const group = element(doc, 'span', 'gt-build-group'), row = element(doc, 'span', 'gt-build-group-slots');
+      row.append(...made.slice(at, at += part.size));
+      group.append(element(doc, 'span', 'gt-build-kanji', part.kanji), row);
+      return group;
+    })));
     tiles.replaceChildren(...s.tiles.map((ch, k) => {
       const tile = button(doc, ch, () => { if (review.place(k)) { render(); focusFirst(); } }, 'gt-build-tile');
       tile.disabled = s.placed.includes(k) || s.status !== 'building';
@@ -51,7 +68,7 @@ export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
     }));
     const last = s.last;
     say.textContent = s.status === 'solved' ? `できた！ ${s.explain ?? `「${s.shownAnswer}」`}`
-      : last && !last.correct ? `「${last.word}」ではなかったよ。${last.wrongAt}${unit}は「${last.expected}」。光る カードから つづけよう${s.shownAnswer ? `（こたえ：${s.shownAnswer}）` : ''}`
+      : last && !last.correct ? `「${spell(last.word)}」ではなかったよ。${where(last.wrongAt - 1)}は「${last.expected}」。光る カードから つづけよう${s.shownAnswer ? `（こたえ：${spell(s.shownAnswer)}）` : ''}`
       : s.placed.length === 0 && s.chosen ? `ゲームでは「${s.chosen}」をえらんだよ。カードを じゅんに おそう` : '';
     next.hidden = s.status !== 'solved';
     next.textContent = s.index + 1 < s.total ? 'つぎへ' : 'おわる';
