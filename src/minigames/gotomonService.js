@@ -12,6 +12,7 @@ import { hubSections } from './hubCatalog.js';
 import { secretsFor, openedSecrets } from './companionSecrets.js';
 import { titleProgress, earnedTitleIds, newTitles } from './companionTitles.js';
 import { stickerSummary } from './companionStickers.js';
+import { typeOf } from './gotomonTypes.js';
 
 // The sticker book's slots: every game in the square (the crown asks for all of them).
 const GAME_COUNT = new Set(hubSections('all').flatMap(section => section.games)).size;
@@ -39,7 +40,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     if (!data) return { id, name: id, imageUrl: null };
     const folder = getBonusMonsterFolder(id) || folders[data.grade] || folders[1];
     return { id, name: data.name || id, imageUrl: `/assets/images/monsters/full/${folder}/${id}.webp`,
-      category: data.category || '', support: supportStyle(data.category),
+      category: data.category || '', support: supportStyle(data.category), type: typeOf(data),
       // きせかえ: what it wears now (drawn over its picture everywhere it appears).
       outfit: wornItems(companions?.[id], { gameCount: GAME_COUNT }) };
   };

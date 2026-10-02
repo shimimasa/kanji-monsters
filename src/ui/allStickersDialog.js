@@ -1,4 +1,4 @@
-import { element, button, companionPortrait } from './adventureUI.js';
+import { element, button, companionPortrait, typeChip } from './adventureUI.js';
 import { OUTFIT_ITEMS } from '../minigames/companionOutfits.js';
 
 const PAGE = 30;
@@ -42,6 +42,7 @@ export function createAllStickersDialog({ doc, service, selectedId, onOpenBook, 
       const body = element(doc, 'div', 'yt-all-body');
       body.append(element(doc, 'strong', '', `${card.gotomon.name}${card.gotomon.id === selectedId ? '（いまの相棒）' : ''}`),
         element(doc, 'small', '', `Lv${card.level} · なかよし ${card.friendship}`), chips);
+      chips.prepend(typeChip(doc, card.gotomon.type));
       const actions = element(doc, 'div', 'yt-all-actions');
       const open = button(doc, 'シール帳', () => onOpenBook?.(card.gotomon), 'yt-all-open'); open.dataset.action = 'open-book';
       actions.append(open);

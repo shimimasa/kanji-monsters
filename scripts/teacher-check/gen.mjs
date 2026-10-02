@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { PROVERB_CASES } from '../../src/minigames/proverbDetective/proverbCases.js';
 import { PROVERB_SPLITS } from '../../src/minigames/proverbDetective/proverbDetectiveGame.js';
 import { proverbTarget } from '../../src/minigames/buildReview.js';
+import { typeOf, typeInfo } from '../../src/minigames/gotomonTypes.js';
 // Minimal CSV parser (quoted fields, BOM).
 const csv = url => {
   const path = url;
@@ -25,7 +26,14 @@ const proverbs = PROVERB_CASES.map((p, i) => {
   const frame = t.frame.map(part => part.kana ? { kana: part.kana } : { kanji: part.kanji, yomi: letters.slice(k, k += part.size).join('') });
   return { id: `p-${pad(i + 1, 2)}`, caseId: p.id, text: p.text, reading: p.reading, frame, byHand: !!PROVERB_SPLITS[p.id] };
 });
-const data = { reading, hints, parts, proverbs };
+// タイプ分け: every Gotomon once (the data files overlap), in id order so the ids stay put.
+const monsters = new Map();
+for (const file of ['enemies_proto', 'enemies_legend', 'enemy_world']) {
+  for (const m of JSON.parse(readFileSync(new URL(`../../public/data/${file}.json`, import.meta.url), 'utf8')).flat(Infinity)) if (m?.id && !monsters.has(m.id)) monsters.set(m.id, m);
+}
+const types = [...monsters.values()].sort((a, b) => a.id.localeCompare(b.id)).map((m, i) => ({ id: `t-${pad(i + 1, 4)}`, mid: m.id, name: m.name, pref: m.prefecture ?? '',
+  category: m.category ?? '', type: typeInfo(typeOf(m)).name, color: typeInfo(typeOf(m)).color, desc: String(m.desc ?? '').slice(0, 60) }));
+const data = { reading, hints, parts, proverbs, types };
 writeFileSync(new URL('./data.json', import.meta.url), JSON.stringify(data));
-console.log(reading.length, hints.length, parts.length, proverbs.length, JSON.stringify(data).length);
+console.log(reading.length, hints.length, parts.length, proverbs.length, types.length, JSON.stringify(data).length);
 console.log(JSON.stringify(reading[0]), JSON.stringify(hints[0]), JSON.stringify(parts[0]), JSON.stringify(proverbs[10]));

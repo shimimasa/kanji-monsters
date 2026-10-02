@@ -1,4 +1,4 @@
-import { element, button, companionPortrait } from './adventureUI.js';
+import { element, button, companionPortrait, typeChip } from './adventureUI.js';
 import { stickerSummary } from '../minigames/companionStickers.js';
 import { OUTFIT_ITEMS, OUTFIT_SLOTS, SLOT_NAMES } from '../minigames/companionOutfits.js';
 import Speech from '../audio/speech.js';
@@ -17,6 +17,7 @@ export function createStickerBookDialog({ doc, service, gotomon, sections, games
   for (const [label, value] of [['シール', `${sum.total} / ${ids.length}`], ['金', sum.gold], ['がんばり', sum.review]]) {
     counts.append(element(doc, 'span', '', `${label} ${value}`));
   }
+  counts.append(typeChip(doc, gotomon.type));
   who.append(companionPortrait(doc, gotomon), counts);
   const how = element(doc, 'p', 'yt-note', `${gotomon.name}と ミニゲームを さいごまで あそぶと 銀シール、ランク A 以上で 金シール。` +
     'まちがえた問題の「もじを ならべて ふくしゅう」を さいごまで やると、シールに にじの ふちが つくよ。');

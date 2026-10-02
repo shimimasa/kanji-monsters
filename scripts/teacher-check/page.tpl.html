@@ -116,9 +116,10 @@ const KINDS = {
   reading: { label: '例文の読み', about: '写真ラリーなどで「この文で どう読む？」と出す603文です。［ ］の漢字を、その読みで読むかを見てください。まちがいなら正しい読みを書いてください。', grades: true },
   proverbs: { label: 'ことわざの分け方', about: 'ことわざのふくしゅうで、漢字ごとにどこまで読むかを分けています（赤い字が漢字の下に出す読み）。「手で決めた」の3つは、ことばの切れ目から分け方を決めました。', grades: false },
   parts: { label: '漢字パーツ', about: '漢字パーツ落としで使う、2つのパーツの組み合わせです。パーツ・ならび方・読みを見てください。', grades: true },
+  types: { label: 'ゴトモンのタイプ', about: 'ゴトモンを7タイプ（たべもの・しぜん・でんせつ・まつり・れきし・ものづくり・ふしぎ）に、データの「カテゴリ」の言葉で分けました。タイプは本編の相性とミニゲームの「とくいタイプ」に使います。ちがうと思ったら「直す」に正しいタイプを書いてください。', grades: false },
   hints: { label: '宅配便のヒント', about: 'ゴトモン宅配便で「ふるさと」を当てるヒントです（〇〇がふるさとの名前）。内容が正しく、子どもに出してよいかを見てください。', grades: false },
 };
-const ORDER = ['reading', 'proverbs', 'parts', 'hints'];
+const ORDER = ['reading', 'proverbs', 'parts', 'hints', 'types'];
 const PAGE = 40;
 const store = (() => { try { return window.localStorage; } catch { return null; } })();
 const remember = (k, v) => { try { store?.setItem('yt-check-' + k, v); } catch {} };
@@ -146,6 +147,11 @@ const view = {
     html: `<div class="meta"><span>小${k.grade}</span><span class="num">${k.id}</span><span>${esc(k.layout)}</span></div>
       <div class="big">${esc(k.a)} ＋ ${esc(k.b)} ＝ ${esc(k.kanji)}</div>
       <div class="yomi">表示する読み：<b>${esc(k.reading)}</b></div>` }),
+  types: t => ({ label: `${t.name}（${t.type}）`, find: t.name + t.category + t.type + t.pref + t.mid,
+    html: `<div class="meta"><span class="num">${t.id}</span><span>${esc(t.mid)}</span><span>${esc(t.pref)}</span></div>
+      <div class="big">${esc(t.name)}</div>
+      <div class="yomi">カテゴリ「${esc(t.category || 'なし')}」 → <b style="background:${t.color};color:#1c1c1c;border-radius:6px;padding:0 6px">${esc(t.type)}</b></div>
+      <div class="small">${esc(t.desc)}</div>` }),
   hints: h => ({ label: `${h.pref}・${h.name}`, find: h.pref + h.name + h.hint + h.home,
     html: `<div class="meta"><span>${esc(h.pref)}</span><span class="num">${h.id}</span><span>${esc(h.name)}</span></div>
       <div>ヒント：${esc(h.hint)}</div>

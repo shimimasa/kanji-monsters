@@ -1,8 +1,16 @@
+import { GOTOMON_TYPES } from '../minigames/gotomonTypes.js';
+const TYPE_LABELS = Object.fromEntries(GOTOMON_TYPES.map(type => [type.id, type]));
 export function element(doc, tag, className = '', text = '') {
   const node = doc.createElement(tag); node.className = className; node.textContent = text; return node;
 }
 export function button(doc, text, action, className = '') {
   const node = element(doc, 'button', className, text); node.type = 'button'; node.onclick = action; return node;
+}
+// A Gotomon's type as a small coloured chip (たべもの・しぜん…).
+export function typeChip(doc, type, prefix = '') {
+  const chip = element(doc, 'span', 'yt-type-chip', `${prefix}${TYPE_LABELS[type]?.name ?? 'ふしぎ'}`);
+  chip.dataset.type = type ?? 'odd'; chip.style.background = TYPE_LABELS[type]?.color ?? '#d6d6d6';
+  return chip;
 }
 export function companionPortrait(doc, gotomon, className = '') {
   const frame = element(doc, 'span', `gt-portrait ${className}`);

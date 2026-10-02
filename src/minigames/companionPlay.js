@@ -1,5 +1,6 @@
 import { growthStatus, supportPoints } from './companionGrowth.js';
 import { createGameplayRun } from './gameplay/gameplayRun.js';
+import { FAVOURED_CHARGE } from './gotomonTypes.js';
 
 // What an answer event was, for the run's feedback and the playtest log: an enemy that reached
 // the barrier or the gate (けいさんインベーダー・漢字防衛隊, reason 'escaped') is a time-out,
@@ -9,7 +10,7 @@ export const answerKind = event => event?.type === 'incorrect'
   : event?.type;
 
 // Consumes committed events; never supplies answers or changes learning rules.
-export function createCompanionPlay(sessionId, { gameId, growth = growthStatus(), support = 'steady', bestTimeMs = null, course = null, pace = 'normal' } = {}) {
+export function createCompanionPlay(sessionId, { gameId, growth = growthStatus(), support = 'steady', bestTimeMs = null, course = null, pace = 'normal', favoured = false } = {}) {
   let seq = 0, correct = 0, combo = 0, maxCombo = 0, gauge = 0, bonus = 0, boosts = 0;
   let reaction = 'idle', remaining = 0, completed = false, revision = 0;
   let answered = 0, learningPoints = 0, recovering = false;
@@ -26,7 +27,7 @@ export function createCompanionPlay(sessionId, { gameId, growth = growthStatus()
       seq = event.seq;
       if (event.type === 'correct') {
         correct++; answered++; learningPoints += 100; combo++; maxCombo = Math.max(maxCombo, combo);
-        gauge = Math.min(4, gauge + growth.effects.charge);
+        gauge = Math.min(4, gauge + growth.effects.charge * (favoured ? FAVOURED_CHARGE : 1));
         if (combo > 2) recovering = false;
         world?.answer(true, event.payload, combo);
         reaction = 'correct'; remaining = 800; revision++;
@@ -55,7 +56,7 @@ export function createCompanionPlay(sessionId, { gameId, growth = growthStatus()
     },
     snapshot() {
       const scene = world?.snapshot(), totalBonus = bonus + (scene?.bonus || 0);
-      return { correct, answered, combo, maxCombo, gauge, bonus:totalBonus, boosts, reaction, revision,
+      return { correct, answered, combo, maxCombo, gauge, bonus:totalBonus, boosts, reaction, revision, favoured,
         learningPoints, score:learningPoints+totalBonus, completed, growth, skillPoints:skillPoints(), world:scene };
     },
   };
