@@ -10,6 +10,8 @@ import { recordSticker, markStickerReview } from './companionStickers.js';
 import { outfitProgress, wornItems, outfitItem, OUTFIT_SLOTS } from './companionOutfits.js';
 import { hubSections } from './hubCatalog.js';
 import { secretsFor, openedSecrets } from './companionSecrets.js';
+import { titleProgress, earnedTitleIds, newTitles } from './companionTitles.js';
+import { stickerSummary } from './companionStickers.js';
 
 // The sticker book's slots: every game in the square (the crown asks for all of them).
 const GAME_COUNT = new Set(hubSections('all').flatMap(section => section.games)).size;
@@ -72,6 +74,19 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     getStickers: id => getProgress().companions?.[id]?.stickers ?? {},
     // ひみつノート: what this companion tells, by なかよし.
     getSecrets: id => secretsFor(lookup(id), getProgress().companions?.[id]),
+    // がんばりの称号: the child's titles over every companion.
+    getTitles: () => titleProgress(getProgress().companions),
+    // みんなのシール帳: how far each owned companion has come (stickers, きせかえ, ひみつ).
+    getCompanionCards() {
+      const companions = getProgress().companions ?? {};
+      return getOwnedGotomon().map(gotomon => {
+        const friend = companions[gotomon.id], secrets = secretsFor(lookup(gotomon.id), friend);
+        return Object.freeze({ gotomon, level: growthStatus(friend).level, friendship: count(friend?.friendship), stickers: stickerSummary(friend?.stickers),
+          outfits: Object.values(outfitProgress(friend, { gameCount: GAME_COUNT })).filter(p => p.unlocked).length,
+          secrets: secrets.filter(s => s.open).length, secretTotal: secrets.length });
+      });
+    },
+    gameCount: GAME_COUNT,
     getOutfit: id => ({ chosen: { ...(getProgress().companions?.[id]?.outfit ?? {}) },
       progress: outfitProgress(getProgress().companions?.[id], { gameCount: GAME_COUNT }) }),
     // Puts an opened item on (or takes the place's item off with null).
@@ -123,6 +138,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         game.bestScore = Math.max(previousBest, points); game.plays = count(game.plays) + 1;
         game.lastSessionId = sessionId; game.bestCombo = Math.max(count(game.bestCombo), count(maxCombo));
         game.recentSessionIds = [...(Array.isArray(game.recentSessionIds) ? game.recentSessionIds : []), sessionId].slice(-64);
+        const titlesBefore = earnedTitleIds(progress.companions);
         const friend = progress.companions[gotomonId] ??= { plays: 0, friendship: 0, medals: [] };
         const before = growthStatus(friend), rank = scoreRank(gameId, points, count(correct));
         const outfitBefore = outfitProgress(friend, { gameCount: GAME_COUNT });
@@ -181,6 +197,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
           before, after, earnedXP: after.xp - before.xp, levelUp: after.level > before.level, rank,
           memory, sticker, newPhotos, newCases, journeyBest,
           // きせかえ opened by this run (a sticker, a level or なかよし).
+          newTitles: newTitles(titlesBefore, progress.companions),
           newSecrets: openedSecrets(lookup(gotomonId), { friendship: friendshipBefore }, friend),
           newOutfits: Object.entries(outfitProgress(friend, { gameCount: GAME_COUNT })).filter(([id, p]) => p.unlocked && !outfitBefore[id].unlocked).map(([id]) => id),
           bestTimeMs:game.bestTimeMs??null,previousTimeMs:previousTime,newTimeBest:validTime&&(!previousTime||roundedTime<previousTime) };
@@ -193,12 +210,14 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     markReviewSticker({ owner, sessionId } = {}) {
       const run = reviewable.get(sessionId);
       if (!run || !owner || owner !== run.owner || owner !== read()?.owner) return { ok: false };
-      let mark = false;
+      let mark = false, titles = [];
       const outcome = save(snapshot => {
-        mark = markStickerReview(snapshot.player.miniGames?.companions?.[run.gotomonId], run.gameId);
+        const companions = snapshot.player.miniGames?.companions, had = earnedTitleIds(companions);
+        mark = markStickerReview(companions?.[run.gotomonId], run.gameId);
+        titles = newTitles(had, companions);
       });
       if (outcome.ok) reviewable.delete(sessionId);
-      return { ...outcome, mark: outcome.ok && mark, gameId: run.gameId };
+      return { ...outcome, mark: outcome.ok && mark, newTitles: outcome.ok ? titles : [], gameId: run.gameId };
     },
   };
 }

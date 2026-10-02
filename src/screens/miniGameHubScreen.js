@@ -14,6 +14,7 @@ import { companionCourse } from '../minigames/companionCourses.js';
 import { HUB_SUBJECTS, NEWEST, hubSections, choiceSubjects, modeForSubject } from '../minigames/hubCatalog.js';
 import { createPhotoAlbumDialog } from '../ui/photoAlbumDialog.js';
 import { createStickerBookDialog } from '../ui/stickerBookDialog.js';
+import { createAllStickersDialog } from '../ui/allStickersDialog.js';
 import { stickerSummary } from '../minigames/companionStickers.js';
 import { stageData, getMonsterById } from '../loaders/dataLoader.js';
 
@@ -48,6 +49,8 @@ const hub = {
     }
     const notebook = button(doc, '学習ノート', () => this.showLearningNotebook());
     notebook.dataset.action = 'learning-notebook';
+    const allBooks = button(doc, 'みんなのシール帳', () => this.showAllStickers()); allBooks.dataset.action = 'all-stickers';
+    if (selected) tools.append(allBooks);
     const albumButton = button(doc, 'アルバム', () => this.showAlbum());
     albumButton.dataset.action = 'photo-album';
     tools.append(albumButton, notebook, button(doc, 'タイトルへ', () => publish('changeScreen', 'title')));
@@ -67,6 +70,16 @@ const hub = {
     }
     else banner.append(element(doc, 'p', '', '相棒は、冒険のステージをクリアして捕まえよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title'), 'yt-primary'));
     wrap.append(banner);
+    // がんばりの称号: the newest title of each track, and the nearest next one.
+    if (selected) {
+      const tracks = gotomonService.getTitles(), row = element(doc, 'p', 'yt-title-row');
+      const earned = tracks.filter(track => track.current);
+      row.append(element(doc, 'span', 'yt-title-label', '称号'));
+      for (const track of earned) row.append(element(doc, 'span', 'yt-title-chip', track.current.name));
+      const next = tracks.filter(track => track.next).sort((a, b) => a.next.left - b.next.left)[0];
+      if (next) row.append(element(doc, 'small', '', `${earned.length ? 'つぎは' : 'さいしょの 称号まで'} ${next.what} あと${next.next.left}${next.unit}で「${next.next.name}」`));
+      wrap.append(row);
+    }
     const reviewCount = englishLearningService.getReviewIds().length, progress = gotomonService.getProgress();
     const suggestions = hubRecommendations({ gameIds: Object.keys(miniGameRegistry), progress, reviewCount,
       sentenceReviewCount: sentenceLearningService.getReviewIds().length, timedReviewCount: timedLearningService.getReviewIds().length });
@@ -161,8 +174,21 @@ const hub = {
       onClose: () => this.root?.querySelector('[data-action=memories]')?.focus() });
     this.dialog = dialog; this.root.append(dialog); dialog.showModal();
   },
-  showStickerBook() {
+  showAllStickers() {
     const selected = gotomonService.getSelectedGotomon();
+    if (!selected) return;
+    this.dialog?.close(); this.dialog?.remove();
+    const dialog = createAllStickersDialog({ doc: document, service: gotomonService, selectedId: selected.id,
+      onOpenBook: gotomon => { this.dialog?.close(); this.showStickerBook(gotomon); },
+      onSelect: gotomon => {
+        // The new companion leads the square at once (its bar, its stickers on the cards).
+        if (gotomonService.setSelectedGotomon(gotomon.id)?.ok) { this.dialog?.close(); publish('changeScreen', 'miniGameHub'); }
+      },
+      onClose: () => this.root?.querySelector('[data-action=all-stickers]')?.focus() });
+    this.dialog = dialog; this.root.append(dialog); dialog.showModal();
+  },
+  showStickerBook(gotomon = null) {
+    const selected = gotomon ?? gotomonService.getSelectedGotomon();
     if (!selected) return;
     this.dialog?.close(); this.dialog?.remove();
     const dialog = createStickerBookDialog({ doc: document, service: gotomonService, gotomon: selected, sections: hubSections('all'),

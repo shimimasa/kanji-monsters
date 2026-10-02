@@ -169,3 +169,13 @@
 .yt-secret{display:grid;gap:2px;padding:8px 10px;border-radius:10px;background:#fff;border:1px solid #d6deea}.yt-secret small{font-size:11px;color:#4d5b72;font-weight:700}
 .yt-secret p{margin:0;line-height:1.6}.yt-secret[data-open=false]{background:#eef1f6}.yt-secret-locked{letter-spacing:.3em;color:#9aa6b8}
 .yt-companion-dialog .yt-secrets .yt-secret-listen{justify-self:start;min-height:34px;margin-top:4px;padding:4px 12px;border:1px solid #3d7bd9;border-radius:999px;background:#eaf2ff;color:#1f4f99;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.yt-title-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 0;font-size:13px}.yt-title-label{font-weight:800;color:#8a5a00}
+.yt-title-chip{padding:2px 10px;border-radius:999px;background:linear-gradient(#fff3d6,#ffe08a);border:1px solid #e0a800;font-weight:800;color:#5a3d00}.yt-title-row small{color:#4b6d5d}
+.yt-title-tracks{display:grid;gap:8px;margin:10px 0;padding:12px;border-radius:14px;background:#fff7e6}.yt-title-tracks h3{margin:0}
+.yt-title-track{display:grid;gap:2px}.yt-title-track progress{width:100%;height:10px;-webkit-appearance:none;appearance:none;border:0;border-radius:999px;background:#f3e3c2;overflow:hidden}.yt-title-track progress::-webkit-progress-bar{background:#f3e3c2;border-radius:999px}.yt-title-track progress::-webkit-progress-value{background:#f08c00;border-radius:999px}.yt-title-track progress::-moz-progress-bar{background:#f08c00;border-radius:999px}.yt-title-track small{font-size:12px;color:#5d4a2a}
+.yt-all-list{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.yt-all-card{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid #d6e2d9;border-radius:12px;background:#fff}
+.yt-all-card .gt-portrait{width:64px;height:64px}.yt-all-card .gt-portrait img{width:100%;height:100%;object-fit:contain}
+.yt-all-body{display:grid;gap:2px;min-width:0}.yt-all-body small{color:#4b6d5d}.yt-all-chips{display:flex;flex-wrap:wrap;gap:4px;margin:0}.yt-all-chips span{padding:1px 8px;border-radius:999px;background:#eef3ef;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+.yt-all-actions{display:grid;gap:6px}.yt-all-more{margin:10px auto 0;display:block}
+@media(max-width:480px){.yt-all-card{grid-template-columns:52px minmax(0,1fr)}.yt-all-card .gt-portrait{width:52px;height:52px}.yt-all-actions{grid-column:1/-1;grid-auto-flow:column;justify-content:start}}

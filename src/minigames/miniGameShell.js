@@ -130,7 +130,10 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   result.append(rankLabel, portrait, resultName, resultTitle, stats);
   if(findings)result.append(findings.root);
   // The run's missed questions, built again from letter cards (games whose missed list carries `build`).
-  const buildReview = createBuildReviewPanel(doc, { onDone: () => { const done = onBuildReviewDone?.(); if (done?.mark) showSticker('review', 'がんばりマークが ついた！ シール帳の シールに にじの ふち'); } });
+  const buildReview = createBuildReviewPanel(doc, { onDone: () => {
+    const done = onBuildReviewDone?.();
+    if (done?.mark) showSticker('review', `がんばりマークが ついた！ シール帳の シールに にじの ふち${done.newTitles?.length ? `　称号「${done.newTitles.join('」「')}」に なった！` : ''}`);
+  } });
   result.append(growthResult.root,stickerNotice,memoryNotice,challengeResult,nextGoal,buildReview.root,resultActions,reward,retrySave);
   shell.append(result);
   const legacyResult = root.querySelector('[class$="-result"]:not(.gt-result)');
@@ -198,6 +201,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
       const sticker = !value?.duplicate && value?.sticker;
       if (sticker?.isNew || sticker?.upgraded) showSticker(sticker.tier, sticker.upgraded ? `シール帳の「${definition.title}」が 金シールに かわった！` : `シール帳に「${definition.title}」の ${sticker.tier === 'gold' ? '金' : '銀'}シール！`);
       const opened = value?.duplicate ? [] : (value?.newOutfits ?? []).map(outfitItem).filter(Boolean);
+      const titles = value?.duplicate ? [] : value?.newTitles ?? [];
+      if (titles.length) showSticker(stickerNotice.hidden ? 'title' : stickerNotice.dataset.tier, `${stickerNotice.hidden ? '' : `${stickerNotice.textContent} `}称号「${titles.join('」「')}」に なった！`);
       const secrets = value?.duplicate ? [] : value?.newSecrets ?? [];
       if (secrets.length) showSticker(stickerNotice.hidden ? 'secret' : stickerNotice.dataset.tier, `${stickerNotice.hidden ? '' : `${stickerNotice.textContent} `}ひみつノートに「${secrets.join('」「')}」が ひらいた！`);
       if (opened.length) showSticker(stickerNotice.hidden ? 'outfit' : stickerNotice.dataset.tier, `${stickerNotice.hidden ? '' : `${stickerNotice.textContent} `}きせかえ ${opened.map(item => `${item.icon}${item.name}`).join('・')} が ひらいた！ シール帳で つけられるよ`);
