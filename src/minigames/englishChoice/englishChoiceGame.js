@@ -1,4 +1,5 @@
 import { generateEnglishChoiceQuestions } from './englishChoiceQuestions.js';
+import { wordTarget } from '../buildReview.js';
 
 // Nonpersistent Core: no DOM, Storage, save, Motion, or scheduler dependencies.
 export function createEnglishChoiceGame({ sessionId, random = Math.random, onEvent = () => {}, history, reviewContentIds }) {
@@ -71,7 +72,8 @@ export function createEnglishChoiceGame({ sessionId, random = Math.random, onEve
       else {
         incorrect++;
         missed.push(Object.freeze({ contentId: problem.contentId, prompt: problem.prompt, questionNumber: answered, selectedAnswer: choice.text,
-          meaning: problem.choices.find(choice => choice.choiceId === problem.correctChoiceId).text }));
+          meaning: problem.choices.find(choice => choice.choiceId === problem.correctChoiceId).text,
+          chosen: choice.text, build: wordTarget({ word: problem.prompt, meaning: problem.choices.find(choice => choice.choiceId === problem.correctChoiceId).text }) }));
       }
       lastAnswer = Object.freeze({
         attemptId: committedAttempt, choiceId, correctChoiceId: problem.correctChoiceId, correct: isCorrect,

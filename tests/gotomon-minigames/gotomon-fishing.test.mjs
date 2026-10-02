@@ -82,6 +82,8 @@ test('a wrong catch is one learning result and shows its plate; the answer glows
   assert.ok(answer.plate.word && answer.plate.meaning);
   assert.equal(events.at(-1).type, 'incorrect');
   assert.equal(game.snapshot().missed.at(-1).word, state.problem.word);
+  assert.equal(game.snapshot().missed.at(-1).build.answer, state.problem.word.toLowerCase());
+  assert.equal(game.snapshot().missed.at(-1).build.script, 'letters');
   next();
   assert.equal(game.snapshot().hintSwimmerId, want);
   assert.equal(game.snapshot().problem.contentId, state.problem.contentId);

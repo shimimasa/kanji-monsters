@@ -33,11 +33,14 @@ export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
     count.textContent = `ふくしゅう ${s.index + 1} / ${s.total}`;
     prompt.textContent = s.prompt; sentence.hidden = !s.sentence;
     sentence.replaceChildren(...(s.sentence ? [element(doc, 'span', '', s.sentence.before), element(doc, 'b', '', s.prompt.match(/「(.+?)」/)?.[1] ?? ''), element(doc, 'span', '', s.sentence.after)] : []));
+    // A number sentence (6+9=15) is counted in cards, a word in letters.
+    const unit = s.script === 'equation' ? '番目' : '文字目';
+    root.dataset.script = s.script ?? '';
     slots.replaceChildren(...Array.from({ length: s.length }, (_, k) => {
       const filled = k < s.placed.length;
       const slot = button(doc, filled ? s.tiles[s.placed[k]] : '', () => { if (review.unplace(k)) render(); }, 'gt-build-slot');
       slot.disabled = !filled || s.status !== 'building';
-      slot.setAttribute('aria-label', filled ? `${k + 1}文字目 ${s.tiles[s.placed[k]]}（おすと もどす）` : `${k + 1}文字目`);
+      slot.setAttribute('aria-label', filled ? `${k + 1}${unit} ${s.tiles[s.placed[k]]}（おすと もどす）` : `${k + 1}${unit}`);
       return slot;
     }));
     tiles.replaceChildren(...s.tiles.map((ch, k) => {
@@ -48,7 +51,7 @@ export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
     }));
     const last = s.last;
     say.textContent = s.status === 'solved' ? `できた！ ${s.explain ?? `「${s.shownAnswer}」`}`
-      : last && !last.correct ? `「${last.word}」ではなかったよ。${last.wrongAt}文字目は「${last.expected}」。光る カードから つづけよう${s.shownAnswer ? `（こたえ：${s.shownAnswer}）` : ''}`
+      : last && !last.correct ? `「${last.word}」ではなかったよ。${last.wrongAt}${unit}は「${last.expected}」。光る カードから つづけよう${s.shownAnswer ? `（こたえ：${s.shownAnswer}）` : ''}`
       : s.placed.length === 0 && s.chosen ? `ゲームでは「${s.chosen}」をえらんだよ。カードを じゅんに おそう` : '';
     next.hidden = s.status !== 'solved';
     next.textContent = s.index + 1 < s.total ? 'つぎへ' : 'おわる';

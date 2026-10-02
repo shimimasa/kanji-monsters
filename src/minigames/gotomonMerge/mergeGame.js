@@ -1,5 +1,6 @@
 import { labelsFor } from '../gotomonBubble/bubbleContent.js';
 import { nearbyNumbers } from '../gotomonToss/tossContent.js';
+import { equationTarget } from '../buildReview.js';
 
 export const MERGE_RULES = Object.freeze({
   size: 4, questions: 16, choices: 4,
@@ -142,7 +143,8 @@ export function createMergeGame({ sessionId, random = Math.random, onEvent = () 
       tile.question = null;
       best = Math.max(best, tile.value);
       lastAnswer = Object.freeze({ answer: answered, correct: right, label: problem.label, value: problem.answer, chosen: Number(choiceId), tileId: tile.tileId });
-      if (!right) missed.push(Object.freeze({ contentId: problem.contentId, prompt: problem.prompt, chosen: choiceId, explain: `${problem.label} = ${problem.answer}`, questionNumber: answered }));
+      if (!right) missed.push(Object.freeze({ contentId: problem.contentId, prompt: problem.prompt, chosen: choiceId, explain: `${problem.label} = ${problem.answer}`, questionNumber: answered,
+        build: equationTarget({ question: problem.label, answer: problem.answer, others: problem.choices.map(c => c.choiceId).filter(id => id !== problem.correctChoiceId) }) }));
       const payload = { attemptId, contentId: problem.contentId, skillId: problem.skillId, chosen: choiceId };
       attemptId = `${sessionId}:move:${moveSerial + 1}`; phase = 'sliding';
       notify(right ? 'correct' : 'incorrect', payload);

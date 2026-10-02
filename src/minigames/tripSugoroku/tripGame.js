@@ -1,5 +1,6 @@
 import { readingQuestion } from '../photoRally/photoRallyContent.js';
 import { buildDetectiveCases } from '../proverbDetective/proverbDetectiveGame.js';
+import { readingTarget } from '../buildReview.js';
 
 export const TRIP_COLUMNS = 4;
 export const BOSS_HP = 5;
@@ -170,7 +171,8 @@ export function createTripGame({ sessionId, random = Math.random, onEvent = () =
       } else {
         incorrect++;
         missed.push(Object.freeze({ contentId: problem.contentId, kind: problem.kind, text: problem.kind === 'kanji' ? problem.kanji : problem.text,
-          answer: problem.kind === 'kanji' ? problem.reading : problem.meaning, questionNumber: answered }));
+          answer: problem.kind === 'kanji' ? problem.reading : problem.meaning, chosen: choice.text, questionNumber: answered,
+          build: problem.kind === 'kanji' ? readingTarget({ word: problem.kanji, reading: problem.reading, sentence: problem, others: problem.choices.filter(c => c.choiceId !== problem.correctChoiceId).map(c => c.text) }) : null }));
       }
       if (column >= TRIP_COLUMNS) bossState.asked++;
       lastAnswer = Object.freeze({ attemptId: committedAttempt, choiceId, correctChoiceId: problem.correctChoiceId, correct: isCorrect, damage });

@@ -19,11 +19,17 @@ export function buildSlashProblems({ sessionId, random = Math.random, mode = 'ka
   const waves = mode === 'english' ? buildFishProblems({ sessionId, random })
     : buildShooterWaves({ sessionId, random, mode: 'kanji', stageKanji, gradeKanji, focusKanjiIds });
   if (!waves) return null;
-  return Object.freeze(waves.map(item => Object.freeze({
+  return Object.freeze(waves.map(sharedProblem));
+}
+
+// One wave of the shooter / ゴトモンつり in the shared four-plate shape (also what the
+// 「もじを ならべて ふくしゅう」 of those games builds from).
+export function sharedProblem(item) {
+  return Object.freeze({
     problemId: item.problemId, contentId: item.contentId, skillId: item.skillId, kind: item.kind,
     prompt: item.kind === 'ja2en' ? `「${item.meaning}」は英語で？` : item.kind === 'en2ja' ? `${item.word} の意味は？` : `「${item.prompt}」は この文で どう読む？`,
     sentence: item.sentence ?? null, word: item.word, answerId: item.contentId,
     plates: Object.freeze(item.plates.map(plate => Object.freeze({ plateId: plate.contentId, text: plate.text,
       note: plate.note ?? (item.kind === 'kanji' ? `${plate.word}の読み` : `${plate.word} ＝ ${plate.meaning}`) }))),
-    explain: item.kind === 'kanji' ? `「${item.prompt}」は「${item.meaning}」` : `${item.word} ＝ ${item.meaning}` })));
+    explain: item.kind === 'kanji' ? `「${item.prompt}」は「${item.meaning}」` : `${item.word} ＝ ${item.meaning}` });
 }

@@ -92,6 +92,9 @@ test('pairing a card wrongly after its partner was seen sends that kanji to the 
   flip(a.cardId); flip(partner.cardId);
   assert.equal(events.at(-1).type, 'incorrect');
   assert.equal(game.snapshot().missed.at(-1).kanji, game.snapshot().pairs.find(pair => pair.pairId === a.pairId).kanji);
+  const slip = game.snapshot().missed.at(-1);
+  if (slip.kind === 'reading') { assert.equal(slip.build.answer, slip.answer); assert.match(slip.build.prompt, new RegExp(slip.kanji)); }
+  else assert.equal(slip.build, null);
 });
 
 test('two rounds of six pairs end the game; clean streaks and new rounds add のぞき見', () => {

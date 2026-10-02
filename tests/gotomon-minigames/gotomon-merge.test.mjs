@@ -46,6 +46,7 @@ test('a question tile becomes its number when answered; a slip still gives the r
   assert.equal(s.tiles.find(t => t.tileId === tile.tileId).question, null);
   assert.equal(s.tiles.find(t => t.tileId === tile.tileId).value, tile.value);
   assert.equal(s.lastAnswer.correct, false); assert.equal(s.incorrect, 1); assert.equal(s.missed.length, 1);
+  assert.equal(s.missed[0].build.answer, `${s.lastAnswer.label}=${s.lastAnswer.value}`);
   assert.deepEqual(events.filter(e => e.type !== 'problemPresented').map(e => e.type), ['incorrect']);
 });
 

@@ -4,7 +4,13 @@ import { readFileSync } from 'node:fs';
 import { buildSlashProblems } from '../../src/minigames/gotomonSlash/slashContent.js';
 import { createSlashGame } from '../../src/minigames/gotomonSlash/slashGame.js';
 import { createOthelloGame } from '../../src/minigames/gotomonOthello/othelloGame.js';
-import { buildTarget, buildTiles, createBuildReview, BUILD_REVIEW as R } from '../../src/minigames/buildReview.js';
+import { buildTarget, buildTiles, createBuildReview, readingTarget, wordTarget, equationTarget, BUILD_REVIEW as R } from '../../src/minigames/buildReview.js';
+import { createTossGame } from '../../src/minigames/gotomonToss/tossGame.js';
+import { buildTossProblems } from '../../src/minigames/gotomonToss/tossContent.js';
+import { createPhotoRallyGame } from '../../src/minigames/photoRally/photoRallyGame.js';
+import { buildPhotoRally } from '../../src/minigames/photoRally/photoRallyContent.js';
+import { createEnglishChoiceGame } from '../../src/minigames/englishChoice/englishChoiceGame.js';
+import { createTimedChoiceGame } from '../../src/minigames/timedChoice/timedChoiceGame.js';
 import { lookalikesOf } from '../../src/minigames/gotomonTrace/traceGame.js';
 
 const seeded = seed => () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
@@ -29,7 +35,7 @@ test('every shared question of the three subjects gives an answer to build and a
         const target = buildTarget(item);
         assert.ok(target?.answer, `${mode} ${item.prompt}`);
         if (mode === 'kanji') { assert.equal(target.answer, answerOf(item)); assert.equal(target.script, 'kana'); assert.equal(target.prompt, item.prompt); assert.ok(target.sentence); }
-        if (mode === 'math') { assert.equal(target.answer, answerOf(item)); assert.equal(target.script, 'digits'); }
+        if (mode === 'math') { assert.equal(target.answer, `${item.prompt.replace(' = ?', '').replaceAll(' ', '')}=${answerOf(item)}`); assert.equal(target.script, 'equation'); }
         if (mode === 'english') { assert.equal(target.script, 'letters'); assert.match(target.answer, /^[a-z]+$/); assert.match(target.prompt, /は英語で？$/); }
         const tiles = buildTiles(target, seeded(seed + 7));
         const answer = [...target.answer];
@@ -40,6 +46,7 @@ test('every shared question of the three subjects gives an answer to build and a
         assert.equal(new Set(rest).size, R.extra);
         assert.ok(rest.every(ch => !answer.includes(ch)), 'the other cards never repeat a letter of the answer');
         if (mode !== 'math' && rest.some(ch => answer.some(a => lookalikesOf(a, target.script).includes(ch)))) look++;
+        if (mode === 'math') assert.ok(rest.some(ch => '+−×'.includes(ch)), 'a number sentence table holds another sign');
         count++; letters += answer.length;
       }
     }
@@ -104,6 +111,10 @@ test('a wrong row keeps the right letters, says which letter differs, and the ne
   spell(review, answer.slice(s.placed.length));
   s = review.snapshot();
   assert.equal(s.status, 'solved'); assert.equal(s.firstTry, 0);
+  // Ending on a question that took two rows (the panel reads the snapshot once more).
+  assert.equal(review.next(), true);
+  s = review.snapshot();
+  assert.equal(s.status, 'done'); assert.equal(s.shownAnswer, null); assert.equal(s.tries, 0);
 });
 
 test('at most four questions come back, each once; without a build nothing is shown', () => {
@@ -136,5 +147,77 @@ test('games carry the build target in their missed list (slash: the content item
   assert.equal(othello.dispatch({ type: 'answer', payload: { sessionId: 'ob', attemptId: s.attemptId, choiceId: wrong.choiceId } }), true);
   const [om] = othello.snapshot().missed;
   assert.equal(om.build.answer, s.problem.choices.find(c => c.choiceId === s.problem.correctChoiceId).text);
-  assert.equal(om.build.sentence, s.problem.sentence);
+  assert.equal(om.build.sentence.before, s.problem.sentence.before); assert.equal(om.build.sentence.after, s.problem.sentence.after);
+});
+
+test('math builds the whole number sentence; + and × may be turned round, − may not', () => {
+  const add = equationTarget({ question: '6 + 9', answer: 15, others: [14, 16, 3] });
+  assert.equal(add.answer, '6+9=15'); assert.deepEqual([...add.accept], ['9+6=15']); assert.equal(add.script, 'equation');
+  assert.equal(add.prompt, '「6 + 9」の しきと こたえを ならべよう'); assert.equal(add.explain, '6 + 9 = 15');
+  assert.deepEqual([...equationTarget({ question: '15 − 9 = ?', answer: '6' }).accept], []);
+  assert.deepEqual([...equationTarget({ question: '3×3', answer: 9 }).accept], [], 'the same both ways is one answer');
+  assert.equal(equationTarget({ question: '7×8', answer: 56 }).answer, '7×8=56');
+  assert.equal(equationTarget({ question: '6 + 9', answer: 14 }), null, 'a sum that does not add up is never taught');
+  assert.equal(equationTarget({ question: '15', answer: 15 }), null);
+  assert.equal(readingTarget({ word: '山', reading: 'yama' }), null);
+  assert.equal(wordTarget({ meaning: 'りんご', word: 'ice cream' }), null);
+
+  // Turned round is right; a wrong sign says which card differs and the right sign glows.
+  const review = createBuildReview({ missed: [{ contentId: 'a', chosen: '14', build: add }, { contentId: 'b', build: add }], random: seeded(3) });
+  spell(review, '9+6=15');
+  let s = review.snapshot();
+  assert.equal(s.status, 'solved'); assert.equal(s.shownAnswer, '9+6=15'); assert.equal(s.firstTry, 1);
+  review.next();
+  spell(review, '6');
+  const t = review.snapshot(), minus = t.tiles.findIndex(ch => ch === '−' || ch === '×');
+  assert.ok(minus >= 0, 'another sign is on the table');
+  review.place(minus);
+  spell(review, '9=15');
+  s = review.snapshot();
+  assert.equal(s.last.correct, false); assert.equal(s.last.wrongAt, 2); assert.equal(s.last.expected, '+');
+  assert.equal(s.word, '6'); assert.equal(s.tiles[s.hintTile], '+');
+  spell(review, '+9=15');
+  assert.equal(review.snapshot().status, 'solved');
+});
+
+test('the other choice games carry what to build: photo rally, word reading, English words and the toss game', () => {
+  const kanji = Object.fromEntries(grade1.map(k => [k.id, k]));
+  const stage = { stageId: 's', grade: 1, kanjiPoolIdList: grade1.slice(0, 30).map(k => k.id) };
+  const rally = buildPhotoRally({ sessionId: 'r', stage, random: seeded(2), stageKanji: stage.kanjiPoolIdList.map(id => kanji[id]), gradeKanji: grade1,
+    monsters: Array.from({ length: 10 }, (_, i) => ({ id: `m${i}`, name: `m${i}` })) });
+  const photo = createPhotoRallyGame({ sessionId: 'r', content: rally });
+  assert.equal(photo.enter(), true);
+  let p = photo.snapshot().problem, wrong = p.choices.find(c => c.choiceId !== p.correctChoiceId);
+  photo.dispatch({ type: 'answer', payload: { sessionId: 'r', problemId: p.problemId, attemptId: photo.snapshot().attemptId, choiceId: wrong.choiceId } });
+  let m = photo.snapshot().missed[0];
+  assert.equal(m.build.answer, p.reading); assert.equal(m.build.sentence.before, p.before); assert.equal(m.chosen, wrong.text);
+  assert.ok([...m.build.decoys].every(ch => [...wrong.text, ...p.choices.flatMap(c => [...c.text])].includes(ch)));
+
+  for (const [create, check] of [[createTimedChoiceGame, (b, q, right) => { assert.equal(b.answer, right); assert.equal(b.prompt, q.prompt); }],
+    [createEnglishChoiceGame, (b, q, right) => { assert.equal(b.answer, q.prompt.toLowerCase()); assert.equal(b.prompt, `「${right}」は英語で？`); }]]) {
+    const game = create({ sessionId: 'c' }); game.enter();
+    const s = game.snapshot(), q = s.problem, bad = q.choices.find(c => c.choiceId !== q.correctChoiceId);
+    game.answer({ sessionId: s.sessionId, problemId: q.problemId, attemptId: s.attemptId, choiceId: bad.choiceId });
+    check(game.snapshot().missed[0].build, q, q.choices.find(c => c.choiceId === q.correctChoiceId).text);
+  }
+
+  const problems = buildTossProblems({ sessionId: 't', random: seeded(5) });
+  const toss = createTossGame({ sessionId: 't', random: seeded(6), content: { carriers: [], problems } });
+  assert.equal(toss.enter(), true);
+  const ts = toss.snapshot(), basket = ts.baskets?.find(b => b.basketId !== ts.problem.correctChoiceId);
+  toss.dispatch({ type: 'throw', payload: { sessionId: 't', attemptId: ts.attemptId, basketId: basket.basketId } });
+  m = toss.snapshot().missed[0];
+  assert.equal(m.build.answer, `${problems[0].question.replaceAll(' ', '')}=${problems[0].answer}`);
+});
+
+test('for the record: how many questions of each source can come back to build', () => {
+  const count = { kanji: [0, 0], english: [0, 0], math: [0, 0] };
+  for (let seed = 1; seed <= 20; seed++) for (const mode of ['kanji', 'english', 'math'])
+    for (const item of buildSlashProblems({ sessionId: 's', random: seeded(seed), mode, gradeKanji: grade1 })) { count[mode][1]++; if (buildTarget(item)) count[mode][0]++; }
+  for (const [mode, [made, all]] of Object.entries(count)) assert.equal(made, all, mode);
+  let times = 0;
+  for (let seed = 1; seed <= 20; seed++) for (const item of buildTossProblems({ sessionId: 't', random: seeded(seed), level: 'times' })) {
+    assert.ok(equationTarget({ question: item.question, answer: item.answer })); times++;
+  }
+  assert.equal(times, 240);
 });

@@ -1,3 +1,5 @@
+import { readingTarget } from '../buildReview.js';
+
 // Nonpersistent Core: no DOM, Storage, save, Motion, or scheduler dependencies.
 // The rally content (stage, kanji and monsters) is built by the caller and passed in.
 export function createPhotoRallyGame({ sessionId, onEvent = () => {}, content }) {
@@ -57,7 +59,8 @@ export function createPhotoRallyGame({ sessionId, onEvent = () => {}, content })
       else {
         incorrect++;
         missed.push(Object.freeze({ contentId: problem.contentId, kanji: problem.kanji, reading: problem.reading,
-          selectedAnswer: choice.text, questionNumber: answered }));
+          selectedAnswer: choice.text, chosen: choice.text, questionNumber: answered,
+          build: readingTarget({ word: problem.kanji, reading: problem.reading, sentence: problem, others: problem.choices.filter(c => c.choiceId !== problem.correctChoiceId).map(c => c.text) }) }));
       }
       lastAnswer = Object.freeze({ attemptId: committedAttempt, choiceId, correctChoiceId: problem.correctChoiceId, correct: isCorrect });
       phase = answered === total ? 'completed' : 'feedback';

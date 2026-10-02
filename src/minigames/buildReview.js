@@ -7,8 +7,44 @@ export const BUILD_REVIEW = Object.freeze({
   extra: 4,
 });
 
+const SIGNS = ['+', '−', '×'];
+const KANA = /^[ぁ-んァ-ヶー]+$/;
+const target = ({ prompt, sentence = null, script, answer, accept = [], decoys = [], explain = null }) => Object.freeze({
+  prompt, sentence: sentence ? Object.freeze({ before: sentence.before ?? '', after: sentence.after ?? '' }) : null, script, answer,
+  accept: Object.freeze([...new Set(accept)].filter(a => a !== answer)), decoys: Object.freeze([...new Set(decoys)]), explain });
+
+// 漢字: the reading of a kanji (in its sentence when there is one) or of a word, in kana.
+// `others` are the other choices of the game (their letters go on the table).
+export function readingTarget({ word, reading, sentence = null, others = [] } = {}) {
+  if (!word || !KANA.test(reading ?? '')) return null;
+  return target({ prompt: sentence ? `「${word}」は この文で どう読む？` : `「${word}」の よみは？`, sentence, script: 'kana', answer: reading,
+    decoys: others.flatMap(t => [...String(t ?? '')]).filter(ch => KANA.test(ch)), explain: `「${word}」は「${reading}」` });
+}
+
+// 英語: the English word, asked from its meaning. Only single words (a–z) are built.
+export function wordTarget({ meaning, word, others = [] } = {}) {
+  const answer = String(word ?? '').toLowerCase();
+  if (!meaning || !/^[a-z]+$/.test(answer)) return null;
+  return target({ prompt: `「${meaning}」は英語で？`, script: 'letters', answer,
+    decoys: others.flatMap(t => [...String(t ?? '').toLowerCase()]).filter(ch => /[a-z]/.test(ch)), explain: `${meaning} ＝ ${answer}` });
+}
+
+// 算数: the whole number sentence (6+9=15) from number and sign cards, so a one-digit answer is
+// not just one card to pick. For + and × the turned-round sentence (9+6=15) is right too.
+// `question` is "6 + 9" (or "6 + 9 = ?"); null when it is not one sum of two numbers.
+export function equationTarget({ question, answer, others = [] } = {}) {
+  const m = String(question ?? '').replace(/\s*=\s*\?\s*$/, '').match(/^\s*(\d+)\s*([+−×*-])\s*(\d+)\s*$/);
+  if (!m) return null;
+  const a = Number(m[1]), b = Number(m[3]), sign = { '-': '−', '*': '×' }[m[2]] ?? m[2];
+  const value = sign === '+' ? a + b : sign === '−' ? a - b : a * b;
+  if (String(value) !== String(answer)) return null;
+  return target({ prompt: `「${a} ${sign} ${b}」の しきと こたえを ならべよう`, script: 'equation', answer: `${a}${sign}${b}=${value}`,
+    accept: sign === '−' ? [] : [`${b}${sign}${a}=${value}`], decoys: others.flatMap(t => [...String(t ?? '')]).filter(ch => /\d/.test(ch)),
+    explain: `${a} ${sign} ${b} = ${value}` });
+}
+
 // What to build for a missed 4-plate question (the shared problems of the slash game and its kin):
-// 漢字 the reading in kana, 英語 the English word (asked from its meaning), 算数 the answer's digits.
+// 漢字 the reading in kana, 英語 the English word (asked from its meaning), 算数 the number sentence.
 // Takes the content item (plates, answerId) or a game's problem (choices, correctChoiceId).
 export function buildTarget(item) {
   const plates = item?.plates ?? item?.choices?.map(c => ({ plateId: c.choiceId, text: c.text, note: c.note ?? null }));
@@ -16,8 +52,11 @@ export function buildTarget(item) {
   if (!Array.isArray(plates) || !plates.some(p => p.plateId === answerId)) return null;
   const [it] = toTraceItems([{ ...item, plates, answerId }]);
   if (!it.target.length) return null;
-  return Object.freeze({ prompt: it.prompt, sentence: it.sentence ?? null, script: it.script, answer: it.target.join(''),
-    decoys: Object.freeze([...new Set(it.decoys)]), explain: it.explain ?? null });
+  if (it.script === 'digits') {
+    const sum = equationTarget({ question: it.prompt, answer: it.target.join(''), others: plates.filter(p => p.plateId !== answerId).map(p => p.text) });
+    if (sum) return sum;
+  }
+  return target({ prompt: it.prompt, sentence: it.sentence ?? null, script: it.script, answer: it.target.join(''), decoys: it.decoys, explain: it.explain ?? null });
 }
 
 function take(random) {
@@ -31,12 +70,15 @@ const shuffled = (items, random) => {
   return list;
 };
 
+// Look-alikes on the table: か/が, b/d …; in a number sentence the other signs (+ − ×).
+const lookOf = (ch, script) => script === 'equation' ? (SIGNS.includes(ch) ? SIGNS.filter(s => s !== ch) : []) : lookalikesOf(ch, script);
+
 // The letter cards for one answer: its own letters and BUILD_REVIEW.extra others, shuffled.
 export function buildTiles(target, random) {
   const answer = [...target.answer];
   const pick = [], seen = new Set(answer);
   const add = ch => { if (pick.length < BUILD_REVIEW.extra && ch && !seen.has(ch)) { seen.add(ch); pick.push(ch); } };
-  for (const ch of shuffled(answer.flatMap(c => lookalikesOf(c, target.script)), random)) add(ch);
+  for (const ch of shuffled(answer.flatMap(c => lookOf(c, target.script)), random)) add(ch);
   for (const ch of shuffled(target.decoys, random)) add(ch);
   for (const ch of shuffled(fillLetters(target.script), random)) add(ch);
   return shuffled([...answer, ...pick], random);
@@ -54,7 +96,14 @@ export function createBuildReview({ missed = [], random = Math.random } = {}) {
   let at = 0, tiles = [], placed = [], tries = 0, status = items.length ? 'building' : 'done', last = null, solved = 0, firstTry = 0;
   const deal = () => { tiles = buildTiles(items[at].target, random); placed = []; tries = 0; last = null; status = 'building'; };
   if (items.length) deal();
-  const answer = () => [...items[at].target.answer];
+  // The right rows (a number sentence may also be turned round); the one the cards head for is
+  // the one that matches the most cards from the start (the first one when none does).
+  const answers = () => [items[at].target.answer, ...(items[at].target.accept ?? [])].map(a => [...a]);
+  const agree = (word, a) => { const k = word.findIndex((ch, i) => ch !== a[i]); return k < 0 ? word.length : k; };
+  const answer = () => {
+    const word = placed.map(k => tiles[k]);
+    return answers().reduce((best, a) => (agree(word, a) > agree(word, best) ? a : best));
+  };
   // The card that should come next (the first unused card with the next letter).
   const nextTile = () => {
     const want = answer()[placed.length];
@@ -82,7 +131,7 @@ export function createBuildReview({ missed = [], random = Math.random } = {}) {
       word: placed.map(k => tiles[k]).join(''),
       // Help after a wrong row: the next card glows; after two, the answer is shown.
       hintTile: status === 'building' && tries > 0 ? nextTile() : -1,
-      shownAnswer: status === 'solved' || tries >= 2 ? items[at].target.answer : null,
+      shownAnswer: status === 'solved' ? last.word : status === 'building' && tries >= 2 ? items[at].target.answer : null,
       last,
     }),
     place(tile) {
@@ -99,7 +148,7 @@ export function createBuildReview({ missed = [], random = Math.random } = {}) {
     },
     next() {
       if (status !== 'solved') return false;
-      if (++at >= items.length) { status = 'done'; tiles = []; placed = []; last = null; return true; }
+      if (++at >= items.length) { status = 'done'; tiles = []; placed = []; tries = 0; last = null; return true; }
       deal();
       return true;
     },
