@@ -2,6 +2,24 @@
 
 > ## 次回はここから（2026-10-02 最終更新）
 >
+> ### 再開するときは（この順で）
+> 1. **状態**：ここまで すべて本番公開済み（最新 PR #70、`main` = `8f272c7`、Vercel 本番 yomitabi.gamanavi.com）。ブランチ
+>    `feature/content-bank-120` は main と同じ中身＋この資料の更新コミットだけ（未push）。`git log --oneline -3` で確認。
+> 2. **次の作業＝ゴトモン拡張の第2弾「わざとパーティ」**（設計 https://claude.ai/artifact/39yJpJ2AESL43mpm8jgZsy の2番、
+>    ユーザーは5点とも おすすめ案で決定済み。順番は タイプと相性(済) → **わざとパーティ** → 配合 → 色ちがい・かがやき → 進化）。
+>    - わざ：いまの相棒技（ゲームごとに同じ）を タイプごとの わざに。7タイプ × 2（Lv1 と Lv7 で おぼえる）＝14わざ。
+>      効果は とくてん・ゲージ・演出だけ（学習の結果・記録には さわらない）。土台は `companionPlay.js`（boost・skillPoints）と
+>      `gotomonTypes.js`（`typeOf`・`GAME_TYPES`・`FAVOURED_CHARGE`）、相棒の形は `gotomonService.getGotomonById`（`type` あり）。
+>    - パーティ（ドラクエの馬車）：ミニゲームに 相棒＋サポーター2ひき。サポーターは タイプの小さな効果、XP を半分もらう。
+>      報酬は `gotomonService.awardGotomonPlayResult`（1つの保存トランザクション）、相棒えらびは `miniGameHubScreen.selectGame`。
+> 3. **作業の決まり**：pushとPRは ユーザーが「PRを作ってマージして本番に出して」と言ったときだけ（毎回）。テストは
+>    `bash scripts/playtest-cdp/run-all-tests.sh` で `SAME-FAILS`、画面は `npm run build` → プレビュー＋ヘッドレスChrome
+>    （下の「ブラウザ確認の準備」）。学習記録は変えない・運なし・なくならない。コミット本文に確かめた数を書く。
+> 4. **待っているもの**：先生チェックのページ https://claude.ai/artifact/5tphzMULn1LQVwUqR7cEMX
+>    （例文の読み603・ことわざ90・パーツ49・宅配便ヒント174・タイプ1,062）。2026-10-02 時点で14件 OK・直す0件。
+>    「見終わった」と言われたら `ArtifactData` で `checks` を読み、「直す」を元データへ（作り方とIDは `scripts/teacher-check/README.md`）。
+>    ほかの宿題：Firestoreルール（最優先の未決定事項）、デプロイ先の一本化、ひみつノートの ふりがな（依存追加は要相談）。
+>
 > **いちばん新しい作業（本番公開済み、PR #70、`main` = `8f272c7`）**: ゴトモン拡張（設計 https://claude.ai/artifact/39yJpJ2AESL43mpm8jgZsy 、5点ともおすすめ案で決定）の第1弾「タイプと相性」。
 > `gotomonTypes.js`：カテゴリの言葉で7タイプ（たべもの・しぜん・でんせつ・まつり・れきし・ものづくり・ふしぎ）、相性の輪 しぜん▶たべもの▶まつり▶れきし▶でんせつ▶ものづくり▶しぜん。
 > 本編：相棒（広場で選んだゴトモン）が敵に つよいと、正解の こうげき1.5ばい（battleScreen は `// TYPE-MATCHUP` の2行だけ。凍結テスト2本は その行を除いて比べるよう直した）。
