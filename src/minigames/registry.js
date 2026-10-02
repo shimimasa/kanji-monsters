@@ -89,6 +89,8 @@ import { createLandGame } from './gotomonLand/landGame.js';
 import { createLandView } from './gotomonLand/landView.js';
 import { createTraceGame } from './gotomonTrace/traceGame.js';
 import { createTraceView } from './gotomonTrace/traceView.js';
+import { createPushGame } from './gotomonPush/pushGame.js';
+import { createPushView } from './gotomonPush/pushView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
 import { buildPhotoRally } from './photoRally/photoRallyContent.js';
 import { stageData, getKanjiById, getKanjiByGrade, getMonsterById, getAllMonsterIds } from '../loaders/dataLoader.js';
@@ -338,4 +340,6 @@ export const miniGameRegistry = Object.freeze({
     create: context => createLandGame({ ...context, content: slashContent(context) }), createView: createLandView }),
   gotomonTrace: Object.freeze({ id: 'gotomonTrace', title: 'ゴトモン・もじなぞり',
     create: context => createTraceGame({ ...context, content: slashContent(context) }), createView: createTraceView }),
+  gotomonPush: Object.freeze({ id: 'gotomonPush', title: 'ゴトモン・おしだし',
+    create: context => createPushGame({ ...context, content: slashContent(context) }), createView: createPushView }),
 });

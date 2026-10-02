@@ -19,7 +19,7 @@ const ONLY = Object.freeze({
 
 // Games where the child picks the subject (their `mode`), newest first, with the subjects each offers.
 const CHOOSE = Object.freeze([
-  ['gotomonTrace', ['kanji', 'english', 'math']], ['gotomonLand', ['kanji', 'english', 'math']], ['gotomonHop', ['kanji', 'english', 'math']],
+  ['gotomonPush', ['kanji', 'english', 'math']], ['gotomonTrace', ['kanji', 'english', 'math']], ['gotomonLand', ['kanji', 'english', 'math']], ['gotomonHop', ['kanji', 'english', 'math']],
   ['gotomonGolf', ['kanji', 'english', 'math']], ['gotomonTag', ['kanji', 'english', 'math']], ['gotomonJump', ['kanji', 'english', 'math']],
   ['gotomonMaze', ['kanji', 'english', 'math']], ['gotomonSeek', ['kanji', 'english', 'math']], ['gotomonRace', ['kanji', 'english', 'math']],
   ['gotomonDrum', ['kanji', 'english', 'math']], ['gotomonSlash', ['kanji', 'english', 'math']], ['gotomonLink', ['kanji', 'english', 'math']],
@@ -27,7 +27,7 @@ const CHOOSE = Object.freeze([
 ].map(([id, subjects]) => Object.freeze({ id, subjects: Object.freeze(subjects) })));
 
 // The newest games: they wear NEW until they are played.
-export const NEWEST = Object.freeze(['gotomonTrace', 'gotomonLand', 'gotomonHop', 'gotomonGolf', 'gotomonTag']);
+export const NEWEST = Object.freeze(['gotomonPush', 'gotomonTrace', 'gotomonLand', 'gotomonHop', 'gotomonGolf']);
 
 const label = id => HUB_SUBJECTS.find(subject => subject.id === id)?.label ?? id;
 
