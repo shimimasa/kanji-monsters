@@ -15,6 +15,7 @@ import { stickerSummary } from './companionStickers.js';
 import { typeOf } from './gotomonTypes.js';
 import { moveFor, supporterXP, MAX_SUPPORTERS } from './gotomonMoves.js';
 import { LEGEND_IDS, recipeFor, regionOf, candidates, firstPair, canBreed } from './gotomonBreeding.js';
+import { lookProgress, wornLook, openedLooks, LOOK_KEYS, evolvedImageUrl } from './companionLooks.js';
 
 // The sticker book's slots: every game in the square (the crown asks for all of them).
 const GAME_COUNT = new Set(hubSections('all').flatMap(section => section.games)).size;
@@ -41,12 +42,15 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     const data = lookup(id);
     if (!data) return { id, name: id, imageUrl: null };
     const folder = getBonusMonsterFolder(id) || folders[data.grade] || folders[1];
-    return { id, name: data.name || id, imageUrl: `/assets/images/monsters/full/${folder}/${id}.webp`,
+    const look = wornLook(companions?.[id], id);
+    return { id, name: data.name || id, imageUrl: look.evolve ? evolvedImageUrl(id) : `/assets/images/monsters/full/${folder}/${id}.webp`,
       category: data.category || '', support: supportStyle(data.category), type: typeOf(data),
       // わざ: the type's Lv1 move, the stronger one from Lv7.
       move: moveFor(typeOf(data), growthStatus(companions?.[id]).level),
       // きせかえ: what it wears now (drawn over its picture everywhere it appears).
-      outfit: wornItems(companions?.[id], { gameCount: GAME_COUNT }) };
+      outfit: wornItems(companions?.[id], { gameCount: GAME_COUNT }),
+      // すがた: 色ちがい and かがやき, when chosen and open.
+      look };
   };
   const getOwnedGotomon = () => {
     const current = read(), companions = current?.snapshot.player.miniGames?.companions ?? {};
@@ -144,6 +148,20 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         friend.outfit = { ...(friend.outfit ?? {}), [slot]: itemId };
       });
     },
+    getLook: id => ({ chosen: { ...(getProgress().companions?.[id]?.look ?? {}) }, progress: lookProgress(getProgress().companions?.[id], id) }),
+    // Turns 色ちがい or かがやき on or off (only once it is open).
+    setLook({ gotomonId, key, on } = {}) {
+      if (!LOOK_KEYS.includes(key) || typeof on !== 'boolean') return { ok: false };
+      if (!getOwnedGotomon().some(item => item.id === gotomonId)) return { ok: false };
+      if (on && !lookProgress(getProgress().companions?.[gotomonId], gotomonId)[key]?.unlocked) return { ok: false };
+      return save(snapshot => {
+        if (!snapshot.player.collection.gotomonIds.includes(gotomonId)) throw new Error('Companion is not owned');
+        const progress = snapshot.player.miniGames ??= { version: 1, games: {}, companions: {} };
+        progress.companions ??= {};
+        const friend = progress.companions[gotomonId] ??= { plays: 0, friendship: 0, medals: [] };
+        friend.look = { ...(friend.look ?? {}), [key]: on };
+      });
+    },
     beginPlay({ sessionId, gameId, gotomonId, supporterIds = [] }) {
       const owned = new Set(getOwnedGotomon().map(friend => friend.id));
       if (!sessionId || !gameId || !owned.has(gotomonId)) return null;
@@ -198,7 +216,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         const titlesBefore = earnedTitleIds(progress.companions);
         const friend = progress.companions[gotomonId] ??= { plays: 0, friendship: 0, medals: [] };
         const before = growthStatus(friend), rank = scoreRank(gameId, points, count(correct));
-        const outfitBefore = outfitProgress(friend, { gameCount: GAME_COUNT });
+        const outfitBefore = outfitProgress(friend, { gameCount: GAME_COUNT }), lookBefore = lookProgress(friend, gotomonId);
         const earnedXP = run ? calculateXP({ completed, finished, correct, rank: rank.rank, newBest: points > previousBest, activeElapsedMs }) : 0;
         const after = growthStatus({ xp: before.xp + earnedXP });
         friend.xp = after.xp; friend.level = after.level;
@@ -265,6 +283,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
           // きせかえ opened by this run (a sticker, a level or なかよし).
           newTitles: newTitles(titlesBefore, progress.companions),
           newSecrets: openedSecrets(lookup(gotomonId), { friendship: friendshipBefore }, friend),
+          newLooks: openedLooks(lookBefore, lookProgress(friend, gotomonId)),
           newOutfits: Object.entries(outfitProgress(friend, { gameCount: GAME_COUNT })).filter(([id, p]) => p.unlocked && !outfitBefore[id].unlocked).map(([id]) => id),
           bestTimeMs:game.bestTimeMs??null,previousTimeMs:previousTime,newTimeBest:validTime&&(!previousTime||roundedTime<previousTime) };
       });
