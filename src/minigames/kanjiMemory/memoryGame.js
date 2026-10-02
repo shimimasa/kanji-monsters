@@ -1,3 +1,5 @@
+import { readingTarget } from '../buildReview.js';
+
 export const PEEK_MS = 1800;
 export const PEEK_STREAK = 3;
 
@@ -85,7 +87,8 @@ export function createMemoryGame({ sessionId, onEvent = () => {}, content }) {
         if (clean) { correct++; cleanStreak++; if (cleanStreak % PEEK_STREAK === 0) { peeks++; earned = true; } }
         else {
           incorrect++; cleanStreak = 0;
-          missed.push(Object.freeze({ contentId: pair.kanjiId, kanji: pair.kanji, kind: rounds[round].kind, answer: pair.text, questionNumber: answered }));
+          missed.push(Object.freeze({ contentId: pair.kanjiId, kanji: pair.kanji, kind: rounds[round].kind, answer: pair.text, questionNumber: answered,
+            build: rounds[round].kind === 'reading' ? readingTarget({ word: pair.kanji, reading: pair.text, sentence: pair.sentence }) : null }));
         }
         lastAnswer = Object.freeze({ attemptId: committedAttempt, match: true, correct: clean, pairId: pair.pairId, earnedPeek: earned,
           roundDone: matched.size === cards().length });

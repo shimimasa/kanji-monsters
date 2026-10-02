@@ -1,4 +1,5 @@
 import { BINGO_CELLS, BINGO_LINES, completedLines, shuffled } from './bingoContent.js';
+import { readingTarget } from '../buildReview.js';
 
 export const BINGO_CALLS = 10;
 export const STAMP_STREAK = 3;
@@ -117,7 +118,8 @@ export function createBingoGame({ sessionId, random = Math.random, onEvent = () 
       } else {
         incorrect++; streak = 0;
         missed.push(Object.freeze({ contentId: target.kanjiId, kanji: target.kanji, clue: problem.kind,
-          answer: problem.kind === 'reading' ? target.reading.reading : target.meaning, questionNumber: answered }));
+          answer: problem.kind === 'reading' ? target.reading.reading : target.meaning, questionNumber: answered,
+          build: problem.kind === 'reading' ? readingTarget({ word: target.kanji, reading: target.reading.reading, sentence: target.reading }) : null }));
         queue.splice(Math.min(RETRY_GAP, queue.length), 0, target);
       }
       lastAnswer = Object.freeze({ attemptId: committedAttempt, choiceId: tapped.cellId, correctChoiceId: target.cellId, correct: isCorrect,

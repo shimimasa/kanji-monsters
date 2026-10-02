@@ -1,4 +1,5 @@
 import { TOSS_BASKETS } from './tossContent.js';
+import { equationTarget } from '../buildReview.js';
 
 export const TOSS_RULES = Object.freeze({
   // Each Gotomon walks its own row; faster rows are nearer the thrower.
@@ -99,7 +100,8 @@ export function createTossGame({ sessionId, random = Math.random, onEvent = () =
       if (right) { scored++; basket.balls++; hintBasketId = null; }
       else {
         tries++; hintBasketId = problem.correctChoiceId;
-        if (first) missed.push(Object.freeze({ contentId: item.problemId, question: item.question, answer: item.answer, chosen: basket.number, questionNumber: answered }));
+        if (first) missed.push(Object.freeze({ contentId: item.problemId, question: item.question, answer: item.answer, chosen: basket.number, questionNumber: answered,
+          build: equationTarget({ question: item.question, answer: item.answer, others: item.numbers.filter(n => n !== item.answer) }) }));
       }
       lastAnswer = Object.freeze({ attemptId: committedAttempt, throw: ++throwSerial, choiceId: basket.basketId, correctChoiceId: problem.correctChoiceId,
         correct: right, first, value: basket.number, answer: item.answer, question: item.question, name: basket.name, x: basket.x, y: basket.y, row: basket.row });

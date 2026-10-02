@@ -67,6 +67,8 @@ test('a wrong kanji is one learning result; the right card then glows and the cu
   assert.equal(give(wrong.cellId), true);
   assert.equal(game.snapshot().lastAnswer.correct, false); assert.equal(events.at(-1).type, 'incorrect');
   assert.equal(game.snapshot().missed.at(-1).kanji, customer.kanji);
+  if (customer.kind === 'reading') assert.equal(game.snapshot().missed.at(-1).build.answer, customer.clue.reading);
+  else assert.equal(game.snapshot().missed.at(-1).build, null);
   assert.equal(give(customer.cellId), false); // no hand-over during feedback
   next();
   assert.equal(game.snapshot().hintCellId, customer.cellId);

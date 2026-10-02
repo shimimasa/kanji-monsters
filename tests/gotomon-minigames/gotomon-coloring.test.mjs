@@ -63,6 +63,8 @@ test('a wrong colour leaves the square blank and says its answer; the first tap 
   assert.equal(after.lastTap.chosenValue, state.values[state.selected]);
   assert.equal(after.incorrect, 1);
   assert.equal(after.missed.length, 1);
+  if (/[+−×]/.test(other.label)) assert.equal(after.missed[0].build.answer, `${other.label}=${other.value}`);
+  else assert.equal(after.missed[0].build, null);
   // The same square with its own colour paints it, but is not a second learning result.
   game.dispatch({ type: 'choose', payload: { sessionId: after.sessionId, color: other.color } });
   assert.equal(paint(other), true);

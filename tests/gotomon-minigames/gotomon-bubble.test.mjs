@@ -96,6 +96,9 @@ test('a miss bounces back: one learning result, reachable matches glow, the same
   assert.equal(after.bubbles.length, before.bubbles.length); // nothing sticks
   assert.equal(events.at(-1).type, 'incorrect');
   assert.equal(after.missed.at(-1).label, before.loaded.label);
+  const sum = after.missed.at(-1);
+  if (/[+−×]/.test(sum.label)) { assert.equal(sum.build.script, 'equation'); assert.equal(sum.build.answer, `${sum.label}=${sum.answer}`); }
+  else assert.equal(sum.build, null);
   next();
   const retry = game.snapshot();
   assert.equal(retry.loaded.loadId, before.loaded.loadId);

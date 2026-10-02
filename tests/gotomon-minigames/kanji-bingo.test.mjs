@@ -106,6 +106,9 @@ test('a miss shows the right square, keeps it closed, and calls that kanji again
   assert.equal(state.lastAnswer.correct, false); assert.equal(state.lastAnswer.correctChoiceId, first.cellId);
   assert.equal(state.marked.filter(Boolean).length, 0);
   assert.equal(state.missed.length, 1); assert.equal(state.missed[0].kanji, first.kanji);
+  // A reading call comes back in the review as the reading to build, in its sentence.
+  if (first.kind === 'reading') { assert.equal(state.missed[0].build.answer, first.clue.reading); assert.equal(state.missed[0].build.sentence.before, first.clue.before); }
+  else assert.equal(state.missed[0].build, null);
   // No second answer to the same call.
   assert.equal(answer(true), false);
   const seen = [];

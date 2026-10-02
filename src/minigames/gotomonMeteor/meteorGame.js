@@ -1,4 +1,5 @@
 import { buildTossProblems, nearbyNumbers } from '../gotomonToss/tossContent.js';
+import { equationTarget } from '../buildReview.js';
 
 // Field coordinates run 0..1 across and down.
 export const METEOR_RULES = Object.freeze({
@@ -100,7 +101,8 @@ export function createMeteorGame({ sessionId, random = Math.random, onEvent = ()
     if (right) correct++;
     else {
       incorrect++;
-      missed.push(Object.freeze({ contentId: meteor.problemId, question: meteor.question, answer: meteor.answer, reason, questionNumber: answered }));
+      missed.push(Object.freeze({ contentId: meteor.problemId, question: meteor.question, answer: meteor.answer, reason, questionNumber: answered,
+        build: equationTarget({ question: meteor.question, answer: meteor.answer }) }));
     }
     return true;
   };

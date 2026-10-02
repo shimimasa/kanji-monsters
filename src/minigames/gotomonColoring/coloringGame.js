@@ -1,4 +1,5 @@
 import { pickValues, labelsFor, pick } from '../gotomonBubble/bubbleContent.js';
+import { equationTarget } from '../buildReview.js';
 
 export const COLORING_RULES = Object.freeze({ size: 10 });
 // Every square shows a calculation (never the bare number), so each one is worked out.
@@ -82,7 +83,8 @@ export function createColoringGame({ sessionId, random = Math.random, onEvent = 
       lastTap = Object.freeze({ tap: tapSerial, cellId, correct: right, first, label: cell.label, value: cell.value, color: selected, chosenValue: values[selected], cellColor: cell.color });
       const payload = { contentId: `${level}:${cell.value}`, skillId: `coloring:${level}`, label: cell.label, chosen: values[selected] };
       if (right) { cell.painted = true; painted++; }
-      else if (first) missed.push(Object.freeze({ contentId: `${level}:${cell.value}`, label: cell.label, answer: cell.value, chosen: values[selected], questionNumber: answered }));
+      else if (first) missed.push(Object.freeze({ contentId: `${level}:${cell.value}`, label: cell.label, answer: cell.value, chosen: values[selected], questionNumber: answered,
+        build: equationTarget({ question: cell.label, answer: cell.value }) }));
       notify(first ? (right ? 'correct' : 'incorrect') : (right ? 'painted' : 'retry'), payload);
       if (painted >= cells.length) { complete(); return true; }
       // A finished colour hands over to the next one with squares left.

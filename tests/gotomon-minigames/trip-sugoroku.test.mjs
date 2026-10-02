@@ -77,6 +77,8 @@ test('a hard boss battle still ends kindly after six questions, keeping the miss
   assert.equal(state.result.bossDefeated, false); assert.equal(state.result.stars, 1); assert.equal(state.result.bossDamage, 0);
   assert.equal(state.boss.asked, BOSS_QUESTIONS);
   assert.equal(state.missed.length, BOSS_QUESTIONS); assert.ok(state.missed.every(item => item.text && item.answer));
+  // Kanji readings come back to build in the review; proverbs do not.
+  assert.ok(state.missed.every(item => (item.kind === 'kanji' ? item.build.answer === item.answer && item.build.sentence : item.build === null)));
 });
 
 test('items: the hint hides two wrong choices once, and きらきら waits for the boss', () => {

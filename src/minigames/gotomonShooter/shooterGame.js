@@ -1,4 +1,6 @@
 import { SHOOTER_FORMATION } from './shooterContent.js';
+import { buildTarget } from '../buildReview.js';
+import { sharedProblem } from '../gotomonSlash/slashContent.js';
 
 // Field coordinates run 0..1 across and down.
 export const SHOOTER_RULES = Object.freeze({
@@ -83,7 +85,7 @@ export function createShooterGame({ sessionId, onEvent = () => {}, content, pace
       tries++; enemies = enemies.filter(other => other !== enemy);
       hintId = enemies.find(other => other.plate.contentId === item.contentId)?.enemyId ?? null;
       if (first) missed.push(Object.freeze({ contentId: item.contentId, word: item.word, meaning: item.meaning, kind: item.kind,
-        chosen: enemy.plate.text, questionNumber: answered }));
+        chosen: enemy.plate.text, build: buildTarget(sharedProblem(item)), questionNumber: answered }));
     }
     lastAnswer = Object.freeze({ attemptId: committedAttempt, hit: ++hitSerial, correct: right, first, kind: item.kind, word: item.word, meaning: item.meaning,
       prompt: item.prompt, plate: enemy.plate, slot: enemy.slot, x: at.x, y: at.y });

@@ -1,4 +1,6 @@
 import { FISH_SWIMMERS } from './fishContent.js';
+import { buildTarget } from '../buildReview.js';
+import { sharedProblem } from '../gotomonSlash/slashContent.js';
 
 export const FISH_RULES = Object.freeze({
   // Each Gotomon swims its own depth; rows take turns swimming right and left.
@@ -101,7 +103,7 @@ export function createFishGame({ sessionId, random = Math.random, onEvent = () =
       else {
         tries++; hintSwimmerId = problem.correctChoiceId;
         if (first) missed.push(Object.freeze({ contentId: item.contentId, word: item.word, meaning: item.meaning, kind: item.kind,
-          chosen: swimmer.plate.text, questionNumber: answered }));
+          chosen: swimmer.plate.text, build: buildTarget(sharedProblem(item)), questionNumber: answered }));
       }
       lastAnswer = Object.freeze({ attemptId: committedAttempt, cast: ++castSerial, choiceId: swimmer.swimmerId, correctChoiceId: problem.correctChoiceId,
         correct: right, first, kind: item.kind, word: item.word, meaning: item.meaning,

@@ -1,4 +1,5 @@
 import { shuffled } from '../kanjiBingo/bingoContent.js';
+import { readingTarget } from '../buildReview.js';
 
 export const SHOP_REQUESTS = 12;
 export const SHOP_SLOTS = 3;
@@ -123,7 +124,8 @@ export function createShopGame({ sessionId, random = Math.random, onEvent = () =
       else {
         hintCellId = customer.cellId;
         if (first) missed.push(Object.freeze({ contentId: customer.kanjiId, kanji: customer.kanji, clue: customer.kind,
-          answer: customer.kind === 'reading' ? customer.clue.reading : customer.clue.meaning, questionNumber: answered }));
+          answer: customer.kind === 'reading' ? customer.clue.reading : customer.clue.meaning, questionNumber: answered,
+          build: customer.kind === 'reading' ? readingTarget({ word: customer.kanji, reading: customer.clue.reading, sentence: customer.clue }) : null }));
       }
       lastAnswer = Object.freeze({ attemptId: committedAttempt, choiceId: cellId, correctChoiceId: customer.cellId, correct: right, first, tip,
         slot: customer.slot, name: customer.name, kanji: customer.kanji, given: cellById(cellId).kanji });

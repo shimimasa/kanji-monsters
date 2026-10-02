@@ -1,4 +1,5 @@
 import { pickValues, labelFor, pick, shuffled } from './bubbleContent.js';
+import { equationTarget } from '../buildReview.js';
 
 // Board geometry in bubble diameters. Rows are packed like a honeycomb: every other
 // row sits half a bubble to the right and holds one bubble less.
@@ -218,7 +219,8 @@ export function createBubbleGame({ sessionId, random = Math.random, onEvent = ()
         tries++;
         hintIds = exposed().filter(bubble => bubble.value === loaded.value).map(bubble => bubble.bubbleId);
         if (first) missed.push(Object.freeze({ contentId: problem.contentId, label: loaded.label, answer: loaded.value,
-          touched: Object.freeze(touching.map(bubble => bubble.label)), questionNumber: answered }));
+          touched: Object.freeze(touching.map(bubble => bubble.label)), questionNumber: answered,
+          build: equationTarget({ question: loaded.label, answer: loaded.value }) }));
       }
       const view = bubble => Object.freeze({ bubbleId: bubble.bubbleId, x: bubble.x, y: bubble.y, label: bubble.label, gotomon: bubble.gotomon ?? null });
       lastAnswer = Object.freeze({ attemptId: committedAttempt, shot: ++shotSerial, correct: right, first, value: loaded.value, label: loaded.label,

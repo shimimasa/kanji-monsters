@@ -107,6 +107,9 @@ test('a beam on another Gotomon is one learning result; it leaves and the answer
     const answer = game.snapshot().lastAnswer;
     assert.equal(answer.correct, false); assert.equal(answer.plate.contentId, wrong.plate.contentId);
     assert.equal(events.at(-1).type, 'incorrect');
+    const slip = game.snapshot().missed.at(-1);
+    assert.equal(slip.build.script, mode === 'kanji' ? 'kana' : 'letters');
+    if (mode === 'kanji') assert.ok(slip.build.sentence);
     next();
     const retry = game.snapshot();
     assert.equal(retry.enemies.length, SHOOTER_FORMATION - 1);

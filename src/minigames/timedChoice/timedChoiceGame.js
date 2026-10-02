@@ -1,4 +1,5 @@
 import { generateTimedChoiceQuestions } from './timedChoiceQuestions.js';
+import { readingTarget } from '../buildReview.js';
 
 export const TIMED_CHOICE_DEFAULT_DEADLINE_MS = 5000;
 export const TIMED_CHOICE_SLOW_DEADLINE_MS = 8000;
@@ -66,7 +67,9 @@ export function createTimedChoiceGame({ sessionId, random = Math.random, onEvent
     else {
       incorrect++;
       missed.push(Object.freeze({ contentId: problem.fixtureId, questionNumber: answered, selectedAnswer: choice?.text ?? null,
-        prompt: problem.prompt, reading: problem.choices.find(choice => choice.choiceId === problem.correctChoiceId).text, reason }));
+        prompt: problem.prompt, reading: problem.choices.find(choice => choice.choiceId === problem.correctChoiceId).text, reason,
+        chosen: choice?.text ?? null, build: readingTarget({ word: problem.prompt.match(/「(.+)」/)?.[1], reading: problem.choices.find(choice => choice.choiceId === problem.correctChoiceId).text,
+          others: problem.choices.filter(c => c.choiceId !== problem.correctChoiceId).map(c => c.text) }) }));
     }
     if (reason === 'timeout') timedOut++;
     lastAnswer = Object.freeze({

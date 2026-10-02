@@ -58,6 +58,8 @@ test('a wrong base is one learning result and lights the right one; the meteor k
   const before = game.snapshot();
   assert.equal(fire(wrongBase()), true);
   assert.equal(events.at(-1).type, 'incorrect');
+  const slip = game.snapshot().missed.at(-1);
+  assert.equal(slip.build.script, 'equation'); assert.ok(slip.build.answer.endsWith(`=${slip.answer}`));
   const after = game.snapshot();
   assert.equal(after.meteors.length, before.meteors.length);
   assert.equal(after.hintBaseId, answerBase());
