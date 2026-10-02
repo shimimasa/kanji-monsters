@@ -1,32 +1,52 @@
-# Checks Codex's evolved pictures and puts them in the game as 512x512 WebP (transparent background).
+# Checks Codex's evolved pictures and puts them in the game as 512x512 WebP (transparent background),
+# matched to the original picture so the Gotomon keep their retro look:
+# - size: as much of the frame as the original fills, and a little more (it has grown), never past 98%;
+# - tone: the same mean brightness as the original (Codex's pictures come out brighter), and 48 flat
+#   colours (no smooth gradients), as the originals have;
+# - file: lossy WebP like the originals (about 15-60 KB instead of 100-200 KB).
 # Reads <outDir>/<id>/<id>_evo.png for every target in targets.json and writes
 # public/assets/images/monsters/evo/<id>.webp. Nothing is overwritten unless --force.
 # A picture whose corners are not transparent is reported and skipped (fix it in Codex, then run again).
 # usage: python scripts/evolution/import-images.py <outDir> [--force]
-import json, sys
+import json, statistics, sys
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageEnhance
 
+COLOURS, GROWTH, MAX_FILL, QUALITY = 48, 1.05, 0.98, 88
 out_dir = Path(sys.argv[1]); force = '--force' in sys.argv
+full = Path('public/assets/images/monsters/full')
 dest = Path('public/assets/images/monsters/evo'); dest.mkdir(parents=True, exist_ok=True)
 targets = json.loads(Path('scripts/evolution/targets.json').read_text(encoding='utf-8'))
+
+def brightness(image):
+    dots = [p for p in image.get_flattened_data() if p[3] > 128][::7]
+    return statistics.mean(max(r, g, b) / 255 for r, g, b, _ in dots)
+
+def fill(image):
+    box = image.getbbox(); return max(box[2] - box[0], box[3] - box[1]) / image.width
+
 for target in targets:
     gid = target['id']; src = out_dir / gid / f'{gid}_evo.png'; to = dest / f'{gid}.webp'
     if not src.exists(): print(f'{gid}: no picture yet'); continue
     if to.exists() and not force: print(f'{gid}: already in the game (use --force to replace)'); continue
+    original = Image.open(next(full.glob(f'*/{gid}.webp'))).convert('RGBA')
     image = Image.open(src).convert('RGBA'); w, h = image.size
     # Generated pictures come with alpha like 253: make every dot fully solid or fully clear, as pixel art is.
     image.putalpha(image.getchannel('A').point(lambda a: 255 if a >= 128 else 0))
     corners = [image.getpixel(p)[3] for p in [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)]]
     if max(corners) > 10: print(f'{gid}: SKIPPED, the background is not transparent (corners alpha {corners}), {w}x{h}'); continue
-    # Fit into 512x512 with the 10% margin the prompt asks for, keeping the dots sharp.
-    box = image.getbbox() or (0, 0, w, h); body = image.crop(box)
-    scale = min(410 / body.width, 410 / body.height)
+    body = image.crop(image.getbbox() or (0, 0, w, h))
+    side = round(512 * min(MAX_FILL, fill(original) * GROWTH)); scale = side / max(body.size)
     body = body.resize((max(1, round(body.width * scale)), max(1, round(body.height * scale))), Image.NEAREST)
+    alpha, rgb = body.getchannel('A'), body.convert('RGB')
+    rgb = ImageEnhance.Brightness(rgb).enhance(min(1.0, brightness(original) / brightness(body)))
+    rgb = rgb.quantize(COLOURS, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).convert('RGB')
+    body = rgb.convert('RGBA'); body.putalpha(alpha)
     canvas = Image.new('RGBA', (512, 512), (0, 0, 0, 0))
     canvas.paste(body, ((512 - body.width) // 2, (512 - body.height) // 2), body)
-    canvas.save(to, 'WEBP', lossless=True)
-    print(f'{gid}: imported from {w}x{h} -> {to} ({to.stat().st_size // 1024} KB)')
+    canvas.save(to, 'WEBP', quality=QUALITY, method=6)
+    print(f'{gid}: imported from {w}x{h} -> {to} ({to.stat().st_size // 1024} KB, fill {fill(canvas):.2f} vs {fill(original):.2f}, '
+          f'brightness {brightness(canvas):.2f} vs {brightness(original):.2f})')
 
 # The game's list of Gotomon with an evolved picture: every WebP now in the evo folder.
 ids = sorted(path.stem for path in dest.glob('*.webp'))

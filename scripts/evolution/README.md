@@ -12,7 +12,7 @@
    Codex の答えは `<回>/<id>/codex.log`。
 3. 目で確かめる（元の絵と並べた シート）
    `python scripts/evolution/compare.py C:/kanji-evo/<回> <シート.png> <id> ...`
-4. ゲームに入れる（背景が透明か確かめ、512x512 の WebP に そろえて `public/assets/images/monsters/evo/<id>.webp`、`evolvedIds.js` を作りなおす）
+4. ゲームに入れる（背景が透明か確かめ、元の絵に そろえる：枠に しめる大きさ＝元の1.05倍・明るさ＝元と同じ・48色・lossy WebP。512x512 で `public/assets/images/monsters/evo/<id>.webp`、`evolvedIds.js` を作りなおす）
    `python scripts/evolution/import-images.py C:/kanji-evo/<回>`（入れかえるときは `--force`）
 
 Claude からは 2. の形の コマンドだけ 許可してある（`.claude/settings.local.json`）。パイプや `cd` を つけると 許可の形から外れる。
