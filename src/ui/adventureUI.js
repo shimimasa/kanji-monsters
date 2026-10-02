@@ -21,6 +21,12 @@ export function companionPortrait(doc, gotomon, className = '') {
     img.onerror = () => { img.hidden = true; fallback.hidden = false; }; frame.append(img);
   }
   if (gotomon?.outfit?.length) dress(doc, frame, gotomon.outfit);
+  // すがた: 色ちがい shifts the picture's colours (its own fixed hue), かがやき adds light around it.
+  if (gotomon?.look?.shiny || gotomon?.look?.glow) {
+    frame.dataset.look = [gotomon.look.shiny && 'shiny', gotomon.look.glow && 'glow'].filter(Boolean).join(' ');
+    if (gotomon.look.shiny) frame.style.setProperty('--look-hue', `hue-rotate(${gotomon.look.hue}deg) saturate(1.25)`);
+    if (gotomon.look.glow) frame.style.setProperty('--look-glow', 'drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px #ffd43b) drop-shadow(0 0 12px #ffb000)');
+  }
   return frame;
 }
 

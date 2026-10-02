@@ -4,6 +4,7 @@ import { validateCompanionStickers } from '../minigames/companionStickers.js';
 import { validateCompanionOutfit } from '../minigames/companionOutfits.js';
 import { validateParty } from '../minigames/gotomonMoves.js';
 import { validateBreeding } from '../minigames/gotomonBreeding.js';
+import { validateCompanionLook } from '../minigames/companionLooks.js';
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 function requireRecord(value, label) {
@@ -118,6 +119,7 @@ export function validateSave(save, currentVersion) {
     if (friend?.memories !== undefined) validateCompanionMemories(friend.memories);
     if (friend?.stickers !== undefined) validateCompanionStickers(friend.stickers);
     if (friend?.outfit !== undefined) validateCompanionOutfit(friend.outfit);
+    if (friend?.look !== undefined) validateCompanionLook(friend.look);
   }
   if (save.player.miniGames?.party !== undefined) validateParty(save.player.miniGames.party);
   if (save.player.miniGames?.breeding !== undefined) validateBreeding(save.player.miniGames.breeding);

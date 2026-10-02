@@ -3,6 +3,7 @@ import { stickerSummary } from '../minigames/companionStickers.js';
 import { OUTFIT_ITEMS, OUTFIT_SLOTS, SLOT_NAMES } from '../minigames/companionOutfits.js';
 import Speech from '../audio/speech.js';
 import { movesOf, supportEffectOf } from '../minigames/gotomonMoves.js';
+import { LOOK_NAMES } from '../minigames/companionLooks.js';
 
 // The sticker book of one companion: one sticker per mini-game, grouped like the square.
 // Silver: played to the end together. Gold: rank A or S. The rainbow rim: the review done after it.
@@ -30,7 +31,35 @@ export function createStickerBookDialog({ doc, service, gotomon, sections, games
   }
   const support = supportEffectOf(gotomon.type);
   moves.append(element(doc, 'p', 'yt-move', `サポーターの とき：${support.name}（${support.text}）`));
-  dialog.append(header, who, moves, how, outfitSection(), secretSection());
+  dialog.append(header, who, moves, how, lookSection(), outfitSection(), secretSection());
+
+  // すがた: 色ちがい (10 gold stickers) and かがやき (Lv10), each turned on or off once open.
+  function lookSection() {
+    const box = element(doc, 'section', 'yt-look'); box.setAttribute('aria-label', 'すがた');
+    const stage = element(doc, 'div', 'yt-look-stage'), items = element(doc, 'div', 'yt-look-items'), say = element(doc, 'p', 'yt-note');
+    say.setAttribute('role', 'status');
+    box.append(element(doc, 'h3', '', 'すがた'), stage, items, say);
+    const hints = { shiny: p => `金シール ${p.have}/${p.need}で ひらく`, glow: p => `Lv${p.need}で ひらく（いま Lv${p.have}）` };
+    const render = () => {
+      const { chosen, progress } = service.getLook(gotomon.id);
+      stage.replaceChildren(companionPortrait(doc, service.getGotomonById(gotomon.id)));
+      items.replaceChildren(...['shiny', 'glow'].map(key => {
+        const p = progress[key], on = !!chosen[key] && p.unlocked;
+        const pick = button(doc, '', () => {
+          const outcome = service.setLook({ gotomonId: gotomon.id, key, on: !on });
+          say.textContent = !outcome?.ok ? 'いまは かえられませんでした。' : on ? `${LOOK_NAMES[key]}を やめたよ` : `${LOOK_NAMES[key]}に なった！`;
+          render(); onOutfit?.();
+          // The book's other pictures of it show the new look at once.
+          for (const old of dialog.querySelectorAll('.yt-sticker-who > .gt-portrait, .yt-outfit-stage > .gt-portrait')) old.replaceWith(companionPortrait(doc, service.getGotomonById(gotomon.id)));
+        }, 'yt-look-item');
+        pick.dataset.look = key; pick.setAttribute('aria-pressed', String(on)); pick.disabled = !p.unlocked;
+        pick.append(element(doc, 'strong', '', LOOK_NAMES[key]), element(doc, 'small', '', p.unlocked ? (on ? 'いまの すがた（タップで もどす）' : 'タップで かえる') : hints[key](p)));
+        return pick;
+      }));
+    };
+    render();
+    return box;
+  }
 
   // ひみつノート: what the companion tells as なかよし grows. Every open line can be read aloud
   // (the descriptions use kanji beyond the grade; a guessed furigana would teach wrong readings).
