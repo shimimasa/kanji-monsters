@@ -8,5 +8,15 @@
   {"id": "TOKU-E10", "style": "cool"},
   {"id": "CAN-E010", "style": "cool"},
   {"id": "EGY-E010", "style": "cool"},
-  {"id": "CHN-E010", "style": "cute"}
+  {"id": "CHN-E010", "style": "cute"},
+  {"id": "AOM-E01", "style": "cute"},
+  {"id": "TKY-E01", "style": "cool"},
+  {"id": "GNM-E01", "style": "eerie"},
+  {"id": "GF-E01", "style": "cool"},
+  {"id": "TYM-E01", "style": "eerie"},
+  {"id": "OSK-E01", "style": "cute"},
+  {"id": "HYG-E01", "style": "cool"},
+  {"id": "OKY-E01", "style": "cool"},
+  {"id": "KOCH-E01", "style": "cool"},
+  {"id": "FUK-E01", "style": "cute"}
 ]
