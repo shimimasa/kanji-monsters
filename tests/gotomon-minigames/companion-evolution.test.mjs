@@ -14,6 +14,7 @@ test('every evolved Gotomon has its picture (a WebP), and is one of the chosen t
     const head = readFileSync(picture(id)).subarray(0, 12).toString('latin1');
     assert.ok(head.startsWith('RIFF') && head.endsWith('WEBP'), `${id} is a WebP`);
     assert.ok(statSync(picture(id)).size > 1000);
+    assert.ok(statSync(picture(id)).size < 100 * 1024, `${id} stays light like the originals (lossy WebP)`);
     assert.ok(targets.includes(id), `${id} is in targets.json`);
   }
   console.log(`evolved pictures: ${EVOLVED_IDS.length} (${EVOLVED_IDS.join(', ')})`);
