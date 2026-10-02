@@ -1,6 +1,7 @@
 import { element, button, companionPortrait } from './adventureUI.js';
 import { stickerSummary } from '../minigames/companionStickers.js';
 import { OUTFIT_ITEMS, OUTFIT_SLOTS, SLOT_NAMES } from '../minigames/companionOutfits.js';
+import Speech from '../audio/speech.js';
 
 // The sticker book of one companion: one sticker per mini-game, grouped like the square.
 // Silver: played to the end together. Gold: rank A or S. The rainbow rim: the review done after it.
@@ -19,7 +20,32 @@ export function createStickerBookDialog({ doc, service, gotomon, sections, games
   who.append(companionPortrait(doc, gotomon), counts);
   const how = element(doc, 'p', 'yt-note', `${gotomon.name}と ミニゲームを さいごまで あそぶと 銀シール、ランク A 以上で 金シール。` +
     'まちがえた問題の「もじを ならべて ふくしゅう」を さいごまで やると、シールに にじの ふちが つくよ。');
-  dialog.append(header, who, how, outfitSection());
+  dialog.append(header, who, how, outfitSection(), secretSection());
+
+  // ひみつノート: what the companion tells as なかよし grows. Every open line can be read aloud
+  // (the descriptions use kanji beyond the grade; a guessed furigana would teach wrong readings).
+  function secretSection() {
+    const box = element(doc, 'section', 'yt-secrets'); box.setAttribute('aria-label', 'ひみつノート');
+    box.append(element(doc, 'h3', '', 'ひみつノート'));
+    const say = element(doc, 'p', 'yt-note'); say.setAttribute('role', 'status');
+    for (const secret of service.getSecrets?.(gotomon.id) ?? []) {
+      const row = element(doc, 'div', 'yt-secret'); row.dataset.secret = secret.key; row.dataset.open = String(secret.open);
+      row.append(element(doc, 'small', '', secret.open ? secret.label : `なかよし ${secret.at} で ひらく · ${secret.label}（いま ${secret.friendship}）`));
+      if (secret.open) {
+        const line = element(doc, 'p', '', secret.text);
+        const listen = button(doc, '🔊 よんで もらう', () => {
+          if (!Speech.isSupported()) { say.textContent = 'この たんまつでは よみあげが つかえません。'; return; }
+          if (!Speech.isEnabled()) { say.textContent = '設定の「よみあげ」が OFF に なっています。'; return; }
+          Speech.speak(secret.text); say.textContent = '';
+        }, 'yt-secret-listen');
+        listen.setAttribute('aria-label', `${secret.label}を よんで もらう`);
+        row.append(line, listen);
+      } else row.append(element(doc, 'p', 'yt-secret-locked', '？？？？？'));
+      box.append(row);
+    }
+    box.append(say);
+    return box;
+  }
 
   // きせかえ: the items this companion has opened, one per place; tapping one again takes it off.
   function outfitSection() {
