@@ -1,0 +1,267 @@
+<title>ヨミタビ 先生チェック</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: one column like a marking sheet — a sticky header with the four piles and their progress,
+   then the rows to mark, each with an OK stamp and a "fix" pen on the right. */
+:root {
+  --paper: #f6f7f2;      /* notebook paper with a faint green bias */
+  --sheet: #ffffff;
+  --ink: #1f2a24;
+  --muted: #5f6b63;
+  --rule: #d9ded5;
+  --red: #c8321e;        /* the teacher's red pen */
+  --red-soft: #fbe7e2;
+  --ok: #1f7a4d;
+  --ok-soft: #e1f2e8;
+  --mark: #fff1b8;
+  --focus: #1b6fb8;
+  --font-text: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+  --font-kanji: "Klee One", "Hiragino Mincho ProN", "Yu Mincho", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #171c19; --sheet: #1f2622; --ink: #e9eee9; --muted: #a3aea6; --rule: #344039;
+    --red: #ff7a63; --red-soft: #3d2420; --ok: #6fd3a0; --ok-soft: #1d3628; --mark: #4a4220; --focus: #7ab8f0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #171c19; --sheet: #1f2622; --ink: #e9eee9; --muted: #a3aea6; --rule: #344039;
+  --red: #ff7a63; --red-soft: #3d2420; --ok: #6fd3a0; --ok-soft: #1d3628; --mark: #4a4220; --focus: #7ab8f0;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-text); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 920px; margin: 0 auto; padding-inline: 16px; padding-block: 0 48px; }
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); border-bottom: 1px solid var(--rule); padding-block: 14px 10px; display: grid; gap: 10px; }
+h1 { font-family: var(--font-kanji); font-weight: 600; font-size: 24px; margin: 0; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); font-size: 13px; max-width: 65ch; }
+.status { font-size: 12px; color: var(--muted); }
+.status[data-state="error"] { color: var(--red); }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { font: inherit; font-size: 14px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); border-radius: 8px; padding: 6px 10px; cursor: pointer; display: grid; gap: 2px; text-align: left; min-width: 0; }
+.tab[aria-selected="true"] { border-color: var(--ink); box-shadow: inset 0 -3px 0 var(--red); }
+.tab b { font-weight: 700; }
+.tab small { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar { height: 4px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--ok); width: 0; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { font: inherit; font-size: 13px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+.tools select, .tools input[type="search"] { font: inherit; font-size: 13px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); border-radius: 6px; padding: 4px 8px; min-width: 0; }
+.tools input[type="search"] { flex: 1 1 160px; }
+.about { font-size: 13px; color: var(--muted); margin: 12px 0 0; max-width: 70ch; }
+ol.rows { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.row { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 14px; align-items: start; }
+.row[data-verdict="ok"] { border-color: var(--ok); }
+.row[data-verdict="fix"] { border-color: var(--red); background: linear-gradient(var(--red-soft), var(--red-soft)) left / 4px 100% no-repeat, var(--sheet); }
+.body { min-width: 0; display: grid; gap: 4px; }
+.meta { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.num { font-variant-numeric: tabular-nums; }
+.big { font-family: var(--font-kanji); font-size: 22px; line-height: 1.4; overflow-wrap: anywhere; }
+.big mark { background: var(--mark); color: var(--ink); padding: 0 2px; border-radius: 3px; }
+.yomi { font-size: 15px; }
+.yomi b { font-family: var(--font-kanji); font-size: 20px; color: var(--red); }
+.small { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+ruby { ruby-position: under; }
+rt { font-family: var(--font-text); font-size: 12px; color: var(--red); font-weight: 700; }
+.tag { font-size: 11px; border: 1px solid var(--red); color: var(--red); border-radius: 4px; padding: 0 5px; }
+.marks { display: grid; gap: 6px; justify-items: end; }
+.btns { display: flex; gap: 6px; }
+.stamp { font: inherit; font-size: 14px; font-weight: 700; border: 2px solid var(--rule); background: var(--sheet); color: var(--muted); border-radius: 999px; min-width: 64px; min-height: 40px; padding: 0 10px; cursor: pointer; }
+.stamp.ok[aria-pressed="true"] { border-color: var(--ok); background: var(--ok-soft); color: var(--ok); }
+.stamp.fix[aria-pressed="true"] { border-color: var(--red); background: var(--red-soft); color: var(--red); }
+.stamp:disabled { cursor: default; opacity: .55; }
+.fixbox { display: grid; gap: 4px; width: min(260px, 100%); }
+.fixbox label { font-size: 12px; color: var(--red); }
+.fixbox textarea { font: inherit; font-size: 14px; border: 1px solid var(--red); background: var(--sheet); color: var(--ink); border-radius: 6px; padding: 6px 8px; resize: vertical; min-height: 40px; }
+.saved { font-size: 11px; color: var(--muted); }
+.more { font: inherit; margin: 12px auto 0; display: block; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+.empty { text-align: center; color: var(--muted); padding: 32px 0; }
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (max-width: 560px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .marks { justify-items: start; }
+  .fixbox { width: 100%; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>ヨミタビ 先生チェック</h1>
+      <p class="lead">ゲームで子どもに見せている文や答えです。正しければ「OK」、直したいときは「直す」を押して正しい形を書いてください。印はすぐ保存され、次の作業で Claude が読んで直します。</p>
+    </div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+    <div class="tools">
+      <button class="chip" type="button" data-filter="todo" id="f-todo">まだ</button>
+      <button class="chip" type="button" data-filter="fix" id="f-fix">直す</button>
+      <button class="chip" type="button" data-filter="all" id="f-all">ぜんぶ</button>
+      <select id="grade" aria-label="学年"><option value="">全学年</option></select>
+      <input type="search" id="q" placeholder="漢字・ことば・県名でさがす" aria-label="さがす">
+    </div>
+    <p class="status" id="status" role="status">保存先に つないでいます…</p>
+  </header>
+  <p class="about" id="about"></p>
+  <ol class="rows" id="rows"></ol>
+  <button class="more" type="button" id="more" hidden>もっと見る</button>
+</div>
+
+<script>
+const DATA = __DATA__;
+const KINDS = {
+  reading: { label: '例文の読み', about: '写真ラリーなどで「この文で どう読む？」と出す603文です。［ ］の漢字を、その読みで読むかを見てください。まちがいなら正しい読みを書いてください。', grades: true },
+  proverbs: { label: 'ことわざの分け方', about: 'ことわざのふくしゅうで、漢字ごとにどこまで読むかを分けています（赤い字が漢字の下に出す読み）。「手で決めた」の3つは、ことばの切れ目から分け方を決めました。', grades: false },
+  parts: { label: '漢字パーツ', about: '漢字パーツ落としで使う、2つのパーツの組み合わせです。パーツ・ならび方・読みを見てください。', grades: true },
+  hints: { label: '宅配便のヒント', about: 'ゴトモン宅配便で「ふるさと」を当てるヒントです（〇〇がふるさとの名前）。内容が正しく、子どもに出してよいかを見てください。', grades: false },
+};
+const ORDER = ['reading', 'proverbs', 'parts', 'hints'];
+const PAGE = 40;
+const store = (() => { try { return window.localStorage; } catch { return null; } })();
+const remember = (k, v) => { try { store?.setItem('yt-check-' + k, v); } catch {} };
+const recall = (k, d) => { try { return store?.getItem('yt-check-' + k) ?? d; } catch { return d; } };
+
+let kind = ORDER.includes(recall('kind')) ? recall('kind') : 'reading';
+let filter = ['todo', 'fix', 'all'].includes(recall('filter')) ? recall('filter') : 'todo';
+let shown = PAGE, db = null, writable = false;
+const marks = new Map(); // id -> { verdict, note, at }
+const el = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// What a row shows, per pile, and the words it is found by.
+const view = {
+  reading: r => ({ label: `${r.kanji}（${r.reading}）`, find: r.kanji + r.reading + r.sentence,
+    html: `<div class="meta"><span>小${r.grade}</span><span class="num">${r.id}</span></div>
+      <div class="big">${esc(r.sentence).replace(/［(.+?)］/, '<mark>$1</mark>')}</div>
+      <div class="yomi">「${esc(r.kanji)}」の読み：<b>${esc(r.reading)}</b></div>
+      <div class="small">出てくるステージ：${esc(r.stages)}</div>` }),
+  proverbs: p => ({ label: p.text, find: p.text + p.reading,
+    html: `<div class="meta"><span class="num">${p.id}</span>${p.byHand ? '<span class="tag">手で決めた</span>' : ''}</div>
+      <div class="big">${p.frame.map(f => f.kana ? esc(f.kana) : `<ruby>${esc(f.kanji)}<rt>${esc(f.yomi)}</rt></ruby>`).join('')}</div>
+      <div class="small">読み：${esc(p.reading)}</div>` }),
+  parts: k => ({ label: k.kanji, find: k.kanji + k.a + k.b + k.reading,
+    html: `<div class="meta"><span>小${k.grade}</span><span class="num">${k.id}</span><span>${esc(k.layout)}</span></div>
+      <div class="big">${esc(k.a)} ＋ ${esc(k.b)} ＝ ${esc(k.kanji)}</div>
+      <div class="yomi">表示する読み：<b>${esc(k.reading)}</b></div>` }),
+  hints: h => ({ label: `${h.pref}・${h.name}`, find: h.pref + h.name + h.hint + h.home,
+    html: `<div class="meta"><span>${esc(h.pref)}</span><span class="num">${h.id}</span><span>${esc(h.name)}</span></div>
+      <div>ヒント：${esc(h.hint)}</div>
+      <div class="small">すみか：${esc(h.home)}<br>当てたあと：${esc(h.fact)}</div>` }),
+};
+const rowsOf = k => DATA[k];
+const gradeOf = item => item.grade ?? null;
+
+function counts(k) {
+  let ok = 0, fix = 0;
+  for (const item of rowsOf(k)) { const m = marks.get(item.id); if (m?.verdict === 'ok') ok++; else if (m?.verdict === 'fix') fix++; }
+  return { ok, fix, total: rowsOf(k).length };
+}
+function renderTabs() {
+  el('tabs').replaceChildren(...ORDER.map(k => {
+    const c = counts(k), b = document.createElement('button');
+    b.className = 'tab'; b.type = 'button'; b.role = 'tab'; b.id = 'tab-' + k;
+    b.setAttribute('aria-selected', String(k === kind));
+    b.innerHTML = `<b>${KINDS[k].label}</b><small>${c.ok + c.fix} / ${c.total} 見た${c.fix ? `・直す ${c.fix}` : ''}</small>`;
+    b.onclick = () => { kind = k; shown = PAGE; remember('kind', k); el('grade').value = ''; render(); };
+    return b;
+  }));
+  const c = counts(kind);
+  el('bar').style.width = `${Math.round(((c.ok + c.fix) / c.total) * 100)}%`;
+}
+function list() {
+  const g = el('grade').value, q = el('q').value.trim();
+  return rowsOf(kind).filter(item => {
+    const m = marks.get(item.id);
+    if (filter === 'todo' && m) return false;
+    if (filter === 'fix' && m?.verdict !== 'fix') return false;
+    if (g && String(gradeOf(item)) !== g) return false;
+    if (q && !view[kind](item).find.includes(q)) return false;
+    return true;
+  });
+}
+function rowHtml(item) {
+  const v = view[kind](item), m = marks.get(item.id);
+  const off = writable ? '' : ' disabled';
+  return `<li class="row" data-id="${item.id}" data-verdict="${m?.verdict ?? ''}">
+    <div class="body">${v.html}</div>
+    <div class="marks">
+      <div class="btns">
+        <button type="button" class="stamp ok" data-act="ok" aria-pressed="${m?.verdict === 'ok'}"${off}>OK</button>
+        <button type="button" class="stamp fix" data-act="fix" aria-pressed="${m?.verdict === 'fix'}"${off}>直す</button>
+      </div>
+      ${m?.verdict === 'fix' ? `<div class="fixbox"><label for="n-${item.id}">正しくは（書くと保存）</label>
+        <textarea id="n-${item.id}" rows="2"${off}>${esc(m.note ?? '')}</textarea></div>` : ''}
+      ${m ? `<span class="saved">${m.pending ? '保存中…' : '保存ずみ'}</span>` : ''}
+    </div>
+  </li>`;
+}
+function render() {
+  renderTabs();
+  for (const id of ['todo', 'fix', 'all']) el('f-' + id).setAttribute('aria-pressed', String(filter === id));
+  const grades = [...new Set(rowsOf(kind).map(gradeOf).filter(Boolean))].sort((a, b) => a - b);
+  const sel = el('grade'), keep = sel.value;
+  sel.hidden = !KINDS[kind].grades;
+  sel.replaceChildren(new Option('全学年', ''), ...grades.map(g => new Option(`小${g}`, String(g))));
+  sel.value = grades.map(String).includes(keep) ? keep : '';
+  el('about').textContent = KINDS[kind].about;
+  const items = list();
+  el('rows').innerHTML = items.length ? items.slice(0, shown).map(rowHtml).join('')
+    : `<li class="empty">${filter === 'todo' ? 'このしゅるいは ぜんぶ見ました。' : filter === 'fix' ? '「直す」をつけたものは まだありません。' : '見つかりませんでした。'}</li>`;
+  el('more').hidden = items.length <= shown;
+  el('more').textContent = `もっと見る（のこり ${items.length - shown}）`;
+}
+
+// Saving: one document per item in "checks"; taking a mark back deletes it.
+async function save(id, next) {
+  const item = rowsOf(kind).find(x => x.id === id);
+  const before = marks.get(id);
+  if (next) marks.set(id, { ...next, pending: true }); else marks.delete(id);
+  render();
+  if (!db) return;
+  try {
+    const ref = db.collection('checks').doc(id);
+    if (next) await ref.set({ kind, verdict: next.verdict, note: next.note ?? '', label: view[kind](item).label, at: new Date().toISOString() });
+    else await ref.delete();
+  } catch (e) {
+    if (before) marks.set(id, before); else marks.delete(id);
+    status(e?.code === 'invalid_argument' ? 'この画面からは保存できません（見るだけの共有です）。' : '保存できませんでした。もう一度押してください。', 'error');
+    if (e?.code === 'invalid_argument') writable = false;
+    render();
+  }
+}
+el('rows').addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]'); if (!b || b.disabled) return;
+  const id = b.closest('.row').dataset.id, m = marks.get(id), act = b.dataset.act;
+  if (m?.verdict === act) save(id, null);
+  else save(id, { verdict: act, note: act === 'fix' ? (m?.note ?? '') : '' });
+});
+el('rows').addEventListener('change', e => {
+  const t = e.target.closest('textarea'); if (!t) return;
+  const id = t.closest('.row').dataset.id;
+  save(id, { verdict: 'fix', note: t.value.trim() });
+});
+for (const id of ['todo', 'fix', 'all']) el('f-' + id).onclick = () => { filter = id; shown = PAGE; remember('filter', id); render(); };
+el('grade').onchange = () => { shown = PAGE; render(); };
+let typing; el('q').oninput = () => { clearTimeout(typing); typing = setTimeout(() => { shown = PAGE; render(); }, 200); };
+el('more').onclick = () => { shown += PAGE; render(); };
+function status(text, state = '') { el('status').textContent = text; el('status').dataset.state = state; }
+
+render();
+(async () => {
+  db = await window.claude?.use?.('db') ?? null;
+  if (!db) { status('この画面では印を保存できません。claude.ai で開いてください。', 'error'); return; }
+  const user = await window.claude.use('user');
+  const can = user ? await user.can('data.write') : null;
+  writable = can !== false;
+  status(writable ? '印は自動で保存されます。' : '見るだけの共有なので、印はつけられません。');
+  db.collection('checks').limit(1000).onSnapshot(snap => {
+    marks.clear();
+    for (const d of snap.docs) { const b = d.data(); if (b?.verdict) marks.set(d.id, { verdict: b.verdict, note: b.note ?? '', pending: d.metadata.hasPendingWrites }); }
+    const focused = document.activeElement?.closest?.('textarea');
+    if (!focused) render();
+  }, () => status('保存先とのつながりが切れました。ページを開きなおしてください。', 'error'));
+})();
+</script>
