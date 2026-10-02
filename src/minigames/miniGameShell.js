@@ -7,6 +7,7 @@ import { friendshipTitle } from './companionGrowth.js';
 import { scoreRank } from './scoreRank.js';
 import { createFindings } from './scenePolish.js';
 import { createBuildReviewPanel } from './buildReviewPanel.js';
+import { outfitItem } from './companionOutfits.js';
 
 // Intro cards are shown once per game per page load; replays start directly.
 const seenIntros = new Set();
@@ -196,6 +197,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
       memoryNotice.hidden = !memoryNotice.textContent;
       const sticker = !value?.duplicate && value?.sticker;
       if (sticker?.isNew || sticker?.upgraded) showSticker(sticker.tier, sticker.upgraded ? `シール帳の「${definition.title}」が 金シールに かわった！` : `シール帳に「${definition.title}」の ${sticker.tier === 'gold' ? '金' : '銀'}シール！`);
+      const opened = value?.duplicate ? [] : (value?.newOutfits ?? []).map(outfitItem).filter(Boolean);
+      if (opened.length) showSticker(stickerNotice.hidden ? 'outfit' : stickerNotice.dataset.tier, `${stickerNotice.hidden ? '' : `${stickerNotice.textContent} `}きせかえ ${opened.map(item => `${item.icon}${item.name}`).join('・')} が ひらいた！ シール帳で つけられるよ`);
       resultDetails.append(reward);
     } else reward.textContent = '記録を保存できませんでした。この画面で「記録の保存を再試行」を押してください。画面を閉じると未保存の記録は失われます。';
     retrySave.hidden = receipt.ok;

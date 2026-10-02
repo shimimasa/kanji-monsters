@@ -166,7 +166,9 @@ const hub = {
     if (!selected) return;
     this.dialog?.close(); this.dialog?.remove();
     const dialog = createStickerBookDialog({ doc: document, service: gotomonService, gotomon: selected, sections: hubSections('all'),
-      games: miniGameRegistry, experiences: gameExperiences, onClose: () => this.root?.querySelector('[data-action=sticker-book]')?.focus() });
+      games: miniGameRegistry, experiences: gameExperiences, onClose: () => this.root?.querySelector('[data-action=sticker-book]')?.focus(),
+      // A new outfit shows at once on the companion bar too.
+      onOutfit: () => { const old = this.root?.querySelector('.yt-friend-banner > .gt-portrait'); old?.replaceWith(companionPortrait(document, gotomonService.getSelectedGotomon())); } });
     this.dialog = dialog; this.root.append(dialog); dialog.showModal();
   },
   showAlbum() {
