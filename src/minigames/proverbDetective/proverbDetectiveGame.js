@@ -1,5 +1,8 @@
 import { PROVERB_CASES } from './proverbCases.js';
-import { readingTarget } from '../buildReview.js';
+import { proverbTarget } from '../buildReview.js';
+
+// Proverbs whose reading can be split over their kanji two ways (お|にかなぼう): the right split.
+export const PROVERB_SPLITS = Object.freeze({ 11: ['おに', 'かなぼう'], 31: ['す', 'もの', 'じょうず'], 97: ['りょうやく', 'くち', 'にが'] });
 
 export const DETECTIVE_CASES = 10;
 
@@ -89,7 +92,7 @@ export function createProverbDetectiveGame({ sessionId, random = Math.random, on
         incorrect++;
         missed.push(Object.freeze({ contentId: problem.contentId, text: problem.text, reading: problem.reading, meaning: problem.meaning,
           questionNumber: answered, tries: ruledOut.length + 1,
-          build: readingTarget({ word: problem.text, reading: problem.reading, note: `いみ：${problem.meaning}` }) }));
+          build: proverbTarget({ text: problem.text, reading: problem.reading, meaning: problem.meaning, split: PROVERB_SPLITS[problem.caseId] }) }));
       }
       lastAnswer = Object.freeze({ attemptId: committedAttempt, choiceId, correctChoiceId: problem.correctChoiceId, correct: firstTry,
         tries: ruledOut.length + 1 });

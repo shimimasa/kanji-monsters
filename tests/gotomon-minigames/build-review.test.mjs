@@ -12,7 +12,8 @@ import { buildPhotoRally } from '../../src/minigames/photoRally/photoRallyConten
 import { createEnglishChoiceGame } from '../../src/minigames/englishChoice/englishChoiceGame.js';
 import { createTimedChoiceGame } from '../../src/minigames/timedChoice/timedChoiceGame.js';
 import { lookalikesOf } from '../../src/minigames/gotomonTrace/traceGame.js';
-import { partsTarget, placeTarget } from '../../src/minigames/buildReview.js';
+import { partsTarget, placeTarget, proverbTarget, kanjiSplits } from '../../src/minigames/buildReview.js';
+import { PROVERB_SPLITS } from '../../src/minigames/proverbDetective/proverbDetectiveGame.js';
 import { KANJI_PARTS } from '../../src/minigames/gotomonParts/partsData.js';
 import { PREFECTURES } from '../../src/minigames/gotomonDelivery/prefectures.js';
 import { PROVERB_CASES } from '../../src/minigames/proverbDetective/proverbCases.js';
@@ -239,8 +240,8 @@ test('the rest: every proverb, kanji-parts row and prefecture can be built, with
   };
   let longest = 0;
   for (const [i, item] of PROVERB_CASES.entries()) {
-    const t = readingTarget({ word: item.text, reading: item.reading, note: `いみ：${item.meaning}` });
-    assert.ok(t, item.text); table(t, i + 1); longest = Math.max(longest, [...t.answer].length);
+    const t = proverbTarget({ text: item.text, reading: item.reading, meaning: item.meaning, split: PROVERB_SPLITS[item.id] });
+    assert.ok(t?.frame, item.text); table(t, i + 1); longest = Math.max(longest, [...t.answer].length);
   }
   const allParts = [...new Set(KANJI_PARTS.flatMap(item => item.parts))];
   for (const [i, item] of KANJI_PARTS.entries()) {
@@ -269,4 +270,21 @@ test('the rest: the drum and the link game carry what to build for every questio
       }
     }
   }
+});
+
+test('proverbs: only the kanji are built, the written kana stay; the three that split two ways are settled by hand', () => {
+  const twoWays = PROVERB_CASES.filter(p => kanjiSplits(p.text, p.reading).ways.length !== 1).map(p => p.id);
+  assert.deepEqual(twoWays, Object.keys(PROVERB_SPLITS).map(Number), 'every proverb has one split, or one chosen by hand');
+  let all = 0, built = 0;
+  for (const p of PROVERB_CASES) {
+    const t = proverbTarget({ text: p.text, reading: p.reading, meaning: p.meaning, split: PROVERB_SPLITS[p.id] });
+    let k = 0; const letters = [...t.answer];
+    assert.equal(t.frame.map(part => part.kana ?? letters.slice(k, k += part.size).join('')).join(''), p.reading, p.text);
+    assert.equal(t.frame.filter(part => part.kanji).map(part => part.kanji).join(''), p.text.replace(/[ぁ-んー]/g, ''));
+    all += p.reading.length; built += letters.length;
+  }
+  const oni = proverbTarget({ text: '鬼に金棒', reading: 'おににかなぼう', split: PROVERB_SPLITS[11] });
+  assert.deepEqual(oni.frame.map(p => p.size ?? p.kana), [2, 'に', 4]);
+  assert.equal(proverbTarget({ text: '鬼に金棒', reading: 'おににかなぼう' }).frame, null, 'two ways and no choice: the whole reading');
+  console.log(`build review: proverbs ${(all / PROVERB_CASES.length).toFixed(1)} → ${(built / PROVERB_CASES.length).toFixed(1)} letters to build on average`);
 });
