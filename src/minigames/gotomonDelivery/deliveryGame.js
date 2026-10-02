@@ -1,3 +1,6 @@
+import { PREFECTURES, prefectureByName } from './prefectures.js';
+import { placeTarget } from '../buildReview.js';
+
 // Nonpersistent Core. Deliveries (a Gotomon who wants to go home, a hint about its
 // prefecture and four prefectures to choose from) come from the caller. The child
 // picks the prefecture on the map and the companion flies the parcel there. A wrong
@@ -67,7 +70,9 @@ export function createDeliveryGame({ sessionId, onEvent = () => {}, content }) {
       if (right) { delivered++; stamps.push(item.prefecture); hintPrefecture = null; }
       else {
         tries++; hintPrefecture = item.prefecture;
-        if (first) missed.push(Object.freeze({ contentId: item.monsterId, name: item.name, prefecture: item.prefecture, chosen: prefecture, questionNumber: answered }));
+        if (first) missed.push(Object.freeze({ contentId: item.monsterId, name: item.name, prefecture: item.prefecture, chosen: prefecture, questionNumber: answered,
+          build: placeTarget({ name: item.name, fullName: prefectureByName(item.prefecture)?.fullName, note: item.hint,
+            others: item.candidates.map(name => prefectureByName(name)?.fullName), fill: PREFECTURES.map(p => p.fullName) }) }));
       }
       lastAnswer = Object.freeze({ attemptId: committedAttempt, try: ++trySerial, choiceId: prefecture, correctChoiceId: item.prefecture,
         correct: right, first, name: item.name, prefecture: item.prefecture, chosen: prefecture, fact: item.fact });

@@ -10,11 +10,11 @@ export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
   const note = element(doc, 'p', 'gt-build-note', 'まちがえた問題を、もじを ならべて こたえよう（記録には のこらないよ）');
   const work = element(doc, 'div', 'gt-build-work'); work.hidden = true;
   const count = element(doc, 'p', 'gt-build-count'), prompt = element(doc, 'p', 'gt-build-prompt'); prompt.tabIndex = -1;
-  const sentence = element(doc, 'p', 'gt-build-sentence');
+  const sentence = element(doc, 'p', 'gt-build-sentence'), hint = element(doc, 'p', 'gt-build-hint');
   const slots = element(doc, 'div', 'gt-build-slots'), tiles = element(doc, 'div', 'gt-build-tiles');
   const say = element(doc, 'p', 'gt-build-say'); say.setAttribute('role', 'status');
   const next = button(doc, 'つぎへ', () => { review.next(); render(); focusFirst(); }, 'gt-button gt-primary'); next.dataset.action = 'build-next';
-  work.append(count, prompt, sentence, slots, tiles, say, next);
+  work.append(count, prompt, sentence, hint, slots, tiles, say, next);
   root.append(open, note, work);
   let review = null, key = null;
 
@@ -24,17 +24,17 @@ export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
   function render() {
     const s = review.snapshot();
     if (s.status === 'done') {
-      count.textContent = ''; prompt.textContent = `${s.total}問 ぜんぶ ならべられたね！`; sentence.replaceChildren(); sentence.hidden = true;
+      count.textContent = ''; prompt.textContent = `${s.total}問 ぜんぶ ならべられたね！`; sentence.replaceChildren(); sentence.hidden = true; hint.hidden = true;
       slots.replaceChildren(); tiles.replaceChildren();
       say.textContent = s.firstTry === s.total ? '1回目で ぜんぶ できたよ。おぼえたね！' : 'もういちど たしかめられたね。';
       next.hidden = true; root.dataset.status = 'done'; return;
     }
     root.dataset.status = s.status;
     count.textContent = `ふくしゅう ${s.index + 1} / ${s.total}`;
-    prompt.textContent = s.prompt; sentence.hidden = !s.sentence;
+    prompt.textContent = s.prompt; sentence.hidden = !s.sentence; hint.hidden = !s.note; hint.textContent = s.note ?? '';
     sentence.replaceChildren(...(s.sentence ? [element(doc, 'span', '', s.sentence.before), element(doc, 'b', '', s.prompt.match(/「(.+?)」/)?.[1] ?? ''), element(doc, 'span', '', s.sentence.after)] : []));
-    // A number sentence (6+9=15) is counted in cards, a word in letters.
-    const unit = s.script === 'equation' ? '番目' : '文字目';
+    // A number sentence (6+9=15) is counted in cards, kanji parts in pieces, a word in letters.
+    const unit = s.script === 'equation' ? '番目' : s.script === 'parts' ? 'つ目' : '文字目';
     root.dataset.script = s.script ?? '';
     slots.replaceChildren(...Array.from({ length: s.length }, (_, k) => {
       const filled = k < s.placed.length;

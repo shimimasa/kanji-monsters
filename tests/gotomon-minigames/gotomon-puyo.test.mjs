@@ -105,6 +105,8 @@ test('a pair touching no egg with its answer is a gentle miss that names both an
   const answer = game.snapshot().lastAnswer;
   assert.equal(answer.correct, false); assert.equal(events.at(-1).type, 'incorrect');
   assert.deepEqual(game.snapshot().missed.at(-1).answers, answer.eggs.map(e => e.value));
+  const sum = answer.eggs.find(e => /[+−×]/.test(e.label));
+  assert.equal(game.snapshot().missed.at(-1).build?.answer ?? null, sum ? `${sum.label}=${sum.value}` : null);
 });
 
 test('a full well never ends the game: the bottom rows are tidied away', () => {

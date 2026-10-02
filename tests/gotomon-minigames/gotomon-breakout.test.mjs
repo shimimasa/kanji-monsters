@@ -73,6 +73,7 @@ test('the first tapped block is the answer: a wrong one names its number and the
   assert.equal(s.blocks.find(b => b.blockId === s.hintId)?.number, s0.problem.answer);
   assert.equal(s.ball.held, true); assert.equal(act('launch'), false, 'the ball waits for the answer');
   assert.equal(s.missed.length, 1);
+  assert.equal(s.missed[0].build.script, 'equation'); assert.ok(s.missed[0].build.answer.endsWith(`=${s0.problem.answer}`));
   assert.equal(choose(), true);
   s = game.snapshot();
   assert.equal(s.chosenId, s.blocks.find(b => b.number === s.problem.answer).blockId);

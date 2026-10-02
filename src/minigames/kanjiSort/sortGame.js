@@ -1,3 +1,5 @@
+import { readingTarget } from '../buildReview.js';
+
 // Stars for a finished puzzle: every card placed on the first try gives three.
 export const starsFor = slips => slips === 0 ? 3 : slips === 1 ? 2 : 1;
 
@@ -84,7 +86,10 @@ export function createSortGame({ sessionId, onEvent = () => {}, content }) {
         if (first) {
           slips++;
           missed.push(Object.freeze({ contentId: want.kanjiId, kanji: want.kanji, kind: puzzle().kind,
-            answer: puzzle().kind === 'reading' ? want.reading : `${want.strokes}画`, chosen: card.kanji, questionNumber: answered }));
+            answer: puzzle().kind === 'reading' ? want.reading : `${want.strokes}画`, chosen: card.kanji, questionNumber: answered,
+            // A reading card comes back as its reading, in the short word shown on the card.
+            build: puzzle().kind === 'reading' ? readingTarget({ word: want.kanji, reading: want.reading,
+              sentence: want.word?.includes(want.kanji) ? { before: want.word.slice(0, want.word.indexOf(want.kanji)), after: want.word.slice(want.word.indexOf(want.kanji) + 1) } : null }) : null }));
         }
       }
       lastAnswer = Object.freeze({ attemptId: committedAttempt, choiceId: card.cardId, correctChoiceId: want.cardId, correct: right, first,

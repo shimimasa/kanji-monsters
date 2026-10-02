@@ -1,4 +1,5 @@
 import { buildSlashProblems } from '../gotomonSlash/slashContent.js';
+import { buildTarget } from '../buildReview.js';
 
 export const DRUM_MODES = Object.freeze(['kanji', 'english', 'math']);
 
@@ -26,6 +27,6 @@ export function buildDrumQuestions({ sessionId, random = Math.random, mode = 'ka
     const shown = truths[i] ? answer : others[Math.floor(take(random) * others.length)];
     return Object.freeze({ problemId: item.problemId, contentId: item.contentId, skillId: item.skillId, kind: item.kind,
       statement: `${ask(item, shown.text)}？`, sentence: item.sentence ?? null, truth: truths[i], shown: shown.text,
-      shownNote: truths[i] ? null : shown.note, answer: answer.text, explain: item.explain });
+      shownNote: truths[i] ? null : shown.note, answer: answer.text, explain: item.explain, build: buildTarget(item) });
   }));
 }

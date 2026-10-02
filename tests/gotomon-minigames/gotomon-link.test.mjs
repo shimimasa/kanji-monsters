@@ -50,6 +50,8 @@ test('a line to the fitting card stays; one to another card springs back and mar
   let s = game.snapshot();
   assert.equal(s.incorrect, 1); assert.equal(s.lefts[0].linked, false); assert.equal(s.lefts[0].hint, true);
   assert.equal(s.lastLine.correct, false); assert.ok(s.lastLine.otherExplain);
+  const slip = s.missed[0];
+  if (slip.contentId.startsWith('reading:')) { assert.equal(slip.build.script, 'kana'); assert.ok(slip.build.sentence); } else assert.equal(slip.build, null);
   assert.equal(link(first, fitting(first)), true);
   assert.equal(link(second, fitting(second)), true);
   s = game.snapshot();

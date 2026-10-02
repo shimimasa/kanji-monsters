@@ -92,6 +92,8 @@ test('a wrong prefecture is one learning result; the home glows and the Gotomon 
   assert.equal(game.snapshot().lastAnswer.correct, false); assert.equal(game.snapshot().lastAnswer.chosen, wrong);
   assert.equal(events.at(-1).type, 'incorrect');
   assert.equal(game.snapshot().missed.at(-1).prefecture, home);
+  const slip = game.snapshot().missed.at(-1);
+  assert.ok(slip.build.answer.startsWith(home)); assert.match(slip.build.answer, /[都道府県]$/); assert.equal(slip.build.script, 'place');
   assert.equal(deliver(home), false); // no delivery during feedback
   next();
   assert.equal(game.snapshot().hintPrefecture, home);

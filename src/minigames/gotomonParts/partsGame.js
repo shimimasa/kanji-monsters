@@ -1,4 +1,5 @@
 import { KANJI_PARTS, kanjiOf } from './partsData.js';
+import { partsTarget } from '../buildReview.js';
 
 export const PARTS_RULES = Object.freeze({
   columns: 5, targets: 10,
@@ -100,7 +101,8 @@ export function createPartsGame({ sessionId, random = Math.random, onEvent = () 
     if (right) { made++; hintColumn = null; }
     else {
       tries++; hintColumn = bases.find(other => other.part === item.parts[1 - fallIndex]).column;
-      if (first) missed.push(Object.freeze({ contentId: `parts:${item.kanji}`, kanji: item.kanji, parts: item.parts, chosen: base.part, questionNumber: answered }));
+      if (first) missed.push(Object.freeze({ contentId: `parts:${item.kanji}`, kanji: item.kanji, parts: item.parts, chosen: base.part, questionNumber: answered,
+        build: partsTarget({ kanji: item.kanji, reading: item.reading, parts: item.parts, layout: item.layout, others: [base.part], fill: allParts }) }));
     }
     lastAnswer = Object.freeze({ attemptId: committedAttempt, landing: ++landSerial, correct: right, first, kanji: item.kanji, reading: item.reading,
       layout: item.layout, part: falling.part, onto: base.part, column: base.column, parts: item.parts });

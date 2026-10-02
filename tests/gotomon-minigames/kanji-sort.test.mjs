@@ -81,6 +81,9 @@ test('a wrong card is one learning result with a clue; the right card glows and 
   const answer = game.snapshot().lastAnswer;
   assert.equal(answer.correct, false); assert.equal(answer.strokes, wrong.strokes); assert.equal(events.at(-1).type, 'incorrect');
   assert.equal(game.snapshot().missed.at(-1).kanji, state.cards.find(card => card.cardId === want).kanji);
+  const slip = game.snapshot().missed.at(-1), card = state.cards.find(c => c.cardId === want);
+  if (state.kind === 'reading') { assert.equal(slip.build.answer, card.reading); assert.match(slip.build.prompt, new RegExp(card.kanji)); }
+  else assert.equal(slip.build, null, 'stroke counts are not built');
   assert.equal(place(want), false); // no placing during feedback
   next();
   assert.equal(game.snapshot().hintCardId, want);

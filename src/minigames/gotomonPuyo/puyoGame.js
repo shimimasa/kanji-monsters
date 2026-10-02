@@ -1,4 +1,5 @@
 import { pickValues, labelFor, pick } from '../gotomonBubble/bubbleContent.js';
+import { equationTarget } from '../buildReview.js';
 
 export const PUYO_RULES = Object.freeze({
   columns: 6, rows: 11, pieces: 16, values: 4,
@@ -122,7 +123,8 @@ export function createPuyoGame({ sessionId, random = Math.random, onEvent = () =
     bestChain = Math.max(bestChain, waves.length);
     answered++; if (right) correct++; else incorrect++;
     if (!right) missed.push(Object.freeze({ contentId: problem.contentId, labels: Object.freeze(piece.eggs.map(e => e.label)),
-      answers: Object.freeze(piece.eggs.map(e => e.value)), questionNumber: answered }));
+      answers: Object.freeze(piece.eggs.map(e => e.value)), questionNumber: answered,
+      build: piece.eggs.map(e => equationTarget({ question: e.label, answer: e.value })).find(Boolean) ?? null }));
     lastAnswer = Object.freeze({ attemptId, pieceId: piece.pieceId, correct: right, first: true,
       eggs: Object.freeze(piece.eggs.map((e, i) => Object.freeze({ ...e, found: found[i], cell: where[i] ? Object.freeze([...where[i]]) : null,
         touching: Object.freeze(touching[i].map(other => other.label)) }))),
