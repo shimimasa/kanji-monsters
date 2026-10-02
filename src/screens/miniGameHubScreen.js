@@ -15,6 +15,7 @@ import { HUB_SUBJECTS, NEWEST, hubSections, choiceSubjects, modeForSubject } fro
 import { createPhotoAlbumDialog } from '../ui/photoAlbumDialog.js';
 import { createStickerBookDialog } from '../ui/stickerBookDialog.js';
 import { createAllStickersDialog } from '../ui/allStickersDialog.js';
+import { createBreedingDialog } from '../ui/breedingDialog.js';
 import { stickerSummary } from '../minigames/companionStickers.js';
 import { GAME_TYPES, typeInfo } from '../minigames/gotomonTypes.js';
 import { supportEffectOf, MAX_SUPPORTERS } from '../minigames/gotomonMoves.js';
@@ -53,6 +54,9 @@ const hub = {
     notebook.dataset.action = 'learning-notebook';
     const allBooks = button(doc, 'みんなのシール帳', () => this.showAllStickers()); allBooks.dataset.action = 'all-stickers';
     if (selected) tools.append(allBooks);
+    // はいごう: two Lv5 Gotomon meet a legend.
+    const breeding = button(doc, 'はいごう', () => this.showBreeding()); breeding.dataset.action = 'breeding';
+    if (selected) tools.append(breeding);
     const albumButton = button(doc, 'アルバム', () => this.showAlbum());
     albumButton.dataset.action = 'photo-album';
     tools.append(albumButton, notebook, button(doc, 'タイトルへ', () => publish('changeScreen', 'title')));
@@ -177,6 +181,13 @@ const hub = {
     this.dialog?.close(); this.dialog?.remove();
     const dialog = createCompanionMemoryDialog({ doc: document, service: gotomonService, definitions: miniGameRegistry,
       onClose: () => this.root?.querySelector('[data-action=memories]')?.focus() });
+    this.dialog = dialog; this.root.append(dialog); dialog.showModal();
+  },
+  showBreeding() {
+    this.dialog?.close(); this.dialog?.remove();
+    const dialog = createBreedingDialog({ doc: document, service: gotomonService,
+      onSelect: gotomon => { if (gotomonService.setSelectedGotomon(gotomon.id)?.ok) { this.dialog?.close(); publish('changeScreen', 'miniGameHub'); } },
+      onClose: () => this.root?.querySelector('[data-action=breeding]')?.focus() });
     this.dialog = dialog; this.root.append(dialog); dialog.showModal();
   },
   showAllStickers() {
