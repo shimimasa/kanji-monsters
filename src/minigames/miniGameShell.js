@@ -248,6 +248,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
         soundAnswers=current.answered;soundBoosts=current.boosts;soundComplete=current.completed;
         if (['correct','boost','celebrate'].includes(current.reaction)) publish('playSE', current.reaction==='correct'?(info.scene==='shoot'?(current.combo>=3?'defeat':'attack'):'correct'):'achievement');
         else if (current.reaction === 'incorrect') publish('playSE', 'wrong');
+        // An enemy reached the barrier or the gate: the shield sound, never the wrong-answer buzzer.
+        else if (current.reaction === 'timeout') publish('playSE', 'shield1');
         else if (current.reaction === 'partial') publish('playSE','decide');
       }
       result.hidden = !showResult;

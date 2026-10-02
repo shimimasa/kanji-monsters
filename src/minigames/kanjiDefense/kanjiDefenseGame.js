@@ -52,7 +52,9 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
   let phase = 'ready', seq = 0, activeElapsedMs = 0, spawnElapsedMs = 0;
   let encounterCursor = 0, monsterSerial = 0, inputSerial = 0, projectileSerial = 0;
   let enemies = [], projectiles = [], explicitTargetId = null, inputToken = null;
-  let life = rules.startingLife, correct = 0, incorrect = 0, resolved = 0, wrongAttempts = 0;
+  // `incorrect` counts readings missed after three tries; `escaped` the enemies that reached the gate
+  // (a time-out: no answer was given), kept apart since 2026-10-02.
+  let life = rules.startingLife, correct = 0, incorrect = 0, escaped = 0, resolved = 0, wrongAttempts = 0;
   let combo = 0, maxCombo = 0, score = 0, result = null, aborted = false, completeEmitted = false;
   let lastAttempt = null, lastResolution = null, practice = [];
 
@@ -87,6 +89,7 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
       score: score + life * 100,
       correct,
       incorrect,
+      escaped,
       wrongAttempts,
       maxCombo,
       life,
@@ -105,7 +108,7 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
     return Object.freeze({
       gameId: 'kanjiDefense', mode: 'arcade', sessionId, phase, paused, active, aborted, pace: pace === 'slow' ? 'slow' : 'normal',
       seq, activeElapsedMs, act: currentAct, waveLabel: `第${currentAct}波`,
-      life, correct, incorrect, resolved, wrongAttempts, combo, maxCombo, score,
+      life, correct, incorrect, escaped, resolved, wrongAttempts, combo, maxCombo, score,
       spawned: encounterCursor, remaining: rules.totalEncounters - encounterCursor,
       inputToken, explicitTargetId, targetId: aimed?.enemyId ?? null,
       targetEnemy: enemySnapshots.find(enemy => enemy.enemyId === aimed?.enemyId) ?? null,
@@ -185,9 +188,8 @@ export function createKanjiDefenseGame({ sessionId, random = Math.random, onEven
       maxCombo = Math.max(maxCombo, combo);
       score += 100 + Math.min(Math.max(combo - 1, 0), 4) * 20 + (enemy.wrongAttempts === 0 ? 25 : 0);
     } else {
-      incorrect++;
       combo = 0;
-      if (reason === 'escaped') life = Math.max(0, life - 1);
+      if (reason === 'escaped') { escaped++; life = Math.max(0, life - 1); } else incorrect++;
     }
     const reading = enemy.content.acceptedReadings[0];
     const record = Object.freeze({
