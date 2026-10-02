@@ -6,6 +6,7 @@ import { getBonusMonsterFolder } from '../utils/monsterImagePaths.js';
 import { growthStatus, calculateXP, supportStyle } from './companionGrowth.js';
 import { scoreRank, betterRank } from './scoreRank.js';
 import { recordCompanionMemory } from './companionMemories.js';
+import { recordSticker, markStickerReview } from './companionStickers.js';
 
 const folders = ['','grade1-hokkaido','grade2-touhoku','grade3-kantou','grade4-chuubu','grade5-kinki','grade6-chuugoku','grade7-asia','grade8-europe','grade9-america','grade10-africa','grade11-shikoku','grade12-kyuusyuu'];
 const count = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
@@ -13,6 +14,8 @@ const count = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
 export function createGotomonService({ ready = isSaveSessionReady, capture = captureSaveContext,
   save = saveGameData, lookup = getMonsterById, now = Date.now } = {}) {
   const tickets = new WeakMap();
+  // Runs that earned a sticker: their build-again review may add the がんばり mark (once).
+  const reviewable = new Map();
   let activeTicket = null;
   function read() {
     try {
@@ -54,6 +57,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     getAlbum: () => getProgress().album ?? {},
     getCaseFiles: () => getProgress().caseFiles ?? {},
     getJourneys: () => getProgress().journeys ?? {},
+    getStickers: id => getProgress().companions?.[id]?.stickers ?? {},
     beginPlay({ sessionId, gameId, gotomonId }) {
       if (!sessionId || !gameId || !getOwnedGotomon().some(friend => friend.id === gotomonId)) return null;
       activeTicket = Object.freeze({ sessionId });
@@ -69,7 +73,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
       });
     },
     awardGotomonPlayResult({ owner, sessionId, gameId, gotomonId, score, correct, maxCombo,
-      ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished, photos = null, cases = null, journey = null }) {
+      ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished, photos = null, cases = null, journey = null, subject = null }) {
       if (!owner || owner !== read()?.owner || !sessionId || !gameId) return { ok: false };
       const run = ticket && tickets.get(ticket);
       if (ticket && (!run || ticket !== activeTicket || ticket.sessionId !== sessionId || run.owner !== owner ||
@@ -139,14 +143,28 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         }
         const memory = run && completed ? recordCompanionMemory(friend, { gameId, score: points,
           finished: !!memoryFinished, at: Math.max(0, Math.floor(now())) }) : null;
+        // The sticker book: a real run played to the end (rank A or S makes it gold).
+        const sticker = run && completed && finished ? recordSticker(friend, { gameId, rank: rank.rank, subject, at: Math.max(0, Math.floor(now())) }) : null;
         reward = { earned, friendship: friend.friendship, plays: friend.plays,
           newBest: points > previousBest, bestScore: game.bestScore, medals: [...friend.medals],
           before, after, earnedXP: after.xp - before.xp, levelUp: after.level > before.level, rank,
-          memory, newPhotos, newCases, journeyBest,
+          memory, sticker, newPhotos, newCases, journeyBest,
           bestTimeMs:game.bestTimeMs??null,previousTimeMs:previousTime,newTimeBest:validTime&&(!previousTime||roundedTime<previousTime) };
       });
       if (outcome.ok && run) run.receipt = reward;
+      if (outcome.ok && reward?.sticker) reviewable.set(sessionId, { owner, gameId, gotomonId });
       return { ...outcome, reward: outcome.ok ? reward : null };
+    },
+    // The がんばり mark on this run's sticker, once its build-again review was done to the end.
+    markReviewSticker({ owner, sessionId } = {}) {
+      const run = reviewable.get(sessionId);
+      if (!run || !owner || owner !== run.owner || owner !== read()?.owner) return { ok: false };
+      let mark = false;
+      const outcome = save(snapshot => {
+        mark = markStickerReview(snapshot.player.miniGames?.companions?.[run.gotomonId], run.gameId);
+      });
+      if (outcome.ok) reviewable.delete(sessionId);
+      return { ...outcome, mark: outcome.ok && mark, gameId: run.gameId };
     },
   };
 }

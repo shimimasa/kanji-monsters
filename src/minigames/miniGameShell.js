@@ -13,7 +13,7 @@ const seenIntros = new Set();
 
 export function createMiniGameShell({ doc, view, definition, gotomon, play, reviewMode = false, pace = 'normal', course = null, onPause, onBoost, onAct, onAdvance, onBack, onReplay, award,
   onReview, onNormalPlay, onNotebook, onRetryMistakes, getMistakeCount = () => 0, getReviewCount = () => 0,
-  getLearningSaveStatus = () => ({ failed: false, pending: 0 }), onRetryLearningSave }) {
+  getLearningSaveStatus = () => ({ failed: false, pending: 0 }), onRetryLearningSave, onBuildReviewDone }) {
   const root = view.root;
   // Headless contract fixtures supply only the v1 view interface.
   if (!root?.querySelector) return { update() {}, dispose() {} };
@@ -108,6 +108,9 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   const stats = element(doc, 'p'), reward = element(doc, 'p', 'gt-reward'); reward.setAttribute('role', 'status');
   const record = element(doc, 'p', 'gt-record'), resultActions = element(doc, 'div', 'gt-result-actions');
   const memoryNotice = element(doc, 'p', 'gt-memory-notice'); memoryNotice.hidden = true; memoryNotice.setAttribute('role', 'status');
+  // The sticker book: a new or golden sticker for this companion, and the がんばり mark after the review.
+  const stickerNotice = element(doc, 'p', 'gt-sticker-notice'); stickerNotice.hidden = true; stickerNotice.setAttribute('role', 'status');
+  const showSticker = (tier, text) => { stickerNotice.dataset.tier = tier; stickerNotice.textContent = text; stickerNotice.hidden = false; };
   const challengeResult = element(doc, 'p', 'gt-challenge-result'); challengeResult.hidden = true;
   const rankLabel = element(doc, 'strong', 'gt-rank'), nextGoal = element(doc, 'p', 'gt-replay-goal');
   const growthResult = createGrowthResult(doc, portrait);
@@ -126,8 +129,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   result.append(rankLabel, portrait, resultName, resultTitle, stats);
   if(findings)result.append(findings.root);
   // The run's missed questions, built again from letter cards (games whose missed list carries `build`).
-  const buildReview = createBuildReviewPanel(doc);
-  result.append(growthResult.root,memoryNotice,challengeResult,nextGoal,buildReview.root,resultActions,reward,retrySave);
+  const buildReview = createBuildReviewPanel(doc, { onDone: () => { const done = onBuildReviewDone?.(); if (done?.mark) showSticker('review', 'がんばりマークが ついた！ シール帳の シールに にじの ふち'); } });
+  result.append(growthResult.root,stickerNotice,memoryNotice,challengeResult,nextGoal,buildReview.root,resultActions,reward,retrySave);
   shell.append(result);
   const legacyResult = root.querySelector('[class$="-result"]:not(.gt-result)');
   if (legacyResult) legacyResult.classList.add('gt-learning-result');
@@ -191,6 +194,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
         memory?.newBest ? `この相棒との自己ベスト！ ${memory.bestScore} pt` :
         memory?.firstPlay ? 'このゲームでの、はじめての思い出ができたよ。' : '';
       memoryNotice.hidden = !memoryNotice.textContent;
+      const sticker = !value?.duplicate && value?.sticker;
+      if (sticker?.isNew || sticker?.upgraded) showSticker(sticker.tier, sticker.upgraded ? `シール帳の「${definition.title}」が 金シールに かわった！` : `シール帳に「${definition.title}」の ${sticker.tier === 'gold' ? '金' : '銀'}シール！`);
       resultDetails.append(reward);
     } else reward.textContent = '記録を保存できませんでした。この画面で「記録の保存を再試行」を押してください。画面を閉じると未保存の記録は失われます。';
     retrySave.hidden = receipt.ok;

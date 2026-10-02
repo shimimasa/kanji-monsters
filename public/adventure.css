@@ -146,3 +146,15 @@
 @media(max-width:1100px){.yt-hub .yt-game-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:850px){.yt-hub .yt-game-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){.yt-hub .yt-game-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.yt-world .yt-subject-tab{padding:0 14px;font-size:15px}}
+.yt-sticker-open{min-height:40px;padding:4px 12px;border:2px solid #e3a500;border-radius:999px;background:#fff6d6;color:#5a4100;font-weight:800;cursor:pointer;white-space:nowrap}
+.yt-sticker-dialog{max-width:min(720px,96vw)}.yt-sticker-who{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.yt-sticker-who img,.yt-sticker-who .yt-portrait{width:64px;height:64px}
+.yt-sticker-counts{display:flex;gap:6px;flex-wrap:wrap;margin:0}.yt-sticker-counts span{padding:2px 10px;border-radius:999px;background:#eef3ef;font-weight:800;font-variant-numeric:tabular-nums}
+.yt-sticker-section h3{margin:14px 0 6px;font-size:15px}.yt-sticker-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px}
+.yt-sticker{display:grid;justify-items:center;gap:3px;text-align:center}.yt-sticker small{font-size:11px;line-height:1.25;color:#3d4a42}
+.yt-sticker-seal{position:relative;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:24px;border:2px dashed #b9c3bc;color:#0000;text-shadow:0 0 0 #b9c3bc66}
+.yt-sticker[data-tier=silver] .yt-sticker-seal{border:0;color:initial;text-shadow:none;background:radial-gradient(circle at 35% 30%,#fff,#c9d2d9 60%,#8d99a3);box-shadow:0 3px 0 #5f6a72}
+.yt-sticker[data-tier=gold] .yt-sticker-seal{border:0;color:initial;text-shadow:none;background:radial-gradient(circle at 35% 30%,#fff8d6,#ffd34d 55%,#c98d00);box-shadow:0 3px 0 #8a6200}
+.yt-sticker[data-review=true] .yt-sticker-seal,.yt-card-sticker[data-review=true]{outline:3px solid transparent;box-shadow:0 0 0 3px #ff6b6b,0 0 0 6px #ffd43b,0 0 0 9px #4dabf7}
+.yt-card-sticker{position:absolute;left:6px;bottom:6px;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#c9d2d9 60%,#8d99a3);box-shadow:0 2px 0 #5f6a72}
+.yt-card-sticker[data-tier=gold]{background:radial-gradient(circle at 35% 30%,#fff8d6,#ffd34d 55%,#c98d00);box-shadow:0 2px 0 #8a6200}
+.yt-card-sticker[data-review=true]{box-shadow:0 0 0 2px #ff6b6b,0 0 0 4px #ffd43b,0 0 0 6px #4dabf7}

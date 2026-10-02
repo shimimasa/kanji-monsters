@@ -18,6 +18,7 @@ import { notebookContext } from './learningNotebook.js';
 import { createRunMistakes } from './runMistakes.js';
 import { companionCourse } from './companionCourses.js';
 import { castForPlay } from './gotomonCast.js';
+import { subjectOf } from './hubCatalog.js';
 
 const layout = Object.freeze({ imageRect: { x: 20, y: 10, width: 240, height: 120 },
   clipRect: { x: 24, y: 14, width: 232, height: 112 } });
@@ -138,6 +139,8 @@ export function createMiniGameHost({ document: doc = globalThis.document,
         getReviewCount: () => wordLearning?.getReviewIds().length || 0,
         getLearningSaveStatus: () => ({ failed: learningSaveFailed, pending: learningRun?.pendingCount() || 0 }),
         onRetryLearningSave: () => { flushLearning(); host.update(0); },
+        // The build-again review done to the end: the がんばり mark on this run's sticker.
+        onBuildReviewDone: () => service.markReviewSticker?.({ owner, sessionId }) ?? null,
         onRefresh: () => host.update(0),
         onAct: action => { if (play.act(action)) { if (PLAYTEST_ENABLED) trackPlaytest('action', {sessionId,action}); host.update(0); } },
         onAdvance: state => dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem?.problemId } }),
@@ -152,7 +155,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
           if (current.snapshot().mode === 'review') return { ok: true, practice: true };
           const outcome = current.snapshot().result?.outcome;
           const receipt=service.awardGotomonPlayResult({ owner, sessionId, ticket, gameId: definition.id, gotomonId: gotomon?.id,
-            ...result, memoryFinished: outcome ? ['clear', 'defended'].includes(outcome) : result.finished });
+            ...result, memoryFinished: outcome ? ['clear', 'defended'].includes(outcome) : result.finished, subject: subjectOf(definition.id, nextProps.mode) });
           if (PLAYTEST_ENABLED) trackPlaytest('reward', {sessionId,ok:receipt.ok,level:receipt.reward?.after?.level,earnedXP:receipt.reward?.earnedXP});
           return receipt;
         } });
