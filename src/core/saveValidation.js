@@ -1,6 +1,7 @@
 import { isCompatibilityKey } from './saveProjection.js';
 import { validateCompanionMemories } from '../minigames/companionMemories.js';
 import { validateCompanionStickers } from '../minigames/companionStickers.js';
+import { validateCompanionOutfit } from '../minigames/companionOutfits.js';
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 function requireRecord(value, label) {
@@ -114,6 +115,7 @@ export function validateSave(save, currentVersion) {
   for (const friend of Object.values(save.player.miniGames?.companions || {})) {
     if (friend?.memories !== undefined) validateCompanionMemories(friend.memories);
     if (friend?.stickers !== undefined) validateCompanionStickers(friend.stickers);
+    if (friend?.outfit !== undefined) validateCompanionOutfit(friend.outfit);
   }
   const activity = save.player.miniGames?.hubActivity;
   if (activity !== undefined) {
