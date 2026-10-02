@@ -13,6 +13,8 @@ import { createLearningNotebookDialog } from '../ui/learningNotebookDialog.js';
 import { companionCourse } from '../minigames/companionCourses.js';
 import { HUB_SUBJECTS, NEWEST, hubSections, choiceSubjects, modeForSubject } from '../minigames/hubCatalog.js';
 import { createPhotoAlbumDialog } from '../ui/photoAlbumDialog.js';
+import { createStickerBookDialog } from '../ui/stickerBookDialog.js';
+import { stickerSummary } from '../minigames/companionStickers.js';
 import { stageData, getMonsterById } from '../loaders/dataLoader.js';
 
 // Photo rally spots: elementary stages the child has reached in the adventure.
@@ -57,7 +59,11 @@ const hub = {
       details.append(element(doc, 'strong', '', `${selected.name} Lv${growth.level}`));
       const track = element(doc, 'progress', 'yt-xp'); track.max = 1; track.value = growth.fraction; track.setAttribute('aria-label', '次のレベルまでの経験値');
       details.append(track, element(doc, 'small', '', growth.remaining ? `あと${growth.remaining} XPでLv${growth.level + 1}` : 'MASTER · 育ちきった旅の相棒'));
-      banner.append(companionPortrait(doc, selected), details, element(doc, 'p', 'yt-friend-cheer', 'いっしょに あそぼう！'));
+      // The companion's sticker book: one sticker per game played to the end together.
+      const sum = stickerSummary(gotomonService.getStickers(selected.id));
+      const book = button(doc, `シール帳 ${sum.total}まい`, () => this.showStickerBook(), 'yt-sticker-open');
+      book.dataset.action = 'sticker-book';
+      banner.append(companionPortrait(doc, selected), details, book, element(doc, 'p', 'yt-friend-cheer', 'いっしょに あそぼう！'));
     }
     else banner.append(element(doc, 'p', '', '相棒は、冒険のステージをクリアして捕まえよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title'), 'yt-primary'));
     wrap.append(banner);
@@ -87,6 +93,7 @@ const hub = {
     // and on ぜんぶ a section per subject, then the games where the subject is chosen.
     const games = new Map(Object.values(miniGameRegistry).map(definition => [definition.id, definition]));
     let subject = readSubject();
+    const stickers = selected ? gotomonService.getStickers(selected.id) : {};
     const makeCard = definition => {
       const info = gameExperiences[definition.id], card = button(doc, '', () => this.selectGame(definition, { subject }), 'yt-game-card');
       card.dataset.gameId = definition.id; card.dataset.arcade = String(!!info.arcade); card.style.setProperty('--accent', info.color);
@@ -96,6 +103,12 @@ const hub = {
       // NEW only on the newest games, until they are played.
       if (NEWEST.includes(definition.id) && !stats) art.append(element(doc, 'span', 'yt-card-badge', 'NEW'));
       if (stats?.bestRank) { const medal = element(doc, 'span', 'yt-card-medal', stats.bestRank); medal.dataset.rank = stats.bestRank; art.append(medal); }
+      // This companion's sticker for the game (silver / gold, a rainbow rim after the review).
+      const sticker = stickers[definition.id];
+      if (sticker) {
+        const seal = element(doc, 'span', 'yt-card-sticker'); seal.dataset.tier = sticker.tier; seal.dataset.review = String(!!sticker.review);
+        seal.setAttribute('aria-label', `${selected.name}の${sticker.tier === 'gold' ? '金' : '銀'}シール`); art.append(seal);
+      }
       const body = element(doc, 'span', 'yt-card-body');
       body.append(element(doc, 'strong', 'yt-card-title', definition.title), element(doc, 'span', 'yt-card-description', info.description));
       const tags = element(doc, 'span', 'yt-card-meta');
@@ -146,6 +159,14 @@ const hub = {
     this.dialog?.close(); this.dialog?.remove();
     const dialog = createCompanionMemoryDialog({ doc: document, service: gotomonService, definitions: miniGameRegistry,
       onClose: () => this.root?.querySelector('[data-action=memories]')?.focus() });
+    this.dialog = dialog; this.root.append(dialog); dialog.showModal();
+  },
+  showStickerBook() {
+    const selected = gotomonService.getSelectedGotomon();
+    if (!selected) return;
+    this.dialog?.close(); this.dialog?.remove();
+    const dialog = createStickerBookDialog({ doc: document, service: gotomonService, gotomon: selected, sections: hubSections('all'),
+      games: miniGameRegistry, experiences: gameExperiences, onClose: () => this.root?.querySelector('[data-action=sticker-book]')?.focus() });
     this.dialog = dialog; this.root.append(dialog); dialog.showModal();
   },
   showAlbum() {

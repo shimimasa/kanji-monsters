@@ -10,7 +10,7 @@ const letterAt = (frame, k) => {
 };
 const spellOut = (frame, letters) => { let k = 0; const list = [...letters]; return frame.map(p => p.kana ?? list.slice(k, k += p.size).join('')).join(''); };
 
-export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
+export function createBuildReviewPanel(doc, { random = Math.random, onDone = null } = {}) {
   const root = element(doc, 'section', 'gt-build-review'); root.hidden = true;
   root.setAttribute('aria-label', 'もじを ならべて ふくしゅう');
   const open = button(doc, '', () => start(), 'gt-button gt-build-open'); open.dataset.action = 'build-review';
@@ -23,7 +23,7 @@ export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
   const next = button(doc, 'つぎへ', () => { review.next(); render(); focusFirst(); }, 'gt-button gt-primary'); next.dataset.action = 'build-next';
   work.append(count, prompt, sentence, hint, slots, tiles, say, next);
   root.append(open, note, work);
-  let review = null, key = null;
+  let review = null, key = null, doneSent = false;
 
   const start = () => { open.hidden = true; note.hidden = true; work.hidden = false; render(); focusFirst(); };
   // When it is done the next button hides: the focus stays in the panel, on the closing words.
@@ -34,7 +34,10 @@ export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
       count.textContent = ''; prompt.textContent = `${s.total}問 ぜんぶ ならべられたね！`; sentence.replaceChildren(); sentence.hidden = true; hint.hidden = true;
       slots.replaceChildren(); tiles.replaceChildren();
       say.textContent = s.firstTry === s.total ? '1回目で ぜんぶ できたよ。おぼえたね！' : 'もういちど たしかめられたね。';
-      next.hidden = true; root.dataset.status = 'done'; return;
+      next.hidden = true; root.dataset.status = 'done';
+      // Done to the end, once per result: the shell may add the がんばり mark.
+      if (!doneSent && s.total) { doneSent = true; onDone?.(); }
+      return;
     }
     root.dataset.status = s.status;
     count.textContent = `ふくしゅう ${s.index + 1} / ${s.total}`;
@@ -78,7 +81,7 @@ export function createBuildReviewPanel(doc, { random = Math.random } = {}) {
     // The run's missed list (entries with `build`); shown once per result.
     sync(missed, runKey) {
       if (runKey === key) return;
-      key = runKey;
+      key = runKey; doneSent = false;
       review = createBuildReview({ missed: missed ?? [], random });
       const total = review.snapshot().total;
       root.hidden = !total; open.hidden = false; note.hidden = false; work.hidden = true;

@@ -29,6 +29,14 @@ const CHOOSE = Object.freeze([
 // The newest games: they wear NEW until they are played.
 export const NEWEST = Object.freeze(['gotomonPush', 'gotomonTrace', 'gotomonLand', 'gotomonHop', 'gotomonGolf']);
 
+// The subject a finished run counts for (the sticker book's 漢字・英語・算数 rewards): a game's own
+// subject, or the one chosen at the start for a game with a choice.
+export function subjectOf(gameId, mode = null) {
+  const own = Object.entries(ONLY).find(([, ids]) => ids.includes(gameId))?.[0];
+  if (own) return own;
+  return CHOOSE.find(item => item.id === gameId)?.subjects.includes(mode) ? mode : null;
+}
+
 const label = id => HUB_SUBJECTS.find(subject => subject.id === id)?.label ?? id;
 
 // The sections shown for a tab: on ぜんぶ, one per subject and then the games with a choice;
