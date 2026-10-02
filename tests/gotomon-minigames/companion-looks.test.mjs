@@ -27,7 +27,7 @@ test('the hue is fixed for each Gotomon (no luck), and only what is open shows',
   const hues = {}; for (const m of data('enemies_proto.json')) hues[shinyHue(m.id)] = (hues[shinyHue(m.id)] ?? 0) + 1;
   assert.equal(Object.keys(hues).length, 5, 'five hues spread over the Gotomon');
   console.log(`hues over 880 Gotomon: ${JSON.stringify(hues)}`);
-  assert.deepEqual({ ...wornLook({ look: { shiny: true, glow: true } }, 'HKD-E01') }, { shiny: false, glow: false, hue: shinyHue('HKD-E01') }, 'chosen but not open');
+  assert.deepEqual({ ...wornLook({ look: { shiny: true, glow: true } }, 'HKD-E01') }, { shiny: false, glow: false, evolve: false, hue: shinyHue('HKD-E01') }, 'chosen but not open');
   assert.equal(wornLook({ look: { shiny: true }, stickers: golds(10) }, 'x').shiny, true);
   validateCompanionLook({}); validateCompanionLook({ shiny: true, glow: false });
   for (const bad of [[], { shiny: 'yes' }, { color: true }, null]) assert.throws(() => validateCompanionLook(bad));
@@ -47,7 +47,7 @@ test('the choice is saved, checked, and drawn; a 10th gold sticker opens 色ち�
   assert.equal(service.setLook({ gotomonId: 'HKD-E01', key: 'shiny', on: true }).ok, false, '9 gold: not open yet');
   assert.equal(service.setLook({ gotomonId: 'HKD-E02', key: 'glow', on: true }).ok, false, 'Lv1: not open yet');
   assert.equal(service.setLook({ gotomonId: 'HKD-E01', key: 'glow', on: true }).ok, true);
-  assert.deepEqual({ ...service.getGotomonById('HKD-E01').look }, { shiny: false, glow: true, hue: shinyHue('HKD-E01') });
+  assert.deepEqual({ ...service.getGotomonById('HKD-E01').look }, { shiny: false, glow: true, evolve: false, hue: shinyHue('HKD-E01') });
   const value = { owner: service.getOwner(), sessionId: 's1', gameId: 'gotomonPush', gotomonId: 'HKD-E01',
     score: 5000, correct: 10, maxCombo: 10, completed: true, finished: true, activeElapsedMs: 90000, subject: 'kanji' };
   value.ticket = service.beginPlay(value);
