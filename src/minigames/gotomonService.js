@@ -13,6 +13,7 @@ import { secretsFor, openedSecrets } from './companionSecrets.js';
 import { titleProgress, earnedTitleIds, newTitles } from './companionTitles.js';
 import { stickerSummary } from './companionStickers.js';
 import { typeOf } from './gotomonTypes.js';
+import { moveFor, supporterXP, MAX_SUPPORTERS } from './gotomonMoves.js';
 
 // The sticker book's slots: every game in the square (the crown asks for all of them).
 const GAME_COUNT = new Set(hubSections('all').flatMap(section => section.games)).size;
@@ -41,6 +42,8 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     const folder = getBonusMonsterFolder(id) || folders[data.grade] || folders[1];
     return { id, name: data.name || id, imageUrl: `/assets/images/monsters/full/${folder}/${id}.webp`,
       category: data.category || '', support: supportStyle(data.category), type: typeOf(data),
+      // わざ: the type's Lv1 move, the stronger one from Lv7.
+      move: moveFor(typeOf(data), growthStatus(companions?.[id]).level),
       // きせかえ: what it wears now (drawn over its picture everywhere it appears).
       outfit: wornItems(companions?.[id], { gameCount: GAME_COUNT }) };
   };
@@ -56,6 +59,11 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
   return {
     getOwnedGotomon, getSelectedGotomon, getGotomonById, getProgress,
     getGrowth: id => growthStatus(getProgress().companions?.[id]),
+    // パーティ: the supporters chosen last time that are still owned (never the companion itself).
+    getParty(companionId = null) {
+      const owned = new Set(getOwnedGotomon().map(item => item.id)), party = getProgress().party;
+      return (Array.isArray(party) ? party : []).filter(id => owned.has(id) && id !== companionId).slice(0, MAX_SUPPORTERS);
+    },
     getOwner: () => read()?.owner ?? null,
     // Kanji this child is still learning: review queue, recent slips and more misses than hits.
     getFocusKanjiIds() {
@@ -103,10 +111,13 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         friend.outfit = { ...(friend.outfit ?? {}), [slot]: itemId };
       });
     },
-    beginPlay({ sessionId, gameId, gotomonId }) {
-      if (!sessionId || !gameId || !getOwnedGotomon().some(friend => friend.id === gotomonId)) return null;
+    beginPlay({ sessionId, gameId, gotomonId, supporterIds = [] }) {
+      const owned = new Set(getOwnedGotomon().map(friend => friend.id));
+      if (!sessionId || !gameId || !owned.has(gotomonId)) return null;
+      // Supporters ride along only if owned, not the companion, and not twice.
+      const supporters = [...new Set(Array.isArray(supporterIds) ? supporterIds : [])].filter(id => owned.has(id) && id !== gotomonId).slice(0, MAX_SUPPORTERS);
       activeTicket = Object.freeze({ sessionId });
-      tickets.set(activeTicket, { owner: read()?.owner, gameId, gotomonId, receipt: null });
+      tickets.set(activeTicket, { owner: read()?.owner, gameId, gotomonId, supporters, receipt: null });
       return activeTicket;
     },
     setSelectedGotomon(id) {
@@ -115,6 +126,18 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         if (!snapshot.player.collection.gotomonIds.includes(id)) throw new Error('Companion is not owned');
         snapshot.player.miniGames ??= { version: 1, games: {}, companions: {} };
         snapshot.player.miniGames.selectedGotomonId = id;
+      });
+    },
+    // Saves the companion and its supporters together (the start button of the picker).
+    setParty(companionId, supporterIds = []) {
+      const owned = new Set(getOwnedGotomon().map(item => item.id));
+      const party = [...new Set(supporterIds)].filter(id => owned.has(id) && id !== companionId).slice(0, MAX_SUPPORTERS);
+      if (!owned.has(companionId)) return { ok: false };
+      return save(snapshot => {
+        if (!snapshot.player.collection.gotomonIds.includes(companionId)) throw new Error('Companion is not owned');
+        snapshot.player.miniGames ??= { version: 1, games: {}, companions: {} };
+        snapshot.player.miniGames.selectedGotomonId = companionId;
+        snapshot.player.miniGames.party = party.filter(id => snapshot.player.collection.gotomonIds.includes(id));
       });
     },
     awardGotomonPlayResult({ owner, sessionId, gameId, gotomonId, score, correct, maxCombo,
@@ -146,6 +169,13 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         const earnedXP = run ? calculateXP({ completed, finished, correct, rank: rank.rank, newBest: points > previousBest, activeElapsedMs }) : 0;
         const after = growthStatus({ xp: before.xp + earnedXP });
         friend.xp = after.xp; friend.level = after.level;
+        // パーティ: each supporter gets half the companion's XP (nothing else changes for it).
+        const supporters = (run?.supporters ?? []).filter(id => snapshot.player.collection.gotomonIds.includes(id)).map(id => {
+          const mate = progress.companions[id] ??= { plays: 0, friendship: 0, medals: [] };
+          const was = growthStatus(mate), now = growthStatus({ xp: was.xp + supporterXP(after.xp - before.xp) });
+          mate.xp = now.xp; mate.level = now.level;
+          return { id, earnedXP: now.xp - was.xp, level: now.level, levelUp: now.level > was.level, newMove: was.level < 7 && now.level >= 7 };
+        });
         friend.bestRank = betterRank(rank.rank, friend.bestRank || 'C');
         game.bestRank = betterRank(rank.rank, game.bestRank || 'C');
         const earned = 1 + Math.min(3, Math.floor(count(correct) / 3));
@@ -196,7 +226,9 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         reward = { earned, friendship: friend.friendship, plays: friend.plays,
           newBest: points > previousBest, bestScore: game.bestScore, medals: [...friend.medals],
           before, after, earnedXP: after.xp - before.xp, levelUp: after.level > before.level, rank,
-          memory, sticker, newPhotos, newCases, journeyBest,
+          memory, sticker, newPhotos, newCases, journeyBest, supporters,
+          // The stronger わざ is learned at Lv7.
+          newMove: before.level < 7 && after.level >= 7,
           // きせかえ opened by this run (a sticker, a level or なかよし).
           newTitles: newTitles(titlesBefore, progress.companions),
           newSecrets: openedSecrets(lookup(gotomonId), { friendship: friendshipBefore }, friend),

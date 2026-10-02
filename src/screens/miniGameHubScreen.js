@@ -17,6 +17,7 @@ import { createStickerBookDialog } from '../ui/stickerBookDialog.js';
 import { createAllStickersDialog } from '../ui/allStickersDialog.js';
 import { stickerSummary } from '../minigames/companionStickers.js';
 import { GAME_TYPES, typeInfo } from '../minigames/gotomonTypes.js';
+import { supportEffectOf, MAX_SUPPORTERS } from '../minigames/gotomonMoves.js';
 import { stageData, getMonsterById } from '../loaders/dataLoader.js';
 
 // Photo rally spots: elementary stages the child has reached in the adventure.
@@ -339,10 +340,17 @@ const hub = {
     };
     updateCourse();
     const message = element(doc, 'p', 'yt-note'); message.setAttribute('role', 'status');
+    const describe = friend => {
+      const growth = gotomonService.getGrowth(friend.id), favoured = GAME_TYPES[definition.id] === friend.type;
+      message.textContent = `わざ「${friend.move.name}」${friend.move.text} · ${growth.description} · ${friend.support?.name || 'マイペース'}：${friend.support?.description || 'いつでも応援'}${favoured ? ` · ${typeInfo(friend.type).name}タイプは この ゲームの とくいタイプ！ わざが はやく たまる` : ''}`;
+    };
+    if (selected) describe(selected);
+    // パーティ: up to two supporters (the ones picked last time, if still owned).
+    let supporterIds = gotomonService.getParty(selectedId);
     const begin = button(doc, selected ? `${selected.name}とスタート` : '相棒が必要です', () => {
-      const result = gotomonService.setSelectedGotomon(selectedId);
+      const result = gotomonService.setParty(selectedId, supporterIds);
       if (!result.ok) { message.textContent = '相棒を保存できませんでした。保存状態を確認して、もう一度お試しください。'; return; }
-      dialog.close(); publish('changeScreen', { name: 'miniGame', props: { ...playOptions, gameId: definition.id, gotomonId: selectedId,
+      dialog.close(); publish('changeScreen', { name: 'miniGame', props: { ...playOptions, gameId: definition.id, gotomonId: selectedId, supporterIds: [...supporterIds],
         courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
         ...(gameExperiences[definition.id].paced ? { pace } : {}),
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
@@ -357,19 +365,37 @@ const hub = {
       const choice = button(doc, '', () => {
         if (PLAYTEST_ENABLED) trackPlaytest('companionChosen', {gameId:definition.id,gotomonId:friend.id});
         selectedId = friend.id;
+        supporterIds = supporterIds.filter(id => id !== selectedId); syncParty();
         updateCourse();
         for (const node of grid.children) node.setAttribute('aria-pressed', String(node.dataset.gotomonId === selectedId));
         begin.textContent = `${friend.name}とスタート`;
-        const growth = gotomonService.getGrowth(friend.id);
-        const favoured = GAME_TYPES[definition.id] === friend.type;
-        message.textContent = `${growth.description} · ${friend.support?.name || 'マイペース'}：${friend.support?.description || 'いつでも応援'}${favoured ? ` · ${typeInfo(friend.type).name}タイプは この ゲームの とくいタイプ！ わざが はやく たまる` : ''}`;
+        describe(friend);
       }, 'yt-friend-choice');
       choice.dataset.gotomonId = friend.id; choice.setAttribute('aria-pressed', String(friend.id === selectedId));
       choice.append(companionPortrait(doc, friend), element(doc, 'strong', '', friend.name), typeChip(doc, friend.type),
         element(doc, 'small', '', `Lv${gotomonService.getGrowth(friend.id).level} · なかよし ${stats[friend.id]?.friendship ?? 0}`)); grid.append(choice);
     }
+    // The supporters: a compact row of the other Gotomon; a third pick replaces the oldest one.
+    const party = element(doc, 'div', 'yt-party'), partyTitle = element(doc, 'p', 'yt-party-title');
+    const partyGrid = element(doc, 'div', 'yt-party-grid'); partyGrid.setAttribute('role', 'group'); partyGrid.setAttribute('aria-label', 'サポーター');
+    const partyNote = element(doc, 'p', 'yt-note');
+    const syncParty = () => {
+      partyTitle.textContent = `サポーター ${supporterIds.length}/${MAX_SUPPORTERS}（いっしょに来て、XPを はんぶん もらう）`;
+      for (const node of partyGrid.children) { node.hidden = node.dataset.gotomonId === selectedId; node.setAttribute('aria-pressed', String(supporterIds.includes(node.dataset.gotomonId))); }
+      partyNote.textContent = supporterIds.length ? supporterIds.map(id => { const mate = owned.find(item => item.id === id); return `${mate.name}：${supportEffectOf(mate.type).name}（${supportEffectOf(mate.type).text}）`; }).join(' / ') : 'えらばなくても あそべます。';
+    };
+    for (const friend of owned) {
+      const chip = button(doc, '', () => {
+        supporterIds = supporterIds.includes(friend.id) ? supporterIds.filter(id => id !== friend.id) : [...supporterIds, friend.id].slice(-MAX_SUPPORTERS);
+        syncParty();
+      }, 'yt-party-choice');
+      chip.dataset.gotomonId = friend.id;
+      chip.append(companionPortrait(doc, friend), element(doc, 'span', '', friend.name), typeChip(doc, friend.type)); partyGrid.append(chip);
+    }
+    syncParty();
+    if (owned.length > 1) party.append(partyTitle, partyGrid, partyNote);
     if (!owned.length) dialog.append(element(doc, 'p', '', 'まだ捕獲したゴトモンがいません。本編でステージをクリアし、仲間に迎えよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title')));
-    dialog.append(grid, courseLabel, message, begin, element(doc, 'p', 'yt-note', '通常コースと復習は、どの相棒でも遊べます。得意コースでも問題の正解は同じです。'));
+    dialog.append(grid, party, courseLabel, message, begin, element(doc, 'p', 'yt-note', '通常コースと復習は、どの相棒でも遊べます。得意コースでも問題の正解は同じです。'));
     this.root.append(dialog); this.dialog = dialog; dialog.showModal();
     if (selected) begin.focus();
   },

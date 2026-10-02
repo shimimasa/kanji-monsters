@@ -2,6 +2,7 @@ import { element, button, companionPortrait, typeChip } from './adventureUI.js';
 import { stickerSummary } from '../minigames/companionStickers.js';
 import { OUTFIT_ITEMS, OUTFIT_SLOTS, SLOT_NAMES } from '../minigames/companionOutfits.js';
 import Speech from '../audio/speech.js';
+import { movesOf, supportEffectOf } from '../minigames/gotomonMoves.js';
 
 // The sticker book of one companion: one sticker per mini-game, grouped like the square.
 // Silver: played to the end together. Gold: rank A or S. The rainbow rim: the review done after it.
@@ -21,7 +22,15 @@ export function createStickerBookDialog({ doc, service, gotomon, sections, games
   who.append(companionPortrait(doc, gotomon), counts);
   const how = element(doc, 'p', 'yt-note', `${gotomon.name}と ミニゲームを さいごまで あそぶと 銀シール、ランク A 以上で 金シール。` +
     'まちがえた問題の「もじを ならべて ふくしゅう」を さいごまで やると、シールに にじの ふちが つくよ。');
-  dialog.append(header, who, how, outfitSection(), secretSection());
+  // わざ: the type's two moves (the second at Lv7) and what it does as a supporter.
+  const moves = element(doc, 'div', 'yt-moves'); moves.setAttribute('aria-label', 'わざ');
+  for (const move of movesOf(gotomon.type, service.getGrowth?.(gotomon.id)?.level ?? 1)) {
+    const row = element(doc, 'p', 'yt-move'); row.dataset.learned = String(move.learned);
+    row.append(element(doc, 'strong', '', move.learned ? `わざ「${move.name}」` : `Lv${move.level}で わざ「${move.name}」`), element(doc, 'span', '', move.text)); moves.append(row);
+  }
+  const support = supportEffectOf(gotomon.type);
+  moves.append(element(doc, 'p', 'yt-move', `サポーターの とき：${support.name}（${support.text}）`));
+  dialog.append(header, who, moves, how, outfitSection(), secretSection());
 
   // ひみつノート: what the companion tells as なかよし grows. Every open line can be read aloud
   // (the descriptions use kanji beyond the grade; a guessed furigana would teach wrong readings).

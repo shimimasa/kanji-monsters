@@ -8,11 +8,12 @@ import { scoreRank } from './scoreRank.js';
 import { createFindings } from './scenePolish.js';
 import { createBuildReviewPanel } from './buildReviewPanel.js';
 import { outfitItem } from './companionOutfits.js';
+import { moveFor, supportEffectOf } from './gotomonMoves.js';
 
 // Intro cards are shown once per game per page load; replays start directly.
 const seenIntros = new Set();
 
-export function createMiniGameShell({ doc, view, definition, gotomon, play, reviewMode = false, pace = 'normal', course = null, onPause, onBoost, onAct, onAdvance, onBack, onReplay, award,
+export function createMiniGameShell({ doc, view, definition, gotomon, supporters = [], play, reviewMode = false, pace = 'normal', course = null, onPause, onBoost, onAct, onAdvance, onBack, onReplay, award,
   onReview, onNormalPlay, onNotebook, onRetryMistakes, getMistakeCount = () => 0, getReviewCount = () => 0,
   getLearningSaveStatus = () => ({ failed: false, pending: 0 }), onRetryLearningSave, onBuildReviewDone }) {
   const root = view.root;
@@ -63,7 +64,10 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   });
   const hud = element(doc, 'div', 'gt-hud'), name = element(doc, 'span', 'gt-friend-name', gotomon?.name || '相棒なし');
   const score = element(doc, 'strong'), combo = element(doc, 'span');
-  name.textContent = `${gotomon?.name || '相棒'} Lv${play.snapshot().growth.level}`;
+  name.textContent = `${gotomon?.name || '相棒'} Lv${play.snapshot().growth.level}${supporters.length ? ` ＋サポーター${supporters.length}` : ''}`;
+  // わざ: the type's move replaces the game's skill name (the game's own effect stays).
+  const move = play.snapshot().move, skillName = move?.name ?? info.skill;
+  if (supporters.length) name.title = supporters.map(item => `${item.name}：${supportEffectOf(item.type).text}`).join(' / ');
   hud.append(name, score, combo);
   const skill = button(doc, '', onBoost, 'gt-button gt-skill'); skill.dataset.action = 'boost';
   const gauge = element(doc, 'meter'); gauge.min = 0; gauge.max = 3; gauge.value = 0; gauge.setAttribute('aria-label', '相棒ゲージ');
@@ -109,6 +113,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   const stats = element(doc, 'p'), reward = element(doc, 'p', 'gt-reward'); reward.setAttribute('role', 'status');
   const record = element(doc, 'p', 'gt-record'), resultActions = element(doc, 'div', 'gt-result-actions');
   const memoryNotice = element(doc, 'p', 'gt-memory-notice'); memoryNotice.hidden = true; memoryNotice.setAttribute('role', 'status');
+  // パーティ: the supporters' XP and a newly learned わざ.
+  const partyNotice = element(doc, 'p', 'gt-party-notice'); partyNotice.hidden = true; partyNotice.setAttribute('role', 'status');
   // The sticker book: a new or golden sticker for this companion, and the がんばり mark after the review.
   const stickerNotice = element(doc, 'p', 'gt-sticker-notice'); stickerNotice.hidden = true; stickerNotice.setAttribute('role', 'status');
   const showSticker = (tier, text) => { stickerNotice.dataset.tier = tier; stickerNotice.textContent = text; stickerNotice.hidden = false; };
@@ -134,7 +140,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
     const done = onBuildReviewDone?.();
     if (done?.mark) showSticker('review', `がんばりマークが ついた！ シール帳の シールに にじの ふち${done.newTitles?.length ? `　称号「${done.newTitles.join('」「')}」に なった！` : ''}`);
   } });
-  result.append(growthResult.root,stickerNotice,memoryNotice,challengeResult,nextGoal,buildReview.root,resultActions,reward,retrySave);
+  result.append(growthResult.root,stickerNotice,partyNotice,memoryNotice,challengeResult,nextGoal,buildReview.root,resultActions,reward,retrySave);
   shell.append(result);
   const legacyResult = root.querySelector('[class$="-result"]:not(.gt-result)');
   if (legacyResult) legacyResult.classList.add('gt-learning-result');
@@ -146,6 +152,10 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
   let state = null, receipt = null, resultShown = false, soundAnswers=0,soundBoosts=0,soundComplete=false;
   let helpAutoPaused = false;
   let feedbackId = null, feedbackMs = 0;
+  // わざ: a short toast when the skill fires (arcade views draw their own HUD, so the shell shows it for every game).
+  const moveToast = element(doc, 'p', 'gt-move-toast'); moveToast.hidden = true; moveToast.setAttribute('aria-live', 'polite');
+  root.append(moveToast);
+  let toastBoosts = 0, toastMs = 0;
   let introOpen = false;
   if (arcade && !seenIntros.has(definition.id)) {
     const intro = element(doc, 'div', 'ya-intro');
@@ -159,6 +169,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
     const mission = play.snapshot().world?.challenge;
     if (mission) meta.append(element(doc, 'span', '', `ミッション：${mission.name}`));
     if (course) meta.append(element(doc, 'span', '', `★ ${course.name}`));
+    if (move) meta.append(element(doc, 'span', '', `わざ：${move.name}（${move.text}）`));
     const start = button(doc, 'スタート！', () => {
       if (!introOpen) return;
       introOpen = false; seenIntros.add(definition.id); intro.remove(); onPause(false); view.focusPlay?.();
@@ -198,6 +209,12 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
         memory?.newBest ? `この相棒との自己ベスト！ ${memory.bestScore} pt` :
         memory?.firstPlay ? 'このゲームでの、はじめての思い出ができたよ。' : '';
       memoryNotice.hidden = !memoryNotice.textContent;
+      const mates = value?.duplicate ? [] : value?.supporters ?? [];
+      const learned = !value?.duplicate && value?.newMove && gotomon?.type ? moveFor(gotomon.type, value.after.level).name : null;
+      partyNotice.textContent = [learned ? `${gotomon.name}が あたらしい わざ「${learned}」を おぼえた！` : '',
+        ...mates.map((mate, i) => { const friend = supporters.find(item => item.id === mate.id);
+          return `${i ? '' : 'サポーター '}${friend?.name ?? 'サポーター'} XP +${mate.earnedXP}${mate.levelUp ? ` → Lv${mate.level}になった！` : ''}${mate.newMove && friend?.type ? ` わざ「${moveFor(friend.type, mate.level).name}」を おぼえた！` : ''}`; })].filter(Boolean).join(' · ');
+      partyNotice.hidden = !partyNotice.textContent;
       const sticker = !value?.duplicate && value?.sticker;
       if (sticker?.isNew || sticker?.upgraded) showSticker(sticker.tier, sticker.upgraded ? `シール帳の「${definition.title}」が 金シールに かわった！` : `シール帳に「${definition.title}」の ${sticker.tier === 'gold' ? '金' : '銀'}シール！`);
       const opened = value?.duplicate ? [] : (value?.newOutfits ?? []).map(outfitItem).filter(Boolean);
@@ -233,11 +250,16 @@ export function createMiniGameShell({ doc, view, definition, gotomon, play, revi
       // The Host re-renders after an accepted boost, so this pass stops here.
       if (arcade && current.gauge >= 3 && !state.paused && !state.result && !introOpen && onBoost()) return;
       gauge.value = Math.min(3, current.gauge); skill.disabled = state.paused || !!state.result || current.gauge < 3;
-      skillLabel.textContent = info.scene==='lantern'?(current.gauge>=3?'光をひらく！':'正解で光がたまる'):current.gauge >= 3 ? `${info.skill} · ${info.scene==='craft'?'2ルートへ光':info.effect}` : `${info.skill} ${Math.floor(current.gauge)}/3`;
-      skill.title = `${current.growth.description}・技 ${current.skillPoints}pt＋ゲーム固有効果`;
+      skillLabel.textContent = info.scene==='lantern'?(current.gauge>=3?'光をひらく！':'正解で光がたまる'):current.gauge >= 3 ? `${skillName} · ${info.scene==='craft'?'2ルートへ光':info.effect}` : `${skillName} ${Math.floor(current.gauge)}/3`;
+      skill.title = `${current.growth.description}・技 ${current.skillPoints}pt＋ゲーム固有効果${move ? `・わざ「${move.name}」${move.text}` : ''}`;
       score.textContent = `${(state.score ?? current.learningPoints) + current.bonus} pt`;
       combo.textContent = `${current.combo} COMBO`;
       scene?.update(state, current, dt);
+      if (move && current.boosts > toastBoosts && !state.result) {
+        moveToast.textContent = `${gotomon?.name ?? '相棒'}の ${move.name}！ ${move.text}`; moveToast.hidden = false; toastMs = 1800;
+      }
+      toastBoosts = current.boosts;
+      if (toastMs > 0) { toastMs -= dt; if (toastMs <= 0 || state.result) { moveToast.hidden = true; toastMs = 0; } }
       view.present?.(play.snapshot(), dt, state);
       const answeredWell = state.lastAnswer?.correct || state.lastAnswer?.classification === 'fullCorrect';
       // manualNext games (reading-heavy ones) wait for the child's own つぎへ.
