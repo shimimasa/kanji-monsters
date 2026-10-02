@@ -179,3 +179,4 @@
 .yt-all-body{display:grid;gap:2px;min-width:0}.yt-all-body small{color:#4b6d5d}.yt-all-chips{display:flex;flex-wrap:wrap;gap:4px;margin:0}.yt-all-chips span{padding:1px 8px;border-radius:999px;background:#eef3ef;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
 .yt-all-actions{display:grid;gap:6px}.yt-all-more{margin:10px auto 0;display:block}
 @media(max-width:480px){.yt-all-card{grid-template-columns:52px minmax(0,1fr)}.yt-all-card .gt-portrait{width:52px;height:52px}.yt-all-actions{grid-column:1/-1;grid-auto-flow:column;justify-content:start}}
+.yt-type-chip{display:inline-block;padding:0 8px;border-radius:999px;font-size:11px;font-weight:800;color:#1c1c1c;line-height:1.7;white-space:nowrap;vertical-align:middle}.yt-type-chip[data-match=true]{box-shadow:0 0 0 2px #e3a500;font-weight:900}.yt-type-chip[data-match=true]::after{content:' ★'}

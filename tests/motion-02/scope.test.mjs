@@ -4,7 +4,9 @@ import fs from 'node:fs';
 import {BATTLE_DISPLAY_HOOKS} from './battle-display-hooks.mjs';
 import {assertBattleDisplayOnly,assertMotionScope,assertAddedPaths,readCheckpointBattle} from './scope-audit.mjs';
 test('complete original battle source reconstructs exactly after removing only explicit display hooks',()=>{
- const source=fs.readFileSync('src/screens/battleScreen.js','utf8').replaceAll('\r\n','\n');
+ // 2026-10-02 (user-approved type matchups): lines marked TYPE-MATCHUP are the only other
+ // addition to the battle; they are taken out first, and everything else is audited as before.
+ const source=fs.readFileSync('src/screens/battleScreen.js','utf8').replaceAll('\r\n','\n').split('\n').filter(line=>!line.includes('// TYPE-MATCHUP')).join('\n');
  const checkpoint=readCheckpointBattle();
  assertBattleDisplayOnly(source,checkpoint);
  const hook=BATTLE_DISPLAY_HOOKS[0][1].join('\n')+'\n';

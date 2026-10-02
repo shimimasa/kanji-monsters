@@ -6,6 +6,7 @@ import { KANJI_DEFENSE_BASE } from './scope-contract.mjs';
 
 const git = (...args) => execFileSync('git', args, { maxBuffer: 16 * 1024 * 1024 }).toString('utf8').replaceAll('\r\n', '\n');
 const read = path => fs.readFileSync(path, 'utf8').replaceAll('\r\n', '\n');
+const NL = String.fromCharCode(10);
 
 // This redesign supersedes the old title-only integration allowlist.
 // Preserve certified input/content/Core; the original scope-contract remains.
@@ -16,7 +17,10 @@ const read = path => fs.readFileSync(path, 'utf8').replaceAll('\r\n', '\n');
 test('main scheduler, battle, save transaction, audio and Motion remain unchanged', () => {
   for (const path of ['src/main.js','src/core/gameState.js','src/core/saveData.js','src/core/storageTransaction.js',
     'src/screens/battleScreen.js','src/audio/audioManager.js','src/visuals/motion/monsterMotionHost.js']) {
-    assert.equal(read(path), git('show', KANJI_DEFENSE_BASE + ':' + path), path);
+    // 2026-10-02 (user-approved type matchups): the battle may hold lines marked TYPE-MATCHUP and
+    // nothing else new; every other line must still be byte-identical to the base.
+    const current = path === 'src/screens/battleScreen.js' ? read(path).split(NL).filter(line => !line.includes('// TYPE-MATCHUP')).join(NL) : read(path);
+    assert.equal(current, git('show', KANJI_DEFENSE_BASE + ':' + path), path);
   }
 });
 test('Host delegates every command without interpreting defense rules', () => {

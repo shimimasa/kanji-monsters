@@ -19,6 +19,7 @@ import { createRunMistakes } from './runMistakes.js';
 import { companionCourse } from './companionCourses.js';
 import { castForPlay } from './gotomonCast.js';
 import { subjectOf } from './hubCatalog.js';
+import { GAME_TYPES } from './gotomonTypes.js';
 
 const layout = Object.freeze({ imageRect: { x: 20, y: 10, width: 240, height: 120 },
   clipRect: { x: 24, y: 14, width: 232, height: 112 } });
@@ -92,7 +93,9 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       const ticket = service.beginPlay?.({ sessionId, gameId: definition.id, gotomonId: gotomon?.id });
       const pace = nextProps.pace === 'slow' ? 'slow' : 'normal';
       play = createCompanionPlay(sessionId, doc.querySelector && !makeView
-        ? { gameId: definition.id, growth, support: gotomon?.support?.id, bestTimeMs: service.getProgress().games?.[definition.id]?.bestTimeMs, course, pace } : {});
+        ? { gameId: definition.id, growth, support: gotomon?.support?.id, bestTimeMs: service.getProgress().games?.[definition.id]?.bestTimeMs, course, pace,
+          // とくいタイプ: a companion of the game's type fills its skill gauge sooner.
+          favoured: !!gotomon?.type && GAME_TYPES[definition.id] === gotomon.type } : {});
       companion = makeCompanion({ sessionId, ownedMonsterIds: owned, selectedId: gotomon?.id, loadImage });
       // stageId and focusKanjiIds serve content built from the adventure (photo rally); other games ignore them.
       game = definition.create({ sessionId, random, history, reviewContentIds, sentenceLevel: nextProps.sentenceLevel, mathLevel: nextProps.mathLevel, region: nextProps.region, mode: nextProps.mode, pace,

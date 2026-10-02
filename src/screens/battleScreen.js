@@ -24,6 +24,7 @@ import { advanceTimer } from '../core/frameClock.js';
 import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { getContainedRect } from '../ui/viewportLayout.js';
 import { createBattleMotionBridge } from '../visuals/battleMotionBridge.js';
+import { companionMatchup } from '../minigames/battleMatchup.js'; // TYPE-MATCHUP
 // 1. まず、ファイル冒頭にimportを追加
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import {
@@ -4987,6 +4988,7 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
       ]);
       battleState.comboCount = 0;
     }
+    dmg = companionMatchup(dmg, gameState.currentEnemy, battleState.log); // TYPE-MATCHUP
     
     // ====== ボス戦のシールドシステム ======
 if (gameState.currentEnemy.isBoss) {

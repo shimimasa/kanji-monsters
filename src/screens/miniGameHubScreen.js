@@ -2,7 +2,7 @@ import { publish } from '../core/eventBus.js';
 import { miniGameRegistry } from '../minigames/registry.js';
 import { gameExperiences } from '../minigames/gameExperiences.js';
 import { gotomonService } from '../minigames/gotomonService.js';
-import { element, button, companionPortrait, isolateScreen } from '../ui/adventureUI.js';
+import { element, button, companionPortrait, isolateScreen, typeChip } from '../ui/adventureUI.js';
 import { PLAYTEST_ENABLED, trackPlaytest } from '../playtest/developmentLogger.js';
 import { englishLearningService } from '../minigames/englishChoice/englishLearningService.js';
 import { timedLearningService } from '../minigames/timedChoice/timedLearningService.js';
@@ -16,6 +16,7 @@ import { createPhotoAlbumDialog } from '../ui/photoAlbumDialog.js';
 import { createStickerBookDialog } from '../ui/stickerBookDialog.js';
 import { createAllStickersDialog } from '../ui/allStickersDialog.js';
 import { stickerSummary } from '../minigames/companionStickers.js';
+import { GAME_TYPES, typeInfo } from '../minigames/gotomonTypes.js';
 import { stageData, getMonsterById } from '../loaders/dataLoader.js';
 
 // Photo rally spots: elementary stages the child has reached in the adventure.
@@ -59,7 +60,8 @@ const hub = {
     const banner = element(doc, 'div', 'yt-friend-banner');
     if (selected) {
       const growth = gotomonService.getGrowth(selected.id), details = element(doc, 'div', 'yt-friend-growth');
-      details.append(element(doc, 'strong', '', `${selected.name} Lv${growth.level}`));
+      const nameLine = element(doc, 'strong', '', `${selected.name} Lv${growth.level} `); nameLine.append(typeChip(doc, selected.type));
+      details.append(nameLine);
       const track = element(doc, 'progress', 'yt-xp'); track.max = 1; track.value = growth.fraction; track.setAttribute('aria-label', '次のレベルまでの経験値');
       details.append(track, element(doc, 'small', '', growth.remaining ? `あと${growth.remaining} XPでLv${growth.level + 1}` : 'MASTER · 育ちきった旅の相棒'));
       // The companion's sticker book: one sticker per game played to the end together.
@@ -126,6 +128,8 @@ const hub = {
       body.append(element(doc, 'strong', 'yt-card-title', definition.title), element(doc, 'span', 'yt-card-description', info.description));
       const tags = element(doc, 'span', 'yt-card-meta');
       for (const tag of [info.time, info.difficulty]) tags.append(element(doc, 'span', '', tag));
+      // The game's とくいタイプ; marked when the companion has it (its skill gauge fills sooner).
+      if (GAME_TYPES[definition.id]) { const fav = typeChip(doc, GAME_TYPES[definition.id], 'とくい '); fav.dataset.match = String(selected?.type === GAME_TYPES[definition.id]); tags.append(fav); }
       if (subject === 'all' && choiceSubjects(definition.id).length) tags.append(element(doc, 'span', 'yt-card-choice', choiceSubjects(definition.id).length === 3 ? '3教科' : '2教科'));
       body.append(tags);
       const featuredCourse = companionCourse(selected, definition.id);
@@ -357,10 +361,11 @@ const hub = {
         for (const node of grid.children) node.setAttribute('aria-pressed', String(node.dataset.gotomonId === selectedId));
         begin.textContent = `${friend.name}とスタート`;
         const growth = gotomonService.getGrowth(friend.id);
-        message.textContent = `${growth.description} · ${friend.support?.name || 'マイペース'}：${friend.support?.description || 'いつでも応援'}`;
+        const favoured = GAME_TYPES[definition.id] === friend.type;
+        message.textContent = `${growth.description} · ${friend.support?.name || 'マイペース'}：${friend.support?.description || 'いつでも応援'}${favoured ? ` · ${typeInfo(friend.type).name}タイプは この ゲームの とくいタイプ！ わざが はやく たまる` : ''}`;
       }, 'yt-friend-choice');
       choice.dataset.gotomonId = friend.id; choice.setAttribute('aria-pressed', String(friend.id === selectedId));
-      choice.append(companionPortrait(doc, friend), element(doc, 'strong', '', friend.name),
+      choice.append(companionPortrait(doc, friend), element(doc, 'strong', '', friend.name), typeChip(doc, friend.type),
         element(doc, 'small', '', `Lv${gotomonService.getGrowth(friend.id).level} · なかよし ${stats[friend.id]?.friendship ?? 0}`)); grid.append(choice);
     }
     if (!owned.length) dialog.append(element(doc, 'p', '', 'まだ捕獲したゴトモンがいません。本編でステージをクリアし、仲間に迎えよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title')));
