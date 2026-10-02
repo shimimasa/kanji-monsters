@@ -61,7 +61,7 @@ export function createCompanionScene({ doc, root, info, gotomon, act }) {
         node.setAttribute('aria-pressed', String(choice.selected));
       }
     }
-    label.textContent=state.paused?'一時停止中':play.reaction==='boost'?`${gotomon?.name}の${info.skill}！`:world.caption || info.goal;
+    label.textContent=state.paused?'一時停止中':play.reaction==='boost'?`${gotomon?.name}の${play.move?.name ?? info.skill}！`:world.caption || info.goal;
     if(board) {
       const lane=state.selectedEnemy?.lane??world.hitLane;
       if(lane!==undefined)actor.style.left=`${(lane+.5)*100/3}%`;
