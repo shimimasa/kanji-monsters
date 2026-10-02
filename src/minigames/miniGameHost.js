@@ -6,7 +6,7 @@ import { miniGameRegistry } from './registry.js';
 import { readActiveCollection } from './collectionAdapter.js';
 import { createCompanionAdapter } from './companionAdapter.js';
 import { gotomonService } from './gotomonService.js';
-import { createCompanionPlay } from './companionPlay.js';
+import { createCompanionPlay, answerKind } from './companionPlay.js';
 import { createMiniGameShell } from './miniGameShell.js';
 import { PLAYTEST_ENABLED, trackPlaytest, observePlaytestCommand } from '../playtest/developmentLogger.js';
 import { scoreRank } from './scoreRank.js';
@@ -99,7 +99,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
         if (valid) { companion?.observe(event); play?.observe(event); }
         if (valid) learningRun?.observe(event);
         if (valid && wordLearning) runMistakes.observe(event);
-        if (PLAYTEST_ENABLED && valid && ['correct','incorrect'].includes(event.type)) trackPlaytest('learning', {sessionId, outcome:event.payload?.classification==='partial'?'partial':event.type});
+        if (PLAYTEST_ENABLED && valid && ['correct','incorrect'].includes(event.type)) trackPlaytest('learning', {sessionId, outcome:answerKind(event)});
       } });
       const current = game;
       const createView = makeView || definition.createView;

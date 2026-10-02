@@ -1,6 +1,13 @@
 import { growthStatus, supportPoints } from './companionGrowth.js';
 import { createGameplayRun } from './gameplay/gameplayRun.js';
 
+// What an answer event was, for the run's feedback and the playtest log: an enemy that reached
+// the barrier or the gate (けいさんインベーダー・漢字防衛隊, reason 'escaped') is a time-out,
+// not a wrong answer — the child gave no answer, so it gets no wrong-answer buzzer.
+export const answerKind = event => event?.type === 'incorrect'
+  ? (event.payload?.reason === 'escaped' ? 'timeout' : event.payload?.classification === 'partial' ? 'partial' : 'incorrect')
+  : event?.type;
+
 // Consumes committed events; never supplies answers or changes learning rules.
 export function createCompanionPlay(sessionId, { gameId, growth = growthStatus(), support = 'steady', bestTimeMs = null, course = null, pace = 'normal' } = {}) {
   let seq = 0, correct = 0, combo = 0, maxCombo = 0, gauge = 0, bonus = 0, boosts = 0;
@@ -27,7 +34,7 @@ export function createCompanionPlay(sessionId, { gameId, growth = growthStatus()
         answered++; combo = 0; recovering = true;
         learningPoints += Math.round(Math.min(1,Math.max(0,event.payload?.score || 0))*100);
         world?.answer(false, event.payload, combo);
-        reaction = event.payload?.classification === 'partial' ? 'partial' : 'incorrect';
+        reaction = answerKind(event);
         remaining = 600; revision++;
       } else if (event.type === 'sessionComplete') {
         // A final answer can fill the gauge: convert it before sealing the result.

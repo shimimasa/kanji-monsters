@@ -166,9 +166,12 @@ test('double submit is rejected after terminal completion', () => {
   const command = { type: 'submit', payload: { sessionId: 'kd-test', token: game.snapshot().inputToken, value: readingFor(enemy) } };
   assert.equal(game.dispatch(command), true); assert.equal(game.dispatch(command), false); assert.equal(game.snapshot().resolved, 1);
 });
-test('escape is terminal incorrect and costs one life', () => {
+test('escape is a terminal time-out, counted apart from wrong readings, and costs one life', () => {
   const events = [], game = create({ onEvent: event => events.push(event), rules: { act1SpeedPerMs: 1 } }); game.enter(); game.update(250);
-  const state = game.snapshot(); assert.equal(state.life, 2); assert.equal(state.incorrect, 1); assert.equal(state.resolved, 1);
+  const state = game.snapshot(); assert.equal(state.life, 2); assert.equal(state.resolved, 1);
+  // Since 2026-10-02 (the teacher's choice): reaching the gate is not a wrong reading.
+  assert.equal(state.incorrect, 0); assert.equal(state.escaped, 1);
+  // The v1 learning event is unchanged: an 'incorrect' event whose reason says it was a time-out.
   assert.equal(events.find(event => event.type === 'incorrect').payload.reason, 'escaped');
 });
 
