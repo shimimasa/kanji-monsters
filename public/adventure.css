@@ -165,3 +165,7 @@
 .yt-outfit-slot h4{margin:0 0 4px;font-size:13px}.yt-outfit-items{display:flex;flex-wrap:wrap;gap:6px}
 .yt-outfit-item{display:grid;justify-items:center;gap:1px;min-width:78px;padding:6px 8px;border:2px solid #c9d5cc;border-radius:12px;background:#fff;font:inherit;cursor:pointer}.yt-outfit-item b{font-size:24px;line-height:1.1}.yt-outfit-item span{font-size:12px;font-weight:700}.yt-outfit-item small{font-size:10px;color:#5d6a62}
 .yt-outfit-item[aria-pressed=true]{border-color:#e3a500;background:#fff6d6;box-shadow:0 0 0 2px #e3a50055}.yt-outfit-item:disabled{cursor:default;opacity:.55}.yt-outfit-item:disabled b{filter:grayscale(1)}
+.yt-secrets{display:grid;gap:8px;margin:12px 0;padding:12px;border-radius:14px;background:#f2f5fb}.yt-secrets h3{margin:0}
+.yt-secret{display:grid;gap:2px;padding:8px 10px;border-radius:10px;background:#fff;border:1px solid #d6deea}.yt-secret small{font-size:11px;color:#4d5b72;font-weight:700}
+.yt-secret p{margin:0;line-height:1.6}.yt-secret[data-open=false]{background:#eef1f6}.yt-secret-locked{letter-spacing:.3em;color:#9aa6b8}
+.yt-companion-dialog .yt-secrets .yt-secret-listen{justify-self:start;min-height:34px;margin-top:4px;padding:4px 12px;border:1px solid #3d7bd9;border-radius:999px;background:#eaf2ff;color:#1f4f99;font:inherit;font-size:13px;font-weight:700;cursor:pointer}

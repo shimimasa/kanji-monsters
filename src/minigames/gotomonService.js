@@ -9,6 +9,7 @@ import { recordCompanionMemory } from './companionMemories.js';
 import { recordSticker, markStickerReview } from './companionStickers.js';
 import { outfitProgress, wornItems, outfitItem, OUTFIT_SLOTS } from './companionOutfits.js';
 import { hubSections } from './hubCatalog.js';
+import { secretsFor, openedSecrets } from './companionSecrets.js';
 
 // The sticker book's slots: every game in the square (the crown asks for all of them).
 const GAME_COUNT = new Set(hubSections('all').flatMap(section => section.games)).size;
@@ -69,6 +70,8 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     getCaseFiles: () => getProgress().caseFiles ?? {},
     getJourneys: () => getProgress().journeys ?? {},
     getStickers: id => getProgress().companions?.[id]?.stickers ?? {},
+    // ひみつノート: what this companion tells, by なかよし.
+    getSecrets: id => secretsFor(lookup(id), getProgress().companions?.[id]),
     getOutfit: id => ({ chosen: { ...(getProgress().companions?.[id]?.outfit ?? {}) },
       progress: outfitProgress(getProgress().companions?.[id], { gameCount: GAME_COUNT }) }),
     // Puts an opened item on (or takes the place's item off with null).
@@ -129,6 +132,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         friend.bestRank = betterRank(rank.rank, friend.bestRank || 'C');
         game.bestRank = betterRank(rank.rank, game.bestRank || 'C');
         const earned = 1 + Math.min(3, Math.floor(count(correct) / 3));
+        const friendshipBefore = count(friend.friendship);
         friend.plays = count(friend.plays) + 1; friend.friendship = count(friend.friendship) + earned;
         friend.medals ??= [];
         if (friend.plays >= 5 && !friend.medals.includes('five-plays')) friend.medals.push('five-plays');
@@ -177,6 +181,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
           before, after, earnedXP: after.xp - before.xp, levelUp: after.level > before.level, rank,
           memory, sticker, newPhotos, newCases, journeyBest,
           // きせかえ opened by this run (a sticker, a level or なかよし).
+          newSecrets: openedSecrets(lookup(gotomonId), { friendship: friendshipBefore }, friend),
           newOutfits: Object.entries(outfitProgress(friend, { gameCount: GAME_COUNT })).filter(([id, p]) => p.unlocked && !outfitBefore[id].unlocked).map(([id]) => id),
           bestTimeMs:game.bestTimeMs??null,previousTimeMs:previousTime,newTimeBest:validTime&&(!previousTime||roundedTime<previousTime) };
       });
