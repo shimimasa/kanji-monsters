@@ -14,6 +14,7 @@ import { titleProgress, earnedTitleIds, newTitles } from './companionTitles.js';
 import { stickerSummary } from './companionStickers.js';
 import { typeOf } from './gotomonTypes.js';
 import { moveFor, supporterXP, MAX_SUPPORTERS } from './gotomonMoves.js';
+import { LEGEND_IDS, recipeFor, regionOf, candidates, firstPair, canBreed } from './gotomonBreeding.js';
 
 // The sticker book's slots: every game in the square (the crown asks for all of them).
 const GAME_COUNT = new Set(hubSections('all').flatMap(section => section.games)).size;
@@ -56,6 +57,19 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     const owned = getOwnedGotomon(), selectedId = getProgress().selectedGotomonId;
     return owned.find(item => item.id === selectedId) ?? owned[0] ?? null;
   };
+  // はいごう: every legend with its recipe, whether its region is known, and who can stand on each side.
+  function getBreedingBook() {
+    const progress = getProgress(), companions = progress.companions ?? {}, bred = progress.breeding ?? {};
+    const owned = getOwnedGotomon(), ownedIds = new Set(owned.map(item => item.id));
+    const friends = owned.map(item => Object.freeze({ ...item, region: regionOf(lookup(item.id)), level: growthStatus(companions[item.id]).level }));
+    const known = new Set(friends.map(friend => friend.region).filter(Boolean));
+    const legends = LEGEND_IDS.map(id => {
+      const recipe = recipeFor(id), sides = candidates(recipe, friends);
+      return Object.freeze({ gotomon: getGotomonById(id, companions), recipe, owned: ownedIds.has(id), bred: !!bred[id],
+        revealed: known.has(recipe.region), a: sides.a, b: sides.b, pair: ownedIds.has(id) ? null : firstPair(recipe, friends) });
+    });
+    return { friends, legends };
+  }
   return {
     getOwnedGotomon, getSelectedGotomon, getGotomonById, getProgress,
     getGrowth: id => growthStatus(getProgress().companions?.[id]),
@@ -96,6 +110,25 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
       });
     },
     gameCount: GAME_COUNT,
+    getBreedingBook,
+    // Meets the legend: it joins the collection, and both parents stay.
+    breed({ legendId, parentA, parentB } = {}) {
+      const recipe = recipeFor(legendId);
+      if (!recipe) return { ok: false };
+      const { friends } = getBreedingBook();
+      if (friends.some(friend => friend.id === legendId) || !canBreed(recipe, friends, parentA, parentB)) return { ok: false };
+      const outcome = save(snapshot => {
+        const ids = snapshot.player.collection.gotomonIds;
+        if (!ids.includes(parentA) || !ids.includes(parentB)) throw new Error('Parent is not owned');
+        if (ids.includes(legendId)) throw new Error('Already met');
+        const progress = snapshot.player.miniGames ??= { version: 1, games: {}, companions: {} };
+        const levels = [parentA, parentB].map(id => growthStatus(progress.companions?.[id]).level);
+        if (levels.some(level => level < 5)) throw new Error('Parents need Lv5');
+        ids.push(legendId);
+        progress.breeding = { ...(progress.breeding ?? {}), [legendId]: { parents: [parentA, parentB], at: Math.max(0, Math.floor(now())) } };
+      });
+      return { ...outcome, gotomon: outcome.ok ? getGotomonById(legendId) : null };
+    },
     getOutfit: id => ({ chosen: { ...(getProgress().companions?.[id]?.outfit ?? {}) },
       progress: outfitProgress(getProgress().companions?.[id], { gameCount: GAME_COUNT }) }),
     // Puts an opened item on (or takes the place's item off with null).

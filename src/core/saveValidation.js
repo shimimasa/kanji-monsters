@@ -3,6 +3,7 @@ import { validateCompanionMemories } from '../minigames/companionMemories.js';
 import { validateCompanionStickers } from '../minigames/companionStickers.js';
 import { validateCompanionOutfit } from '../minigames/companionOutfits.js';
 import { validateParty } from '../minigames/gotomonMoves.js';
+import { validateBreeding } from '../minigames/gotomonBreeding.js';
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 function requireRecord(value, label) {
@@ -119,6 +120,7 @@ export function validateSave(save, currentVersion) {
     if (friend?.outfit !== undefined) validateCompanionOutfit(friend.outfit);
   }
   if (save.player.miniGames?.party !== undefined) validateParty(save.player.miniGames.party);
+  if (save.player.miniGames?.breeding !== undefined) validateBreeding(save.player.miniGames.breeding);
   const activity = save.player.miniGames?.hubActivity;
   if (activity !== undefined) {
     requireRecord(activity, 'hub activity');
