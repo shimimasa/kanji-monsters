@@ -14,7 +14,7 @@ if (!outDir) throw new Error('usage: run-codex.mjs <outDir> [--dry] [--jobs=N] [
 const dry = rest.includes('--dry'), jobs = Math.max(1, Number(rest.find(arg => arg.startsWith('--jobs='))?.slice(7)) || 4);
 const only = rest.filter(arg => !arg.startsWith('--'));
 const data = file => JSON.parse(readFileSync(`public/data/${file}`, 'utf8')).flat(Infinity).filter(m => m?.id);
-const monsters = new Map([...data('enemies_proto.json'), ...data('enemy_world.json')].map(m => [m.id, m]));
+const monsters = new Map([...data('enemies_proto.json'), ...data('enemies_legend.json')].map(m => [m.id, m]));
 // The picture is found by its file name in any folder of full/ (the world Gotomon's grade does not name their folder).
 const FULL = 'public/assets/images/monsters/full';
 const pictureOf = id => readdirSync(FULL).map(folder => resolve(FULL, folder, `${id}.webp`)).find(existsSync);

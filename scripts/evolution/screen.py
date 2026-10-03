@@ -3,7 +3,7 @@
 # stops looking like the same Gotomon), and each one gets the direction that fits it.
 # Gotomon that already have an evolved picture are left out.
 # usage: python scripts/evolution/screen.py <sheet-prefix> <stage-prefix|id> ...
-#   e.g. python scripts/evolution/screen.py C:/kanji-evo/screen-tohoku tohoku hokkaido
+#   e.g. python scripts/evolution/screen.py C:/kanji-evo/screen-tohoku tohoku hokkaido   ('legend' = all legends)
 #   writes <sheet-prefix>-1.png, -2.png ... (20 Gotomon each)
 import json, sys, textwrap
 from pathlib import Path
@@ -14,13 +14,14 @@ data = lambda f: [m for m in _flat(json.loads(Path(f'public/data/{f}').read_text
 def _flat(x):
     for i in (x if isinstance(x, list) else [x]):
         yield from (_flat(i) if isinstance(i, list) else [i])
-monsters = data('enemies_proto.json') + data('enemy_world.json') + data('enemies_legend.json')
+legends = {m['id'] for m in data('enemies_legend.json')}  # key 'legend' picks all of them
+monsters = data('enemies_proto.json') + data('enemies_legend.json')  # the game loads these two (enemy_world.json is an unused copy)
 full = Path('public/assets/images/monsters/full')
 done = {p.stem for p in Path('public/assets/images/monsters/evo').glob('*.webp')}
 picked, seen = [], set()
 for m in monsters:
     if m['id'] in seen or m['id'] in done: continue
-    if any(m['id'] == k or str(m.get('stageId', '')).startswith(k) for k in keys):
+    if any(m['id'] == k or (k == 'legend' and m['id'] in legends) or str(m.get('stageId', '')).startswith(k) for k in keys):
         pic = next(full.glob(f"*/{m['id']}.webp"), None)
         if pic: picked.append((m, pic)); seen.add(m['id'])
 
