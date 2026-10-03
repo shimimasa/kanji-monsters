@@ -1,7 +1,7 @@
 # 進化の絵（Codex で作る）
 
 `targets.json` に 1ぴきずつ `id` と `style`（方向）を書く。方向は その子の性格に合わせて 1つ：
-`cute`（かわいさ）・`cool`（かっこよさ）・`eerie`（ちょっと ぶきみ。こわすぎない）。からだの変え方は書かない
+`cute`（かわいさ）・`cool`（かっこよさ）・`eerie`（ちょっと ぶきみ。こわすぎない）・`noble`（りっぱ。実在の人物・神さま・仏像・文化財・民族の衣装が もとの子に。敬意をもって、悪者ふう・こわい顔に しない）。からだの変え方は書かない
 （Codex が しょうかい文と元の絵から考える）。方向ごとの ことばは `run-codex.mjs` の `STYLES`、共通の指示は `prompt.tpl.txt`。
 
 1. 指示文の確認（Codex は呼ばない）
@@ -16,3 +16,11 @@
    `python scripts/evolution/import-images.py C:/kanji-evo/<回>`（入れかえるときは `--force`）
 
 Claude からは 2. の形の コマンドだけ 許可してある（`.claude/settings.local.json`）。パイプや `cd` を つけると 許可の形から外れる。
+
+## 元の絵から 作りなおす（2026-10-03 追加）
+
+テーマに 問題が ある子を デザインから 作りなおすとき：`base-targets.json` に `{id, name, design, refs}`（refs＝同じ地方の スタイル見本3体）を書く →
+`node --experimental-default-type=module scripts/evolution/run-codex.mjs C:/kanji-evo/<回> --base` → 目で確認 →
+`python scripts/evolution/import-base.py C:/kanji-evo/<回>`（full と thumb を 置きかえ。明るい絵が 暗い見本で くすむときは `"tone": "keep"`）→
+`python scripts/evolution/coloring-entry.py <id> ...`（ぬりえの データ）→ 名前・文は `public/data/enemies_proto.json` の 行だけ 書きかえる → ふつうの しんか。
+
