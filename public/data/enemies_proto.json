@@ -1611,18 +1611,18 @@
   {
     "id": "IBK-E01",
     "stageId": "kanto_area3",
-    "name": "レンコンマンドラ",
+    "name": "水戸納豆スライム",
     "prefecture": "茨城",
     "grade": 3,
     "thumb": "IBK-E01_thumb",
     "image": "IBK-E01.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "農産系",
-    "habitat": "霞ヶ浦・蓮根畑",
-    "desc": "レンコンの体から芽を出した小妖怪。ぴょこんと飛び出しては笑う。",
-    "trivia": "茨城県はレンコンの生産量日本一。霞ヶ浦周辺で多く栽培される。",
-    "catchphrase": "「シャキッと元気！穴だらけの妖精！」"
+    "category": "食文化",
+    "habitat": "水戸市",
+    "desc": "ねばねばの糸をのばす納豆のスライム。はしで持ち上げると、どこまでも糸がのびる。",
+    "trivia": "茨城県の水戸は、納豆の名産地として知られている。",
+    "catchphrase": "「ねばっと元気、糸ひきパワー！」"
   },
   {
     "id": "IBK-E02",
@@ -3901,34 +3901,34 @@
   {
     "id": "SG-E04",
     "stageId": "kinki_area1",
-    "name": "近江牛ミノタウロス",
+    "name": "近江牛バーガービースト",
     "prefecture": "滋賀",
     "grade": 5,
     "thumb": "SG-E04_thumb",
     "image": "SG-E04.webp",
     "isBoss": false,
     "weakness": "kunyomi",
-    "category": "畜産文化",
+    "category": "食文化",
     "habitat": "近江八幡市",
-    "desc": "黒毛の牛頭を持つ戦士。重厚な体格で地面を踏み鳴らす。",
+    "desc": "近江牛のハンバーガーに角が生えたモンスター。舌をぺろりと出して、食いしんぼうに暴れる。",
     "trivia": "近江牛は日本三大和牛の一つで、全国に知られる高級ブランド。",
-    "catchphrase": "「黒き巨躯、雷鳴のように迫る！」"
+    "catchphrase": "「ジューシーな角で、ガブリ！」"
   },
   {
     "id": "SG-E05",
     "stageId": "kinki_area1",
-    "name": "長浜曳山ドールゴーレム",
+    "name": "ビワコオオナマズ",
     "prefecture": "滋賀",
     "grade": 5,
     "thumb": "SG-E05_thumb",
     "image": "SG-E05.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "人形系",
-    "habitat": "長浜曳山祭",
-    "desc": "曳山の人形が動き出したゴーレム。木の香りを漂わせる。",
-    "trivia": "曳山祭の舞台人形は精巧で「動く美術品」と呼ばれる。",
-    "catchphrase": "「木の舞台から飛び出す、人形守護者！」"
+    "category": "自然",
+    "habitat": "琵琶湖",
+    "desc": "琵琶湖の深いところにすむ大きなナマズのモンスター。水面から勢いよくはね上がる。",
+    "trivia": "ビワコオオナマズは琵琶湖などにすむ日本最大のナマズで、1メートルをこえるものもいる。",
+    "catchphrase": "「湖の底から、ザブーン！」"
   },
   {
     "id": "SG-E06",
@@ -4189,18 +4189,18 @@
   {
     "id": "KYT-E02",
     "stageId": "kinki_area3",
-    "name": "清水寺ゴーレム",
+    "name": "八ツ橋ゴーレム",
     "prefecture": "京都",
     "grade": 5,
     "thumb": "KYT-E02_thumb",
     "image": "KYT-E02.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "歴史・建築",
-    "habitat": "清水寺",
-    "desc": "清水寺の舞台の木組みが組み上がって動き出した守護者。足場が軋む音が鳴り響く。",
-    "trivia": "清水寺は世界遺産で、日本の仏教建築の代表。",
-    "catchphrase": "「千年の木組み、今ここに立つ！」"
+    "category": "食文化",
+    "habitat": "京都市",
+    "desc": "八ツ橋の生地でできたやわらかいゴーレム。三角のお菓子を手に、にこにこ歩く。",
+    "trivia": "八ツ橋は、米の粉で作る京都を代表するおみやげのお菓子。",
+    "catchphrase": "「もっちり三角、京のおもてなし！」"
   },
   {
     "id": "KYT-E03",
@@ -6051,7 +6051,7 @@
   {
     "id": "IND-E008",
     "stageId": "asia_area2",
-    "name": "ナーガガーディアン",
+    "name": "インドコブラガーディアン",
     "prefecture": "インド",
     "grade": 7,
     "thumb": "IND-E008_thumb",
@@ -6059,10 +6059,10 @@
     "isBoss": false,
     "weakness": "kunyomi",
     "category": "自然",
-    "habitat": "ナーガマングローブ林",
-    "desc": "大きな象牙を持つ神聖な象の戦士。大地を揺るがすほどの力を持つ。",
-    "trivia": "ナーガはインド神話由来で、インドの国章にも描かれる象徴。",
-    "catchphrase": "大地を揺るがす、象の力！"
+    "habitat": "インドの森",
+    "desc": "金のかんむりをかぶった青いコブラ。首を大きく広げて、森を見守る。",
+    "trivia": "インドにはキングコブラやインドコブラなど、多くの種類のコブラがすんでいる。",
+    "catchphrase": "「首を広げて、森を守る！」"
   },
   {
     "id": "IND-E009",
@@ -6619,18 +6619,18 @@
   {
     "id": "TAI-E003",
     "stageId": "asia_area6",
-    "name": "マンゴーゴーレム",
+    "name": "タイかんむりサーペント",
     "prefecture": "タイ",
     "grade": 7,
     "thumb": "TAI-E003.thumb",
     "image": "TAI-E003.webp",
     "isBoss": false,
     "weakness": "kunyomi",
-    "category": "食文化",
-    "habitat": "果樹園と市場の果物かご",
-    "desc": "黄金色の果実が結晶化した小さなゴーレム。甘い香りで仲間を癒す力を持つ。",
-    "trivia": "タイ産マンゴーは世界的に有名で、スイーツやジュースとして人気。",
-    "catchphrase": "甘さで癒す、黄金の守護者！"
+    "category": "自然",
+    "habitat": "タイの川辺",
+    "desc": "金のかんむりをかぶった緑の大へび。うろこが光をはね返してきらめく。",
+    "trivia": "タイの古い建物には、かんむりをかぶったへびのかざりがよく見られる。",
+    "catchphrase": "「かんむりの輝き、川を守る！」"
   },
   {
     "id": "TAI-E004",
@@ -7221,11 +7221,11 @@
     "image": "MYM-E010.webp",
     "isBoss": true,
     "weakness": "onyomi",
-    "category": "自然・ボス",
-    "habitat": "バガンロード湖",
-    "desc": "大きなカップを背負った巨大な水牛。水を操り敵を溺れさせる。",
-    "trivia": "バガンロード湖はミャンマーで有名な湖で、多様な生き物が生息する。",
-    "catchphrase": "水の女王で大海原を支配する！"
+    "category": "歴史・ボス",
+    "habitat": "バガン遺跡",
+    "desc": "金色の塔がいくつも集まって生まれた巨人。夕日を浴びると全身がかがやく。",
+    "trivia": "バガンには、昔に建てられた塔や寺院が2000以上も残っている。",
+    "catchphrase": "「千の塔の力、ここに集う！」"
   },
   {
     "id": "MNG-E001",
@@ -10349,7 +10349,7 @@
   {
     "id": "BRA-E005",
     "stageId": "america_area9",
-    "name": "サッカークーペ",
+    "name": "サッカージャガー",
     "prefecture": "ブラジル",
     "grade": 9,
     "thumb": "BRA-E005.thumb",
@@ -10358,9 +10358,9 @@
     "weakness": "kunyomi",
     "category": "スポーツ",
     "habitat": "サッカー場",
-    "desc": "サッカーボールの甲羅を持つカメ型モンスター。回転シュートで攻撃する。",
+    "desc": "サッカーボールを自在にあやつるジャガーのモンスター。すばやいドリブルで相手をかわす。",
     "trivia": "ブラジルはサッカー大国として知られる。",
-    "catchphrase": "「必殺！スピンシュートタックル！」"
+    "catchphrase": "「必殺！ジャガーシュート！」"
   },
   {
     "id": "BRA-E006",
