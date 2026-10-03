@@ -1,5 +1,6 @@
 import { gotomonService } from './gotomonService.js';
 import { matchup, typeOf, typeInfo } from './gotomonTypes.js';
+import { publish } from '../core/eventBus.js';
 
 // The main battle's one hook for type matchups: called only after a right answer, with that
 // answer's damage. A companion (the Gotomon chosen in the mini-game square) whose type beats the
@@ -11,6 +12,7 @@ export function companionMatchup(damage, enemy, log, { getCompanion = () => goto
     const factor = matchup(companion.type, typeOf(enemy));
     if (factor === 1) return damage;
     log?.push?.(`相棒の${companion.name}（${typeInfo(companion.type).name}）が ${typeInfo(typeOf(enemy)).name}に つよい！ ${factor}ばい！`);
+    publish('battle:companionCheer', { factor }); // the companion in the corner lights up (ui/battleCompanion.js)
     return Math.round(damage * factor);
   } catch {
     return damage;
