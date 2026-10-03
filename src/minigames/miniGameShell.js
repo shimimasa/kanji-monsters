@@ -80,7 +80,14 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   const scene = arcadeView ? null : createCompanionScene({ doc, root, info, gotomon, act: onAct });
   if (scene) hud.after(scene.root);
   // Not '*-companion': minigame-shell.css hides that suffix for the older games' canvas figures.
-  else view.attachCompanion?.(companionPortrait(doc, gotomon, 'ya-buddy'));
+  else {
+    // パーティ: in the arcade games the supporters stand beside the companion's picture.
+    const buddy = companionPortrait(doc, gotomon, 'ya-buddy');
+    // Beside it, not inside it, so the companion's かがやき/色ちがい does not spread to them.
+    const holder = supporters.length ? element(doc, 'span', 'gt-buddy-wrap') : buddy;
+    if (supporters.length) { const side = element(doc, 'span', 'gt-party gt-party-side'); for (const item of supporters) { const face = companionPortrait(doc, item, 'gt-party-face'); face.title = item.name; side.append(face); } holder.append(buddy, side); }
+    view.attachCompanion?.(holder);
+  }
   const sceneCanvas = scene?.root.querySelector('.gt-scene');
   if (!reviewMode && !arcadeView) {
     root.classList.add('gt-fullscreen-play');

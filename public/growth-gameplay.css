@@ -199,3 +199,6 @@ section.yt-game.gt-fullscreen-play .gt-result:not([hidden]),section.yt-game.gt-f
 .gt-party .gt-party-face{width:26px;height:26px;display:inline-block;overflow:hidden;border-radius:6px;background:#ffffff22}
 .gt-party .gt-party-face img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 .gt-party .gt-party-face .gt-image-fallback{font-size:8px}
+.gt-party.gt-party-side{position:absolute;right:-2px;bottom:-2px;gap:0;pointer-events:none;z-index:1}
+.gt-party.gt-party-side .gt-party-face{width:40%;max-width:26px;min-width:16px;height:auto;aspect-ratio:1;background:transparent;filter:drop-shadow(0 1px 0 #000a)}
+.gt-buddy-wrap{display:contents}
