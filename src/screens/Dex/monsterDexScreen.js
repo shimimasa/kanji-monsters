@@ -963,8 +963,8 @@ rightControls.appendChild(nextBtn);
     const typeSelect = document.createElement('select');
     typeSelect.className = 'monster-type-filter';
     typeSelect.style.cssText = regionSelect.style.cssText;
-    typeSelect.append(new Option('すべて', 'all'), ...GOTOMON_TYPES.map(type => new Option(type.name, type.id)));
-    for (const option of typeSelect.options) option.style.cssText = 'background: rgba(30, 58, 138, 0.9); color: white;';
+    const typeOption = (text, value) => { const option = document.createElement('option'); option.value = value; option.textContent = text; option.style.cssText = 'background: rgba(30, 58, 138, 0.9); color: white;'; return option; };
+    typeSelect.append(typeOption('すべて', 'all'), ...GOTOMON_TYPES.map(type => typeOption(type.name, type.id)));
     typeSelect.value = this.currentTypeFilter || 'all';
     typeSelect.addEventListener('change', (e) => {
       this.currentTypeFilter = e.target.value;
