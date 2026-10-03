@@ -11,6 +11,7 @@ import { getEnemiesByStageId } from '../loaders/dataLoader.js';
 import { loadDex } from '../models/monsterDex.js';
 import { isStageCleared as isStageClearedSSoT } from '../core/saveData.js';
 import { drawRoundedRect, drawEnhancedTabs as drawEnhancedTabsShared } from '../ui/canvasUtils.js';
+import { stageTypeLines } from '../minigames/stageMatchup.js'; // ゴトモン拡張: タイプの ヒント
 // === 1. importの後に共通関数を追加 ===
 
 
@@ -577,8 +578,9 @@ if (this.isReviewMode) {
     const ctx = this.ctx;
     const tooltipX = this.mouseX + 20;
     const tooltipY = this.mouseY - 80;
-    const tooltipWidth = 200;
-    const tooltipHeight = 100;
+    const typeLines = stageTypeLines(stage.stageId);
+    const tooltipWidth = 240;
+    const tooltipHeight = 100 + typeLines.length * 20;
 
     // 背景
     ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
@@ -602,6 +604,7 @@ if (this.isReviewMode) {
       `漢検 ${this.selectedTabLevel}級 相当` : `漢検 ${this.selectedTabLevel} 相当`;
     ctx.fillText(levelText, tooltipX + 10, tooltipY + yOffset);
     yOffset += 20;
+    for (const line of typeLines) { ctx.fillStyle = line.color; ctx.fillText(line.text, tooltipX + 10, tooltipY + yOffset); yOffset += 20; }
     
     const isCleared = this.isStageCleared(stage.stageId);
     ctx.fillStyle = isCleared ? '#4CAF50' : '#FFC107';

@@ -4,6 +4,9 @@ import { gameState, saveGameData } from '../core/gameState.js';
 import { addMonster, loadDex } from '../models/monsterDex.js';
 
 import { getAllMonsterIds, getMonsterById, stageData } from '../loaders/dataLoader.js';
+// ゴトモン拡張を つかまえた画面にも (2026-10-03): タイプと しんかの 予告。表示だけ。
+import { typeOf, typeInfo } from '../minigames/gotomonTypes.js';
+import { EVOLVE_LEVEL } from '../minigames/companionLooks.js';
 const monsterCaptureScreen = {
   canvas: null,
   container: null,
@@ -141,6 +144,10 @@ const monsterCaptureScreen = {
       const name = document.createElement('div');
       name.textContent = m.name;
       Object.assign(name.style, { fontWeight: '700', marginTop: '6px', textAlign: 'center' });
+      const type = typeInfo(typeOf(m)), typeLabel = document.createElement('div');
+      const chip = document.createElement('span'); chip.className = 'capture-type-chip'; chip.textContent = type.name;
+      Object.assign(chip.style, { background: type.color, color: '#1c1c1c', borderRadius: '999px', padding: '0 10px', fontSize: '13px', fontWeight: '700' });
+      Object.assign(typeLabel.style, { textAlign: 'center', marginTop: '4px' }); typeLabel.appendChild(chip);
 
       const badge = document.createElement('div');
       const updateBadge = () => {
@@ -175,6 +182,7 @@ const monsterCaptureScreen = {
 
       card.appendChild(thumb);
       card.appendChild(name);
+      card.appendChild(typeLabel);
       card.appendChild(badge);
       grid.appendChild(card);
     }
@@ -212,7 +220,7 @@ const monsterCaptureScreen = {
 
     panel.appendChild(header);
     const companionNote = document.createElement('p');
-    companionNote.textContent = '迎えたゴトモンは、タイトルの「ミニゲーム」から相棒に選べます。好きな仲間と記録を伸ばそう！';
+    companionNote.textContent = `迎えたゴトモンは、タイトルの「ミニゲーム」から相棒に選べます。相棒にして Lv${EVOLVE_LEVEL}に なると しんかするよ。タイプが あう相棒は、本編の バトルでも 力を かしてくれる！`;
     Object.assign(companionNote.style, { fontSize: '14px', lineHeight: '1.6', color: '#e3f3d4' });
     panel.appendChild(companionNote);
     panel.appendChild(grid);
