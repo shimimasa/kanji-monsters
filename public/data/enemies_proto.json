@@ -246,18 +246,18 @@
   {
     "id": "HKD-E016",
     "stageId": "hokkaido_area2",
-    "name": "雪ミクスピリット",
+    "name": "雪まつりスノーゴーレム",
     "prefecture": "北海道",
     "grade": 1,
     "thumb": "HKD-E016_thumb",
     "image": "HKD-E016.webp",
     "isBoss": false,
     "weakness": "kunyomi",
-    "category": "祭典",
+    "category": "祭り",
     "habitat": "大通公園・雪まつり会場",
-    "desc": "雪像から生まれた透明感のある精霊。冷気の吐息で相手を凍らせる。",
-    "trivia": "札幌雪まつりは巨大な雪像で有名。",
-    "catchphrase": "『澄んだ息吹、きらめく氷華！』"
+    "desc": "さっぽろ雪まつりの大きな雪像が動き出した、まるっこい雪の巨人。氷のつぶがきらきら光る。",
+    "trivia": "さっぽろ雪まつりは毎年2月に開かれ、大通公園などに大きな雪像や氷像がならぶ。",
+    "catchphrase": "「ひんやり大きな、雪のともだち！」"
   },
   {
     "id": "HKD-E017",
@@ -2461,18 +2461,18 @@
   {
     "id": "NGT-E04",
     "stageId": "chubu_area1",
-    "name": "日本酒バインドゴースト",
+    "name": "佐渡トキスピリット",
     "prefecture": "新潟",
     "grade": 4,
     "thumb": "NGT-E04_thumb",
     "image": "NGT-E04.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "酒文化系",
-    "habitat": "長岡や新潟の酒蔵",
-    "desc": "酒樽の蒸気から生まれた酔いどれの霊。白いもやに包まれ、赤い光の目で漂う。",
-    "trivia": "新潟は酒蔵数日本一を誇り、淡麗辛口の酒が有名。",
-    "catchphrase": "「酒気をまとい、酔夢に誘う影！」"
+    "category": "自然・動物",
+    "habitat": "佐渡島",
+    "desc": "とき色の羽を広げてふんわり飛ぶ、トキの精霊。長いくちばしで田んぼのえさをさがす。",
+    "trivia": "トキは一度日本の野生からいなくなったが、佐渡島で育てて空にはなす取り組みが続いている。",
+    "catchphrase": "「とき色の羽で、空へ！」"
   },
   {
     "id": "NGT-E05",
@@ -3421,18 +3421,18 @@
   {
     "id": "YMN-E04",
     "stageId": "chubu_area7",
-    "name": "ワインバットシャドー",
+    "name": "信玄餅スライム",
     "prefecture": "山梨",
     "grade": 4,
     "thumb": "YMN-E04_thumb",
     "image": "YMN-E04.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "酒文化系",
-    "habitat": "勝沼ワイナリー",
-    "desc": "葡萄酒の香りを漂わせるコウモリモンスター。赤い瞳で夜空を飛ぶ。",
-    "trivia": "勝沼は日本ワイン発祥の地とされ、ワイナリーが多数存在する。",
-    "catchphrase": "「葡萄酒の夜に舞う、赤眼の翼！」"
+    "category": "食文化",
+    "habitat": "甲府市",
+    "desc": "きなこをまぶしたおもちのスライム。黒みつのしずくをたらしながら、ぷるんとはねる。",
+    "trivia": "信玄餅は、きなこをかけたおもちに黒みつをかけて食べる山梨県の名物のお菓子。",
+    "catchphrase": "「きなこと黒みつ、あまーいぞ！」"
   },
   {
     "id": "YMN-E05",
@@ -3469,18 +3469,18 @@
   {
     "id": "YMN-E07",
     "stageId": "chubu_area7",
-    "name": "吉田火祭サラマンダー",
+    "name": "吉田火祭タイマツスピリット",
     "prefecture": "山梨",
     "grade": 4,
     "thumb": "YMN-E07_thumb",
     "image": "YMN-E07.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "祭り系",
+    "category": "祭り",
     "habitat": "富士吉田市",
-    "desc": "松明の火から生まれた小さな火蜥蜴モンスター。火の粉を散らしながら跳ね回る。",
-    "trivia": "吉田の火祭は「日本三奇祭」のひとつで、国の重要無形民俗文化財に指定。",
-    "catchphrase": "「炎の跳ね星、夏の祭り！」"
+    "desc": "吉田の火祭りの大たいまつが精霊になった姿。頭のあたたかい炎で、夜の町を明るく照らす。",
+    "trivia": "吉田の火祭りは、毎年夏の終わりに富士吉田市で行われ、町じゅうに大きなたいまつがともされる。",
+    "catchphrase": "「ともせ、夏の終わりの大たいまつ！」"
   },
   {
     "id": "YMN-E08",
@@ -4557,18 +4557,18 @@
   {
     "id": "OSK-E05",
     "stageId": "kinki_area5",
-    "name": "グリコランナー",
+    "name": "淀川イタセンパラ",
     "prefecture": "大阪",
     "grade": 5,
     "thumb": "OSK-E05_thumb",
     "image": "OSK-E05.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "観光",
-    "habitat": "大阪市・道頓堀",
-    "desc": "グリコサインから飛び出したランナー型モンスター。ゴールポーズで元気を与える。",
-    "trivia": "道頓堀のグリコ看板は大阪を代表する観光スポット。",
-    "catchphrase": "「走って笑顔、大阪パワー全開！」"
+    "category": "自然・生き物",
+    "habitat": "淀川のワンド",
+    "desc": "淀川にすむ小さな魚のモンスター。秋になるとむらさき色やピンクにかがやく。",
+    "trivia": "イタセンパラは淀川などにすむ小さな魚で、国の天然記念物として守られている。",
+    "catchphrase": "「ひらひら泳ぐ、川の宝石！」"
   },
   {
     "id": "OSK-E06",
@@ -5553,18 +5553,18 @@
   {
     "id": "HRS-E07",
     "stageId": "chugoku_area4",
-    "name": "原爆ドームガーディアン",
+    "name": "平和の折り鶴スピリット",
     "prefecture": "広島",
     "grade": 6,
     "thumb": "HRS-E07_thumb",
     "image": "HRS-E07.webp",
     "isBoss": false,
     "weakness": "kunyomi",
-    "category": "建造物",
-    "habitat": "広島市平和記念公園",
-    "desc": "原爆ドームを背負った守護霊モンスター。荘厳で不気味な存在感を放ち、平和の記憶を守り続ける。",
-    "trivia": "原爆ドームは1996年に世界文化遺産に登録され、戦争の悲惨さと平和の大切さを伝えている。",
-    "catchphrase": "「永遠に語り継ぐ、平和の守護者！」"
+    "category": "歴史・平和",
+    "habitat": "平和記念公園",
+    "desc": "色とりどりの折り鶴がつながって生まれた精霊。やさしい光で、平和へのねがいを運ぶ。",
+    "trivia": "広島の平和記念公園には、世界中から平和をねがう折り鶴がとどけられている。",
+    "catchphrase": "「ねがいをのせて、空高く！」"
   },
   {
     "id": "HRS-E08",
@@ -7471,18 +7471,18 @@
   {
     "id": "FRA-E006",
     "stageId": "europe_area1",
-    "name": "ワインブドウインプ",
+    "name": "ラスコー洞窟バイソン",
     "prefecture": "フランス",
     "grade": 8,
     "thumb": "FRA-E006.thumb",
     "image": "FRA-E006.webp",
     "isBoss": false,
     "weakness": "kunyomi",
-    "category": "食文化＋自然",
-    "habitat": "ボルドーやブルゴーニュの葡萄畑",
-    "desc": "葡萄の房が角になった小悪魔。芳醇な香りの霧で相手をふらりと酔わせる。",
-    "trivia": "テロワール（土壌・気候・地形）がワインの個性を形作る。",
-    "catchphrase": "一粒でほろり、二粒でふわり！"
+    "category": "歴史",
+    "habitat": "ラスコー洞窟",
+    "desc": "洞窟の壁画にえがかれたバイソンが動き出した姿。体に赤茶色と黒の線のもようがある。",
+    "trivia": "フランスのラスコー洞窟には、およそ2万年前の人々がえがいた動物の壁画が残っている。",
+    "catchphrase": "「2万年の時をこえて、ドドドッ！」"
   },
   {
     "id": "FRA-E007",
@@ -7519,18 +7519,18 @@
   {
     "id": "FRA-E009",
     "stageId": "europe_area1",
-    "name": "ギャランティ・ペーパー",
+    "name": "モンブランアイベックス",
     "prefecture": "フランス",
     "grade": 8,
     "thumb": "FRA-E009.thumb",
     "image": "FRA-E009.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "歴史",
-    "habitat": "革命記念の広場",
-    "desc": "黒い外套に刃の紋章を宿す寡黙な番人。正義の計量を象徴する冷ややかな鎌を携える。",
-    "trivia": "ギロチンは“平等な刑”として導入された歴史を持つ。",
-    "catchphrase": "秤は正しさ、刃は迷いを断つ。"
+    "category": "自然",
+    "habitat": "モンブラン",
+    "desc": "大きくまがった角をもつ野生のヤギ。雪の岩場をひょいひょいと登る。",
+    "trivia": "モンブランはアルプス山脈でいちばん高い山で、フランスとイタリアのさかいにある。",
+    "catchphrase": "「けわしい岩山も、ひとっとび！」"
   },
   {
     "id": "FRA-E010",
@@ -7584,18 +7584,18 @@
   {
     "id": "DEU-E003",
     "stageId": "europe_area2",
-    "name": "ビアマグスピリット",
+    "name": "くるみ割り人形ソルジャー",
     "prefecture": "ドイツ",
     "grade": 8,
     "thumb": "DEU-E003.thumb",
     "image": "DEU-E003.webp",
     "isBoss": false,
     "weakness": "kunyomi",
-    "category": "食文化＋文化",
-    "habitat": "ビアホール、祭りのテント",
-    "desc": "ジョッキが精霊化。泡の王冠をかぶり、カランと鳴らして場を盛り上げる応援役。",
-    "trivia": "ビアマグ（石製やガラス製のジョッキ）は蓋付きのものも多く、衛生面から発達した。",
-    "catchphrase": "乾杯の一振り、士気MAX！"
+    "category": "工芸",
+    "habitat": "エルツ山地",
+    "desc": "木でできた、くるみ割り人形の兵隊。大きな口でかたいくるみもパキッとわる。",
+    "trivia": "ドイツのエルツ山地では、くるみ割り人形などの木のおもちゃが昔から作られている。",
+    "catchphrase": "「パキッとわって、おまかせあれ！」"
   },
   {
     "id": "DEU-E004",
@@ -8692,18 +8692,18 @@
   {
     "id": "KAZ-E002",
     "stageId": "europe_area9",
-    "name": "クムィススピリット",
+    "name": "天山ユキヒョウ",
     "prefecture": "カザフスタン",
     "grade": 8,
     "thumb": "KAZ-E002.thumb",
     "image": "KAZ-E002.webp",
     "isBoss": false,
     "weakness": "kunyomi",
-    "category": "食文化",
-    "habitat": "ユルタの茶会",
-    "desc": "馬乳酒クムィスの泡から生まれた精霊。しゅわしゅわと白い気泡をまとっている。",
-    "trivia": "クムィスは発酵させた馬乳で、遊牧民に親しまれる飲み物。",
-    "catchphrase": "「泡立つ力で駆け抜けろ！」"
+    "category": "自然",
+    "habitat": "天山山脈",
+    "desc": "白っぽい毛に黒い輪のもようをもつユキヒョウ。長いしっぽで雪の岩場をかけまわる。",
+    "trivia": "ユキヒョウは天山山脈など、中央アジアの高い山にすむ。",
+    "catchphrase": "「雪山の風と、いっしょに走る！」"
   },
   {
     "id": "KAZ-E003",
@@ -9255,7 +9255,7 @@
   {
     "id": "USA-E007",
     "stageId": "america_area2",
-    "name": "カウボーイライダー",
+    "name": "カウボーイラッソー",
     "prefecture": "アメリカ合衆国",
     "grade": 9,
     "thumb": "USA-E007.thumb",
@@ -9263,10 +9263,10 @@
     "isBoss": false,
     "weakness": "onyomi",
     "category": "文化",
-    "habitat": "西部の荒野",
-    "desc": "馬に跨りリボルバーとウィップを操る戦士。砂塵を巻き上げながら突撃する。",
-    "trivia": "カウボーイは西部開拓時代の象徴で、アメリカ文化のヒーロー的存在。",
-    "catchphrase": "「荒野を駆ける鋼鉄の騎士！」"
+    "habitat": "西部の牧場",
+    "desc": "テンガロンハットのカウボーイ。馬に乗って、投げなわをくるくる回す。",
+    "trivia": "カウボーイは、アメリカの西部で馬に乗って牛の世話をした人たち。",
+    "catchphrase": "「投げなわ一本、ヒーハー！」"
   },
   {
     "id": "USA-E008",
@@ -9610,17 +9610,17 @@
     "id": "CUB-E009",
     "stageId": "america_area4",
     "prefecture": "キューバ",
-    "name": "ハバナシガーゴーレム",
+    "name": "マメハチドリ",
     "grade": 9,
     "thumb": "CUB-E009.thumb",
     "image": "CUB-E009.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "文化",
-    "habitat": "葉巻工場",
-    "desc": "葉巻の煙をまとった守護像。煙幕で敵を覆う。",
-    "trivia": "キューバの葉巻は世界的に有名で、高級品として愛される。",
-    "catchphrase": "「煙に巻いて守り抜く！」"
+    "category": "自然・動物",
+    "habitat": "キューバの森",
+    "desc": "世界でいちばん小さな鳥のモンスター。はばたきながら空中で止まり、花のみつをすう。",
+    "trivia": "マメハチドリはキューバだけにすむ鳥で、体長はおよそ5センチほどしかない。",
+    "catchphrase": "「小さくたって、すばやさ一番！」"
   },
   {
     "id": "CUB-E010",
@@ -9866,34 +9866,34 @@
   {
     "id": "BOL-E005",
     "stageId": "america_area6",
-    "name": "アルパカスモーカー",
+    "name": "ふわもこアルパカ",
     "prefecture": "ボリビア",
     "grade": 9,
     "thumb": "BOL-E005.thumb",
     "image": "BOL-E005.webp",
     "isBoss": false,
     "weakness": "kunyomi",
-    "category": "自然",
-    "habitat": "アンデスの山間",
-    "desc": "煙を吐くアルパカ型モンスター。煙で敵の視界を奪う。",
-    "trivia": "アルパカは毛織物の原料として重宝され、南米の重要な家畜。",
-    "catchphrase": "「モコモコ煙で包み込む！」"
+    "category": "自然・動物",
+    "habitat": "アンデスの高原",
+    "desc": "ふわふわの毛につつまれたアルパカ。のんびりしているが、毛はとてもあたたかい。",
+    "trivia": "アルパカの毛はやわらかくてあたたかく、アンデスでは昔から服や毛布に使われてきた。",
+    "catchphrase": "「もふもふパワーで、ぽかぽか！」"
   },
   {
     "id": "BOL-E006",
     "stageId": "america_area6",
-    "name": "チチャスライム",
+    "name": "チチカカミズガエル",
     "prefecture": "ボリビア",
     "grade": 9,
     "thumb": "BOL-E006.thumb",
     "image": "BOL-E006.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "食文化",
-    "habitat": "祭りの会場",
-    "desc": "紫のトウモロコシ酒をモチーフにしたスライム。酔わせるオーラを放つ。",
-    "trivia": "チチャはアンデス地域の伝統的な飲み物で、トウモロコシを発酵させて作られる。",
-    "catchphrase": "「酔いどれスライムの宴！」"
+    "category": "自然・動物",
+    "habitat": "チチカカ湖",
+    "desc": "チチカカ湖にすむ大きなカエル。たるんだ皮ふのひだで、水の中の空気をとりこむ。",
+    "trivia": "チチカカミズガエルはチチカカ湖だけにすむカエルで、ほとんど水の中でくらしている。",
+    "catchphrase": "「湖の底から、ケロロン！」"
   },
   {
     "id": "BOL-E007",
@@ -9930,18 +9930,18 @@
   {
     "id": "BOL-E009",
     "stageId": "america_area6",
-    "name": "カーニバルデーモン",
+    "name": "オルロカーニバルダンサー",
     "prefecture": "ボリビア",
     "grade": 9,
     "thumb": "BOL-E009.thumb",
     "image": "BOL-E009.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "文化",
-    "habitat": "オルーロのカーニバル",
-    "desc": "祭りの仮面をかぶった悪魔型モンスター。陽気さと恐怖を併せ持つ。",
-    "trivia": "オルーロのカーニバルはユネスコ無形文化遺産に登録された、ボリビア最大の祭り。",
-    "catchphrase": "「踊れ！悪魔のカーニバル！」"
+    "category": "祭り",
+    "habitat": "オルロ",
+    "desc": "きらびやかな衣装とかざりの仮面をつけた踊り手。マントをひるがえして軽やかに踊る。",
+    "trivia": "オルロのカーニバルは、ボリビアのオルロで行われる大きな祭りで、世界の無形文化遺産になっている。",
+    "catchphrase": "「きらきら衣装で、踊りまくれ！」"
   },
   {
     "id": "BOL-E010",
@@ -10140,18 +10140,18 @@
   {
     "id": "CHL-E002",
     "stageId": "america_area8",
-    "name": "ワイングレープバット",
+    "name": "フンボルトペンギン",
     "prefecture": "チリ",
     "grade": 9,
     "thumb": "CHL-E002.thumb",
     "image": "CHL-E002.webp",
     "isBoss": false,
     "weakness": "kunyomi",
-    "category": "食文化",
-    "habitat": "ブドウ畑の上空",
-    "desc": "ブドウの実のような体を持つコウモリ。群れで飛び回り、芳醇な香りを漂わせる。",
-    "trivia": "チリは世界有数のワイン生産国として知られている。",
-    "catchphrase": "「芳醇な翼で夜を舞う！」"
+    "category": "自然・動物",
+    "habitat": "チリの海岸",
+    "desc": "胸に黒い帯がひとつあるペンギン。岩の上で胸をはって海を見わたす。",
+    "trivia": "フンボルトペンギンは、チリやペルーの海岸にすむペンギン。",
+    "catchphrase": "「波のりペンギン、出発だ！」"
   },
   {
     "id": "CHL-E003",
@@ -10252,18 +10252,18 @@
   {
     "id": "CHL-E009",
     "stageId": "america_area8",
-    "name": "ピウチェンシャドウ",
+    "name": "アタカマ星空スピリット",
     "prefecture": "チリ",
     "grade": 9,
     "thumb": "CHL-E009.thumb",
     "image": "CHL-E009.webp",
     "isBoss": false,
     "weakness": "onyomi",
-    "category": "伝承",
-    "habitat": "夜の村落",
-    "desc": "吸血鬼のような影のモンスター。人々の血を求めて夜に現れる。",
-    "trivia": "ピウチェンはチリの民間伝承に登場する吸血の怪物。",
-    "catchphrase": "「闇に潜む血の影！」"
+    "category": "自然・宇宙",
+    "habitat": "アタカマ砂漠",
+    "desc": "アタカマ砂漠の夜空から生まれた精霊。体に星や天の川のもようがかがやく。",
+    "trivia": "アタカマ砂漠は空気がかわいていて星がよく見えるため、世界の大きな天文台が集まっている。",
+    "catchphrase": "「満天の星を、きみにも！」"
   },
   {
     "id": "CHL-E010",
@@ -12145,7 +12145,7 @@
   {
     "id": "ZAF-E007",
     "stageId": "africa_area10",
-    "name": "ズールーウォリアー",
+    "name": "ズールービーズダンサー",
     "prefecture": "南アフリカ",
     "grade": 10,
     "thumb": "ZAF-E007.thumb",
@@ -12153,10 +12153,10 @@
     "isBoss": false,
     "weakness": "onyomi",
     "category": "文化",
-    "habitat": "ズールー族の集落と草原",
-    "desc": "盾と槍を持つ勇ましい戦士モンスター。威厳ある舞で士気を高める。",
-    "trivia": "ズールー族は豊かな舞踊やビーズ工芸で知られ、色の組み合わせに意味が込められることもある。",
-    "catchphrase": "「盾鳴らし、勇気を鼓す！」"
+    "habitat": "クワズール・ナタール",
+    "desc": "色あざやかなビーズのかざりをつけた踊り手。力強いステップで、見る人を元気にする。",
+    "trivia": "南アフリカのズールーの人々は、色あざやかなビーズ細工で知られている。",
+    "catchphrase": "「ビーズがおどる、元気のステップ！」"
   },
   {
     "id": "ZAF-E008",

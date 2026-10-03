@@ -3,8 +3,11 @@
 // attached; up to --jobs runs at once (default 4). Codex only writes <id>_evo.png there; nothing in the
 // repo is touched. A target whose picture is already there is skipped, so a round can be resumed, and a
 // new round goes into a new output folder.
-// usage: node --experimental-default-type=module scripts/evolution/run-codex.mjs <outDir> [--dry] [--jobs=N] [id ...]
+// usage: node --experimental-default-type=module scripts/evolution/run-codex.mjs <outDir> [--dry] [--jobs=N] [--base] [id ...]
 //   --dry: write each prompt.txt and show the attached picture, without calling Codex.
+//   --base: make a new base picture instead (for a Gotomon redesigned from scratch, ユーザーの依頼 2026-10-03):
+//     targets from base-targets.json ({id, name, design, refs}), prompt base.tpl.txt, the refs' pictures attached
+//     as style samples, and Codex writes <id>_base.png.
 import { readFileSync, mkdirSync, existsSync, writeFileSync, readdirSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join, resolve } from 'node:path';
@@ -12,7 +15,8 @@ import { join, resolve } from 'node:path';
 const [outDir, ...rest] = process.argv.slice(2);
 if (!outDir) throw new Error('usage: run-codex.mjs <outDir> [--dry] [--jobs=N] [id ...]');
 const dry = rest.includes('--dry'), jobs = Math.max(1, Number(rest.find(arg => arg.startsWith('--jobs='))?.slice(7)) || 4);
-const only = rest.filter(arg => !arg.startsWith('--'));
+const only = rest.filter(arg => !arg.startsWith('--')), base = rest.includes('--base');
+const suffix = base ? 'base' : 'evo';
 const data = file => JSON.parse(readFileSync(`public/data/${file}`, 'utf8')).flat(Infinity).filter(m => m?.id);
 const monsters = new Map([...data('enemies_proto.json'), ...data('enemies_legend.json')].map(m => [m.id, m]));
 // The picture is found by its file name in any folder of full/ (the world Gotomon's grade does not name their folder).
@@ -26,10 +30,20 @@ const STYLES = {
   // 実在の人物・神さま・仏像・文化財・民族の衣装が もとの子（ユーザーの決定：子どもが その土地の 歴史や 名所を 知るための 教育ゲームなので 作る）。
   noble: 'りっぱで かっこよく する。この キャラクターは 実在の 人物・神話の 神さま・仏像・文化財・民族の 衣装が もとなので、敬意を もって えがく。悪者・こわい顔・ふざけた すがた・あやしい 色には しない。顔は おだやかで 堂々と。服装・文様・建物の 形は 元の絵の 特ちょうを ていねいに のこし、光・かざり・堂々とした ポーズで 成長を 表す。',
 };
-const template = readFileSync('scripts/evolution/prompt.tpl.txt', 'utf8');
-const targets = JSON.parse(readFileSync('scripts/evolution/targets.json', 'utf8')).filter(t => !only.length || only.includes(t.id));
+const template = readFileSync(`scripts/evolution/${base ? 'base' : 'prompt'}.tpl.txt`, 'utf8');
+const targets = JSON.parse(readFileSync(`scripts/evolution/${base ? 'base-targets' : 'targets'}.json`, 'utf8')).filter(t => !only.length || only.includes(t.id));
+
+function prepareBase(target) {
+  if (!monsters.has(target.id)) throw new Error(`unknown ${target.id}`);
+  const images = target.refs.map(ref => pictureOf(ref) ?? (() => { throw new Error(`no picture for ${ref}`); })());
+  const dir = resolve(join(outDir, target.id)); mkdirSync(dir, { recursive: true });
+  const prompt = template.replaceAll('{name}', target.name).replaceAll('{design}', target.design).replaceAll('{id}', target.id);
+  writeFileSync(join(dir, 'prompt.txt'), prompt);
+  return { ...target, style: 'base', monster: { name: target.name }, images, image: images.join(', '), dir, prompt, done: existsSync(join(dir, `${target.id}_base.png`)) };
+}
 
 function prepare(target) {
+  if (base) return prepareBase(target);
   const monster = monsters.get(target.id);
   if (!monster) throw new Error(`unknown ${target.id}`);
   if (!STYLES[target.style]) throw new Error(`${target.id}: style must be one of ${Object.keys(STYLES)}`);
@@ -44,13 +58,13 @@ function prepare(target) {
 
 function run(task) {
   return new Promise(done => {
-    const started = Date.now(), child = spawn('codex', ['exec', '--skip-git-repo-check', '-s', 'workspace-write', '-C', task.dir, '-i', task.image, '-'], { shell: true });
+    const started = Date.now(), child = spawn('codex', ['exec', '--skip-git-repo-check', '-s', 'workspace-write', '-C', task.dir, ...(task.images ?? [task.image]).flatMap(image => ['-i', image]), '-'], { shell: true });
     let log = '';
     child.stdout.on('data', chunk => { log += chunk; }); child.stderr.on('data', chunk => { log += chunk; });
     const timer = setTimeout(() => child.kill(), 15 * 60 * 1000);
     child.on('close', code => {
       clearTimeout(timer); writeFileSync(join(task.dir, 'codex.log'), log);
-      const ok = existsSync(join(task.dir, `${task.id}_evo.png`));
+      const ok = existsSync(join(task.dir, `${task.id}_${suffix}.png`));
       console.log(`${task.id} (${task.style}): ${ok ? 'saved' : 'NOT saved'} (exit ${code}, ${Math.round((Date.now() - started) / 1000)}s)`);
       done();
     });
