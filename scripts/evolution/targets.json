@@ -472,7 +472,6 @@
   {"id": "KNK-E010", "style": "cool"},
   {"id": "TAI-E001", "style": "cute"},
   {"id": "TAI-E002", "style": "cool"},
-  {"id": "TAI-E003", "style": "cool"},
   {"id": "TAI-E004", "style": "cool"},
   {"id": "TAI-E005", "style": "cool"},
   {"id": "TAI-E006", "style": "eerie"},
@@ -675,7 +674,6 @@
   {"id": "BRA-E002", "style": "cute"},
   {"id": "BRA-E003", "style": "cute"},
   {"id": "BRA-E004", "style": "cool"},
-  {"id": "BRA-E005", "style": "cool"},
   {"id": "BRA-E006", "style": "cute"},
   {"id": "BRA-E007", "style": "cute"},
   {"id": "BRA-E008", "style": "cute"},
@@ -870,5 +868,13 @@
   {"id": "HYG-E09", "style": "cool"},
   {"id": "ARG-E006", "style": "cool"},
   {"id": "ARG-E008", "style": "eerie"},
-  {"id": "ARG-E010", "style": "cool"}
+  {"id": "ARG-E010", "style": "cool"},
+  {"id": "TAI-E003", "style": "cool"},
+  {"id": "BRA-E005", "style": "cool"},
+  {"id": "IBK-E01", "style": "cute"},
+  {"id": "SG-E04", "style": "cute"},
+  {"id": "SG-E05", "style": "cool"},
+  {"id": "KYT-E02", "style": "cute"},
+  {"id": "IND-E008", "style": "cool"},
+  {"id": "KYU-F05", "style": "cool"}
 ]
