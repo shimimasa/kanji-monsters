@@ -4,6 +4,12 @@ import { getMonsterById, getAllMonsterIds } from '../../loaders/dataLoader.js';
 import { publish } from '../../core/eventBus.js';
 import { gameState } from '../../core/gameState.js';
 import { createScreenLifecycle } from '../../core/screenLifecycle.js';
+// ゴトモン拡張を図鑑にも (2026-10-03): タイプ・しんかの すがた・はいごうの ヒント。表示だけで、記録は かえない。
+import { GOTOMON_TYPES, typeOf, typeInfo, TYPE_BEATS } from '../../minigames/gotomonTypes.js';
+import { canEvolve, evolvedImageUrl, EVOLVE_LEVEL } from '../../minigames/companionLooks.js';
+import { isLegend, recipeFor, BREED_LEVEL } from '../../minigames/gotomonBreeding.js';
+import { regionName } from '../../minigames/breedingRegions.js';
+import { gotomonService } from '../../minigames/gotomonService.js';
 
 // --- グローバルスコープにあったヘルパー関数を、このファイル内に移動 ---
 
@@ -61,6 +67,17 @@ function normalizeKana(str) {
   return out.replace(/[ぁぃぅぇぉっゃゅょゎ]/g, m => ({
     'ぁ':'あ','ぃ':'い','ぅ':'う','ぇ':'え','ぉ':'お','っ':'つ','ゃ':'や','ゅ':'ゆ','ょ':'よ','ゎ':'わ'
   }[m] || m)).replace(/\s+/g, '').trim();
+}
+
+// A small coloured label with the Gotomon's type (the same colours as the sticker book).
+function typeChip(monster) {
+  const info = typeInfo(typeOf(monster));
+  const chip = document.createElement('span');
+  chip.className = 'monster-type-chip';
+  chip.textContent = info.name;
+  Object.assign(chip.style, { display: 'inline-block', background: info.color, color: '#1c1c1c', borderRadius: '999px',
+    padding: '0 10px', fontSize: '13px', fontWeight: '700', lineHeight: '1.7' });
+  return chip;
 }
 
 function createCard(monster, { showUncollected = false, isFavorite = false, onToggleFavorite = null } = {}) {
@@ -127,9 +144,11 @@ function createCard(monster, { showUncollected = false, isFavorite = false, onTo
   const prefectureEl = document.createElement('p');
   const regionFallback = ([1,2,3,4,5,6,11,12].includes(monster.grade)
     ? japanRegionMap[monster.grade] : worldRegionMap[monster.grade]);
-  prefectureEl.textContent = isCollected ? (monster.prefecture || regionFallback || '不明') : '？？？';
+  prefectureEl.textContent = isCollected ? (monster.prefecture || regionFallback || '不明')
+    : (isLegend(monster.id) ? 'はいごうで 会える' : '？？？');
   prefectureEl.classList.add('monster-prefecture');
   card.appendChild(prefectureEl);
+  if (isCollected) card.appendChild(typeChip(monster));
 
   if (isNewMonster(monster.id) && isCollected) {
     const newBadge = document.createElement('div');
@@ -154,6 +173,42 @@ const observer = new IntersectionObserver((entries) => {
 }, { rootMargin: '200px' });
 
 
+
+// The Gotomon expansions in the detail view: its type and what it is strong against, its evolved
+// picture once this child's companion has reached it (a button switches the picture), and for a
+// legend the breeding recipe. Reading only: nothing here changes the save.
+function appendExpansionInfo(info, monster, img) {
+  const line = (label, ...nodes) => {
+    const p = document.createElement('p');
+    const strong = document.createElement('strong'); strong.textContent = `${label}:`;
+    p.append(strong, ' ', ...nodes); info.appendChild(p); return p;
+  };
+  const type = typeOf(monster), beats = TYPE_BEATS[type];
+  line('タイプ', typeChip(monster), beats ? `　${typeInfo(beats).name}に つよい` : '　どの タイプとも ふつう');
+  if (canEvolve(monster.id)) {
+    let progress = null;
+    try { progress = gotomonService.getLook(monster.id).progress.evolve; } catch { progress = null; }
+    if (progress?.unlocked) {
+      const toggle = document.createElement('button');
+      toggle.className = 'monster-evolve-toggle';
+      Object.assign(toggle.style, { marginLeft: '8px', padding: '2px 12px', borderRadius: '999px', border: '2px solid #ffd54a',
+        background: 'rgba(255, 213, 74, 0.18)', color: 'inherit', font: 'inherit', cursor: 'pointer' });
+      const base = img.src, evolved = evolvedImageUrl(monster.id);
+      const show = on => { img.src = on ? evolved : base; toggle.textContent = on ? 'もとの すがたに もどす' : 'しんかの すがたを 見る'; toggle.dataset.on = on ? '1' : ''; };
+      toggle.onclick = event => { event.stopPropagation(); show(!toggle.dataset.on); publish('playSE', 'decide'); };
+      show(false);
+      line('しんか', `Lv${EVOLVE_LEVEL}で しんかした！`, toggle);
+    } else {
+      line('しんか', `相棒に して Lv${EVOLVE_LEVEL}に なると、しんかの すがたが 見られるよ`
+        + (progress?.have > 1 ? `（いま Lv${progress.have}）` : ''));
+    }
+  }
+  const recipe = isLegend(monster.id) ? recipeFor(monster.id) : null;
+  if (recipe) {
+    line('はいごう', `${regionName(recipe.region)}の ${typeInfo(recipe.a).name}タイプ（Lv${BREED_LEVEL}）＋ `
+      + `${typeInfo(recipe.b).name}タイプ（Lv${BREED_LEVEL}）で 会える`);
+  }
+}
 
 // モンスター詳細モーダルを表示する関数
 function showMonsterModal(monster) {
@@ -216,6 +271,7 @@ function showMonsterModal(monster) {
     <p><strong>説明:</strong> ${monster.desc || '—'}</p>
     <p><strong>豆知識:</strong> ${monster.trivia || '—'}</p>
   `;
+  appendExpansionInfo(info, monster, img);
 
   modalContent.appendChild(closeBtn);
   modalContent.appendChild(img);
@@ -250,6 +306,7 @@ const monsterDexState = {
 
   // フィルタ・ソート
   currentRegionFilter: 'all',
+  currentTypeFilter: 'all',
   currentSortOrder: 'id',
   currentMode: 'japan',
 
@@ -378,7 +435,8 @@ savePreferences() {
       favoritesFirst: this.favoritesFirst,
       currentPage: this.currentPage,
       searchQuery: this.searchQuery,
-      showUncollectedSilhouette: this.showUncollectedSilhouette
+      showUncollectedSilhouette: this.showUncollectedSilhouette,
+      currentTypeFilter: this.currentTypeFilter
     };
     localStorage.setItem(this._prefsKey, JSON.stringify(prefs));
   } catch (e) {
@@ -400,6 +458,7 @@ loadPreferences() {
     this.currentPage = Number.isInteger(p.currentPage) ? p.currentPage : 0;
     this.searchQuery = typeof p.searchQuery === 'string' ? p.searchQuery : '';
     this.showUncollectedSilhouette = !!p.showUncollectedSilhouette;
+    this.currentTypeFilter = GOTOMON_TYPES.some(type => type.id === p.currentTypeFilter) ? p.currentTypeFilter : 'all';
   } catch (e) {
     // noop
   }
@@ -420,7 +479,11 @@ loadPreferences() {
         return monster && monster.grade === this.currentRegionFilter;
       });
     }
-  
+
+    if (this.currentTypeFilter && this.currentTypeFilter !== 'all') {
+      filtered = filtered.filter(id => { const monster = getMonsterById(id); return monster && typeOf(monster) === this.currentTypeFilter; });
+    }
+
     // 検索（名前ひらがな正規化）
     if (this.searchQuery && this.searchQuery.trim()) {
       const q = normalizeKana(this.searchQuery);
@@ -891,6 +954,28 @@ rightControls.appendChild(nextBtn);
 
     leftControls.appendChild(regionLabel);
     leftControls.appendChild(regionSelect);
+
+    // タイプセレクト（ゴトモン拡張, 2026-10-03）
+    const typeLabel = document.createElement('span');
+    typeLabel.className = 'monster-type-label';
+    typeLabel.textContent = 'タイプ：';
+    Object.assign(typeLabel.style, { color: '#ffffff', fontWeight: '500', margin: '0 8px 0 12px' });
+    const typeSelect = document.createElement('select');
+    typeSelect.className = 'monster-type-filter';
+    typeSelect.style.cssText = regionSelect.style.cssText;
+    const typeOption = (text, value) => { const option = document.createElement('option'); option.value = value; option.textContent = text; option.style.cssText = 'background: rgba(30, 58, 138, 0.9); color: white;'; return option; };
+    typeSelect.append(typeOption('すべて', 'all'), ...GOTOMON_TYPES.map(type => typeOption(type.name, type.id)));
+    typeSelect.value = this.currentTypeFilter || 'all';
+    typeSelect.addEventListener('change', (e) => {
+      this.currentTypeFilter = e.target.value;
+      this.applyFiltersAndSort();
+      this.currentPage = 0;
+      this.renderPage();
+      this.savePreferences();
+      publish('playSE', 'decide');
+    });
+    leftControls.appendChild(typeLabel);
+    leftControls.appendChild(typeSelect);
 
     // ページネーションボタン（右側コントロールで定義済みの関数を使用）
     // ここでの重複定義は削除済み

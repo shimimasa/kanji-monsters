@@ -12,6 +12,7 @@ import { loadDex } from '../models/monsterDex.js';
 import { isStageCleared as isStageClearedSSoT } from '../core/saveData.js';
 import { drawRoundedRect, drawEnhancedTabs as drawEnhancedTabsShared } from '../ui/canvasUtils.js';
 import { createScreenLifecycle } from '../core/screenLifecycle.js';
+import { stageTypeLines } from '../minigames/stageMatchup.js'; // ゴトモン拡張: タイプの ヒント
 
 /** 学年に応じたアイコンを返す */
 function getGradeIcon(grade) {
@@ -519,8 +520,9 @@ this._dex = loadDex();
     const ctx = this.ctx;
     const tooltipX = this.mouseX + 20;
     const tooltipY = this.mouseY - 80;
-    const tooltipWidth = 200;
-    const tooltipHeight = 90;
+    const typeLines = stageTypeLines(stage.stageId);
+    const tooltipWidth = 240;
+    const tooltipHeight = 90 + typeLines.length * 20;
 
     // 背景
     ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
@@ -541,6 +543,7 @@ this._dex = loadDex();
     
     ctx.fillText(`地方: ${stage.region}`, tooltipX + 10, tooltipY + yOffset);
     yOffset += 20;
+    for (const line of typeLines) { ctx.fillStyle = line.color; ctx.fillText(line.text, tooltipX + 10, tooltipY + yOffset); yOffset += 20; }
     
     const isCleared = this.isStageCleared(stage.stageId);
     ctx.fillStyle = isCleared ? '#4CAF50' : '#FFC107';

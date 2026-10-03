@@ -69,7 +69,10 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   // わざ: the type's move replaces the game's skill name (the game's own effect stays).
   const move = play.snapshot().move, skillName = move?.name ?? info.skill;
   if (supporters.length) name.title = supporters.map(item => `${item.name}：${supportEffectOf(item.type).text}`).join(' / ');
-  hud.append(name, score, combo);
+  // パーティ: the supporters' small pictures beside the name (with their しんか and other looks).
+  const party = element(doc, 'span', 'gt-party');
+  for (const item of supporters) { const face = companionPortrait(doc, item, 'gt-party-face'); face.title = `${item.name}：${supportEffectOf(item.type).text}`; party.append(face); }
+  hud.append(name, ...(supporters.length ? [party] : []), score, combo);
   const skill = button(doc, '', onBoost, 'gt-button gt-skill'); skill.dataset.action = 'boost';
   const gauge = element(doc, 'meter'); gauge.min = 0; gauge.max = 3; gauge.value = 0; gauge.setAttribute('aria-label', '相棒ゲージ');
   const skillLabel = element(doc, 'span'); skill.append(gauge, skillLabel); hud.append(skill);
@@ -77,7 +80,14 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   const scene = arcadeView ? null : createCompanionScene({ doc, root, info, gotomon, act: onAct });
   if (scene) hud.after(scene.root);
   // Not '*-companion': minigame-shell.css hides that suffix for the older games' canvas figures.
-  else view.attachCompanion?.(companionPortrait(doc, gotomon, 'ya-buddy'));
+  else {
+    // パーティ: in the arcade games the supporters stand beside the companion's picture.
+    const buddy = companionPortrait(doc, gotomon, 'ya-buddy');
+    // Beside it, not inside it, so the companion's かがやき/色ちがい does not spread to them.
+    const holder = supporters.length ? element(doc, 'span', 'gt-buddy-wrap') : buddy;
+    if (supporters.length) { const side = element(doc, 'span', 'gt-party gt-party-side'); for (const item of supporters) { const face = companionPortrait(doc, item, 'gt-party-face'); face.title = item.name; side.append(face); } holder.append(buddy, side); }
+    view.attachCompanion?.(holder);
+  }
   const sceneCanvas = scene?.root.querySelector('.gt-scene');
   if (!reviewMode && !arcadeView) {
     root.classList.add('gt-fullscreen-play');

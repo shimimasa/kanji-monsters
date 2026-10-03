@@ -3,6 +3,7 @@ import { getEnemiesByStageId, getKanjiByStageId } from '../loaders/dataLoader.js
 import battleScreenState from '../screens/battleScreen.js';
 import { publish } from '../core/eventBus.js';
 import { gameState, battleState, resetStageProgress, saveGameData } from '../core/gameState.js';
+import { showBattleCompanion, hideBattleCompanion } from '../ui/battleCompanion.js'; // ゴトモン拡張: 相棒が バトルを 見まもる
 
 export default function createBattleState(stageId){
   let enemies, kanjiPool;
@@ -51,11 +52,13 @@ export default function createBattleState(stageId){
         };
         publish('changeScreen', 'resultWin', resultData);
       });
+      showBattleCompanion();
     },
     update(dt) {
       battleScreenState.update(dt);
     },
     exit() {
+      hideBattleCompanion();
       battleScreenState.exit();
     }
   };

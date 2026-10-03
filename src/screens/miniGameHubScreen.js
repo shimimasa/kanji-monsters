@@ -73,7 +73,10 @@ const hub = {
       const sum = stickerSummary(gotomonService.getStickers(selected.id));
       const book = button(doc, `シール帳 ${sum.total}まい`, () => this.showStickerBook(), 'yt-sticker-open');
       book.dataset.action = 'sticker-book';
-      banner.append(companionPortrait(doc, selected), details, book, element(doc, 'p', 'yt-friend-cheer', 'いっしょに あそぼう！'));
+      // しんか: how far the companion is from its evolved picture (or that it has evolved).
+      const evolve = gotomonService.getLook(selected.id).progress.evolve;
+      const cheer = !evolve ? 'いっしょに あそぼう！' : evolve.unlocked ? 'しんかした すがたは シール帳で つけられるよ！' : `あと Lv${evolve.need - evolve.have}で しんか！`;
+      banner.append(companionPortrait(doc, selected), details, book, element(doc, 'p', 'yt-friend-cheer', cheer));
     }
     else banner.append(element(doc, 'p', '', '相棒は、冒険のステージをクリアして捕まえよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title'), 'yt-primary'));
     wrap.append(banner);
