@@ -37,7 +37,8 @@ export function drawRoundedRect(ctx, x, y, width, height, radius) {
  * @param {(tab) => boolean} resolvers.isReviewTab 総復習タブかどうか
  */
 export function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime, resolvers) {
-  const { getKey, getIcon, getSubText, isReviewTab } = resolvers;
+  // getProgress（任意）: { pct, isNext, locked } を返すと、タブの下に達成率の棒・「つぎ」の印・🔒を出す
+  const { getKey, getIcon, getSubText, isReviewTab, getProgress } = resolvers;
   const tabCount = tabs.length;
   const tabW = canvasWidth / tabCount;
   const tabH = 60; // 高さを増加
@@ -107,7 +108,8 @@ export function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animatio
     const centerX = x0 + tabW / 2;
     const centerY = insetY + insetH / 2;
 
-    const icon = getIcon(tab);
+    const progress = getProgress ? getProgress(tab) : null;
+    const icon = progress?.locked ? '🔒' : getIcon(tab);
     const mainText = tab.label;
     const subText = getSubText(tab);
 
@@ -135,9 +137,27 @@ export function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animatio
 
       // サブテキスト
       if (subText) {
-        ctx.font = '10px "UDデジタル教科書体", sans-serif';
-        ctx.fillStyle = isSelected ? 'rgba(255, 255, 255, 0.8)' : 'rgba(226, 232, 240, 0.7)';
-        ctx.fillText(subText, centerX, centerY + 16);
+        ctx.font = progress ? '11px "UDデジタル教科書体", sans-serif' : '10px "UDデジタル教科書体", sans-serif';
+        ctx.fillStyle = isSelected ? 'rgba(255, 255, 255, 0.85)' : 'rgba(226, 232, 240, 0.75)';
+        ctx.fillText(subText, centerX, centerY + (progress ? 14 : 16));
+      }
+    }
+
+    // 達成率の棒（タブの下の端）と「つぎ」の印
+    if (progress && !isReviewTab(tab)) {
+      const barX = x0 + 10, barW = tabW - 20, barY = insetY + insetH - 7;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.fillRect(barX, barY, barW, 4);
+      ctx.fillStyle = progress.pct >= 100 ? '#f6c945' : '#48bb78';
+      ctx.fillRect(barX, barY, Math.round(barW * Math.max(0, Math.min(100, progress.pct)) / 100), 4);
+      if (progress.isNext) {
+        ctx.font = 'bold 10px "UDデジタル教科書体", sans-serif';
+        const label = 'つぎ', w = ctx.measureText(label).width + 8;
+        ctx.fillStyle = '#e53e3e';
+        drawRoundedRect(ctx, x0 + tabW - w - 4, insetY + 2, w, 14, 6);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(label, x0 + tabW - w / 2 - 4, insetY + 9);
       }
     }
 

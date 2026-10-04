@@ -2,27 +2,36 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {BATTLE_DISPLAY_HOOKS} from './battle-display-hooks.mjs';
-import {assertBattleDisplayOnly,assertMotionScope,assertAddedPaths,readCheckpointBattle} from './scope-audit.mjs';
-test('complete original battle source reconstructs exactly after removing only explicit display hooks',()=>{
- // 2026-10-02 (user-approved type matchups): lines marked TYPE-MATCHUP are the only other
- // addition to the battle; they are taken out first, and everything else is audited as before.
- // 2026-10-04 (user-approved battle layout fix): lines marked BATTLE-LAYOUT are taken out the same way.
- const source=fs.readFileSync('src/screens/battleScreen.js','utf8').replaceAll('\r\n','\n').split('\n').filter(line=>!line.includes('// TYPE-MATCHUP')&&!line.includes('// BATTLE-LAYOUT')).join('\n');
- const checkpoint=readCheckpointBattle();
- assertBattleDisplayOnly(source,checkpoint);
- const hook=BATTLE_DISPLAY_HOOKS[0][1].join('\n')+'\n';
+import {assertMotionScope,assertAddedPaths} from './scope-audit.mjs';
+// 2026-10-04 (user decision): the battle screen is no longer frozen byte for byte, so it can be
+// improved directly. What stays protected is the Motion integration itself: each of the nine
+// approved display hooks must still be in battleScreen.js, whole and in order.
+const NL=String.fromCharCode(10), CRLF=String.fromCharCode(13,10);
+function assertHooksPresent(source){
+ const lines=source.replaceAll(CRLF,NL).split(NL);
+ let cursor=0;
+ for(const [i,[,added]] of BATTLE_DISPLAY_HOOKS.entries()){
+   const body=added.filter(line=>line.trim()!=='');
+   let at=-1;
+   for(let k=cursor;k<=lines.length-body.length;k++){
+     if(body.every((line,j)=>lines[k+j]===line)){at=k;break;}
+   }
+   assert.ok(at>=0,`Motion hook ${i+1} is missing or changed`);
+   cursor=at+body.length;
+ }
+}
+test('the nine Motion display hooks are still in the battle screen, whole and in order',()=>{
+ const lf=fs.readFileSync('src/screens/battleScreen.js','utf8').replaceAll(CRLF,NL);
+ assertHooksPresent(lf);
+ const hook=BATTLE_DISPLAY_HOOKS[3][1].join(NL);
+ assert.ok(lf.includes(hook));
  const mutations={
-   'extra statement in hook':source.replace(hook,hook+'gameState.playerStats.hp = 0;\n'),
-   'changed hook':source.replace('this._pixelMotion?.update({','this._pixelMotion?.dispose({'),
-   'deleted hook':source.replace(hook,''),
-   'moved intact hook':source.replace(hook,'')+hook,
-   'duplicated hook':source.replace(hook,hook+hook),
-   'unapproved body change':source+'// unapproved addition\n',
-   'removed existing body':source.replace("import { getContainedRect } from '../ui/viewportLayout.js';\n",''),
+   'deleted hook':lf.replace(hook,''),
+   'changed hook':lf.replace('this._pixelMotion?.update({','this._pixelMotion?.dispose({'),
  };
  for(const [name,fixture] of Object.entries(mutations)){
-   assert.notEqual(fixture,source,name);
-   assert.throws(()=>assertBattleDisplayOnly(fixture,checkpoint),{name:'AssertionError'},name);
+   assert.notEqual(fixture,lf,name);
+   assert.throws(()=>assertHooksPresent(fixture),{name:'AssertionError'},name);
  }
 });
 test('stable/checkpoint paths, exact new-file allowlist and package bytes remain protected',()=>{

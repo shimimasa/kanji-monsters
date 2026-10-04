@@ -7,7 +7,8 @@ import { gameState, battleState, recordStageCleared, saveGameData, resetStagePro
 import { checkAchievements } from '../core/achievementManager.js';
 import { calcBonusReward, isFirstClear, markBonusFirstClear, isBonusUnlocked } from '../core/bonusManager.js';
 import { stageData } from '../loaders/dataLoader.js';
-import { findNextStage } from '../core/nextStage.js';
+import { findNextStage, gradeEndGuide } from '../core/nextStage.js';
+import { isStageCleared } from '../core/saveData.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { createScreenLifecycle } from '../core/screenLifecycle.js';
@@ -42,6 +43,15 @@ const quickReviewButton = {
 };
 
 // 「つぎのステージへ」。同じ学年の次のステージを、ステージ選択を通らずに始める
+// 学年の さいごで 学年まとめに 鍵が ある時の「マスターに ちょうせん ▶ ステージ名」
+const masterButton = {
+  x: 330,
+  y: 346,
+  width: 420,
+  height: 48,
+  text: 'マスターに ちょうせん'
+};
+
 const goNextButton = {
   x: 250,
   y: 418,
@@ -56,7 +66,7 @@ const goNextButton = {
 const RESULT_LAYOUT = {
   titleY: 66,          // 「ステージクリア！」の帯の中心（帯は ±30、「おめでとう！」は +50）
   panelY: 140,         // 「きろく」のパネル
-  panelH: 176,
+  panelH: 166,         // 4行と パーフェクトの 1行が 入る高さ
   bonusPanelH: 206,    // 学年まとめの パネル（4行まで）
   gap: 14,
   rowA: 52,            // つぎへ
@@ -153,10 +163,17 @@ if (!this._countCommitted) {
 
     // つぎのステージ（クリアの印を立てたあとに見るので、最後のステージなら学年まとめの鍵も反映される）
     try {
-      this.nextStage = findNextStage(stageData, stageId, isBonusUnlocked);
+      const cleared = (id) => !!(isStageCleared(id) || gameState.stageProgress?.[id]?.cleared);
+      this.nextStage = findNextStage(stageData, stageId, isBonusUnlocked, cleared);
+      // 「つぎ」が無い（学年の通常ステージを ぜんぶ クリア、まとめは まだ鍵）時は、鍵の 開け方を 案内する
+      this.gradeEnd = this.nextStage ? null : gradeEndGuide(stageData, stageId, {
+        isCleared: cleared, isBonusUnlocked,
+        isMastered: (id) => !!gameState.stageReviewUnlocked?.[id],
+      });
     } catch (e) {
       console.warn('つぎのステージを決められませんでした:', e);
       this.nextStage = null;
+      this.gradeEnd = null;
     }
 
     const bonusCheckId = stageId || gameState.currentStageId || '';
@@ -224,6 +241,18 @@ const hasMistakes = !!(gameState.wrongKanjiList && gameState.wrongKanjiList.leng
 this.layoutButtons(hasMistakes);
 if (hasMistakes) this.drawMistakeScrollPanel(ctx, 50, this.buttonTop(), 250, RESULT_LAYOUT.mistakeH);
 if (this.nextStage) this.drawRichButton(ctx, goNextButton, isMouseOverRect(this.mouseX, this.mouseY, goNextButton));
+if (this.gradeEnd) {
+  // 例:「北海道の まとめは、マスターを そろえると ひらくよ（1/2）」
+  const g = this.gradeEnd;
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#7a4a12';
+  fitText(ctx, `${g.region ? g.region + 'の ' : ''}まとめは、マスターを そろえると ひらくよ（${g.mastered}/${g.total}）`,
+    masterButton.x + masterButton.width / 2, masterButton.y - 15, masterButton.width, 17, 'bold ');
+  ctx.restore();
+  this.drawRichButton(ctx, masterButton, isMouseOverRect(this.mouseX, this.mouseY, masterButton));
+}
 if (hasMistakes) this.drawRichButton(ctx, quickReviewButton, isMouseOverRect(this.mouseX, this.mouseY, quickReviewButton));
 this.drawRichButton(ctx, nextStageButton, isMouseOverRect(this.mouseX, this.mouseY, nextStageButton));
 
@@ -558,11 +587,15 @@ drawBonusResultPanel(ctx, x, y, width, height) {
   layoutButtons(hasMistakes) {
     goNextButton.text = this.nextStage?.name ? `つぎへ ▶ ${this.nextStage.name}` : 'つぎのステージへ';
     // 「つぎへ」が無い時（学年の最後など）は、ステージ選択へ が いちばんの ボタンなので緑のまま
-    nextStageButton.tone = this.nextStage ? 'secondary' : 'primary';
+    nextStageButton.tone = (this.nextStage || this.gradeEnd) ? 'secondary' : 'primary';
+    masterButton.text = this.gradeEnd?.stage?.name ? `マスターに ちょうせん ▶ ${this.gradeEnd.stage.name}` : 'マスターに ちょうせん';
     const L = RESULT_LAYOUT;
     const top = this.buttonTop();
     // 「つぎへ」が無ければ 下の列が上へ上がる
-    const rowB = this.nextStage ? top + L.rowA + L.rowGap : top;
+    // 学年の さいご（gradeEnd）は 1行の 案内（26）＋「マスターに ちょうせん」（48）の下に 下の列
+    const rowB = this.nextStage ? top + L.rowA + L.rowGap : (this.gradeEnd ? top + 26 + 48 + 6 : top);
+    const area = hasMistakes ? { x: 330, width: 420 } : { x: 220, width: 360 };
+    Object.assign(masterButton, { x: area.x, y: top + 26, width: area.width, height: 48 });
     if (hasMistakes) {
       // 左に まちがえた漢字のパネル（x50〜300）。ボタンは右側 x330〜750
       Object.assign(goNextButton, { x: 330, y: top, width: 420, height: L.rowA });
@@ -712,6 +745,7 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     this.resultData = null;
     this.bonusSummary = null;
     this.nextStage = null;
+    this.gradeEnd = null;
     this._countCommitted = false; // ← 追加: 次回のためにリセット
   },
 
@@ -788,6 +822,16 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       // つぎのバトル画面がBGMを流すので、勝利BGMは止めておく（ゲームオーバーの「もういちど」と同じ）
       publish('stopBGM', 0.2);
       publish('changeScreen', 'stageLoading');
+      return;
+    }
+
+    // マスターに ちょうせん: ステージ選択の「マスター」と同じ（そのステージの れんしゅう）
+    if (this.gradeEnd && isMouseOverRect(x, y, masterButton)) {
+      publish('playSE', 'decide');
+      gameState.currentStageId = this.gradeEnd.stage.stageId;
+      gameState.gameMode = 'practice';
+      publish('playBGM', 'title'); // 練習モードはメニュー共通BGM
+      publish('changeScreen', 'practiceBattle');
       return;
     }
 
