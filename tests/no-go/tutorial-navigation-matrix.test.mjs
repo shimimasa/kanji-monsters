@@ -11,9 +11,11 @@ for (const scenario of ['seen-stage-shared-completion','new-stage-guide-then-old
   for(let i=0;i<100&&f.imports.length===0;i++)await drain();
   assert.equal(f.imports.length,1);assert.ok(f.imports[0].url.endsWith('/resultWinScreen.js'));assert.ok(result._clickHandler);
   fsm.update(16);assert.equal(f.overlays().length,0);
-  // Real drawn next-stage control: [300,480,200,50].
+  // Real drawn stage-select control: [300,390,200,46] - the second row, under 「つぎへ ▶ 北海道市街地」
+  // (2026-10-04: the result screen moved up so the achievement popup that main.js draws at y450-530
+  // no longer covers it).
   assert.ok(f.draws.some(([op,text])=>op==='fillText'&&text==='ステージ選択へ'));
-  f.advance(400);f.click(400,505);
+  f.advance(400);f.click(400,413);
   assert.equal(fsm.currentState,stage);assert.equal(result.canvas,null);fsm.update(16);
   assert.equal(f.imports.length,2);
   let currentGuide=null,destroyed=0;

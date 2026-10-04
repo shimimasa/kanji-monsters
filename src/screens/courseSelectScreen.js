@@ -3,6 +3,13 @@ import { images } from '../loaders/assetsLoader.js';
 import { drawButton, isMouseOverRect, drawText } from '../ui/uiRenderer.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { createScreenLifecycle } from '../core/screenLifecycle.js';
+import { gameState } from '../core/gameState.js';
+import { stageData } from '../loaders/dataLoader.js';
+import { pickJapanGrade } from '../core/japanStart.js';
+import stageSelectState from './stageSelectScreen.js';
+
+const isJapanStageCleared = (stageId) => stageSelectState.isStageCleared(stageId);
+const readLastPlayedStage = () => { try { return localStorage.getItem('lastPlayedStage'); } catch { return null; } };
 
 const courseSelectScreen = {
   _lifecycle: createScreenLifecycle(),
@@ -184,9 +191,13 @@ const courseSelectScreen = {
   const y = coords.y;
 
     // 日本編（小学生）エリアがクリックされた場合
+    // 地方の地図は飛ばして、ステージ選択へ直接（学年のタブで地方を選べる）。開く学年は japanStart.js
     if (isMouseOverRect(x, y, this.japanButton)) {
       publish('playSE', 'decide');
-      publish('changeScreen', 'regionSelect');
+      gameState.currentGrade = pickJapanGrade(stageData, isJapanStageCleared, readLastPlayedStage(),
+        grade => stageSelectState.isRegionUnlocked(grade));
+      gameState.previousScreen = 'stageSelect';
+      publish('changeScreen', 'stageSelect');
       return;
     }
 
