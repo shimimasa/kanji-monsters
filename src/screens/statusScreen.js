@@ -4,6 +4,7 @@ import { publish } from '../core/eventBus.js';
 import { images } from '../loaders/assetsLoader.js';
 import { checkAchievements } from '../core/achievementManager.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas } from './battle/portraitLayout.js';
 
 const statusScreenState = {
   canvas: null,
@@ -42,12 +43,31 @@ const statusScreenState = {
       text: 'メニューに戻る' 
     };
 
+    this._layout();
+
     // クリックイベント登録
     this.registerHandlers();
   },
 
+  /** ボタンの 位置。スマホを たてに 持った時（480×680）は 大きく（2026-10-04） */
+  _layout() {
+    if (!this.canvas || !this.backButton) return;
+    const cx = this.canvas.width / 2;
+    if (isPortraitCanvas(this.canvas)) {
+      Object.assign(this.hpUpgradeButton, { x: cx - 200, y: 340, width: 190, height: 60 });
+      Object.assign(this.attackUpgradeButton, { x: cx + 10, y: 340, width: 190, height: 60 });
+      Object.assign(this.backButton, { x: cx - 150, y: 440, width: 300, height: 60 });
+    } else {
+      Object.assign(this.hpUpgradeButton, { x: cx - 180, y: 300, width: 160, height: 50 });
+      Object.assign(this.attackUpgradeButton, { x: cx + 20, y: 300, width: 160, height: 50 });
+      Object.assign(this.backButton, { x: cx - 100, y: 400, width: 200, height: 50 });
+    }
+  },
+
   /** 毎フレームの描画更新 */
   update(dt) {
+    // スマホを たてに 持った時は 盤面を 480×680 に（screens/battle/portraitLayout.js）
+    if (syncPortraitCanvas(this.canvas)) this._layout();
     const { ctx, canvas } = this;
     const player = gameState.playerStats;
 
@@ -126,6 +146,7 @@ const statusScreenState = {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
     this.unregisterHandlers();
     this.canvas = null;
     this.ctx = null;
@@ -146,6 +167,7 @@ const statusScreenState = {
 
   /** クリック処理 */
   handleClick(e) {
+    this._layout();
     const coords = getGameCoordinates(e, this.canvas);
     if (!isValidCoordinates(coords)) {
       return false; // 黒帯エリアのクリックは無視

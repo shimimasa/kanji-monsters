@@ -8,6 +8,7 @@ import { stageData } from '../loaders/dataLoader.js';
 import { pickJapanGrade, pickWorldGrade, WORLD_LEVEL_BY_GRADE } from '../core/japanStart.js';
 import stageSelectState from './stageSelectScreen.js';
 import worldStageSelectState from './worldStageSelectScreen.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas } from './battle/portraitLayout.js';
 
 const isJapanStageCleared = (stageId) => stageSelectState.isStageCleared(stageId);
 const readLastPlayedStage = () => { try { return localStorage.getItem('lastPlayedStage'); } catch { return null; } };
@@ -65,7 +66,25 @@ const courseSelectScreen = {
   },
 
   /** 毎フレーム呼び出し（描画） */
+  /** 札と ボタンの 位置。スマホを たてに 持った時（480×680）は 日本編・世界編を 上下に 並べる */
+  _layout() {
+    if (!this.canvas || !this.japanButton) return;
+    const cw = this.canvas.width, ch = this.canvas.height;
+    if (isPortraitCanvas(this.canvas)) {
+      Object.assign(this.japanButton, { x: 40, y: 110, width: 400, height: 230 });
+      Object.assign(this.worldButton, { x: 40, y: 360, width: 400, height: 230 });
+      Object.assign(this.backButton, { x: 10, y: ch - 64, width: 150, height: 50 });
+    } else {
+      Object.assign(this.japanButton, { x: 50, y: 150, width: cw / 2 - 75, height: ch - 250 });
+      Object.assign(this.worldButton, { x: cw / 2 + 25, y: 150, width: cw / 2 - 75, height: ch - 250 });
+      Object.assign(this.backButton, { x: 10, y: ch - 60, width: 120, height: 40 });
+    }
+  },
+
   update(dt) {
+    // スマホを たてに 持った時は 盤面を 480×680 に（screens/battle/portraitLayout.js）
+    syncPortraitCanvas(this.canvas);
+    this._layout();
     const cw = this.canvas.width;
     const ch = this.canvas.height;
     const ctx = this.ctx;
@@ -108,11 +127,11 @@ const courseSelectScreen = {
         ctx.font = '16px "UDデジタル教科書体", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
-        ctx.fillText('※ 画面をタップして選択してください', cw / 2, ch - 30);
+        // たての 画面は「タイトルへ」と 重ならないよう、札と ボタンの あいだに
+        ctx.fillText('※ 画面をタップして選択してください', cw / 2, isPortraitCanvas(this.canvas) ? ch - 70 : ch - 30);
     
-        // タイトルへボタン（下部左）
+        // タイトルへボタン（下部左）。位置は _layout()
         if (this.backButton) {
-          this.backButton.y = ch - 60; // 画面高さに追従
           drawButton(ctx, this.backButton.x, this.backButton.y, this.backButton.width, this.backButton.height, this.backButton.text);
         }
   },
@@ -137,10 +156,16 @@ const courseSelectScreen = {
     
     // 画像（存在する場合）
     if (image) {
-      const imgWidth = Math.min(area.width - 40, image.width);
-      const imgHeight = Math.min(area.height - 100, image.height);
+      let imgWidth = Math.min(area.width - 40, image.width);
+      let imgHeight = Math.min(area.height - 100, image.height);
+      if (isPortraitCanvas(this.canvas) && image.width && image.height) {
+        // たての 画面は 枠が 横長なので、地図の 形を くずさずに 収める
+        const s = Math.min((area.width - 40) / image.width, (area.height - 80) / image.height);
+        imgWidth = image.width * s;
+        imgHeight = image.height * s;
+      }
       const imgX = area.x + (area.width - imgWidth) / 2;
-      const imgY = area.y + 70;
+      const imgY = isPortraitCanvas(this.canvas) ? area.y + 58 : area.y + 70;
       
       ctx.drawImage(image, imgX, imgY, imgWidth, imgHeight);
     }
@@ -150,6 +175,7 @@ const courseSelectScreen = {
   exit() {
     this._lifecycle.deactivate();
     this.unregisterHandlers();
+    restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
     this.canvas = null;
     this.ctx = null;
   },
@@ -185,6 +211,7 @@ const courseSelectScreen = {
     e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
 
     // 新しい座標変換
+  this._layout(); // 札の 位置は 盤面の 大きさで 変わる
   const coords = getGameCoordinates(e, this.canvas);
   if (!isValidCoordinates(coords)) return; // 黒帯領域のクリックは無視
   
