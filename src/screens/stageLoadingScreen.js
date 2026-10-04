@@ -8,6 +8,7 @@ import { showBootError, hideBootProgress } from '../ui/bootProgress.js';
 import { getLearningControls, drawLearningButton } from '../ui/learningControls.js';
 import { getGameCoordinates } from '../utils/coordinateUtils.js';
 import { isMouseOverRect } from '../ui/uiRenderer.js';
+import { syncPortraitCanvas } from './battle/portraitLayout.js';
 
 const stageLoadingState = {
   canvas: null,
@@ -112,6 +113,9 @@ const stageLoadingState = {
   update(dt) {
     const { ctx, canvas } = this;
     if (!ctx) return;
+    // スマホを たてに 持った時は 盤面を 480×680 に（つぎの バトルも 同じ 大きさ）。
+    // 出る時に 800×600 へ 戻さないのは、バトル・ステージ選択が 自分で 合わせるから（戻すと 一瞬 小さくなる）
+    syncPortraitCanvas(canvas);
 
     // ローディング画面の描画
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -121,7 +125,7 @@ const stageLoadingState = {
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const barWidth = 600;
+    const barWidth = Math.min(600, canvas.width - 60);
     const barHeight = 30;
     const x = (canvas.width - barWidth) / 2;
     const y = (canvas.height - barHeight) / 2;

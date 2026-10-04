@@ -9,6 +9,7 @@ import { commitLearningOutcome } from '../core/learningOutcome.js';
 import { createScreenLifecycle } from '../core/screenLifecycle.js';
 import { getGameCoordinates } from '../utils/coordinateUtils.js';
 import { getLearningControls, drawLearningButton, placeLearningInput } from '../ui/learningControls.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas, placePortraitInput, PORTRAIT } from './battle/portraitLayout.js';
 
 // 読みの正規化・取得は共通実装を使用（配列/文字列データ両対応）
 
@@ -27,7 +28,15 @@ const reviewStage = {
   _lifecycle: createScreenLifecycle(),
   _answerSubmission: null,
   nearMissCount: 0,
-  getControls() { return getLearningControls(this.canvas); },
+  getControls() {
+    const controls = getLearningControls(this.canvas);
+    if (!isPortraitCanvas(this.canvas)) return controls;
+    // スマホを たてに 持った時（480×680）: もどるは 左上、こたえるは いちばん下に 横いっぱい（2026-10-04）
+    const h = controls.submit.h;
+    return { ...controls, portrait: true,
+      back: { ...controls.back, x: 10, y: 10, w: 130, h: Math.max(controls.back.h, 50) },
+      submit: { ...controls.submit, x: 10, y: PORTRAIT.H - h - 12, w: 460, h } };
+  },
 
   /** enter: 初期化 */
   enter(arg) {
@@ -72,6 +81,11 @@ const reviewStage = {
       this.inputEl.style.display = 'block';
       this.inputEl.value = '';
     }
+
+    // 盤面を 50音パッドの 上に 収める（学年まとめ・バトルと 同じ。以前は パッドが 入力欄と こたえる に 重なっていた）
+    document.documentElement?.classList?.add('vh-lock');
+    document.body?.classList?.add('vh-lock');
+    this.canvas.classList?.add('vh-lock');
 
     // 3) 最初の漢字をロード
     this.currentIndex = 0;
@@ -155,6 +169,7 @@ const reviewStage = {
   /** 毎フレーム描画 */
   update(dt) {
     const { ctx, canvas } = this;
+    syncPortraitCanvas(canvas); // スマホを たてに 持った時は 480×680（screens/battle/portraitLayout.js）
     // きょうの分が無い時は、ひと言だけ出してから戻る
     if (this.emptyMessage) {
       ctx.fillStyle = '#1e3c72';
@@ -179,16 +194,25 @@ const reviewStage = {
     // タイトル
     ctx.fillStyle = 'white';
     ctx.font      = '24px "UDデジタル教科書体",sans-serif';
-    ctx.fillText('復習モード', 540, 60);
+    const controls = this.getControls();
+    if (controls.portrait) {
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText('復習モード', 156, 35);
+    } else {
+      ctx.fillText('復習モード', 540, 60);
+    }
 
     // ステージ選択ボタン
-    const controls = this.getControls();
     drawLearningButton(ctx, controls.back, controls.scale);
     drawLearningButton(ctx, controls.submit, controls.scale);
-    placeLearningInput(canvas, this.inputEl, controls);
+    if (controls.portrait) placePortraitInput(canvas, this.inputEl, controls.submit.y);
+    else {
+      if (this.inputEl?.dataset) delete this.inputEl.dataset.toggleSide;
+      placeLearningInput(canvas, this.inputEl, controls);
+    }
 
     // 漢字ボックス
-    const x = canvas.width/2, y = controls.compact ? 205 : 220;
+    const x = canvas.width/2, y = controls.portrait ? 280 : (controls.compact ? 205 : 220);
     const w = 180, h = 180;
     ctx.strokeStyle = 'white';
     ctx.lineWidth   = 2;
@@ -222,6 +246,11 @@ const reviewStage = {
     this._answerSubmission = null;
     this.inputEl?.removeEventListener('keydown', this._keydownHandler);
     if (this.inputEl) this.inputEl.style.display = 'none';
+    if (this.inputEl?.dataset) delete this.inputEl.dataset.toggleSide;
+    restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
+    document.documentElement?.classList?.remove('vh-lock');
+    document.body?.classList?.remove('vh-lock');
+    this.canvas?.classList?.remove('vh-lock');
     // キャンバスクリック解除
     if (this.canvas && this._clickHandler) {
       this.canvas.removeEventListener('click', this._clickHandler);
