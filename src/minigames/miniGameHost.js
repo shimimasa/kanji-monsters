@@ -3,6 +3,7 @@ import { images } from '../loaders/assetsLoader.js';
 import { HKD_E01_MOTION } from '../visuals/motion/monsterMotionManifest.js';
 import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { miniGameRegistry } from './registry.js';
+import { miniGameBgm, miniGameCommandSound } from './miniGameSound.js';
 import { readActiveCollection } from './collectionAdapter.js';
 import { createCompanionAdapter } from './companionAdapter.js';
 import { gotomonService } from './gotomonService.js';
@@ -56,9 +57,9 @@ export function createMiniGameHost({ document: doc = globalThis.document,
   const host = {
     enter(nextProps = {}) {
       host.exit(); props = nextProps;
-      publish('playBGM', 'miniGamePlay');
       const definition = miniGameRegistry[nextProps.gameId || 'mathSprint'];
       if (!definition) throw new Error('Unknown mini game');
+      publish('playBGM', miniGameBgm(definition.id));
       const sessionId = makeSessionId(); valid = true; manualPaused = false; visibilityPaused = !!doc.hidden;
       observedResult = false;
       learningAnswerCount = 0;
@@ -117,7 +118,11 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       const dispatch = command => {
         if (!valid || current !== game) return false;
         play.context(current.snapshot());
+        const before = current.snapshot();
         if (!play.allowCommand(command) || current.dispatch(command) !== true) return false;
+        const commandSound = miniGameCommandSound(command);
+        const after = current.snapshot();
+        if (commandSound && after.answered === before.answered && after.lastAnswer === before.lastAnswer) publish('playSE', commandSound);
         flushLearning();
         if (PLAYTEST_ENABLED) observePlaytestCommand(sessionId,command);
         host.update(0); return true;

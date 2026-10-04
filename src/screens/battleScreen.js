@@ -5715,6 +5715,7 @@ function onHint() {
   }
   const level = current + 1;
   gameState.hintLevel = level;
+  publish('playSE', 'hint');
 
   const k = gameState.currentKanji || {};
   const onyomi = Array.isArray(k.onyomi) ? k.onyomi : [];

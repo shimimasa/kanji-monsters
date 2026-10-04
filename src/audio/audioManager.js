@@ -49,6 +49,9 @@ export class AudioManager {
         yomitomo: '/assets/audio/bgm_yomitomo.mp3',
         miniGameHub: '/assets/audio/bgm_minigame_hub.mp3',
         miniGamePlay: '/assets/audio/bgm_minigame_play.mp3',
+        miniGameAction: '/assets/audio/bgm_minigame_action.mp3',
+        miniGamePuzzle: '/assets/audio/bgm_minigame_puzzle.mp3',
+        miniGameRelaxed: '/assets/audio/bgm_minigame_relaxed.mp3',
 
         // ステージ別BGMを追加
         // NOTE: 北海道A/B.mp3 はリポジトリに存在せず無音になっていたため、
@@ -112,13 +115,20 @@ export class AudioManager {
         nearMiss: '/assets/audio/se_near_miss.mp3',
         capture: '/assets/audio/se_capture.mp3',
         stageClear: '/assets/audio/se_stage_clear.mp3',
+        hint: '/assets/audio/se_hint.mp3',
+        evolve: '/assets/audio/se_evolve.mp3',
+        reward: '/assets/audio/se_reward.mp3',
+        miniShot: '/assets/audio/se_mini_shot.mp3',
+        miniWhoosh: '/assets/audio/se_mini_whoosh.mp3',
+        miniHop: '/assets/audio/se_mini_hop.mp3',
+        miniPop: '/assets/audio/se_mini_pop.mp3',
 
         // NOTE: 以下は呼び出しはあったが未登録で、ずっと無音だったもの。
         // 専用音源が用意されるまで、意味の近い既存音を暫定割当する
         // （専用ファイルを置いたらこの行を差し替えるだけでよい）。
-        achievement: '/assets/audio/se_master.mp3',  // 実績解除（要: 専用ファンファーレ）
+        achievement: '/assets/audio/se_achievement.mp3',  // 実績・トロフィーの専用音
         cancel:      '/assets/audio/se_cancel.mp3',  // もどる・とじる用のやわらかい音
-        shieldBreak: '/assets/audio/se_shield3.mp3'  // シールド破壊（要: 専用の破壊音）
+        shieldBreak: '/assets/audio/se_shield_break.mp3'  // シールドがわれる専用音
 
         // 意図的に未登録のまま残しているキー（既存音を当てると体験が悪くなるため）:
         //   gameover … 「今回はここまで！」画面。静かなBGMが担う場面なので、

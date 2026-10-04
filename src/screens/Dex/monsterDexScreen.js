@@ -195,7 +195,7 @@ function appendExpansionInfo(info, monster, img) {
         background: 'rgba(255, 213, 74, 0.18)', color: 'inherit', font: 'inherit', cursor: 'pointer' });
       const base = img.src, evolved = evolvedImageUrl(monster.id);
       const show = on => { img.src = on ? evolved : base; toggle.textContent = on ? 'もとの すがたに もどす' : 'しんかの すがたを 見る'; toggle.dataset.on = on ? '1' : ''; };
-      toggle.onclick = event => { event.stopPropagation(); show(!toggle.dataset.on); publish('playSE', 'decide'); };
+      toggle.onclick = event => { event.stopPropagation(); const evolving = !toggle.dataset.on; show(evolving); publish('playSE', evolving ? 'evolve' : 'cancel'); };
       show(false);
       line('しんか', `Lv${EVOLVE_LEVEL}で しんかした！`, toggle);
     } else {
