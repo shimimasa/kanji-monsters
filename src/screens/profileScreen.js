@@ -77,7 +77,8 @@ const profileScreen = {
         title.textContent = 'プロフィール / 称号';
         title.style.margin = '0';
         title.style.fontSize = '20px';
-        title.style.flex = '1';
+        // せまい 画面では 見出しを 1行に して、ボタンは 下に 折り返す（以前は たて書きの ように つぶれていた）
+        title.style.flex = '1 1 220px';
     
         const toKanjiDexBtn = document.createElement('button');
         toKanjiDexBtn.textContent = '漢字図鑑';
@@ -124,6 +125,8 @@ const profileScreen = {
         toAchievementsBtn.onclick = () => publish('changeScreen', 'achievements');
 
         header.append(backBtn, title, toStatusBtn, toAchievementsBtn, toKanjiDexBtn, toMonsterDexBtn);
+        header.style.flexWrap = 'wrap';
+        [backBtn, toStatusBtn, toAchievementsBtn, toKanjiDexBtn, toMonsterDexBtn].forEach(btn => { btn.style.whiteSpace = 'nowrap'; });
 
         const summary = loadProfileSummary();
 

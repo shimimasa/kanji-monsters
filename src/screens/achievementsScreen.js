@@ -5,6 +5,23 @@ import { gameState, isAchievementUnlocked } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { loadDex as loadKanjiDex } from '../models/kanjiDex.js';
 import { loadDex as loadMonsterDex } from '../models/monsterDex.js';
+import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas } from './battle/portraitLayout.js';
+
+// 並び。スマホを たてに 持った時（480×680）は 1列を 横いっぱいに、ボタンは 下に（2026-10-04）
+const LIST_WIDE = { x: 50, w: 680, iconX: 60, textX: 95, rightX: 720, startY: 110, lineHeight: 45, itemHeight: 40, perPage: 8, pageY: 525 };
+const LIST_TALL = { x: 10, w: 460, iconX: 20, textX: 55, rightX: null, startY: 112, lineHeight: 54, itemHeight: 48, perPage: 9, pageY: 600 };
+function layoutButtons(portrait) {
+  if (portrait) {
+    Object.assign(BTN.back, { x: 10, y: 10, w: 130, h: 44 });
+    Object.assign(BTN.prevPage, { x: 10, y: 620, w: 150, h: 48 });
+    Object.assign(BTN.nextPage, { x: 320, y: 620, w: 150, h: 48 });
+  } else {
+    Object.assign(BTN.back, { x: 20, y: 20, w: 100, h: 30 });
+    Object.assign(BTN.prevPage, { x: 580, y: 500, w: 100, h: 40 });
+    Object.assign(BTN.nextPage, { x: 690, y: 500, w: 100, h: 40 });
+  }
+}
 
 const BTN = {
   back: { x: 20, y: 20, w: 100, h: 30, label: 'メニューへ' },
@@ -36,8 +53,10 @@ const achievementsScreen = {
     
     // イベント登録
     this._clickHandler = e => {
-      const r = this.canvas.getBoundingClientRect();
-      const x = e.clientX - r.left, y = e.clientY - r.top;
+      // 画面の 座標を 盤面の 座標に（以前は そのまま 比べていて、800×600 で 表示されて いない 時は ボタンが ずれた）
+      const coords = getGameCoordinates(e, this.canvas);
+      if (!isValidCoordinates(coords)) return;
+      const x = coords.x, y = coords.y;
       
       // 戻るボタン（プロフィール画面から入るのが正規動線）
       if (isMouseOverRect(x, y, BTN.back)) {
@@ -91,6 +110,11 @@ const achievementsScreen = {
 
   /** update：毎フレーム描画 */
   update(dt) {
+    // スマホを たてに 持った時は 盤面を 480×680 に（screens/battle/portraitLayout.js）
+    syncPortraitCanvas(this.canvas);
+    const portrait = isPortraitCanvas(this.canvas);
+    layoutButtons(portrait);
+    this.itemsPerPage = (portrait ? LIST_TALL : LIST_WIDE).perPage;
     const { ctx, canvas } = this;
     
     // 背景
@@ -132,17 +156,19 @@ const achievementsScreen = {
       ctx.fillStyle = 'white';
       ctx.font = '16px "UDデジタル教科書体", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(`${currentPage} / ${totalPages}`, canvas.width / 2, 525);
+      ctx.fillText(`${currentPage} / ${totalPages}`, canvas.width / 2, (portrait ? LIST_TALL : LIST_WIDE).pageY);
     }
   },
 
   /** 実績リストを描画 */
   drawAchievementsList() {
     const { ctx } = this;
-    const startY = 110;
-    const lineHeight = 45;
-    const itemWidth = 680;
-    const itemHeight = 40;
+    const L = isPortraitCanvas(this.canvas) ? LIST_TALL : LIST_WIDE;
+    this._list = L;
+    const startY = L.startY;
+    const lineHeight = L.lineHeight;
+    const itemWidth = L.w;
+    const itemHeight = L.itemHeight;
     
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
@@ -158,7 +184,7 @@ const achievementsScreen = {
       // アイテム背景
       if (isUnlocked) {
         // 解除済み：輝く背景
-        const gradient = ctx.createLinearGradient(50, y - itemHeight/2, 50 + itemWidth, y + itemHeight/2);
+        const gradient = ctx.createLinearGradient(L.x, y - itemHeight/2, L.x + itemWidth, y + itemHeight/2);
         gradient.addColorStop(0, 'rgba(255, 215, 0, 0.1)');
         gradient.addColorStop(0.5, 'rgba(255, 215, 0, 0.2)');
         gradient.addColorStop(1, 'rgba(255, 215, 0, 0.1)');
@@ -167,12 +193,12 @@ const achievementsScreen = {
         // 未解除：暗い背景
         ctx.fillStyle = 'rgba(100, 100, 100, 0.1)';
       }
-      ctx.fillRect(50, y - itemHeight/2, itemWidth, itemHeight);
+      ctx.fillRect(L.x, y - itemHeight/2, itemWidth, itemHeight);
       
       // 枠線
       ctx.strokeStyle = isUnlocked ? '#FFD700' : '#555';
       ctx.lineWidth = 1;
-      ctx.strokeRect(50, y - itemHeight/2, itemWidth, itemHeight);
+      ctx.strokeRect(L.x, y - itemHeight/2, itemWidth, itemHeight);
 
       if (isUnlocked) {
         // 解除済み実績の表示
@@ -191,24 +217,27 @@ const achievementsScreen = {
     // トロフィーアイコン
     ctx.fillStyle = '#FFD700';
     ctx.font = '24px serif';
-    ctx.fillText('🏆', 60, y);
+    const L = this._list || LIST_WIDE;
+    ctx.fillText('🏆', L.iconX, y);
     
     // タイトル
     ctx.fillStyle = '#FFD700';
     ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
-    ctx.fillText(achievement.title, 95, y - 8);
+    ctx.fillText(achievement.title, L.textX, y - 8);
     
     // 説明
     ctx.fillStyle = 'white';
     ctx.font = '14px "UDデジタル教科書体", sans-serif';
-    ctx.fillText(achievement.description, 95, y + 12);
+    ctx.fillText(achievement.description, L.textX, y + 12);
     
-    // 解除済みマーク
-    ctx.fillStyle = '#00FF00';
-    ctx.font = '12px "UDデジタル教科書体", sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText('✓ 解除済み', 720, y);
-    ctx.textAlign = 'left';
+    // 解除済みマーク（たての 画面は 右に 場所が ないので 出さない。金色の タイトルで わかる）
+    if (L.rightX) {
+      ctx.fillStyle = '#00FF00';
+      ctx.font = '12px "UDデジタル教科書体", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('✓ 解除済み', L.rightX, y);
+      ctx.textAlign = 'left';
+    }
   },
 
   /** 未解除実績を描画 */
@@ -218,24 +247,27 @@ const achievementsScreen = {
     // ロックアイコン
     ctx.fillStyle = '#666';
     ctx.font = '24px serif';
-    ctx.fillText('🔒', 60, y);
+    const L = this._list || LIST_WIDE;
+    ctx.fillText('🔒', L.iconX, y);
     
     // 隠されたタイトル
     ctx.fillStyle = '#666';
     ctx.font = '18px "UDデジタル教科書体", sans-serif';
-    ctx.fillText('？？？', 95, y - 8);
+    ctx.fillText('？？？', L.textX, y - 8);
     
     // 隠された説明
     ctx.fillStyle = '#555';
     ctx.font = '14px "UDデジタル教科書体", sans-serif';
-    ctx.fillText('未解除の実績です', 95, y + 12);
+    // たての 画面は 右に 場所が ないので、ヒントが あれば 説明の 行に 出す
+    const hint = this.shouldShowHint(achievement) ? this.getConditionHint(achievement) : '';
+    ctx.fillText(!L.rightX && hint ? hint : '未解除の実績です', L.textX, y + 12);
     
     // 条件のヒント（オプション）
-    if (this.shouldShowHint(achievement)) {
+    if (L.rightX && this.shouldShowHint(achievement)) {
       ctx.fillStyle = '#888';
       ctx.font = '12px "UDデジタル教科書体", sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(this.getConditionHint(achievement), 720, y);
+      ctx.fillText(this.getConditionHint(achievement), L.rightX, y);
       ctx.textAlign = 'left';
     }
   },
@@ -304,6 +336,8 @@ const achievementsScreen = {
 
   /** exit：画面離脱時のクリーンアップ */
   exit() {
+    restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
+    layoutButtons(false);
     // イベント解除
     if (this.canvas && this._clickHandler) {
       this.canvas.removeEventListener('click', this._clickHandler);

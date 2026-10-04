@@ -906,8 +906,9 @@ html,body{
   .settings-container {
     top: 15%;
     width: 95%;
-    max-height: 55vh;
-    margin-bottom: 180px;
+    /* 下の 空きは 使われていない（もどるは 中の いちばん下）。画面の 下まで 使う */
+    max-height: calc(85dvh - 16px);
+    margin-bottom: 0;
   }
   
   .settings-panel {
@@ -944,11 +945,12 @@ html,body{
 
 @media (max-width: 480px) {
   .settings-container {
-    top: 10%;
+    top: 8px;
     width: 98%;
     gap: 15px;
-    max-height: 50vh;
-    margin-bottom: 160px;
+    /* スマホは 画面の 高さ いっぱい（以前は 半分の 50vh で 下が 空いていた） */
+    max-height: calc(100dvh - 16px);
+    margin-bottom: 0;
   }
   
   .settings-panel {
