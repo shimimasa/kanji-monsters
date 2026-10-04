@@ -112,13 +112,16 @@ export class AudioManager {
         nearMiss: '/assets/audio/se_near_miss.mp3',
         capture: '/assets/audio/se_capture.mp3',
         stageClear: '/assets/audio/se_stage_clear.mp3',
+        hint: '/assets/audio/se_hint.mp3',
+        evolve: '/assets/audio/se_evolve.mp3',
+        reward: '/assets/audio/se_reward.mp3',
 
         // NOTE: 以下は呼び出しはあったが未登録で、ずっと無音だったもの。
         // 専用音源が用意されるまで、意味の近い既存音を暫定割当する
         // （専用ファイルを置いたらこの行を差し替えるだけでよい）。
-        achievement: '/assets/audio/se_master.mp3',  // 実績解除（要: 専用ファンファーレ）
+        achievement: '/assets/audio/se_achievement.mp3',  // 実績・トロフィーの専用音
         cancel:      '/assets/audio/se_cancel.mp3',  // もどる・とじる用のやわらかい音
-        shieldBreak: '/assets/audio/se_shield3.mp3'  // シールド破壊（要: 専用の破壊音）
+        shieldBreak: '/assets/audio/se_shield_break.mp3'  // シールドがわれる専用音
 
         // 意図的に未登録のまま残しているキー（既存音を当てると体験が悪くなるため）:
         //   gameover … 「今回はここまで！」画面。静かなBGMが担う場面なので、

@@ -58,6 +58,31 @@ render('se_stage_clear', 1.65, [
   { at: 0.67, length: 0.94, freq: 783.99, gain: 0.23, decay: 1.2 },
   { at: 0.67, length: 0.94, freq: 523.25, gain: 0.12, decay: 1.2 },
 ]);
+render('se_achievement', 0.95, [
+  { at: 0, length: 0.36, freq: 783.99, gain: 0.16 },
+  { at: 0.14, length: 0.38, freq: 987.77, gain: 0.17 },
+  { at: 0.28, length: 0.60, freq: 1174.66, gain: 0.20, decay: 1.3 },
+]);
+render('se_hint', 0.27, [
+  { at: 0, length: 0.13, freq: 783.99, gain: 0.17, decay: 2 },
+  { at: 0.09, length: 0.16, freq: 1046.5, gain: 0.20, decay: 2 },
+]);
+render('se_evolve', 1.35, [
+  { at: 0, length: 0.35, from: 392, to: 523.25, gain: 0.15 },
+  { at: 0.20, length: 0.35, from: 523.25, to: 659.25, gain: 0.16 },
+  { at: 0.40, length: 0.35, from: 659.25, to: 783.99, gain: 0.17 },
+  { at: 0.64, length: 0.68, freq: 1046.5, gain: 0.22, decay: 1.4 },
+  { at: 0.64, length: 0.68, freq: 783.99, gain: 0.12, decay: 1.4 },
+]);
+render('se_reward', 0.52, [
+  { at: 0, length: 0.27, freq: 659.25, gain: 0.17 },
+  { at: 0.15, length: 0.34, freq: 880, gain: 0.19, decay: 1.5 },
+]);
+render('se_shield_break', 0.34, [
+  { at: 0, length: 0.12, from: 1800, to: 1400, gain: 0.18, decay: 3 },
+  { at: 0.035, length: 0.16, from: 1200, to: 700, gain: 0.16, decay: 3 },
+  { at: 0.10, length: 0.21, from: 850, to: 420, gain: 0.12, decay: 2.5 },
+]);
 
 // Two short loops. The quiet final half-second lets either loop return to beat one cleanly.
 const chord = (notes, at, length, gain = 0.055) => notes.map(freq => ({ at, length, freq, gain, attack: 0.035, decay: 0.55 }));

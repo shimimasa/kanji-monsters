@@ -943,6 +943,7 @@ if (this.unmasteredKanji.length === 0) {
       
       const level = current + 1;
       gameState.hintLevel = level;
+      publish('playSE', 'hint');
       
       // 指す読みは 同じ問題の あいだ 変えない。まだ おぼえていない 読み（右上で ○ の読み）から えらぶ
       if (level === 1 || !this._hintTarget || this._hintTarget.kanjiId !== k.id) {

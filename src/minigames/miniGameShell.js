@@ -236,6 +236,9 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
       const looks = value?.duplicate ? [] : value?.newLooks ?? [];
       if (looks.length) showSticker(stickerNotice.hidden ? 'outfit' : stickerNotice.dataset.tier, `${stickerNotice.hidden ? '' : `${stickerNotice.textContent} `}すがた「${looks.map(key => LOOK_NAMES[key]).join('」「')}」が ひらいた！ シール帳で かえられるよ`);
       if (opened.length) showSticker(stickerNotice.hidden ? 'outfit' : stickerNotice.dataset.tier, `${stickerNotice.hidden ? '' : `${stickerNotice.textContent} `}きせかえ ${opened.map(item => `${item.icon}${item.name}`).join('・')} が ひらいた！ シール帳で つけられるよ`);
+      // ごほうびが同時に届いてもジングルは1回だけ。復習や保存済みの結果では鳴らさない。
+      if (looks.includes('evolve')) publish('playSE', 'evolve');
+      else if (sticker?.isNew || sticker?.upgraded || opened.length || titles.length || secrets.length || looks.length) publish('playSE', 'reward');
       resultDetails.append(reward);
     } else reward.textContent = '記録を保存できませんでした。この画面で「記録の保存を再試行」を押してください。画面を閉じると未保存の記録は失われます。';
     retrySave.hidden = receipt.ok;
