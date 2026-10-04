@@ -1,0 +1,80 @@
+// Original, deterministic sound assets for the sound and visual review.
+// Run with Node, then encode the WAV files to mp3/m4a/ogg with ffmpeg.
+import { mkdirSync, writeFileSync } from 'node:fs';
+
+const rate = 44100;
+const output = 'public/assets/audio';
+mkdirSync(output, { recursive: true });
+
+function render(name, duration, notes) {
+  const samples = Math.ceil(duration * rate);
+  const data = Buffer.alloc(44 + samples * 2);
+  data.write('RIFF', 0);
+  data.writeUInt32LE(data.length - 8, 4);
+  data.write('WAVEfmt ', 8);
+  data.writeUInt32LE(16, 16);
+  data.writeUInt16LE(1, 20);
+  data.writeUInt16LE(1, 22);
+  data.writeUInt32LE(rate, 24);
+  data.writeUInt32LE(rate * 2, 28);
+  data.writeUInt16LE(2, 32);
+  data.writeUInt16LE(16, 34);
+  data.write('data', 36);
+  data.writeUInt32LE(samples * 2, 40);
+  for (let i = 0; i < samples; i++) {
+    const t = i / rate;
+    let value = 0;
+    for (const n of notes) {
+      const local = t - n.at;
+      if (local < 0 || local >= n.length) continue;
+      const fadeIn = Math.min(1, local / (n.attack ?? 0.008));
+      const fadeOut = Math.pow(Math.max(0, 1 - local / n.length), n.decay ?? 2);
+      const f = n.from && n.to ? n.from + (n.to - n.from) * local / n.length : n.freq;
+      const phase = 2 * Math.PI * f * local;
+      const tone = Math.sin(phase) + 0.18 * Math.sin(phase * 2) + 0.05 * Math.sin(phase * 3);
+      value += tone * (n.gain ?? 0.3) * fadeIn * fadeOut;
+    }
+    data.writeInt16LE(Math.round(Math.max(-0.95, Math.min(0.95, value)) * 32767), 44 + i * 2);
+  }
+  writeFileSync(`${output}/${name}.wav`, data);
+}
+
+render('se_tap', 0.10, [{ at: 0, length: 0.09, freq: 660, gain: 0.22, decay: 3 }]);
+render('se_cancel', 0.20, [{ at: 0, length: 0.18, from: 440, to: 330, gain: 0.27, decay: 2.2 }]);
+render('se_near_miss', 0.42, [
+  { at: 0, length: 0.25, freq: 523.25, gain: 0.20 },
+  { at: 0.13, length: 0.27, freq: 659.25, gain: 0.20 },
+]);
+render('se_capture', 1.25, [
+  { at: 0, length: 0.42, freq: 523.25, gain: 0.20 },
+  { at: 0.20, length: 0.42, freq: 659.25, gain: 0.20 },
+  { at: 0.40, length: 0.42, freq: 783.99, gain: 0.20 },
+  { at: 0.62, length: 0.60, freq: 1046.5, gain: 0.25, decay: 1.5 },
+]);
+render('se_stage_clear', 1.65, [
+  { at: 0, length: 0.30, freq: 392, gain: 0.19 },
+  { at: 0.22, length: 0.30, freq: 523.25, gain: 0.19 },
+  { at: 0.44, length: 0.30, freq: 659.25, gain: 0.19 },
+  { at: 0.67, length: 0.94, freq: 783.99, gain: 0.23, decay: 1.2 },
+  { at: 0.67, length: 0.94, freq: 523.25, gain: 0.12, decay: 1.2 },
+]);
+
+// Two short loops. The quiet final half-second lets either loop return to beat one cleanly.
+const chord = (notes, at, length, gain = 0.055) => notes.map(freq => ({ at, length, freq, gain, attack: 0.035, decay: 0.55 }));
+const melody = (frequencies, step, gain = 0.12) => frequencies.map((freq, i) => ({ at: i * step, length: step * 0.88, freq, gain, decay: 1.4 }));
+render('bgm_minigame_hub', 8, [
+  ...chord([261.63, 329.63, 392], 0, 1.9),
+  ...chord([293.66, 349.23, 440], 2, 1.9),
+  ...chord([329.63, 392, 493.88], 4, 1.9),
+  ...chord([261.63, 349.23, 440], 6, 1.45),
+  ...melody([523.25, 587.33, 659.25, 587.33, 698.46, 659.25, 587.33, 523.25,
+    659.25, 783.99, 880, 783.99, 698.46, 659.25, 587.33, 523.25], 0.5),
+]);
+render('bgm_minigame_play', 8, [
+  ...chord([261.63, 329.63, 392], 0, 1.9, 0.045),
+  ...chord([220, 261.63, 349.23], 2, 1.9, 0.045),
+  ...chord([293.66, 392, 493.88], 4, 1.9, 0.045),
+  ...chord([196, 261.63, 392], 6, 1.45, 0.045),
+  ...melody([523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46,
+    659.25, 783.99, 987.77, 783.99, 698.46, 587.33, 523.25, 392], 0.5, 0.1),
+]);

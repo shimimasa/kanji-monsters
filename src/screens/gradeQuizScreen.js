@@ -245,6 +245,7 @@ const gradeQuizScreen = {
     if (!ok) {
       const nearMiss = assessment.nearMiss;
       if (assessment.kind === 'near-miss') {
+        publish('playSE', 'nearMiss');
         this.nearMissCount = (this.nearMissCount || 0) + 1;
         this.feedback = getNearMissLines(nearMiss, this.nearMissCount).join('  ');
         this.feedbackColor = '#5bc0de'; // 読みちがいの琥珀とは分ける

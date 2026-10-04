@@ -2,6 +2,7 @@ import basePractice from './practiceBattleScreen.js';
 import { gameState, battleState, saveGameData, beginQuestion } from '../core/gameState.js';
 import { publish } from '../core/eventBus.js';
 import { getKanjiByStageId } from '../loaders/dataLoader.js';
+import { openQuickReviewDialog } from '../ui/quickReviewDialog.js';
 
 
 const quickReviewPracticeScreen = {
@@ -19,6 +20,8 @@ const quickReviewPracticeScreen = {
   
   enter(canvasEl, onComplete) {
     try {
+      this._quickReviewDialog?.();
+      this._quickReviewDialog = null;
       this.onPracticeComplete = onComplete;
       gameState.gameMode = 'practice';
   
@@ -54,8 +57,11 @@ const quickReviewPracticeScreen = {
   
       // 最終チェック
       if (!qr || (!hasIds && !hasTexts)) {
-        alert('復習対象の漢字が見つかりませんでした。');
-        publish('changeScreen', gameState.previousScreen || 'stageSelect');
+        this._quickReviewDialog = openQuickReviewDialog({
+          title: 'いまは ふりかえる 字が ないよ',
+          detail: 'いま とりくむ 字は ないよ。ちずへ もどろう。',
+          onDone: () => publish('changeScreen', gameState.previousScreen || 'stageSelect'),
+        });
         return;
       }
   
@@ -119,6 +125,7 @@ const quickReviewPracticeScreen = {
 
   _completeQuickReview() {
     try {
+      if (this._quickReviewDialog) return;
       battleState.inputEnabled = false;
   
       const stageId = gameState.currentStageId;
@@ -128,29 +135,25 @@ const quickReviewPracticeScreen = {
         .map(k => (k.kanji || k.text || ''))
         .filter(Boolean);
   
-      try { alert(`誤答の復習が完了しました！\n今回とりくんだ字: ${list.length ? list.join(' ') : '（なし）'}`); } catch {}
-  
-      // レビューに進むか？（OK=レビュー / キャンセル=ステージ選択）
-      let goReview = false;
-      try {
-        goReview = window.confirm('もう少しつづけますか？\nOK：もう1もん（今回の字で練習）\nキャンセル：今日はここまで（地図へ）');
-      } catch {} 
-
-      if (goReview) {
-        // 今回の集合のみを対象にする「限定レビュー」へ
-        this.quickReviewOnlyPoolMode = true;
-        this.quickReviewPoolIds = new Set(this.originalReviewIds);
-        this.wrongOnlyMode = false;      // 誤答限定は解除
-        this.reviewMode = true;          // レビューモードON
-        // スコア等はそのまま（persistは既存ロジックに任せる）
-        this._enterQuickReviewReview();
-        return;
-      }
-  
-      // もどる（従来どおりステージ選択へ）
-      publish('playBGM', 'title');
-      const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-      publish('changeScreen', target);
+      this._quickReviewDialog = openQuickReviewDialog({
+        title: 'ふりかえり かんりょう！',
+        detail: `今回 とりくんだ 字：${list.length ? list.join(' ') : 'ここまで'}`,
+        onMore: () => {
+          this._quickReviewDialog = null;
+          this.quickReviewOnlyPoolMode = true;
+          this.quickReviewPoolIds = new Set(this.originalReviewIds);
+          this.wrongOnlyMode = false;
+          this.reviewMode = true;
+          battleState.inputEnabled = true;
+          this._enterQuickReviewReview();
+        },
+        onDone: () => {
+          this._quickReviewDialog = null;
+          publish('playBGM', 'title');
+          const target = gameState.previousScreen === 'worldStageSelect' ? 'worldStageSelect' : 'stageSelect';
+          publish('changeScreen', target);
+        },
+      });
     } catch (e) {
       console.error('❌ quickReviewPractice._completeQuickReview error:', e);
       publish('changeScreen', gameState.previousScreen || 'stageSelect');
@@ -440,6 +443,8 @@ _drawImprovedPracticeUI() {
 
   exit() {
     try {
+      this._quickReviewDialog?.();
+      this._quickReviewDialog = null;
       if (typeof basePractice.exit === 'function') {
         basePractice.exit.call(this);
       }

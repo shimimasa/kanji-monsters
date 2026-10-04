@@ -127,6 +127,8 @@ const resultWinState = {
     // import予約より前のawaitも、開始した入場世代に所属する。
     if (!this._lifecycle.active || this._lifecycle.generation !== entryGeneration) return;
 
+    // クリア入場だけの短い音。レベルアップ音とは分ける。
+    publish('playSE', 'stageClear');
     // クリア画面に入ったらクリアBGMを再生
     publish('playBGM', 'victory');
 

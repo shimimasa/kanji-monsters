@@ -15,6 +15,8 @@
 //   このパッドは値を書き込んで Enter を投げるだけにして、画面側のロジックには
 //   触らない。表示・非表示も入力欄の display を見て自分で決める。
 
+import { publish } from '../core/eventBus.js';
+
 /** 五十音表（学校の壁掛け表と同じく右から あ行→わ行、上から あ段→お段）。null は空きマス */
 const GOJUON_ROWS = [
   ['わ', 'ら', 'や', 'ま', 'は', 'な', 'た', 'さ', 'か', 'あ'],
@@ -274,7 +276,7 @@ const KanaPad = {
     btn.type = 'button';
     if (extraClass) btn.className = extraClass;
     btn.textContent = label;
-    this._bindPress(btn, action);
+    this._bindPress(btn, action, extraClass !== 'kanaPad__submit');
     return btn;
   },
 
@@ -282,10 +284,11 @@ const KanaPad = {
    * 押した瞬間に反応させる。既定動作を止めるのは、入力欄からフォーカスが
    * 外れたり、押した拍子に画面がスクロールするのを防ぐため。
    */
-  _bindPress(btn, action) {
+  _bindPress(btn, action, sound = true) {
     const handler = (e) => {
       e.preventDefault();
       e.stopPropagation();
+      if (sound) publish('playSE', 'tap');
       action();
     };
     if ('PointerEvent' in window) {

@@ -4890,9 +4890,8 @@ function handleNearMiss(answer, correctReadings, inputEl) {
   battleScreenState.showLogBlock(lines);
   // 正しい書き方を見せる回（2回目以降）は、音でも渡す
   if (battleState.nearMissCount >= 2) Speech.speak(nearMiss.reading);
-  // NOTE: se_wrong は鳴らさない。読みちがいと同じ音にすると、せっかく
-  // 「よめてるよ」と伝えている意味が消える。専用の やさしい音が用意できたら差し替える。
-  publish('playSE', 'cancel');
+  // 読めていることを伝える、やさしい専用音。正誤の記録はここでは決めない。
+  publish('playSE', 'nearMiss');
 
   // 同じ問題のまま、もう一度書ける状態に戻す
   battleState.inputEnabled = true;
