@@ -11,7 +11,7 @@ export function companionMatchup(damage, enemy, log, { getCompanion = () => goto
     if (!companion || !enemy || !Number.isFinite(damage)) return damage;
     const factor = matchup(companion.type, typeOf(enemy));
     if (factor === 1) return damage;
-    log?.push?.(`相棒の${companion.name}（${typeInfo(companion.type).name}）が ${typeInfo(typeOf(enemy)).name}に つよい！ ${factor}ばい！`);
+    log?.push?.(`あいぼうの${companion.name}（${typeInfo(companion.type).name}）が ${typeInfo(typeOf(enemy)).name}に つよい！ ${factor}ばい！`);
     publish('battle:companionCheer', { factor }); // the companion in the corner lights up (ui/battleCompanion.js)
     return Math.round(damage * factor);
   } catch {

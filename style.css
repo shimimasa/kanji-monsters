@@ -193,6 +193,11 @@ html.vh-lock, body.vh-lock { height: 100dvh; overflow: hidden; }
   max-width: calc((100dvh - var(--kanapad-height, 0px)) * 4 / 3);
   max-height: calc(100vw * 3 / 4);
 }
+/* スマホを たてに 持った時の バトル（盤面 480×680、src/screens/battle/portraitLayout.js） */
+#gameCanvas.vh-lock.yt-portrait {
+  max-width: calc((100dvh - var(--kanapad-height, 0px)) * 480 / 680);
+  max-height: calc(100vw * 680 / 480);
+}
 
 .game-input {
   position: absolute; /* Canvasに重ねるため */

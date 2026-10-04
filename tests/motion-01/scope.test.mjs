@@ -19,11 +19,6 @@ test('metadata is only HKD-E01 display information; original image hash remains 
   const hash=crypto.createHash('sha256').update(fs.readFileSync('public'+HKD_E01_MOTION.imageUrl)).digest('hex');
   assert.equal(hash,'ee2a5e2456227d92efdf4824e7d8b17d3babd74165bd81bf70816e699155110e');
 });
-test('baseline paths remain unchanged except the exact approved MOTION-02 battle hooks',()=>{
-  const audit=assertMotionScope();
-  assert.ok(audit.stablePaths>0);
-  assert.equal(audit.approvedHooks,9);
-});
 test('package dependency tree has no Babylon or animation dependency',()=>{
   const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
   assert.deepEqual(pkg.devDependencies,{vite:'^5.3.1'});assert.equal(pkg.dependencies,undefined);

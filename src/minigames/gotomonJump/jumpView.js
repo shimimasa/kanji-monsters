@@ -83,7 +83,7 @@ export function createJumpView({ document: doc, dispatch, onBack, getSnapshot, c
     const state = getSnapshot();
     if (!active || state.paused || state.phase !== 'answering') return false;
     const ok = dispatch({ type: 'choose', payload: { sessionId: state.sessionId, attemptId: state.attemptId, plateId } });
-    if (ok) { note.textContent = 'その雲に きめた！ 相棒が おりていくよ'; frame.announce(note.textContent); }
+    if (ok) { note.textContent = 'その雲に きめた！ あいぼうが おりていくよ'; frame.announce(note.textContent); }
     return ok;
   };
   const cloudAt = event => cloudNodes.find(node => {

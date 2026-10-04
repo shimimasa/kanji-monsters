@@ -10,15 +10,15 @@ export function growthStatus(record = {}) {
     fraction: level === 10 ? 1 : (xp - floor) / (next - floor),
     effects: Object.freeze({ skillPoints: level >= 4 ? 165 : 150, potency: level >= 4 ? 1.1 : 1,
       charge: level >= 7 ? 1.15 : 1, startGauge: level === 10 ? 1 : 0 }),
-    description: level === 10 ? '開始ゲージ1・技+10%・チャージ+15%' : level >= 7 ? '技+10%・チャージ+15%' : level >= 4 ? '相棒技の効果+10%' : '正解3回で相棒技',
-    nextUnlock: level < 4 ? 'Lv4で相棒技の効果+10%' : level < 7 ? 'Lv7でチャージ+15%' : level < 10 ? 'Lv10で開始ゲージ1' : '育ちきった、旅の相棒' });
+    description: level === 10 ? '開始ゲージ1・技+10%・チャージ+15%' : level >= 7 ? '技+10%・チャージ+15%' : level >= 4 ? 'あいぼう技の効果+10%' : '正解3回であいぼう技',
+    nextUnlock: level < 4 ? 'Lv4であいぼう技の効果+10%' : level < 7 ? 'Lv7でチャージ+15%' : level < 10 ? 'Lv10で開始ゲージ1' : '育ちきった、旅のあいぼう' });
 }
 
 export function friendshipTitle(friendship = 0) {
   const value = safeCount(friendship);
   if (value >= 100) return { title: 'ずっといっしょ', message: 'きみとなら、何度だって！', next: null };
   if (value >= 40) return { title: '息ぴったり', message: 'いいコンビになってきたね！', next: 100 };
-  if (value >= 12) return { title: 'いつもの相棒', message: '次も、いっしょに行こう！', next: 40 };
+  if (value >= 12) return { title: 'いつものあいぼう', message: '次も、いっしょに行こう！', next: 40 };
   return { title: '旅のはじまり', message: 'きみと遊べて、うれしい！', next: 12 };
 }
 

@@ -197,7 +197,7 @@ export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSna
       moodMs = Math.max(0, moodMs - dt); if (!moodMs) hero.dataset.mood = '';
       const w = play.world || {};
       hero.dataset.fever = String(!!w.fever);
-      if (play.boosts !== lastBoosts) { if (play.boosts > lastBoosts) { fx.banner('相棒エール！', 'great'); fx.flash('great'); } lastBoosts = play.boosts; }
+      if (play.boosts !== lastBoosts) { if (play.boosts > lastBoosts) { fx.banner('あいぼうエール！', 'great'); fx.flash('great'); } lastBoosts = play.boosts; }
       const total = state?.rules?.totalEncounters ?? 12, resolved = state?.resolved ?? 0;
       const mission = w.challenge;
       frame.hud.set({ points: (state?.score ?? play.learningPoints) + play.bonus, comboCount: play.combo,

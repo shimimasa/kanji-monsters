@@ -373,6 +373,14 @@ const KanaPad = {
     if (!rect.width && !rect.height) return;
     const btnWidth = this.toggleEl.offsetWidth || 140;
     const btnHeight = this.toggleEl.offsetHeight || 26;
+    // 入力欄に data-toggle-side="right" が あれば、上ではなく 右どなりに 置く
+    // （スマホを たてに 持った時の バトル。上には 会話ログが ある）
+    if (this.inputEl.dataset?.toggleSide === 'right') {
+      const left = Math.max(4, Math.min(rect.right + 8, window.innerWidth - btnWidth - 4));
+      this.toggleEl.style.left = `${left}px`;
+      this.toggleEl.style.top = `${Math.max(4, rect.top + (rect.height - btnHeight) / 2)}px`;
+      return;
+    }
     let left = rect.right - btnWidth;
     left = Math.max(4, Math.min(left, window.innerWidth - btnWidth - 4));
     const top = Math.max(4, rect.top - btnHeight - 6);

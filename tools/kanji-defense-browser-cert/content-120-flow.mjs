@@ -10,7 +10,7 @@ const out = new URL('../../artifacts/content-120/browser-flow/', import.meta.url
 await fs.mkdir(out, { recursive: true });
 const { browser, name } = await launchPreferredBrowser(chromium);
 const evidence = { browser: name, checks: [], errors: [], screenshots: [] };
-const save = getDefaultSave(); save.player.name = '相棒QA'; save.player.coreStats.exp = 42;
+const save = getDefaultSave(); save.player.name = 'あいぼうQA'; save.player.coreStats.exp = 42;
 save.player.collection.gotomonIds = ['HKD-E01', 'HKD-E02'];
 const readings = Object.fromEntries(KANJI_DEFENSE_LIMITED_UX_CONTENT.map(item => [item.prompt, item.acceptedReadings[0]]));
 const ids = ['mathSprint','mathInvader','englishChoice','sentenceOrder','timedChoice','multiSelect','asyncChoice','kanjiDefense'];

@@ -68,7 +68,7 @@ const hub = {
       const nameLine = element(doc, 'strong', '', `${selected.name} Lv${growth.level} `); nameLine.append(typeChip(doc, selected.type));
       details.append(nameLine);
       const track = element(doc, 'progress', 'yt-xp'); track.max = 1; track.value = growth.fraction; track.setAttribute('aria-label', '次のレベルまでの経験値');
-      details.append(track, element(doc, 'small', '', growth.remaining ? `あと${growth.remaining} XPでLv${growth.level + 1}` : 'MASTER · 育ちきった旅の相棒'));
+      details.append(track, element(doc, 'small', '', growth.remaining ? `あと${growth.remaining} XPでLv${growth.level + 1}` : 'MASTER · 育ちきった旅のあいぼう'));
       // The companion's sticker book: one sticker per game played to the end together.
       const sum = stickerSummary(gotomonService.getStickers(selected.id));
       const book = button(doc, `シール帳 ${sum.total}まい`, () => this.showStickerBook(), 'yt-sticker-open');
@@ -78,7 +78,7 @@ const hub = {
       const cheer = !evolve ? 'いっしょに あそぼう！' : evolve.unlocked ? 'しんかした すがたは シール帳で つけられるよ！' : `あと Lv${evolve.need - evolve.have}で しんか！`;
       banner.append(companionPortrait(doc, selected), details, book, element(doc, 'p', 'yt-friend-cheer', cheer));
     }
-    else banner.append(element(doc, 'p', '', '相棒は、冒険のステージをクリアして捕まえよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title'), 'yt-primary'));
+    else banner.append(element(doc, 'p', '', 'あいぼうは、冒険のステージをクリアして捕まえよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title'), 'yt-primary'));
     wrap.append(banner);
     // がんばりの称号: the newest title of each track, and the nearest next one.
     if (selected) {
@@ -165,7 +165,7 @@ const hub = {
     };
     render();
     wrap.append(tabs, shelf);
-    wrap.append(element(doc, 'p', 'yt-note', '遊ぶと相棒が成長し、技が少し強くなる。新しい仲間は、本編の新しい土地で。'));
+    wrap.append(element(doc, 'p', 'yt-note', '遊ぶとあいぼうが成長し、技が少し強くなる。新しい なかまは、本編の新しい土地で。'));
     root.append(wrap); doc.body.append(root); this.root = root; this.restore = isolateScreen(doc, root);
     tabs.querySelector('[aria-pressed=true]')?.focus({ preventScroll: true });
     if (PLAYTEST_ENABLED) trackPlaytest('hubShown', {});
@@ -226,10 +226,10 @@ const hub = {
     if (PLAYTEST_ENABLED) trackPlaytest('gameChosen', {gameId:definition.id});
     this.dialog?.remove();
     const doc = document, dialog = element(doc, 'dialog', 'yt-companion-dialog');
-    dialog.setAttribute('aria-label', '相棒ゴトモンを選ぶ');
+    dialog.setAttribute('aria-label', 'あいぼうゴトモンを選ぶ');
     const header = element(doc, 'div', 'yt-picker-header');
     header.append(element(doc, 'h2', '', definition.title), button(doc, '閉じる', () => dialog.close()));
-    dialog.append(header, element(doc, 'p', '', '今回いっしょに遊ぶ相棒を選ぼう。'));
+    dialog.append(header, element(doc, 'p', '', '今回いっしょに遊ぶあいぼうを選ぼう。'));
     const guide = element(doc, 'section', 'yt-game-guide');
     guide.append(element(doc, 'h3', '', 'あそびかた'));
     const steps = element(doc, 'ol');
@@ -241,7 +241,7 @@ const hub = {
       dialog.append(element(doc, 'p', 'yt-note', '記録に合わせて、まちがえた問題・まだ解いていない問題・前に正解した問題を組み合わせます。'));
     }
     let sentenceLevel = 'standard';
-    if (playOptions.practiceContentIds) dialog.append(element(doc, 'p', 'yt-note', '学習ノートで選んだ問題を練習します。得点や相棒の成長は増えません。'));
+    if (playOptions.practiceContentIds) dialog.append(element(doc, 'p', 'yt-note', '学習ノートで選んだ問題を練習します。得点やあいぼうの成長は増えません。'));
     else if (definition.id === 'sentenceOrder' && playOptions.review) dialog.append(element(doc, 'p', 'yt-note', '3ピース・4ピースでまちがえた文を、最大10文ずつ復習します。'));
     if (definition.id === 'sentenceOrder' && !playOptions.review) {
       const label = element(doc, 'label', 'yt-memory-picker', '文ならべのコース');
@@ -250,7 +250,7 @@ const hub = {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
       select.onchange = () => { sentenceLevel = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', 'どちらも10問。挑戦コースは10文を順番を変えて出題します。得点・ランク・相棒の記録は共通です。'));
+        element(doc, 'p', 'yt-note', 'どちらも10問。挑戦コースは10文を順番を変えて出題します。得点・ランク・あいぼうの記録は共通です。'));
     }
     let mathLevel = 'addsub';
     if (['gotomonToss', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout', 'gotomonMeteor', 'gotomonColoring', 'gotomonMerge'].includes(definition.id)) {
@@ -275,7 +275,7 @@ const hub = {
       const preset = modeForSubject(definition.id, playOptions.subject);
       if (preset) { mode = preset; select.value = preset; }
       select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', push ? 'どれも10へや。はこから 出てくるのは、きみが旅で出会ったゴトモンたちです。' : trace ? 'どれも12問。漢字は読み、英語は英単語の つづり、算数は 答えの 数字を なぞります。もんだいを 出すのは、きみが旅で出会ったゴトモンたちです。' : land ? 'どれも12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'どれも12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'どれも12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'どれも12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'どれも12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'どれも12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'どれも12問。いっしょに走るのは相棒、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'どれも12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', push ? 'どれも10へや。はこから 出てくるのは、きみが旅で出会ったゴトモンたちです。' : trace ? 'どれも12問。漢字は読み、英語は英単語の つづり、算数は 答えの 数字を なぞります。もんだいを 出すのは、きみが旅で出会ったゴトモンたちです。' : land ? 'どれも12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'どれも12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'どれも12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'どれも12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'どれも12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'どれも12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'どれも12問。いっしょに走るのはあいぼう、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'どれも12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
     }
     if (definition.id === 'gotomonParts') {
       const label = element(doc, 'label', 'yt-memory-picker', 'くみたてる漢字');
@@ -332,7 +332,7 @@ const hub = {
     if (gameExperiences[definition.id].paced && !playOptions.review) {
       const paceBox = element(doc, 'div', 'yt-pace'); paceBox.setAttribute('role', 'radiogroup'); paceBox.setAttribute('aria-label', 'はやさ');
       paceBox.append(element(doc, 'span', 'yt-pace-label', 'はやさ'));
-      const choices = [['normal', 'ふつう', 'いつものはやさ'], ['slow', 'ゆっくり', '敵や相棒がゆっくり動く']].map(([value, label, hint]) => {
+      const choices = [['normal', 'ふつう', 'いつものはやさ'], ['slow', 'ゆっくり', '敵やあいぼうがゆっくり動く']].map(([value, label, hint]) => {
         const choice = button(doc, '', () => { pace = value; writePace(value); sync(); }, 'yt-pace-choice');
         choice.setAttribute('role', 'radio'); choice.dataset.pace = value;
         choice.append(element(doc, 'strong', '', label), element(doc, 'small', '', hint));
@@ -361,9 +361,9 @@ const hub = {
     if (selected) describe(selected);
     // パーティ: up to two supporters (the ones picked last time, if still owned).
     let supporterIds = gotomonService.getParty(selectedId);
-    const begin = button(doc, selected ? `${selected.name}とスタート` : '相棒が必要です', () => {
+    const begin = button(doc, selected ? `${selected.name}とスタート` : 'あいぼうが必要です', () => {
       const result = gotomonService.setParty(selectedId, supporterIds);
-      if (!result.ok) { message.textContent = '相棒を保存できませんでした。保存状態を確認して、もう一度お試しください。'; return; }
+      if (!result.ok) { message.textContent = 'あいぼうを保存できませんでした。保存状態を確認して、もう一度お試しください。'; return; }
       dialog.close(); publish('changeScreen', { name: 'miniGame', props: { ...playOptions, gameId: definition.id, gotomonId: selectedId, supporterIds: [...supporterIds],
         courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
         ...(gameExperiences[definition.id].paced ? { pace } : {}),
@@ -408,8 +408,8 @@ const hub = {
     }
     syncParty();
     if (owned.length > 1) party.append(partyTitle, partyGrid, partyNote);
-    if (!owned.length) dialog.append(element(doc, 'p', '', 'まだ捕獲したゴトモンがいません。本編でステージをクリアし、仲間に迎えよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title')));
-    dialog.append(grid, party, courseLabel, message, begin, element(doc, 'p', 'yt-note', '通常コースと復習は、どの相棒でも遊べます。得意コースでも問題の正解は同じです。'));
+    if (!owned.length) dialog.append(element(doc, 'p', '', 'まだ捕獲したゴトモンがいません。本編でステージをクリアして、なかまに しよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title')));
+    dialog.append(grid, party, courseLabel, message, begin, element(doc, 'p', 'yt-note', '通常コースと復習は、どのあいぼうでも遊べます。得意コースでも問題の正解は同じです。'));
     this.root.append(dialog); this.dialog = dialog; dialog.showModal();
     if (selected) begin.focus();
   },

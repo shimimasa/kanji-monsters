@@ -78,7 +78,7 @@ try {
   await expect(page.getByRole('region', { name: '今日のおすすめ' })).toContainText('3語');
   await screenshot('hub-recommendation.png');
   await page.reload(); await page.locator('#titleMiniGameButton').click();
-  await page.getByRole('button', { name: '相棒と復習する' }).click(); await start();
+  await page.getByRole('button', { name: 'あいぼうと復習する' }).click(); await start();
   const reviewed = [];
   reviewed.push(await answer(true));
   const firstReviewProblem = (await state()).problem.problemId;
@@ -103,7 +103,7 @@ try {
   await answer(false); await page.locator('[data-action=back]').click();
   await expect(page.getByRole('region', { name: '今日のおすすめ' })).toContainText('1語');
   evidence.checks.push('normal replay and interrupted answer history');
-  await page.getByRole('button', { name: '相棒と復習する' }).click(); await start();
+  await page.getByRole('button', { name: 'あいぼうと復習する' }).click(); await start();
   expect((await state()).totalQuestions).toBe(1);
   await answer(false);
   await expect(page.locator('[data-action=review]')).toContainText('1語');

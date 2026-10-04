@@ -1,5 +1,6 @@
 // src/screens/battle/theme.js
 import { getLearningControls } from '../../ui/learningControls.js';
+import { isPortraitCanvas, PORTRAIT_LAYOUT, portraitButtons } from './portraitLayout.js';
 // バトル画面のUI定数・調整値（refactoring-plan Phase 5-1: 定数の抽出、挙動変化なし）
 // battleScreen.js 分割の最初のステップ。今後 engine/renderer/effects/input をここに並べていく。
 
@@ -33,6 +34,15 @@ export const PREV_KANJI_PANEL_BOTTOM = 284;
 
 export function layoutBattleButtons(canvas) {
   const controls = getLearningControls(canvas);
+  if (isPortraitCanvas(canvas)) {
+    // スマホを たてに 持った時（portraitLayout.js）: 上に もどる・れんしゅうへ、いちばん下に 3つ
+    const h = Math.max(controls.back.h, PORTRAIT_LAYOUT.stage.h);
+    Object.assign(BTN.stage, PORTRAIT_LAYOUT.stage, { h });
+    Object.assign(BTN.practice, PORTRAIT_LAYOUT.practice, { h });
+    const row = portraitButtons(controls.attack.h);
+    for (const key of ['attack','heal','hint']) Object.assign(BTN[key], row[key]);
+    return { ...controls, portrait: true };
+  }
   for (const key of ['practice','attack','heal','hint']) Object.assign(BTN[key],controls[key]);
   Object.assign(BTN.stage,controls.back);
   const height = canvas?.height || 600;

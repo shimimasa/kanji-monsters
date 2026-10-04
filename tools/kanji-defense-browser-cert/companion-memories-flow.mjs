@@ -46,7 +46,7 @@ try {
   await page.locator('[data-action=memories]').click();
   await expect(page.locator('[data-memory-game=englishChoice]')).toContainText('記録 1回');
   const selectedBefore = (await progress()).selectedGotomonId;
-  await page.getByLabel('思い出を見る相棒').selectOption('HKD-E02');
+  await page.getByLabel('思い出を見るあいぼう').selectOption('HKD-E02');
   await expect(page.locator('.yt-memory-content')).toContainText('思い出はこれから');
   expect((await progress()).selectedGotomonId).toBe(selectedBefore);
   await page.keyboard.press('Escape');

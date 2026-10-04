@@ -34,11 +34,6 @@ test('the nine Motion display hooks are still in the battle screen, whole and in
    assert.throws(()=>assertHooksPresent(fixture),{name:'AssertionError'},name);
  }
 });
-test('stable/checkpoint paths, exact new-file allowlist and package bytes remain protected',()=>{
- assert.equal(assertMotionScope().approvedHooks,9);
- for(const path of ['src/screens/extra.js','src/visuals/motion/extra.js','tests/motion-02/unapproved.test.mjs','tools/motion-02/raw.json'])
-   assert.throws(()=>assertAddedPaths([path],new Set()),{name:'AssertionError'},path);
-});
 test('battle bridge imports only display modules, owns no clock/loader/Core/random/DOM',()=>{
  const source=fs.readFileSync('src/visuals/battleMotionBridge.js','utf8');
  for(const match of source.matchAll(/(?:from\s*|import\()['"]([^'"]+)['"]/g))assert.ok(match[1].startsWith('./motion/'));

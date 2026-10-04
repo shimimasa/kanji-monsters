@@ -199,7 +199,7 @@ function appendExpansionInfo(info, monster, img) {
       show(false);
       line('しんか', `Lv${EVOLVE_LEVEL}で しんかした！`, toggle);
     } else {
-      line('しんか', `相棒に して Lv${EVOLVE_LEVEL}に なると、しんかの すがたが 見られるよ`
+      line('しんか', `あいぼうに して Lv${EVOLVE_LEVEL}に なると、しんかの すがたが 見られるよ`
         + (progress?.have > 1 ? `（いま Lv${progress.have}）` : ''));
     }
   }

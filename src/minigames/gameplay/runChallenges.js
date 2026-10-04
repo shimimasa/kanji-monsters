@@ -23,8 +23,8 @@ const GOALS = Object.freeze({
   sentenceOrder: [
     { id: 'chain', name: '3つの文を連続完成', deadline: 99, target: 3,
       rule: '正しい文を3回続けてつくろう。', hint: '言葉のつながりを読んでから板をえらぼう。', value: data => data.maxCombo },
-    { id: 'quick', name: '相棒を止めずに3回わたらせる', deadline: 99, target: 3,
-      rule: '相棒が川岸に着く前に、橋を完成させよう。', hint: '文のはじめになる板から探そう。', value: data => data.world.quick || 0 },
+    { id: 'quick', name: 'あいぼうを止めずに3回わたらせる', deadline: 99, target: 3,
+      rule: 'あいぼうが川岸に着く前に、橋を完成させよう。', hint: '文のはじめになる板から探そう。', value: data => data.world.quick || 0 },
   ],
   timedChoice: [
     { id: 'quick', name: 'すばやく5回タッチ', deadline: 99, target: 5,

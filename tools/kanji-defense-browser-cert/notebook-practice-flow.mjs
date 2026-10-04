@@ -34,7 +34,7 @@ try{
     const wanted=bank.entries[0].id;
     const row=dialog.locator(`[data-content-id="${wanted}"]`);
     await row.locator('[data-action=practice-one]').click();
-    await expect(page.getByRole('dialog',{name:'相棒ゴトモンを選ぶ'})).toContainText('学習ノートで選んだ問題');
+    await expect(page.getByRole('dialog',{name:'あいぼうゴトモンを選ぶ'})).toContainText('学習ノートで選んだ問題');
     await page.locator('[data-action=start-game]').click();let s=await state();
     expect(s.mode).toBe('review');expect(s.totalQuestions).toBe(1);expect(s.problem.contentId??s.problem.fixtureId).toBe(wanted);
     if(bank.gameId==='sentenceOrder'){

@@ -11,7 +11,7 @@ export const NODE_TYPES = Object.freeze({
   training: { label: '修行の道', icon: '🔥', note: '苦手な漢字2問。がんばると⭐' },
   proverb: { label: 'ことわざの社', icon: '📜', note: 'ことわざ1問。当てると🔥' },
   chest: { label: '宝箱', icon: '🎁', note: '道具がひとつ手に入る' },
-  rest: { label: '休けい所', icon: '⛺', note: '相棒と休んで🔥' },
+  rest: { label: '休けい所', icon: '⛺', note: 'あいぼうと休んで🔥' },
 });
 export const ITEMS = Object.freeze({
   hint: { label: 'ヒントの火', icon: '🔥', note: 'まちがいの答えが2つ消える' },
@@ -140,7 +140,7 @@ export function createTripGame({ sessionId, random = Math.random, onEvent = () =
       node = target; path.push(nodeId); nodeCorrect = 0; nodeAsked = 0; reward = null;
       opponent = target.type === 'reading' ? pick(monsters, random) ?? null : null;
       if (target.type === 'chest') { const item = take(random) < .5 ? 'hint' : 'power'; gain(item, `宝箱から${ITEMS[item].label}が出てきた！`); return true; }
-      if (target.type === 'rest') { gain('hint', '相棒とひと休み。ヒントの火を手に入れた'); return true; }
+      if (target.type === 'rest') { gain('hint', 'あいぼうとひと休み。ヒントの火を手に入れた'); return true; }
       steps = target.type === 'proverb' ? [nextProverb] : target.type === 'training' ? [() => nextKanji({ focus: true }), () => nextKanji({ focus: true })] : [nextKanji, nextKanji];
       if (!present(steps.shift()())) finishNode();
       return true;

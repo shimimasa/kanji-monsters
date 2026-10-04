@@ -104,6 +104,8 @@ test('learning features preserve other five cores/views, reward formulas, kanji 
   // Companion play can select a course; grading and growth formulas remain frozen.
   files.push('src/minigames/companionGrowth.js', 'src/minigames/scoreRank.js',
     'src/playtest/developmentLogger.js', 'src/core/saveData.js', 'src/core/learningOutcome.js', 'src/audio/audioManager.js');
-  for (const file of files) assert.equal(readFileSync(file, 'utf8').replaceAll('\r\n', '\n'),
+  // 2026-10-04 (user decision): the companion is called 「あいぼう」 in hiragana everywhere. That
+  // wording is the only change allowed here; formulas must still match byte for byte.
+  for (const file of files) assert.equal(readFileSync(file, 'utf8').replaceAll('\r\n', '\n').replaceAll('あいぼう', '相棒'),
     execFileSync('git', ['show', `2c5c501:${file}`], { encoding: 'utf8' }).replaceAll('\r\n', '\n'), file);
 });

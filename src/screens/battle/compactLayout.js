@@ -12,6 +12,7 @@ import { getReadingsOf } from '../../utils/readings.js';
 import { getContainedRect } from '../../ui/viewportLayout.js';
 import { drawRoundedRect } from '../../ui/canvasUtils.js';
 import { BTN, COMPACT_BATTLE_AREA } from './theme.js';
+import { isPortraitCanvas } from './portraitLayout.js';
 
 const TOGGLE_ID = 'kanaPadToggle'; // ui/kanaPad.js の「たんまつで書く」ボタン
 
@@ -52,6 +53,8 @@ export function compactLogBox(screen, height) {
   const { centerY, height: kanjiH } = screen.getKanjiBoxMetrics();
   const bottom = (inputBox ? inputBox.y : BTN.attack.y) - 8;
   const y = Math.max(centerY + kanjiH / 2, bottom - height);
+  // たての 画面では「たんまつで書く」は 入力欄の 右どなり（ログの 下）なので、横いっぱいに 使う
+  if (isPortraitCanvas(canvas)) return { x: 10, y, w: canvas.width - 20 };
   const right = toggleBox && toggleBox.y + toggleBox.h > y ? toggleBox.x - 10 : canvas.width - 12;
   return { x: 20, y, w: Math.max(300, right - 20) };
 }

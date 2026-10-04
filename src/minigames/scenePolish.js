@@ -24,7 +24,7 @@ export function installScenePolish({doc,root,stage,scene,actor,board,info}) {
   if(dungeon){for(let i=0;i<10;i++){const room=element(doc,'span','',String(i+1));dungeon.append(room);rooms.push(room);}scene.append(dungeon);}
   const orb=info.scene==='lantern'?element(doc,'div','gt-light-orb'):null;
   const pips=[];
-  if(orb){orb.setAttribute('aria-label','外周が残り時間、明るさが光、3つの点で相棒技');for(let i=0;i<3;i++){const pip=element(doc,'i');orb.append(pip);pips.push(pip);}scene.append(orb);}
+  if(orb){orb.setAttribute('aria-label','外周が残り時間、明るさが光、3つの点であいぼう技');for(let i=0;i<3;i++){const pip=element(doc,'i');orb.append(pip);pips.push(pip);}scene.append(orb);}
   const sky=info.scene==='craft'?doc.createElementNS('http://www.w3.org/2000/svg','svg'):null;
   const routeNodes=[],routeLines=[];
   const shapes=[[[30,75],[20,52],[23,29],[40,14],[60,26],[67,49]],[[118,22],[145,40],[125,64],[150,74],[178,54],[173,22]],[[228,65],[218,25],[242,43],[250,12],[267,44],[284,25]]];
@@ -50,7 +50,7 @@ export function installScenePolish({doc,root,stage,scene,actor,board,info}) {
       pop.style.left=actor.style.left||'50%';animate(pop);
       if(state.mode!=='review'){
         const success={race:'ダッシュ！',shoot:'命中！',treasure:'扉が開いた！',bridge:'橋がつながった！',lantern:'光が届いた！',craft:'星が輝いた！',explore:'発見！',defend:'防衛成功！'};
-        event.textContent=boostChanged&&!answerChanged?'相棒の技、発動！':hit?(success[info.scene]||'成功！'):'もう一度、挑戦！';
+        event.textContent=boostChanged&&!answerChanged?'あいぼうの技、発動！':hit?(success[info.scene]||'成功！'):'もう一度、挑戦！';
         event.dataset.tone=boostChanged&&!answerChanged?'skill':hit?'success':'retry';
         animate(event);
       }

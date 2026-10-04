@@ -27,6 +27,7 @@ import TextScale from './ui/textScale.js';
 import Ruby from './ui/ruby.js';
 import Speech from './audio/speech.js';
 import { createAchievementToasts, drawAchievementToast } from './ui/achievementToasts.js';
+import { installRotateHint } from './ui/rotateHint.js';
 
 
 /* ----------------------------- ログ静音化 ----------------------------- */
@@ -109,6 +110,8 @@ function loop(now) {
   TextScale.install();
   Ruby.install();
   KanaPad.install();
+  // スマホを よこに 持った時、canvas の 画面では「たてに してね」を 出す（ui/rotateHint.js）
+  installRotateHint();
   // 日本語の声は非同期に届く端末があるので、先に選んでおく
   Speech.warmUp();
   // 1) 画像 & JSON プリロード

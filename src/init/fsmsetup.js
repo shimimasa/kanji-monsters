@@ -9,8 +9,10 @@ import prefSelectState     from '../states/prefSelectState.js';
 import stageSelectState    from '../screens/stageSelectScreen.js';
 import titleState          from '../screens/titleScreen.js';
 import menuScreenState     from '../screens/menuScreen.js';
-import miniGameHost        from '../minigames/miniGameHost.js';
-import miniGameHub         from '../screens/miniGameHubScreen.js';
+// ミニゲームの 土台と 広場は、はじめて 開いた時に 読み込む（41本ぶんの コードを 本編の 読み込みに 入れない）
+import { lazyState }       from './lazyState.js';
+const miniGameHost = lazyState(() => import('../minigames/miniGameHost.js'));
+const miniGameHub  = lazyState(() => import('../screens/miniGameHubScreen.js'));
 import { loadAllGameData } from '../loaders/dataLoader.js';
 import { subscribe }       from '../core/eventBus.js';
 import settingsState       from '../screens/settingsScreen.js';
@@ -127,5 +129,7 @@ export async function setupFSM() {
     window.switchScreen = switchScreen;
   }
 
+  // 最初の 画面が 出たあと、ひまな時に ミニゲームの 分を 先に 読んでおく（広場を 開いた時に 待たない）
+  if (typeof window !== 'undefined') setTimeout(() => { miniGameHub.preload(); miniGameHost.preload(); }, 4000);
   return fsm;
 }

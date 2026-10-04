@@ -10,7 +10,7 @@ export function getStepsFor(screenId, ctx = {}) {
         return [
           {
             title: 'ゲームをはじめよう',
-            text: '冒険をはじめよう！\n捕まえたゴトモンは、ミニゲームの相棒にもなるよ。',
+            text: '冒険をはじめよう！\n捕まえたゴトモンは、ミニゲームのあいぼうにもなるよ。',
             anchor: () => {
               const r = globalThis.document?.getElementById('titleAdventureButton')?.getBoundingClientRect();
               return r ? { x: r.left, y: r.top, w: r.width, h: r.height }
@@ -81,7 +81,7 @@ export function getStepsFor(screenId, ctx = {}) {
             return [
               {
                 title: 'けっか',
-                text: 'できた！ つぎのステージへ すすもう。\n「ヨミトモ」も つかまえられるよ。',
+                text: 'できた！ つぎのステージへ すすもう。\nゴトモンを なかまに できるよ。',
                 anchor: () => centerBox(ctx.canvas, 420, 160)
               }
             ];
@@ -89,7 +89,7 @@ export function getStepsFor(screenId, ctx = {}) {
           case 'monsterDex':
             return [
               { title: 'ナビ', text: 'ならべかえ や しぼりこみ が できるよ。', anchor: () => domRect('.monster-dex-navigation') },
-              { title: 'カード', text: 'ヨミトモにしたゴトモンを みてみよう！\nおすと しょうさいが ひらくよ。', anchor: () => domRect('.monster-card-grid') }
+              { title: 'カード', text: 'なかまに した ゴトモンを みてみよう！\nおすと しょうさいが ひらくよ。', anchor: () => domRect('.monster-card-grid') }
             ];
     
           case 'kanjiDex':

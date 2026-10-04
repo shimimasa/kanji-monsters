@@ -210,7 +210,7 @@ export function createQuizWorld(kind, effects, { course = null, pace = 'normal' 
           : kind === 'bingo' ? (bingoLines ? `ビンゴ${bingoLines}列 · ${bingoMarked}マスあけた` : `${bingoMarked}マスあけた · ビンゴまであと少し`)
           : kind === 'case' && cases.length ? `事件を${cases.length}件解決${cases.some(item => item.stars === 3) ? ` · 名推理 ${cases.filter(item => item.stars === 3).length}回` : ''}`
           : correct ? `${spec.label}を${correct}${spec.unit}${spec.verb}${quick ? ` · はやわざ ${quick}回` : ''}${courseOn && special ? ` · ${spec.special} ${special}回` : ''}`
-          : `相棒といっしょに、さいごまで${answered}問あそんだ`,
+          : `あいぼうといっしょに、さいごまで${answered}問あそんだ`,
         goal: 'はやく答えるほど、得点がのびる' };
     },
   };

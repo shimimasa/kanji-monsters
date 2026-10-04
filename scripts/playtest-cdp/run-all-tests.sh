@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs every test directory and compares the failing test names with baseline-failures.txt.
-# Only the byte-freeze / allowlist gates are expected to fail; anything else is a regression.
+# The list is empty now: every test is expected to pass; any failure is a regression.
 # usage: bash scripts/playtest-cdp/run-all-tests.sh   (from the repo root)
 here="$(cd "$(dirname "$0")" && pwd)"; out="$(mktemp)"
 for d in tests/*/; do
@@ -11,7 +11,9 @@ for d in tests/*/; do
 done
 # The baseline may have CRLF line endings on a Windows checkout.
 if diff <(tr -d '\r' < "$here/baseline-failures.txt") "$out"; then
-  echo "SAME-FAILS: only the known freeze gates fail"
+  # 2026-10-04: the 40 byte-freeze / allowlist gates that always failed were removed (their
+  # checkpoints were superseded by later, user-approved changes), so the list is now empty.
+  if [ -s "$out" ]; then echo "SAME-FAILS: only the known failures in baseline-failures.txt"; else echo "ALL-PASS: no test fails"; fi
 else
   echo "DIFFERENT from baseline (see diff above)"
 fi
