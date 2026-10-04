@@ -51,3 +51,21 @@ npm パッケージは追加していません（Node 22 の fetch / WebSocket �
   | othbot | 漢字オセロ（読みは分からないので答えはランダム） | （なし） |
 - 画面幅を変えたら最後に `node cdp.mjs viewport 1280 800` で戻す。
 
+
+## スマホの画面で 確かめる（2026-10-04 追加）
+
+`cdp.mjs viewport` は Windows では 幅512 が 下限で、スマホを たてに した 状態（幅600以下で たて長 → 盤面 480×680）を 作れない。
+1回の 接続の 中で 端末を まねる `emusession.mjs` を 使う。
+
+```
+node scripts/playtest-cdp/emusession.mjs 390 844 "nav:http://localhost:4173/" "wait:1500" \
+  "tapjs:document.getElementById('titleAdventureButton')" "wait:3000" "tapgame:397,588" "wait:2500" "shot:C:/tmp/quiz.png"
+```
+
+- 手順: `nav:<url>` `wait:<ms>` `eval:<js>`（結果を表示）`tap:<x>,<y>`（画面の座標）`tapjs:<要素を返すJS>`
+  `tapgame:<x>,<y>`（**盤面の 座標**。表示の 大きさに 合わせて 変換して タップ）`size:<w>,<h>` `shot:<png>`（Windows の パスは C:/... で）
+- **起動の たびに 端末の 大きさを 設定しなおすので、直後は 盤面が 一瞬 800×600 に 戻る**。最初の 手順は `wait:1500` に する
+  （しないと 最初の タップが ずれる）。
+- 押した ボタンが alert を 出すと ページが 止まり、`eval` が 返らなくなる（例：まだ ひらいていない 四国・九州の タブ）。
+  そうなったら `node scripts/playtest-cdp/reset-page.mjs` で タブを 閉じて 作りなおす。
+- 盤面の 座標の 目安（たて 480×680）：ステージ選択の 力だめし 397,588 ／ 学年まとめの こたえる 240,640 ／ 結果の 復習に挑戦 240,640
