@@ -2,6 +2,7 @@ import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { getLearningControls, drawLearningButton, placeLearningInput } from '../ui/learningControls.js';
 import { COMPACT_BATTLE_AREA } from './battle/theme.js';
 import { placeCompactBattleInput } from './battle/compactLayout.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas, PORTRAIT } from './battle/portraitLayout.js';
 import { isMouseOverRect } from '../ui/uiRenderer.js';
 // 練習バトル画面 - UI改善版（ボタンレス・統計強化・フィードバック改善）
 
@@ -36,6 +37,17 @@ const PRACTICE_PANELS_COMPACT = Object.freeze({
   guide: { x: 20, y: 306, w: 270, h: 50 },
   progress: { x: 20, y: 368, w: 270, h: 64 },
   stats: { x: 20, y: 438, w: 270, h: 76 },
+});
+// スマホを たてに 持った時（盤面 480×680、screens/battle/portraitLayout.js）。上から
+// もどる・マスターモード ／ 前回の漢字・学習中の漢字 ／ 出題の 漢字 ／ 案内 ／ 進捗・統計 ／ 入力欄 ／ こたえる・ヒント
+const PRACTICE_PANELS_PORTRAIT = Object.freeze({
+  ...PRACTICE_PANELS_WIDE,
+  modeBadge: { x: 160, y: 14, w: 160, h: 40 },
+  previous: { x: 10, y: 70, w: 225, h: 170 },
+  current: { x: 245, y: 70, w: 225, h: 170 },
+  guide: { x: 10, y: 414, w: 460, h: 42 },
+  progress: { x: 10, y: 462, w: 225, h: 76 },
+  stats: { x: 245, y: 462, w: 225, h: 76 },
 });
 
 const practiceBattleScreenState = {
@@ -1114,9 +1126,10 @@ if (this.unmasteredKanji.length === 0) {
       // 操作の案内の 場所を つかう（その間 案内は 出さない）。以前は 石版の下 y294 の 半透明の帯で、
       // 縦の画面では 入力欄の 裏に、せまい画面では 案内と 重なって 読めなかった（2026-10-04）
       const guide = this.panelConfig.guide;
-      const x = 20;
-      const w = controls.compact ? 510 : 520;        // 右の「たんまつで書く」・セッション統計に かからない幅
-      const top = controls.compact ? guide.y - 6 : guide.y;
+      const portrait = isPortraitCanvas(this.canvas);
+      const x = portrait ? guide.x : 20;
+      const w = portrait ? guide.w : (controls.compact ? 510 : 520);        // 右の「たんまつで書く」・セッション統計に かからない幅
+      const top = controls.compact && !portrait ? guide.y - 6 : guide.y;
       let fontSize = Math.max(16, 16 / controls.scale);
       ctx.save();
       ctx.font = `bold ${fontSize}px "UDデジタル教科書体",sans-serif`;
@@ -1304,7 +1317,12 @@ gameState.enemies = originalEnemies;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // ① 背景描画
-    if (this.stageBgImage) {
+    if (this.stageBgImage && isPortraitCanvas(this.canvas)) {
+      // たて長の 盤面では 横の 背景を ゆがめず、まん中を 切りとって 使う
+      const img = this.stageBgImage, cw = this.canvas.width, ch = this.canvas.height;
+      const sw = Math.min(img.width, img.height * cw / ch), sh = sw * ch / cw;
+      this.ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, 0, 0, cw, ch);
+    } else if (this.stageBgImage) {
       this.ctx.drawImage(this.stageBgImage, 0, 0, this.canvas.width, this.canvas.height);
     } else {
       const grad = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
@@ -1315,7 +1333,8 @@ gameState.enemies = originalEnemies;
     }
 
 // ② 上部ボタン描画（左上「もどる」）
-const controls = getLearningControls(this.canvas);
+// ボタンの 位置は _controls()（せまい画面・たての 画面で 変わる）。共通の 位置で 描くと 古い 場所に 残っていた
+const controls = this._controls();
 drawLearningButton(this.ctx, controls.back, controls.scale);
 if (this.practiceComplete) {
   drawLearningButton(this.ctx, controls.continue, controls.scale);
@@ -1323,7 +1342,7 @@ if (this.practiceComplete) {
 } else {
   drawLearningButton(this.ctx, controls.submit, controls.scale);
 }
-if (controls.compact) { placeLearningInput(this.canvas,this.inputEl,controls); placeCompactBattleInput(this.canvas, this.inputEl); }
+if (controls.compact && !controls.portrait) { placeLearningInput(this.canvas,this.inputEl,controls); placeCompactBattleInput(this.canvas, this.inputEl); }
 
     // ③ 漢字ボックス描画
     this._drawKanjiBoxWithEffects();
@@ -1345,7 +1364,7 @@ if (controls.compact) { placeLearningInput(this.canvas,this.inputEl,controls); p
     const kanjiX = this.canvas.width / 2;
 
     //　入力中は上に寄せて少し縮小
-    const kanjiY = getLearningControls(this.canvas).compact ? 220 : (isKbOpen ? 120 : 200);
+    const kanjiY = isPortraitCanvas(this.canvas) ? 330 : (getLearningControls(this.canvas).compact ? 220 : (isKbOpen ? 120 : 200));
     const baseW = isKbOpen ? 160 : 180;
     const baseH = isKbOpen ? 140 : 160;
     
@@ -1556,6 +1575,14 @@ _teardownGlobalBackHandler() {
    */
   _controls() {
     const controls = getLearningControls(this.canvas);
+    if (isPortraitCanvas(this.canvas)) {
+      // スマホを たてに 持った時: もどるは 左上、こたえる・ヒント（おわった時は もう1もん・今日はここまで）は いちばん下
+      const h = controls.submit.h, y = PORTRAIT.H - h - 12, w = 228;
+      const left = { x: 10, y, w, h }, right = { x: 242, y, w, h };
+      return { ...controls, portrait: true, back: { ...controls.back, x: 10, y: 10, w: 130, h: Math.max(controls.back.h, 50) },
+        submit: { ...controls.submit, ...left }, hint: { ...controls.hint, ...right },
+        continue: { ...controls.continue, ...left }, finish: { ...controls.finish, ...right } };
+    }
     if (!controls.compact) {
       // ふつうの画面: 共通の配置だと こたえる（x300〜500）と ヒント（x470〜）が 重なるので となりに ずらす
       return { ...controls, hint: { ...controls.hint, x: controls.submit.x + controls.submit.w + 10 } };
@@ -1567,6 +1594,7 @@ _teardownGlobalBackHandler() {
 
   /** 枠の置き場所を 画面の大きさに あわせて 切りかえる */
   _layoutPanels() {
+    if (isPortraitCanvas(this.canvas)) return (this.panelConfig = PRACTICE_PANELS_PORTRAIT);
     const compact = !!(this.canvas && getLearningControls(this.canvas).compact);
     this.panelConfig = compact ? PRACTICE_PANELS_COMPACT : PRACTICE_PANELS_WIDE;
     return this.panelConfig;
@@ -2125,9 +2153,9 @@ _teardownGlobalBackHandler() {
       if (stats) {
         // せまい画面: 12px だと 実寸8px前後で 読めないので、2行に まとめて 大きく（2026-10-04）
         this.ctx.textBaseline = 'alphabetic';
-        this.ctx.font = 'bold 20px "UDデジタル教科書体", sans-serif';
+        this.ctx.font = `bold ${w < 260 ? 18 : 20}px "UDデジタル教科書体", sans-serif`;
         this.ctx.fillText('📈 きょうの れんしゅう', x + 10, y + 24);
-        this.ctx.font = '18px "UDデジタル教科書体", sans-serif';
+        this.ctx.font = `${w < 260 ? 16 : 18}px "UDデジタル教科書体", sans-serif`; // たての 画面は 枠が せまい
         this.ctx.fillText(`よめた: ${correctCount}（ためした: ${totalPracticed}）`, x + 10, y + 48);
         this.ctx.fillText(`れんぞく: ${correctStreak}（さいこう ${maxStreak}）`, x + 10, y + 70);
         return;
@@ -2157,6 +2185,26 @@ _teardownGlobalBackHandler() {
   _adjustInputPosition() {
     if (!this.canvas) return;
     const controls = getLearningControls(this.canvas);
+    if (isPortraitCanvas(this.canvas) && this.inputEl) {
+      // スマホを たてに 持った時: こたえる・ヒント の すぐ上、左寄せ。右に「たんまつで書く」（バトルと 同じ）
+      const s = this.inputEl.style, rect = this.canvas.getBoundingClientRect();
+      const scale = Math.min(rect.width / this.canvas.width, rect.height / this.canvas.height);
+      const left = rect.left + (rect.width - this.canvas.width * scale) / 2, top = rect.top + (rect.height - this.canvas.height * scale) / 2;
+      const inputH = this.inputEl.offsetHeight || 48;
+      s.removeProperty('width'); s.bottom = 'auto';
+      s.width = `${Math.round(320 * scale)}px`;
+      s.left = `${Math.round(left + 10 * scale)}px`;
+      s.top = `${Math.round(top + (this._controls().submit.y - 8) * scale - inputH)}px`;
+      this.inputEl.dataset.toggleSide = 'right';
+      const toggle = document.getElementById('kanaPadToggle');
+      if (toggle && !toggle.hidden) {
+        const r = this.inputEl.getBoundingClientRect();
+        toggle.style.left = `${Math.round(Math.min(r.right + 8, window.innerWidth - (toggle.offsetWidth || 140) - 4))}px`;
+        toggle.style.top = `${Math.round(r.top + (r.height - (toggle.offsetHeight || 40)) / 2)}px`;
+      }
+      return;
+    }
+    if (this.inputEl?.dataset) delete this.inputEl.dataset.toggleSide;
     if (controls.compact && this.inputEl) {
       this.inputEl.style.removeProperty('width');
       this.inputEl.style.bottom = 'auto';
@@ -2286,6 +2334,8 @@ _teardownGlobalBackHandler() {
    */
   update(dt) {
     try {
+      // スマホを たてに 持った時は 盤面を 480×680 に（バトルと 同じ）
+      if (syncPortraitCanvas(this.canvas)) this._adjustInputPosition();
       // 親クラスのupdate処理を実行
       const originalEnemy = gameState.currentEnemy;
       const originalEnemies = gameState.enemies;
@@ -2296,8 +2346,8 @@ _teardownGlobalBackHandler() {
       // 最小限のバトルUI描画
       this._drawMinimalBattleUI(dt);
       
-      // 🎨 改善されたUIを描画
-      this._hideEnemyAndPlayerUIAreas();
+      // 🎨 改善されたUIを描画（たての 盤面では 埋め戻しの 場所が ずれるので しない）
+      if (!isPortraitCanvas(this.canvas)) this._hideEnemyAndPlayerUIAreas();
       this._drawImprovedPracticeUI();
       
       // 入力欄の位置を調整
@@ -2646,6 +2696,8 @@ _drawPracticeCompletePrompt() {
     try {
       this._lifecycle.deactivate();
       this.practiceComplete = false;
+      restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
+      if (this.inputEl?.dataset) delete this.inputEl.dataset.toggleSide;
       if (this._originalHandleAttack) {
         this.handleAttack = this._originalHandleAttack;
         this._originalHandleAttack = null;

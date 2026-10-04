@@ -9,6 +9,14 @@ import { gameState, saveGameData } from '../core/gameState.js';
 import { calcFailXP } from '../core/bonusManager.js';
 import { addPlayerExp } from '../core/gameState.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas } from './battle/portraitLayout.js';
+
+/** 2×2 の ボタンを 盤面の まん中に そろえる（800 でも、たての 画面の 480 でも） */
+function layoutButtons(canvas) {
+  const cx = (canvas?.width || 800) / 2;
+  retryButton.x = stageSelectButton.x = cx - 210;
+  masterButton.x = titleButton.x = cx + 10;
+}
 
 // ボタンは 2×2 に すき間をあけて並べる（以前は 3つが すき間なく 横に並び、押しまちがえやすかった）。
 // 下の列も y450 より上に置く（実績のお知らせは canvas の y450〜530 に出る）。2026-10-04
@@ -96,6 +104,9 @@ const gameOverState = {
     if (!this.ctx || !this.canvas) return;
 
     const { ctx, canvas } = this;
+    // スマホを たてに 持った時は 盤面を 480×680 に（screens/battle/portraitLayout.js）
+    syncPortraitCanvas(canvas);
+    layoutButtons(canvas);
     this.animationTime += 16; // 約60FPSでアニメーション
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -447,6 +458,7 @@ const gameOverState = {
   exit() {
     if (this.canvas) {
       this.unregisterHandlers();
+      restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
     }
     this.canvas = null;
     this.ctx = null;

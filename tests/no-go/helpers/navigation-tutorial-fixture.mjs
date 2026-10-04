@@ -97,11 +97,13 @@ export async function navigationFixture(t) {
     overlays: () => body.children.filter(e => e.style.zIndex === 100002),
     overlaysAdded: () => overlaysAdded,
     click(rect) {
-      const r = canvas.getBoundingClientRect(), scale = Math.min(r.width/800, r.height/600);
+      // 盤面の 大きさは 画面ごとに 変わる（スマホを たてに 持った時は 480×680）
+      const W = canvas.width || 800, H = canvas.height || 600;
+      const r = canvas.getBoundingClientRect(), scale = Math.min(r.width/W, r.height/H);
       const event = new Event('click', { cancelable: true });
       Object.defineProperties(event, {
-        clientX: { value: r.left+(r.width-800*scale)/2+(rect.x+rect.width/2)*scale },
-        clientY: { value: r.top+(r.height-600*scale)/2+(rect.y+rect.height/2)*scale },
+        clientX: { value: r.left+(r.width-W*scale)/2+(rect.x+rect.width/2)*scale },
+        clientY: { value: r.top+(r.height-H*scale)/2+(rect.y+rect.height/2)*scale },
       });
       canvas.dispatchEvent(event);
     },
