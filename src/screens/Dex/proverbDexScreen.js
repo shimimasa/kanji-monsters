@@ -58,7 +58,7 @@ const proverbDexScreen = {
       : document.getElementById('gameCanvas');
     this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
 
-    publish('playBGM', 'bgm_kanjiDex');
+    publish('playBGM', 'bgm_proverbDex');
 
     // 背面のキャンバスを隠す（前の画面が透けないように）
     this._canvasRef = this.canvas || null;

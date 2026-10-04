@@ -15,8 +15,19 @@ const commandSounds = Object.freeze({
   hop: 'miniHop', hit: 'miniPop', flip: 'miniPop', link: 'miniPop',
   paint: 'miniPop', place: 'miniPop', lay: 'miniPop', deliver: 'miniPop',
   stamp: 'miniPop', slide: 'miniPop',
+  move: 'miniMove', steer: 'miniMove', shift: 'miniMove',
 });
 
 export function miniGameCommandSound(command) {
   return commandSounds[command?.type] || null;
+}
+
+export function miniGameWorldSound(state) {
+  if (state?.gameId === 'gotomonLand' && state.lastPickup) {
+    return { id: `land:${state.lastPickup.pickup}`, key: 'miniPickup' };
+  }
+  if (state?.gameId === 'gotomonTag' && state.lastTouch) {
+    return { id: `tag:${state.lastTouch.touch}`, key: state.lastTouch.kind === 'friend' ? 'miniPickup' : null };
+  }
+  return null;
 }

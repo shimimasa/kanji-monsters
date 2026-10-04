@@ -3,7 +3,7 @@ import { images } from '../loaders/assetsLoader.js';
 import { HKD_E01_MOTION } from '../visuals/motion/monsterMotionManifest.js';
 import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { miniGameRegistry } from './registry.js';
-import { miniGameBgm, miniGameCommandSound } from './miniGameSound.js';
+import { miniGameBgm, miniGameCommandSound, miniGameWorldSound } from './miniGameSound.js';
 import { readActiveCollection } from './collectionAdapter.js';
 import { createCompanionAdapter } from './companionAdapter.js';
 import { gotomonService } from './gotomonService.js';
@@ -53,6 +53,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
   let learningRun = null;
   let learningAnswerCount = 0;
   let learningSaveFailed = false;
+  let lastWorldSoundId = null, lastMoveSoundAt = -Infinity;
   const syncPause = () => game?.setPaused(visibilityPaused || manualPaused);
   const host = {
     enter(nextProps = {}) {
@@ -62,6 +63,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       publish('playBGM', miniGameBgm(definition.id));
       const sessionId = makeSessionId(); valid = true; manualPaused = false; visibilityPaused = !!doc.hidden;
       observedResult = false;
+      lastWorldSoundId = null; lastMoveSoundAt = -Infinity;
       learningAnswerCount = 0;
       learningSaveFailed = false;
       const owned = collection(), selected = service.getSelectedGotomon();
@@ -122,7 +124,13 @@ export function createMiniGameHost({ document: doc = globalThis.document,
         if (!play.allowCommand(command) || current.dispatch(command) !== true) return false;
         const commandSound = miniGameCommandSound(command);
         const after = current.snapshot();
-        if (commandSound && after.answered === before.answered && after.lastAnswer === before.lastAnswer) publish('playSE', commandSound);
+        if (commandSound && after.answered === before.answered && after.lastAnswer === before.lastAnswer) {
+          const now = Date.now();
+          if (commandSound !== 'miniMove' || now - lastMoveSoundAt >= 140) {
+            publish('playSE', commandSound);
+            if (commandSound === 'miniMove') lastMoveSoundAt = now;
+          }
+        }
         flushLearning();
         if (PLAYTEST_ENABLED) observePlaytestCommand(sessionId,command);
         host.update(0); return true;
@@ -213,6 +221,11 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       if (!valid) return;
       game.update(dtMs);
       const state = game.snapshot();
+      const worldSound = miniGameWorldSound(state);
+      if (worldSound && worldSound.id !== lastWorldSoundId) {
+        lastWorldSoundId = worldSound.id;
+        if (worldSound.key) publish('playSE', worldSound.key);
+      }
       // Timeouts are committed by update rather than a UI command.
       if (learningRun && state.answered !== learningAnswerCount) {
         learningAnswerCount = state.answered;
