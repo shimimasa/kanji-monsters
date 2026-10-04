@@ -2,6 +2,7 @@ import { companionPortrait, element } from './adventureUI.js';
 import { subscribe } from '../core/eventBus.js';
 import { gotomonService } from '../minigames/gotomonService.js';
 import { typeInfo } from '../minigames/gotomonTypes.js';
+import { BTN, PREV_KANJI_PANEL_BOTTOM } from '../screens/battle/theme.js';
 
 // ゴトモン拡張を 本編バトルにも (2026-10-03): the companion chosen in the mini-game square watches the
 // battle from a corner, wearing its しんか / 色ちがい / かがやき / きせかえ. When the type matchup makes a
@@ -36,16 +37,39 @@ export function showBattleCompanion(doc = globalThis.document) {
   return layer;
 }
 
-// Beside the battle canvas when there is room (it covers nothing), else inside it on the left of the
-// scenery, below the もどる button and above the player's box and the answer area.
+// Where it covers nothing: beside the battle canvas when there is room, else above it, else inside it
+// on the left between the 「1つまえの漢字」 panel and the れんしゅうへ button, shrunk to fit.
+// (2026-10-04: inside used to be 30% down, right over the 「1つまえの漢字」 panel and れんしゅうへ.)
 function place(doc) {
   const canvas = doc.getElementById?.('gameCanvas');
   if (!layer || !canvas?.getBoundingClientRect) return;
   const box = canvas.getBoundingClientRect();
   if (!box.width) return;
-  const outside = box.left >= 100;
-  layer.style.left = `${Math.round(outside ? box.left - 92 : box.left + 8)}px`;
-  layer.style.top = `${Math.round(box.top + box.height * (outside ? 0.5 : 0.3))}px`;
+  setFaceSize(72);
+  const height = layer.offsetHeight || 110;
+  if (box.left >= 100) {
+    layer.style.left = `${Math.round(box.left - 92)}px`;
+    layer.style.top = `${Math.round(box.top + box.height * 0.5)}px`;
+    return;
+  }
+  layer.style.left = `${Math.round(box.left + 8)}px`;
+  if (box.top >= height + 8) {
+    layer.style.top = `${Math.round(box.top - height - 4)}px`;
+    return;
+  }
+  const scale = box.width / (canvas.width || 800);
+  const top = PREV_KANJI_PANEL_BOTTOM + 8;
+  const practiceTop = BTN.practice.y > top ? BTN.practice.y : (canvas.height || 600) - 150;
+  const room = (practiceTop - 6 - top) * scale;
+  // 吹き出しと名前のぶん（height - 72）を引いた残りに 顔を収める（小さくても 32px）
+  setFaceSize(Math.max(32, Math.min(72, Math.floor(room - (height - 72)))));
+  layer.style.top = `${Math.round(box.top + top * scale)}px`;
+}
+
+function setFaceSize(px) {
+  const portrait = layer?._portrait;
+  if (!portrait || portrait.style.width === `${px}px`) return;
+  portrait.style.width = `${px}px`; portrait.style.height = `${px}px`;
 }
 
 export function hideBattleCompanion() {

@@ -16,9 +16,11 @@ test('T01/U04: actual tutorial describes world scope and points hint at its visi
 
 test('U04: tutorial hint anchor follows contained Canvas letterboxing at 390px',async()=>{
  const canvas={width:800,height:600,getBoundingClientRect:()=>({left:13,top:27,width:390,height:700})};
- const {getLearningControls}=await import('../../src/ui/learningControls.js');
+ // 2026-10-04: せまい画面のバトルはヒントを右側へ動かした（screens/battle/theme.js）。指すのはバトルの配置
+ const {BTN,layoutBattleButtons}=await import('../../src/screens/battle/theme.js');
  const {gameToScreenCoordinates}=await import('../../src/utils/coordinateUtils.js');
- const b=getLearningControls(canvas).hint,p=gameToScreenCoordinates(b.x,b.y,canvas);
+ layoutBattleButtons(canvas);
+ const b={...BTN.hint},p=gameToScreenCoordinates(b.x,b.y,canvas);
  const anchor=getStepsFor('battle',{canvas}).find(s=>s.title==='ヒント').anchor();
  assert.ok(Math.abs(anchor.x-p.x)<1);assert.ok(Math.abs(anchor.y-p.y)<1);
  assert.ok(Math.abs(anchor.h-b.h*390/800)<1);

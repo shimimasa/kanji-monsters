@@ -3,19 +3,34 @@
 
 import { publish } from '../core/eventBus.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
-import { gameState, battleState, recordStageCleared, saveGameData } from '../core/gameState.js';
+import { gameState, battleState, recordStageCleared, saveGameData, resetStageProgress } from '../core/gameState.js';
 import { checkAchievements } from '../core/achievementManager.js';
-import { calcBonusReward, isFirstClear, markBonusFirstClear } from '../core/bonusManager.js';
+import { calcBonusReward, isFirstClear, markBonusFirstClear, isBonusUnlocked } from '../core/bonusManager.js';
+import { stageData } from '../loaders/dataLoader.js';
+import { findNextStage } from '../core/nextStage.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { createScreenLifecycle } from '../core/screenLifecycle.js';
 
+/** 幅 maxW に入るまで文字を小さくして書く（最小 13px） */
+function fitText(ctx, text, x, y, maxW, size, weight = '') {
+  let px = size;
+  ctx.font = `${weight}${px}px "UDデジタル教科書体", sans-serif`;
+  while (px > 13 && ctx.measureText(text).width > maxW) {
+    px -= 1;
+    ctx.font = `${weight}${px}px "UDデジタル教科書体", sans-serif`;
+  }
+  ctx.fillText(text, x, y);
+}
+
+// 位置は layoutButtons() で毎回決める（まちがえた漢字のパネルの有無・つぎのステージの有無で変わる）
 const nextStageButton = {
   x: 300,
-  y: 480,
+  y: 490,
   width: 200,
   height: 50,
-  text: 'ステージ選択へ'
+  text: 'ステージ選択へ',
+  tone: 'secondary'
 };
 
 const quickReviewButton = {
@@ -24,6 +39,30 @@ const quickReviewButton = {
   width: 220,
   height: 50,
   text: 'いま おぼえちゃう！'
+};
+
+// 「つぎのステージへ」。同じ学年の次のステージを、ステージ選択を通らずに始める
+const goNextButton = {
+  x: 250,
+  y: 418,
+  width: 300,
+  height: 58,
+  text: 'つぎのステージへ'
+};
+
+// 画面のたての並び（800×600）。ボタンの下端は 450 より上に置く。
+// 実績のお知らせは main.js（凍結中）が canvas の y450〜530 の真ん中に3.5秒描くので、
+// 以前はクリア直後に「ステージ選択へ」がその下に隠れていた。
+const RESULT_LAYOUT = {
+  titleY: 66,          // 「ステージクリア！」の帯の中心（帯は ±30、「おめでとう！」は +50）
+  panelY: 140,         // 「きろく」のパネル
+  panelH: 176,
+  bonusPanelH: 206,    // 学年まとめの パネル（4行まで）
+  gap: 14,
+  rowA: 52,            // つぎへ
+  rowB: 46,            // いま おぼえちゃう！・ステージ選択へ
+  rowGap: 8,
+  mistakeH: 108,       // 「つぎの たびで また 会う 字」
 };
 
 const resultWinState = {
@@ -112,6 +151,14 @@ if (!this._countCommitted) {
 
     this.bonusSummary = null;
 
+    // つぎのステージ（クリアの印を立てたあとに見るので、最後のステージなら学年まとめの鍵も反映される）
+    try {
+      this.nextStage = findNextStage(stageData, stageId, isBonusUnlocked);
+    } catch (e) {
+      console.warn('つぎのステージを決められませんでした:', e);
+      this.nextStage = null;
+    }
+
     const bonusCheckId = stageId || gameState.currentStageId || '';
     const m = /^bonus_g(\d+)$/i.exec(bonusCheckId);
     if (m) {
@@ -153,54 +200,32 @@ if (!this._countCommitted) {
     this.drawParchmentBackground(ctx, canvas.width, canvas.height);
 
     // 2. 装飾的なタイトルを描画
-    this.drawDecorativeTitle(ctx, canvas.width / 2, 120);
+    // 全体を上に詰めている。実績のお知らせ（main.js が y450〜530 に描く）にボタンが隠れないように
+    this.drawDecorativeTitle(ctx, canvas.width / 2, RESULT_LAYOUT.titleY);
 
     // 3. パーフェクトクリア演出
     if (gameState.justClearedPerfectly) {
-      this.drawPerfectClearCrown(ctx, canvas.width / 2 + 200, 80);
+      this.drawPerfectClearCrown(ctx, canvas.width / 2 + 200, RESULT_LAYOUT.titleY - 40);
     }
 
         // 4. 結果表示パネル
         if (this.bonusSummary) {
           // 学年ボーナス専用のパネルのみ描画（通常パネルはスキップ）
-          this.drawBonusResultPanel(ctx, canvas.width / 2 - 180, 200, 360, 210);
+          this.drawBonusResultPanel(ctx, canvas.width / 2 - 180, RESULT_LAYOUT.panelY, 360, RESULT_LAYOUT.bonusPanelH);
         } else {
-          this.drawResultPanel(ctx, canvas.width / 2 - 150, 200, 300, 180);
+          this.drawResultPanel(ctx, canvas.width / 2 - 180, RESULT_LAYOUT.panelY, 360, RESULT_LAYOUT.panelH);
         }
     
 
-// 5. ステージ選択ボタン
-const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
-this.drawRichButton(ctx, nextStageButton, isHovered);
-
-// 6. 復習パネル＋「間違えた漢字をマスター」ボタン（右側に配置）
-if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
-  const panelRect = { x: 50, y: 420, w: 250, h: 150 };
-  // パネル
-  this.drawMistakeScrollPanel(ctx, panelRect.x, panelRect.y, panelRect.w, panelRect.h);
-
-  // 右側に基本配置
-  quickReviewButton.x = Math.min(panelRect.x + panelRect.w + 20, canvas.width - quickReviewButton.width - 20);
-  quickReviewButton.y = panelRect.y + Math.floor((panelRect.h - quickReviewButton.height) / 2);
-
-  // ステージ選択ボタンと重なったら上下に退避
-  const overlap = !(quickReviewButton.x + quickReviewButton.width < nextStageButton.x ||
-                    quickReviewButton.x > nextStageButton.x + nextStageButton.width ||
-                    quickReviewButton.y + quickReviewButton.height < nextStageButton.y ||
-                    quickReviewButton.y > nextStageButton.y + nextStageButton.height);
-  if (overlap) {
-    // まずはパネルの上へ
-    let newY = panelRect.y - quickReviewButton.height - 10;
-    if (newY < 20) {
-      // 上が狭ければパネルの下へ
-      newY = panelRect.y + panelRect.h + 10;
-    }
-    quickReviewButton.y = Math.min(newY, canvas.height - quickReviewButton.height - 20);
-  }
-
-  const isHoveredReview = isMouseOverRect(this.mouseX, this.mouseY, quickReviewButton);
-  this.drawRichButton(ctx, quickReviewButton, isHoveredReview);
-}
+// 5. 下の段: 左に「つぎの旅でまた会う漢字」、右（なければ真ん中）にボタン
+//    上の列: つぎのステージへ（いちばん大きく） / 下の列: いま おぼえちゃう！・ステージ選択へ
+//    以前は「いま おぼえちゃう！」がステージ選択へと重なるのをよけて、戦績の枠の上に逃げていた。
+const hasMistakes = !!(gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0);
+this.layoutButtons(hasMistakes);
+if (hasMistakes) this.drawMistakeScrollPanel(ctx, 50, this.buttonTop(), 250, RESULT_LAYOUT.mistakeH);
+if (this.nextStage) this.drawRichButton(ctx, goNextButton, isMouseOverRect(this.mouseX, this.mouseY, goNextButton));
+if (hasMistakes) this.drawRichButton(ctx, quickReviewButton, isMouseOverRect(this.mouseX, this.mouseY, quickReviewButton));
+this.drawRichButton(ctx, nextStageButton, isMouseOverRect(this.mouseX, this.mouseY, nextStageButton));
 
    
   },
@@ -423,8 +448,9 @@ if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
     ctx.font = 'bold 24px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#8B4513';
-    ctx.fillText('戦績', x + width/2, y + 30);
-    
+    // 文言は 1〜2年の漢字と ひらがな だけにする（対象は漢字が苦手な子。「戦績」「現在」「総」は読めない）
+    ctx.fillText('きろく', x + width/2, y + 30);
+
     // 結果データ（間違い数の対比表示はやめ、成長が見える並びにする）
     const newlyReadCount = gameState.newlyReadKanjiList ? gameState.newlyReadKanjiList.length : 0;
     // 同じステージを周回する子（＝伸びのゆっくりな子ほど多い）は、はじめて読めた漢字が
@@ -434,27 +460,22 @@ if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
     const answeredExamples = [...new Set((gameState.correctKanjiList || []).map(k => k?.text || k?.kanji).filter(Boolean))].slice(0, 3);
     const newExamples = [...new Set((gameState.newlyReadKanjiList || []).map(k => k?.text || k?.kanji).filter(Boolean))].slice(0, 3);
     const results = [
-      `今回の正解入力: ${gameState.correctKanjiList ? gameState.correctKanjiList.length : 0}`,
+      `よめた 回数: ${gameState.correctKanjiList ? gameState.correctKanjiList.length : 0}`,
       newlyReadCount > 0
-        ? `今回初めて正解した字: ${newExamples.join('・')}（${newlyReadCount}字）`
-        : (answeredExamples.length ? `今回正解した字: ${answeredExamples.join('・')}` : `正解記録のある字: ${readSoFar}字`),
-      `現在レベル: ${gameState.playerStats.level}`,
-      `総ステージクリア: ${gameState.playerStats.stagesCleared}`
+        ? `はじめて よめた 字: ${newExamples.join('・')}（${newlyReadCount}字）`
+        : (answeredExamples.length ? `よめた 字: ${answeredExamples.join('・')}` : `これまでに よめた 字: ${readSoFar}字`),
+      `レベル: ${gameState.playerStats.level}`,
+      `クリアした ステージ: ${gameState.playerStats.stagesCleared}`
     ];
 
     ctx.textAlign = 'left';
 
     results.forEach((text, index) => {
       // はじめて読めた漢字がある時は、その行をお祝い色で強調する
-      if (index === 1 && newlyReadCount > 0) {
-        ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
-        ctx.fillStyle = '#1e8449';
-        ctx.fillText(`✨ ${text}`, x + 20, y + 70 + index * 25);
-      } else {
-        ctx.font = '18px "UDデジタル教科書体", sans-serif';
-        ctx.fillStyle = '#654321';
-        ctx.fillText(text, x + 20, y + 70 + index * 25);
-      }
+      const highlight = index === 1 && newlyReadCount > 0;
+      ctx.fillStyle = highlight ? '#1e8449' : '#654321';
+      // 枠からはみ出さないように、入りきらない行は文字を小さくする（以前は緑の行が枠の外まで出ていた）
+      fitText(ctx, highlight ? `✨ ${text}` : text, x + 20, y + 70 + index * 25, width - 40, 18, highlight ? 'bold ' : '');
     });
     
     // パーフェクトクリアの場合の特別表示
@@ -499,31 +520,30 @@ drawBonusResultPanel(ctx, x, y, width, height) {
   ctx.font = 'bold 24px "UDデジタル教科書体", sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = '#8B4513';
-  ctx.fillText('戦績', x + width/2, y + 30);
+  ctx.fillText('きろく', x + width/2, y + 30);
 
   // セクション見出し
   ctx.font = '22px sans-serif';
   ctx.fillStyle = '#ffffff';
-  ctx.fillText('学年ボーナス結果', x + width/2, y + 65);
+  ctx.fillText('学年まとめの けっか', x + width/2, y + 65);
 
+  // 1〜2年の漢字と ひらがな だけにする（「連戦」「倍率」「付与」「称号」「進捗」は読めない）
   const lines = [
-    `連戦数: ${s.fights}`,
-    `よめた漢字: ${s.correctCount} / ${s.totalAsked} ／ 残りHP: ${s.remHpPct}%`,
-    `ランク: ${s.rank}（倍率 x${s.multiplier}）`,
-    `ステージクリア時のEXP付与: なし`
+    `たたかった 回数: ${s.fights}`,
+    `よめた 字: ${s.correctCount} / ${s.totalAsked} ／ のこりHP: ${s.remHpPct}%`,
+    `ランク: ${s.rank}（ばいりつ x${s.multiplier}）`
   ];
   const tp = s.titleProgress;
   if (tp?.gained) {
-    const nextText = tp.nextThreshold ? `次の称号まで ${tp.nextThreshold - tp.count} 回` : '称号コンプリート！';
-    lines.push(`称号進捗: クリア ${tp.count} 回（${nextText}）`);
+    const nextText = tp.nextThreshold ? `つぎの しょうごうまで あと ${tp.nextThreshold - tp.count} 回` : 'しょうごう ぜんぶ ゲット！';
+    lines.push(`しょうごう: クリア ${tp.count} 回（${nextText}）`);
   }
 
   ctx.textAlign = 'left';
   ctx.fillStyle = '#654321';
-  ctx.font = '18px "UDデジタル教科書体", sans-serif';
   let yy = y + 95;
   for (const t of lines) {
-    ctx.fillText(t, x + 20, yy);
+    fitText(ctx, t, x + 20, yy, width - 40, 18);
     yy += 24;
   }
 
@@ -534,10 +554,37 @@ drawBonusResultPanel(ctx, x, y, width, height) {
   /**
    * リッチなボタンを描画
    */
+  /** 下の段のボタンの位置を決める（描画とクリック判定の両方から呼ぶ） */
+  layoutButtons(hasMistakes) {
+    goNextButton.text = this.nextStage?.name ? `つぎへ ▶ ${this.nextStage.name}` : 'つぎのステージへ';
+    // 「つぎへ」が無い時（学年の最後など）は、ステージ選択へ が いちばんの ボタンなので緑のまま
+    nextStageButton.tone = this.nextStage ? 'secondary' : 'primary';
+    const L = RESULT_LAYOUT;
+    const top = this.buttonTop();
+    // 「つぎへ」が無ければ 下の列が上へ上がる
+    const rowB = this.nextStage ? top + L.rowA + L.rowGap : top;
+    if (hasMistakes) {
+      // 左に まちがえた漢字のパネル（x50〜300）。ボタンは右側 x330〜750
+      Object.assign(goNextButton, { x: 330, y: top, width: 420, height: L.rowA });
+      Object.assign(quickReviewButton, { x: 330, y: rowB, width: 205, height: L.rowB, fontSize: 18 });
+      Object.assign(nextStageButton, { x: 545, y: rowB, width: 205, height: L.rowB, fontSize: 18 });
+    } else {
+      Object.assign(goNextButton, { x: 220, y: top, width: 360, height: L.rowA });
+      Object.assign(nextStageButton, { x: 300, y: rowB, width: 200, height: L.rowB, fontSize: 20 });
+    }
+  },
+
+  /** パネルの下の段の上端（学年まとめのパネルは少し高い） */
+  buttonTop() {
+    const L = RESULT_LAYOUT;
+    return L.panelY + (this.bonusSummary ? L.bonusPanelH : L.panelH) + L.gap;
+  },
+
   drawRichButton(ctx, button, isHovered) {
     ctx.save();
-    
+
     const { x, y, width, height, text } = button;
+    const secondary = button.tone === 'secondary';
     const scale = isHovered ? 1.05 : 1.0;
     
     // ホバー時のスケール調整
@@ -552,7 +599,11 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     
     // ボタン背景のグラデーション
     const buttonGradient = ctx.createLinearGradient(scaledX, scaledY, scaledX, scaledY + scaledHeight);
-    if (isHovered) {
+    if (secondary) {
+      // ステージ選択へ（もどる側）は茶色にして、「つぎのステージへ」と見分けられるように
+      buttonGradient.addColorStop(0, isHovered ? '#a0703c' : '#8b5a2b');
+      buttonGradient.addColorStop(1, isHovered ? '#6b4423' : '#5a3a1c');
+    } else if (isHovered) {
       buttonGradient.addColorStop(0, '#32CD32'); // ライムグリーン
       buttonGradient.addColorStop(0.5, '#228B22'); // フォレストグリーン
       buttonGradient.addColorStop(1, '#006400'); // ダークグリーン
@@ -577,8 +628,13 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     ctx.fillStyle = highlightGradient;
     ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight * 0.3);
     
-    // ボタンテキスト
-    ctx.font = 'bold 20px "UDデジタル教科書体", sans-serif';
+    // ボタンテキスト（ステージ名が長い時は ボタンに収まるまで小さくする）
+    let fontSize = button.fontSize || 20;
+    ctx.font = `bold ${fontSize}px "UDデジタル教科書体", sans-serif`;
+    while (fontSize > 14 && ctx.measureText(text).width > scaledWidth - 20) {
+      fontSize -= 1;
+      ctx.font = `bold ${fontSize}px "UDデジタル教科書体", sans-serif`;
+    }
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     
@@ -628,23 +684,20 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#8B4513';
-    ctx.fillText('つぎの旅でまた会う漢字:', x + 10, y + 25);
+    ctx.fillText('つぎの たびで また 会う 字', x + 10, y + 28);
 
-    // また会う漢字リスト
-    ctx.font = '14px "UDデジタル教科書体", sans-serif';
+    // また会う字。同じ字が何回も入っているので まとめ、横に大きく並べる（パネルは高さ108）
+    const seen = [...new Set(gameState.wrongKanjiList.map(k => `${k?.text || k?.kanji || k}`).filter(Boolean))];
+    const maxDisplay = Math.min(seen.length, 6);
+    ctx.font = '24px "UDデジタル教科書体", sans-serif';
     ctx.fillStyle = '#654321';
-    
-    const maxDisplay = Math.min(gameState.wrongKanjiList.length, 4); // 最大4個まで表示
-    for (let i = 0; i < maxDisplay; i++) {
-      const kanji = gameState.wrongKanjiList[i];
-      const text = `${kanji.text || kanji}`;
-      ctx.fillText(text, x + 15, y + 50 + i * 20);
-    }
-    
+    ctx.fillText(seen.slice(0, maxDisplay).join(' '), x + 15, y + 62);
+
     // 表示しきれない場合の省略表示
-    if (gameState.wrongKanjiList.length > 4) {
+    if (seen.length > maxDisplay) {
+      ctx.font = '14px "UDデジタル教科書体", sans-serif';
       ctx.fillStyle = '#A0522D';
-      ctx.fillText(`...他${gameState.wrongKanjiList.length - 4}個`, x + 15, y + 130);
+      ctx.fillText(`ほか ${seen.length - maxDisplay}こ`, x + 15, y + 90);
     }
     
     ctx.restore();
@@ -658,6 +711,7 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     this.ctx = null;
     this.resultData = null;
     this.bonusSummary = null;
+    this.nextStage = null;
     this._countCommitted = false; // ← 追加: 次回のためにリセット
   },
 
@@ -722,6 +776,21 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
     const x = coords.x;
     const y = coords.y;
 
+    const hasMistakes = !!(gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0);
+    this.layoutButtons(hasMistakes);
+
+    // つぎのステージへ: ステージ選択で2回押すのと同じ準備をして、すぐ始める
+    if (this.nextStage && isMouseOverRect(x, y, goNextButton)) {
+      publish('playSE', 'decide');
+      const targetId = this.nextStage.stageId;
+      gameState.currentStageId = targetId;
+      resetStageProgress(targetId);
+      // つぎのバトル画面がBGMを流すので、勝利BGMは止めておく（ゲームオーバーの「もういちど」と同じ）
+      publish('stopBGM', 0.2);
+      publish('changeScreen', 'stageLoading');
+      return;
+    }
+
     if (isMouseOverRect(x, y, nextStageButton)) {
       publish('playSE', 'decide');
       // 同画面への遷移を禁止して確実に抜ける
@@ -734,7 +803,8 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       publish('changeScreen', targetScreen);
     }
     
-    if (isMouseOverRect(x, y, quickReviewButton)) {
+    // 描いていない時（まちがいが0）は押せない。以前は見えない当たり判定が残っていた
+    if (hasMistakes && isMouseOverRect(x, y, quickReviewButton)) {
       publish('playSE', 'decide');
       const targetStageId = (this.resultData && this.resultData.stageId) || gameState.currentStageId;
       const wrongRaw = (this.resultData && this.resultData.wrong) || gameState.wrongKanjiList || [];

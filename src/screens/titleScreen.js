@@ -113,7 +113,8 @@ const titleState = {
       onSettings: () => publish('changeScreen', 'settings'),
       onDex: () => { gameState.previousScreen = 'title'; publish('changeScreen', 'monsterDex'); },
       onSlots: () => this._openSlotPicker(),
-      onResume: this.continueButton ? () => this._quickResume() : null,
+      onResume: this.continueButton ? this._lifecycle.guard(() => this._quickResume()) : null,
+      resumeLabel: this._resumeLabel(),
       onReset: this.resetButton ? () => this._resetGameData() : null,
     });
   },
@@ -186,6 +187,13 @@ _startGame() {
     } catch {
       return null;
     }
+  },
+
+  /** 「本編のつづきから」の下に出す、前回の場所（例: 前回：北海道奥地） */
+  _resumeLabel() {
+    const id = this.continueButton?.stageId;
+    const stage = id && Array.isArray(stageData) ? stageData.find(s => s.stageId === id) : null;
+    return stage?.name ? `前回：${stage.name}` : '';
   },
 
   /** クイック再開: 前回ステージの地図（ステージ選択画面）へ直行する */

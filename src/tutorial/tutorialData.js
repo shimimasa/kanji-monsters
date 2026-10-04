@@ -1,4 +1,4 @@
-import { getLearningControls } from '../ui/learningControls.js';
+import { BTN, layoutBattleButtons } from '../screens/battle/theme.js';
 import { gameToScreenCoordinates } from '../utils/coordinateUtils.js';
 // tutorialData.js
 // 画面ごとのガイド手順を定義。座標は canvas 左上起点のpx。
@@ -225,8 +225,10 @@ export function getStepsFor(screenId, ctx = {}) {
    } 
 
   export default getStepsFor;
+// バトルのボタンは せまい画面で共通の配置から ずらしているので、バトルの配置（BTN）を指す
 function learningButtonRect(canvas, key) {
  const c = canvas || document.getElementById('gameCanvas');
- const b = getLearningControls(c)[key];
+ layoutBattleButtons(c);
+ const b = BTN[key];
  return canvasRect(c,b.x,b.y,b.w,b.h);
 }

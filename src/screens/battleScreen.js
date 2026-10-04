@@ -37,6 +37,8 @@ import {
   PLAYER_HP_ANIM_SPEED,
   DEBUG,
 } from './battle/theme.js';
+import { placeCompactBattleInput, compactLogShift, showAnswerReveal, clearAnswerReveal, drawAnswerReveal } from './battle/compactLayout.js'; // BATTLE-LAYOUT
+import { openLeaveConfirm, closeLeaveConfirm } from './battle/leaveConfirm.js'; // BATTLE-LAYOUT
 
 // battleStateに残り時間プロパティを追加
 battleState.timeRemaining = 60;
@@ -1758,6 +1760,8 @@ const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 
       msgY = Math.max(200, msgY - coveredCanvasPx);
     }
     this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
+    const logShift = controls.compact ? compactLogShift(this, this.logRect) : null; // BATTLE-LAYOUT ボタンの裏から石版の下へ
+    if (logShift) this.logRect = { ...this.logRect, x: msgX + logShift.dx, y: msgY + logShift.dy }; // BATTLE-LAYOUT
   
     // 表示準備
     const padding    = 8;
@@ -1810,6 +1814,7 @@ const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 
       return t.slice(0, lo) + '…';
     };
 
+if (logShift) { this.ctx.save(); this.ctx.translate(logShift.dx, logShift.dy); } // BATTLE-LAYOUT
         // クリップ
 this.ctx.save();
 
@@ -1908,6 +1913,7 @@ this.ctx.clip();
       drawY += logLineHeight;
     });
     this.ctx.restore();
+    if (logShift) this.ctx.restore(); // BATTLE-LAYOUT
     
 
 // 右側スクロールバー（currentモードでは非表示）
@@ -1970,6 +1976,7 @@ if (this.logMode === 'blockPaged') {
     this._logHintDismissed = true;
   }       
 
+    drawAnswerReveal(this, this.ctx, controls); // BATTLE-LAYOUT 読みちがいの「こたえ」札
     // レベルアップメッセージの描画
     if (this.levelUpMessage) {
       // 半透明の黒いオーバーレイで背景を暗く
@@ -2589,6 +2596,9 @@ _setupMobileViewportWorkarounds() {
           this._adjustInputPosition();
           if (detail.open) scrollCanvasTopIntoView();
         };
+        // BATTLE-LAYOUT canvas はパッドのぶん縮む（--kanapad-height）ので keyboardState には映さない。
+        // BATTLE-LAYOUT 映すとログが二重に持ち上がって石版に重なり、下に余白も足されていた。入力欄の置き直しだけにする
+        this._kanaPadLayoutHandler = () => { this._adjustInputPosition(); }; // BATTLE-LAYOUT
         window.addEventListener('kanapad:layout', this._kanaPadLayoutHandler);
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', this._vvResizeHandler);
@@ -2674,6 +2684,7 @@ _adjustInputPosition() {
       s.removeProperty('width');
       s.bottom = 'auto';
       placeLearningInput(this.canvas, this.inputEl, controls);
+      placeCompactBattleInput(this.canvas, this.inputEl); // BATTLE-LAYOUT 右側（HPパネルの横）へ
       return;
     }
     const isTablet = window.innerWidth <= 1024;
@@ -3394,6 +3405,8 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
 }
   },
   exit() {
+    clearAnswerReveal(this); // BATTLE-LAYOUT
+    closeLeaveConfirm(); // BATTLE-LAYOUT
     this._pixelMotion?.dispose();
     this._pixelMotion = null;
     this._lifecycle?.deactivate();
@@ -3694,6 +3707,7 @@ if (e.type === 'touchstart') {
   });
   
         // 「ステージ選択」ボタン押下時
+        if (isMouseOverRect(x, y, BTN.stage)) { publish('playSE', 'decide'); openLeaveConfirm(); return true; } // BATTLE-LAYOUT 1タップで進みが消えないよう「ちずに もどる？」で確かめる
         if (isMouseOverRect(x, y, BTN.stage)) {
           console.log('「ステージ選択」ボタンがクリックされました');
           publish('playBGM', 'title'); // メニュー共通BGMへ
@@ -5318,6 +5332,7 @@ setManagedTimeout(() => {
       'おしい！もうすこし！',
       readingMsg
     ]);
+    showAnswerReveal(battleScreenState, gameState.currentKanji); // BATTLE-LAYOUT
     
     // 統計データの更新（不正解）
     battleState.mistakesThisStage++;
@@ -5568,6 +5583,7 @@ gameState.playerStats.healsSuccessful++;
       '読みがちがったみたい',
       readingMsg
     ]);
+    showAnswerReveal(battleScreenState, gameState.currentKanji); // BATTLE-LAYOUT
 
     // 統計データの更新（不正解）
     battleState.mistakesThisStage++;
@@ -5756,6 +5772,7 @@ export function pickNextKanji() {
   // バナーも消去
   if (battleScreenState && typeof battleScreenState === 'object') {
     battleScreenState.currentHintText = '';
+    clearAnswerReveal(battleScreenState); // BATTLE-LAYOUT「こたえ」札も次の問題で消す
   }
 
 

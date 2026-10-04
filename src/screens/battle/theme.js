@@ -23,10 +23,30 @@ export const BTN = {
   hint:   { x: 470, y: 380, w: 110, h: 50,  label: 'ヒント' },
 };
 
+// せまい画面（compact）のバトルの下側。左にHPパネル（x20〜280）を残し、
+// こうげき・かいふく・ヒントと入力欄は右側（x300〜780）にまとめる。
+// 共通の getLearningControls は横いっぱいに3つ並べるので、HPパネルとログを覆っていた。
+export const COMPACT_BATTLE_AREA = { left: 300, right: 780, gap: 12 };
+
+// 「1つまえの漢字」パネル（battleScreen.js が x20・y104・140×180 で描く）の下端
+export const PREV_KANJI_PANEL_BOTTOM = 284;
+
 export function layoutBattleButtons(canvas) {
   const controls = getLearningControls(canvas);
   for (const key of ['practice','attack','heal','hint']) Object.assign(BTN[key],controls[key]);
   Object.assign(BTN.stage,controls.back);
+  const height = canvas?.height || 600;
+  if (controls.compact) {
+    const { left, right, gap } = COMPACT_BATTLE_AREA;
+    const w = Math.floor((right - left - gap * 2) / 3);
+    ['attack','heal','hint'].forEach((key, i) => Object.assign(BTN[key], { x: left + i * (w + gap), w }));
+    // 「れんしゅうへ」は もどる の右。共通の配置（x520）だと敵の名前の札の裏に隠れていた
+    Object.assign(BTN.practice, { x: BTN.stage.x + BTN.stage.w + 10, y: BTN.stage.y, w: 230 });
+  } else {
+    // 「れんしゅうへ」は 自分のHPパネル（下端から 150）の すぐ上。もどる の下（y76〜124）だと
+    // 「1つまえの漢字」パネル（y104〜）に下半分が隠れていた
+    Object.assign(BTN.practice, { x: 20, y: height - 150 - BTN.practice.h - 8, w: 120 });
+  }
   return controls;
 }
 

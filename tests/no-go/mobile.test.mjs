@@ -50,6 +50,7 @@ for(const width of [390,768])test(`U01: battle targets have >=44 CSS px and five
  canvas.getBoundingClientRect=()=>({left:13,top:27,width,height:1024});
  gameState.currentStageId='hokkaido_area1';gameState.previousScreen='stageSelect';battleState.turn='player';battleState.inputEnabled=true;
  let target;subscribe('changeScreen',s=>target=s);
+ let decides=0;subscribe('playSE',s=>{if(s==='decide')decides++;});
  let answers=0;battle._answerSubmission={submit(){answers++;}};
  gameState.currentKanji={id:'g1-001',text:'一',onyomi:['いち'],kunyomi:['ひと']};
  // Let the real handler refresh responsive geometry before measuring it.
@@ -58,9 +59,11 @@ for(const width of [390,768])test(`U01: battle targets have >=44 CSS px and five
  for(const key of ['stage','practice','attack','heal','hint']) {
    const b=BTN[key];assert.ok(b.h*scale>=44,`${key}: actual height ${b.h*scale}`);
    for(const [x,y] of points(b)) {
-     target=null;gameState.hintLevel=0;const before=answers;const p=gameToScreenCoordinates(x,y,canvas);
+     target=null;gameState.hintLevel=0;const before=answers,decidesBefore=decides;const p=gameToScreenCoordinates(x,y,canvas);
      battle.handleClick({clientX:p.x,clientY:p.y,preventDefault(){}});
-     if(key==='stage')assert.equal(target,'stageSelect');
+     // 2026-10-04: もどる は すぐ地図へ行かず「ちずに もどる？」で確かめる（tests/main-flow/leave-confirm.test.mjs）。
+     // 押せたことは 決定の音で見る
+     if(key==='stage'){assert.notEqual(target,'stageSelect');assert.equal(decides,decidesBefore+1);}
      if(key==='practice')assert.ok(target==='practiceBattle'||Array.isArray(target)&&target[0]==='practiceBattle');
      if(['attack','heal'].includes(key))assert.equal(answers,before+1);
      if(key==='hint')assert.equal(gameState.hintLevel,1);

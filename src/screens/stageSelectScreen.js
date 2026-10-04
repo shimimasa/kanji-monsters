@@ -1388,8 +1388,8 @@ update(dt) {
     // 「もどる」ボタン
     if (isMouseOverRect(x, y, backButton)) {
       publish('playSE', 'decide');
-      // titleではなく、regionSelectに戻るように修正
-      publish('changeScreen', 'regionSelect');
+      // 地方の地図は通らなくなったので（courseSelectScreen の 日本編 → ここ）、冒険先の選択へ戻る
+      publish('changeScreen', 'courseSelect');
       return;
     }
 

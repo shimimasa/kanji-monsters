@@ -17,7 +17,8 @@ test('FINAL-QA-01 CASE A: real Japan click leaves no old tutorial, overlay, guid
   let target, destroyed = 0; const guide = { destroy() { destroyed++; } };
   f.onTransition(next => { target=next; f.exit(); gameState.currentStageId='region-screen'; tutorial.guide=guide; });
   f.advance(400); f.click(course.japanButton);
-  assert.equal(target,'regionSelect'); assert.equal(course.canvas,null);
+  // 2026-10-04: 日本編は地方の地図を飛ばしてステージ選択へ直接行く（core/japanStart.js）
+  assert.equal(target,'stageSelect'); assert.equal(course.canvas,null);
   const before = snapshot(); await f.release('old');
   assert.deepEqual({ starts:f.starts.length, overlays:f.overlaysAdded(), destroyed, stateChanges:Number(snapshot()!==before) },
     { starts:0, overlays:0, destroyed:0, stateChanges:0 });
