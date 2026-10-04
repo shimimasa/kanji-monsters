@@ -37,8 +37,8 @@ import {
   PLAYER_HP_ANIM_SPEED,
   DEBUG,
 } from './battle/theme.js';
-import { placeCompactBattleInput, compactLogShift, showAnswerReveal, clearAnswerReveal, drawAnswerReveal } from './battle/compactLayout.js'; // BATTLE-LAYOUT
-import { openLeaveConfirm, closeLeaveConfirm } from './battle/leaveConfirm.js'; // BATTLE-LAYOUT
+import { placeCompactBattleInput, compactLogBox, showAnswerReveal, clearAnswerReveal, drawAnswerReveal } from './battle/compactLayout.js';
+import { openLeaveConfirm, closeLeaveConfirm } from './battle/leaveConfirm.js';
 
 // battleStateに残り時間プロパティを追加
 battleState.timeRemaining = 60;
@@ -1703,7 +1703,7 @@ this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY)
 const margin = 12;
 const msgMinW = 500;
 const msgMaxW = 640;
-const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 0.62)));
+let msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 0.62)));
 
 // タイトルは背景描画後に高コントラストで描画（下方で描画）
 
@@ -1738,13 +1738,17 @@ const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 
  	const renderLines = newestFirst ? [...lines].reverse() : lines;
 
     // ▼ lines 決定後にサイズと座標を計算（TDZ回避）
+    // せまい画面（compact）は 800×600 が 0.6倍ほどに縮むので、16px だと実寸10px前後で読めない。
+    // 文字を実寸14px以上にして、ログは 石版の下・入力欄の左上の空きへ置く（compactLogBox）。
+    const compactLog     = controls.compact;
+    const logFontPx      = compactLog ? Math.round(Math.max(16, 14 / controls.scale)) : 16;
     const visibleCount   = Math.max(1, (Array.isArray(lines) ? lines.length : 1));
-    const logLineHeight  = visibleCount >= 3 ? 22 : 24;
+    const logLineHeight  = compactLog ? logFontPx + 6 : (visibleCount >= 3 ? 22 : 24);
     const titleH         = 24;
-    const padBottom      = 12;
+    const padBottom      = compactLog ? 8 : 12;
   
     const msgH = titleH + padBottom + logLineHeight * visibleCount;
-    const msgX = this.canvas.width  - margin - msgW;
+    let msgX = this.canvas.width  - margin - msgW;
 
     // ログは画面の下端に置いているが、入力中は下からキーボード（またはゲーム内の
     // 50音パッド）と入力欄がせり上がってきて、その裏に隠れる。
@@ -1759,9 +1763,11 @@ const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 
       // 200 は入力中に上へ寄せた漢字パネル（中心120・高さ140）の下端
       msgY = Math.max(200, msgY - coveredCanvasPx);
     }
+    if (compactLog) {
+      // 下の端はボタンと自分のHPパネルの場所なので、石版の下の空きへ（以前はボタンの裏に隠れていた）
+      ({ x: msgX, y: msgY, w: msgW } = compactLogBox(this, msgH));
+    }
     this.logRect = { x: msgX, y: msgY, w: msgW, h: msgH };
-    const logShift = controls.compact ? compactLogShift(this, this.logRect) : null; // BATTLE-LAYOUT ボタンの裏から石版の下へ
-    if (logShift) this.logRect = { ...this.logRect, x: msgX + logShift.dx, y: msgY + logShift.dy }; // BATTLE-LAYOUT
   
     // 表示準備
     const padding    = 8;
@@ -1770,7 +1776,7 @@ const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 
     const innerRight = msgX + msgW - padding;
     const innerBottom= msgY + msgH - 12;     // 下部余白
     const maxLinesByHeight = Math.max(1, Math.floor((innerBottom - innerTop) / logLineHeight));
-    this.ctx.font = '18px "UDデジタル教科書体", sans-serif';
+    this.ctx.font = `${compactLog ? logFontPx : 18}px "UDデジタル教科書体", sans-serif`;
     this.ctx.textAlign = 'left';
     this.ctx.textBaseline = 'top';
 
@@ -1814,7 +1820,6 @@ const msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 
       return t.slice(0, lo) + '…';
     };
 
-if (logShift) { this.ctx.save(); this.ctx.translate(logShift.dx, logShift.dy); } // BATTLE-LAYOUT
         // クリップ
 this.ctx.save();
 
@@ -1905,7 +1910,7 @@ this.ctx.clip();
         drawY,
         color || '#F3E9D7',
         'rgba(0,0,0,0.9)',
-        '16px "UDデジタル教科書体", sans-serif',
+        `${logFontPx}px "UDデジタル教科書体", sans-serif`,
         'left',
         'top',
         3
@@ -1913,7 +1918,6 @@ this.ctx.clip();
       drawY += logLineHeight;
     });
     this.ctx.restore();
-    if (logShift) this.ctx.restore(); // BATTLE-LAYOUT
     
 
 // 右側スクロールバー（currentモードでは非表示）
@@ -1976,7 +1980,8 @@ if (this.logMode === 'blockPaged') {
     this._logHintDismissed = true;
   }       
 
-    drawAnswerReveal(this, this.ctx, controls); // BATTLE-LAYOUT 読みちがいの「こたえ」札
+    // 読みちがいの「こたえ」札（ログより上に重ねる）
+    drawAnswerReveal(this, this.ctx, controls);
     // レベルアップメッセージの描画
     if (this.levelUpMessage) {
       // 半透明の黒いオーバーレイで背景を暗く
@@ -2587,18 +2592,9 @@ _setupMobileViewportWorkarounds() {
         this._vvScrollHandler = () => { if (this.keyboardState.open) scrollCanvasTopIntoView(); };
 
         // ゲーム内の50音パッドは端末のキーボードではないので visualViewport が動かない。
-        // 盤面を詰める処理はキーボード用のものが既にあるので、そこへ合流させる。
-        this._kanaPadLayoutHandler = (e) => {
-          const detail = (e && e.detail) || {};
-          this.keyboardState.open = !!detail.open;
-          this.keyboardState.bottomInset = detail.open ? (detail.height || 0) : 0;
-          setScrollPadding(!!detail.open);
-          this._adjustInputPosition();
-          if (detail.open) scrollCanvasTopIntoView();
-        };
-        // BATTLE-LAYOUT canvas はパッドのぶん縮む（--kanapad-height）ので keyboardState には映さない。
-        // BATTLE-LAYOUT 映すとログが二重に持ち上がって石版に重なり、下に余白も足されていた。入力欄の置き直しだけにする
-        this._kanaPadLayoutHandler = () => { this._adjustInputPosition(); }; // BATTLE-LAYOUT
+        // canvas はパッドのぶん縮む（--kanapad-height）ので keyboardState には映さない。
+        // 映すとログが二重に持ち上がって石版に重なり、下に余白も足されていた。入力欄の置き直しだけにする
+        this._kanaPadLayoutHandler = () => { this._adjustInputPosition(); };
         window.addEventListener('kanapad:layout', this._kanaPadLayoutHandler);
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', this._vvResizeHandler);
@@ -2684,7 +2680,7 @@ _adjustInputPosition() {
       s.removeProperty('width');
       s.bottom = 'auto';
       placeLearningInput(this.canvas, this.inputEl, controls);
-      placeCompactBattleInput(this.canvas, this.inputEl); // BATTLE-LAYOUT 右側（HPパネルの横）へ
+      placeCompactBattleInput(this.canvas, this.inputEl); // 右側（HPパネルの横）へ
       return;
     }
     const isTablet = window.innerWidth <= 1024;
@@ -3405,8 +3401,8 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
 }
   },
   exit() {
-    clearAnswerReveal(this); // BATTLE-LAYOUT
-    closeLeaveConfirm(); // BATTLE-LAYOUT
+    clearAnswerReveal(this);
+    closeLeaveConfirm();
     this._pixelMotion?.dispose();
     this._pixelMotion = null;
     this._lifecycle?.deactivate();
@@ -3706,13 +3702,10 @@ if (e.type === 'touchstart') {
     console.log(`ボタン[${key}] 座標(${btn.x},${btn.y},${btn.w},${btn.h}) ヒット:${isHit}`);
   });
   
-        // 「ステージ選択」ボタン押下時
-        if (isMouseOverRect(x, y, BTN.stage)) { publish('playSE', 'decide'); openLeaveConfirm(); return true; } // BATTLE-LAYOUT 1タップで進みが消えないよう「ちずに もどる？」で確かめる
+        // 「もどる」ボタン押下時: 1タップで進みが消えないよう「ちずに もどる？」で確かめる（leaveConfirm.js）
         if (isMouseOverRect(x, y, BTN.stage)) {
-          console.log('「ステージ選択」ボタンがクリックされました');
-          publish('playBGM', 'title'); // メニュー共通BGMへ
-          const targetScreen = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-          publish('changeScreen', targetScreen);
+          publish('playSE', 'decide');
+          openLeaveConfirm();
           return true;
         }
 
@@ -5332,7 +5325,7 @@ setManagedTimeout(() => {
       'おしい！もうすこし！',
       readingMsg
     ]);
-    showAnswerReveal(battleScreenState, gameState.currentKanji); // BATTLE-LAYOUT
+    showAnswerReveal(battleScreenState, gameState.currentKanji);
     
     // 統計データの更新（不正解）
     battleState.mistakesThisStage++;
@@ -5583,7 +5576,7 @@ gameState.playerStats.healsSuccessful++;
       '読みがちがったみたい',
       readingMsg
     ]);
-    showAnswerReveal(battleScreenState, gameState.currentKanji); // BATTLE-LAYOUT
+    showAnswerReveal(battleScreenState, gameState.currentKanji);
 
     // 統計データの更新（不正解）
     battleState.mistakesThisStage++;
@@ -5772,7 +5765,7 @@ export function pickNextKanji() {
   // バナーも消去
   if (battleScreenState && typeof battleScreenState === 'object') {
     battleScreenState.currentHintText = '';
-    clearAnswerReveal(battleScreenState); // BATTLE-LAYOUT「こたえ」札も次の問題で消す
+    clearAnswerReveal(battleScreenState); // 「こたえ」札も次の問題で消す
   }
 
 

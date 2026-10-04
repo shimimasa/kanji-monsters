@@ -39,3 +39,23 @@ test('every normal stage except the last of its grade has a next stage of the sa
   }
   assert.ok(checked > 60, `checked ${checked}`);
 });
+
+// 2026-10-04: 学年の さいごで まとめに 鍵が ある時
+import { gradeEndGuide } from '../../src/core/nextStage.js';
+
+test('after the last stage with the summary locked: an earlier stage not yet cleared comes next', () => {
+  const notCleared = new Set(['tohoku_area2']);
+  assert.equal(findNextStage(stages, 'tohoku_area6', locked, id => !notCleared.has(id))?.stageId, 'tohoku_area2');
+  assert.equal(findNextStage(stages, 'tohoku_area6', open, id => !notCleared.has(id))?.stageId, 'tohoku_bonus', 'an open summary comes first');
+});
+
+test('all cleared but the summary locked: guide to マスター, starting from the first stage not mastered', () => {
+  const all = () => true;
+  const mastered = new Set(['hokkaido_area1']);
+  const guide = gradeEndGuide(stages, 'hokkaido_area2', { isCleared: all, isBonusUnlocked: locked, isMastered: id => mastered.has(id) });
+  assert.deepEqual({ region: guide.region, mastered: guide.mastered, total: guide.total, stage: guide.stage.stageId },
+    { region: '北海道', mastered: 1, total: 2, stage: 'hokkaido_area2' });
+  assert.equal(gradeEndGuide(stages, 'hokkaido_area2', { isCleared: all, isBonusUnlocked: open, isMastered: none => false }), null, 'summary open: no guide');
+  assert.equal(gradeEndGuide(stages, 'hokkaido_area2', { isCleared: id => id !== 'hokkaido_area1', isBonusUnlocked: locked, isMastered: () => false }), null, 'a stage still to clear: no guide');
+  assert.equal(gradeEndGuide(stages, 'hokkaido_bonus', { isCleared: all, isBonusUnlocked: locked, isMastered: () => false }), null);
+});

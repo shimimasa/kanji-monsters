@@ -1,14 +1,10 @@
 // src/screens/battle/compactLayout.js
 // バトル画面の「せまい画面（compact）」の置き場所と、読みちがいの「こたえ」札。
 //
-// battleScreen.js は凍結されている（tests/motion-02・minigame-production-kanji-defense）。
-// ここに処理を置き、battleScreen.js には「// BATTLE-LAYOUT」の印を付けた呼び出しの行だけを足す
-// （2026-10-04 ユーザー承認。TYPE-MATCHUP と同じ扱い）。
-//
 // 直したこと:
 // 1. Chromebook や iPad の横向きでは 50音パッドのぶん盤面が 0.6倍ほどに縮み、ボタンが下の端に
 //    並ぶ。そこには会話ログと自分のHPパネルがあり、ログは完全に、HPは半分隠れていた。
-//    → ボタンと入力欄を右側（HPパネルの横）にまとめ、ログは石版の下・入力欄の左上の空きへずらす。
+//    → ボタンと入力欄を右側（HPパネルの横）にまとめ、ログは石版の下・入力欄の左上の空きへ置く。
 // 2. 読みちがいの時の正しい読みはログにしか出ず、1.3秒で敵のこうげきの文に置きかわっていた。
 //    → 石版のすぐ下に大きな札で出し、次の問題が出るまで消さない。
 import { gameState } from '../../core/gameState.js';
@@ -43,24 +39,21 @@ export function placeCompactBattleInput(canvas, input) {
 }
 
 /**
- * ログの枠（元は右下）を、石版の下・入力欄の上・「たんまつで書く」の左へ移すずれを返す。
- * 左はHPパネルと同じ x=20。上は石版の下端より上にしない。
+ * せまい画面のログの枠: 石版の下・入力欄の上・「たんまつで書く」（入力欄の右上）の左。
+ * 左はHPパネルと同じ x=20。上は石版の下端より上にしない（3行の時だけ少し詰まる）。
+ * @returns {{x:number, y:number, w:number}}
  */
-export function compactLogShift(screen, rect) {
+export function compactLogBox(screen, height) {
   const canvas = screen.canvas;
   const content = contentOf(canvas);
   const inputBox = toGame(content, screen.inputEl?.getBoundingClientRect?.());
   const toggleEl = document.getElementById(TOGGLE_ID);
   const toggleBox = toggleEl && !toggleEl.hidden ? toGame(content, toggleEl.getBoundingClientRect()) : null;
-  const { centerY, height } = screen.getKanjiBoxMetrics();
+  const { centerY, height: kanjiH } = screen.getKanjiBoxMetrics();
   const bottom = (inputBox ? inputBox.y : BTN.attack.y) - 8;
-  const y = Math.max(centerY + height / 2, bottom - rect.h);
-  let x = 20;
-  // 「たんまつで書く」と同じ高さにかかるなら、その左に収まるように（収まらなければ x=20 のまま）
-  if (toggleBox && toggleBox.y + toggleBox.h > y && toggleBox.x - 10 - rect.w < x) {
-    x = Math.max(12, toggleBox.x - 10 - rect.w);
-  }
-  return { dx: x - rect.x, dy: y - rect.y };
+  const y = Math.max(centerY + kanjiH / 2, bottom - height);
+  const right = toggleBox && toggleBox.y + toggleBox.h > y ? toggleBox.x - 10 : canvas.width - 12;
+  return { x: 20, y, w: Math.max(300, right - 20) };
 }
 
 export function showAnswerReveal(screen, kanji) {

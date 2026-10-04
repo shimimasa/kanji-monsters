@@ -14,14 +14,13 @@ const NL = String.fromCharCode(10);
 // preservation and all 120 records are separately certified in content-120 tests.
 // The Content 120 byte freeze of the defense Core/View was retired when the game was
 // rebuilt as a real-time arcade game; core.test.mjs and lifecycle.test.mjs specify it now.
-test('main scheduler, battle, save transaction, audio and Motion remain unchanged', () => {
-  for (const path of ['src/main.js','src/core/gameState.js','src/core/saveData.js','src/core/storageTransaction.js',
-    'src/screens/battleScreen.js','src/audio/audioManager.js','src/visuals/motion/monsterMotionHost.js']) {
-    // 2026-10-02 (user-approved type matchups): the battle may hold lines marked TYPE-MATCHUP and
-    // nothing else new; every other line must still be byte-identical to the base.
-    // 2026-10-04 (user-approved battle layout fix): lines marked BATTLE-LAYOUT are allowed the same way.
-    const current = path === 'src/screens/battleScreen.js' ? read(path).split(NL).filter(line => !line.includes('// TYPE-MATCHUP') && !line.includes('// BATTLE-LAYOUT')).join(NL) : read(path);
-    assert.equal(current, git('show', KANJI_DEFENSE_BASE + ':' + path), path);
+// 2026-10-04 (user decision): the main game's battle screen and main loop are no longer frozen,
+// so they can be improved directly (battle layout, the achievement popups). The save transaction,
+// audio and the Motion host stay byte-identical to the base.
+test('save transaction, audio and Motion remain unchanged', () => {
+  for (const path of ['src/core/gameState.js','src/core/saveData.js','src/core/storageTransaction.js',
+    'src/audio/audioManager.js','src/visuals/motion/monsterMotionHost.js']) {
+    assert.equal(read(path), git('show', KANJI_DEFENSE_BASE + ':' + path), path);
   }
 });
 test('Host delegates every command without interpreting defense rules', () => {

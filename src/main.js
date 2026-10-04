@@ -26,6 +26,7 @@ import KanaPad from './ui/kanaPad.js';
 import TextScale from './ui/textScale.js';
 import Ruby from './ui/ruby.js';
 import Speech from './audio/speech.js';
+import { createAchievementToasts, drawAchievementToast } from './ui/achievementToasts.js';
 
 
 /* ----------------------------- ログ静音化 ----------------------------- */
@@ -38,7 +39,8 @@ if (!import.meta.env.DEV) {
 }
 
 /* ----------------------------- 実績通知システム ----------------------------- */
-const achievementNotificationQueue = [];
+// 1まいずつ 順番に出す（ui/achievementToasts.js）。音は そのまいを 出す時に 鳴らす
+const achievementToasts = createAchievementToasts({ onShow: () => publish('playSE', 'achievement') });
 
 /* ----------------------------- DOM / Canvas ----------------------------- */
 const canvas = document.getElementById('gameCanvas');
@@ -94,92 +96,9 @@ function loop(now) {
   }
   
   // 実績通知の描画
-  drawAchievementNotifications(ctx);
+  drawAchievementToast(ctx, canvas, achievementToasts.current());
   
   requestAnimationFrame(loop);
-}
-
-/**
- * 実績解除通知のポップアップを描画する
- * @param {CanvasRenderingContext2D} ctx キャンバスコンテキスト
- */
-function drawAchievementNotifications(ctx) {
-  if (achievementNotificationQueue.length === 0) return;
-  
-  // 画面下部に表示するための基準位置
-  const baseY = canvas.height - 150;
-  const popupWidth = 400;
-  const popupHeight = 80;
-  const popupX = (canvas.width - popupWidth) / 2;
-  
-  achievementNotificationQueue.forEach((notification, index) => {
-    const y = baseY - (index * (popupHeight + 10)); // 複数の通知は上に重ねて表示
-    
-    // 背景（リッチなスタイル）
-    ctx.save();
-    
-    // 外側の影
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-    ctx.shadowBlur = 10;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 4;
-    
-    // グラデーション背景
-    const gradient = ctx.createLinearGradient(popupX, y, popupX, y + popupHeight);
-    gradient.addColorStop(0, '#FFD700'); // ゴールド
-    gradient.addColorStop(1, '#FFA500'); // オレンジ
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(popupX, y, popupWidth, popupHeight);
-    
-    // 枠線
-    ctx.shadowColor = 'transparent';
-    ctx.strokeStyle = '#B8860B'; // ダークゴールド
-    ctx.lineWidth = 3;
-    ctx.strokeRect(popupX, y, popupWidth, popupHeight);
-    
-    // アイコン部分の背景
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.fillRect(popupX + 10, y + 10, 60, popupHeight - 20);
-    
-    // テキスト描画
-    ctx.fillStyle = '#000';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    
-       // 🏆アイコンと「実績解除！」
-       ctx.font = 'bold 24px "UDデジタル教科書体", sans-serif';
-       ctx.fillText('🏆', popupX + 25, y + popupHeight / 2 - 10);
-       
-       ctx.font = 'bold 18px "UDデジタル教科書体", sans-serif';
-       ctx.fillText('実績解除！', popupX + 80, y + 25);
-       
-       // 実績タイトル
-       ctx.font = '16px "UDデジタル教科書体", sans-serif';
-       ctx.fillStyle = '#333';
-       let title = notification.title || '';
-       if (title.length > 20) title = title.substring(0, 20) + '...';
-       ctx.fillText(title, popupX + 80, y + 44);
-       
-       // 説明（1行）
-       ctx.font = '14px "UDデジタル教科書体", sans-serif';
-       ctx.fillStyle = '#222';
-       let desc = notification.description || '';
-       if (desc.length > 28) desc = desc.substring(0, 28) + '...';
-       ctx.fillText(desc, popupX + 80, y + 64);
-       
-       // キラキラエフェクト（簡易版）
-       const sparkles = ['✨', '⭐', '💫'];
-       for (let i = 0; i < 3; i++) {
-         const sparkleX = popupX + popupWidth - 60 + (i * 20);
-         const sparkleY = y + 20 + (Math.sin(Date.now() / 500 + i) * 10);
-         ctx.font = '20px sans-serif';
-         ctx.fillStyle = '#FFF';
-         ctx.fillText(sparkles[i], sparkleX, sparkleY);
-       }
-       
-       ctx.restore();
-  });
 }
 
 (async function initGame() {
@@ -309,45 +228,11 @@ subscribe('setSEVolume', v => audio.setSEVolume(v));
 subscribe('getBGMVolume', callback => callback(audio.getBGMVolume()));
 subscribe('getSEVolume', callback => callback(audio.getSEVolume()));
 
+// 実績のお知らせ。同時に いくつ来ても 1まいずつ（2つめ以降が ボタンに かぶらない）。
+// multipleAchievementsUnlocked の「まとめ」は achievementToasts が 自分で作るので 使わない
 subscribe('achievementUnlocked', (achievementData) => {
   console.log(`🎉 実績解除通知: ${achievementData.title}`);
-  
-  // 通知キューに追加
-  achievementNotificationQueue.push({
-    title: achievementData.title,
-    description: achievementData.description,
-    timestamp: Date.now()
-  });
-  
-  // 効果音
-  publish('playSE', 'achievement');
-  
-  // 3.5秒後に通知を自動削除
-  setTimeout(() => {
-    const index = achievementNotificationQueue.findIndex(
-      n => n.timestamp === Date.now() - 3500
-    );
-    if (index !== -1) {
-      achievementNotificationQueue.splice(index, 1);
-    }
-    // より確実な削除のため、最初の要素を削除（FIFO）
-    if (achievementNotificationQueue.length > 0) {
-      achievementNotificationQueue.shift();
-    }
-  }, 3500);
-});
-
-// 複数同時解除のバンドル通知
-subscribe('multipleAchievementsUnlocked', (arr) => {
-  if (!Array.isArray(arr) || arr.length === 0) return;
-  achievementNotificationQueue.push({
-    title: `新しい実績を${arr.length}件 解除`,
-    description: 'トロフィー画面で詳細を確認',
-    timestamp: Date.now()
-  });
-  setTimeout(() => {
-    if (achievementNotificationQueue.length > 0) achievementNotificationQueue.shift();
-  }, 3500);
+  achievementToasts.push(achievementData);
 });
 
 // 漢字図鑑に追加するイベントを購読

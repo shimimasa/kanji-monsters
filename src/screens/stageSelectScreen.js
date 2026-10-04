@@ -51,8 +51,13 @@ function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime) 
   drawEnhancedTabsShared(ctx, tabs, selectedValue, canvasWidth, animationTime, {
     getKey: (tab) => tab.grade,
     getIcon: (tab) => getGradeIcon(tab.grade),
-    getSubText: (tab) => getGradeRegion(tab.grade),
+    // 地方の地図を 通らなくなったので（2026-10-04）、地方ごとの 達成率は ここで 見せる
+    getSubText: (tab) => {
+      const p = stageSelectScreenState._tabProgress?.[tab.grade];
+      return p && !p.locked ? `${getGradeRegion(tab.grade)} ${p.pct}%` : getGradeRegion(tab.grade);
+    },
     isReviewTab: (tab) => tab.grade === 0,
+    getProgress: (tab) => stageSelectScreenState._tabProgress?.[tab.grade] || null,
   });
 }
 
@@ -340,6 +345,8 @@ _drawAllCaughtMark(ctx, x, y) {
   updateStageList() {
     // 選択中のステージをクリア
     this.selectedStage = null;
+    // タブの 達成率（毎フレーム クリア記録を 読まないよう、ここで まとめて 計算しておく）
+    this._tabProgress = this.computeTabProgress();
     // 適切な初期化箇所で
 this._uncaughtCache = new Map();
 this._dex = loadDex();
@@ -397,6 +404,25 @@ this._dex = loadDex();
     });
   },
   
+  /**
+   * 学年タブごとの { pct, isNext, locked }。
+   * pct は 通常ステージの クリア率。isNext は 地方の地図の「NEXT!」と同じ（1〜6年で 100% でない 最初の学年）。
+   */
+  computeTabProgress() {
+    const result = {};
+    let next = null;
+    for (const tab of tabs) {
+      const normal = stageData.filter(s => s.grade === tab.grade && this.isNormalStage(s));
+      const cleared = normal.filter(s => this.isStageCleared(s.stageId)).length;
+      const pct = normal.length ? Math.round((cleared / normal.length) * 100) : 0;
+      const locked = !this.isRegionUnlocked(tab.grade);
+      result[tab.grade] = { pct, locked, isNext: false };
+      if (next === null && tab.grade <= 6 && pct < 100) next = tab.grade;
+    }
+    if (next !== null) result[next].isNext = true;
+    return result;
+  },
+
   /** ステージのクリア状況を確認 */
   isStageCleared(stageId) {
     const localStorageCleared = isStageClearedSSoT(stageId); // P0-2 StepB-2(中影響/最小差分): clear_* 直読を集約関数へ
