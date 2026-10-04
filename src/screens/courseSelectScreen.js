@@ -5,8 +5,9 @@ import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils
 import { createScreenLifecycle } from '../core/screenLifecycle.js';
 import { gameState } from '../core/gameState.js';
 import { stageData } from '../loaders/dataLoader.js';
-import { pickJapanGrade } from '../core/japanStart.js';
+import { pickJapanGrade, pickWorldGrade, WORLD_LEVEL_BY_GRADE } from '../core/japanStart.js';
 import stageSelectState from './stageSelectScreen.js';
+import worldStageSelectState from './worldStageSelectScreen.js';
 
 const isJapanStageCleared = (stageId) => stageSelectState.isStageCleared(stageId);
 const readLastPlayedStage = () => { try { return localStorage.getItem('lastPlayedStage'); } catch { return null; } };
@@ -202,9 +203,12 @@ const courseSelectScreen = {
     }
 
         // 世界編（中学生）エリアがクリックされた場合
+        // 大陸の地図も飛ばして、世界編のステージ選択へ直接（級のタブで選べる）。開く級は japanStart.js
         if (isMouseOverRect(x, y, this.worldButton)) {
           publish('playSE', 'decide');
-          publish('changeScreen', 'continentSelect');
+          const grade = pickWorldGrade(stageData, (id) => worldStageSelectState.isStageCleared(id), readLastPlayedStage());
+          gameState.previousScreen = 'worldStageSelect';
+          publish('changeScreen', { name: 'worldStageSelect', props: { kanken_level: WORLD_LEVEL_BY_GRADE[grade] } });
           return;
         }
     

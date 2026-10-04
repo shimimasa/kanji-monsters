@@ -39,7 +39,7 @@ async function loadAchievements() {
  * @param {Object} playerStats プレイヤー統計データ
  * @returns {boolean} 条件を満たしているかどうか
  */
-function checkCondition(achievement, playerStats) {
+export function checkCondition(achievement, playerStats) {
   const { condition } = achievement;
   const { type, value } = condition;
 
@@ -81,9 +81,14 @@ function checkCondition(achievement, playerStats) {
     case 'healsSuccessful':
       return playerStats.healsSuccessful >= value;
     case 'regionCleared': {
-      const regionStages = stageData.filter(s => s.region === value);
+      // value はステージIDの頭（'tohoku' → tohoku_area1〜）か 地方名（'東北'）。
+      // 以前は地方名とだけ比べていて、データの 'tohoku' 'kanto' が一致せず、この実績は取れなかった。
+      // 学年まとめ（*_bonus）は 「全ステージ」に入れない（鍵が 別にあるため）。2026-10-04
+      const key = String(value || '');
+      const regionStages = stageData.filter(s => s && !/^bonus_|_bonus$/i.test(String(s.stageId))
+        && (s.region === key || String(s.stageId).startsWith(key + '_')));
       if (regionStages.length === 0) return false;
-      return regionStages.every(s => gameState.stageProgress?.[s.stageId]?.cleared);
+      return regionStages.every(s => !!(isStageCleared(s.stageId) || gameState.stageProgress?.[s.stageId]?.cleared));
     }
     case 'gradeCompleted': {
       const gradeKanji = kanjiData.filter(k => k.grade === value);

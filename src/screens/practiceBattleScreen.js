@@ -118,6 +118,8 @@ wrongTargets: { ids: new Set(), texts: new Set() },
     try {
       this.onPracticeComplete = onComplete;
       gameState.gameMode = 'practice';
+      // 入力欄は バトルと 共用。負けた時などに 入れかけの 読みが 持ちこされないよう 空にする（2026-10-04）
+      try { const shared = document.getElementById('kanjiInput'); if (shared) shared.value = ''; } catch {}
 
       // ← 追加: ボーナス練習は必ず世界編に戻れるように補強
       try {
@@ -2118,14 +2120,23 @@ _teardownGlobalBackHandler() {
       this.ctx.strokeRect(x, y, w, h);
       
       this.ctx.fillStyle = 'white';
-      this.ctx.font = 'bold 14px "UDデジタル教科書体", sans-serif';
       this.ctx.textAlign = 'left';
+      const { totalPracticed, correctCount, correctStreak, maxStreak } = this.practiceStats;
+      if (stats) {
+        // せまい画面: 12px だと 実寸8px前後で 読めないので、2行に まとめて 大きく（2026-10-04）
+        this.ctx.textBaseline = 'alphabetic';
+        this.ctx.font = 'bold 20px "UDデジタル教科書体", sans-serif';
+        this.ctx.fillText('📈 きょうの れんしゅう', x + 10, y + 24);
+        this.ctx.font = '18px "UDデジタル教科書体", sans-serif';
+        this.ctx.fillText(`よめた: ${correctCount}（ためした: ${totalPracticed}）`, x + 10, y + 48);
+        this.ctx.fillText(`れんぞく: ${correctStreak}（さいこう ${maxStreak}）`, x + 10, y + 70);
+        return;
+      }
+      this.ctx.font = 'bold 14px "UDデジタル教科書体", sans-serif';
       this.ctx.fillText('📈 セッション統計', x + 10, y + 18);
       
       this.ctx.font = '12px "UDデジタル教科書体", sans-serif';
       let statY = y + 35;
-      
-      const { totalPracticed, correctCount, correctStreak, maxStreak } = this.practiceStats;
       
       // 練習は避難先なので評価メーター（正答率・平均秒数）は出さない。
       // 積み上げ型の「よめた数」と連続記録だけを見せる

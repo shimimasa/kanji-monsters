@@ -27,3 +27,14 @@ test('a locked 小学生 / 全漢字 tab is not opened from the last stage', () 
   assert.equal(pickJapanGrade(stages, none, shikoku.stageId, g => g !== 11), 1);
   assert.equal(pickJapanGrade(stages, none, shikoku.stageId), 11);
 });
+
+// 世界編も 大陸の地図を 飛ばす（2026-10-04）
+import { pickWorldGrade, WORLD_LEVEL_BY_GRADE } from '../../src/core/japanStart.js';
+
+test('world: the level of the last world stage, else the first level not all cleared, else 4級', () => {
+  const europe = stages.find(s => s.stageId === 'europe_area1');
+  assert.equal(WORLD_LEVEL_BY_GRADE[pickWorldGrade(stages, none, europe.stageId)], '3');
+  assert.equal(WORLD_LEVEL_BY_GRADE[pickWorldGrade(stages, none, 'hokkaido_area1')], '4', 'a Japan stage does not count');
+  assert.equal(WORLD_LEVEL_BY_GRADE[pickWorldGrade(stages, clearedGrades(7, 8), null)], '準2');
+  assert.equal(WORLD_LEVEL_BY_GRADE[pickWorldGrade(stages, clearedGrades(7, 8, 9, 10), null)], '4');
+});

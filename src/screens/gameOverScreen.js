@@ -10,27 +10,38 @@ import { calcFailXP } from '../core/bonusManager.js';
 import { addPlayerExp } from '../core/gameState.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 
+// ボタンは 2×2 に すき間をあけて並べる（以前は 3つが すき間なく 横に並び、押しまちがえやすかった）。
+// 下の列も y450 より上に置く（実績のお知らせは canvas の y450〜530 に出る）。2026-10-04
 const retryButton = {
-  x: 200,  // 左側
-  y: 420,
-  width: 140,
+  x: 190,
+  y: 340,
+  width: 200,
   height: 50,
   text: 'もういちど！'
 };
 
-const stageSelectButton = {
-  x: 340,  // 中央
-  y: 420,
-  width: 140,
+// 負けた子の 次の一手として、同じステージの マスター（れんしゅう）へ
+const masterButton = {
+  x: 410,
+  y: 340,
+  width: 200,
   height: 50,
+  text: 'マスターで れんしゅう'
+};
+
+const stageSelectButton = {
+  x: 190,
+  y: 400,
+  width: 200,
+  height: 46,
   text: 'ちずにもどる'
 };
 
 const titleButton = {
-  x: 480,  // 右側
-  y: 420,
-  width: 140,
-  height: 50,
+  x: 410,
+  y: 400,
+  width: 200,
+  height: 46,
   text: 'タイトルへ'
 };
 
@@ -93,10 +104,10 @@ const gameOverState = {
     this.drawSunsetBackground(ctx, canvas.width, canvas.height);
 
     // 2. 「今回はここまで！」タイトルを描画
-    this.drawRestTitle(ctx, canvas.width / 2, 120);
+    this.drawRestTitle(ctx, canvas.width / 2, 90);
 
     // 3. 旅のきろくパネル
-    this.drawTravelLogPanel(ctx, canvas.width / 2 - 150, 220, 300, 160);
+    this.drawTravelLogPanel(ctx, canvas.width / 2 - 170, 165, 340, 160);
 
     // 4. ボタン群
     const isRetryHovered = isMouseOverRect(this.mouseX, this.mouseY, retryButton);
@@ -104,6 +115,7 @@ const gameOverState = {
     const isTitleHovered = isMouseOverRect(this.mouseX, this.mouseY, titleButton);
 
     this.drawJourneyButton(ctx, retryButton, isRetryHovered, 'retry');
+    this.drawJourneyButton(ctx, masterButton, isMouseOverRect(this.mouseX, this.mouseY, masterButton), 'master');
     this.drawJourneyButton(ctx, stageSelectButton, isStageSelectHovered, 'stageSelect');
     this.drawJourneyButton(ctx, titleButton, isTitleHovered, 'title');
 
@@ -273,10 +285,16 @@ const gameOverState = {
     ctx.fillText('たびのきろく', x + width/2, y + 35);
 
     // 結果データ（間違い数の突きつけはせず、出会いとして数える）
+    // 1〜2年の漢字と ひらがなで。0こは 出さない（結果画面と同じく、へらない 累計に おきかえる）。
+    // 同じ字が 何回も 入っているので 字の数で 数える
+    const uniqueCount = list => new Set((list || []).map(k => k?.id || k?.text || k?.kanji || k)).size;
+    const readNow = uniqueCount(gameState.correctKanjiList);
+    const readSoFar = Object.values(gameState.kanjiAnswerStats || {}).filter(v => (v?.correct || 0) > 0).length;
+    const met = uniqueCount(gameState.wrongKanjiList);
     const results = [
-      `読めた漢字: ${gameState.correctKanjiList.length}個`,
-      `出会った漢字: ${gameState.wrongKanjiList.length}個`,
-      `いまのレベル: ${gameState.playerStats.level}`
+      readNow > 0 ? `こんかい よめた 字: ${readNow}こ` : `これまでに よめた 字: ${readSoFar}こ`,
+      ...(met > 0 ? [`また 会う 字: ${met}こ`] : []),
+      `レベル: ${gameState.playerStats.level}`
     ];
 
     ctx.font = '16px "UDデジタル教科書体", sans-serif';
@@ -291,7 +309,10 @@ const gameOverState = {
     ctx.font = '14px "UDデジタル教科書体", sans-serif';
     ctx.fillStyle = '#FFDFA8';
     ctx.textAlign = 'center';
-    ctx.fillText('またここから しゅっぱつしよう！', x + width/2, y + height - 15);
+    // 5体で 立てた 旗が あれば、「もういちど」は そこから 始まる
+    const checkpoint = Number(gameState.stageProgress?.[gameState.currentStageId]?.checkpoint || 0);
+    ctx.fillText(checkpoint > 0 ? `はたの ところ（${checkpoint + 1}たいめ）から つづけられるよ！` : 'またここから しゅっぱつしよう！',
+      x + width/2, y + height - 15);
 
     ctx.restore();
   },
@@ -329,6 +350,10 @@ const gameOverState = {
         buttonGradient.addColorStop(0.5, '#D9762B');
         buttonGradient.addColorStop(1, '#B85E1F');
       }
+    } else if (type === 'master') {
+      // マスターで れんしゅう（やさしい むらさき系）
+      buttonGradient.addColorStop(0, isHovered ? '#9F7AEA' : '#805AD5');
+      buttonGradient.addColorStop(1, isHovered ? '#6B46C1' : '#553C9A');
     } else if (type === 'stageSelect') {
       // ちずにもどるボタン（緑系）
       if (isHovered) {
@@ -506,6 +531,15 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
           publish('playBGM', 'title');
           // タイトル画面へ戻る
           publish('changeScreen', 'title');
+        }
+
+        // マスターで れんしゅう（ステージ選択の「マスター」と同じ）
+        if (isMouseOverRect(x, y, masterButton)) {
+          publish('playSE', 'decide');
+          gameState.gameMode = 'practice';
+          publish('playBGM', 'title'); // 練習モードはメニュー共通BGM
+          publish('changeScreen', 'practiceBattle');
+          return;
         }
 
         // ステージ選択へボタン

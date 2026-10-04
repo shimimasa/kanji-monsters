@@ -44,8 +44,13 @@ function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime) 
   drawEnhancedTabsShared(ctx, tabs, selectedValue, canvasWidth, animationTime, {
     getKey: (tab) => tab.kanken_level,
     getIcon: (tab) => getKankenIcon(tab.kanken_level),
-    getSubText: (tab) => getKankenContinent(tab.kanken_level),
+    getSubText: (tab) => {
+      const p = worldStageSelectScreen._tabProgress?.[tab.grade];
+      return p ? `${getKankenContinent(tab.kanken_level)} ${p.pct}%` : getKankenContinent(tab.kanken_level);
+    },
     isReviewTab: (tab) => tab.kanken_level === 'review',
+    // 大陸の地図を 通らなくなったので（2026-10-04）、級ごとの 達成率と「つぎ」は ここで 見せる
+    getProgress: (tab) => worldStageSelectScreen._tabProgress?.[tab.grade] || null,
   });
 }
 
@@ -347,6 +352,8 @@ this._dex = loadDex();
 
   /** ステージリストを更新する（漢検レベル切り替え時に呼ばれる） */
   updateStageList() {
+    // 級タブの 達成率（毎フレーム クリア記録を 読まないよう、ここで まとめて 計算しておく）
+    this._tabProgress = this.computeTabProgress();
     // 総復習モードの切替
 this.isReviewMode = (this.selectedTabLevel === "review" || this.selectedGrade === 0);
 if (this.isReviewMode) {
@@ -513,6 +520,22 @@ if (this.isReviewMode) {
           fontSize,
           stage: { stageId: bonusId, name: bonusLabel, grade: this.selectedGrade }
         });
+  },
+
+  /** 級タブごとの { pct, isNext }。isNext は まだ 100% でない 最初の級（大陸の地図と 同じ） */
+  computeTabProgress() {
+    const result = {};
+    let next = null;
+    for (const tab of tabs) {
+      if (tab.kanken_level === 'review') continue;
+      const normal = stageData.filter(s => s.grade === tab.grade && !/^bonus_|_bonus$/i.test(String(s.stageId)));
+      const cleared = normal.filter(s => this.isStageCleared(s.stageId)).length;
+      const pct = normal.length ? Math.round((cleared / normal.length) * 100) : 0;
+      result[tab.grade] = { pct, locked: false, isNext: false };
+      if (next === null && pct < 100) next = tab.grade;
+    }
+    if (next !== null) result[next].isNext = true;
+    return result;
   },
 
   /** ステージのクリア状況を確認 */
@@ -1237,7 +1260,8 @@ handleClick(e) {
     // 戻るボタンのクリック処理
     if (isMouseOverRect(x, y, backButton)) {
       publish('playSE', 'decide');
-      publish('changeScreen', 'continentSelect');
+      // 大陸の地図は通らなくなったので（courseSelectScreen の 世界編 → ここ）、冒険先の選択へ戻る
+      publish('changeScreen', 'courseSelect');
       return;
     }
 
