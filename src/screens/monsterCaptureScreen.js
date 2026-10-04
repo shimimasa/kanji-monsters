@@ -7,6 +7,7 @@ import { getAllMonsterIds, getMonsterById, stageData } from '../loaders/dataLoad
 // ゴトモン拡張を つかまえた画面にも (2026-10-03): タイプと しんかの 予告。表示だけ。
 import { typeOf, typeInfo } from '../minigames/gotomonTypes.js';
 import { EVOLVE_LEVEL } from '../minigames/companionLooks.js';
+import { gotomonService } from '../minigames/gotomonService.js';
 const monsterCaptureScreen = {
   canvas: null,
   container: null,
@@ -59,10 +60,16 @@ const monsterCaptureScreen = {
 
   },
 
+  // 2026-10-04 作り直し:
+  // - 下のボタンの帯は半透明＋ぼかしでカードの上に貼りついていて、2列目の名前が読めなかった。
+  //   → カードの一覧だけがスクロールし、ボタンの帯は一覧の下に置く（重ならない）
+  // - 文は 1〜2年の漢字と ひらがな だけ（「迎えた」「相棒」「最大」「候補」「確定」「選択中」は読めない）
+  // - 本編だけ遊ぶ子も あいぼうを えらべるように、ここで「あいぼうに する」を選べる
   _createDOM() {
     if (this.container) this.container.remove();
 
     this.container = document.createElement('div');
+    this.container.id = 'monsterCaptureScreen';
     Object.assign(this.container.style, {
       position: 'fixed',
       left: '0', top: '0',
@@ -84,30 +91,60 @@ const monsterCaptureScreen = {
     const panel = document.createElement('div');
     Object.assign(panel.style, {
       width: '90vw', maxWidth: '1000px',
-      background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.85), rgba(59, 130, 246, 0.6))',
+      background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.95), rgba(37, 99, 200, 0.92))',
       border: '2px solid rgba(59,130,246,0.5)',
       borderRadius: '16px',
       boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
       padding: '16px',
       color: '#fff',
-      // スクロール可能に
       maxHeight: '90dvh',
-      overflowY: 'auto',
-      WebkitOverflowScrolling: 'touch',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      gap: '8px',
+      overflow: 'hidden'
     });
 
     const header = document.createElement('div');
-    header.textContent = `ヨミトモにしよう！：最大 ${this.captureLimit} 体選べます（全${this.candidates.length}候補）`;
-    Object.assign(header.style, { fontSize: '20px', fontWeight: '700', marginBottom: '12px' });
+    header.textContent = 'なかまに する ゴトモンを えらぼう！';
+    Object.assign(header.style, { fontSize: '22px', fontWeight: '700' });
+    const counter = document.createElement('div');
+    Object.assign(counter.style, { fontSize: '16px', fontWeight: '700', color: '#ffe58a' });
+
+    let current = null;
+    try { current = gotomonService.getSelectedGotomon(); } catch { current = null; }
+    const companionNote = document.createElement('p');
+    companionNote.textContent = `なかまに した ゴトモンは あいぼうに できるよ。あいぼうが Lv${EVOLVE_LEVEL}に なると しんかするよ。タイプが あう あいぼうは、バトルで 力を かしてくれる！`
+      + (current ? `（いまの あいぼう: ${current.name}）` : '');
+    Object.assign(companionNote.style, { fontSize: '14px', lineHeight: '1.6', color: '#e3f3d4', margin: '0' });
 
     const grid = document.createElement('div');
     Object.assign(grid.style, {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-      gap: '12px'
+      gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+      gap: '12px',
+      // ここだけスクロールする（ボタンの帯と重ならない）
+      flex: '1 1 auto',
+      minHeight: '0',
+      overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
+      padding: '4px'
     });
+
+    const refreshers = [];
+    const confirmBtn = document.createElement('button');
+    const cancelBtn = document.createElement('button');
+    const refreshAll = () => {
+      // 選んでいない子を「あいぼう」には できない（選ぶのを やめたら 外す）
+      if (this.companionPick && !this.selected.has(this.companionPick) && !(this.dex && this.dex.has(this.companionPick))) {
+        this.companionPick = null;
+      }
+      counter.textContent = `えらべるのは ${this.captureLimit}ひき まで（いま ${this.selected.size}ひき）`;
+      confirmBtn.textContent = this.selected.size > 0 ? `なかまに する（${this.selected.size}ひき）`
+        : (this.companionPick ? 'あいぼうを かえて すすむ' : 'すすむ');
+      // 何も えらんでいない時は「すすむ」1つだけ（「えらばないで すすむ」と同じ意味になるので）
+      cancelBtn.style.display = this.selected.size > 0 || this.companionPick ? '' : 'none';
+      refreshers.forEach(fn => fn());
+    };
 
     for (const id of this.candidates) {
       const m = getMonsterById(id);
@@ -116,15 +153,18 @@ const monsterCaptureScreen = {
       const already = this.dex && this.dex.has(id); // ← 修正: this.dex
 
       const card = document.createElement('div');
+      card.dataset.monsterId = id;
       Object.assign(card.style, {
         background: 'linear-gradient(135deg, rgba(139,69,19,0.85), rgba(160,82,45,0.7))',
         border: '2px solid #8B4513',
         borderRadius: '12px',
         padding: '10px',
-        cursor: already ? 'not-allowed' : 'pointer', // ← 追加：捕獲済みは選択不可
+        cursor: already ? 'default' : 'pointer',
         userSelect: 'none',
         transition: 'all .2s',
-        opacity: already ? '0.55' : '1' // ← 追加：捕獲済みは半透明
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch'
       });
 
       const thumb = document.createElement('img');
@@ -139,7 +179,9 @@ const monsterCaptureScreen = {
       thumb.src = idStr.startsWith('PRV-')
         ? `/assets/images/monsters/thumb/${m.id}.webp`
         : `/assets/images/monsters/thumb/${folder}/${m.id}.webp`;
-      Object.assign(thumb.style, { width: '100%', borderRadius: '8px' });
+      thumb.alt = m.name;
+      // すでに なかまの子は 絵だけ うすくする（ボタンは うすくしない）
+      Object.assign(thumb.style, { width: '100%', borderRadius: '8px', opacity: already ? '0.6' : '1' });
 
       const name = document.createElement('div');
       name.textContent = m.name;
@@ -150,33 +192,46 @@ const monsterCaptureScreen = {
       Object.assign(typeLabel.style, { textAlign: 'center', marginTop: '4px' }); typeLabel.appendChild(chip);
 
       const badge = document.createElement('div');
-      const updateBadge = () => {
-        // ← 変更：捕獲済みは常時「ヨミトモ」表示、選択中表示は未捕獲のみ
+      Object.assign(badge.style, { marginTop: '4px', textAlign: 'center', fontWeight: '700', minHeight: '1.4em' });
+
+      // 「あいぼうに する」: 選んだ子か、すでに なかまの子だけ。いまの あいぼうには 出さない
+      const companionBtn = document.createElement('button');
+      companionBtn.type = 'button';
+      companionBtn.className = 'capture-companion-button';
+      Object.assign(companionBtn.style, { marginTop: '6px', minHeight: '40px', borderRadius: '8px', fontSize: '14px', fontWeight: '700',
+        cursor: 'pointer', border: '2px solid #ffd700' });
+      companionBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.companionPick = this.companionPick === id ? null : id;
+        publish('playSE', 'decide');
+        refreshAll();
+      });
+
+      refreshers.push(() => {
         const selected = this.selected.has(id);
-        badge.textContent = already ? 'ヨミトモ！' : (selected ? '選択中' : '');
-        Object.assign(badge.style, {
-          marginTop: '4px',
-          textAlign: 'center',
-          color: already ? '#ffd700' : (selected ? '#00ffb3' : 'transparent'),
-          fontWeight: '700'
-        });
+        const isCurrent = current && current.id === id;
+        badge.textContent = isCurrent ? 'いまの あいぼう' : (already ? 'なかま だよ' : (selected ? 'えらんだ！' : ''));
+        badge.style.color = isCurrent || already ? '#ffd700' : '#00ffb3';
         card.style.outline = selected ? '3px solid #00ffb3' : 'none';
-      };
-      updateBadge();
+        const canPick = !isCurrent && (selected || already);
+        companionBtn.style.display = canPick ? 'block' : 'none';
+        const picked = this.companionPick === id;
+        companionBtn.textContent = picked ? '★ あいぼうに する' : '☆ あいぼうに する';
+        companionBtn.setAttribute('aria-pressed', picked ? 'true' : 'false');
+        companionBtn.style.background = picked ? '#ffd700' : 'rgba(0,0,0,0.25)';
+        companionBtn.style.color = picked ? '#3b2a12' : '#ffe58a';
+      });
 
       card.addEventListener('click', () => {
-        // ← 追加：捕獲済みは選択不可
-        if (already) {
-          try { publish('playSE', 'cancel'); } catch {}
-          return;
-        }
+        // すでに なかまの子は 選ばない（図鑑には もう いる）
+        if (already) return;
         if (this.selected.has(id)) {
           this.selected.delete(id);
         } else {
-          if (this.selected.size >= this.captureLimit) return;
+          if (this.selected.size >= this.captureLimit) { publish('playSE', 'cancel'); return; }
           this.selected.add(id);
         }
-        updateBadge();
+        refreshAll();
         publish('playSE', 'decide');
       });
 
@@ -184,34 +239,33 @@ const monsterCaptureScreen = {
       card.appendChild(name);
       card.appendChild(typeLabel);
       card.appendChild(badge);
+      card.appendChild(companionBtn);
       grid.appendChild(card);
     }
 
+    // ボタンの帯: 一覧の下に置く（以前は sticky で一覧の上に重なり、半透明＋ぼかしで名前が読めなかった）
     const footer = document.createElement('div');
     Object.assign(footer.style, {
-      display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '12px',
-      // 常に下に貼り付け
-      position: 'sticky',
-      bottom: '0',
-      background: 'linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.25))',
-      backdropFilter: 'blur(4px)',
-      padding: '8px 0'
+      display: 'flex', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap',
+      paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.25)'
     });
 
-    const cancelBtn = document.createElement('button');
-    cancelBtn.textContent = 'スキップ';
+    cancelBtn.textContent = 'えらばないで すすむ';
     Object.assign(cancelBtn.style, buttonStyle('gray'));
     cancelBtn.onclick = () => {
       publish('playSE', 'cancel');
       this._goResultWin();
     };
 
-    const confirmBtn = document.createElement('button');
-    confirmBtn.textContent = 'ヨミトモを確定';
+    confirmBtn.id = 'captureConfirmButton';
     Object.assign(confirmBtn.style, buttonStyle('green'));
     confirmBtn.onclick = () => {
       publish('playSE', 'decide');
       for (const id of this.selected) addMonster(id);
+      // なかまに入れてから あいぼうに する（なかまでない子は あいぼうに できない）
+      if (this.companionPick) {
+        try { gotomonService.setSelectedGotomon(this.companionPick); } catch (e) { console.warn('あいぼうを かえられませんでした:', e); }
+      }
       this._goResultWin();
     };
 
@@ -219,13 +273,13 @@ const monsterCaptureScreen = {
     footer.appendChild(confirmBtn);
 
     panel.appendChild(header);
-    const companionNote = document.createElement('p');
-    companionNote.textContent = `迎えたゴトモンは、タイトルの「ミニゲーム」から相棒に選べます。相棒にして Lv${EVOLVE_LEVEL}に なると しんかするよ。タイプが あう相棒は、本編の バトルでも 力を かしてくれる！`;
-    Object.assign(companionNote.style, { fontSize: '14px', lineHeight: '1.6', color: '#e3f3d4' });
+    panel.appendChild(counter);
     panel.appendChild(companionNote);
     panel.appendChild(grid);
     panel.appendChild(footer);
     this.container.appendChild(panel);
+    this.companionPick = null;
+    refreshAll();
     document.body.appendChild(this.container);
   },
 
@@ -295,7 +349,10 @@ function shuffle(arr) {
 
 function buttonStyle(kind) {
   const base = {
-    padding: '10px 16px',
+    padding: '12px 18px',
+    minHeight: '48px',
+    fontSize: '17px',
+    fontWeight: '700',
     borderRadius: '8px',
     border: '1px solid rgba(255,255,255,0.2)',
     color: '#fff',
