@@ -45,3 +45,17 @@ test('the 「たてに してね」 hint: touch, sideways and short, only over a
   assert.equal(shouldShowRotateHint(win(844, 390), doc({}, true)), false, 'a DOM screen (title, square) is in front');
   assert.equal(shouldShowRotateHint(win(844, 390), doc({ visibility: 'hidden' })), false, 'capture screen hides the canvas');
 });
+
+// ステージ選択の タブ: たての 画面（480幅）では 4つずつ 2段（2026-10-04）
+import { tabIndexAt, tabGeometry } from '../../src/ui/canvasUtils.js';
+
+test('two rows of grade tabs: each tab is hit where it is drawn; one row stays as before', () => {
+  assert.deepEqual(tabGeometry(8, 480, 2), { perRow: 4, tabW: 120, tabH: 50, height: 100 });
+  assert.equal(tabIndexAt(10, 10, 8, 480, 2), 0);
+  assert.equal(tabIndexAt(470, 10, 8, 480, 2), 3);
+  assert.equal(tabIndexAt(10, 60, 8, 480, 2), 4, 'second row starts with 5年');
+  assert.equal(tabIndexAt(470, 99, 8, 480, 2), 7);
+  assert.equal(tabIndexAt(10, 120, 8, 480, 2), -1, 'below the tabs');
+  assert.equal(tabIndexAt(790, 30, 8, 800, 1), 7, 'landscape: one row of 8');
+  assert.equal(tabIndexAt(10, 61, 8, 800, 1), -1);
+});

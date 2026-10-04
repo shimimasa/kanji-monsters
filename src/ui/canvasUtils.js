@@ -36,22 +36,37 @@ export function drawRoundedRect(ctx, x, y, width, height, radius) {
  * @param {(tab) => string} resolvers.getSubText サブラベル（地方名/大陸名）を返す
  * @param {(tab) => boolean} resolvers.isReviewTab 総復習タブかどうか
  */
+/** タブの 並び。rows=2 で 2段（スマホを たてに 持った時の 480幅の 盤面） */
+export function tabGeometry(tabCount, canvasWidth, rows = 1) {
+  const perRow = Math.ceil(tabCount / rows);
+  return { perRow, tabW: canvasWidth / perRow, tabH: rows > 1 ? 50 : 60, height: (rows > 1 ? 50 : 60) * rows };
+}
+
+/** タブの どれを 押したか（無ければ -1） */
+export function tabIndexAt(x, y, tabCount, canvasWidth, rows = 1) {
+  const { perRow, tabW, tabH, height } = tabGeometry(tabCount, canvasWidth, rows);
+  if (y < 0 || y > height) return -1;
+  const index = Math.min(rows - 1, Math.floor(y / tabH)) * perRow + Math.floor(x / tabW);
+  return index >= 0 && index < tabCount ? index : -1;
+}
+
 export function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime, resolvers) {
   // getProgress（任意）: { pct, isNext, locked } を返すと、タブの下に達成率の棒・「つぎ」の印・🔒を出す
-  const { getKey, getIcon, getSubText, isReviewTab, getProgress } = resolvers;
+  // rows（任意）: 2 で 2段に 並べる（スマホを たてに 持った時）
+  const { getKey, getIcon, getSubText, isReviewTab, getProgress, rows = 1 } = resolvers;
   const tabCount = tabs.length;
-  const tabW = canvasWidth / tabCount;
-  const tabH = 60; // 高さを増加
+  const { perRow, tabW, tabH, height } = tabGeometry(tabCount, canvasWidth, rows);
 
   // 背景グラデーション
-  const bgGradient = ctx.createLinearGradient(0, 0, 0, tabH);
+  const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
   bgGradient.addColorStop(0, '#2d3748');
   bgGradient.addColorStop(1, '#1a202c');
   ctx.fillStyle = bgGradient;
-  ctx.fillRect(0, 0, canvasWidth, tabH);
+  ctx.fillRect(0, 0, canvasWidth, height);
 
   tabs.forEach((tab, i) => {
-    const x0 = i * tabW;
+    const x0 = (i % perRow) * tabW;
+    const rowY = Math.floor(i / perRow) * tabH;
     const isSelected = (getKey(tab) === selectedValue);
 
     // タブの基本形状
@@ -60,6 +75,7 @@ export function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animatio
     const insetH = isSelected ? tabH : tabH - 8;
 
     ctx.save();
+    ctx.translate(0, rowY); // 2段めは 下へ
 
     // 選択中タブの背景
     if (isSelected) {
@@ -190,6 +206,6 @@ export function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animatio
   // 全体の影
   ctx.save();
   ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-  ctx.fillRect(0, tabH, canvasWidth, 3);
+  ctx.fillRect(0, height, canvasWidth, 3);
   ctx.restore();
 }

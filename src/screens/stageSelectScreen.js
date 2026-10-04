@@ -10,7 +10,8 @@ import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils
 import { getEnemiesByStageId } from '../loaders/dataLoader.js';
 import { loadDex } from '../models/monsterDex.js';
 import { isStageCleared as isStageClearedSSoT } from '../core/saveData.js';
-import { drawRoundedRect, drawEnhancedTabs as drawEnhancedTabsShared } from '../ui/canvasUtils.js';
+import { drawRoundedRect, drawEnhancedTabs as drawEnhancedTabsShared, tabIndexAt } from '../ui/canvasUtils.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas } from './battle/portraitLayout.js';
 import { createScreenLifecycle } from '../core/screenLifecycle.js';
 import { stageTypeLines } from '../minigames/stageMatchup.js'; // ゴトモン拡張: タイプの ヒント
 
@@ -58,6 +59,21 @@ function drawEnhancedTabs(ctx, tabs, selectedValue, canvasWidth, animationTime) 
     },
     isReviewTab: (tab) => tab.grade === 0,
     getProgress: (tab) => stageSelectScreenState._tabProgress?.[tab.grade] || null,
+    // スマホを たてに 持った時（480幅）は 4つずつ 2段
+    rows: isPortraitCanvas(stageSelectScreenState.canvas) ? 2 : 1,
+  });
+}
+
+// スマホを たてに 持った時の 下の ボタン（3つずつ 2段）。ふつうの 画面の 位置も ここで 戻す
+const FOOTER_BUTTONS = () => [backButton, practiceButton, quizButton, dexButton, monsterButton, profileButton];
+function layoutFooter(portrait) {
+  FOOTER_BUTTONS().forEach((button, i) => {
+    if (portrait) {
+      Object.assign(button, { x: 10 + (i % 3) * 157, y: i < 3 ? 564 : 620, width: 146, height: 48 });
+    } else {
+      Object.assign(button, { x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * i, y: BUTTON_CONFIG.y,
+        width: BUTTON_CONFIG.width, height: BUTTON_CONFIG.height });
+    }
   });
 }
 
@@ -367,12 +383,14 @@ this._dex = loadDex();
     // キャンバス/パネルの幾何
     const cw = this.canvas?.width || 800;
     const ch = this.canvas?.height || 600;
-    const panelY = 60;
-    const panelH = ch - 140;
-    const leftPanelWidth = cw / 2;
+    // スマホを たてに 持った時は タブ2段の 下から、横いっぱい（右の 地図は 出さない）
+    const portrait = isPortraitCanvas(this.canvas);
+    const panelY = portrait ? 110 : 60;
+    const panelH = portrait ? 440 : ch - 140;
+    const leftPanelWidth = portrait ? cw : cw / 2;
 
     // リスト領域（上端と下端）- 見出し分のスペースを確保
-    const listStartY = 130;                   // 見出し分を考慮して下に移動（80→120）
+    const listStartY = portrait ? 160 : 130;                   // 見出し分を考慮して下に移動（80→120）
     const listBottom = panelY + panelH - 12;  // 下端はパネル内に収める
 
     // 空き高さからボタン高さを自動算出
@@ -525,8 +543,8 @@ this._dex = loadDex();
       }
     }
 
-    // マップマーカーのホバー判定
-    if (gameState.currentGrade !== 0) {
+    // マップマーカーのホバー判定（たての 画面は 地図が ない）
+    if (gameState.currentGrade !== 0 && !isPortraitCanvas(this.canvas)) {
       for (const stage of this.stages) {
         if (!stage.pos) continue;
         const { x, y } = stage.pos;
@@ -774,9 +792,21 @@ this._dex = loadDex();
 
 /** 毎フレーム描画・更新 */
 update(dt) {
+  // スマホを たてに 持った時は 盤面を 480×680 に（screens/battle/portraitLayout.js）
+  if (syncPortraitCanvas(this.canvas)) this.updateStageList();
+  const portrait = isPortraitCanvas(this.canvas);
+  layoutFooter(portrait);
   const { ctx, canvas, stages } = this;
   const cw = canvas.width, ch = canvas.height;
   ctx.clearRect(0, 0, cw, ch);
+  if (portrait) {
+    // 地図を 出さない かわりの 背景
+    const bg = ctx.createLinearGradient(0, 0, 0, ch);
+    bg.addColorStop(0, '#1d3b52');
+    bg.addColorStop(1, '#0f2233');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, cw, ch);
+  }
 
   // アニメーション時間を更新
   this.animationTime += dt || 16;
@@ -789,10 +819,12 @@ update(dt) {
     }
   }
 
-  // 背景画像をキャンバスの右半分に描画（クロスフェード対応）
+  // 背景画像をキャンバスの右半分に描画（クロスフェード対応）。たての 画面では 出さない
   const imageX = cw / 2;
   
-  if (this.crossfadeState.active) {
+  if (portrait) {
+    // 地図なし
+  } else if (this.crossfadeState.active) {
     // クロスフェード中
     const progress = this.crossfadeState.timer / this.crossfadeState.duration;
     const oldAlpha = 1 - progress;
@@ -823,9 +855,9 @@ update(dt) {
 
   // 左側のステージリスト背景パネル
   const panelX = 10;
-  const panelY = 70;
-  const panelW = cw / 2 - 20;
-  const panelH = ch - 150;
+  const panelY = portrait ? 110 : 70;
+  const panelW = portrait ? cw - 20 : cw / 2 - 20;
+  const panelH = portrait ? 440 : ch - 150;
   this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
 
   drawEnhancedTabs(ctx, tabs, gameState.currentGrade, cw, this.animationTime, 'grade');
@@ -1035,8 +1067,8 @@ update(dt) {
       });
     }
 
-    // 各ステージのマーカーを動的に描画（ステータス別表示）
-    if (gameState.currentGrade !== 0) {
+    // 各ステージのマーカーを動的に描画（ステータス別表示）。たての 画面は 地図が ないので 出さない
+    if (gameState.currentGrade !== 0 && !portrait) {
       const nextStage = this.getNextStage();
       
       stages.forEach(stage => {
@@ -1116,8 +1148,8 @@ update(dt) {
   // フッターバーの描画
   this._drawFooterBar(ctx, cw, ch);
 
-  // ツールチップの描画（総復習モード以外）
-  if (gameState.currentGrade !== 0) {
+  // ツールチップの描画（総復習モード以外。たての 画面は 指なので 出さない）
+  if (gameState.currentGrade !== 0 && !portrait) {
     this.drawTooltip(this.hoveredStage);
   }
 },
@@ -1125,10 +1157,12 @@ update(dt) {
   /** フッターバーとボタンの描画 */
   _drawFooterBar(ctx, canvasWidth, canvasHeight) {
     // フッターバーの背景を描画
-    const footerBarX = startX - 10;
-    const footerBarY = BUTTON_CONFIG.y - 10;
-    const footerBarWidth = totalWidth + 20;
-    const footerBarHeight = BUTTON_CONFIG.height + 20;
+    // たての 画面は 2段（layoutFooter）なので 下の 帯も 広げる
+    const portraitBar = isPortraitCanvas(this.canvas);
+    const footerBarX = portraitBar ? 0 : startX - 10;
+    const footerBarY = portraitBar ? 554 : BUTTON_CONFIG.y - 10;
+    const footerBarWidth = portraitBar ? canvasWidth : totalWidth + 20;
+    const footerBarHeight = portraitBar ? canvasHeight - 554 : BUTTON_CONFIG.height + 20;
     
     // 半透明の背景
     ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
@@ -1246,6 +1280,8 @@ update(dt) {
   exit() {
     this._lifecycle.deactivate();
     this.unregisterHandlers();
+    restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
+    layoutFooter(false);
     // スライダー削除
     const bgmSlider = document.getElementById('bgmVolumeSlider');
     if (bgmSlider) bgmSlider.remove();
@@ -1303,12 +1339,11 @@ update(dt) {
     const x = coords.x;
     const y = coords.y;
 
-    // タブクリック判定
-    const tabCount = tabs.length;
-    const tabW = this.canvas.width / tabCount;
-    const tabH = 60;
-    if (y >= 0 && y <= tabH) {
-      const idx = Math.floor(x / tabW);
+    // タブクリック判定（たての 画面は 2段）
+    const portrait = isPortraitCanvas(this.canvas);
+    layoutFooter(portrait);
+    const idx = tabIndexAt(x, y, tabs.length, this.canvas.width, portrait ? 2 : 1);
+    if (idx >= 0) {
       const tab = tabs[idx];
       if (tab) {
         const oldGrade = gameState.currentGrade;
@@ -1376,8 +1411,8 @@ update(dt) {
         }
       }
 
-      // 各ステージマーカーのクリック判定（1回目は選択、2回目で遷移）
-      if (gameState.currentGrade !== 0) {
+      // 各ステージマーカーのクリック判定（1回目は選択、2回目で遷移）。たての 画面は 地図が ない
+      if (gameState.currentGrade !== 0 && !portrait) {
         for (const stage of this.stages) {
           if (stage.pos) {
             const { x: markerX, y: markerY } = stage.pos;

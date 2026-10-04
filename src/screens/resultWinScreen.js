@@ -9,6 +9,7 @@ import { calcBonusReward, isFirstClear, markBonusFirstClear, isBonusUnlocked } f
 import { stageData } from '../loaders/dataLoader.js';
 import { findNextStage, gradeEndGuide } from '../core/nextStage.js';
 import { isStageCleared } from '../core/saveData.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas } from './battle/portraitLayout.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { createScreenLifecycle } from '../core/screenLifecycle.js';
@@ -209,6 +210,8 @@ if (!this._countCommitted) {
     if (!this.ctx || !this.canvas) return;
     
     const { ctx, canvas } = this;
+    // スマホを たてに 持った時は 盤面を 480×680 に（バトルと 同じ。screens/battle/portraitLayout.js）
+    syncPortraitCanvas(canvas);
     if (!prefersReducedMotion()) this.animationTime += Math.max(0, dt || 0);
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -239,7 +242,11 @@ if (!this._countCommitted) {
 //    以前は「いま おぼえちゃう！」がステージ選択へと重なるのをよけて、戦績の枠の上に逃げていた。
 const hasMistakes = !!(gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0);
 this.layoutButtons(hasMistakes);
-if (hasMistakes) this.drawMistakeScrollPanel(ctx, 50, this.buttonTop(), 250, RESULT_LAYOUT.mistakeH);
+if (hasMistakes) {
+  // たての 画面では きろくの 下に 横いっぱい、それ以外は 左下
+  if (isPortraitCanvas(canvas)) this.drawMistakeScrollPanel(ctx, 40, this.buttonTop(), 400, 96);
+  else this.drawMistakeScrollPanel(ctx, 50, this.buttonTop(), 250, RESULT_LAYOUT.mistakeH);
+}
 if (this.nextStage) this.drawRichButton(ctx, goNextButton, isMouseOverRect(this.mouseX, this.mouseY, goNextButton));
 if (this.gradeEnd) {
   // 例:「北海道の まとめは、マスターを そろえると ひらくよ（1/2）」
@@ -590,6 +597,21 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     nextStageButton.tone = (this.nextStage || this.gradeEnd) ? 'secondary' : 'primary';
     masterButton.text = this.gradeEnd?.stage?.name ? `マスターに ちょうせん ▶ ${this.gradeEnd.stage.name}` : 'マスターに ちょうせん';
     const L = RESULT_LAYOUT;
+    if (isPortraitCanvas(this.canvas)) {
+      // スマホを たてに 持った時: まちがえた字の パネルの 下に、横いっぱいで たてに 並べる
+      const x = 40, w = 400, half = (w - 10) / 2;
+      const top = this.buttonTop() + (hasMistakes ? 104 : 0);
+      Object.assign(goNextButton, { x, y: top, width: w, height: L.rowA });
+      Object.assign(masterButton, { x, y: top + 26, width: w, height: 48 });
+      const rowB = this.nextStage ? top + L.rowA + L.rowGap : (this.gradeEnd ? top + 26 + 48 + 6 : top);
+      if (hasMistakes) {
+        Object.assign(quickReviewButton, { x, y: rowB, width: half, height: L.rowB, fontSize: 18 });
+        Object.assign(nextStageButton, { x: x + half + 10, y: rowB, width: half, height: L.rowB, fontSize: 18 });
+      } else {
+        Object.assign(nextStageButton, { x: 120, y: rowB, width: 240, height: L.rowB, fontSize: 20 });
+      }
+      return;
+    }
     const top = this.buttonTop();
     // 「つぎへ」が無ければ 下の列が上へ上がる
     // 学年の さいご（gradeEnd）は 1行の 案内（26）＋「マスターに ちょうせん」（48）の下に 下の列
@@ -740,6 +762,7 @@ drawBonusResultPanel(ctx, x, y, width, height) {
   exit() {
     this._lifecycle.deactivate();
     this.unregisterHandlers();
+    restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
     this.canvas = null;
     this.ctx = null;
     this.resultData = null;

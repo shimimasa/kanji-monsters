@@ -10,6 +10,13 @@ import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils
 import { getEnemiesByStageId } from '../loaders/dataLoader.js';
 import { loadDex } from '../models/monsterDex.js';
 import { isStageCleared as isStageClearedSSoT } from '../core/saveData.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas } from './battle/portraitLayout.js';
+
+// スマホを たてに 持った時（盤面 480×680）は リストを 横いっぱいに し、右の 地図は 出さない
+function __portrait() { return isPortraitCanvas(worldStageSelectScreen.canvas); }
+function __listW(cw) { return __portrait() ? cw - 20 : cw / 2 - 20; }
+function __mapX(cw) { return __portrait() ? cw : cw / 2; }          // たての 画面では 盤面の 外
+function __panelH(ch, cut) { return __portrait() ? ch - 220 : ch - cut; } // 下の ボタン2段（y554〜）の 上まで
 import { drawRoundedRect, drawEnhancedTabs as drawEnhancedTabsShared } from '../ui/canvasUtils.js';
 import { stageTypeLines } from '../minigames/stageMatchup.js'; // ゴトモン拡張: タイプの ヒント
 // === 1. importの後に共通関数を追加 ===
@@ -165,6 +172,15 @@ const BUTTON_CONFIG = {
 const totalWidth = (BUTTON_CONFIG.width * 5) + (BUTTON_CONFIG.gap * 4);
 // 開始X座標を計算（中央揃え）
 const startX = (800 - totalWidth) / 2;
+
+// 下の ボタン。たての 画面は 3つと 2つの 2段。ふつうの 画面の 位置も ここで 戻す
+function layoutFooter(portrait) {
+  [backButton, practiceButton, dexButton, monsterButton, profileButton].forEach((button, i) => {
+    if (portrait) Object.assign(button, { x: 10 + (i % 3) * 157, y: i < 3 ? 564 : 620, width: 146, height: 48 });
+    else Object.assign(button, { x: startX + (BUTTON_CONFIG.width + BUTTON_CONFIG.gap) * i, y: BUTTON_CONFIG.y,
+      width: BUTTON_CONFIG.width, height: BUTTON_CONFIG.height });
+  });
+}
 
 // 各ボタンのx座標を正しく計算（5ボタン配置）
 const backButton = { 
@@ -367,8 +383,8 @@ if (this.isReviewMode) {
   const ch = this.canvas ? this.canvas.height : 600;
   const panelX = 10;
   const panelY = 60;
-  const panelW = cw / 2 - 20;
-  const panelH = ch - 140;
+  const panelW = __listW(cw);
+  const panelH = __panelH(ch, 140);
   const listStartY = panelY + 60;         // タイトル分の余白
   const listBottom = panelY + panelH - 12;
 
@@ -473,8 +489,8 @@ if (this.isReviewMode) {
         const ch = this.canvas ? this.canvas.height : 600;
         const panelX = 10;
         const panelY = 80;                 // 上余白
-        const panelW = cw / 2 - 20;        // 左半分 - マージン
-        const panelH = ch - 150;           // フッターバー分の高さを調整
+        const panelW = __listW(cw);        // 左半分 - マージン
+        const panelH = __panelH(ch, 150);           // フッターバー分の高さを調整
         const listStartY = panelY + 50;    // タイトル分の余白
         const listBottom = panelY + panelH - 12; // パネル下端に少し余白
     
@@ -583,7 +599,7 @@ if (this.isReviewMode) {
     }
 
     // マップマーカーのホバー判定（総復習モードでは無効）
-    for (const stage of (!this.isReviewMode ? this.stages : [])) {
+    for (const stage of (!this.isReviewMode && !isPortraitCanvas(this.canvas) ? this.stages : [])) {
       if (!stage?.pos) continue; // ボーナス等、posがないステージはスキップ
       const { x, y } = stage.pos;
       if (this.mouseX >= x && this.mouseX <= x + MARKER_SIZE && 
@@ -780,6 +796,9 @@ if (this.isReviewMode) {
 
   /** 毎フレーム描画・更新 */
   update(dt) {
+    // スマホを たてに 持った時は 盤面を 480×680 に（screens/battle/portraitLayout.js）
+    if (syncPortraitCanvas(this.canvas)) this.updateStageList();
+    layoutFooter(isPortraitCanvas(this.canvas));
     const { ctx, canvas, stages } = this;
     const cw = canvas.width, ch = canvas.height;
     ctx.clearRect(0, 0, cw, ch);
@@ -797,7 +816,7 @@ if (this.isReviewMode) {
     if (this.isReviewMode) {
       // 左パネル
       const cw = this.canvas.width, ch = this.canvas.height;
-      const panelX = 10, panelY = 60, panelW = cw / 2 - 20, panelH = ch - 140;
+      const panelX = 10, panelY = 60, panelW = __listW(cw), panelH = __panelH(ch, 140);
       this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
     
       // タイトル
@@ -830,7 +849,7 @@ if (this.isReviewMode) {
         });
       }
       // 右側に世界地図（既存の worldMap を使用）
-      const mapX = cw / 2;
+      const mapX = __mapX(cw); // たての 画面では 地図を 盤面の 外へ（出さない）
       const mapY = 60;
       const mapWidth = cw / 2;
       const mapHeight = ch - 120;
@@ -845,7 +864,7 @@ if (this.isReviewMode) {
 
     // 右側の大陸地図を描画（総復習モードではスキップ）
     if (!this.isReviewMode) {
-      const mapX = cw / 2;
+      const mapX = __mapX(cw); // たての 画面では 地図を 盤面の 外へ（出さない）
       const mapY = 60;
       const mapWidth = cw / 2;
       const mapHeight = ch - 120;
@@ -886,8 +905,8 @@ if (this.isReviewMode) {
       // 左側のステージリスト背景パネル
       const panelX = 10;
       const panelY = 70; // 元の60から70に変更
-      const panelW = cw / 2 - 20;
-      const panelH = ch - 140; // フッターバー分の高さを調整
+      const panelW = __listW(cw);
+      const panelH = __panelH(ch, 140); // フッターバー分の高さを調整
       this.drawPanelBackground(ctx, panelX, panelY, panelW, panelH, 'stone');
     }
 
@@ -921,7 +940,7 @@ if (this.isReviewMode) {
 
       const textWidth = ctx.measureText(title).width;
       const textBgPadding = 10;
-      const textBgX = 10 + (cw / 2 - 20) / 2 - textWidth / 2 - textBgPadding;
+      const textBgX = 10 + (__listW(cw)) / 2 - textWidth / 2 - textBgPadding;
       const textBgY = 80;
       const textBgWidth = textWidth + textBgPadding * 2;
       const textBgHeight = 36;
@@ -937,7 +956,7 @@ if (this.isReviewMode) {
       ctx.shadowBlur = 4;
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 2;
-      ctx.fillText(title, 10 + (cw / 2 - 20) / 2, 85);
+      ctx.fillText(title, 10 + (__listW(cw)) / 2, 85);
       ctx.shadowColor = 'transparent';
       ctx.shadowBlur = 0;
       ctx.shadowOffsetX = 0;
@@ -1037,7 +1056,7 @@ this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
     } else if (!this.isReviewMode) {
       // ステージがない場合のメッセージ
       const panelX = 10;
-      const panelW = cw / 2 - 20;
+      const panelW = __listW(cw);
       ctx.fillStyle = '#ccc';
       ctx.font = '16px sans-serif';
       ctx.textAlign = 'center';
@@ -1048,7 +1067,7 @@ this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
     if (!this.isReviewMode) {
       stages.forEach(stage => {
         // ステージに位置情報がある場合のみ描画
-        if (stage.pos) {
+        if (stage.pos && !isPortraitCanvas(this.canvas)) { // たての 画面は 地図が ない
           const { x: markerX, y: markerY } = stage.pos;
           const isCleared = this.isStageCleared(stage.stageId);
           const isHovered = this.hoveredStage && this.hoveredStage.stageId === stage.stageId;
@@ -1132,8 +1151,8 @@ this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
     // フッターバーの描画
     this._drawFooterBar(ctx, cw, ch);
 
-    // ツールチップの描画（総復習モード以外）
-    if (!this.isReviewMode) {
+    // ツールチップの描画（総復習モード以外。たての 画面は 指なので 出さない）
+    if (!this.isReviewMode && !isPortraitCanvas(this.canvas)) {
       this.drawTooltip(this.hoveredStage);
     }
     
@@ -1211,6 +1230,7 @@ handleClick(e) {
 
 
     // タブクリック判定
+    layoutFooter(isPortraitCanvas(this.canvas));
     const tabCount = tabs.length;
     const tabW = this.canvas.width / tabCount;
     const tabH = 60;
@@ -1463,11 +1483,12 @@ _drawAllCaughtMark(ctx, x, y) {
 
   /** フッターバーの描画 */
   _drawFooterBar(ctx, canvasWidth, canvasHeight) {
-    // フッターバーの背景を描画
-    const footerBarX = startX - 10;
-    const footerBarY = BUTTON_CONFIG.y - 10;
-    const footerBarWidth = totalWidth + 20;
-    const footerBarHeight = BUTTON_CONFIG.height + 20;
+    // フッターバーの背景を描画（たての 画面は 2段なので 広げる）
+    const portraitBar = isPortraitCanvas(this.canvas);
+    const footerBarX = portraitBar ? 0 : startX - 10;
+    const footerBarY = portraitBar ? 554 : BUTTON_CONFIG.y - 10;
+    const footerBarWidth = portraitBar ? canvasWidth : totalWidth + 20;
+    const footerBarHeight = portraitBar ? canvasHeight - 554 : BUTTON_CONFIG.height + 20;
     
     // 半透明の背景
     ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
@@ -1551,6 +1572,8 @@ _drawAllCaughtMark(ctx, x, y) {
 
   /** 確実にリスナーを解除 */
   exit() {
+    restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
+    layoutFooter(false);
     if (this.canvas) {
       this.canvas.removeEventListener('click', this._clickHandler);
       this.canvas.removeEventListener('touchstart', this._clickHandler);
