@@ -39,6 +39,7 @@ import {
 } from './battle/theme.js';
 import { placeCompactBattleInput, compactLogBox, showAnswerReveal, clearAnswerReveal, drawAnswerReveal } from './battle/compactLayout.js';
 import { openLeaveConfirm, closeLeaveConfirm } from './battle/leaveConfirm.js';
+import { PORTRAIT_LAYOUT, isPortraitCanvas, syncPortraitCanvas, restoreLandscapeCanvas } from './battle/portraitLayout.js';
 
 // battleStateに残り時間プロパティを追加
 battleState.timeRemaining = 60;
@@ -272,6 +273,8 @@ const battleScreenState = {
  },
 
  getKanjiBoxMetrics() {
+  // スマホを たてに 持った時は 決まった 場所（portraitLayout.js）
+  if (isPortraitCanvas(this.canvas)) return { ...PORTRAIT_LAYOUT.kanji };
   const isKbOpen = !!(this.keyboardState && this.keyboardState.open);
   const centerX = this.canvas ? (this.canvas.width / 2) : (window.innerWidth / 2);
   const centerY = this.canvas && getLearningControls(this.canvas).compact ? 220 : (isKbOpen ? 120 : 200);   // 入力中は上へ
@@ -1222,10 +1225,18 @@ getMaxHealCountFromSettings() {
     // NOTE: 以前はここで50音パッドの高さを keyboardState に映していたが、
     //       いまは canvas 自体がパッドのぶん縮む（index.html の --kanapad-height）。
     //       映すと二重に持ち上がるので消した。keyboardState は端末キーボード専用。
+    // スマホの 向きが 変わったら 盤面の 大きさを 切りかえる（たて: 480×680、それ以外: 800×600）
+    if (syncPortraitCanvas(this.canvas)) this._adjustInputPosition();
+    const portrait = isPortraitCanvas(this.canvas);
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // ① 背景描画 (画像 or グラデ)
-    if (this.stageBgImage) {
+    if (this.stageBgImage && portrait) {
+      // たて長の 盤面では 横の 背景を ゆがめず、まん中を 切りとって 使う
+      const img = this.stageBgImage, cw = this.canvas.width, ch = this.canvas.height;
+      const sw = Math.min(img.width, img.height * cw / ch), sh = sw * ch / cw;
+      this.ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, 0, 0, cw, ch);
+    } else if (this.stageBgImage) {
       // ステージ背景画像がある場合は画像を描画
       this.ctx.drawImage(this.stageBgImage, 0, 0, this.canvas.width, this.canvas.height);
     } else {
@@ -1279,7 +1290,7 @@ if (typeof drawStoneButton === 'function') {
 try {
   const st = stageData.find(s => s.stageId === gameState.currentStageId);
   const title = st?.name;
-  if (title && !controls.compact) {
+  if (title && !controls.compact && !controls.portrait) {
     const baseX = BTN.stage.x + BTN.stage.w + 14;
     const baseY = BTN.stage.y + 2;
 
@@ -1322,7 +1333,7 @@ try {
 const enemy = gameState.currentEnemy;
 
 // ← 変更: 漢字パネルの右側に枠が被らないように動的配置
-const ew = 240, eh = 120;
+let ew = 240, eh = 120;
 const { centerX: kx, width: kw } = this.getKanjiBoxMetrics();
 const kanjiRight = kx + kw / 2;
 const enemyMargin = 24;    // パネルとの余白
@@ -1336,6 +1347,8 @@ if (this.canvas) {
   const maxEx = (this.canvas.width - outerW) - outerPad;
   ex = Math.min(ex, maxEx);
 }
+// スマホを たてに 持った時は 左上（右に 敵の 名前と HP）
+if (portrait) ({ ex, ey, ew, eh } = PORTRAIT_LAYOUT.enemy);
 
 // アニメーション用オフセット計算
 let offsetX = 0, offsetY = 0, rotateAngle = 0, alpha = 1;
@@ -1552,9 +1565,11 @@ if (gameState.currentEnemy && gameState.currentEnemy.weakness &&
       // ボタンがパネルの裏に隠れ、押せているのに見えない状態だった
       // せまい画面（compact）は 0.6倍ほどに 縮むので、12px だと 実寸8px前後で 読めない。
       // 左の列いっぱい（幅270）に 広げ、漢字を 左・読みを 右に 並べて 文字を 約1.6倍にする（2026-10-04）
-      const big = !!controls.compact;
-      const k = big ? 1.6 : 1;
-      const bx = 20, by = 104, bw = big ? 270 : 140, bh = big ? 190 : 180;
+      // スマホを たてに 持った時は 出題の 漢字の 左（たて並びの まま 少し 大きく）
+      const big = !portrait && !!controls.compact;
+      const k = portrait ? 1.1 : (big ? 1.6 : 1);
+      const { x: bx, y: by, w: bw, h: bh } = portrait ? PORTRAIT_LAYOUT.prev
+        : { x: 20, y: 104, w: big ? 270 : 140, h: big ? 190 : 180 };
       
       // パネル背景描画
       this.drawPanelBackground(this.ctx, bx, by, bw, bh, 'stone');
@@ -1696,7 +1711,17 @@ if (big) nextY = Math.max(nextY, by + 128); // 漢字の 下まで 来てから�
     }
 
     // ── 新規：UIパネル描画 ──
-    this.drawPlayerStatusPanel(this.ctx);
+    if (portrait) {
+      // スマホを たてに 持った時: 自分の パネル（左下 x20・下から150）を 縮めて 右上へ
+      const p = PORTRAIT_LAYOUT.player;
+      this.ctx.save();
+      this.ctx.translate(p.x - 20 * p.scale, p.y - (this.canvas.height - 150) * p.scale);
+      this.ctx.scale(p.scale, p.scale);
+      this.drawPlayerStatusPanel(this.ctx);
+      this.ctx.restore();
+    } else {
+      this.drawPlayerStatusPanel(this.ctx);
+    }
     this.drawEnemyStatusPanel(this.ctx);
 
     
@@ -1747,7 +1772,7 @@ let msgW = Math.min(msgMaxW, Math.max(msgMinW, Math.floor(this.canvas.width * 0.
     // ▼ lines 決定後にサイズと座標を計算（TDZ回避）
     // せまい画面（compact）は 800×600 が 0.6倍ほどに縮むので、16px だと実寸10px前後で読めない。
     // 文字を実寸14px以上にして、ログは 石版の下・入力欄の左上の空きへ置く（compactLogBox）。
-    const compactLog     = controls.compact;
+    const compactLog     = controls.compact || controls.portrait;
     const logFontPx      = compactLog ? Math.round(Math.max(16, 14 / controls.scale)) : 16;
     const visibleCount   = Math.max(1, (Array.isArray(lines) ? lines.length : 1));
     const logLineHeight  = compactLog ? logFontPx + 6 : (visibleCount >= 3 ? 22 : 24);
@@ -2426,8 +2451,8 @@ if (hh.visible) {
     }
     
     // 1) 配置境界（ステージ選択の右〜敵HPの左）
-    const leftBound  = 200;
-    const rightBound = this.canvas.width - 280;
+    const leftBound  = isPortraitCanvas(this.canvas) ? 20 : 200;
+    const rightBound = this.canvas.width - (isPortraitCanvas(this.canvas) ? 20 : 280);
     const hintMaxW   = Math.max(160, rightBound - leftBound);
 
     // 2) テキストとフォントサイズ（枠幅に収まるまで縮小）
@@ -2685,6 +2710,26 @@ _adjustInputPosition() {
     s.setProperty('pointer-events', 'auto', 'important');
 
     const controls = layoutBattleButtons(this.canvas);
+    if (controls.portrait) {
+      // スマホを たてに 持った時: こうげき・かいふく・ヒント の すぐ上、左寄せ。右に「たんまつで書く」（kanaPad.js）
+      const content = getContainedRect(this.canvas.getBoundingClientRect(), this.canvas.width, this.canvas.height);
+      const { left, width } = PORTRAIT_LAYOUT.input;
+      const inputH = this.inputEl.offsetHeight || 48;
+      s.bottom = 'auto';
+      s.width = `${Math.round(width * content.scale)}px`;
+      s.left = `${Math.round(content.left + left * content.scale)}px`;
+      s.top = `${Math.round(content.top + (BTN.attack.y - 8) * content.scale - inputH)}px`;
+      this.inputEl.dataset.toggleSide = 'right';
+      // 「たんまつで書く」も いっしょに 右どなりへ（kanaPad は 開け閉め の時にしか 置きなおさない）
+      const toggle = document.getElementById('kanaPadToggle');
+      if (toggle && !toggle.hidden) {
+        const r = this.inputEl.getBoundingClientRect();
+        toggle.style.left = `${Math.round(Math.min(r.right + 8, window.innerWidth - (toggle.offsetWidth || 140) - 4))}px`;
+        toggle.style.top = `${Math.round(r.top + (r.height - (toggle.offsetHeight || 40)) / 2)}px`;
+      }
+      return;
+    }
+    if (this.inputEl?.dataset) delete this.inputEl.dataset.toggleSide;
     if (controls.compact) {
       s.removeProperty('width');
       s.bottom = 'auto';
@@ -3156,10 +3201,13 @@ const content = rect ? getContainedRect(rect, this.canvas.width, this.canvas.hei
   },
 
 drawEnemyStatusPanel(ctx) {
-  const panelW = 280;
-  const panelH = 120;
-  const panelX = 800 - panelW - 20;
-  const panelY = 10;
+  // スマホを たてに 持った時は 敵の 絵の 右（portraitLayout.js）
+  const portrait = isPortraitCanvas(this.canvas);
+  const rect = portrait ? PORTRAIT_LAYOUT.enemyStatus : { x: (this.canvas?.width || 800) - 300, y: 10, w: 280, h: 120 };
+  const panelW = rect.w;
+  const panelH = rect.h;
+  const panelX = rect.x;
+  const panelY = rect.y;
 
   if (images.panelEnemy) {
     ctx.drawImage(images.panelEnemy, panelX, panelY, panelW, panelH);
@@ -3168,24 +3216,31 @@ drawEnemyStatusPanel(ctx) {
   if (!gameState.currentEnemy) return;
 
   // --- ▼ここからY軸の配置を調整▼ ---
-  const horizontalPadding = 35;
+  const horizontalPadding = portrait ? 22 : 35;
   const contentX = panelX + horizontalPadding;
   const contentW = panelW - (horizontalPadding * 2);
 
-  // 上段グループのY座標を少し下げて、中央に寄せる
-  const topRowY = panelY + 30;
+  // 上段グループのY座標を少し下げて、中央に寄せる（高さに 合わせて: 120 で 30）
+  const topRowY = panelY + Math.round(panelH * 0.25);
 
-  // HPバーのY座標を上げて、中央に寄せる
-  const barY = panelY + 65;
+  // HPバーのY座標を上げて、中央に寄せる（120 で 65）
+  const barY = panelY + Math.round(panelH * 0.54);
   const barH = 22;
   // --- ▲ここまでY軸の配置を調整▲ ---
 
 
   // 3. 敵の名前を左上に配置
+  // 名前が 長い 敵は 枠に 入るまで 文字を 小さくする（たての 画面では 枠が せまい）
+  let nameFs = 18;
+  ctx.font = `bold ${nameFs}px "UDデジタル教科書体", sans-serif`;
+  while (nameFs > 12 && ctx.measureText(gameState.currentEnemy.name).width > contentW) {
+    nameFs -= 1;
+    ctx.font = `bold ${nameFs}px "UDデジタル教科書体", sans-serif`;
+  }
   this.drawTextWithOutline(
     gameState.currentEnemy.name,
     contentX, topRowY,
-    '#FF6347', '#000000', 'bold 18px "UDデジタル教科書体", sans-serif',
+    '#FF6347', '#000000', `bold ${nameFs}px "UDデジタル教科書体", sans-serif`,
     'left', 'top', 3
   );
 
@@ -3412,6 +3467,9 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
   exit() {
     clearAnswerReveal(this);
     closeLeaveConfirm();
+    // ほかの 画面は 800×600 で 描くので、たて長の 盤面は ここで 戻す
+    restoreLandscapeCanvas(this.canvas);
+    if (this.inputEl?.dataset) delete this.inputEl.dataset.toggleSide;
     this._pixelMotion?.dispose();
     this._pixelMotion = null;
     this._lifecycle?.deactivate();

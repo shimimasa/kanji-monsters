@@ -3,6 +3,7 @@ import { subscribe } from '../core/eventBus.js';
 import { gotomonService } from '../minigames/gotomonService.js';
 import { typeInfo } from '../minigames/gotomonTypes.js';
 import { BTN, PREV_KANJI_PANEL_BOTTOM } from '../screens/battle/theme.js';
+import { isPortraitCanvas, PORTRAIT_LAYOUT } from '../screens/battle/portraitLayout.js';
 
 // ゴトモン拡張を 本編バトルにも (2026-10-03): the companion chosen in the mini-game square watches the
 // battle from a corner, wearing its しんか / 色ちがい / かがやき / きせかえ. When the type matchup makes a
@@ -47,6 +48,14 @@ function place(doc) {
   if (!box.width) return;
   setFaceSize(72);
   const height = layer.offsetHeight || 110;
+  if (isPortraitCanvas(canvas)) {
+    // スマホを たてに 持った時: 出題の 漢字の 右の 空き（portraitLayout.js）
+    const scale = box.width / canvas.width, spot = PORTRAIT_LAYOUT.companion;
+    setFaceSize(Math.max(40, Math.min(72, Math.floor(120 * scale) - 24)));
+    layer.style.left = `${Math.round(box.left + spot.x * scale)}px`;
+    layer.style.top = `${Math.round(box.top + spot.y * scale)}px`;
+    return;
+  }
   if (box.left >= 100) {
     layer.style.left = `${Math.round(box.left - 92)}px`;
     layer.style.top = `${Math.round(box.top + box.height * 0.5)}px`;
