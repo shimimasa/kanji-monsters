@@ -26,3 +26,20 @@ export function pickJapanGrade(stages, isCleared, lastPlayedId, isUnlocked = () 
   }
   return 1;
 }
+
+// 世界編も 同じ考え方（2026-10-04）: 大陸の地図を 飛ばして 世界編の ステージ選択へ。
+// 1. 前に遊んだ ステージが 世界編（7〜10＝漢検4級〜2級）なら、その級
+// 2. なければ 7〜10 で まだ 全部 クリアしていない 最初の級
+// 3. 全部 クリアしていれば 4級（7）
+export const WORLD_LEVEL_BY_GRADE = Object.freeze({ 7: '4', 8: '3', 9: '準2', 10: '2' });
+
+export function pickWorldGrade(stages, isCleared, lastPlayedId) {
+  const list = Array.isArray(stages) ? stages : [];
+  const last = lastPlayedId ? list.find(s => s && s.stageId === lastPlayedId) : null;
+  if (last && WORLD_LEVEL_BY_GRADE[last.grade]) return last.grade;
+  for (let grade = 7; grade <= 10; grade++) {
+    const normal = list.filter(s => s && s.grade === grade && isNormalStage(s));
+    if (normal.length && !normal.every(s => isCleared(s.stageId))) return grade;
+  }
+  return 7;
+}

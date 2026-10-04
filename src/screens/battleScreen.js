@@ -916,15 +916,16 @@ updateShieldBreakEffect() {
         this.inputEl.style.display = 'block';
         this.inputEl.placeholder = 'よみを にゅうりょく';
         
-        // Enter キーで最後に選択したコマンドを呼び出す
+        // Enter・「よむ！」は いつも こうげき。かいふくは ボタンを 押した その時だけ（answerMode）。
+        // 以前は 最後に押したボタンが モードとして のこり、ヒントの あとの「よむ！」で また ヒントが出たり、
+        // 一度 かいふくを 押すと ずっと かいふくに なったりしていた（画面からは 分からない）。2026-10-04
         this._answerSubmission?.dispose?.();
         this._answerSubmission = bindInputSubmission(this.inputEl, () => {
           if (battleState.turn !== 'player' || !battleState.inputEnabled) return false;
-          const mode = battleState.lastCommandMode || 'attack';
+          const mode = answerMode();
           try {
-            if (mode === 'attack') onAttack();
-            else if (mode === 'heal') onHeal();
-            else onHint();
+            if (mode === 'heal') onHeal();
+            else onAttack();
           } catch (error) {
             console.error('処理中にエラーが発生しました:', error);
             battleState.inputEnabled = true;
@@ -1549,7 +1550,11 @@ if (gameState.currentEnemy && gameState.currentEnemy.weakness &&
     if (battleState.lastAnswered) {
       // by は「れんしゅうへ」ボタン（y 64〜96）の下に置く。70 だと重なって
       // ボタンがパネルの裏に隠れ、押せているのに見えない状態だった
-      const bx = 20, by = 104, bw = 140, bh = 180;
+      // せまい画面（compact）は 0.6倍ほどに 縮むので、12px だと 実寸8px前後で 読めない。
+      // 左の列いっぱい（幅270）に 広げ、漢字を 左・読みを 右に 並べて 文字を 約1.6倍にする（2026-10-04）
+      const big = !!controls.compact;
+      const k = big ? 1.6 : 1;
+      const bx = 20, by = 104, bw = big ? 270 : 140, bh = big ? 190 : 180;
       
       // パネル背景描画
       this.drawPanelBackground(this.ctx, bx, by, bw, bh, 'stone');
@@ -1557,12 +1562,12 @@ if (gameState.currentEnemy && gameState.currentEnemy.weakness &&
       this.ctx.fillStyle = 'white';
       this.ctx.textAlign = 'center';
       // タイトル
-      this.ctx.font = 'bold 14px "UDデジタル教科書体",sans-serif';
-      this.ctx.fillText('1つまえの漢字', bx + bw/2, by + 15);
+      this.ctx.font = `bold ${Math.round(14 * k)}px "UDデジタル教科書体",sans-serif`;
+      this.ctx.fillText('1つまえの漢字', bx + bw/2, by + Math.round(15 * k));
       
       // 漢字本体
-      this.ctx.font = '42px serif';
-      this.ctx.fillText(battleState.lastAnswered.text, bx + bw/2, by + 55);
+      this.ctx.font = big ? '56px serif' : '42px serif';
+      this.ctx.fillText(battleState.lastAnswered.text, big ? bx + 44 : bx + bw/2, big ? by + 100 : by + 55);
 
       // 読み進捗の取得（存在しない場合も考慮）
       const prog = (gameState.kanjiReadProgress && gameState.kanjiReadProgress[battleState.lastAnswered.id]) || null;
@@ -1575,10 +1580,10 @@ if (gameState.currentEnemy && gameState.currentEnemy.weakness &&
 
       // 折り返しヘルパー（ラベル幅を考慮、トークン単位）
       const drawWrappedTokens = (label, tokens, y, masteredSet) => {
-        this.ctx.font = '12px "UDデジタル教科書体",sans-serif';
+        this.ctx.font = `${Math.round(12 * k)}px "UDデジタル教科書体",sans-serif`;
         this.ctx.textAlign = 'left';
-        const left = bx + 10;
-        const maxW = bw - 20;
+        const left = big ? bx + 88 : bx + 10;   // せまい画面は 漢字の 右に
+        const maxW = big ? bw - 98 : bw - 20;
         const labelW = this.ctx.measureText(label).width;
 
         let x = left;
@@ -1598,7 +1603,7 @@ if (gameState.currentEnemy && gameState.currentEnemy.weakness &&
           const w = this.ctx.measureText(p.text).width;
           if (x + w > left + maxW) {
             // 改行
-            y += 18; // 行高
+            y += Math.round(18 * k); // 行高
             firstLine = false;
             x = left + labelW; // 2行目以降はラベル分インデント
           }
@@ -1607,30 +1612,32 @@ if (gameState.currentEnemy && gameState.currentEnemy.weakness &&
           x += w;
         });
 
-        return y + 18; // 次に描くベースYを返す
+        return y + Math.round(18 * k); // 次に描くベースYを返す
       };
 
       // 音読み（正解済みのみ青、折り返し）
-let nextY = drawWrappedTokens('音読み: ', (battleState.lastAnswered.onyomi || []), by + 85, progOn);
+let nextY = drawWrappedTokens(big ? '音: ' : '音読み: ', (battleState.lastAnswered.onyomi || []), big ? by + 62 : by + 85, progOn);
 
 // 訓読み（正解済みのみ青、折り返し）
-nextY = drawWrappedTokens('訓読み: ', (battleState.lastAnswered.kunyomi || []), nextY, progKun);
+nextY = drawWrappedTokens(big ? '訓: ' : '訓読み: ', (battleState.lastAnswered.kunyomi || []), nextY, progKun);
 
 // 画数（常に白色）
 this.ctx.fillStyle = 'white';
-this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, bx + 10, nextY);
+this.ctx.fillText(`画数: ${battleState.lastAnswered.strokes}`, big ? bx + 88 : bx + 10, nextY);
+if (big) nextY = Math.max(nextY, by + 128); // 漢字の 下まで 来てから「さっきためした」
 
       // さっきためした読みの表示（次のヒントとして中立色で示す）
       if (this.lastIncorrectAnswer) {
         this.ctx.fillStyle = 'rgba(52, 152, 219, 0.15)';
-        this.ctx.fillRect(bx + 10, nextY + 10, bw - 20, 22);
+        const boxH = Math.round(22 * k);
+        this.ctx.fillRect(bx + 10, nextY + 10, bw - 20, boxH);
         this.ctx.strokeStyle = 'rgba(52, 152, 219, 0.6)';
         this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(bx + 10, nextY + 10, bw - 20, 22);
+        this.ctx.strokeRect(bx + 10, nextY + 10, bw - 20, boxH);
         this.ctx.fillStyle = '#d6eaf8';
-        this.ctx.font = 'bold 12px "UDデジタル教科書体",sans-serif';
+        this.ctx.font = `bold ${Math.round(12 * k)}px "UDデジタル教科書体",sans-serif`;
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(`さっきためしたよみ: ${this.lastIncorrectAnswer}`, bx + bw/2, nextY + 21);
+        this.ctx.fillText(`さっきためしたよみ: ${this.lastIncorrectAnswer}`, bx + bw/2, nextY + 10 + boxH / 2 + 1);
       }
     }
     // ← ここまで追加
@@ -2353,8 +2360,11 @@ if (hh.visible) {
     const fs = Math.max(16, Math.min(18, Math.round(fsBase * (0.95 + 0.05 * hh.alpha))));
     ctx.save();
     ctx.font = `bold ${fs}px "UDデジタル教科書体", sans-serif`;
+    // 50音パッドには Enter キーが無いので、「よむ！」の ボタンで 案内する
+    const padOpen = !!document.getElementById('kanaPad')?.classList?.contains('kanaPad--open');
+    const helpText = padOpen ? String(hh.text).replace('Enterキーで', '「よむ！」で ') : hh.text;
     const padX = 14, padY = 8;
-    const textW = Math.ceil(ctx.measureText(hh.text).width);
+    const textW = Math.ceil(ctx.measureText(helpText).width);
     const w = textW + padX * 2;
     const h = fs + padY * 2;
     const x = (this.canvas.width - w) / 2;
@@ -2382,7 +2392,7 @@ if (hh.visible) {
     ctx.fillStyle = '#fff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(hh.text, x + w / 2, y + h / 2);
+    ctx.fillText(helpText, x + w / 2, y + h / 2);
     ctx.restore();
   }
 }
@@ -2649,11 +2659,10 @@ _adjustInputPosition() {
     if (this.inputEl && !this._answerSubmission) {
       this._answerSubmission = bindInputSubmission(this.inputEl, () => {
         if (battleState.turn !== 'player' || !battleState.inputEnabled) return false;
-        const mode = battleState.lastCommandMode || 'attack';
+        const mode = answerMode(); // Enter・「よむ！」は いつも こうげき（かいふくは ボタンの時だけ）
         try {
-          if (mode === 'attack') onAttack?.();
-          else if (mode === 'heal') onHeal?.();
-          else onHint?.();
+          if (mode === 'heal') onHeal?.();
+          else onAttack?.();
         } catch (err) {
           console.error('処理中にエラー:', err);
           battleState.inputEnabled = true;
@@ -3737,10 +3746,9 @@ if (e.type === 'touchstart') {
     return true;
   }
   
-  // 「ヒント」ボタン押下時
+  // 「ヒント」ボタン押下時（モードとしては のこさない。つぎの「よむ！」は こうげき）
   if (isMouseOverRect(x, y, BTN.hint)) {
     console.log('「ヒント」ボタンがクリックされました');
-    battleState.lastCommandMode = 'hint';
     onHint();
     return true;
   }
@@ -5758,6 +5766,13 @@ function enemyTurn() {
   }
 }
 
+
+/** Enter・「よむ！」の 答えの 使いみち。かいふくボタンを 押した その1回だけ 'heal'、ほかは いつも 'attack' */
+function answerMode() {
+  const mode = battleState.lastCommandMode === 'heal' ? 'heal' : 'attack';
+  battleState.lastCommandMode = 'attack';
+  return mode;
+}
 
 export function pickNextKanji() {
   // ヒントレベルをリセット

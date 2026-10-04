@@ -7,6 +7,7 @@ const { default: stage } = await import('../../src/screens/stageSelectScreen.js'
 const { default: title } = await import('../../src/screens/titleScreen.js');
 const { default: name } = await import('../../src/screens/playerNameInputScreen.js');
 const { default: continent } = await import('../../src/screens/continentSelectScreen.js');
+const { default: world } = await import('../../src/screens/worldStageSelectScreen.js');
 const { FSM } = await import('../../src/core/fsm.js');
 const snapshot = () => JSON.stringify({ stage: gameState.currentStageId, question: gameState.currentKanji,
   player: gameState.playerStats, turn: battleState.turn, input: battleState.inputEnabled, save: storage.getItem('krb_save') });
@@ -25,23 +26,31 @@ test('FINAL-QA-01 CASE A: real Japan click leaves no old tutorial, overlay, guid
   assert.equal(tutorial.guide,guide);
 });
 
-test('FINAL-QA-01 CASE B: real name -> FSM -> course -> continent stays unobstructed', async t => {
+// 2026-10-04: 世界編は 大陸の地図を 飛ばして 世界編の ステージ選択へ 直接 行く（core/japanStart.js）
+test('FINAL-QA-01 CASE B: real name -> FSM -> course -> world stage select stays unobstructed', async t => {
   const f = await navigationFixture(t);
-  const fsm = new FSM('name', { name, courseSelect:course, continentSelect:continent }); f.track(name);
-  f.onTransition(next => { fsm.change(next,f.canvas); f.track(fsm.currentState); });
+  const fsm = new FSM('name', { name, courseSelect:course, worldStageSelect:world }); f.track(name);
+  let lastTarget;
+  f.onTransition(next => { lastTarget = next; const id = typeof next === 'object' ? next.name : next; fsm.change(id,f.canvas); f.track(fsm.currentState); });
   name.nameInputElement.value='あお'; name._answerSubmission.submit('あお'); await drain();
   assert.equal(fsm.currentState,course); assert.equal(gameState.playerName,'あお');
   assert.equal(f.imports.length,1); f.advance(400); f.click(course.worldButton);
-  assert.equal(fsm.currentState,continent); assert.equal(course.canvas,null); fsm.update(16);
-  const before = snapshot(), camera = JSON.stringify(continent.camera);
+  assert.equal(fsm.currentState,world); assert.equal(course.canvas,null); fsm.update(16);
+  assert.deepEqual(lastTarget.props, { kanken_level:'4' }, 'nothing played yet: 4級');
+  const before = snapshot();
   await f.release('old'); fsm.update(16);
-  assert.equal(fsm.currentState,continent);
+  assert.equal(fsm.currentState,world);
   assert.deepEqual({ starts:f.starts.length, overlays:f.overlaysAdded() }, { starts:0, overlays:0 });
-  assert.equal(snapshot(),before); assert.equal(JSON.stringify(continent.camera),camera);
-  // With no covering DOM, the real map's registered handler still operates.
-  assert.equal(continent.isZooming,false); f.click({ x:298,y:248,width:4,height:4 });
-  assert.equal(continent.isZooming,true); assert.equal(continent.zoomTarget.name,'アジア');
+  assert.equal(snapshot(),before);
+  // With no covering DOM, the real stage list's registered handler still operates.
+  const first = world.stageButtons[0];
+  assert.ok(first, 'the 4級 stages are listed');
+  // 入った直後 0.7秒の タップは 残り物として 無視する作りなので、それを すぎてから
+  f.advance(800);
+  f.click(first);
+  assert.equal(world.selectedStage?.stageId, first.stage.stageId);
 });
+
 
 for (const [id,screen] of [['courseSelect',course],['regionSelect',region],['stageSelect',stage],['title',title]]) {
   if (screen !== course) test(`FINAL-QA-01 adjacent ${id}: actual exit rejects late tutorial`, async t => {
