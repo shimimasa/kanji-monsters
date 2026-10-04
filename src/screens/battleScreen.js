@@ -38,6 +38,7 @@ import {
   DEBUG,
 } from './battle/theme.js';
 import { placeCompactBattleInput, compactLogShift, showAnswerReveal, clearAnswerReveal, drawAnswerReveal } from './battle/compactLayout.js'; // BATTLE-LAYOUT
+import { openLeaveConfirm, closeLeaveConfirm } from './battle/leaveConfirm.js'; // BATTLE-LAYOUT
 
 // battleStateに残り時間プロパティを追加
 battleState.timeRemaining = 60;
@@ -3405,6 +3406,7 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
   },
   exit() {
     clearAnswerReveal(this); // BATTLE-LAYOUT
+    closeLeaveConfirm(); // BATTLE-LAYOUT
     this._pixelMotion?.dispose();
     this._pixelMotion = null;
     this._lifecycle?.deactivate();
@@ -3705,6 +3707,7 @@ if (e.type === 'touchstart') {
   });
   
         // 「ステージ選択」ボタン押下時
+        if (isMouseOverRect(x, y, BTN.stage)) { publish('playSE', 'decide'); openLeaveConfirm(); return true; } // BATTLE-LAYOUT 1タップで進みが消えないよう「ちずに もどる？」で確かめる
         if (isMouseOverRect(x, y, BTN.stage)) {
           console.log('「ステージ選択」ボタンがクリックされました');
           publish('playBGM', 'title'); // メニュー共通BGMへ
