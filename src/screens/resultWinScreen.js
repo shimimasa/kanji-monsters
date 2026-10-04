@@ -3,19 +3,23 @@
 
 import { publish } from '../core/eventBus.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
-import { gameState, battleState, recordStageCleared, saveGameData } from '../core/gameState.js';
+import { gameState, battleState, recordStageCleared, saveGameData, resetStageProgress } from '../core/gameState.js';
 import { checkAchievements } from '../core/achievementManager.js';
-import { calcBonusReward, isFirstClear, markBonusFirstClear } from '../core/bonusManager.js';
+import { calcBonusReward, isFirstClear, markBonusFirstClear, isBonusUnlocked } from '../core/bonusManager.js';
+import { stageData } from '../loaders/dataLoader.js';
+import { findNextStage } from '../core/nextStage.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { createScreenLifecycle } from '../core/screenLifecycle.js';
 
+// 位置は layoutButtons() で毎回決める（まちがえた漢字のパネルの有無・つぎのステージの有無で変わる）
 const nextStageButton = {
   x: 300,
-  y: 480,
+  y: 490,
   width: 200,
   height: 50,
-  text: 'ステージ選択へ'
+  text: 'ステージ選択へ',
+  tone: 'secondary'
 };
 
 const quickReviewButton = {
@@ -24,6 +28,15 @@ const quickReviewButton = {
   width: 220,
   height: 50,
   text: 'いま おぼえちゃう！'
+};
+
+// 「つぎのステージへ」。同じ学年の次のステージを、ステージ選択を通らずに始める
+const goNextButton = {
+  x: 250,
+  y: 418,
+  width: 300,
+  height: 58,
+  text: 'つぎのステージへ'
 };
 
 const resultWinState = {
@@ -112,6 +125,14 @@ if (!this._countCommitted) {
 
     this.bonusSummary = null;
 
+    // つぎのステージ（クリアの印を立てたあとに見るので、最後のステージなら学年まとめの鍵も反映される）
+    try {
+      this.nextStage = findNextStage(stageData, stageId, isBonusUnlocked);
+    } catch (e) {
+      console.warn('つぎのステージを決められませんでした:', e);
+      this.nextStage = null;
+    }
+
     const bonusCheckId = stageId || gameState.currentStageId || '';
     const m = /^bonus_g(\d+)$/i.exec(bonusCheckId);
     if (m) {
@@ -169,38 +190,15 @@ if (!this._countCommitted) {
         }
     
 
-// 5. ステージ選択ボタン
-const isHovered = isMouseOverRect(this.mouseX, this.mouseY, nextStageButton);
-this.drawRichButton(ctx, nextStageButton, isHovered);
-
-// 6. 復習パネル＋「間違えた漢字をマスター」ボタン（右側に配置）
-if (gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0) {
-  const panelRect = { x: 50, y: 420, w: 250, h: 150 };
-  // パネル
-  this.drawMistakeScrollPanel(ctx, panelRect.x, panelRect.y, panelRect.w, panelRect.h);
-
-  // 右側に基本配置
-  quickReviewButton.x = Math.min(panelRect.x + panelRect.w + 20, canvas.width - quickReviewButton.width - 20);
-  quickReviewButton.y = panelRect.y + Math.floor((panelRect.h - quickReviewButton.height) / 2);
-
-  // ステージ選択ボタンと重なったら上下に退避
-  const overlap = !(quickReviewButton.x + quickReviewButton.width < nextStageButton.x ||
-                    quickReviewButton.x > nextStageButton.x + nextStageButton.width ||
-                    quickReviewButton.y + quickReviewButton.height < nextStageButton.y ||
-                    quickReviewButton.y > nextStageButton.y + nextStageButton.height);
-  if (overlap) {
-    // まずはパネルの上へ
-    let newY = panelRect.y - quickReviewButton.height - 10;
-    if (newY < 20) {
-      // 上が狭ければパネルの下へ
-      newY = panelRect.y + panelRect.h + 10;
-    }
-    quickReviewButton.y = Math.min(newY, canvas.height - quickReviewButton.height - 20);
-  }
-
-  const isHoveredReview = isMouseOverRect(this.mouseX, this.mouseY, quickReviewButton);
-  this.drawRichButton(ctx, quickReviewButton, isHoveredReview);
-}
+// 5. 下の段: 左に「つぎの旅でまた会う漢字」、右（なければ真ん中）にボタン
+//    上の列: つぎのステージへ（いちばん大きく） / 下の列: いま おぼえちゃう！・ステージ選択へ
+//    以前は「いま おぼえちゃう！」がステージ選択へと重なるのをよけて、戦績の枠の上に逃げていた。
+const hasMistakes = !!(gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0);
+this.layoutButtons(hasMistakes);
+if (hasMistakes) this.drawMistakeScrollPanel(ctx, 50, 420, 250, 150);
+if (this.nextStage) this.drawRichButton(ctx, goNextButton, isMouseOverRect(this.mouseX, this.mouseY, goNextButton));
+if (hasMistakes) this.drawRichButton(ctx, quickReviewButton, isMouseOverRect(this.mouseX, this.mouseY, quickReviewButton));
+this.drawRichButton(ctx, nextStageButton, isMouseOverRect(this.mouseX, this.mouseY, nextStageButton));
 
    
   },
@@ -534,10 +532,27 @@ drawBonusResultPanel(ctx, x, y, width, height) {
   /**
    * リッチなボタンを描画
    */
+  /** 下の段のボタンの位置を決める（描画とクリック判定の両方から呼ぶ） */
+  layoutButtons(hasMistakes) {
+    goNextButton.text = this.nextStage?.name ? `つぎへ ▶ ${this.nextStage.name}` : 'つぎのステージへ';
+    // 「つぎへ」が無い時（学年の最後など）は、ステージ選択へ が いちばんの ボタンなので緑のまま
+    nextStageButton.tone = this.nextStage ? 'secondary' : 'primary';
+    if (hasMistakes) {
+      // 左に まちがえた漢字のパネル（x50〜300）。ボタンは右側 x330〜750
+      Object.assign(goNextButton, { x: 330, y: 418, width: 420, height: 58 });
+      Object.assign(quickReviewButton, { x: 330, y: 490, width: 205, height: 50, fontSize: 18 });
+      Object.assign(nextStageButton, { x: 545, y: 490, width: 205, height: 50, fontSize: 18 });
+    } else {
+      Object.assign(goNextButton, { x: 220, y: 418, width: 360, height: 58 });
+      Object.assign(nextStageButton, { x: 300, y: 490, width: 200, height: 50, fontSize: 20 });
+    }
+  },
+
   drawRichButton(ctx, button, isHovered) {
     ctx.save();
-    
+
     const { x, y, width, height, text } = button;
+    const secondary = button.tone === 'secondary';
     const scale = isHovered ? 1.05 : 1.0;
     
     // ホバー時のスケール調整
@@ -552,7 +567,11 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     
     // ボタン背景のグラデーション
     const buttonGradient = ctx.createLinearGradient(scaledX, scaledY, scaledX, scaledY + scaledHeight);
-    if (isHovered) {
+    if (secondary) {
+      // ステージ選択へ（もどる側）は茶色にして、「つぎのステージへ」と見分けられるように
+      buttonGradient.addColorStop(0, isHovered ? '#a0703c' : '#8b5a2b');
+      buttonGradient.addColorStop(1, isHovered ? '#6b4423' : '#5a3a1c');
+    } else if (isHovered) {
       buttonGradient.addColorStop(0, '#32CD32'); // ライムグリーン
       buttonGradient.addColorStop(0.5, '#228B22'); // フォレストグリーン
       buttonGradient.addColorStop(1, '#006400'); // ダークグリーン
@@ -577,8 +596,13 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     ctx.fillStyle = highlightGradient;
     ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight * 0.3);
     
-    // ボタンテキスト
-    ctx.font = 'bold 20px "UDデジタル教科書体", sans-serif';
+    // ボタンテキスト（ステージ名が長い時は ボタンに収まるまで小さくする）
+    let fontSize = button.fontSize || 20;
+    ctx.font = `bold ${fontSize}px "UDデジタル教科書体", sans-serif`;
+    while (fontSize > 14 && ctx.measureText(text).width > scaledWidth - 20) {
+      fontSize -= 1;
+      ctx.font = `bold ${fontSize}px "UDデジタル教科書体", sans-serif`;
+    }
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     
@@ -658,6 +682,7 @@ drawBonusResultPanel(ctx, x, y, width, height) {
     this.ctx = null;
     this.resultData = null;
     this.bonusSummary = null;
+    this.nextStage = null;
     this._countCommitted = false; // ← 追加: 次回のためにリセット
   },
 
@@ -722,6 +747,21 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
     const x = coords.x;
     const y = coords.y;
 
+    const hasMistakes = !!(gameState.wrongKanjiList && gameState.wrongKanjiList.length > 0);
+    this.layoutButtons(hasMistakes);
+
+    // つぎのステージへ: ステージ選択で2回押すのと同じ準備をして、すぐ始める
+    if (this.nextStage && isMouseOverRect(x, y, goNextButton)) {
+      publish('playSE', 'decide');
+      const targetId = this.nextStage.stageId;
+      gameState.currentStageId = targetId;
+      resetStageProgress(targetId);
+      // つぎのバトル画面がBGMを流すので、勝利BGMは止めておく（ゲームオーバーの「もういちど」と同じ）
+      publish('stopBGM', 0.2);
+      publish('changeScreen', 'stageLoading');
+      return;
+    }
+
     if (isMouseOverRect(x, y, nextStageButton)) {
       publish('playSE', 'decide');
       // 同画面への遷移を禁止して確実に抜ける
@@ -734,7 +774,8 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
       publish('changeScreen', targetScreen);
     }
     
-    if (isMouseOverRect(x, y, quickReviewButton)) {
+    // 描いていない時（まちがいが0）は押せない。以前は見えない当たり判定が残っていた
+    if (hasMistakes && isMouseOverRect(x, y, quickReviewButton)) {
       publish('playSE', 'decide');
       const targetStageId = (this.resultData && this.resultData.stageId) || gameState.currentStageId;
       const wrongRaw = (this.resultData && this.resultData.wrong) || gameState.wrongKanjiList || [];
