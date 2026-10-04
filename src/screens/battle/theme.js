@@ -23,10 +23,20 @@ export const BTN = {
   hint:   { x: 470, y: 380, w: 110, h: 50,  label: 'ヒント' },
 };
 
+// せまい画面（compact）のバトルの下側。左にHPパネル（x20〜280）を残し、
+// こうげき・かいふく・ヒントと入力欄は右側（x300〜780）にまとめる。
+// 共通の getLearningControls は横いっぱいに3つ並べるので、HPパネルとログを覆っていた。
+export const COMPACT_BATTLE_AREA = { left: 300, right: 780, gap: 12 };
+
 export function layoutBattleButtons(canvas) {
   const controls = getLearningControls(canvas);
   for (const key of ['practice','attack','heal','hint']) Object.assign(BTN[key],controls[key]);
   Object.assign(BTN.stage,controls.back);
+  if (controls.compact) {
+    const { left, right, gap } = COMPACT_BATTLE_AREA;
+    const w = Math.floor((right - left - gap * 2) / 3);
+    ['attack','heal','hint'].forEach((key, i) => Object.assign(BTN[key], { x: left + i * (w + gap), w }));
+  }
   return controls;
 }
 

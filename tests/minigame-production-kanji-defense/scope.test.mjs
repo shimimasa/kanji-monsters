@@ -19,7 +19,8 @@ test('main scheduler, battle, save transaction, audio and Motion remain unchange
     'src/screens/battleScreen.js','src/audio/audioManager.js','src/visuals/motion/monsterMotionHost.js']) {
     // 2026-10-02 (user-approved type matchups): the battle may hold lines marked TYPE-MATCHUP and
     // nothing else new; every other line must still be byte-identical to the base.
-    const current = path === 'src/screens/battleScreen.js' ? read(path).split(NL).filter(line => !line.includes('// TYPE-MATCHUP')).join(NL) : read(path);
+    // 2026-10-04 (user-approved battle layout fix): lines marked BATTLE-LAYOUT are allowed the same way.
+    const current = path === 'src/screens/battleScreen.js' ? read(path).split(NL).filter(line => !line.includes('// TYPE-MATCHUP') && !line.includes('// BATTLE-LAYOUT')).join(NL) : read(path);
     assert.equal(current, git('show', KANJI_DEFENSE_BASE + ':' + path), path);
   }
 });

@@ -6,7 +6,8 @@ import {assertBattleDisplayOnly,assertMotionScope,assertAddedPaths,readCheckpoin
 test('complete original battle source reconstructs exactly after removing only explicit display hooks',()=>{
  // 2026-10-02 (user-approved type matchups): lines marked TYPE-MATCHUP are the only other
  // addition to the battle; they are taken out first, and everything else is audited as before.
- const source=fs.readFileSync('src/screens/battleScreen.js','utf8').replaceAll('\r\n','\n').split('\n').filter(line=>!line.includes('// TYPE-MATCHUP')).join('\n');
+ // 2026-10-04 (user-approved battle layout fix): lines marked BATTLE-LAYOUT are taken out the same way.
+ const source=fs.readFileSync('src/screens/battleScreen.js','utf8').replaceAll('\r\n','\n').split('\n').filter(line=>!line.includes('// TYPE-MATCHUP')&&!line.includes('// BATTLE-LAYOUT')).join('\n');
  const checkpoint=readCheckpointBattle();
  assertBattleDisplayOnly(source,checkpoint);
  const hook=BATTLE_DISPLAY_HOOKS[0][1].join('\n')+'\n';
