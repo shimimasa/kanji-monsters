@@ -13,14 +13,26 @@ const statusScreenState = {
   hpUpgradeButton: null,
   attackUpgradeButton: null,
   backButton: null,
+  companionImage: null,
 
   /** 画面表示時の初期化 */
   enter(arg) {
+    const entry = this._entry = (this._entry || 0) + 1;
+    this.companionImage = null;
     // canvas が渡されなければ DOM から取得
     this.canvas = (arg && typeof arg.getContext === 'function')
       ? arg
       : document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
+    // 広場と同じあいぼうの絵を、ここを開いた時だけ読み込む。
+    import('../minigames/gotomonService.js').then(({ gotomonService }) => {
+      if (this._entry !== entry) return;
+      const url = gotomonService.getSelectedGotomon()?.imageUrl;
+      if (!url) return;
+      const image = new Image();
+      image.onload = () => { if (this._entry === entry) this.companionImage = image; };
+      image.src = url;
+    }).catch(() => {});
 
     // ボタン設定
     const cx = this.canvas.width / 2;
@@ -73,8 +85,26 @@ const statusScreenState = {
 
     // 背景
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'black';
+    const background = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    background.addColorStop(0, '#15384d');
+    background.addColorStop(1, '#0a1d30');
+    ctx.fillStyle = background;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = 'rgba(154, 226, 215, .4)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(18, 18, canvas.width - 36, canvas.height - 36);
+    const panelWidth = Math.min(canvas.width - 56, 540);
+    ctx.fillStyle = 'rgba(255, 255, 255, .08)';
+    ctx.fillRect((canvas.width - panelWidth) / 2, 138, panelWidth, 146);
+    if (this.companionImage) {
+      const size = isPortraitCanvas(canvas) ? 95 : 116;
+      const x = canvas.width / 2 + (isPortraitCanvas(canvas) ? 112 : 148);
+      ctx.fillStyle = 'rgba(255, 223, 147, .18)';
+      ctx.beginPath();
+      ctx.arc(x + size / 2, 208, size / 2 + 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.drawImage(this.companionImage, x, 208 - size / 2, size, size);
+    }
 
     // タイトル
     ctx.fillStyle = 'white';
@@ -106,10 +136,11 @@ const statusScreenState = {
 
     // スキルポイントがない場合の説明
     if (player.skillPoints === 0) {
-      ctx.fillStyle = '#888888';
+      ctx.fillStyle = '#cde4ed';
       ctx.font = '16px "UDデジタル教科書体", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('レベルアップでスキルポイントを獲得できます', canvas.width / 2, statusY + lineHeight * 4.5);
+      ctx.fillText('レベルアップでスキルポイントを獲得できます', canvas.width / 2,
+        isPortraitCanvas(canvas) ? 310 : 470);
     }
 
     // アップグレードボタンの描画
@@ -146,6 +177,8 @@ const statusScreenState = {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    this._entry++;
+    this.companionImage = null;
     restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
     this.unregisterHandlers();
     this.canvas = null;

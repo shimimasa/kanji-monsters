@@ -287,6 +287,7 @@ _drawAllCaughtMark(ctx, x, y) {
   /** 画面表示時の初期化 */
   enter(arg) {
     this._lifecycle.activate();
+    this.notice = null;
     // BGM 再生 & canvas 取得
     publish('playBGM', 'title');
     this.canvas = (arg && typeof arg.getContext === 'function')
@@ -1152,7 +1153,42 @@ update(dt) {
   if (gameState.currentGrade !== 0 && !portrait) {
     this.drawTooltip(this.hoveredStage);
   }
+  this._drawNotice(ctx, cw, ch);
 },
+
+  _showNotice(lines) {
+    this.notice = lines;
+    this.render();
+  },
+
+  _drawNotice(ctx, width, height) {
+    if (!this.notice) return;
+    const boxWidth = Math.min(width - 36, 560);
+    const boxHeight = 86 + this.notice.length * 34;
+    const left = (width - boxWidth) / 2;
+    const top = (height - boxHeight) / 2;
+    ctx.save();
+    ctx.fillStyle = 'rgba(5, 22, 38, 0.75)';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = '#183f55';
+    ctx.fillRect(left, top, boxWidth, boxHeight);
+    ctx.strokeStyle = '#8ed8e8';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(left, top, boxWidth, boxHeight);
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '20px "UDデジタル教科書体", sans-serif';
+    this.notice.forEach((line, index) => {
+      ctx.font = '20px "UDデジタル教科書体", sans-serif';
+      if (ctx.measureText(line).width > boxWidth - 24) ctx.font = '16px "UDデジタル教科書体", sans-serif';
+      ctx.fillText(line, width / 2, top + 31 + index * 34);
+    });
+    ctx.fillStyle = '#b8f4df';
+    ctx.font = '18px "UDデジタル教科書体", sans-serif';
+    ctx.fillText('タップして もどる', width / 2, top + boxHeight - 23);
+    ctx.restore();
+  },
 
   /** フッターバーとボタンの描画 */
   _drawFooterBar(ctx, canvasWidth, canvasHeight) {
@@ -1338,6 +1374,7 @@ update(dt) {
     
     const x = coords.x;
     const y = coords.y;
+    if (this.notice) { this.notice = null; publish('playSE', 'cancel'); return; }
 
     // タブクリック判定（たての 画面は 2段）
     const portrait = isPortraitCanvas(this.canvas);
@@ -1351,9 +1388,9 @@ update(dt) {
         // ← 追加: 四国/九州の未解放ブロック
         if ((tab.grade === 11 || tab.grade === 12) && !this.isRegionUnlocked(tab.grade)) {
           publish('playSE', 'cancel');
-          alert(tab.grade === 11
-            ? '四国地方はまだ解放されていません。\n解放条件: 1〜6年の通常ステージを全てクリア'
-            : '九州地方はまだ解放されていません。\n解放条件: 1〜11年の通常ステージを全てクリア');
+          this._showNotice(tab.grade === 11
+            ? ['四国は この先に あるよ', '1〜6年の ステージを クリアすると ひらくよ']
+            : ['九州は この先に あるよ', '1〜11年の ステージを クリアすると ひらくよ']);
           return;
         }
 
@@ -1396,7 +1433,7 @@ update(dt) {
               })();
               if (!g || !isBonusUnlocked(g)) {
                  publish('playSE', 'cancel');
-                 alert('この学年ボーナスはまだ解放されていません。\n同学年の通常ステージを全てクリアし、学年の漢字を全てマスターすると解放されます。');
+                 this._showNotice(['学年の ボーナスは この先に あるよ', 'この学年の ステージを クリアして', '漢字を マスターすると ひらくよ']);
                  return;
                }
              }
@@ -1429,7 +1466,7 @@ update(dt) {
                   })();
                   if (!g || !isBonusUnlocked(g)) {
                      publish('playSE', 'cancel');
-                     alert('この学年ボーナスはまだ解放されていません。\n通常ステージをすべてクリアすると解放されます。');
+                     this._showNotice(['学年の ボーナスは この先に あるよ', 'この学年の ステージを クリアすると ひらくよ']);
                      return;
                    }
                  }
@@ -1515,12 +1552,12 @@ update(dt) {
         gameState.gameMode = 'practice';
         publish('changeScreen', 'practiceBattle');
       } else {
-        alert('マスターできるステージがありません。');
+        this._showNotice(['いまは すすめる ステージが ないよ', 'ほかの 学年も のぞいてみよう']);
       }
     }
     // ステージが選択されていない場合
     else {
-      alert('マスターしたいステージを先に選択してください。');
+      this._showNotice(['れんしゅうしたい ステージを えらんでね']);
     }
   },
   

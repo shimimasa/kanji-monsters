@@ -130,6 +130,7 @@ const reviewStage = {
     const assessment = classifyReadingAnswer(raw, this.currentKanji.readings);
     if (assessment.kind === 'blank') return false;
     if (assessment.kind === 'near-miss') {
+      publish('playSE', 'nearMiss');
       this.nearMissCount++;
       this.message = getNearMissLines(assessment.nearMiss, this.nearMissCount).join('  ');
       if (this.inputEl) this.inputEl.value = '';

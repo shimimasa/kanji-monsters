@@ -16,10 +16,10 @@ const NL = String.fromCharCode(10);
 // rebuilt as a real-time arcade game; core.test.mjs and lifecycle.test.mjs specify it now.
 // 2026-10-04 (user decision): the main game's battle screen and main loop are no longer frozen,
 // so they can be improved directly (battle layout, the achievement popups). The save transaction,
-// audio and the Motion host stay byte-identical to the base.
-test('save transaction, audio and Motion remain unchanged', () => {
+// 2026-10-04 (user decision): audioManager can add dedicated sounds; save and Motion stay frozen.
+test('save transaction and Motion remain unchanged', () => {
   for (const path of ['src/core/gameState.js','src/core/saveData.js','src/core/storageTransaction.js',
-    'src/audio/audioManager.js','src/visuals/motion/monsterMotionHost.js']) {
+    'src/visuals/motion/monsterMotionHost.js']) {
     assert.equal(read(path), git('show', KANJI_DEFENSE_BASE + ':' + path), path);
   }
 });

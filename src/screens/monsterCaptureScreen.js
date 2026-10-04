@@ -260,7 +260,7 @@ const monsterCaptureScreen = {
     confirmBtn.id = 'captureConfirmButton';
     Object.assign(confirmBtn.style, buttonStyle('green'));
     confirmBtn.onclick = () => {
-      publish('playSE', 'decide');
+      publish('playSE', 'capture');
       for (const id of this.selected) addMonster(id);
       // なかまに入れてから あいぼうに する（なかまでない子は あいぼうに できない）
       if (this.companionPick) {

@@ -102,8 +102,9 @@ test('learning features preserve other five cores/views, reward formulas, kanji 
   const games = ['multiSelect', 'asyncChoice'];
   const files = games.map(id => `src/minigames/${id}/${id}Game.js`);
   // Companion play can select a course; grading and growth formulas remain frozen.
+  // 2026-10-04 (user decision): audioManager can add dedicated sounds; learning records remain frozen.
   files.push('src/minigames/companionGrowth.js', 'src/minigames/scoreRank.js',
-    'src/playtest/developmentLogger.js', 'src/core/saveData.js', 'src/core/learningOutcome.js', 'src/audio/audioManager.js');
+    'src/playtest/developmentLogger.js', 'src/core/saveData.js', 'src/core/learningOutcome.js');
   // 2026-10-04 (user decision): the companion is called 「あいぼう」 in hiragana everywhere. That
   // wording is the only change allowed here; formulas must still match byte for byte.
   for (const file of files) assert.equal(readFileSync(file, 'utf8').replaceAll('\r\n', '\n').replaceAll('あいぼう', '相棒'),

@@ -1106,7 +1106,7 @@ if (this.unmasteredKanji.length === 0) {
     if (battleState.nearMissCount >= 2) Speech.speak(nearMiss.reading);
 
     // se_wrong は鳴らさない（読みちがいと同じ音にすると案内の意味が消える）
-    publish('playSE', 'cancel');
+    publish('playSE', 'nearMiss');
 
     if (this.inputEl) this.inputEl.value = '';
     battleState.turn = 'player';

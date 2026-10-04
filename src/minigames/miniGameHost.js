@@ -56,6 +56,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
   const host = {
     enter(nextProps = {}) {
       host.exit(); props = nextProps;
+      publish('playBGM', 'miniGamePlay');
       const definition = miniGameRegistry[nextProps.gameId || 'mathSprint'];
       if (!definition) throw new Error('Unknown mini game');
       const sessionId = makeSessionId(); valid = true; manualPaused = false; visibilityPaused = !!doc.hidden;

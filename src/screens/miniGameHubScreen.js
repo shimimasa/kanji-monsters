@@ -39,6 +39,7 @@ const writeSubject = value => { try { localStorage.setItem(SUBJECT_KEY, value); 
 const hub = {
   enter(props = {}) {
     this.exit();
+    publish('playBGM', 'miniGameHub');
     const doc = document, root = element(doc, 'section', 'yt-world yt-hub'); root.id = 'miniGameHub';
     root.setAttribute('aria-label', 'ミニゲーム広場');
     const wrap = element(doc, 'div', 'yt-hub-content'), header = element(doc, 'header', 'yt-hub-header');
