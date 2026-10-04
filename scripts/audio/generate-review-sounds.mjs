@@ -88,6 +88,11 @@ render('se_mini_shot', 0.17, [{ at: 0, length: 0.16, from: 880, to: 440, gain: 0
 render('se_mini_whoosh', 0.23, [{ at: 0, length: 0.22, from: 320, to: 920, gain: 0.18, decay: 1.8 }]);
 render('se_mini_hop', 0.21, [{ at: 0, length: 0.20, from: 390, to: 690, gain: 0.17, decay: 1.9 }]);
 render('se_mini_pop', 0.12, [{ at: 0, length: 0.11, from: 650, to: 890, gain: 0.16, decay: 3 }]);
+render('se_mini_move', 0.10, [{ at: 0, length: 0.09, from: 330, to: 440, gain: 0.11, decay: 3 }]);
+render('se_mini_pickup', 0.29, [
+  { at: 0, length: 0.16, freq: 783.99, gain: 0.14, decay: 2 },
+  { at: 0.10, length: 0.17, freq: 1046.5, gain: 0.15, decay: 2 },
+]);
 
 // Two short loops. The quiet final half-second lets either loop return to beat one cleanly.
 const chord = (notes, at, length, gain = 0.055) => notes.map(freq => ({ at, length, freq, gain, attack: 0.035, decay: 0.55 }));

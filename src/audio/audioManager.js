@@ -122,6 +122,8 @@ export class AudioManager {
         miniWhoosh: '/assets/audio/se_mini_whoosh.mp3',
         miniHop: '/assets/audio/se_mini_hop.mp3',
         miniPop: '/assets/audio/se_mini_pop.mp3',
+        miniMove: '/assets/audio/se_mini_move.mp3',
+        miniPickup: '/assets/audio/se_mini_pickup.mp3',
 
         // NOTE: 以下は呼び出しはあったが未登録で、ずっと無音だったもの。
         // 専用音源が用意されるまで、意味の近い既存音を暫定割当する
