@@ -141,7 +141,7 @@ export function createSentenceOrderView({ document: doc, dispatch, onBack, getSn
     crossing = 0;
     if (answer.correct) {
       fx.pop(50, 26, '橋がつながった！', 'good');
-      feedback.textContent = friendName && !friend.hidden ? `せいかい！ 相棒がわたって、${friendName}に会いに行くよ` : 'せいかい！ 相棒がわたるよ';
+      feedback.textContent = friendName && !friend.hidden ? `せいかい！ あいぼうがわたって、${friendName}に会いに行くよ` : 'せいかい！ あいぼうがわたるよ';
       if (!friend.hidden) friend.dataset.met = 'true';
       frame.announce(`せいかい。${text}`);
     } else {
@@ -164,7 +164,7 @@ export function createSentenceOrderView({ document: doc, dispatch, onBack, getSn
         const waiting = castAt(cast?.wild, friendSerial++);
         friend.hidden = !waiting || state.mode === 'review'; friend.dataset.met = 'false'; friendName = waiting?.name ?? '';
         if (waiting) friend.src = waiting.imageUrl;
-        feedback.textContent = state.mode === 'review' ? '文のつながりを、相棒とたしかめよう' : '文のはじめの言葉をタップ！';
+        feedback.textContent = state.mode === 'review' ? '文のつながりを、あいぼうとたしかめよう' : '文のはじめの言葉をタップ！';
       }
       if (!problem) return;
       const laid = state.laid ?? [];

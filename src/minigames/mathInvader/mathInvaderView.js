@@ -193,7 +193,7 @@ export function createMathInvaderView({ document: doc, dispatch, onBack, getSnap
       moodMs = Math.max(0, moodMs - dt); if (!moodMs) turret.dataset.mood = '';
       const w = play.world || {};
       turret.dataset.fever = String(!!w.fever);
-      if (play.boosts !== lastBoosts) { if (play.boosts > lastBoosts) { fx.banner('相棒の連射！', 'great'); fx.flash('great'); } lastBoosts = play.boosts; }
+      if (play.boosts !== lastBoosts) { if (play.boosts > lastBoosts) { fx.banner('あいぼうの連射！', 'great'); fx.flash('great'); } lastBoosts = play.boosts; }
       const mission = w.challenge;
       frame.hud.set({ points: (state?.score ?? play.learningPoints) + play.bonus, comboCount: play.combo,
         progressValue: (state?.resolved ?? 0) / 10, progressLabel: `撃破 ${state?.correct ?? 0} · のこり ${10 - (state?.resolved ?? 0)}`,

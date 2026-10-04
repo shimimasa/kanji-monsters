@@ -102,7 +102,7 @@ export function createInvaderWorld(effects, { course = null } = {}) {
     snapshot() {
       return { kind: 'shoot', bonus, progress: kills / 10, kills, feverShots, fever: feverShots > 0, golden, goldenHits,
         bossDown, bossFirstTry, escapes, shield,
-        metric: `撃破 ${kills}/10`, caption: feverShots ? `相棒の連射！ あと${feverShots}発` : golden ? '次の一発は黄金弾！' : '',
+        metric: `撃破 ${kills}/10`, caption: feverShots ? `あいぼうの連射！ あと${feverShots}発` : golden ? '次の一発は黄金弾！' : '',
         summary: `${kills}機を撃破${bossDown ? ' · ボス撃破！' : ''}${course ? ` · 黄金弾 ${goldenHits}発` : ''}`,
         goal: bossDown ? '次は連続撃破をのばそう' : '最後のボスまで撃ちぬこう' };
     },
@@ -122,7 +122,7 @@ export function createGateWorld(effects, { course = null } = {}) {
     boost() { cheer = 3; },
     snapshot() {
       return { kind: 'defend', bonus, progress: correct / 12, correct, cheer, fever: cheer > 0, wards, wardHits, escapes,
-        metric: `撃退 ${correct}/12`, caption: cheer ? `相棒エール！ あと${cheer}回パワーアップ` : wards ? '守りの札が光っている！' : '',
+        metric: `撃退 ${correct}/12`, caption: cheer ? `あいぼうエール！ あと${cheer}回パワーアップ` : wards ? '守りの札が光っている！' : '',
         summary: `${correct}体を撃退${course ? ` · 札で撃退 ${wardHits}回` : ''}`,
         goal: '近いモンスターから読んで、連続撃退をめざそう' };
     },

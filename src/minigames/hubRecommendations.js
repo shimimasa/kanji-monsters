@@ -4,7 +4,7 @@ export function hubRecommendations({ gameIds, progress = {}, reviewCount = 0, ti
   const known = id => typeof id === 'string' && gameIds.includes(id);
   if (reviewCount > 0 && known('englishChoice')) {
     suggestions.push({ kind: 'review', gameId: 'englishChoice', review: true,
-      label: `英単語${reviewCount}語を復習しよう`, reason: 'まちがえた語を、もう一度たしかめよう。', action: '相棒と復習する' });
+      label: `英単語${reviewCount}語を復習しよう`, reason: 'まちがえた語を、もう一度たしかめよう。', action: 'あいぼうと復習する' });
   }
   if (timedReviewCount > 0 && known('timedChoice')) {
     suggestions.push({ kind: 'review', gameId: 'timedChoice', review: true,

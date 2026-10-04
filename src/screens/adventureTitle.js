@@ -5,7 +5,7 @@ export function createAdventureTitle({ document: doc = document, playerName, onS
   const root = element(doc, 'section', 'yt-world yt-title'); root.id = 'adventureTitle';
   root.setAttribute('aria-label', 'ヨミタビ タイトル');
   const content = element(doc, 'div', 'yt-title-content'); root.append(content);
-  content.append(element(doc, 'p', 'yt-eyebrow', 'ことばを読んで、まだ見ぬ仲間に会いに。'));
+  content.append(element(doc, 'p', 'yt-eyebrow', 'ことばを読んで、まだ見ぬ なかまに 会いに。'));
   const logo = element(doc, 'img', 'yt-logo'); logo.src = '/assets/images/logo.png'; logo.alt = 'ヨミタビ ゴトモン'; content.append(logo);
   const landscape = element(doc, 'div', 'yt-landscape'); landscape.setAttribute('aria-hidden', 'true');
   const friend = gotomonService.getSelectedGotomon();
@@ -15,7 +15,7 @@ export function createAdventureTitle({ document: doc = document, playerName, onS
   content.append(element(doc, 'p', 'yt-welcome', playerName ? `${playerName}さん、旅のつづきを。` : '読むたび、世界が広がる。'));
   const actions = element(doc, 'div', 'yt-title-actions');
   const storyPath = element(doc, 'section', 'yt-title-path');
-  storyPath.append(element(doc, 'h2', '', 'ヨミタビ本編'), element(doc, 'p', '', '漢字を読みながら旅を進め、ゴトモンを仲間にしよう。'));
+  storyPath.append(element(doc, 'h2', '', 'ヨミタビ本編'), element(doc, 'p', '', '漢字を読みながら旅を進め、ゴトモンを なかまに しよう。'));
   // 「つづきから」は 本当に 前に あそんだ 場所（その地方の ステージ選択）へ 行く。
   // 以前は 大きいボタンが 冒険先の選択（日本／世界）へ行き、前の場所へ もどれるのは 下の 小さな
   // 「まえの場所から」だけだった。ほかの場所へは、すぐ下の「ほかの場所をえらぶ」から。
@@ -32,7 +32,7 @@ export function createAdventureTitle({ document: doc = document, playerName, onS
   const hub = button(doc, 'ミニゲーム広場へ', onHub, 'yt-secondary'); hub.id = 'titleMiniGameButton';
   miniPath.append(hub);
   actions.append(storyPath, miniPath); content.append(actions);
-  content.append(element(doc, 'p', 'yt-note', friend ? `${friend.name}とミニゲームにも挑戦できるよ。` : 'ミニゲームのプレイには相棒が必要です。本編でゴトモンを仲間にしよう。'));
+  content.append(element(doc, 'p', 'yt-note', friend ? `${friend.name}とミニゲームにも挑戦できるよ。` : 'ミニゲームのプレイにはあいぼうが必要です。本編でゴトモンを なかまに しよう。'));
   const links = element(doc, 'nav', 'yt-title-links'); links.setAttribute('aria-label', '補助メニュー');
   links.append(button(doc, 'ゴトモン図鑑', onDex), button(doc, 'せってい', onSettings), button(doc, 'だれが あそぶ？', onSlots));
   if (onReset) {

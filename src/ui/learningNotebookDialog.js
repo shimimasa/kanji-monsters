@@ -78,14 +78,14 @@ export function createLearningNotebookDialog({ doc, services, canReview, onRevie
         practice.dataset.action = 'practice-search'; practice.disabled = !canReview; content.append(practice);
         content.append(element(doc, 'p', 'yt-note', canReview
           ? '最大10問。まちがえた問題を優先し、正解済みは最後に答えた日が古いものから選びます。「今回のまとめ練習」が出題の目印です。'
-          : '練習は、冒険で相棒を見つけてから始められます。'));
+          : '練習は、冒険であいぼうを見つけてから始められます。'));
       }
     }
     if (summary.pending.length && !searching) {
       const start = button(doc, `復習する（今回${Math.min(10, summary.pending.length)}${bank.unit}）`, () => {
         startReview(bank.gameId);
       }, 'yt-primary'); start.disabled = !canReview; start.dataset.action = 'notebook-review'; content.append(start);
-      content.append(element(doc, 'p', 'yt-note', canReview ? '最近まちがえた問題から最大10問ずつ。正解した問題は復習の一覧から外れます。' : '復習は、冒険で相棒を見つけてから始められます。'));
+      content.append(element(doc, 'p', 'yt-note', canReview ? '最近まちがえた問題から最大10問ずつ。正解した問題は復習の一覧から外れます。' : '復習は、冒険であいぼうを見つけてから始められます。'));
     } else if (!summary.pending.length && summary.attempted) content.append(element(doc, 'p', '', '今、復習が必要な問題はありません。'));
     function list(entries) {
       const rows = element(doc, 'ul', 'yt-memory-list');

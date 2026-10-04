@@ -14,7 +14,7 @@ export function typeChip(doc, type, prefix = '') {
 }
 export function companionPortrait(doc, gotomon, className = '') {
   const frame = element(doc, 'span', `gt-portrait ${className}`);
-  const fallback = element(doc, 'span', 'gt-image-fallback', gotomon?.name || '相棒');
+  const fallback = element(doc, 'span', 'gt-image-fallback', gotomon?.name || 'あいぼう');
   fallback.hidden = !!gotomon?.imageUrl; frame.append(fallback);
   if (gotomon?.imageUrl) {
     const img = element(doc, 'img'); img.src = gotomon.imageUrl; img.alt = gotomon.name; img.loading = 'lazy';

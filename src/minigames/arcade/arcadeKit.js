@@ -79,8 +79,8 @@ function createHud(el) {
   const progress = el('div', 'ya-progress'); const progressFill = el('i'); const progressText = el('span');
   progress.append(progressFill, progressText);
   const lives = el('div', 'ya-lives');
-  const gauge = el('div', 'ya-gauge'); gauge.setAttribute('aria-label', '相棒ゲージ');
-  const gaugeLabel = el('span', '', '相棒'); gauge.append(gaugeLabel);
+  const gauge = el('div', 'ya-gauge'); gauge.setAttribute('aria-label', 'あいぼうゲージ');
+  const gaugeLabel = el('span', '', 'あいぼう'); gauge.append(gaugeLabel);
   const pips = [0, 1, 2].map(() => { const pip = el('i'); gauge.append(pip); return pip; });
   const mission = el('div', 'ya-mission'); mission.hidden = true;
   left.append(scoreBox, combo); right.append(progress, lives, gauge, mission); root.append(left, right);
@@ -111,7 +111,7 @@ function createHud(el) {
       }
       pips.forEach((pip, i) => toggleClass(pip, 'on', gaugeValue >= i + 1));
       gauge.dataset.fever = String(!!fever);
-      gaugeLabel.textContent = fever ? 'フィーバー！' : '相棒';
+      gaugeLabel.textContent = fever ? 'フィーバー！' : 'あいぼう';
       mission.hidden = !missionText; mission.textContent = missionText; mission.dataset.done = String(!!missionDone);
     },
   };

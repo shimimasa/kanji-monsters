@@ -40,14 +40,14 @@ export function createAllStickersDialog({ doc, service, selectedId, onOpenBook, 
       for (const text of [`シール ${card.stickers.total}/${service.gameCount}`, `金 ${card.stickers.gold}`, `がんばり ${card.stickers.review}`,
         `きせかえ ${card.outfits}/${OUTFIT_ITEMS.length}`, `ひみつ ${card.secrets}/${card.secretTotal}`]) chips.append(element(doc, 'span', '', text));
       const body = element(doc, 'div', 'yt-all-body');
-      body.append(element(doc, 'strong', '', `${card.gotomon.name}${card.gotomon.id === selectedId ? '（いまの相棒）' : ''}`),
+      body.append(element(doc, 'strong', '', `${card.gotomon.name}${card.gotomon.id === selectedId ? '（いまのあいぼう）' : ''}`),
         element(doc, 'small', '', `Lv${card.level} · なかよし ${card.friendship}`), chips);
       chips.prepend(typeChip(doc, card.gotomon.type));
       const actions = element(doc, 'div', 'yt-all-actions');
       const open = button(doc, 'シール帳', () => onOpenBook?.(card.gotomon), 'yt-all-open'); open.dataset.action = 'open-book';
       actions.append(open);
       if (card.gotomon.id !== selectedId) {
-        const pick = button(doc, '相棒にする', () => onSelect?.(card.gotomon), 'yt-all-pick'); pick.dataset.action = 'make-companion';
+        const pick = button(doc, 'あいぼうにする', () => onSelect?.(card.gotomon), 'yt-all-pick'); pick.dataset.action = 'make-companion';
         actions.append(pick);
       }
       row.append(companionPortrait(doc, card.gotomon), body, actions);

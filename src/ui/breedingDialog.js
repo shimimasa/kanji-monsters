@@ -88,7 +88,7 @@ export function createBreedingDialog({ doc, service, onSelect, onClose }) {
       choosing = null; book = service.getBreedingBook();
       news.replaceChildren(element(doc, 'strong', '', `${result.gotomon.name}が なかまに なった！`),
         element(doc, 'span', '', ` ${names.join('と ')}も いっしょだよ。`));
-      const make = button(doc, '相棒にする', () => onSelect?.(result.gotomon), 'yt-all-pick'); make.dataset.action = 'make-companion';
+      const make = button(doc, 'あいぼうにする', () => onSelect?.(result.gotomon), 'yt-all-pick'); make.dataset.action = 'make-companion';
       news.append(make); news.hidden = false; render();
     }, 'yt-primary');
     confirm.dataset.action = 'confirm-breed';

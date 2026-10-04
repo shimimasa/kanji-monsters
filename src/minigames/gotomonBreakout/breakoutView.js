@@ -145,7 +145,7 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
     if (bounce && bounce.bounce !== shownBounce && state.phase === 'answering') {
       shownBounce = bounce.bounce;
       const node = nodes.get(bounce.blockId); if (node) restartClass(node, 'bk-bump');
-      note.textContent = state.hintId ? 'コツン！ 相棒が ねらいを 手伝うよ' : 'コツン！ えらんだ ブロックを ねらおう';
+      note.textContent = state.hintId ? 'コツン！ あいぼうが ねらいを 手伝うよ' : 'コツン！ えらんだ ブロックを ねらおう';
     }
   };
   const showAnswer = state => {

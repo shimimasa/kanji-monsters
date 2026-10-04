@@ -15,7 +15,7 @@ try {
   const launched = await launchPreferredBrowser(chromium);
   browser = launched.browser; report.browser = launched.name;
   const save = getDefaultSave();
-  save.player.name = '相棒コースQA';
+  save.player.name = 'あいぼうコースQA';
   save.player.collection.gotomonIds = ['HKD-E01', 'HKD-E02', 'HKD-E03', 'HKD-E04', 'AOM-E09'];
   save.meta.compatibilityEntries = { tutorial_seen_title: '1' };
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });

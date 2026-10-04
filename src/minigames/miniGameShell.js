@@ -63,9 +63,9 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
       onPause(false);
     }
   });
-  const hud = element(doc, 'div', 'gt-hud'), name = element(doc, 'span', 'gt-friend-name', gotomon?.name || '相棒なし');
+  const hud = element(doc, 'div', 'gt-hud'), name = element(doc, 'span', 'gt-friend-name', gotomon?.name || 'あいぼうなし');
   const score = element(doc, 'strong'), combo = element(doc, 'span');
-  name.textContent = `${gotomon?.name || '相棒'} Lv${play.snapshot().growth.level}${supporters.length ? ` ＋サポーター${supporters.length}` : ''}`;
+  name.textContent = `${gotomon?.name || 'あいぼう'} Lv${play.snapshot().growth.level}${supporters.length ? ` ＋サポーター${supporters.length}` : ''}`;
   // わざ: the type's move replaces the game's skill name (the game's own effect stays).
   const move = play.snapshot().move, skillName = move?.name ?? info.skill;
   if (supporters.length) name.title = supporters.map(item => `${item.name}：${supportEffectOf(item.type).text}`).join(' / ');
@@ -74,7 +74,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   for (const item of supporters) { const face = companionPortrait(doc, item, 'gt-party-face'); face.title = `${item.name}：${supportEffectOf(item.type).text}`; party.append(face); }
   hud.append(name, ...(supporters.length ? [party] : []), score, combo);
   const skill = button(doc, '', onBoost, 'gt-button gt-skill'); skill.dataset.action = 'boost';
-  const gauge = element(doc, 'meter'); gauge.min = 0; gauge.max = 3; gauge.value = 0; gauge.setAttribute('aria-label', '相棒ゲージ');
+  const gauge = element(doc, 'meter'); gauge.min = 0; gauge.max = 3; gauge.value = 0; gauge.setAttribute('aria-label', 'あいぼうゲージ');
   const skillLabel = element(doc, 'span'); skill.append(gauge, skillLabel); hud.append(skill);
   if (!arcadeView) howTo.after(hud);
   const scene = arcadeView ? null : createCompanionScene({ doc, root, info, gotomon, act: onAct });
@@ -117,9 +117,9 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   for (const node of [header, soundPanel, hud, root.querySelector('.gt-goal-picker'), root.querySelector('.gt-world-actions')]) {
     node?.addEventListener('keydown', event => event.stopPropagation());
   }
-  const result = element(doc, 'section', 'gt-result'); result.hidden = true; result.setAttribute('aria-label', '相棒とのプレイ結果');
+  const result = element(doc, 'section', 'gt-result'); result.hidden = true; result.setAttribute('aria-label', 'あいぼうとのプレイ結果');
   result.addEventListener('keydown', event => event.stopPropagation());
-  const resultTitle = element(doc, 'h2', '', '相棒と、ひとつ先へ。'), portrait = companionPortrait(doc, gotomon);
+  const resultTitle = element(doc, 'h2', '', 'あいぼうと、ひとつ先へ。'), portrait = companionPortrait(doc, gotomon);
   const resultName = element(doc, 'h3', '', gotomon?.name || ''), resultScore = element(doc, 'strong', 'gt-final-score');
   const stats = element(doc, 'p'), reward = element(doc, 'p', 'gt-reward'); reward.setAttribute('role', 'status');
   const record = element(doc, 'p', 'gt-record'), resultActions = element(doc, 'div', 'gt-result-actions');
@@ -159,7 +159,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   resultDetails.append(element(doc, 'summary', '', 'くわしい記録・問題のふりかえり'),resultScore,record);
   if (legacyResult) { legacyResult.before(resultDetails); resultDetails.append(legacyResult); }
   result.append(resultDetails);
-  resultDetails.append(button(doc, '新しい相棒を探しに冒険へ', () => { onBack(); publish('changeScreen', 'title'); }, 'gt-button'));
+  resultDetails.append(button(doc, '新しいあいぼうを探しに冒険へ', () => { onBack(); publish('changeScreen', 'title'); }, 'gt-button'));
   let state = null, receipt = null, resultShown = false, soundAnswers=0,soundBoosts=0,soundComplete=false;
   let helpAutoPaused = false;
   let feedbackId = null, feedbackMs = 0;
@@ -208,7 +208,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
       const value = receipt.reward;
       growthResult.show(value);
       if (value && !value.duplicate) resultTitle.textContent = friendshipTitle(value.friendship).message;
-      reward.textContent = value?.duplicate ? '記録は保存済みです。' : `なかよし +${value.earned} → ${value.friendship} · いっしょに${value.plays}回${value.medals.includes('five-plays') ? ' · メダル「いつもの相棒」' : ''}`;
+      reward.textContent = value?.duplicate ? '記録は保存済みです。' : `なかよし +${value.earned} → ${value.friendship} · いっしょに${value.plays}回${value.medals.includes('five-plays') ? ' · メダル「いつものあいぼう」' : ''}`;
       record.textContent = `${value?.newBest ? '✦ 自己ベスト！ ' : 'BEST '}${value?.bestScore ?? ''}`;
       result.dataset.newBest = String(!!value?.newBest);
       const memory = !value?.duplicate && value?.memory;
@@ -217,7 +217,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
         newCases.length ? `ことわざ図鑑に「解決」の印が${newCases.length}こふえたよ！` :
         value?.journeyBest ? `${state.stage?.name ?? 'この地方'}のボスの記録が ★${value.journeyBest} になったよ！` :
         memory?.firstFinish ? '思い出がふえた！ はじめて最後まであそんだね。' :
-        memory?.newBest ? `この相棒との自己ベスト！ ${memory.bestScore} pt` :
+        memory?.newBest ? `このあいぼうとの自己ベスト！ ${memory.bestScore} pt` :
         memory?.firstPlay ? 'このゲームでの、はじめての思い出ができたよ。' : '';
       memoryNotice.hidden = !memoryNotice.textContent;
       const mates = value?.duplicate ? [] : value?.supporters ?? [];
@@ -269,7 +269,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
       combo.textContent = `${current.combo} COMBO`;
       scene?.update(state, current, dt);
       if (move && current.boosts > toastBoosts && !state.result) {
-        moveToast.textContent = `${gotomon?.name ?? '相棒'}の ${move.name}！ ${move.text}`; moveToast.hidden = false; toastMs = 1800;
+        moveToast.textContent = `${gotomon?.name ?? 'あいぼう'}の ${move.name}！ ${move.text}`; moveToast.hidden = false; toastMs = 1800;
       }
       toastBoosts = current.boosts;
       if (toastMs > 0) { toastMs -= dt; if (toastMs <= 0 || state.result) { moveToast.hidden = true; toastMs = 0; } }
@@ -292,7 +292,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
       if (state.mode === 'review') {
         if (scene) scene.root.hidden = true;
         skill.hidden = true; score.hidden = true; combo.hidden = true;
-        help.textContent = definition.id === 'sentenceOrder' ? '文のつながりを、相棒とたしかめよう。' : 'ことばを、相棒とたしかめよう。';
+        help.textContent = definition.id === 'sentenceOrder' ? '文のつながりを、あいぼうとたしかめよう。' : 'ことばを、あいぼうとたしかめよう。';
       }
       if (soundAnswers!==current.answered||soundBoosts!==current.boosts||soundComplete!==current.completed) {
         soundAnswers=current.answered;soundBoosts=current.boosts;soundComplete=current.completed;
@@ -333,7 +333,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
         growthResult.update(state.paused ? 0 : dt);
         findings?.update(current.world?.findings);
         resultScore.textContent = `${points} pt`;
-        stats.textContent = reviewing ? '相棒と、ことばをたしかめたよ。' : `${current.world?.course ? `${current.world.course.name} · ` : ''}${current.world?.summary || ''}${receipt?.reward?.newTimeBest?' · タイム更新！':''}`;
+        stats.textContent = reviewing ? 'あいぼうと、ことばをたしかめたよ。' : `${current.world?.course ? `${current.world.course.name} · ` : ''}${current.world?.summary || ''}${receipt?.reward?.newTimeBest?' · タイム更新！':''}`;
         result.dataset.world=info.scene;result.dataset.triumph=String(info.scene==='craft'?current.world?.completed===3:info.scene==='shoot'?!!current.world?.bossDown:info.scene==='defend'?state.life>0:current.correct>=8);
         replay.disabled = state.paused;
         if (!resultShown) { resultShown = true; root.scrollTop = 0; (onNotebook && receipt?.ok ? notebook : replay).focus({ preventScroll: true }); }

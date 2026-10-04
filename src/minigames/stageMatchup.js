@@ -17,8 +17,8 @@ export function stageTypeLines(stageId, { getEnemies = getEnemiesByStageId, getC
     if (companion) {
       const strong = enemies.filter(enemy => matchup(companion.type, typeOf(enemy)) > 1).length;
       lines.push(strong
-        ? { text: `相棒が つよい敵: ${strong}ひき`, color: '#7dffb0' }
-        : { text: '相棒の タイプは ふつう', color: '#cfd8dc' });
+        ? { text: `あいぼうが つよい敵: ${strong}ひき`, color: '#7dffb0' }
+        : { text: 'あいぼうの タイプは ふつう', color: '#cfd8dc' });
     }
     return lines;
   } catch {
