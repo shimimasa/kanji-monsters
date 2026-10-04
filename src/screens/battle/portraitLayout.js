@@ -71,3 +71,26 @@ export function portraitButtons(h) {
     hint: { x: left + (w + gap) * 2, y, w, h },
   };
 }
+
+/**
+ * たての 盤面で、読みの 入力欄を「こたえる」の すぐ上・左寄せに 置く。右に「たんまつで書く」
+ * （バトル・れんしゅうと 同じ 置き方。学年まとめ・復習で 使う）
+ */
+export function placePortraitInput(canvas, inputEl, submitY, doc = globalThis.document, win = globalThis.window) {
+  if (!canvas || !inputEl) return;
+  const s = inputEl.style, rect = canvas.getBoundingClientRect();
+  const scale = Math.min(rect.width / canvas.width, rect.height / canvas.height);
+  const left = rect.left + (rect.width - canvas.width * scale) / 2, top = rect.top + (rect.height - canvas.height * scale) / 2;
+  const inputH = inputEl.offsetHeight || 48;
+  s.removeProperty('width'); s.bottom = 'auto';
+  s.width = `${Math.round(320 * scale)}px`;
+  s.left = `${Math.round(left + 10 * scale)}px`;
+  s.top = `${Math.round(top + (submitY - 8) * scale - inputH)}px`;
+  inputEl.dataset.toggleSide = 'right';
+  const toggle = doc?.getElementById?.('kanaPadToggle');
+  if (toggle && !toggle.hidden) {
+    const r = inputEl.getBoundingClientRect();
+    toggle.style.left = `${Math.round(Math.min(r.right + 8, (win?.innerWidth ?? 9999) - (toggle.offsetWidth || 140) - 4))}px`;
+    toggle.style.top = `${Math.round(r.top + (r.height - (toggle.offsetHeight || 40)) / 2)}px`;
+  }
+}

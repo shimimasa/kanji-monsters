@@ -5,6 +5,15 @@ import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState, updatePlayerName } from '../core/gameState.js';
 import { getGameCoordinates, isValidCoordinates, gameToScreenCoordinates } from '../utils/coordinateUtils.js';
 import { bindInputSubmission } from '../core/answerSubmission.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas } from './battle/portraitLayout.js';
+
+// 並び。スマホを たてに 持った時（480×680）は 文字と ボタンを 大きく（2026-10-04）
+function nameLayout(canvas) {
+  const cx = canvas.width / 2;
+  return isPortraitCanvas(canvas)
+    ? { titleY: 190, noteY: 236, frame: { x: cx - 180, y: 300, w: 360, h: 48 }, msgY: 392, button: { x: cx - 140, y: 440, width: 280, height: 64 } }
+    : { titleY: 150, noteY: 200, frame: { x: cx - 150, y: 280, w: 300, h: 40 }, msgY: 355, button: { x: cx - 100, y: 400, width: 200, height: 50 } };
+}
 
 const playerNameInputState = {
   /** 画面表示時の初期化 */
@@ -13,8 +22,8 @@ const playerNameInputState = {
     this.canvas = canvas || document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
 
-    const cx = this.canvas.width / 2;
-    this.confirmButton = { x: cx - 100, y: 400, width: 200, height: 50, text: 'けってい' };
+    syncPortraitCanvas(this.canvas);
+    this.confirmButton = { ...nameLayout(this.canvas).button, text: 'けってい' };
     this.validationMessage = '';
 
     // HTML入力欄をセットアップ（存在しなければ動的に生成する）
@@ -54,7 +63,7 @@ const playerNameInputState = {
   _positionInputElement() {
     if (!this.nameInputElement || !this.canvas) return;
     const cx = this.canvas.width / 2;
-    const frame = { x: cx - 150, y: 280, w: 300, h: 40 };
+    const frame = nameLayout(this.canvas).frame;
     const topLeft = gameToScreenCoordinates(frame.x, frame.y, this.canvas);
     const center = gameToScreenCoordinates(cx, frame.y + frame.h / 2, this.canvas);
     const scale = topLeft.scale;
@@ -69,6 +78,13 @@ const playerNameInputState = {
 
   /** 毎フレーム呼び出し（描画） */
   update(dt) {
+    // スマホの 向きが かわったら 盤面と 入力欄を 合わせなおす
+    if (syncPortraitCanvas(this.canvas)) {
+      Object.assign(this.confirmButton, nameLayout(this.canvas).button);
+      this._positionInputElement();
+    }
+    const L = nameLayout(this.canvas);
+    const portrait = isPortraitCanvas(this.canvas);
     const cw = this.canvas.width, ch = this.canvas.height;
     const ctx = this.ctx;
     ctx.clearRect(0, 0, cw, ch);
@@ -84,21 +100,27 @@ const playerNameInputState = {
     ctx.fillStyle = 'white';
     ctx.font = '32px "UDデジタル教科書体",sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('なまえを にゅうりょく してください', cw / 2, 150);
+    if (portrait) {
+      // たての 画面は 1行に 入らないので 2行に
+      ctx.fillText('なまえを', cw / 2, L.titleY - 40);
+      ctx.fillText('にゅうりょく してください', cw / 2, L.titleY);
+    } else {
+      ctx.fillText('なまえを にゅうりょく してください', cw / 2, L.titleY);
+    }
     
     ctx.font = '20px "UDデジタル教科書体",sans-serif';
-    ctx.fillText('(5もじまで)', cw / 2, 200);
+    ctx.fillText('(5もじまで)', cw / 2, L.noteY);
 
     // 入力欄の枠（HTMLの入力欄が見えるように透明な枠を描画）
     ctx.strokeStyle = 'white';
     ctx.lineWidth = 2;
-    ctx.strokeRect(cw / 2 - 150, 280, 300, 40);
+    ctx.strokeRect(L.frame.x, L.frame.y, L.frame.w, L.frame.h);
 
     // 入力チェックのメッセージ（alertの代わりにゲーム内で表示）
     if (this.validationMessage) {
       ctx.fillStyle = '#FFD98E';
       ctx.font = '18px "UDデジタル教科書体",sans-serif';
-      ctx.fillText(this.validationMessage, cw / 2, 355);
+      ctx.fillText(this.validationMessage, cw / 2, L.msgY);
     }
 
     // 決定ボタン
@@ -112,6 +134,7 @@ const playerNameInputState = {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
     this.unregisterHandlers();
     if (this._resizeHandler) {
       window.removeEventListener('resize', this._resizeHandler);

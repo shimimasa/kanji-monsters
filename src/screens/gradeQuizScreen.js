@@ -11,6 +11,7 @@ import { commitLearningOutcome } from '../core/learningOutcome.js';
 import { createScreenLifecycle } from '../core/screenLifecycle.js';
 import { getQuizResultSummary } from '../core/learningPresentation.js';
 import { getLearningControls, drawLearningButton, placeLearningInput } from '../ui/learningControls.js';
+import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas, placePortraitInput, PORTRAIT } from './battle/portraitLayout.js';
 
 // 読みの正規化・取得は共通実装を使用（配列/文字列データ両対応）
 
@@ -38,6 +39,20 @@ const gradeQuizScreen = {
   _answerSubmission: null,
   getControls() {
     const controls = getLearningControls(this.canvas);
+    if (isPortraitCanvas(this.canvas)) {
+      // スマホを たてに 持った時（480×680）: もどるは 左上、モンスターは 上、漢字は まん中、
+      // こたえる（おわった時は 3つの ボタン）は いちばん下（2026-10-04）
+      const h = controls.submit.h, y = PORTRAIT.H - h - 12;
+      Object.assign(BTN.back, controls.back, { x: 10, y: 10, w: 130, h: Math.max(controls.back.h, 50) });
+      [['again', 10], ['review', 166], ['select', 322]].forEach(([key, x]) => Object.assign(BTN[key], { x, y, w: 148, h }));
+      Object.assign(MONSTER_PANEL, { x: 130, y: 76, w: 220, h: 160 });
+      Object.assign(KANJI_BOX, { centerX: 240, centerY: 340, w: 180, h: 180 });
+      controls.submit = { ...controls.submit, x: 10, y, w: 460, h };
+      controls.portrait = true;
+      return controls;
+    }
+    Object.assign(MONSTER_PANEL, { x: 560, y: 90, w: 220, h: 170 });
+    Object.assign(KANJI_BOX, { centerX: 380, w: 200, h: 200 });
     Object.assign(BTN.back, controls.back);
     for (const [key, source] of [['again','attack'],['review','heal'],['select','hint']]) {
       const label = BTN[key].label;
@@ -199,7 +214,13 @@ const gradeQuizScreen = {
     // 結果画面では入力欄そのものを隠すので、ここで !important の display:block を
     // 立て直してしまわないよう抜ける（resize や 50音パッドの開閉はどの phase でも起こる）
     if (this.phase !== 'quiz') return;
-    placeLearningInput(this.canvas, this.inputEl, this.getControls());
+    const controls = this.getControls();
+    if (controls.portrait) {
+      placePortraitInput(this.canvas, this.inputEl, controls.submit.y); // たての 画面: こたえる の すぐ上、右に「たんまつで書く」
+      return;
+    }
+    if (this.inputEl.dataset) delete this.inputEl.dataset.toggleSide;
+    placeLearningInput(this.canvas, this.inputEl, controls);
   },
 
   _loadCurrent() {
@@ -281,6 +302,7 @@ const gradeQuizScreen = {
   update(dt) {
     const { ctx, canvas } = this;
     if (!ctx) return;
+    syncPortraitCanvas(canvas); // スマホを たてに 持った時は 480×680（screens/battle/portraitLayout.js）
     const controls = this.getControls();
     this._adjustInputPosition();
     // 背景。単色だと寂しいので学年のステージ画像を敷き、白文字が沈まないよう
@@ -299,7 +321,7 @@ const gradeQuizScreen = {
     ctx.font = '24px "UDデジタル教科書体",sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(`学年まとめテスト（${this.grade}年）`, controls.compact ? 310 : 170, 35);
+    ctx.fillText(`学年まとめテスト（${this.grade}年）`, controls.portrait ? 150 : (controls.compact ? 310 : 170), controls.portrait ? 24 : 35);
 
     // 戻るボタン
     drawLearningButton(ctx, BTN.back, controls.scale);
@@ -310,7 +332,7 @@ const gradeQuizScreen = {
       ctx.font = '18px "UDデジタル教科書体",sans-serif';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
-      ctx.fillText(`Q ${Math.min(this.index + 1, this.order.length)} / ${this.order.length}`, 20, 110);
+      ctx.fillText(`Q ${Math.min(this.index + 1, this.order.length)} / ${this.order.length}`, 20, controls.portrait ? 84 : 110);
 
       this._drawMonster(ctx);
 
@@ -428,6 +450,8 @@ const gradeQuizScreen = {
 
     // 画面固定（vh-lock）を無効化（次画面の表示前に解除。他画面と同じ作法）
     const cvs = this.canvas;
+    restoreLandscapeCanvas(cvs); // ほかの 画面は 800×600 で 描く
+    if (this.inputEl) delete this.inputEl.dataset.toggleSide;
     {
       document.documentElement.classList.remove('vh-lock');
       document.body.classList.remove('vh-lock');
