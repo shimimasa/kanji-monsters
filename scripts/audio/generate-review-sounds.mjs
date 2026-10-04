@@ -84,6 +84,11 @@ render('se_shield_break', 0.34, [
   { at: 0.10, length: 0.21, from: 850, to: 420, gain: 0.12, decay: 2.5 },
 ]);
 
+render('se_mini_shot', 0.17, [{ at: 0, length: 0.16, from: 880, to: 440, gain: 0.20, decay: 2.6 }]);
+render('se_mini_whoosh', 0.23, [{ at: 0, length: 0.22, from: 320, to: 920, gain: 0.18, decay: 1.8 }]);
+render('se_mini_hop', 0.21, [{ at: 0, length: 0.20, from: 390, to: 690, gain: 0.17, decay: 1.9 }]);
+render('se_mini_pop', 0.12, [{ at: 0, length: 0.11, from: 650, to: 890, gain: 0.16, decay: 3 }]);
+
 // Two short loops. The quiet final half-second lets either loop return to beat one cleanly.
 const chord = (notes, at, length, gain = 0.055) => notes.map(freq => ({ at, length, freq, gain, attack: 0.035, decay: 0.55 }));
 const melody = (frequencies, step, gain = 0.12) => frequencies.map((freq, i) => ({ at: i * step, length: step * 0.88, freq, gain, decay: 1.4 }));
@@ -102,4 +107,29 @@ render('bgm_minigame_play', 8, [
   ...chord([196, 261.63, 392], 6, 1.45, 0.045),
   ...melody([523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46,
     659.25, 783.99, 987.77, 783.99, 698.46, 587.33, 523.25, 392], 0.5, 0.1),
+]);
+
+render('bgm_minigame_action', 8, [
+  ...chord([196, 261.63, 392], 0, 1.85, 0.047),
+  ...chord([220, 293.66, 440], 2, 1.85, 0.047),
+  ...chord([246.94, 329.63, 493.88], 4, 1.85, 0.047),
+  ...chord([196, 293.66, 392], 6, 1.42, 0.047),
+  ...melody([392, 523.25, 659.25, 783.99, 659.25, 523.25, 587.33, 698.46,
+    783.99, 659.25, 880, 783.99, 698.46, 587.33, 523.25, 392], 0.5, 0.11),
+]);
+render('bgm_minigame_puzzle', 8, [
+  ...chord([261.63, 329.63, 392], 0, 1.85, 0.04),
+  ...chord([246.94, 329.63, 392], 2, 1.85, 0.04),
+  ...chord([220, 293.66, 392], 4, 1.85, 0.04),
+  ...chord([261.63, 349.23, 440], 6, 1.42, 0.04),
+  ...melody([523.25, 659.25, 587.33, 523.25, 493.88, 587.33, 659.25, 587.33,
+    440, 523.25, 587.33, 698.46, 659.25, 587.33, 523.25, 440], 0.5, 0.085),
+]);
+render('bgm_minigame_relaxed', 8, [
+  ...chord([261.63, 329.63, 392], 0, 1.85, 0.038),
+  ...chord([220, 261.63, 349.23], 2, 1.85, 0.038),
+  ...chord([196, 261.63, 329.63], 4, 1.85, 0.038),
+  ...chord([261.63, 329.63, 392], 6, 1.42, 0.038),
+  ...melody([392, 440, 523.25, 440, 392, 349.23, 329.63, 392,
+    440, 523.25, 587.33, 523.25, 440, 392, 349.23, 329.63], 0.5, 0.07),
 ]);

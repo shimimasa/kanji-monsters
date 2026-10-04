@@ -49,6 +49,9 @@ export class AudioManager {
         yomitomo: '/assets/audio/bgm_yomitomo.mp3',
         miniGameHub: '/assets/audio/bgm_minigame_hub.mp3',
         miniGamePlay: '/assets/audio/bgm_minigame_play.mp3',
+        miniGameAction: '/assets/audio/bgm_minigame_action.mp3',
+        miniGamePuzzle: '/assets/audio/bgm_minigame_puzzle.mp3',
+        miniGameRelaxed: '/assets/audio/bgm_minigame_relaxed.mp3',
 
         // ステージ別BGMを追加
         // NOTE: 北海道A/B.mp3 はリポジトリに存在せず無音になっていたため、
@@ -115,6 +118,10 @@ export class AudioManager {
         hint: '/assets/audio/se_hint.mp3',
         evolve: '/assets/audio/se_evolve.mp3',
         reward: '/assets/audio/se_reward.mp3',
+        miniShot: '/assets/audio/se_mini_shot.mp3',
+        miniWhoosh: '/assets/audio/se_mini_whoosh.mp3',
+        miniHop: '/assets/audio/se_mini_hop.mp3',
+        miniPop: '/assets/audio/se_mini_pop.mp3',
 
         // NOTE: 以下は呼び出しはあったが未登録で、ずっと無音だったもの。
         // 専用音源が用意されるまで、意味の近い既存音を暫定割当する
