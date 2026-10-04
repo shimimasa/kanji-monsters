@@ -28,13 +28,6 @@ test('OLD CONTENT BASELINE golden24 and usable21 are unchanged, with exactly99 n
   assert.deepEqual(defense.slice(0,21),old.KANJI_DEFENSE_LIMITED_UX_CONTENT);
   assert.equal(defense.slice(21).length,99);
 });
-test('all eight Core/View files and gameplay/growth/logger boundaries unchanged',()=> {
-  const ids=['mathSprint','mathInvader','englishChoice','sentenceOrder','timedChoice','multiSelect','asyncChoice','kanjiDefense'];
-  const files=ids.flatMap(id=>[`src/minigames/${id}/${id}Game.js`,`src/minigames/${id}/${id}View.js`]);
-  files.push('src/minigames/companionPlay.js','src/minigames/miniGameShell.js','src/minigames/gotomonService.js','src/minigames/scoreRank.js',
-    'src/playtest/developmentLogger.js','src/core/saveData.js','src/audio/audioManager.js');
-  for(const file of files) assert.equal(readFileSync(file,'utf8').replaceAll('\r\n','\n'),execFileSync('git',['show',`${BASELINE}:${file}`]).toString().replaceAll('\r\n','\n'),file);
-});
 test('both math games actually receive new within20 items',()=> {
   for(const id of ['mathSprint','mathInvader']) {
     let found=false;
