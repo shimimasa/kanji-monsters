@@ -1,5 +1,7 @@
 import { prefersReducedMotion } from '../ui/motionPreferences.js';
 import { getLearningControls, drawLearningButton, placeLearningInput } from '../ui/learningControls.js';
+import { COMPACT_BATTLE_AREA } from './battle/theme.js';
+import { placeCompactBattleInput } from './battle/compactLayout.js';
 import { isMouseOverRect } from '../ui/uiRenderer.js';
 // 練習バトル画面 - UI改善版（ボタンレス・統計強化・フィードバック改善）
 
@@ -15,6 +17,27 @@ import Speech from '../audio/speech.js';
 import { bindInputSubmission } from '../core/answerSubmission.js';
 import { commitLearningOutcome } from '../core/learningOutcome.js';
 // 練習バトル画面状態
+// 枠の置き場所（800×600）。ふつうの画面
+const PRACTICE_PANELS_WIDE = Object.freeze({
+  previous: { x: 20, y: 70, w: 260, h: 200 },
+  current: { x: 520, y: 70, w: 260, h: 200 },
+  modeBadge: { x: 320, y: 20, w: 160, h: 40 },
+  progress: { x: 100, y: 490, w: 350, h: 64 },
+  history: { x: 480, y: 200, w: 300, h: 120 },
+  // こたえる・ヒント（y380〜428）の すぐ下。以前は y380 で ボタンの裏に かくれていた
+  guide: { x: 240, y: 432, w: 300, h: 50 },
+});
+// せまい画面（Chromebook・iPad 横で 50音パッドを出した時。0.6倍ほどに縮む）。
+// こたえる・ヒント と入力欄は 右側（x300〜780、下の端）なので、案内・進捗・統計は 左の列に たてに並べる。
+// 「1つまえの漢字」は もどる（y20〜90）の下から。以前は どれも ボタンや入力欄の下に かくれていた。
+const PRACTICE_PANELS_COMPACT = Object.freeze({
+  ...PRACTICE_PANELS_WIDE,
+  previous: { x: 20, y: 100, w: 260, h: 190 },
+  guide: { x: 20, y: 306, w: 270, h: 50 },
+  progress: { x: 20, y: 368, w: 270, h: 64 },
+  stats: { x: 20, y: 438, w: 270, h: 76 },
+});
+
 const practiceBattleScreenState = {
   // 既存のbattleScreenStateの全機能を継承
   ...battleScreenState,
@@ -67,6 +90,7 @@ wrongTargets: { ids: new Set(), texts: new Set() },
 
 
   // 📐 最適化されたレイアウト設定（ボタンエリア削除後）
+  // せまい画面（compact）では _layoutPanels() が PRACTICE_PANELS_COMPACT に切りかえる
   panelConfig: {
     // 前回の漢字パネル（読み表示付きで少し拡大）
     previous: { x: 20, y: 70, w: 260, h: 200 },
@@ -892,21 +916,60 @@ if (this.unmasteredKanji.length === 0) {
     console.log('💡 マスターモードヒント処理開始');
     
     try {
-      if (!gameState.currentKanji) return;
-      
+      const k = gameState.currentKanji;
+      if (!k) return;
+      // 以前は 回数を 数えるだけで 画面に 何も出なかった（押しても 何も 起きない）。
+      // バトルと同じ 4だんかい（画数 → 読みの 1文字め → いみ → 読み）を 案内の 帯に 出す（2026-10-04）
+      const show = (text) => { this.nearMissNotice = { lines: [text], until: Date.now() + 6000 }; };
       const current = Number(gameState.hintLevel || 0);
       if (current >= 4) {
+        show('ヒントは ここまで！ まちがえても だいじょうぶ');
         return;
       }
       
       const level = current + 1;
       gameState.hintLevel = level;
       
-      console.log(`💡 ヒントレベル${level}を表示`);
+      // 指す読みは 同じ問題の あいだ 変えない。まだ おぼえていない 読み（右上で ○ の読み）から えらぶ
+      if (level === 1 || !this._hintTarget || this._hintTarget.kanjiId !== k.id) {
+        this._hintTarget = { kanjiId: k.id, ...this._pickHintReading(k) };
+      }
+      const t = this._hintTarget;
+      const label = t.on ? '音読み' : '訓読み';
+      switch (level) {
+        case 1: show(`ヒント: 画数は ${k.strokes ?? '?'}画`); break;
+        case 2: show(t.reading ? `ヒント: ${label}は「${t.reading.substring(0, 1)}○○」から はじまる` : 'ヒント: 読みの データが ありません'); break;
+        case 3: show(`ヒント: いみは「${k.meaning ?? '（じゅんびちゅう）'}」`); break;
+        default:
+          if (t.reading) {
+            show(`ヒント: ${label}は「${t.reading}」`);
+            // 字だけでなく 音でも わたす（読むのが 苦手な子には 耳からの 道が いる）
+            try { Speech.speak(t.reading); } catch {}
+          } else {
+            show('ヒント: 読みの データが ありません');
+          }
+      }
       
     } catch (error) {
       console.error('❌ ヒント処理エラー:', error);
     }
+  },
+  /** ヒントで 指す 読み: レビューの ○ の読み → まだ おぼえていない 音読み → 訓読み → さいしょの 読み */
+  _pickHintReading(k) {
+    const onyomi = Array.isArray(k.onyomi) ? k.onyomi : [];
+    const kunyomi = Array.isArray(k.kunyomi) ? k.kunyomi : [];
+    if (this.reviewMode && this.reviewTargetReading) {
+      return { reading: this.reviewTargetReading, on: onyomi.includes(this.reviewTargetReading) };
+    }
+    const prog = (gameState.kanjiReadProgress && gameState.kanjiReadProgress[k.id]) || {};
+    const known = (key) => new Set(prog[key] instanceof Set ? [...prog[key]] : (prog[key] || []));
+    const onKnown = known('onyomi'), kunKnown = known('kunyomi');
+    const on = onyomi.find(r => !onKnown.has(r));
+    if (on) return { reading: on, on: true };
+    const kun = kunyomi.find(r => !kunKnown.has(r));
+    if (kun) return { reading: kun, on: false };
+    if (onyomi[0]) return { reading: onyomi[0], on: true };
+    return { reading: kunyomi[0] || '', on: false };
   },
   /**
    * 練習での正解処理
@@ -1045,27 +1108,35 @@ if (this.unmasteredKanji.length === 0) {
 
     try {
       const ctx = this.ctx;
-      const isKbOpen = !!(this.keyboardState && this.keyboardState.open);
-      const cx = this.canvas.width / 2;
-      const top = (isKbOpen ? 120 + 70 : 200 + 80) + 14;
-      const fontSize = Math.max(16,16/getLearningControls(this.canvas).scale);
-      const lineH = fontSize + 4;
-      const w = this.canvas.width - 40;
-      const h = notice.lines.length * lineH + 16;
-
+      const controls = getLearningControls(this.canvas);
+      // 操作の案内の 場所を つかう（その間 案内は 出さない）。以前は 石版の下 y294 の 半透明の帯で、
+      // 縦の画面では 入力欄の 裏に、せまい画面では 案内と 重なって 読めなかった（2026-10-04）
+      const guide = this.panelConfig.guide;
+      const x = 20;
+      const w = controls.compact ? 510 : 520;        // 右の「たんまつで書く」・セッション統計に かからない幅
+      const top = controls.compact ? guide.y - 6 : guide.y;
+      let fontSize = Math.max(16, 16 / controls.scale);
       ctx.save();
-      // 読みちがいの琥珀ではなく、続けてよいことが伝わる色にする
-      ctx.fillStyle = 'rgba(52, 152, 219, 0.18)';
-      ctx.fillRect(cx - w / 2, top, w, h);
-      ctx.strokeStyle = 'rgba(91, 192, 222, 0.8)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(cx - w / 2, top, w, h);
+      ctx.font = `bold ${fontSize}px "UDデジタル教科書体",sans-serif`;
+      while (fontSize > 12 && notice.lines.some(line => ctx.measureText(line).width > w - 16)) {
+        fontSize -= 1;
+        ctx.font = `bold ${fontSize}px "UDデジタル教科書体",sans-serif`;
+      }
+      const lineH = fontSize + 6;
+      const h = notice.lines.length * lineH + 14;
+
+      // 読みちがいの琥珀ではなく、続けてよいことが伝わる色にする（下が すけないように 不透明に）
+      ctx.fillStyle = 'rgba(21, 67, 110, 0.95)';
+      ctx.fillRect(x, top, w, h);
+      ctx.strokeStyle = 'rgba(91, 192, 222, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, top, w, h);
 
       ctx.fillStyle = '#eaf6fd';
-      ctx.font = `bold ${fontSize}px "UDデジタル教科書体",sans-serif`;
       ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
       notice.lines.forEach((line, i) => {
-        ctx.fillText(line, cx, top + fontSize + i * lineH);
+        ctx.fillText(line, x + w / 2, top + 7 + fontSize + i * lineH);
       });
       ctx.restore();
     } catch (error) {
@@ -1160,7 +1231,7 @@ if (this.unmasteredKanji.length === 0) {
       if (!isValidCoordinates(coords)) return false;
       const x = coords.x, y = coords.y;
 
-      const controls = getLearningControls(this.canvas);
+      const controls = this._controls();
       if (this.practiceComplete && isMouseOverRect(x,y,controls.continue)) {
         this._answerSubmission.submit('',e); return true;
       }
@@ -1250,7 +1321,7 @@ if (this.practiceComplete) {
 } else {
   drawLearningButton(this.ctx, controls.submit, controls.scale);
 }
-if (controls.compact) placeLearningInput(this.canvas,this.inputEl,controls);
+if (controls.compact) { placeLearningInput(this.canvas,this.inputEl,controls); placeCompactBattleInput(this.canvas, this.inputEl); }
 
     // ③ 漢字ボックス描画
     this._drawKanjiBoxWithEffects();
@@ -1478,10 +1549,33 @@ _teardownGlobalBackHandler() {
   },
 
   /**
+   * ボタンの位置。せまい画面（compact）は バトルと同じく、こたえる・ヒント を右側（x300〜780）に並べる。
+   * 共通の配置（横いっぱい）だと「マスター進捗」「セッション統計」の上に重なっていた（2026-10-04）
+   */
+  _controls() {
+    const controls = getLearningControls(this.canvas);
+    if (!controls.compact) {
+      // ふつうの画面: 共通の配置だと こたえる（x300〜500）と ヒント（x470〜）が 重なるので となりに ずらす
+      return { ...controls, hint: { ...controls.hint, x: controls.submit.x + controls.submit.w + 10 } };
+    }
+    const { left, right, gap } = COMPACT_BATTLE_AREA;
+    const w = Math.floor((right - left - gap) / 2);
+    return { ...controls, submit: { ...controls.submit, x: left, w }, hint: { ...controls.hint, x: left + w + gap, w } };
+  },
+
+  /** 枠の置き場所を 画面の大きさに あわせて 切りかえる */
+  _layoutPanels() {
+    const compact = !!(this.canvas && getLearningControls(this.canvas).compact);
+    this.panelConfig = compact ? PRACTICE_PANELS_COMPACT : PRACTICE_PANELS_WIDE;
+    return this.panelConfig;
+  },
+
+  /**
    * 🎨 改善されたUIを描画
    */
   _drawImprovedPracticeUI() {
     try {
+      this._layoutPanels();
       this._drawPreviousKanjiPanelWithReadings();  // 前回漢字（読み付き）
       this._drawCurrentKanjiDetailPanel();         // 現在漢字詳細
       this._drawEnhancedProgressPanel();           // 進捗パネル（簡素）
@@ -1753,7 +1847,9 @@ _teardownGlobalBackHandler() {
                         this.progressState.current += (this.progressState.target - this.progressState.current) * 0.12;
                   
                         // 右上に数値（バーの上）
-                        const progressLabel = `${masteredCount} / ${totalKanji} (${Math.round(this.progressState.current * 100)}%)`;
+                        // せまい枠では タイトルと ぶつかるので ％ を はぶく
+                        const progressLabel = w < 320 ? `${masteredCount} / ${totalKanji}`
+                          : `${masteredCount} / ${totalKanji} (${Math.round(this.progressState.current * 100)}%)`;
                         this.ctx.font = 'bold 16px "UDデジタル教科書体", sans-serif';
                         this.ctx.textAlign = 'right';
                         this.ctx.fillStyle = 'white';
@@ -1901,6 +1997,8 @@ _teardownGlobalBackHandler() {
     if (!this.ctx) return;
     
     try {
+      // ヒントや おしいの お知らせを 出している間は、同じ場所なので 案内は 出さない
+      if (this.nearMissNotice && Date.now() <= this.nearMissNotice.until) return;
       const { x, y, w, h } = this.panelConfig.guide;
       
       // 背景
@@ -2005,11 +2103,12 @@ _teardownGlobalBackHandler() {
     if (!this.ctx) return;
     
     try {
-      // 画面右下に配置（キャンバスサイズに追従）
-      const w = 230;
-      const h = 90;
-      const x = this.canvas.width - w - 20;
-      const y = this.canvas.height - h - 40;
+      // 画面右下に配置（キャンバスサイズに追従）。せまい画面は 左の列（panelConfig.stats）
+      const stats = this.panelConfig.stats;
+      const w = stats ? stats.w : 230;
+      const h = stats ? stats.h : 90;
+      const x = stats ? stats.x : this.canvas.width - w - 20;
+      const y = stats ? stats.y : this.canvas.height - h - 40;
       
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
       this.ctx.fillRect(x, y, w, h);
@@ -2051,6 +2150,7 @@ _teardownGlobalBackHandler() {
       this.inputEl.style.removeProperty('width');
       this.inputEl.style.bottom = 'auto';
       placeLearningInput(this.canvas,this.inputEl,controls);
+      placeCompactBattleInput(this.canvas, this.inputEl); // こたえる・ヒント の上（右側）へ
       return;
     }
     
@@ -2150,8 +2250,9 @@ _teardownGlobalBackHandler() {
              // 50音パッドを使うと（端末キーボードが開かないので）ここに来て重なっていた。
              let cssTop;
              if (rect) {
-               const guideY = this.panelConfig?.guide?.y ?? 380;
-               const targetCanvasY = Math.min(this.canvas.height - 40, guideY - 46);
+               // こたえる・ヒント の すぐ上（案内の枠は ボタンの下に 移した）
+               const buttonY = this._controls().submit.y;
+               const targetCanvasY = Math.min(this.canvas.height - 40, buttonY - 46);
                cssTop = rect.top + (targetCanvasY / this.canvas.height) * rect.height - inputH / 2;
              } else {
                cssTop = window.innerHeight - inputH - 24;
@@ -2192,7 +2293,7 @@ _teardownGlobalBackHandler() {
       this._adjustInputPosition();
       // This is the effective update method. Draw controls after the panels,
       // so both completion choices remain visible and share the hit rectangles.
-      const controls = getLearningControls(this.canvas);
+      const controls = this._controls();
       drawLearningButton(this.ctx,controls.back,controls.scale);
       if (this.practiceComplete) {
         this._drawPracticeCompletePrompt();
