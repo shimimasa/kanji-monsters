@@ -61,7 +61,7 @@ export function createShooterView({ document: doc, dispatch, onBack, getSnapshot
   const say = el('button', 'gs-say', '🔊'); say.type = 'button'; say.setAttribute('aria-label', '英語を聞く');
   on(say, 'click', () => { if (active && sayWord) Speech.speakEnglish(sayWord); });
   ask.append(askText, say, sentence);
-  const fireButton = el('button', 'gs-fire', 'うつ！'); fireButton.type = 'button';
+  const fireButton = el('button', 'gs-fire', 'いまの位置から うつ！'); fireButton.type = 'button';
   on(fireButton, 'click', () => command('fire'));
   // The shell advances after feedback; this stays hidden and only serves hosts without auto-advance.
   const go = el('button', 'gs-go', 'つぎへ'); go.type = 'button'; go.dataset.action = 'next'; go.hidden = true;
@@ -110,7 +110,7 @@ export function createShooterView({ document: doc, dispatch, onBack, getSnapshot
     if (problem.kind === 'kanji' && problem.sentence) sentence.append(el('span', '', problem.sentence.before), el('b', '', problem.prompt), el('span', '', problem.sentence.after));
     say.hidden = problem.kind !== 'en2ja'; sayWord = problem.kind === 'en2ja' ? problem.word : '';
     if (sayWord) Speech.speakEnglish(sayWord);
-    note.textContent = 'タップした所へ飛んでビーム！ ドラッグで移動だけもできるよ';
+    note.textContent = '答えのふだをタップすると いどうして うつよ。「うつ！」は いまの位置から。';
     state.enemies.forEach((enemy, i) => {
       const item = enemies[enemy.slot], who = castAt(cast?.wild, state.wave * SHOOTER_FORMATION + i);
       item.key = enemy.enemyId; item.plate.textContent = enemy.plate.text; item.node.classList?.remove('gs-leave', 'gs-friend');

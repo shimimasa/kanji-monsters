@@ -7,6 +7,9 @@ const CSS = `
 #gotomonColoringScreen .cl-cell{display:grid;place-items:center;min-width:0;min-height:0;padding:0;border:0;border-radius:4px;background:#f1ece2;color:#3a2a1a;font:inherit;font-size:clamp(9px,min(2.6vw,2.2vh),18px);font-weight:900;letter-spacing:-.04em;line-height:1;cursor:pointer;touch-action:manipulation;box-shadow:inset 0 0 0 1px #d9cdb8}
 #gotomonColoringScreen .cl-cell[data-empty=true]{background:transparent;box-shadow:none;cursor:default}
 #gotomonColoringScreen .cl-cell[data-painted=true]{background:var(--paint);color:transparent;box-shadow:none;cursor:default}
+#gotomonColoringScreen .cl-board[data-focus-row] .cl-cell[data-outside=true]{opacity:.16;pointer-events:none}
+#gotomonColoringScreen .cl-rows{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;color:#fff;font-size:14px;font-weight:800}
+#gotomonColoringScreen .cl-rows button{min-height:42px;padding:6px 10px;border:2px solid #ffe4aa;border-radius:10px;background:#fff9e8;color:#3a2a1a;font:inherit;font-weight:800;cursor:pointer}
 #gotomonColoringScreen .cl-cell.cl-pop{animation:cl-pop .3s ease-out}
 #gotomonColoringScreen .cl-cell.cl-no{animation:cl-no .4s ease-out}
 #gotomonColoringScreen .cl-cell:focus-visible{outline:3px solid #2a6fb0;outline-offset:1px}
@@ -27,7 +30,7 @@ const CSS = `
 `;
 
 export function createColoringView({ document: doc, dispatch, onBack, getSnapshot }) {
-  let active = true, lastEventId = 0, doneShown = false, shownTap = 0, built = false;
+  let active = true, lastEventId = 0, doneShown = false, shownTap = 0, built = false, focusRow = 0;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'gotomonColoringScreen', title: 'ゴトモンぬりえ', theme: 'coloring' });
@@ -42,10 +45,17 @@ export function createColoringView({ document: doc, dispatch, onBack, getSnapsho
 
   const title = el('p', 'cl-title');
   const ask = el('p', 'cl-ask'); ask.dataset.role = 'problem';
+  const rows = el('div', 'cl-rows'), rowLabel = el('span');
+  const previousRow = el('button', '', '前のだん'), nextRow = el('button', '', '次のだん'), allRows = el('button', '', 'ぜんぶ見る');
+  for (const node of [previousRow, nextRow, allRows]) node.type = 'button';
+  on(previousRow, 'click', () => { focusRow = Math.max(0, focusRow - 1); render(session()); });
+  on(nextRow, 'click', () => { focusRow = Math.min(R.size - 1, focusRow + 1); render(session()); });
+  on(allRows, 'click', () => { focusRow = focusRow === null ? 0 : null; render(session()); });
+  rows.append(previousRow, rowLabel, nextRow, allRows);
   const palette = el('div', 'cl-palette'); palette.setAttribute('aria-label', 'いろ');
   const swatches = [];
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
-  dock.append(title, ask, palette, note);
+  dock.append(title, ask, rows, palette, note);
   doc.body.append(root);
 
   const session = () => getSnapshot();
@@ -68,7 +78,7 @@ export function createColoringView({ document: doc, dispatch, onBack, getSnapsho
     for (let index = 0; index < R.size * R.size; index++) {
       const cell = byIndex.get(index);
       if (!cell) { const blank = el('i', 'cl-cell'); blank.dataset.empty = 'true'; board.append(blank); continue; }
-      const node = el('button', 'cl-cell', cell.label); node.type = 'button';
+      const node = el('button', 'cl-cell', cell.label); node.type = 'button'; node.dataset.row = String(cell.row);
       node.style.setProperty?.('--paint', state.picture.palette[cell.color]);
       node.setAttribute('aria-label', cell.label);
       on(node, 'click', () => paint(cell.cellId)); board.append(node); cellNodes.set(cell.cellId, node);
@@ -84,9 +94,22 @@ export function createColoringView({ document: doc, dispatch, onBack, getSnapsho
   };
   const render = state => {
     if (!built) build(state);
+    if (focusRow !== null && !state.cells.some(cell => cell.row === focusRow && !cell.painted)) {
+      const next = state.cells.find(cell => !cell.painted && cell.row > focusRow) ?? state.cells.find(cell => !cell.painted);
+      if (next) focusRow = next.row;
+    }
+    board.dataset.focusRow = focusRow === null ? '' : String(focusRow);
+    rowLabel.textContent = focusRow === null ? 'ぜんぶの だん' : `${focusRow + 1}だん目 / ${R.size}だん`;
+    previousRow.disabled = focusRow === null || focusRow === 0;
+    nextRow.disabled = focusRow === null || focusRow === R.size - 1;
+    allRows.textContent = focusRow === null ? '1だんずつ見る' : 'ぜんぶ見る';
     for (const cell of state.cells) {
       const node = cellNodes.get(cell.cellId), done = String(cell.painted);
-      if (node && node.dataset.painted !== done) { node.dataset.painted = done; node.disabled = cell.painted; if (cell.painted) restartClass(node, 'cl-pop'); }
+      if (node) {
+        node.dataset.outside = String(focusRow !== null && cell.row !== focusRow);
+        node.disabled = cell.painted || (focusRow !== null && cell.row !== focusRow);
+        if (node.dataset.painted !== done) { node.dataset.painted = done; if (cell.painted) restartClass(node, 'cl-pop'); }
+      }
     }
     swatches.forEach(({ node, count }, color) => {
       const pressed = String(state.selected === color);

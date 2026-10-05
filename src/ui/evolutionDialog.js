@@ -30,6 +30,7 @@ const CSS = `
 #yt-evolution-room .yt-evo-status{min-height:42px;margin:12px 0;font-size:clamp(16px,2.5vw,21px);font-weight:800;line-height:1.5}
 #yt-evolution-room .yt-evo-action{min-height:56px;padding:10px 28px;border:0;border-radius:16px;background:#ffcf54;color:#3d2900;font:inherit;font-size:20px;font-weight:900;cursor:pointer;box-shadow:0 5px 0 #9b6c17}
 #yt-evolution-room .yt-evo-action:disabled{background:#d5e2d9;color:#435e50;box-shadow:none;cursor:default}
+#yt-evolution-room .yt-evo-play{display:block;margin:12px auto 0;min-height:48px;padding:8px 20px;border:2px solid #e4ffe8;border-radius:14px;background:#e4ffe8;color:#15362c;font:inherit;font-weight:800;cursor:pointer}
 #yt-evolution-room .yt-evo-foot{margin:16px 0 0;color:#e8f7ee;font-size:14px;line-height:1.5}
 @keyframes yt-evo-rise{50%{transform:scale(1.2);filter:brightness(2.5)}100%{transform:scale(.78);opacity:.2}}
 @keyframes yt-evo-flash{50%{background:#fff7bd;box-shadow:0 0 60px #ffe68d}100%{background:#fff7bd}}
@@ -37,7 +38,7 @@ const CSS = `
 @media(prefers-reduced-motion:reduce){#yt-evolution-room .yt-evo-stage[data-phase=evolving] .gt-portrait,#yt-evolution-room .yt-evo-stage[data-phase=evolving] .yt-evo-future{animation:none}}
 `;
 
-export function createEvolutionDialog({ doc, service, selectedId, onClose, onChanged }) {
+export function createEvolutionDialog({ doc, service, selectedId, onClose, onChanged, onPlay }) {
   const dialog = element(doc, 'dialog', 'yt-companion-dialog yt-evolution');
   dialog.id = 'yt-evolution-room'; dialog.setAttribute('aria-label', 'しんかのへや');
   const style = element(doc, 'style'); style.textContent = CSS; dialog.append(style);
@@ -51,7 +52,9 @@ export function createEvolutionDialog({ doc, service, selectedId, onClose, onCha
   const stage = element(doc, 'div', 'yt-evo-stage'), status = element(doc, 'p', 'yt-evo-status');
   status.setAttribute('role', 'status');
   const action = button(doc, '', () => act(), 'yt-evo-action'); action.dataset.action = 'evolve';
-  main.append(name, level, stage, status, action);
+  const playAction = button(doc, '広場で あそぶ ゲームを えらぶ', () => onPlay?.(), 'yt-evo-play');
+  playAction.dataset.action = 'play-to-evolve';
+  main.append(name, level, stage, status, action, playAction);
   layout.append(list, main);
   inner.append(header, lead, layout, element(doc, 'p', 'yt-evo-foot', 'Lvは ミニゲームを さいごまで あそぶと 上がるよ。しんかした あとでも、もとの すがたを えらべるよ。'));
 
@@ -73,7 +76,7 @@ export function createEvolutionDialog({ doc, service, selectedId, onClose, onCha
     if (!friend) {
       name.textContent = 'あいぼうを さがしに いこう'; level.textContent = '';
       stage.replaceChildren(element(doc, 'p', '', '冒険で ゴトモンと なかまに なろう。'));
-      status.textContent = 'なかまが できたら、また ここに 来てね。'; action.hidden = true; return;
+      status.textContent = 'なかまが できたら、また ここに 来てね。'; action.hidden = true; playAction.hidden = true; return;
     }
     const look = service.getLook(friend.id), growth = service.getGrowth(friend.id), evolved = !!look.chosen.evolve && look.progress.evolve.unlocked;
     name.textContent = friend.name;
@@ -88,6 +91,7 @@ export function createEvolutionDialog({ doc, service, selectedId, onClose, onCha
     status.textContent = message || (evolved ? 'しんかした すがたで いっしょに あそんでいるよ！' :
       look.progress.evolve.unlocked ? 'じゅんび OK！ 「しんかさせる」を おしてね。' : `あと ${needXp - growth.xp} XP。ミニゲームで いっしょに あそぼう！`);
     action.hidden = false; action.disabled = !look.progress.evolve.unlocked;
+    playAction.hidden = look.progress.evolve.unlocked || !onPlay;
     action.textContent = evolved ? 'もとの すがたで あそぶ' : 'しんかさせる！';
   };
   const act = () => {

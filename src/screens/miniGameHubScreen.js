@@ -30,7 +30,7 @@ const rallyStages = () => {
 const monsterInfo = id => ({ ...gotomonService.getGotomonById(id), desc: getMonsterById(id)?.desc || '', trivia: getMonsterById(id)?.trivia || '' });
 
 const PACE_KEY = 'yomitabi.minigamePace';
-const readPace = () => { try { return localStorage.getItem(PACE_KEY) === 'slow' ? 'slow' : 'normal'; } catch { return 'normal'; } };
+const readPace = () => { try { return localStorage.getItem(PACE_KEY) === 'normal' ? 'normal' : 'slow'; } catch { return 'slow'; } };
 const writePace = value => { try { localStorage.setItem(PACE_KEY, value); } catch { /* A preference only. */ } };
 // The subject tab last chosen in the square.
 const SUBJECT_KEY = 'yomitabi.hubSubject';
@@ -116,6 +116,17 @@ const hub = {
       recommendation.append(list);
       wrap.append(recommendation);
     }
+    if (selected && !Object.values(progress.games ?? {}).some(game => game?.plays > 0)) {
+      const first = suggestions.find(item => miniGameRegistry[item.gameId]) ?? { gameId: 'gotomonSeek' };
+      const firstGame = miniGameRegistry[first.gameId];
+      if (firstGame) {
+        const startHere = element(doc, 'section', 'yt-start-here');
+        startHere.append(element(doc, 'h2', '', 'まずは あいぼうと ひとつ あそぼう'),
+          element(doc, 'p', '', 'さいごまで あそぶと あいぼうが そだつよ。Lv5に なったら「しんかのへや」で すがたを かえられるよ。'),
+          button(doc, `${firstGame.title}で あそぶ`, () => this.selectGame(firstGame), 'yt-primary'));
+        wrap.insertBefore(startHere, wrap.querySelector('.yt-recommendations'));
+      }
+    }
     // The games, by what the child wants to practice: a tab per subject (kept for next time),
     // and on ぜんぶ a section per subject, then the games where the subject is chosen.
     const games = new Map(Object.values(miniGameRegistry).map(definition => [definition.id, definition]));
@@ -200,12 +211,20 @@ const hub = {
   },
   showEvolution(gotomonId = gotomonService.getSelectedGotomon()?.id) {
     this.dialog?.close(); this.dialog?.remove();
+    let leaveToPlay = false;
     const dialog = createEvolutionDialog({ doc: document, service: gotomonService, selectedId: gotomonId,
+      onPlay: () => {
+        leaveToPlay = true;
+        dialog.close();
+        const pick = this.root?.querySelector('.yt-start-here button, .yt-recommendation');
+        if (pick) { pick.scrollIntoView({ block: 'center', behavior: 'smooth' }); pick.focus({ preventScroll: true }); }
+        else this.root?.querySelector('.yt-game-card')?.focus();
+      },
       onChanged: () => {
         const selected = gotomonService.getSelectedGotomon(), old = this.root?.querySelector('.yt-friend-banner > .gt-portrait');
         if (selected && old) old.replaceWith(companionPortrait(document, selected));
       },
-      onClose: () => this.root?.querySelector('[data-action=evolution]')?.focus() });
+      onClose: () => { if (!leaveToPlay) this.root?.querySelector('[data-action=evolution]')?.focus(); } });
     this.dialog = dialog; this.root.append(dialog); dialog.showModal();
   },
   showAllStickers() {

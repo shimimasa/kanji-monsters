@@ -45,7 +45,8 @@ try {
     await page.keyboard.press('Enter');
   }
   assert.ok((await inspect()).session.result, 'result screen reached');
-  await page.locator('#mathSprintScreen .gt-result').waitFor({ state: 'visible', timeout: 15000 });
+  await page.locator('#mathSprintScreen .gt-result').waitFor({ state: 'visible', timeout: 45000 });
+  assert.equal(await page.locator('#mathSprintScreen [data-action=pause]').isVisible(), false);
   const go = page.locator('#mathSprintScreen [data-action=open-evolution]');
   assert.equal(await go.isVisible(), true, 'evolution entry appears after reaching Lv5');
   await go.click();
