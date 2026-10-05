@@ -10,11 +10,12 @@ import { createBuildReviewPanel } from './buildReviewPanel.js';
 import { outfitItem } from './companionOutfits.js';
 import { moveFor, supportEffectOf } from './gotomonMoves.js';
 import { LOOK_NAMES } from './companionLooks.js';
+import { courseCountLabel } from './courseLength.js';
 
 // Intro cards are shown once per game per page load; replays start directly.
 const seenIntros = new Set();
 
-export function createMiniGameShell({ doc, view, definition, gotomon, supporters = [], play, reviewMode = false, pace = 'normal', course = null, onPause, onBoost, onAct, onAdvance, onBack, onReplay, award,
+export function createMiniGameShell({ doc, view, definition, gotomon, supporters = [], play, reviewMode = false, pace = 'normal', course = null, shortCourse = false, onPause, onBoost, onAct, onAdvance, onBack, onReplay, award,
   onReview, onNormalPlay, onNotebook, onEvolution, onRetryMistakes, getMistakeCount = () => 0, getReviewCount = () => 0,
   getLearningSaveStatus = () => ({ failed: false, pending: 0 }), onRetryLearningSave, onBuildReviewDone }) {
   const root = view.root;
@@ -180,7 +181,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
     const meta = element(doc, 'div', 'ya-intro-meta');
     meta.append(element(doc, 'span', pace === 'slow' ? 'ya-pace-slow' : '', pace === 'slow' ? 'ゆっくりモード' : 'ふつうのはやさ'));
     const mission = play.snapshot().world?.challenge;
-    if (mission) meta.append(element(doc, 'span', '', `ミッション：${mission.name}`));
+    if (mission && !shortCourse) meta.append(element(doc, 'span', '', `ミッション：${mission.name}`));
+    if (shortCourse) meta.append(element(doc, 'span', '', `ちょこっとコース：${courseCountLabel(definition.id, true)}`));
     if (course) meta.append(element(doc, 'span', '', `★ ${course.name}`));
     if (move) meta.append(element(doc, 'span', '', `わざ：${move.name}（${move.text}）`));
     const start = button(doc, 'スタート！', () => {
@@ -212,7 +214,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
       growthResult.show(value);
       if (value && !value.duplicate) resultTitle.textContent = friendshipTitle(value.friendship).message;
       reward.textContent = value?.duplicate ? '記録は保存済みです。' : `なかよし +${value.earned} → ${value.friendship} · いっしょに${value.plays}回${value.medals.includes('five-plays') ? ' · メダル「いつものあいぼう」' : ''}`;
-      record.textContent = `${value?.newBest ? '✦ 自己ベスト！ ' : 'BEST '}${value?.bestScore ?? ''}`;
+      record.textContent = shortCourse ? 'ちょこっとコースで あそんだよ。あいぼうは そだつよ。' : `${value?.newBest ? '✦ 自己ベスト！ ' : 'BEST '}${value?.bestScore ?? ''}`;
       result.dataset.newBest = String(!!value?.newBest);
       const memory = !value?.duplicate && value?.memory;
       const newPhotos = value?.duplicate ? [] : value?.newPhotos ?? [], newCases = value?.duplicate ? [] : value?.newCases ?? [];
@@ -314,9 +316,9 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
         if (!receipt) commit();
         const reviewing = state.mode === 'review';
         growthResult.root.hidden = reviewing;
-        rankLabel.hidden = reviewing;
+        rankLabel.hidden = reviewing || shortCourse;
         findings && (findings.root.hidden = reviewing);
-        replay.textContent = reviewing ? '通常の10問であそぶ' : 'もう一度あそぶ';
+        replay.textContent = reviewing ? 'ふつうにあそぶ' : 'もう一度あそぶ';
         review.hidden = !onReview || !receipt?.ok || !getReviewCount();
         review.disabled = state.paused;
         notebook.disabled = state.paused || !receipt?.ok;
@@ -328,8 +330,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
         const points = (state.result.score ?? current.learningPoints) + current.bonus;
         const rank = scoreRank(definition.id, points, current.correct);
         rankLabel.textContent = `${rank.rank} RANK`; rankLabel.dataset.rank = rank.rank;
-        nextGoal.textContent = reviewing ? `${state.correct} / ${state.totalQuestions}${definition.id === 'sentenceOrder' ? '文' : '語'}に正解。${getReviewCount() ? 'もう一度たしかめよう。' : '今回の復習はできたね！'}` : rank.next ? rank.goal : current.world?.goal || '次は自己ベストをこえよう';
-        const challenge = reviewing ? null : current.world?.challenge;
+        nextGoal.textContent = reviewing ? `${state.correct} / ${state.totalQuestions}${definition.id === 'sentenceOrder' ? '文' : '語'}に正解。${getReviewCount() ? 'もう一度たしかめよう。' : '今回の復習はできたね！'}` : shortCourse ? 'また あそぼう！ いつものコースにも ちょうせんできるよ。' : rank.next ? rank.goal : current.world?.goal || '次は自己ベストをこえよう';
+        const challenge = reviewing || shortCourse ? null : current.world?.challenge;
         challengeResult.hidden = !challenge;
         if (challenge) {
           challengeResult.textContent = challenge.status === 'achieved' ? challenge.message : `今回の目標「${challenge.name}」は次の挑戦へ。`;
@@ -341,7 +343,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
         findings?.update(current.world?.findings);
         resultScore.textContent = `${points} pt`;
         stats.textContent = reviewing ? 'あいぼうと、ことばをたしかめたよ。' : `${current.world?.course ? `${current.world.course.name} · ` : ''}${current.world?.summary || ''}${receipt?.reward?.newTimeBest?' · タイム更新！':''}`;
-        result.dataset.world=info.scene;result.dataset.triumph=String(info.scene==='craft'?current.world?.completed===3:info.scene==='shoot'?!!current.world?.bossDown:info.scene==='defend'?state.life>0:current.correct>=8);
+        result.dataset.world=info.scene;result.dataset.triumph=String(shortCourse ? !!state.result?.finished : info.scene==='craft'?current.world?.completed===3:info.scene==='shoot'?!!current.world?.bossDown:info.scene==='defend'?state.life>0:current.correct>=8);
         replay.disabled = state.paused;
         if (!resultShown) { resultShown = true; root.scrollTop = 0; (onNotebook && receipt?.ok ? notebook : replay).focus({ preventScroll: true }); }
       }

@@ -34,9 +34,10 @@ const shuffled = (items, random) => {
 // three of those the companion aims the next bounce off the paddle straight at it. A
 // dropped ball comes back to the paddle: there is no game over. One learning result per
 // question, on its first chosen block.
-export function createBreakoutGame({ sessionId, random = Math.random, onEvent = () => {}, content, pace = 'normal' }) {
+export function createBreakoutGame({ sessionId, random = Math.random, onEvent = () => {}, content, pace = 'normal', courseLength = 'full' }) {
   const level = content?.level === 'times' ? 'times' : 'addsub';
-  const questions = content?.questions ?? buildTossProblems({ sessionId, random, level });
+  const allQuestions = content?.questions ?? buildTossProblems({ sessionId, random, level });
+  const questions = courseLength === 'short' ? allQuestions?.slice(0, 6) : allQuestions;
   const speed = R.speedPerMs[pace === 'slow' ? 'slow' : 'normal'];
   let active = true, paused = false, notifying = false, observer = onEvent;
   let phase = 'ready', seq = 0, activeElapsedMs = 0, index = 0, blockSerial = 0, hitSerial = 0, version = 0;

@@ -8,6 +8,7 @@ import { validateSave } from '../../src/core/saveValidation.js';
 import { recordSticker, markStickerReview, stickerSummary, validateCompanionStickers } from '../../src/minigames/companionStickers.js';
 import { subjectOf, hubSections } from '../../src/minigames/hubCatalog.js';
 import { miniGameRegistry } from '../../src/minigames/registry.js';
+import { SHORT_COURSE_COUNTS } from '../../src/minigames/courseLength.js';
 
 async function fixture() {
   const initial = getDefaultSave(); initial.player.collection.gotomonIds = ['HKD-E01', 'HKD-E02'];
@@ -66,6 +67,27 @@ test('the reward gives a sticker only for a real run played to the end, kept in 
   assert.deepEqual(service.getStickers('HKD-E02'), {});
   saveGameData(); await loadGameData();
   assert.equal(service.getStickers('HKD-E01').gotomonPush.subjects[0], 'kanji');
+  validateSave(loadSave());
+});
+
+test('short courses grow the companion without changing full-course records or stickers', async () => {
+  const { service } = await fixture();
+  for (const gameId of Object.keys(SHORT_COURSE_COUNTS)) {
+    const rankBefore = service.getProgress().companions['HKD-E01'].bestRank;
+    const sessionId = `short-${gameId}`;
+    const result = service.awardGotomonPlayResult(args(service, sessionId, { gameId, shortCourse: true, score: 900, correct: 5, activeElapsedMs: 5000 }));
+    assert.equal(result.ok, true); assert.ok(result.reward.earnedXP >= 2);
+    assert.equal(result.reward.newBest, false); assert.equal(result.reward.sticker, null); assert.equal(result.reward.memory, null);
+    const saved = service.getProgress();
+    assert.equal(saved.games[gameId].bestScore, 0); assert.equal(saved.games[gameId].plays, 1);
+    assert.equal(saved.games[gameId].bestRank, undefined); assert.equal(saved.companions['HKD-E01'].bestRank, rankBefore);
+    assert.equal(service.getStickers('HKD-E01')[gameId], undefined);
+    assert.equal(service.awardGotomonPlayResult(args(service, sessionId, { gameId, shortCourse: true })).reward.duplicate, true);
+    const full = service.awardGotomonPlayResult(args(service, `full-${gameId}`, { gameId, score: 300 }));
+    assert.equal(full.reward.newBest, true); assert.equal(full.reward.bestScore, 300);
+    assert.equal(full.reward.sticker.isNew, true);
+  }
+  assert.ok(service.getProgress().companions['HKD-E01'].friendship > 10);
   validateSave(loadSave());
 });
 
