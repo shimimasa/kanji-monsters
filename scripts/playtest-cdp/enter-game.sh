@@ -3,7 +3,7 @@
 # its start options (e.g. "とびらのもんだい" math, "けいさんのもんだい" times), and presses スタート.
 # Needs the preview on :4173 and headless Chrome on :9333 (see README.md).
 cd "$(dirname "$0")"
-node cdp.mjs nav http://localhost:4173/ >/dev/null
+node cdp.mjs nav http://127.0.0.1:4173/ >/dev/null
 for i in 1 2 3 4 5 6; do r=$(node cdp.mjs eval "!![...document.querySelectorAll('button')].find(b=>b.textContent.includes('ミニゲーム広場へ'))" | tr -d '"'); [ "$r" = true ] && break; sleep 0.5; done
 node cdp.mjs eval "document.querySelectorAll('button').forEach(b=>{if(b.textContent.includes('スキップ'))b.click()}); [...document.querySelectorAll('button')].find(b=>b.textContent.includes('ミニゲーム広場へ'))?.click(); 'ok'" >/dev/null
 sleep 0.3

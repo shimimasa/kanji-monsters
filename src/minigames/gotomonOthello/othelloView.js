@@ -31,6 +31,11 @@ const CSS = `
 #gotomonOthelloScreen .ot-choices{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 #gotomonOthelloScreen .ot-choice{min-height:60px;border:0;border-radius:14px;background:#fffdf6;color:#1b2a36;font:inherit;font-size:clamp(18px,2.4vw,26px);font-weight:900;box-shadow:0 4px 0 #1d5e3a;cursor:pointer;touch-action:manipulation}
 #gotomonOthelloScreen .ot-star{margin:0;text-align:center;color:#ffe066;font-size:13px;font-weight:900}
+@media (max-width:700px){
+  #gotomonOthelloScreen .ot-side{width:27%;min-width:0}
+  #gotomonOthelloScreen .ot-me{left:12%;bottom:15%}
+  #gotomonOthelloScreen .ot-rival{right:12%;top:auto;bottom:15%}
+}
 @keyframes ot-glow{from{transform:scale(.9)}to{transform:scale(1.05)}}
 @keyframes ot-flip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
 @keyframes ot-new{0%{transform:scale(.3)}100%{transform:none}}
@@ -161,9 +166,11 @@ export function createOthelloView({ document: doc, dispatch, onBack, getSnapshot
       if (state.result && !doneShown) {
         doneShown = true;
         const r = state.result, name = rival?.name ?? 'あいて';
-        const head = r.outcome === 'win' ? 'きみの勝ち！' : r.outcome === 'draw' ? 'ひきわけ！' : `${name}の勝ち`;
+        const head = r.outcome === 'win' ? 'きみの勝ち！' : r.outcome === 'draw' ? 'ひきわけ！' : 'さいごまで あそんだよ！';
         fx.banner(head, r.outcome === 'lose' ? 'good' : 'great'); fx.burst(50, 50, 'great', 2);
-        note.textContent = `${head} きみ ${r.mine}まい・${name} ${r.theirs}まい。${r.outcome === 'lose' ? '1回で正解がつづくと「ほしの石」がふえて、もっと強くなれるよ' : `ほしの石 ${r.stars}こ！`}`;
+        note.textContent = r.outcome === 'lose'
+          ? `${head} ${r.stars ? `ほしの石 ${r.stars}こ！ ` : ''}また いっしょに あそぼうね。`
+          : `${head} きみ ${r.mine}まい・${name} ${r.theirs}まい。ほしの石 ${r.stars}こ！`;
       }
     },
     present(play, dt, state) {
@@ -176,6 +183,7 @@ export function createOthelloView({ document: doc, dispatch, onBack, getSnapshot
         if (event.type === 'boost') { fx.banner('オセロフィーバー！', 'great'); fx.flash('great'); }
       }
       const mission = w.challenge;
+      frame.hud.root.style.display = state.result ? 'none' : '';
       frame.hud.set({ points: play.learningPoints + play.bonus, comboCount: play.combo,
         progressValue: Math.min(1, (state.board?.filter(Boolean).length ?? 0) / (N * N)), progressLabel: `きみ ${state.mine ?? 0} ・ あいて ${state.theirs ?? 0}`,
         life: null, gaugeValue: play.gauge, fever: w.fever,
