@@ -9,8 +9,8 @@ const CSS = `
 #gotomonBubbleScreen .ya-field{background:radial-gradient(circle at 20% 20%,#ffffff55 0 6%,transparent 7%),radial-gradient(circle at 80% 35%,#ffffff44 0 4%,transparent 5%),linear-gradient(#2b1b54,#4b2f8a 55%,#6a47b8)}
 #gotomonBubbleScreen .ya-world{touch-action:none}
 #gotomonBubbleScreen .gb-board{position:absolute;left:50%;top:58px;bottom:1%;aspect-ratio:${W}/${H};max-width:98%;transform:translateX(-50%);border-radius:14px;background:#ffffff10;box-shadow:inset 0 0 0 2px #ffffff22}
-#gotomonBubbleScreen .gb-bubble{position:absolute;width:${pct(0.96, W)};aspect-ratio:1;transform:translate(-50%,-50%);display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 32% 28%,#ffffffee 0 12%,#bfe6ff 13% 55%,#6fb9e3 100%);box-shadow:inset 0 -3px 0 #0002,0 2px 3px #0004;color:#1b2a36;font-weight:900;font-size:clamp(10px,min(1.6vw,2.1vh),17px);letter-spacing:-.02em;line-height:1;pointer-events:none;transition:left .3s,top .3s}
-#gotomonBubbleScreen .gb-bubble span{position:relative;z-index:1;padding:1px 3px;border-radius:6px;background:#ffffffc8}
+#gotomonBubbleScreen .gb-bubble{position:absolute;width:${pct(0.96, W)};aspect-ratio:1;transform:translate(-50%,-50%);display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 32% 28%,#ffffffee 0 12%,#bfe6ff 13% 55%,#6fb9e3 100%);box-shadow:inset 0 -3px 0 #0002,0 2px 3px #0004;color:#1b2a36;font-weight:900;font-size:clamp(14px,min(2.2vw,2.5vh),19px);letter-spacing:-.04em;line-height:1;pointer-events:none;transition:left .3s,top .3s}
+#gotomonBubbleScreen .gb-bubble span{position:relative;z-index:1;padding:1px 3px;border-radius:6px;background:#fffdf6;box-shadow:0 1px 2px #0004}
 #gotomonBubbleScreen .gb-bubble img{position:absolute;inset:6%;width:88%;height:88%;object-fit:contain;opacity:.95;filter:drop-shadow(0 1px 1px #0005)}
 #gotomonBubbleScreen .gb-bubble[data-gotomon=true]{background:radial-gradient(circle at 32% 28%,#ffffffee 0 12%,#ffe7a8 13% 55%,#f0a868 100%)}
 #gotomonBubbleScreen .gb-bubble[data-hint=true]{box-shadow:0 0 0 3px #37c871,0 0 12px 4px #37c871aa;animation:gb-glow .7s ease-in-out infinite alternate}

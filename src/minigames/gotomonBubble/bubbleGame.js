@@ -4,11 +4,11 @@ import { equationTarget } from '../buildReview.js';
 // Board geometry in bubble diameters. Rows are packed like a honeycomb: every other
 // row sits half a bubble to the right and holds one bubble less.
 export const BUBBLE_RULES = Object.freeze({
-  columns: 8, startRows: 5, maxRows: 10, rowHeight: Math.sqrt(3) / 2,
-  shooter: Object.freeze({ x: 4, y: 10.4 }), height: 11.2,
+  columns: 6, startRows: 4, maxRows: 8, rowHeight: Math.sqrt(3) / 2,
+  shooter: Object.freeze({ x: 3, y: 8.2 }), height: 8.8,
   shots: 15, trapped: 5,
   // A new row comes down when the board gets thin, while there is room.
-  refillBelow: 14, refillMaxRow: 7,
+  refillBelow: 10, refillMaxRow: 5,
   minAngle: Math.PI * 0.07, maxAngle: Math.PI * 0.93,
   hitDistance: 0.86, step: 0.05,
 });
