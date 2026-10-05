@@ -9,6 +9,7 @@ import { createCompanionAdapter } from './companionAdapter.js';
 import { gotomonService } from './gotomonService.js';
 import { createCompanionPlay, answerKind } from './companionPlay.js';
 import { createMiniGameShell } from './miniGameShell.js';
+import { supportsShortCourse } from './courseLength.js';
 import { PLAYTEST_ENABLED, trackPlaytest, observePlaytestCommand } from '../playtest/developmentLogger.js';
 import { scoreRank } from './scoreRank.js';
 import { englishLearningService } from './englishChoice/englishLearningService.js';
@@ -100,7 +101,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
         .slice(0, MAX_SUPPORTERS).map(id => service.getGotomonById(id));
       const ticket = service.beginPlay?.({ sessionId, gameId: definition.id, gotomonId: gotomon?.id, supporterIds: supporters.map(item => item.id) });
       const pace = nextProps.pace === 'slow' ? 'slow' : 'normal';
-      const shortCourse = !nextProps.review && ['gotomonPush', 'gotomonBreakout'].includes(definition.id) && nextProps.courseLength === 'short';
+      const shortCourse = !nextProps.review && supportsShortCourse(definition.id) && nextProps.courseLength === 'short';
       play = createCompanionPlay(sessionId, doc.querySelector && !makeView
         ? { gameId: definition.id, growth, support: gotomon?.support?.id, bestTimeMs: service.getProgress().games?.[definition.id]?.bestTimeMs, course, pace,
           // とくいタイプ: a companion of the game's type fills its skill gauge sooner.

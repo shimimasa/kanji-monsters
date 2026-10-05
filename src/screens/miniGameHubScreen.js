@@ -1,6 +1,7 @@
 import { publish } from '../core/eventBus.js';
 import { miniGameRegistry } from '../minigames/registry.js';
 import { gameExperiences } from '../minigames/gameExperiences.js';
+import { supportsShortCourse, courseCountLabel, SHORT_COURSE_COUNTS } from '../minigames/courseLength.js';
 import { gotomonService } from '../minigames/gotomonService.js';
 import { element, button, companionPortrait, isolateScreen, typeChip } from '../ui/adventureUI.js';
 import { PLAYTEST_ENABLED, trackPlaytest } from '../playtest/developmentLogger.js';
@@ -32,6 +33,9 @@ const monsterInfo = id => ({ ...gotomonService.getGotomonById(id), desc: getMons
 const PACE_KEY = 'yomitabi.minigamePace';
 const readPace = () => { try { return localStorage.getItem(PACE_KEY) === 'normal' ? 'normal' : 'slow'; } catch { return 'slow'; } };
 const writePace = value => { try { localStorage.setItem(PACE_KEY, value); } catch { /* A preference only. */ } };
+const LENGTH_KEY = 'yomitabi.minigameLength';
+const readLength = () => { try { return localStorage.getItem(LENGTH_KEY) === 'short' ? 'short' : 'full'; } catch { return 'full'; } };
+const writeLength = value => { try { localStorage.setItem(LENGTH_KEY, value); } catch { /* A preference only. */ } };
 // The subject tab last chosen in the square.
 const SUBJECT_KEY = 'yomitabi.hubSubject';
 const readSubject = () => { try { const v = localStorage.getItem(SUBJECT_KEY); return HUB_SUBJECTS.some(item => item.id === v) ? v : 'all'; } catch { return 'all'; } };
@@ -47,6 +51,8 @@ const hub = {
     const heading = element(doc, 'div', 'yt-hub-heading');
     heading.append(element(doc, 'small', '', 'ヨミタビ / 旅のよりみち'), element(doc, 'h1', '', 'ミニゲーム広場'));
     const tools = element(doc, 'div', 'yt-hub-tools');
+    const settings = button(doc, 'ミニゲームの設定', () => this.showSettings());
+    settings.dataset.action = 'game-settings'; tools.append(settings);
     const selected = gotomonService.getSelectedGotomon();
     if (selected) {
       const memories = button(doc, '思い出', () => this.showMemories(), 'yt-memory-open');
@@ -150,14 +156,14 @@ const hub = {
       const body = element(doc, 'span', 'yt-card-body');
       body.append(element(doc, 'strong', 'yt-card-title', definition.title), element(doc, 'span', 'yt-card-description', info.description));
       const tags = element(doc, 'span', 'yt-card-meta');
-      for (const tag of [info.time, info.difficulty]) tags.append(element(doc, 'span', '', tag));
+      for (const tag of [supportsShortCourse(definition.id) && readLength() === 'short' ? courseCountLabel(definition.id, true) : info.time, info.difficulty]) tags.append(element(doc, 'span', '', tag));
       // The game's とくいタイプ; marked when the companion has it (its skill gauge fills sooner).
       if (GAME_TYPES[definition.id]) { const fav = typeChip(doc, GAME_TYPES[definition.id], 'とくい '); fav.dataset.match = String(selected?.type === GAME_TYPES[definition.id]); tags.append(fav); }
       if (subject === 'all' && choiceSubjects(definition.id).length) tags.append(element(doc, 'span', 'yt-card-choice', choiceSubjects(definition.id).length === 3 ? '3教科' : '2教科'));
       body.append(tags);
       const featuredCourse = companionCourse(selected, definition.id);
       if (featuredCourse) body.append(element(doc, 'span', 'yt-card-course', `★ 得意コース：${featuredCourse.name}`));
-      body.append(element(doc, 'small', 'yt-card-record', stats ? (stats.bestScore > 0 || !['gotomonPush', 'gotomonBreakout'].includes(definition.id) ? `BEST ${stats.bestScore} pt · ${stats.plays}回` : `${stats.plays}回 あそんだよ · いつものコースで記録をつくろう`) : 'はじめての記録をつくろう'));
+      body.append(element(doc, 'small', 'yt-card-record', stats ? (stats.bestScore > 0 || !supportsShortCourse(definition.id) ? `BEST ${stats.bestScore} pt · ${stats.plays}回` : `${stats.plays}回 あそんだよ · いつものコースで記録をつくろう`) : 'はじめての記録をつくろう'));
       card.append(art, body);
       return card;
     };
@@ -186,6 +192,39 @@ const hub = {
     if (PLAYTEST_ENABLED) trackPlaytest('hubShown', {});
     if (props?.notebookContext) this.showLearningNotebook(props.notebookContext);
     if (props?.evolutionId) this.showEvolution(props.evolutionId);
+  },
+  showSettings() {
+    this.dialog?.close(); this.dialog?.remove();
+    const doc = document, dialog = element(doc, 'dialog', 'yt-companion-dialog');
+    dialog.setAttribute('aria-label', 'ミニゲームの設定');
+    const header = element(doc, 'div', 'yt-picker-header');
+    header.append(element(doc, 'h2', '', 'ミニゲームの設定'), button(doc, '閉じる', () => dialog.close()));
+    dialog.append(header, element(doc, 'p', 'yt-note', 'ここでえらぶ長さと はやさは、次にあそぶときから使うよ。ゲームを始める前に、今回だけ変えることもできるよ。'));
+    const addChoices = (title, values, selected, save) => {
+      const group = element(doc, 'div', 'yt-pace'); group.setAttribute('role', 'radiogroup'); group.setAttribute('aria-label', title);
+      group.append(element(doc, 'span', 'yt-pace-label', title));
+      const choices = values.map(([value, label, hint]) => {
+        const choice = button(doc, '', () => {
+          selected = value; save(value);
+          choices.forEach(item => item.setAttribute('aria-checked', String(item.dataset.value === selected)));
+        }, 'yt-pace-choice');
+        choice.setAttribute('role', 'radio'); choice.dataset.value = value; choice.setAttribute('aria-checked', String(value === selected));
+        choice.append(element(doc, 'strong', '', label), element(doc, 'small', '', hint)); group.append(choice); return choice;
+      });
+      dialog.append(group);
+    };
+    addChoices('あそぶ長さ', [['full', 'いつも', 'これまでの長さ'], ['short', 'ちょこっと', '短い区切りまであそぶ']], readLength(), value => {
+      writeLength(value);
+      for (const card of this.root?.querySelectorAll('.yt-game-card') ?? []) {
+        if (!supportsShortCourse(card.dataset.gameId)) continue;
+        const time = card.querySelector('.yt-card-meta > span');
+        if (time) time.textContent = value === 'short' ? courseCountLabel(card.dataset.gameId, true) : gameExperiences[card.dataset.gameId].time;
+      }
+    });
+    dialog.append(element(doc, 'p', 'yt-note', `ちょこっとコースは現在${Object.keys(SHORT_COURSE_COUNTS).length}種類。ほかのゲームは、それぞれの区切りまで あそべるよ。短いコースでも あいぼうは そだつよ。`));
+    addChoices('はやさ', [['slow', 'ゆっくり', '動くゲームの初期設定'], ['normal', 'ふつう', 'いつものはやさ']], readPace(), writePace);
+    dialog.addEventListener('close', () => this.root?.querySelector('[data-action=game-settings]')?.focus());
+    this.root.append(dialog); this.dialog = dialog; dialog.showModal();
   },
   showLearningNotebook(initialContext) {
     this.dialog?.close(); this.dialog?.remove();
@@ -297,14 +336,15 @@ const hub = {
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'いつものコースは12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonColoring' ? 'ぬりえになるのは、きみがつかまえたゴトモン（まだいなければ旅で出会ったゴトモン）です。' : definition.id === 'gotomonMerge' ? 'どちらも16問。タイルの数が大きくなると、旅で出会ったゴトモンにかわります。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
     }
-    let courseLength = 'full';
-    if (['gotomonPush', 'gotomonBreakout'].includes(definition.id) && !playOptions.review) {
-      const label = element(doc, 'label', 'yt-memory-picker', 'あそぶ長さ');
+    let courseLength = readLength();
+    if (supportsShortCourse(definition.id) && !playOptions.review) {
+      const label = element(doc, 'label', 'yt-memory-picker', '今回あそぶ長さ');
       const select = element(doc, 'select'); select.setAttribute('aria-label', 'あそぶ長さ');
-      for (const [value, text] of [['full', definition.id === 'gotomonPush' ? 'いつも（10へや）' : 'いつも（12問）'],
-        ['short', definition.id === 'gotomonPush' ? 'ちょこっと（5へや）' : 'ちょこっと（6問）']]) {
+      for (const [value, text] of [['full', `いつも（${courseCountLabel(definition.id)}）`],
+        ['short', `ちょこっと（${courseCountLabel(definition.id, true)}）`]]) {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
+      select.value = courseLength;
       select.onchange = () => { courseLength = select.value; };
       label.append(select); dialog.append(label, element(doc, 'p', 'yt-note', 'ちょこっとコースでも あいぼうは そだつよ。最高点とシールは いつものコースで 記録するよ。'));
     }
@@ -321,7 +361,7 @@ const hub = {
       const preset = modeForSubject(definition.id, playOptions.subject);
       if (preset) { mode = preset; select.value = preset; }
       select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', push ? 'いつものコースは10へや。はこから 出てくるのは、きみが旅で出会ったゴトモンたちです。' : trace ? 'どれも12問。漢字は読み、英語は英単語の つづり、算数は 答えの 数字を なぞります。もんだいを 出すのは、きみが旅で出会ったゴトモンたちです。' : land ? 'どれも12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'どれも12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'どれも12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'どれも12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'どれも12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'どれも12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'どれも12問。いっしょに走るのはあいぼう、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'どれも12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', push ? 'いつものコースは10へや。はこから 出てくるのは、きみが旅で出会ったゴトモンたちです。' : trace ? 'いつものコースは12問。漢字は読み、英語は英単語の つづり、算数は 答えの 数字を なぞります。もんだいを 出すのは、きみが旅で出会ったゴトモンたちです。' : land ? 'いつものコースは12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'いつものコースは12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'いつものコースは12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'いつものコースは12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'いつものコースは12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'いつものコースは12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'いつものコースは12問。いっしょに走るのはあいぼう、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'いつものコースは12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
     }
     if (definition.id === 'gotomonParts') {
       const label = element(doc, 'label', 'yt-memory-picker', 'くみたてる漢字');
@@ -413,7 +453,7 @@ const hub = {
       dialog.close(); publish('changeScreen', { name: 'miniGame', props: { ...playOptions, gameId: definition.id, gotomonId: selectedId, supporterIds: [...supporterIds],
         courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
         ...(gameExperiences[definition.id].paced ? { pace } : {}),
-        ...(['gotomonPush', 'gotomonBreakout'].includes(definition.id) ? { courseLength } : {}),
+        ...(supportsShortCourse(definition.id) ? { courseLength } : {}),
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
         ...(['gotomonToss', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout', 'gotomonMeteor', 'gotomonColoring', 'gotomonMerge'].includes(definition.id) ? { mathLevel } : {}),
         ...(definition.id === 'gotomonDelivery' ? { region } : {}),

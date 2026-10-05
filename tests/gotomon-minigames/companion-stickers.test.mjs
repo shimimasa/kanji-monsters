@@ -8,6 +8,7 @@ import { validateSave } from '../../src/core/saveValidation.js';
 import { recordSticker, markStickerReview, stickerSummary, validateCompanionStickers } from '../../src/minigames/companionStickers.js';
 import { subjectOf, hubSections } from '../../src/minigames/hubCatalog.js';
 import { miniGameRegistry } from '../../src/minigames/registry.js';
+import { SHORT_COURSE_COUNTS } from '../../src/minigames/courseLength.js';
 
 async function fixture() {
   const initial = getDefaultSave(); initial.player.collection.gotomonIds = ['HKD-E01', 'HKD-E02'];
@@ -71,7 +72,7 @@ test('the reward gives a sticker only for a real run played to the end, kept in 
 
 test('short courses grow the companion without changing full-course records or stickers', async () => {
   const { service } = await fixture();
-  for (const gameId of ['gotomonPush', 'gotomonBreakout']) {
+  for (const gameId of Object.keys(SHORT_COURSE_COUNTS)) {
     const rankBefore = service.getProgress().companions['HKD-E01'].bestRank;
     const sessionId = `short-${gameId}`;
     const result = service.awardGotomonPlayResult(args(service, sessionId, { gameId, shortCourse: true, score: 900, correct: 5, activeElapsedMs: 5000 }));

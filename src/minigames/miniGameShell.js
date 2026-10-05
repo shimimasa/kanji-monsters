@@ -10,6 +10,7 @@ import { createBuildReviewPanel } from './buildReviewPanel.js';
 import { outfitItem } from './companionOutfits.js';
 import { moveFor, supportEffectOf } from './gotomonMoves.js';
 import { LOOK_NAMES } from './companionLooks.js';
+import { courseCountLabel } from './courseLength.js';
 
 // Intro cards are shown once per game per page load; replays start directly.
 const seenIntros = new Set();
@@ -181,7 +182,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
     meta.append(element(doc, 'span', pace === 'slow' ? 'ya-pace-slow' : '', pace === 'slow' ? 'ゆっくりモード' : 'ふつうのはやさ'));
     const mission = play.snapshot().world?.challenge;
     if (mission && !shortCourse) meta.append(element(doc, 'span', '', `ミッション：${mission.name}`));
-    if (shortCourse) meta.append(element(doc, 'span', '', `ちょこっとコース：${definition.id === 'gotomonPush' ? '5へや' : '6問'}`));
+    if (shortCourse) meta.append(element(doc, 'span', '', `ちょこっとコース：${courseCountLabel(definition.id, true)}`));
     if (course) meta.append(element(doc, 'span', '', `★ ${course.name}`));
     if (move) meta.append(element(doc, 'span', '', `わざ：${move.name}（${move.text}）`));
     const start = button(doc, 'スタート！', () => {
@@ -317,7 +318,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
         growthResult.root.hidden = reviewing;
         rankLabel.hidden = reviewing || shortCourse;
         findings && (findings.root.hidden = reviewing);
-        replay.textContent = reviewing ? '通常の10問であそぶ' : 'もう一度あそぶ';
+        replay.textContent = reviewing ? 'ふつうにあそぶ' : 'もう一度あそぶ';
         review.hidden = !onReview || !receipt?.ok || !getReviewCount();
         review.disabled = state.paused;
         notebook.disabled = state.paused || !receipt?.ok;

@@ -5,6 +5,7 @@ import { getMonsterById } from '../loaders/dataLoader.js';
 import { getBonusMonsterFolder } from '../utils/monsterImagePaths.js';
 import { growthStatus, calculateXP, supportStyle } from './companionGrowth.js';
 import { scoreRank, betterRank } from './scoreRank.js';
+import { supportsShortCourse } from './courseLength.js';
 import { recordCompanionMemory } from './companionMemories.js';
 import { recordSticker, markStickerReview } from './companionStickers.js';
 import { outfitProgress, wornItems, outfitItem, OUTFIT_SLOTS } from './companionOutfits.js';
@@ -200,7 +201,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     awardGotomonPlayResult({ owner, sessionId, gameId, gotomonId, score, correct, maxCombo,
       ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished, photos = null, cases = null, journey = null, subject = null, shortCourse = false }) {
       if (!owner || owner !== read()?.owner || !sessionId || !gameId) return { ok: false };
-      shortCourse = shortCourse === true && ['gotomonPush', 'gotomonBreakout'].includes(gameId);
+      shortCourse = shortCourse === true && supportsShortCourse(gameId);
       const run = ticket && tickets.get(ticket);
       if (ticket && (!run || ticket !== activeTicket || ticket.sessionId !== sessionId || run.owner !== owner ||
           run.gameId !== gameId || run.gotomonId !== gotomonId || !completed)) return { ok: false };
