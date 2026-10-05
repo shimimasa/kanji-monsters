@@ -31,6 +31,7 @@ try {
       page.on('pageerror', error => errors.push(error.message));
       await page.goto('http://127.0.0.1:4173/');
       await page.locator('#titleMiniGameButton').click();
+      await page.locator('.yt-start-here').waitFor({ state: 'visible' });
       await page.locator('[data-action=evolution]').waitFor({ state: 'visible' });
       await page.screenshot({ path: new URL(`${viewport.width}-${ready ? 'ready' : 'waiting'}-hub.png`, out).pathname.replace(/^\/(\w:)/, '$1') });
       await page.locator('[data-action=evolution]').click();
@@ -42,6 +43,10 @@ try {
       if (!ready) {
         assert.equal(await action.isDisabled(), true);
         assert.match(await room.innerText(), /あと 1 XP/);
+        await room.locator('[data-action=play-to-evolve]').click();
+        assert.equal(await room.isVisible(), false);
+        assert.equal(await page.locator('.yt-start-here button, .yt-recommendation').first().evaluate(node => node === document.activeElement), true);
+        await page.locator('[data-action=evolution]').click();
       } else {
         assert.equal(await action.isEnabled(), true);
         await action.click();

@@ -262,7 +262,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
       for (const child of shell.children) {
         if (![header, soundPanel, howTo].includes(child)) child.inert = !!state.paused;
       }
-      pause.textContent = introOpen ? 'じゅんび中' : howTo.open ? 'あそびかた確認中' : state.paused ? '再開' : '一時停止';
+      pause.textContent = showResult ? '' : introOpen ? 'じゅんび中' : howTo.open ? 'あそびかた確認中' : state.paused ? '再開' : '一時停止';
+      pause.hidden = showResult;
       pause.disabled = !!state.result || howTo.open || introOpen;
       howTo.hidden = !!state.result;
       // Arcade: the companion's skill fires on its own as a fever when the gauge fills.

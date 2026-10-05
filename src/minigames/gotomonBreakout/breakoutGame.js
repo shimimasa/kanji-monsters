@@ -221,6 +221,15 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
       if (!block) return false;
       choose(block); return true;
     },
+    // Physical follow-up is optional after a clear answer choice. No second answer event.
+    assist({ sessionId: s, attemptId: a } = {}) {
+      if (!active || paused || notifying || phase !== 'answering' || s !== sessionId || a !== attemptId || !chosenId) return false;
+      const chosen = blocks.find(block => block.blockId === chosenId);
+      if (!chosen) return false;
+      assisted++;
+      hitBlock(chosen);
+      return true;
+    },
     next({ sessionId: sourceSession } = {}) {
       if (!active || paused || notifying || sourceSession !== sessionId || phase !== 'feedback') return false;
       if (index + 1 >= questions.length) { complete(); return true; }
@@ -230,7 +239,7 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
     },
     dispatch(command) {
       if (!command || typeof command !== 'object') return false;
-      if (['steer', 'launch', 'next', 'choose'].includes(command.type)) return this[command.type](command.payload);
+      if (['steer', 'launch', 'next', 'choose', 'assist'].includes(command.type)) return this[command.type](command.payload);
       return false;
     },
     snapshot,
