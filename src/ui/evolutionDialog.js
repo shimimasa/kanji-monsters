@@ -1,4 +1,5 @@
 import { publish } from '../core/eventBus.js';
+import { audio } from '../audio/audio.js';
 import { EVOLVE_LEVEL } from '../minigames/companionLooks.js';
 import { XP_THRESHOLDS } from '../minigames/companionGrowth.js';
 import { element, button, companionPortrait } from './adventureUI.js';
@@ -25,8 +26,8 @@ const CSS = `
 #yt-evolution-room .yt-evo-stage .gt-portrait img{image-rendering:pixelated}
 #yt-evolution-room .yt-evo-arrow{font-size:clamp(30px,5vw,50px);color:#ffe083}
 #yt-evolution-room .yt-evo-future{display:grid;place-items:center;width:min(34vw,210px);height:220px;border:2px dashed #b7d8c9;border-radius:22px;color:#fff2b6;font-size:76px;font-weight:900}
-#yt-evolution-room .yt-evo-stage[data-phase=evolving] .gt-portrait{animation:yt-evo-rise 1s ease-in-out forwards}
-#yt-evolution-room .yt-evo-stage[data-phase=evolving] .yt-evo-future{animation:yt-evo-flash 1s ease-in-out forwards}
+#yt-evolution-room .yt-evo-stage[data-phase=evolving] .gt-portrait{animation:yt-evo-rise 3.55s ease-in-out forwards}
+#yt-evolution-room .yt-evo-stage[data-phase=evolving] .yt-evo-future{animation:yt-evo-flash 3.55s ease-in-out forwards}
 #yt-evolution-room .yt-evo-status{min-height:42px;margin:12px 0;font-size:clamp(16px,2.5vw,21px);font-weight:800;line-height:1.5}
 #yt-evolution-room .yt-evo-action{min-height:56px;padding:10px 28px;border:0;border-radius:16px;background:#ffcf54;color:#3d2900;font:inherit;font-size:20px;font-weight:900;cursor:pointer;box-shadow:0 5px 0 #9b6c17}
 #yt-evolution-room .yt-evo-action:disabled{background:#d5e2d9;color:#435e50;box-shadow:none;cursor:default}
@@ -60,7 +61,7 @@ export function createEvolutionDialog({ doc, service, selectedId, onClose, onCha
 
   const friends = service.getOwnedGotomon().filter(friend => service.getLook(friend.id).progress.evolve);
   let currentId = friends.some(friend => friend.id === selectedId) ? selectedId : friends[0]?.id;
-  let busy = false, timer = null;
+  let busy = false, timer = null, musicTimer = null, musicActive = false;
   const render = (message = '') => {
     const friend = friends.find(item => item.id === currentId);
     list.replaceChildren(...friends.map(item => {
@@ -103,11 +104,33 @@ export function createEvolutionDialog({ doc, service, selectedId, onClose, onCha
     onChanged?.();
     if (evolved) { publish('playSE', 'cancel'); render('もとの すがたで あそぶよ。しんかした すがたには いつでも もどせるよ。'); return; }
     busy = true; action.disabled = true; stage.dataset.phase = 'evolving'; status.textContent = `${friends.find(item => item.id === currentId)?.name}が しんかするよ…`;
-    publish('playSE', 'evolve');
-    timer = setTimeout(() => { busy = false; timer = null; if (dialog.isConnected) render(`${friends.find(item => item.id === currentId)?.name}が しんかした！ いっしょに あそぼう！`); },
-      globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 1050);
+    const reducedMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (!reducedMotion) {
+      audio.playBGM('evolution', false);
+      musicActive = true;
+      audio.playSE('evolutionGlimmer');
+    }
+    timer = setTimeout(() => {
+      timer = null;
+      if (!dialog.isConnected) return;
+      audio.playSE('evolutionReveal');
+      render(`${friends.find(item => item.id === currentId)?.name}が しんかした！ いっしょに あそぼう！`);
+      if (musicActive) {
+        action.disabled = true;
+        musicTimer = setTimeout(() => {
+          musicTimer = null;
+          if (musicActive) { audio.playBGM('miniGameHub'); musicActive = false; }
+          busy = false; action.disabled = false;
+        }, 1150);
+      } else busy = false;
+    }, reducedMotion ? 0 : 3550);
   };
   render();
-  dialog.addEventListener('close', () => { if (timer) clearTimeout(timer); dialog.remove(); onClose?.(); }, { once: true });
+  dialog.addEventListener('close', () => {
+    if (timer) clearTimeout(timer);
+    if (musicTimer) clearTimeout(musicTimer);
+    if (musicActive) { audio.playBGM('miniGameHub'); musicActive = false; }
+    dialog.remove(); onClose?.();
+  }, { once: true });
   return dialog;
 }
