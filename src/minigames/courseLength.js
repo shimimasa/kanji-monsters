@@ -12,10 +12,16 @@ export const SHORT_COURSE_COUNTS = Object.freeze({
   gotomonHop: 6,
   gotomonLand: 6,
   gotomonTrace: 6,
+  gotomonToss: 6,
+  gotomonFishing: 6,
+  gotomonDelivery: 5,
+  gotomonDrum: 6,
+  gotomonShooter: 6,
 });
 
 export const supportsShortCourse = gameId => Object.hasOwn(SHORT_COURSE_COUNTS, gameId);
 export const shortCourseCount = gameId => SHORT_COURSE_COUNTS[gameId] ?? null;
 export const courseUnit = gameId => gameId === 'gotomonPush' ? 'へや' : gameId === 'gotomonGolf' ? 'ホール'
-  : gameId === 'gotomonLand' ? 'ステージ' : '問';
-export const courseCountLabel = (gameId, short = false) => `${short ? shortCourseCount(gameId) : gameId === 'gotomonPush' ? 10 : 12}${courseUnit(gameId)}`;
+  : gameId === 'gotomonLand' ? 'ステージ' : gameId === 'gotomonToss' ? '球'
+  : gameId === 'gotomonDelivery' ? 'こ' : '問';
+export const courseCountLabel = (gameId, short = false) => `${short ? shortCourseCount(gameId) : ['gotomonPush', 'gotomonDelivery'].includes(gameId) ? 10 : 12}${courseUnit(gameId)}`;

@@ -180,6 +180,8 @@ const shortSlashContent = (context, gameId) => {
   return context.courseLength === 'short' && content?.problems
     ? { ...content, problems: content.problems.slice(0, shortCourseCount(gameId)) } : content;
 };
+const shortContent = (context, gameId, content, key) => context.courseLength === 'short' && Array.isArray(content?.[key])
+  ? { ...content, [key]: content[key].slice(0, shortCourseCount(gameId)) } : content;
 // The drum asks そう？ちがう？ about kanji readings from the stage reached last, English words, or sums.
 const drumContent = ({ sessionId, random, mode, focusKanjiIds }) => {
   const kind = ['english', 'math'].includes(mode) ? mode : 'kanji';
@@ -297,17 +299,17 @@ export const miniGameRegistry = Object.freeze({
   kanjiSort: Object.freeze({ id: 'kanjiSort', title: '漢字ならべパズル',
     create: context => createSortGame({ ...context, content: sortContent(context) }), createView: createSortView }),
   gotomonToss: Object.freeze({ id: 'gotomonToss', title: 'ゴトモン玉入れ',
-    create: context => createTossGame({ ...context, content: tossContent(context) }), createView: createTossView }),
+    create: context => createTossGame({ ...context, content: shortContent(context, 'gotomonToss', tossContent(context), 'problems') }), createView: createTossView }),
   gotomonFishing: Object.freeze({ id: 'gotomonFishing', title: 'ゴトモンつり',
-    create: context => createFishGame({ ...context, content: fishContent(context) }), createView: createFishView }),
+    create: context => createFishGame({ ...context, content: shortContent(context, 'gotomonFishing', fishContent(context), 'problems') }), createView: createFishView }),
   gotomonDelivery: Object.freeze({ id: 'gotomonDelivery', title: 'ゴトモン宅配便',
-    create: context => createDeliveryGame({ ...context, content: deliveryContent(context) }), createView: createDeliveryView }),
+    create: context => createDeliveryGame({ ...context, content: shortContent(context, 'gotomonDelivery', deliveryContent(context), 'deliveries') }), createView: createDeliveryView }),
   gotomonBubble: Object.freeze({ id: 'gotomonBubble', title: 'ゴトモン・バブル',
     create: context => createBubbleGame({ ...context, content: bubbleContent(context) }), createView: createBubbleView }),
   gotomonPuyo: Object.freeze({ id: 'gotomonPuyo', title: 'けいさんぷよ',
     create: context => createPuyoGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createPuyoView }),
   gotomonShooter: Object.freeze({ id: 'gotomonShooter', title: 'ゴトモン・シューター',
-    create: context => createShooterGame({ ...context, content: shooterContent(context) }), createView: createShooterView }),
+    create: context => createShooterGame({ ...context, content: shortContent(context, 'gotomonShooter', shooterContent(context), 'waves') }), createView: createShooterView }),
   gotomonBreakout: Object.freeze({ id: 'gotomonBreakout', title: 'ゴトモン・ブロックくずし',
     create: context => createBreakoutGame({ ...context, content: { level: context.mathLevel === 'times' ? 'times' : 'addsub' } }), createView: createBreakoutView }),
   gotomonMeteor: Object.freeze({ id: 'gotomonMeteor', title: 'いん石げいげき',
@@ -321,7 +323,7 @@ export const miniGameRegistry = Object.freeze({
   gotomonColoring: Object.freeze({ id: 'gotomonColoring', title: 'ゴトモンぬりえ',
     create: context => createColoringGame({ ...context, content: coloringContent(context) }), createView: createColoringView }),
   gotomonDrum: Object.freeze({ id: 'gotomonDrum', title: 'ゴトモン・リズムたいこ',
-    create: context => createDrumGame({ ...context, content: drumContent(context) }), createView: createDrumView }),
+    create: context => createDrumGame({ ...context, content: shortContent(context, 'gotomonDrum', drumContent(context), 'questions') }), createView: createDrumView }),
   gotomonRace: Object.freeze({ id: 'gotomonRace', title: 'ゴトモン・レース',
     create: context => createRaceGame({ ...context, content: shortSlashContent(context, 'gotomonRace') }), createView: createRaceView }),
   gotomonMerge: Object.freeze({ id: 'gotomonMerge', title: 'けいさん2048',
