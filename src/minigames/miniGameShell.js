@@ -15,7 +15,7 @@ import { LOOK_NAMES } from './companionLooks.js';
 const seenIntros = new Set();
 
 export function createMiniGameShell({ doc, view, definition, gotomon, supporters = [], play, reviewMode = false, pace = 'normal', course = null, onPause, onBoost, onAct, onAdvance, onBack, onReplay, award,
-  onReview, onNormalPlay, onNotebook, onRetryMistakes, getMistakeCount = () => 0, getReviewCount = () => 0,
+  onReview, onNormalPlay, onNotebook, onEvolution, onRetryMistakes, getMistakeCount = () => 0, getReviewCount = () => 0,
   getLearningSaveStatus = () => ({ failed: false, pending: 0 }), onRetryLearningSave, onBuildReviewDone }) {
   const root = view.root;
   // Headless contract fixtures supply only the v1 view interface.
@@ -134,6 +134,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   const growthResult = createGrowthResult(doc, portrait);
   const findings=['treasure','explore','craft'].includes(info.scene)?createFindings(doc,info.scene==='explore'?5:info.scene==='craft'?3:4):null;
   const replay = button(doc, 'もう一度あそぶ', () => state?.mode === 'review' ? onNormalPlay() : onReplay(), 'gt-button gt-primary'); replay.dataset.action = 'replay';
+  const evolveAction = button(doc, 'しんかのへやへ', () => onEvolution?.(), 'gt-button gt-primary');
+  evolveAction.dataset.action = 'open-evolution'; evolveAction.hidden = true;
   const review = button(doc, 'まちがえた語をもう一度', () => onReview?.(), 'gt-button');
   review.dataset.action = 'review'; review.hidden = true;
   review.title = 'これまで記録した間違いから、最大10問を復習します。';
@@ -142,7 +144,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   const notebook = button(doc, '学習ノートに戻る', () => { if (receipt?.ok && !state?.paused) onNotebook?.(); }, 'gt-button');
   notebook.dataset.action = 'return-notebook'; notebook.hidden = !onNotebook;
   const retrySave = button(doc, '記録の保存を再試行', () => { receipt = null; commit(); }, 'gt-button'); retrySave.hidden = true;
-  resultActions.append(notebook, retryMistakes, replay, review, button(doc, 'ミニゲーム広場へ', onBack, 'gt-button'));
+  resultActions.append(notebook, retryMistakes, evolveAction, replay, review, button(doc, 'ミニゲーム広場へ', onBack, 'gt-button'));
   stats.className='gt-world-result';
   result.append(rankLabel, portrait, resultName, resultTitle, stats);
   if(findings)result.append(findings.root);
@@ -196,6 +198,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   }
   function commit() {
     const current = play.snapshot();
+    evolveAction.hidden = true;
     receipt = award({ score: (state.result?.score ?? current.learningPoints) + current.bonus,
       correct: current.correct, maxCombo: current.maxCombo, completed: current.completed,
       finished: state.result?.finished ?? (state.answered ?? state.resolved ?? 0) >= (definition.id === 'kanjiDefense' ? 12 : 10), activeElapsedMs: state.activeElapsedMs, timeMs:current.world?.timeMs,
@@ -234,11 +237,11 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
       const secrets = value?.duplicate ? [] : value?.newSecrets ?? [];
       if (secrets.length) showSticker(stickerNotice.hidden ? 'secret' : stickerNotice.dataset.tier, `${stickerNotice.hidden ? '' : `${stickerNotice.textContent} `}ひみつノートに「${secrets.join('」「')}」が ひらいた！`);
       const looks = value?.duplicate ? [] : value?.newLooks ?? [];
-      if (looks.length) showSticker(stickerNotice.hidden ? 'outfit' : stickerNotice.dataset.tier, `${stickerNotice.hidden ? '' : `${stickerNotice.textContent} `}すがた「${looks.map(key => LOOK_NAMES[key]).join('」「')}」が ひらいた！ シール帳で かえられるよ`);
+      if (looks.length) showSticker(stickerNotice.hidden ? 'outfit' : stickerNotice.dataset.tier, `${stickerNotice.hidden ? '' : `${stickerNotice.textContent} `}すがた「${looks.map(key => LOOK_NAMES[key]).join('」「')}」が ひらいた！ ${looks.includes('evolve') ? 'しんかのへやで しんかさせよう！' : 'シール帳で かえられるよ'}`);
+      evolveAction.hidden = !looks.includes('evolve') || !onEvolution;
       if (opened.length) showSticker(stickerNotice.hidden ? 'outfit' : stickerNotice.dataset.tier, `${stickerNotice.hidden ? '' : `${stickerNotice.textContent} `}きせかえ ${opened.map(item => `${item.icon}${item.name}`).join('・')} が ひらいた！ シール帳で つけられるよ`);
       // ごほうびが同時に届いてもジングルは1回だけ。復習や保存済みの結果では鳴らさない。
-      if (looks.includes('evolve')) publish('playSE', 'evolve');
-      else if (sticker?.isNew || sticker?.upgraded || opened.length || titles.length || secrets.length || looks.length) publish('playSE', 'reward');
+      if (sticker?.isNew || sticker?.upgraded || opened.length || titles.length || secrets.length || looks.length) publish('playSE', 'reward');
       resultDetails.append(reward);
     } else reward.textContent = '記録を保存できませんでした。この画面で「記録の保存を再試行」を押してください。画面を閉じると未保存の記録は失われます。';
     retrySave.hidden = receipt.ok;

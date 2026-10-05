@@ -150,11 +150,16 @@ export function createMiniGameHost({ document: doc = globalThis.document,
         if (!flushLearning()?.ok) return;
         host.exit(); publish('changeScreen', { name: 'miniGameHub', props: { notebookContext: returnContext } });
       } : null;
+      const goEvolution = () => {
+        if (!valid || current !== game || !current.snapshot().result || owner !== service.getOwner()) return;
+        const saved = flushLearning(); if (saved && !saved.ok) return;
+        host.exit(); publish('changeScreen', { name: 'miniGameHub', props: { evolutionId: gotomon.id } });
+      };
       view = createView({ document: doc, getSnapshot: () => current.snapshot(),
         dispatch, cast: doc.querySelector && !makeView ? castForPlay(service, Math.random, gotomon?.id) : undefined,
         onBack: goBack, onReplay: replay });
       shell = makeShell({ doc, view, definition, gotomon, supporters, play, reviewMode: !!nextProps.review, pace, course,
-        onPause: value => host.setPaused(value), onBack: goBack, onReplay: replay,
+        onPause: value => host.setPaused(value), onBack: goBack, onReplay: replay, onEvolution: goEvolution,
         onReview: wordLearning ? review : null, onNormalPlay: normalPlay,
         onNotebook: returnToNotebook,
         onRetryMistakes: wordLearning ? retryMistakes : null, getMistakeCount: () => getRunReviewIds().length,

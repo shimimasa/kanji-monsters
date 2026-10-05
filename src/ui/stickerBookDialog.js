@@ -7,7 +7,7 @@ import { LOOK_NAMES, LOOK_KEYS } from '../minigames/companionLooks.js';
 
 // The sticker book of one companion: one sticker per mini-game, grouped like the square.
 // Silver: played to the end together. Gold: rank A or S. The rainbow rim: the review done after it.
-export function createStickerBookDialog({ doc, service, gotomon, sections, games, experiences, onClose, onOutfit }) {
+export function createStickerBookDialog({ doc, service, gotomon, sections, games, experiences, onClose, onOutfit, onEvolution }) {
   const dialog = element(doc, 'dialog', 'yt-companion-dialog yt-sticker-dialog');
   dialog.setAttribute('aria-label', `${gotomon.name}のシール帳`);
   const header = element(doc, 'div', 'yt-picker-header');
@@ -39,12 +39,17 @@ export function createStickerBookDialog({ doc, service, gotomon, sections, games
     const stage = element(doc, 'div', 'yt-look-stage'), items = element(doc, 'div', 'yt-look-items'), say = element(doc, 'p', 'yt-note');
     say.setAttribute('role', 'status');
     box.append(element(doc, 'h3', '', 'すがた'), stage, items, say);
+    const evolution = service.getLook(gotomon.id).progress.evolve;
+    if (evolution && onEvolution) {
+      box.append(element(doc, 'p', 'yt-note', evolution.unlocked ? 'しんかのへやで、あいぼうを しんかさせよう！' : `Lv${evolution.need}になったら、しんかのへやで しんかできるよ（いま Lv${evolution.have}）。`));
+      const go = button(doc, 'しんかのへやへ', () => onEvolution(), 'yt-primary'); go.dataset.action = 'open-evolution'; box.append(go);
+    }
     const hints = { evolve: p => `Lv${p.need}で しんかできる（いま Lv${p.have}）`, shiny: p => `金シール ${p.have}/${p.need}で ひらく`, glow: p => `Lv${p.need}で ひらく（いま Lv${p.have}）` };
     const render = () => {
       const { chosen, progress } = service.getLook(gotomon.id);
       stage.replaceChildren(companionPortrait(doc, service.getGotomonById(gotomon.id)));
       // しんか shows only for a Gotomon that has an evolved picture.
-      items.replaceChildren(...LOOK_KEYS.filter(key => progress[key]).map(key => {
+      items.replaceChildren(...LOOK_KEYS.filter(key => key !== 'evolve' && progress[key]).map(key => {
         const p = progress[key], on = !!chosen[key] && p.unlocked;
         const pick = button(doc, '', () => {
           const outcome = service.setLook({ gotomonId: gotomon.id, key, on: !on });

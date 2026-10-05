@@ -4,8 +4,9 @@ import { getDefaultSave } from '../../src/core/saveData.js';
 import { KANJI_DEFENSE_GOLDEN_CONTENT } from '../../src/minigames/kanjiDefense/kanjiDefenseContent.js';
 import { launchPreferredBrowser } from './helpers.mjs';
 const phase = process.argv[2] || 'before';
+const targetId = process.argv[3];
 const legacy = phase === 'public-before';
-const baseUrl = legacy ? 'https://yomitabi.gamanavi.com/' : 'http://127.0.0.1:4173';
+const baseUrl = legacy ? 'https://yomitabi.gamanavi.com/' : 'http://127.0.0.1:4173/';
 const output = new URL(`../../artifacts/play-quality/${phase}/`, import.meta.url);
 await fs.mkdir(output,{recursive:true});
 const {browser} = await launchPreferredBrowser(chromium);
@@ -19,13 +20,20 @@ await context.addInitScript(save=>{
 },save);
 const page=await context.newPage(), results={phase,errors:[],games:{}};
 page.on('pageerror',e=>results.errors.push(e.message));
-const snap=()=>page.evaluate(()=>window.fsm.currentState.inspect().session);
+const hostChunk = legacy ? null : (await fs.readdir(new URL('../../dist/assets/', import.meta.url))).find(name => /^miniGameHost-.*\.js$/.test(name));
+const inspect=()=>legacy ? page.evaluate(()=>window.fsm.currentState.inspect()) : page.evaluate(async url => (await import(url)).default.inspect(), `/assets/${hostChunk}`);
+const snap=async()=> (await inspect()).session;
 const shot=async(id,moment)=>page.screenshot({path:new URL(`${id}-${moment}.png`,output).pathname.replace(/^\/(\w:)/,'$1')});
 const readings=Object.fromEntries(KANJI_DEFENSE_GOLDEN_CONTENT.map(x=>[x.prompt,x.acceptedReadings[0]]));
 const titleButtons = {mathSprint:'titleMiniGameButton',mathInvader:'titleMathInvaderButton',englishChoice:'titleEnglishChoiceButton',sentenceOrder:'titleSentenceOrderButton',timedChoice:'titleTimedChoiceButton',multiSelect:'titleMultiSelectButton',asyncChoice:'titleAsyncChoiceButton',kanjiDefense:'titleKanjiDefenseButton'};
 async function answer(id,wrong=false){
   let s=await snap();
-  if(s.phase==='feedback'){await page.locator('[data-action=next]:visible').click();s=await snap();}
+  if(s.phase==='feedback'){
+    const next=page.locator('[data-action=next]:visible');
+    if(await next.count())await next.click();
+    else for(let i=0;i<30&&(await snap()).phase==='feedback';i++)await page.waitForTimeout(100);
+    s=await snap();
+  }
   if(id==='asyncChoice'){
     const routes=page.locator('[data-action=explore]:not(:disabled)');
     if(await routes.count())await routes.nth(s.answered%await routes.count()).click();
@@ -33,21 +41,17 @@ async function answer(id,wrong=false){
   if(['mathInvader','kanjiDefense'].includes(id)){
     await expect(page.locator('[data-enemy-id]').first()).toBeVisible();
     const r=await page.locator('[data-enemy-id]').first().boundingBox();await page.mouse.click(r.x+r.width/2,r.y+r.height/2);s=await snap();
-    await page.locator(`#${id}Screen input[type=text]`).fill(wrong?'999':String(id==='mathInvader'?s.selectedEnemy.answer:readings[s.selectedEnemy.prompt]));
-    await page.locator('[data-action=answer]').click();
+    const value=wrong?'999':String(id==='mathInvader'?s.targetEnemy.answer:readings[s.targetEnemy.prompt]);
+    if(id==='mathInvader'){await page.keyboard.type(value);await page.locator('#mathInvaderScreen .ya-pad-fire').click();await page.waitForTimeout(350);}
+    else {await page.locator(`#${id}Screen input[type=text]`).fill(value);await page.locator('[data-action=answer]').click();}
   }else if(id==='mathSprint'){
-    await page.getByRole('textbox',{name:'こたえ',exact:true}).fill(wrong?'999':String(s.problem.answer));await page.locator('[data-action=answer]').click();
+    await page.keyboard.type(wrong?'999':String(s.problem.answer));await page.keyboard.press('Enter');
   }else if(id==='sentenceOrder'){
     const wanted=[...s.problem.correctOrder];if(wrong)[wanted[0],wanted[1]]=[wanted[1],wanted[0]];
-    for(let i=0;i<wanted.length;i++){
-      let current=await snap();while(current.currentOrder.indexOf(wanted[i])>i){
-        await page.locator(`[data-chunk-id="${wanted[i]}"]`).click();await page.locator('[data-action=move-left]').click();current=await snap();
-      }
-    }
-    await page.locator('[data-action=submit]').click();
+    for(const id of wanted)await page.locator(`[data-chunk-id="${id}"]`).click({force:true});
   }else if(id==='multiSelect'){
     const ids=wrong?[s.problem.choices.find(c=>!s.problem.correctChoiceIds.includes(c.choiceId)).choiceId]:s.problem.correctChoiceIds;
-    for(const choice of ids)await page.locator(`[data-choice-id="${choice}"]`).click();await page.locator('[data-action=submit]').click();
+    for(const choice of ids)await page.locator(`[data-choice-id="${choice}"]`).click({force:true});await page.locator('[data-action=submit]').click();
   }else{
     const choice=wrong?s.problem.choices.find(x=>x.choiceId!==s.problem.correctChoiceId).choiceId:s.problem.correctChoiceId;
     await page.locator(`[data-choice-id="${choice}"]`).click();
@@ -63,26 +67,27 @@ try{
  await page.waitForFunction(() => window.fsm?.currentState);
  if (legacy) { const skip = page.getByRole('button',{name:'スキップ',exact:true}); if(await skip.isVisible())await skip.click(); }
  else await page.locator('#titleMiniGameButton').click();
- for(const id of ['mathSprint','mathInvader','englishChoice','sentenceOrder','timedChoice','multiSelect','asyncChoice','kanjiDefense']){
+ for(const id of ['mathSprint','mathInvader','englishChoice','sentenceOrder','timedChoice','multiSelect','asyncChoice','kanjiDefense'].filter(id=>!targetId||targetId.split(',').includes(id))){
   console.log('PLAY',phase,id);
   if(legacy)await page.locator(`#${titleButtons[id]}`).click();
-  else {await page.locator(`[data-game-id="${id}"]`).click();await page.locator('[data-gotomon-id="HKD-E02"]').click();await page.locator('[data-action=start-game]').click();await expect(page.locator('.gt-actor')).toBeVisible();}
+  else {await page.locator(`[data-game-id="${id}"]`).click();await page.locator('.yt-friend-choice[data-gotomon-id="HKD-E02"]').click();await page.locator('[data-action=start-game]').click();await page.locator('[data-action=start-play]').click();await expect(page.locator(`#${id}Screen`)).toBeVisible();}
   await shot(id,'start');
   const gameRoot = page.locator(`#${id}Screen`);
   const entry=results.games[id]={};entry.initialText=await gameRoot.innerText();
   await answer(id,true);entry.wrong=await snap();await shot(id,'wrong');
   if(id==='kanjiDefense'){await answer(id,true);entry.terminalWrong=await snap();}
   for(let i=0;i<3;i++)await answer(id);
-  entry.combo=await page.evaluate(()=>window.fsm.currentState.inspect().play);await shot(id,'playing');
-  if(!legacy){await page.locator('[data-action=boost]').click();await page.waitForTimeout(100);entry.boost=await page.evaluate(()=>window.fsm.currentState.inspect().play);await shot(id,'skill');}
+  entry.combo=(await inspect()).play;await shot(id,'playing');
+  if(!legacy){const boost=page.locator('[data-action=boost]');if(await boost.count()&&await boost.isEnabled())await boost.click();await page.waitForTimeout(100);entry.boost=(await inspect()).play;await shot(id,'skill');}
   else entry.boost='NOT AVAILABLE: published version has no companion gauge/skill';
   const now=Date.now();await page.waitForTimeout(1100);entry.phaseAfter1100ms=(await snap()).phase;entry.elapsedProbe=Date.now()-now;
   entry.layout=await gameRoot.evaluate(root=>({scrollHeight:root.scrollHeight,clientHeight:root.clientHeight,scrollTop:root.scrollTop,scrollWidth:root.scrollWidth,clientWidth:root.clientWidth}));
-  let attempts=0;while(!(await snap()).result&&attempts++<30){await answer(id);if(!legacy&&await page.locator('[data-action=boost]').isEnabled())await page.locator('[data-action=boost]').click();if(id==='mathInvader'&&!legacy&&await page.locator('.gt-boss').isVisible())await shot(id,'boss');}
+  let attempts=0;while(!(await snap()).result&&attempts++<80){await answer(id);const boost=page.locator('[data-action=boost]');if(!legacy&&await boost.count()&&await boost.isEnabled())await boost.click();if(id==='mathInvader'&&!legacy&&await page.locator('.gt-boss').isVisible())await shot(id,'boss');}
+  entry.lastSnapshot=await snap();entry.attempts=attempts;
   expect((await snap()).result).toBeTruthy();await shot(id,'result');entry.finalText=await (legacy?gameRoot:page.locator('.gt-result')).innerText();
   await page.locator('[data-action=replay]:visible').click();expect((await snap()).result).toBeNull();await page.locator('[data-action=back]').click();
   if(legacy)continue;
-  await page.locator(`[data-game-id="${id}"]`).click();await page.locator('[data-gotomon-id="HKD-E01"]').click();await page.locator('[data-action=start-game]').click();await answer(id);await shot(id,'other-companion');await page.locator('[data-action=back]').click();
+  await page.locator(`[data-game-id="${id}"]`).click();await page.locator('.yt-friend-choice[data-gotomon-id="HKD-E01"]').click();await page.locator('[data-action=start-game]').click();if(await page.locator('[data-action=start-play]').isVisible())await page.locator('[data-action=start-play]').click();await answer(id);await shot(id,'other-companion');await page.locator('[data-action=back]').click();
  }
  results.status='PASS';
 }catch(e){results.status='FAIL';results.failure=e.stack;console.error(e);process.exitCode=1;}
