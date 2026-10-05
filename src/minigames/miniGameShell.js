@@ -77,6 +77,10 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   const skill = button(doc, '', onBoost, 'gt-button gt-skill'); skill.dataset.action = 'boost';
   const gauge = element(doc, 'meter'); gauge.min = 0; gauge.max = 3; gauge.value = 0; gauge.setAttribute('aria-label', 'あいぼうゲージ');
   const skillLabel = element(doc, 'span'); skill.append(gauge, skillLabel); hud.append(skill);
+  const moveBurst = element(doc, 'span', 'gt-move-burst'); moveBurst.setAttribute('aria-hidden', 'true');
+  moveBurst.dataset.type = move?.type || gotomon?.type || 'odd';
+  moveBurst.textContent = ({ food: '🍞', nature: '🍃', legend: '✨', fest: '🥁', history: '📜', craft: '⚙️', odd: '💫' })[moveBurst.dataset.type] || '💫';
+  skill.append(moveBurst);
   if (!arcadeView) howTo.after(hud);
   const scene = arcadeView ? null : createCompanionScene({ doc, root, info, gotomon, act: onAct });
   if (scene) hud.after(scene.root);
@@ -279,6 +283,8 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
       scene?.update(state, current, dt);
       if (move && current.boosts > toastBoosts && !state.result) {
         moveToast.textContent = `${gotomon?.name ?? 'あいぼう'}の ${move.name}！ ${move.text}`; moveToast.hidden = false; toastMs = 1800;
+        moveBurst.classList.remove('is-active'); void moveBurst.offsetWidth; moveBurst.classList.add('is-active');
+        publish('playSE', 'miniPickup');
       }
       toastBoosts = current.boosts;
       if (toastMs > 0) { toastMs -= dt; if (toastMs <= 0 || state.result) { moveToast.hidden = true; toastMs = 0; } }
