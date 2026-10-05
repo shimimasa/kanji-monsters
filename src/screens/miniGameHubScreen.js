@@ -16,6 +16,7 @@ import { createPhotoAlbumDialog } from '../ui/photoAlbumDialog.js';
 import { createStickerBookDialog } from '../ui/stickerBookDialog.js';
 import { createAllStickersDialog } from '../ui/allStickersDialog.js';
 import { createBreedingDialog } from '../ui/breedingDialog.js';
+import { createEvolutionDialog } from '../ui/evolutionDialog.js';
 import { stickerSummary } from '../minigames/companionStickers.js';
 import { GAME_TYPES, typeInfo } from '../minigames/gotomonTypes.js';
 import { supportEffectOf, MAX_SUPPORTERS } from '../minigames/gotomonMoves.js';
@@ -76,8 +77,10 @@ const hub = {
       book.dataset.action = 'sticker-book';
       // しんか: how far the companion is from its evolved picture (or that it has evolved).
       const evolve = gotomonService.getLook(selected.id).progress.evolve;
-      const cheer = !evolve ? 'いっしょに あそぼう！' : evolve.unlocked ? 'しんかした すがたは シール帳で つけられるよ！' : `あと Lv${evolve.need - evolve.have}で しんか！`;
-      banner.append(companionPortrait(doc, selected), details, book, element(doc, 'p', 'yt-friend-cheer', cheer));
+      const cheer = !evolve ? 'いっしょに あそぼう！' : evolve.unlocked ? 'しんかのへやで すがたを えらべるよ！' : `あと Lv${evolve.need - evolve.have}で しんか！`;
+      const evolution = button(doc, evolve?.unlocked ? '✨ しんかのへやへ' : 'しんかのへや', () => this.showEvolution(), 'yt-evolution-open');
+      evolution.dataset.action = 'evolution';
+      banner.append(companionPortrait(doc, selected), details, book, evolution, element(doc, 'p', 'yt-friend-cheer', cheer));
     }
     else banner.append(element(doc, 'p', '', 'あいぼうは、冒険のステージをクリアして捕まえよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title'), 'yt-primary'));
     wrap.append(banner);
@@ -171,6 +174,7 @@ const hub = {
     tabs.querySelector('[aria-pressed=true]')?.focus({ preventScroll: true });
     if (PLAYTEST_ENABLED) trackPlaytest('hubShown', {});
     if (props?.notebookContext) this.showLearningNotebook(props.notebookContext);
+    if (props?.evolutionId) this.showEvolution(props.evolutionId);
   },
   showLearningNotebook(initialContext) {
     this.dialog?.close(); this.dialog?.remove();
@@ -194,6 +198,16 @@ const hub = {
       onClose: () => this.root?.querySelector('[data-action=breeding]')?.focus() });
     this.dialog = dialog; this.root.append(dialog); dialog.showModal();
   },
+  showEvolution(gotomonId = gotomonService.getSelectedGotomon()?.id) {
+    this.dialog?.close(); this.dialog?.remove();
+    const dialog = createEvolutionDialog({ doc: document, service: gotomonService, selectedId: gotomonId,
+      onChanged: () => {
+        const selected = gotomonService.getSelectedGotomon(), old = this.root?.querySelector('.yt-friend-banner > .gt-portrait');
+        if (selected && old) old.replaceWith(companionPortrait(document, selected));
+      },
+      onClose: () => this.root?.querySelector('[data-action=evolution]')?.focus() });
+    this.dialog = dialog; this.root.append(dialog); dialog.showModal();
+  },
   showAllStickers() {
     const selected = gotomonService.getSelectedGotomon();
     if (!selected) return;
@@ -213,6 +227,7 @@ const hub = {
     this.dialog?.close(); this.dialog?.remove();
     const dialog = createStickerBookDialog({ doc: document, service: gotomonService, gotomon: selected, sections: hubSections('all'),
       games: miniGameRegistry, experiences: gameExperiences, onClose: () => this.root?.querySelector('[data-action=sticker-book]')?.focus(),
+      onEvolution: () => this.showEvolution(selected.id),
       // A new outfit shows at once on the companion bar too.
       onOutfit: () => { const old = this.root?.querySelector('.yt-friend-banner > .gt-portrait'); old?.replaceWith(companionPortrait(document, gotomonService.getSelectedGotomon())); } });
     this.dialog = dialog; this.root.append(dialog); dialog.showModal();

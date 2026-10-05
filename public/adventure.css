@@ -50,6 +50,8 @@
 .yt-hub .yt-memory-open{margin-left:0}
 .yt-hub .yt-friend-banner{margin:0 0 16px;min-height:0;padding:8px 14px;border:0;border-radius:16px;background:linear-gradient(90deg,#fffaf0,#eef6e4);box-shadow:0 3px 0 #213f2b12}
 .yt-hub .yt-friend-banner .gt-portrait{width:56px;height:54px}
+.yt-hub .yt-evolution-open{min-height:48px;padding:8px 16px;border:2px solid #ad7016;border-radius:14px;background:#ffe396;color:#3e2b08;font:inherit;font-weight:900;cursor:pointer}
+.yt-hub .yt-evolution-open:focus-visible{outline:3px solid #1e715c;outline-offset:3px}
 .yt-friend-growth{display:grid;gap:3px;min-width:160px}.yt-friend-growth progress{width:100%;height:8px}
 .yt-friend-cheer{margin-left:auto!important;font-weight:800;color:#206b57}
 .yt-hub .yt-game-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
@@ -128,6 +130,7 @@
 .yt-world .yt-pace-choice[aria-checked=true]{border:3px solid #206b57;background:#d8efdc}
 @media(max-width:1000px){.yt-hub .yt-game-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:720px){.yt-hub .yt-game-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.yt-friend-cheer{display:none}.yt-hub-tools{margin-left:0}}
+@media(max-width:480px){.yt-hub .yt-evolution-open{flex:1 1 150px}}
 @media(max-width:420px){.yt-pace{grid-template-columns:1fr 1fr}.yt-pace-label{grid-column:1/-1}}
 /* Mini-game square by subject: tabs, sections, smaller cards. */
 .yt-subject-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px}

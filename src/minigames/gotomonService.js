@@ -52,6 +52,12 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
       // すがた: 色ちがい and かがやき, when chosen and open.
       look };
   };
+  const getBaseGotomonById = id => {
+    const gotomon = getGotomonById(id), data = lookup(id);
+    if (!data) return gotomon;
+    const folder = getBonusMonsterFolder(id) || folders[data.grade] || folders[1];
+    return { ...gotomon, imageUrl: `/assets/images/monsters/full/${folder}/${id}.webp`, look: { ...gotomon.look, evolve: false } };
+  };
   const getOwnedGotomon = () => {
     const current = read(), companions = current?.snapshot.player.miniGames?.companions ?? {};
     return ownedIdsFromSnapshot(current?.snapshot).map(id => getGotomonById(id, companions));
@@ -75,7 +81,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
     return { friends, legends };
   }
   return {
-    getOwnedGotomon, getSelectedGotomon, getGotomonById, getProgress,
+    getOwnedGotomon, getSelectedGotomon, getGotomonById, getBaseGotomonById, getProgress,
     getGrowth: id => growthStatus(getProgress().companions?.[id]),
     // パーティ: the supporters chosen last time that are still owned (never the companion itself).
     getParty(companionId = null) {
