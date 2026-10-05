@@ -125,6 +125,32 @@ test('after a while the companion carries the box: the room clears with ⭐1, ne
   assert.equal(events.filter(e => e.type === 'incorrect').length, 0);
 });
 
+test('after choosing an answer, the child can hand over the pushing without another learning result', () => {
+  const { game, s, choose, tool, events, next } = newPush({ seed: 15 });
+  assert.equal(tool('carry'), false, 'answer choice comes first');
+  choose(s().problem.correctChoiceId);
+  const answers = events.filter(event => ['correct', 'incorrect'].includes(event.type)).length;
+  game.setPaused(true); assert.equal(tool('carry'), false); game.setPaused(false);
+  assert.equal(tool('carry'), true);
+  assert.equal(s().phase, 'cleared'); assert.equal(s().helped, 1);
+  assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, answers);
+  assert.equal(tool('carry'), false, 'cannot repeat the handover');
+  next(); assert.equal(s().room, 1);
+});
+
+test('every room can be completed with the companion carrying after the answer', () => {
+  const { s, choose, tool, next, events } = newPush({ seed: 17 });
+  for (let room = 0; room < R.rooms; room++) {
+    choose(s().problem.correctChoiceId);
+    assert.equal(tool('carry'), true);
+    next();
+  }
+  assert.equal(s().phase, 'completed');
+  assert.equal(s().result.rooms, R.rooms);
+  assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, R.rooms);
+  assert.equal(events.filter(event => event.type === 'sessionComplete').length, 1);
+});
+
 test('a whole run: ten rooms, one learning result each, a result and one sessionComplete', () => {
   for (const mode of ['kanji', 'english', 'math']) {
     const { game, s, choose, solve, next, events } = newPush({ seed: 13, mode });

@@ -102,9 +102,10 @@ export function createPushView({ document: doc, dispatch, onBack, getSnapshot, c
   const tools = el('div', 'ps-tools');
   const undo = el('button', 'ps-tool', '↶ 1つ もどす'); undo.type = 'button'; undo.dataset.action = 'undo';
   const reset = el('button', 'ps-tool', '⟲ さいしょから'); reset.type = 'button'; reset.dataset.action = 'reset';
-  const help = el('button', 'ps-tool ps-help', 'ゴトモンに はこんでもらう'); help.type = 'button'; help.dataset.action = 'help';
-  on(undo, 'click', () => command('undo')); on(reset, 'click', () => command('reset')); on(help, 'click', () => command('help'));
-  tools.append(undo, reset, help); controls.append(pad, tools);
+  const carry = el('button', 'ps-tool ps-help', 'ここから はこんでもらう'); carry.type = 'button'; carry.dataset.action = 'carry';
+  on(undo, 'click', () => command('undo')); on(reset, 'click', () => command('reset'));
+  on(carry, 'click', () => command('carry'));
+  tools.append(undo, reset, carry); controls.append(pad, tools);
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
   dock.append(title, prompt, choices, controls, note);
   doc.body.append(root);
@@ -159,7 +160,7 @@ export function createPushView({ document: doc, dispatch, onBack, getSnapshot, c
     place(player, state.player);
     const choosing = state.phase === 'choosing', pushing = state.phase === 'pushing';
     choices.hidden = !choosing; controls.hidden = !pushing;
-    undo.disabled = !state.canUndo; reset.disabled = !state.canUndo; help.hidden = !state.canHelp;
+    undo.disabled = !state.canUndo; reset.disabled = !state.canUndo; carry.hidden = !pushing;
     const pkey = `${state.phase}:${state.problem?.problemId ?? state.room}`;
     if (pkey !== problemKey) {
       problemKey = pkey;
@@ -173,7 +174,7 @@ export function createPushView({ document: doc, dispatch, onBack, getSnapshot, c
         if (state.problem.problemId.endsWith(':0')) note.textContent = '答えの はこを タップしよう';
       } else if (pushing) {
         prompt.textContent = '金色の はこを、すあな（まるい ところ）へ おそう！';
-        note.textContent = 'となりの マスを タップするか 矢印で すすもう。はこの うしろから おすと うごくよ';
+        note.textContent = 'はこの うしろから おそう。むずかしいときは「ここから はこんでもらう」も えらべるよ';
       } else prompt.textContent = state.phase === 'cleared' ? 'すあなに とどいた！' : state.phase === 'completed' ? 'ぜんぶの へや クリア！' : '';
     }
     choiceButtons.forEach(button => {
@@ -235,7 +236,7 @@ export function createPushView({ document: doc, dispatch, onBack, getSnapshot, c
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; [...choiceButtons, ...arrows, undo, reset, help, ...cellButtons].forEach(button => { button.disabled = true; }); },
+    stopInput() { active = false; [...choiceButtons, ...arrows, undo, reset, carry, ...cellButtons].forEach(button => { button.disabled = true; }); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

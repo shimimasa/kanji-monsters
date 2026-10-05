@@ -92,6 +92,33 @@ test('the first tapped block is the answer: a wrong one names its number and the
   assert.equal(other.game.snapshot().lastAnswer.first, true);
 });
 
+test('after choosing an answer, the companion can break its block without a second learning result', () => {
+  const { game, act, choose, events, next } = newBreakout({ seed: 16 });
+  assert.equal(act('assist'), false, 'answer choice comes first');
+  choose();
+  const answers = events.filter(event => ['correct', 'incorrect'].includes(event.type)).length;
+  game.setPaused(true); assert.equal(act('assist'), false); game.setPaused(false);
+  assert.equal(act('assist'), true);
+  assert.equal(game.snapshot().phase, 'feedback');
+  assert.equal(game.snapshot().assisted, 1);
+  assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, answers);
+  assert.equal(act('assist'), false, 'cannot repeat the assist');
+  assert.equal(next(), true); assert.equal(game.snapshot().question, 1);
+});
+
+test('all twelve answers can finish with the companion breaking each chosen block', () => {
+  const { game, act, choose, next, events } = newBreakout({ seed: 18 });
+  let count = 0;
+  while (game.snapshot().phase !== 'completed' && count++ < R.questions + 1) {
+    assert.equal(choose(), true);
+    assert.equal(act('assist'), true);
+    assert.equal(next(), true);
+  }
+  assert.equal(game.snapshot().result.freed, R.questions);
+  assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, R.questions);
+  assert.equal(events.filter(event => event.type === 'sessionComplete').length, 1);
+});
+
 test('once the answer glows, a paddle bounce heads straight for it, so nobody stays stuck', () => {
   for (const seed of [12, 13, 14]) {
     const { game, act, choose } = newBreakout({ seed });

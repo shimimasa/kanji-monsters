@@ -25,6 +25,8 @@ const CSS = `
 #gotomonBreakoutScreen .bk-block[data-wrong=true]{filter:grayscale(.7);opacity:.6}
 #gotomonBreakoutScreen .bk-launch{min-height:52px;border:0;border-radius:14px;background:#ffb627;color:#3a2400;font:inherit;font-size:20px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer;touch-action:manipulation}
 #gotomonBreakoutScreen .bk-launch[hidden]{display:none}
+#gotomonBreakoutScreen .bk-assist{min-height:48px;padding:6px 12px;border:2px solid #c7ecd2;border-radius:12px;background:#e9fff0;color:#214731;font:inherit;font-weight:800;cursor:pointer}
+#gotomonBreakoutScreen .bk-assist[hidden]{display:none}
 #gotomonBreakoutScreen .bk-review{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
 #gotomonBreakoutScreen .bk-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
 #gotomonBreakoutScreen .bk-review li[data-correct=false]{background:#fff3da}
@@ -55,11 +57,13 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
   const question = el('p', 'bk-question'); question.dataset.role = 'problem';
   const launchButton = el('button', 'bk-launch', 'ボールをうつ！'); launchButton.type = 'button';
   on(launchButton, 'click', () => command('launch'));
+  const assistButton = el('button', 'bk-assist', 'あいぼうに あててもらう'); assistButton.type = 'button'; assistButton.dataset.action = 'assist';
+  on(assistButton, 'click', () => command('assist'));
   // The shell advances after feedback; this stays hidden and only serves hosts without auto-advance.
   const go = el('button', 'bk-go', 'つぎへ'); go.type = 'button'; go.dataset.action = 'next'; go.hidden = true;
   on(go, 'click', () => proceed());
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
-  dock.append(title, question, launchButton, note, go);
+  dock.append(title, question, launchButton, assistButton, note, go);
   const review = el('div', 'ya-learning-result'); review.hidden = true;
   const reviewList = el('ol', 'bk-review'); review.append(el('h3', '', '今回の計算'), reviewList); frame.shell.append(review);
   doc.body.append(root);
@@ -128,6 +132,7 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
     ballNode.hidden = !state.ball;
     if (state.ball) { ballNode.style.left = px(state.ball.x); ballNode.style.top = py(state.ball.y); }
     launchButton.hidden = !(state.ball?.held && state.phase === 'answering' && state.chosenId);
+    assistButton.hidden = !(state.phase === 'answering' && state.chosenId);
     const titleText = state.phase === 'completed' ? '' : `もんだい ${Math.min(state.questions, state.question + 1)}/${state.questions}　たすけたゴトモン ${state.freed}`;
     if (title.textContent !== titleText) title.textContent = titleText;
     if (state.problem && questionKey !== state.problem.contentId) {
@@ -137,7 +142,7 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
     const choice = state.lastChoice;
     if (choice && choice.choice !== shownChoice) {
       shownChoice = choice.choice;
-      if (choice.correct) note.textContent = `「${choice.number}」に けってい！ パドルで ボールを 当てて わろう`;
+      if (choice.correct) note.textContent = `「${choice.number}」に けってい！ ボールで ねらうか、あいぼうに まかせよう`;
       else { wrongIds.add(choice.blockId); const node = nodes.get(choice.blockId); if (node) restartClass(node, 'bk-bump'); note.textContent = `「${choice.number}」は ${state.problem.question} の答えじゃないよ。光っている ブロックを タップしよう`; }
       frame.announce(note.textContent);
     }

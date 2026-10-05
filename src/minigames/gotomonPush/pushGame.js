@@ -250,6 +250,14 @@ export function createPushGame({ sessionId, random = Math.random, onEvent = () =
       clearRoom(true);
       return true;
     },
+    // Once the answer is chosen, the child may hand over the physical puzzle.
+    // This does not judge the answer again or change the learning record.
+    carry({ sessionId: s, attemptId: a } = {}) {
+      if (!active || paused || notifying || phase !== 'pushing' || s !== sessionId || a !== attemptId) return false;
+      box = layout.goal; boxes.find(item => item.state === 'chosen').cell = box;
+      clearRoom(true);
+      return true;
+    },
     dispatch(command) {
       if (!command || typeof command !== 'object') return false;
       if (command.type === 'choose') return this.choose(command.payload);
@@ -257,6 +265,7 @@ export function createPushGame({ sessionId, random = Math.random, onEvent = () =
       if (command.type === 'undo') return this.undo(command.payload);
       if (command.type === 'reset') return this.reset(command.payload);
       if (command.type === 'help') return this.help(command.payload);
+      if (command.type === 'carry') return this.carry(command.payload);
       return false;
     },
     snapshot,
