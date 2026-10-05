@@ -157,7 +157,7 @@ const hub = {
       body.append(tags);
       const featuredCourse = companionCourse(selected, definition.id);
       if (featuredCourse) body.append(element(doc, 'span', 'yt-card-course', `★ 得意コース：${featuredCourse.name}`));
-      body.append(element(doc, 'small', 'yt-card-record', stats ? `BEST ${stats.bestScore} pt · ${stats.plays}回` : 'はじめての記録をつくろう'));
+      body.append(element(doc, 'small', 'yt-card-record', stats ? (stats.bestScore > 0 || !['gotomonPush', 'gotomonBreakout'].includes(definition.id) ? `BEST ${stats.bestScore} pt · ${stats.plays}回` : `${stats.plays}回 あそんだよ · いつものコースで記録をつくろう`) : 'はじめての記録をつくろう'));
       card.append(art, body);
       return card;
     };
@@ -295,7 +295,18 @@ const hub = {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'どちらも12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonColoring' ? 'ぬりえになるのは、きみがつかまえたゴトモン（まだいなければ旅で出会ったゴトモン）です。' : definition.id === 'gotomonMerge' ? 'どちらも16問。タイルの数が大きくなると、旅で出会ったゴトモンにかわります。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'いつものコースは12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonColoring' ? 'ぬりえになるのは、きみがつかまえたゴトモン（まだいなければ旅で出会ったゴトモン）です。' : definition.id === 'gotomonMerge' ? 'どちらも16問。タイルの数が大きくなると、旅で出会ったゴトモンにかわります。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
+    }
+    let courseLength = 'full';
+    if (['gotomonPush', 'gotomonBreakout'].includes(definition.id) && !playOptions.review) {
+      const label = element(doc, 'label', 'yt-memory-picker', 'あそぶ長さ');
+      const select = element(doc, 'select'); select.setAttribute('aria-label', 'あそぶ長さ');
+      for (const [value, text] of [['full', definition.id === 'gotomonPush' ? 'いつも（10へや）' : 'いつも（12問）'],
+        ['short', definition.id === 'gotomonPush' ? 'ちょこっと（5へや）' : 'ちょこっと（6問）']]) {
+        const option = element(doc, 'option', '', text); option.value = value; select.append(option);
+      }
+      select.onchange = () => { courseLength = select.value; };
+      label.append(select); dialog.append(label, element(doc, 'p', 'yt-note', 'ちょこっとコースでも あいぼうは そだつよ。最高点とシールは いつものコースで 記録するよ。'));
     }
     let mode = definition.id === 'gotomonParts' ? 'easy' : ['gotomonSlash', 'gotomonDrum', 'gotomonRace', 'gotomonLink', 'gotomonSeek', 'gotomonMaze', 'gotomonJump', 'gotomonTag', 'gotomonGolf', 'gotomonHop', 'gotomonLand', 'gotomonTrace', 'gotomonPush'].includes(definition.id) ? 'kanji' : 'english';
     if (['gotomonSlash', 'gotomonDrum', 'gotomonRace', 'gotomonLink', 'gotomonSeek', 'gotomonMaze', 'gotomonJump', 'gotomonTag', 'gotomonGolf', 'gotomonHop', 'gotomonLand', 'gotomonTrace', 'gotomonPush'].includes(definition.id)) {
@@ -310,7 +321,7 @@ const hub = {
       const preset = modeForSubject(definition.id, playOptions.subject);
       if (preset) { mode = preset; select.value = preset; }
       select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', push ? 'どれも10へや。はこから 出てくるのは、きみが旅で出会ったゴトモンたちです。' : trace ? 'どれも12問。漢字は読み、英語は英単語の つづり、算数は 答えの 数字を なぞります。もんだいを 出すのは、きみが旅で出会ったゴトモンたちです。' : land ? 'どれも12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'どれも12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'どれも12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'どれも12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'どれも12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'どれも12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'どれも12問。いっしょに走るのはあいぼう、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'どれも12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', push ? 'いつものコースは10へや。はこから 出てくるのは、きみが旅で出会ったゴトモンたちです。' : trace ? 'どれも12問。漢字は読み、英語は英単語の つづり、算数は 答えの 数字を なぞります。もんだいを 出すのは、きみが旅で出会ったゴトモンたちです。' : land ? 'どれも12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'どれも12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'どれも12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'どれも12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'どれも12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'どれも12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'どれも12問。いっしょに走るのはあいぼう、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'どれも12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
     }
     if (definition.id === 'gotomonParts') {
       const label = element(doc, 'label', 'yt-memory-picker', 'くみたてる漢字');
@@ -402,6 +413,7 @@ const hub = {
       dialog.close(); publish('changeScreen', { name: 'miniGame', props: { ...playOptions, gameId: definition.id, gotomonId: selectedId, supporterIds: [...supporterIds],
         courseId: courseCheck.checked && !courseLabel.hidden ? companionCourse(owned.find(item => item.id === selectedId), definition.id)?.id : null,
         ...(gameExperiences[definition.id].paced ? { pace } : {}),
+        ...(['gotomonPush', 'gotomonBreakout'].includes(definition.id) ? { courseLength } : {}),
         ...(definition.id === 'sentenceOrder' ? { sentenceLevel } : {}),
         ...(['gotomonToss', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout', 'gotomonMeteor', 'gotomonColoring', 'gotomonMerge'].includes(definition.id) ? { mathLevel } : {}),
         ...(definition.id === 'gotomonDelivery' ? { region } : {}),

@@ -108,8 +108,9 @@ export function buildRoom(answerIndex, random) {
 // answer box glows. Then the child pushes the answer box onto the nest (the other boxes do not
 // move); one step back and starting the room over are always there, and after a while the
 // companion offers to carry the box. No time limit, no game over.
-export function createPushGame({ sessionId, random = Math.random, onEvent = () => {}, content, pace = 'normal' }) {
+export function createPushGame({ sessionId, random = Math.random, onEvent = () => {}, content, pace = 'normal', courseLength = 'full' }) {
   const problems = content?.problems ?? null;
+  const roomLimit = courseLength === 'short' ? 5 : R.rooms;
   const helpMs = pace === 'slow' ? R.helpAfterMs.slow : R.helpAfterMs.normal;
   let active = true, paused = false, notifying = false, observer = onEvent;
   let phase = 'ready', seq = 0, activeElapsedMs = 0, room = -1, tries = 0, answerSerial = 0, clearLeft = 0, clearSerial = 0;
@@ -121,10 +122,10 @@ export function createPushGame({ sessionId, random = Math.random, onEvent = () =
   const canHelp = () => phase === 'pushing' && (moves >= R.helpAfterMoves || roomMs >= helpMs);
   const snapshot = () => Object.freeze({
     gameId: 'gotomonPush', mode: 'push', sessionId, phase, paused, active, aborted, seq, activeElapsedMs, pace: pace === 'slow' ? 'slow' : 'normal',
-    size: N, room, rooms: R.rooms, rocks: Object.freeze([...(layout?.rocks ?? [])]), goal: layout?.goal ?? -1, player,
+    size: N, room, rooms: roomLimit, rocks: Object.freeze([...(layout?.rocks ?? [])]), goal: layout?.goal ?? -1, player,
     boxes: Object.freeze(boxes.map(item => Object.freeze({ ...item }))), moves, pushes, fewest: layout?.fewest ?? 0,
     canHelp: canHelp(), canUndo: phase === 'pushing' && history.length > 0, hintChoiceId,
-    problem, attemptId, answered, correct, incorrect, stars, helped, friends, combo, maxCombo, total: R.rooms,
+    problem, attemptId, answered, correct, incorrect, stars, helped, friends, combo, maxCombo, total: roomLimit,
     result, lastAnswer, lastClear, missed: Object.freeze([...missed]),
   });
   const notify = (type, payload = {}, problemId = problem?.problemId ?? null) => {
@@ -170,7 +171,7 @@ export function createPushGame({ sessionId, random = Math.random, onEvent = () =
 
   return {
     enter() {
-      if (!active || phase !== 'ready' || notifying || !Array.isArray(problems) || problems.length < R.rooms
+      if (!active || phase !== 'ready' || notifying || !Array.isArray(problems) || problems.length < roomLimit
         || problems.some(item => !item.plates?.some(plate => plate.plateId === item.answerId) || item.plates.length !== 4)) return false;
       startRoom(0); return true;
     },
@@ -182,7 +183,7 @@ export function createPushGame({ sessionId, random = Math.random, onEvent = () =
       if (phase !== 'cleared') return;
       clearLeft -= dt;
       if (clearLeft > 0) return;
-      if (room + 1 >= R.rooms) complete(); else startRoom(room + 1);
+      if (room + 1 >= roomLimit) complete(); else startRoom(room + 1);
     },
     setPaused(value) { if (active) paused = !!value; },
     // The learning result: the box the child taps. Only the first tap of a room counts.

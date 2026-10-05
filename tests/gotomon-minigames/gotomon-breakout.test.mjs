@@ -6,9 +6,9 @@ import { growthStatus } from '../../src/minigames/companionGrowth.js';
 
 const seeded = seed => () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
 
-function newBreakout({ seed = 3, level = 'addsub', pace = 'normal' } = {}) {
+function newBreakout({ seed = 3, level = 'addsub', pace = 'normal', courseLength = 'full' } = {}) {
   const events = [], sessionId = `brk${seed}`;
-  const game = createBreakoutGame({ sessionId, random: seeded(seed), pace, onEvent: event => events.push(event), content: { level } });
+  const game = createBreakoutGame({ sessionId, random: seeded(seed), pace, courseLength, onEvent: event => events.push(event), content: { level } });
   assert.equal(game.enter(), true);
   const act = (type, extra = {}) => game.dispatch({ type, payload: { sessionId, attemptId: game.snapshot().attemptId, ...extra } });
   const next = () => game.dispatch({ type: 'next', payload: { sessionId } });
@@ -62,6 +62,20 @@ test('the ball never gets stuck: every run finishes, and only answers break', ()
       assert.equal(events.filter(event => event.type === 'sessionComplete').length, 1);
     }
   }
+});
+
+test('short course completes after six chosen answers', () => {
+  const { game, choose, act, next, events } = newBreakout({ seed: 14, courseLength: 'short' });
+  assert.equal(game.snapshot().questions, 6);
+  for (let i = 0; i < 6; i++) {
+    assert.equal(choose(), true);
+    assert.equal(act('assist'), true);
+    next();
+  }
+  assert.equal(game.snapshot().phase, 'completed');
+  assert.equal(game.snapshot().result.answered, 6);
+  assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, 6);
+  assert.equal(events.filter(event => event.type === 'sessionComplete').length, 1);
 });
 
 test('the first tapped block is the answer: a wrong one names its number and the answer glows; bounces never count', () => {

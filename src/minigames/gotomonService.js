@@ -198,8 +198,9 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
       });
     },
     awardGotomonPlayResult({ owner, sessionId, gameId, gotomonId, score, correct, maxCombo,
-      ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished, photos = null, cases = null, journey = null, subject = null }) {
+      ticket, completed = false, finished = false, activeElapsedMs = 0, timeMs = null, memoryFinished = finished, photos = null, cases = null, journey = null, subject = null, shortCourse = false }) {
       if (!owner || owner !== read()?.owner || !sessionId || !gameId) return { ok: false };
+      shortCourse = shortCourse === true && ['gotomonPush', 'gotomonBreakout'].includes(gameId);
       const run = ticket && tickets.get(ticket);
       if (ticket && (!run || ticket !== activeTicket || ticket.sessionId !== sessionId || run.owner !== owner ||
           run.gameId !== gameId || run.gotomonId !== gotomonId || !completed)) return { ok: false };
@@ -216,14 +217,18 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         const roundedTime = Math.round(timeMs);
         const validTime = !!run && completed && finished && gameId==='mathSprint' && count(correct)>=8 && Number.isSafeInteger(roundedTime) && roundedTime>0 && typeof timeMs==='number';
         if(validTime)game.bestTimeMs=Math.min(previousTime??Infinity,roundedTime);
-        game.bestScore = Math.max(previousBest, points); game.plays = count(game.plays) + 1;
-        game.lastSessionId = sessionId; game.bestCombo = Math.max(count(game.bestCombo), count(maxCombo));
+        if (!shortCourse) game.bestScore = Math.max(previousBest, points);
+        game.plays = count(game.plays) + 1;
+        game.lastSessionId = sessionId;
+        if (!shortCourse) game.bestCombo = Math.max(count(game.bestCombo), count(maxCombo));
         game.recentSessionIds = [...(Array.isArray(game.recentSessionIds) ? game.recentSessionIds : []), sessionId].slice(-64);
         const titlesBefore = earnedTitleIds(progress.companions);
         const friend = progress.companions[gotomonId] ??= { plays: 0, friendship: 0, medals: [] };
         const before = growthStatus(friend), rank = scoreRank(gameId, points, count(correct));
         const outfitBefore = outfitProgress(friend, { gameCount: GAME_COUNT }), lookBefore = lookProgress(friend, gotomonId);
-        const earnedXP = run ? calculateXP({ completed, finished, correct, rank: rank.rank, newBest: points > previousBest, activeElapsedMs }) : 0;
+        const earnedXP = run ? shortCourse && completed
+          ? Math.max(2, calculateXP({ completed, finished: false, correct, rank: 'C', newBest: false, activeElapsedMs }))
+          : calculateXP({ completed, finished, correct, rank: rank.rank, newBest: points > previousBest, activeElapsedMs }) : 0;
         const after = growthStatus({ xp: before.xp + earnedXP });
         friend.xp = after.xp; friend.level = after.level;
         // パーティ: each supporter gets half the companion's XP (nothing else changes for it).
@@ -233,8 +238,10 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
           mate.xp = now.xp; mate.level = now.level;
           return { id, earnedXP: now.xp - was.xp, level: now.level, levelUp: now.level > was.level, newMove: was.level < 7 && now.level >= 7 };
         });
-        friend.bestRank = betterRank(rank.rank, friend.bestRank || 'C');
-        game.bestRank = betterRank(rank.rank, game.bestRank || 'C');
+        if (!shortCourse) {
+          friend.bestRank = betterRank(rank.rank, friend.bestRank || 'C');
+          game.bestRank = betterRank(rank.rank, game.bestRank || 'C');
+        }
         const earned = 1 + Math.min(3, Math.floor(count(correct) / 3));
         const friendshipBefore = count(friend.friendship);
         friend.plays = count(friend.plays) + 1; friend.friendship = count(friend.friendship) + earned;
@@ -276,12 +283,12 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
           journeys[journey.stageId] = { stars: Math.max(count(entry?.stars), stars), trips: count(entry?.trips) + 1,
             firstAt: entry?.firstAt ?? Math.max(0, Math.floor(now())) };
         }
-        const memory = run && completed ? recordCompanionMemory(friend, { gameId, score: points,
+        const memory = !shortCourse && run && completed ? recordCompanionMemory(friend, { gameId, score: points,
           finished: !!memoryFinished, at: Math.max(0, Math.floor(now())) }) : null;
         // The sticker book: a real run played to the end (rank A or S makes it gold).
-        const sticker = run && completed && finished ? recordSticker(friend, { gameId, rank: rank.rank, subject, at: Math.max(0, Math.floor(now())) }) : null;
+        const sticker = !shortCourse && run && completed && finished ? recordSticker(friend, { gameId, rank: rank.rank, subject, at: Math.max(0, Math.floor(now())) }) : null;
         reward = { earned, friendship: friend.friendship, plays: friend.plays,
-          newBest: points > previousBest, bestScore: game.bestScore, medals: [...friend.medals],
+          newBest: !shortCourse && points > previousBest, bestScore: game.bestScore, medals: [...friend.medals],
           before, after, earnedXP: after.xp - before.xp, levelUp: after.level > before.level, rank,
           memory, sticker, newPhotos, newCases, journeyBest, supporters,
           // The stronger わざ is learned at Lv7.

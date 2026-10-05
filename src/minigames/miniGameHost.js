@@ -100,6 +100,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
         .slice(0, MAX_SUPPORTERS).map(id => service.getGotomonById(id));
       const ticket = service.beginPlay?.({ sessionId, gameId: definition.id, gotomonId: gotomon?.id, supporterIds: supporters.map(item => item.id) });
       const pace = nextProps.pace === 'slow' ? 'slow' : 'normal';
+      const shortCourse = !nextProps.review && ['gotomonPush', 'gotomonBreakout'].includes(definition.id) && nextProps.courseLength === 'short';
       play = createCompanionPlay(sessionId, doc.querySelector && !makeView
         ? { gameId: definition.id, growth, support: gotomon?.support?.id, bestTimeMs: service.getProgress().games?.[definition.id]?.bestTimeMs, course, pace,
           // とくいタイプ: a companion of the game's type fills its skill gauge sooner.
@@ -107,7 +108,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
           move: gotomon?.move ?? null, party: partyEffects(supporters.map(item => item.type)) } : {});
       companion = makeCompanion({ sessionId, ownedMonsterIds: owned, selectedId: gotomon?.id, loadImage });
       // stageId and focusKanjiIds serve content built from the adventure (photo rally); other games ignore them.
-      game = definition.create({ sessionId, random, history, reviewContentIds, sentenceLevel: nextProps.sentenceLevel, mathLevel: nextProps.mathLevel, region: nextProps.region, mode: nextProps.mode, pace,
+      game = definition.create({ sessionId, random, history, reviewContentIds, sentenceLevel: nextProps.sentenceLevel, mathLevel: nextProps.mathLevel, region: nextProps.region, mode: nextProps.mode, pace, courseLength: shortCourse ? 'short' : 'full',
         stageId: nextProps.stageId, focusKanjiIds: service.getFocusKanjiIds?.() ?? [], onEvent: event => {
         if (valid) { companion?.observe(event); play?.observe(event); }
         if (valid) learningRun?.observe(event);
@@ -158,7 +159,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       view = createView({ document: doc, getSnapshot: () => current.snapshot(),
         dispatch, cast: doc.querySelector && !makeView ? castForPlay(service, Math.random, gotomon?.id) : undefined,
         onBack: goBack, onReplay: replay });
-      shell = makeShell({ doc, view, definition, gotomon, supporters, play, reviewMode: !!nextProps.review, pace, course,
+      shell = makeShell({ doc, view, definition, gotomon, supporters, play, reviewMode: !!nextProps.review, pace, course, shortCourse,
         onPause: value => host.setPaused(value), onBack: goBack, onReplay: replay, onEvolution: goEvolution,
         onReview: wordLearning ? review : null, onNormalPlay: normalPlay,
         onNotebook: returnToNotebook,
@@ -182,7 +183,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
           if (current.snapshot().mode === 'review') return { ok: true, practice: true };
           const outcome = current.snapshot().result?.outcome;
           const receipt=service.awardGotomonPlayResult({ owner, sessionId, ticket, gameId: definition.id, gotomonId: gotomon?.id,
-            ...result, memoryFinished: outcome ? ['clear', 'defended'].includes(outcome) : result.finished, subject: subjectOf(definition.id, nextProps.mode) });
+            ...result, shortCourse, memoryFinished: outcome ? ['clear', 'defended'].includes(outcome) : result.finished, subject: subjectOf(definition.id, nextProps.mode) });
           if (PLAYTEST_ENABLED) trackPlaytest('reward', {sessionId,ok:receipt.ok,level:receipt.reward?.after?.level,earnedXP:receipt.reward?.earnedXP});
           return receipt;
         } });

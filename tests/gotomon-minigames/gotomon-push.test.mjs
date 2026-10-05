@@ -9,10 +9,10 @@ const grade1 = JSON.parse(readFileSync(new URL('../../public/data/kanji_g1_proto
 const N = R.size;
 const border = at => at < N || at >= N * N - N || at % N === 0 || at % N === N - 1;
 
-function newPush({ seed = 3, mode = 'math', pace = 'normal' } = {}) {
+function newPush({ seed = 3, mode = 'math', pace = 'normal', courseLength = 'full' } = {}) {
   const events = [], sessionId = `push${seed}`;
   const problems = buildSlashProblems({ sessionId, random: seeded(seed + 1), mode, gradeKanji: grade1 });
-  const game = createPushGame({ sessionId, random: seeded(seed), pace, onEvent: event => events.push(event), content: { problems } });
+  const game = createPushGame({ sessionId, random: seeded(seed), pace, courseLength, onEvent: event => events.push(event), content: { problems } });
   assert.equal(game.enter(), true);
   const s = () => game.snapshot();
   const choose = boxId => game.dispatch({ type: 'choose', payload: { sessionId, attemptId: s().attemptId, boxId } });
@@ -148,6 +148,18 @@ test('every room can be completed with the companion carrying after the answer',
   assert.equal(s().phase, 'completed');
   assert.equal(s().result.rooms, R.rooms);
   assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, R.rooms);
+  assert.equal(events.filter(event => event.type === 'sessionComplete').length, 1);
+});
+
+test('short course completes after five rooms with one chosen answer per room', () => {
+  const { s, choose, tool, next, events } = newPush({ seed: 21, courseLength: 'short' });
+  assert.equal(s().rooms, 5); assert.equal(s().total, 5);
+  for (let room = 0; room < 5; room++) {
+    assert.equal(choose(s().problem.correctChoiceId), true);
+    assert.equal(tool('carry'), true); next();
+  }
+  assert.equal(s().phase, 'completed'); assert.equal(s().result.rooms, 5);
+  assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, 5);
   assert.equal(events.filter(event => event.type === 'sessionComplete').length, 1);
 });
 
