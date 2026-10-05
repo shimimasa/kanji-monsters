@@ -10,10 +10,11 @@ import { growthStatus } from '../../src/minigames/companionGrowth.js';
 const monsters = JSON.parse(readFileSync(new URL('../../public/data/enemies_proto.json', import.meta.url), 'utf8'));
 const seeded = seed => () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
 
-function newDelivery({ seed = 3, regionId = 'all' } = {}) {
+function newDelivery({ seed = 3, regionId = 'all', short = false } = {}) {
   const events = [], sessionId = `delivery${seed}`;
+  const deliveries = buildDeliveries({ sessionId, random: seeded(seed), monsters, regionId });
   const game = createDeliveryGame({ sessionId, onEvent: event => events.push(event),
-    content: { regionId, deliveries: buildDeliveries({ sessionId, random: seeded(seed), monsters, regionId }) } });
+    content: { regionId, deliveries: short ? deliveries.slice(0, 5) : deliveries } });
   assert.equal(game.enter(), true);
   const deliver = prefecture => game.dispatch({ type: 'deliver', payload: { sessionId, attemptId: game.snapshot().attemptId, prefecture } });
   const next = () => game.dispatch({ type: 'next', payload: { sessionId } });
@@ -81,6 +82,15 @@ test('ten deliveries end the run with one result and a stamp for each prefecture
   assert.equal(result.delivered, DELIVERIES); assert.equal(result.correct, DELIVERIES); assert.equal(result.stamps, DELIVERIES);
   assert.equal(stamps.length, DELIVERIES);
   assert.equal(events.filter(event => event.type === 'correct').length, DELIVERIES);
+  assert.equal(events.filter(event => event.type === 'sessionComplete').length, 1);
+});
+
+test('five deliveries form a complete short trip with one answer per Gotomon', () => {
+  const { game, events, bring } = newDelivery({ short: true });
+  assert.equal(game.snapshot().total, 5);
+  while (game.snapshot().phase !== 'completed') bring();
+  assert.equal(game.snapshot().result.delivered, 5);
+  assert.equal(events.filter(event => event.type === 'correct').length, 5);
   assert.equal(events.filter(event => event.type === 'sessionComplete').length, 1);
 });
 

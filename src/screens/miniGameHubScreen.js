@@ -334,7 +334,7 @@ const hub = {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'いつものコースは12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonColoring' ? 'ぬりえになるのは、きみがつかまえたゴトモン（まだいなければ旅で出会ったゴトモン）です。' : definition.id === 'gotomonMerge' ? 'どちらも16問。タイルの数が大きくなると、旅で出会ったゴトモンにかわります。' : 'どちらも12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'いつものコースは12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonColoring' ? 'ぬりえになるのは、きみがつかまえたゴトモン（まだいなければ旅で出会ったゴトモン）です。' : definition.id === 'gotomonMerge' ? 'どちらも16問。タイルの数が大きくなると、旅で出会ったゴトモンにかわります。' : 'いつものコースは12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
     }
     let courseLength = readLength();
     if (supportsShortCourse(definition.id) && !playOptions.review) {
@@ -361,7 +361,7 @@ const hub = {
       const preset = modeForSubject(definition.id, playOptions.subject);
       if (preset) { mode = preset; select.value = preset; }
       select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', push ? 'いつものコースは10へや。はこから 出てくるのは、きみが旅で出会ったゴトモンたちです。' : trace ? 'いつものコースは12問。漢字は読み、英語は英単語の つづり、算数は 答えの 数字を なぞります。もんだいを 出すのは、きみが旅で出会ったゴトモンたちです。' : land ? 'いつものコースは12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'いつものコースは12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'いつものコースは12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'いつものコースは12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'いつものコースは12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'いつものコースは12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'いつものコースは12問。いっしょに走るのはあいぼう、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'どれも12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'いつものコースは12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', push ? 'いつものコースは10へや。はこから 出てくるのは、きみが旅で出会ったゴトモンたちです。' : trace ? 'いつものコースは12問。漢字は読み、英語は英単語の つづり、算数は 答えの 数字を なぞります。もんだいを 出すのは、きみが旅で出会ったゴトモンたちです。' : land ? 'いつものコースは12ステージ。とびらで まっていたり、？ブロックから 出てきたりするのは、きみが旅で出会ったゴトモンたちです。' : hop ? 'いつものコースは12問。荷車を 走らせたり、川を 泳いだり、おうちで まっていたりするのは、きみが旅で出会ったゴトモンたちです。' : golf ? 'いつものコースは12ホール。旗を持ったり バンパーに なったりするのは、きみが旅で出会ったゴトモンたちです。' : tag ? 'いつものコースは12問。おにごっこの あいては、きみが旅で出会ったゴトモンたちです。' : jump ? 'いつものコースは12問。雲の上で ふだを持っているのは、きみが旅で出会ったゴトモンたちです。' : maze ? '3かい×とびら4つで12問。行き止まりで まっているのは、きみが旅で出会ったゴトモンたちです。' : seek ? 'いつものコースは12問。かくれているのは、きみが旅で出会ったゴトモンたちです。' : link ? '6本ずつ2まい。カードを持っているのは、きみが旅で出会ったゴトモンたちです。' : race ? 'いつものコースは12問。いっしょに走るのはあいぼう、ライバルは旅で出会ったゴトモンたちです。' : drum ? 'いつものコースは12問。おどりに来るのは、きみが旅で出会ったゴトモンたちです。' : 'いつものコースは12問。くす玉から出てくるのは、きみが旅で出会ったゴトモンたちです。'));
     }
     if (definition.id === 'gotomonParts') {
       const label = element(doc, 'label', 'yt-memory-picker', 'くみたてる漢字');
@@ -381,7 +381,7 @@ const hub = {
       const preset = modeForSubject(definition.id, playOptions.subject);
       if (preset) { mode = preset; select.value = preset; }
       select.onchange = () => { mode = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', 'どちらも12問。ふだを持っているのは、旅で出会ったゴトモンたちです。'));
+        element(doc, 'p', 'yt-note', 'いつものコースは12問。ふだを持っているのは、旅で出会ったゴトモンたちです。'));
     }
     let region = 'all';
     if (definition.id === 'gotomonDelivery') {
@@ -392,7 +392,7 @@ const hub = {
         const option = element(doc, 'option', '', text); option.value = value; select.append(option);
       }
       select.onchange = () => { region = select.value; }; label.append(select); dialog.append(label,
-        element(doc, 'p', 'yt-note', 'どの地方でも10こ。地方をえらぶと、その地方の都道府県だけが出ます。'));
+        element(doc, 'p', 'yt-note', 'いつものコースは10こ。地方をえらぶと、その地方の都道府県だけが出ます。'));
     }
     let stageId = null;
     if (['photoRally', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort'].includes(definition.id)) {

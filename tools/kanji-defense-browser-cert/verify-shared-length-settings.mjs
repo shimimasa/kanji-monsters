@@ -52,7 +52,7 @@ try {
       const state = await page.evaluate(async url => (await import(url)).default.inspect().session, `/assets/${hostChunk}`);
       assert.ok(state, `${viewport.width} ${gameId}: host session is missing; screens ${await page.locator('section[id]').evaluateAll(nodes => nodes.map(node => node.id).join(','))}; errors ${errors.join(' | ')}`);
       const actual = gameId === 'gotomonPush' ? state.rooms : gameId === 'gotomonBreakout' ? state.questions
-        : gameId === 'gotomonTrace' ? state.firstRound : state.total;
+        : gameId === 'gotomonTrace' ? state.firstRound : gameId === 'gotomonShooter' ? state.waves : state.total;
       assert.equal(actual, count, gameId);
     }
     await hub();
