@@ -52,6 +52,7 @@ export class AudioManager {
         miniGameAction: '/assets/audio/bgm_minigame_action.mp3',
         miniGamePuzzle: '/assets/audio/bgm_minigame_puzzle.mp3',
         miniGameRelaxed: '/assets/audio/bgm_minigame_relaxed.mp3',
+        evolution: '/assets/audio/bgm_evolution.mp3',
 
         // ステージ別BGMを追加
         // NOTE: 北海道A/B.mp3 はリポジトリに存在せず無音になっていたため、
@@ -117,6 +118,8 @@ export class AudioManager {
         stageClear: '/assets/audio/se_stage_clear.mp3',
         hint: '/assets/audio/se_hint.mp3',
         evolve: '/assets/audio/se_evolve.mp3',
+        evolutionGlimmer: '/assets/audio/se_evolution_glimmer.mp3',
+        evolutionReveal: '/assets/audio/se_evolution_reveal.mp3',
         reward: '/assets/audio/se_reward.mp3',
         miniShot: '/assets/audio/se_mini_shot.mp3',
         miniWhoosh: '/assets/audio/se_mini_whoosh.mp3',
