@@ -22,12 +22,18 @@ const CSS = `
 #gotomonTraceScreen .tr-board{position:relative;width:100%;aspect-ratio:1;display:grid;grid-template-columns:repeat(${R.size},1fr);gap:2.2%;padding:2.2%;box-sizing:border-box;border-radius:18px;background:#7b2cbf;box-shadow:0 8px 0 #5a189a,0 12px 18px #0003;touch-action:none;user-select:none}
 #gotomonTraceScreen .tr-tile{display:grid;place-items:center;border-radius:14%;background:linear-gradient(#fff,#f1e4ff);color:#240046;font-size:clamp(18px,7.4cqh,52px);font-weight:900;box-shadow:0 4px 0 #c8b6ff;cursor:pointer;transition:transform .08s}
 #gotomonTraceScreen .tr-tile[data-on=true]{background:linear-gradient(#ffe066,#ffd43b);box-shadow:0 4px 0 #f59f00;transform:scale(1.05)}
+#gotomonTraceScreen .tr-tile[data-step]:not([data-step=''])::before{content:attr(data-step);position:absolute;right:5%;bottom:3%;z-index:1;display:grid;place-items:center;min-width:1.3em;height:1.3em;padding:0 .1em;border-radius:50%;background:#5a189a;color:#fff;font-size:clamp(10px,2.2cqh,14px);line-height:1}
 #gotomonTraceScreen .tr-tile[data-hint=true]{box-shadow:0 0 0 4px #37c871,0 0 16px #37c871;animation:tr-glow .7s ease-in-out infinite alternate}
 #gotomonTraceScreen .tr-tile{position:relative}
 #gotomonTraceScreen .tr-tile[data-order]:not([data-order=''])::after{content:attr(data-order);position:absolute;left:6%;top:4%;min-width:1.4em;padding:0 .2em;border-radius:999px;background:#37c871;color:#fff;font-size:clamp(10px,2.6cqh,18px);line-height:1.4em;text-align:center}
 #gotomonTraceScreen .tr-tile[data-pop=true]{animation:tr-pop .8s ease-out forwards}
 #gotomonTraceScreen .tr-line{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 #gotomonTraceScreen .tr-line polyline{fill:none;stroke:#ff6d00cc;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+#gotomonTraceScreen .tr-runner{position:absolute;z-index:3;display:grid;place-items:center;width:clamp(24px,5.8cqh,36px);height:clamp(24px,5.8cqh,36px);pointer-events:none;transform:translate(-50%,-50%);transition:left .2s ease-out,top .2s ease-out;filter:drop-shadow(0 2px 2px #32164e99)}
+#gotomonTraceScreen .tr-runner[hidden]{display:none}
+#gotomonTraceScreen .tr-runner .gt-portrait{display:block;width:100%;height:100%}
+#gotomonTraceScreen .tr-runner .gt-portrait img{width:100%;height:100%;object-fit:contain}
+#gotomonTraceScreen .tr-runner.tr-hop .gt-portrait{animation:tr-tile-hop .24s ease-out}
 #gotomonTraceScreen .tr-title{margin:0;text-align:center;font-size:14px;font-weight:900;color:#bfe3ff}
 #gotomonTraceScreen .tr-prompt{margin:0;padding:8px 12px;border-radius:14px;background:#ffffff14;color:#fff;text-align:center;font-size:clamp(20px,2.8vw,28px);font-weight:900;line-height:1.3}
 #gotomonTraceScreen .tr-prompt small{display:block;margin-top:4px;font-size:15px;font-weight:700;color:#d4e8ff}
@@ -40,6 +46,8 @@ const CSS = `
 @keyframes tr-glow{from{filter:brightness(1)}to{filter:brightness(1.15)}}
 @keyframes tr-shake{0%,100%{translate:0}25%{translate:-8px}75%{translate:8px}}
 @keyframes tr-pop{0%{transform:scale(1)}40%{transform:scale(1.25) rotate(-6deg)}100%{transform:scale(0);opacity:0}}
+@keyframes tr-tile-hop{0%,100%{transform:translateY(0) scale(1)}45%{transform:translateY(-35%) scale(1.12)}}
+@media(prefers-reduced-motion:reduce){#gotomonTraceScreen .tr-runner{transition:none}#gotomonTraceScreen .tr-runner.tr-hop .gt-portrait{animation:none}}
 `;
 const SVG = 'http://www.w3.org/2000/svg';
 
@@ -63,11 +71,14 @@ export function createTraceView({ document: doc, dispatch, onBack, getSnapshot, 
   const line = doc.createElementNS ? doc.createElementNS(SVG, 'svg') : el('div');
   line.setAttribute('class', 'tr-line'); line.setAttribute('viewBox', '0 0 100 100'); line.setAttribute('preserveAspectRatio', 'none');
   const poly = doc.createElementNS ? doc.createElementNS(SVG, 'polyline') : el('i'); line.append(poly);
+  // Inspired by https://github.com/shimimasa/kanji-trace-jump: a character hops after each traced step.
+  // Here the companion follows selected letters; the reading is still graded only on submit.
+  const runner = el('div', 'tr-runner'); runner.hidden = true; runner.setAttribute('aria-hidden', 'true');
   for (let i = 0; i < R.size * R.size; i++) {
     const tile = el('div', 'tr-tile'); tile.dataset.cell = String(i); tile.setAttribute('role', 'button');
     board.append(tile); tileNodes.push(tile);
   }
-  board.append(line);
+  board.append(line, runner);
   stage.append(top, gauge, board); wrap.append(stage); world.append(wrap);
 
   const title = el('p', 'tr-title');
@@ -76,7 +87,7 @@ export function createTraceView({ document: doc, dispatch, onBack, getSnapshot, 
   const clearBtn = el('button', 'tr-btn', 'けす'); clearBtn.type = 'button';
   const backBtn = el('button', 'tr-btn', '1文字もどす'); backBtn.type = 'button';
   tools.append(backBtn, clearBtn);
-  const help = el('p', 'tr-help', 'となりの もじを ゆびで なぞって、答えを つくろう（タップでも つなげられるよ）');
+  const help = el('p', 'tr-help', 'となりの もじを つなぐと、あいぼうが ぴょん！ タップでも なぞれるよ');
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
   dock.append(title, prompt, tools, help, note);
   doc.body.append(root);
@@ -85,9 +96,20 @@ export function createTraceView({ document: doc, dispatch, onBack, getSnapshot, 
   const say = text => { note.textContent = text; frame.announce(text); };
   const drawPath = () => {
     const s = state();
-    tileNodes.forEach((tile, i) => { const v = String(path.includes(i)); if (tile.dataset.on !== v) tile.dataset.on = v; });
+    tileNodes.forEach((tile, i) => { const step = path.indexOf(i), v = String(step >= 0); if (tile.dataset.on !== v) tile.dataset.on = v; tile.dataset.step = step >= 0 ? String(step + 1) : ''; });
     const pts = path.map(i => { const r = Math.floor(i / R.size), c = i % R.size; return `${(c + 0.5) * 100 / R.size},${(r + 0.5) * 100 / R.size}`; });
     poly.setAttribute('points', pts.join(' '));
+    runner.hidden = path.length === 0;
+    if (path.length) {
+      const cell = path.at(-1), tileBox = tileNodes[cell].getBoundingClientRect?.(), boardBox = board.getBoundingClientRect?.();
+      if (tileBox?.width && boardBox?.width) {
+        runner.style.left = `${tileBox.left - boardBox.left + tileBox.width * .78}px`;
+        runner.style.top = `${tileBox.top - boardBox.top + tileBox.height * .2}px`;
+      } else {
+        runner.style.left = `${(cell % R.size + .78) * 100 / R.size}%`;
+        runner.style.top = `${(Math.floor(cell / R.size) + .2) * 100 / R.size}%`;
+      }
+    }
     slotNodes.forEach((slot, k) => { const ch = path[k] !== undefined ? s.tiles[path[k]] : ''; if (slot.textContent !== ch) slot.textContent = ch; slot.dataset.on = String(!!ch); });
   };
   const submit = () => {
@@ -108,7 +130,7 @@ export function createTraceView({ document: doc, dispatch, onBack, getSnapshot, 
     if (path.includes(cell)) return;
     if (path.length && !touching(path.at(-1), cell)) { if (!dragging) { path = [cell]; drawPath(); } return; }
     if (path.length >= s.length) return;
-    path.push(cell); drawPath();
+    path.push(cell); drawPath(); restartClass(runner, 'tr-hop');
     if (!dragging && path.length === s.length) submit();
   };
   // The tile under the finger, only near its middle (so a diagonal move does not catch a side tile).
@@ -203,7 +225,11 @@ export function createTraceView({ document: doc, dispatch, onBack, getSnapshot, 
   return {
     root,
     // The companion stands across from the asking Gotomon and cheers at every right word.
-    attachCompanion(portrait) { buddy.append(portrait); },
+    attachCompanion(portrait) {
+      buddy.append(portrait);
+      const face = portrait.querySelector?.('.ya-buddy') ?? portrait;
+      runner.append(face.cloneNode(true));
+    },
     focusPlay() { tileNodes[0]?.focus?.({ preventScroll: true }); },
     update(s) {
       if (!active) return;
