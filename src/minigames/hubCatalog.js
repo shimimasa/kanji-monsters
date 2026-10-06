@@ -14,7 +14,7 @@ const ONLY = Object.freeze({
   kanji: Object.freeze(['photoRally', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonParts', 'gotomonOthello', 'tripSugoroku', 'kanjiDefense']),
   english: Object.freeze(['englishChoice', 'gotomonFishing', 'gotomonSnake']),
   math: Object.freeze(['mathSprint', 'gotomonToss', 'gotomonColoring', 'mathInvader', 'gotomonMeteor', 'gotomonMerge', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout']),
-  language: Object.freeze(['sentenceOrder', 'timedChoice', 'proverbDetective', 'multiSelect', 'asyncChoice', 'gotomonDelivery']),
+  language: Object.freeze(['historyBuild', 'sentenceOrder', 'timedChoice', 'proverbDetective', 'multiSelect', 'asyncChoice', 'gotomonDelivery']),
 });
 
 // Games where the child picks the subject (their `mode`), newest first, with the subjects each offers.
@@ -27,7 +27,7 @@ const CHOOSE = Object.freeze([
 ].map(([id, subjects]) => Object.freeze({ id, subjects: Object.freeze(subjects) })));
 
 // The newest games: they wear NEW until they are played.
-export const NEWEST = Object.freeze(['gotomonPush', 'gotomonTrace', 'gotomonLand', 'gotomonHop', 'gotomonGolf']);
+export const NEWEST = Object.freeze(['historyBuild', 'gotomonPush', 'gotomonTrace', 'gotomonLand', 'gotomonHop']);
 
 // The subject a finished run counts for (the sticker book's 漢字・英語・算数 rewards): a game's own
 // subject, or the one chosen at the start for a game with a choice.
