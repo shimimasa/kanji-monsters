@@ -1,7 +1,8 @@
 import { gameExperiences } from './gameExperiences.js';
 
 const actionScenes = new Set(['race', 'shoot', 'mole', 'land', 'tag', 'jump', 'grandprix', 'drum', 'slash', 'snake', 'meteor', 'breakout', 'shooter', 'toss', 'defend']);
-const puzzleScenes = new Set(['bridge', 'stars', 'mine', 'push', 'trace', 'maze', 'othello', 'link', 'merge', 'parts', 'puyo', 'bubble', 'sort', 'memory', 'bingo']);
+const puzzleScenes = new Set(['bridge', 'stars', 'mine', 'push', 'trace', 'maze', 'othello', 'link', 'merge', 'parts', 'puyo', 'bubble', 'sort', 'memory', 'bingo',
+  'room', 'cycle', 'town', 'mosaic']);
 
 export function miniGameBgm(gameId) {
   const scene = gameExperiences[gameId]?.scene;

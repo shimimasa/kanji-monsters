@@ -9,14 +9,14 @@ const ids = Object.keys(miniGameRegistry);
 
 test('ぜんぶ shows every game exactly once, in sections by subject and then the games with a choice', () => {
   const sections = hubSections('all');
-  assert.deepEqual(sections.map(s => s.id), ['kanji', 'english', 'math', 'language', 'choose']);
+  assert.deepEqual(sections.map(s => s.id), ['kanji', 'english', 'math', 'science', 'language', 'choose']);
   const shown = sections.flatMap(s => s.games);
   assert.equal(shown.length, ids.length);
   assert.deepEqual([...shown].sort(), [...ids].sort());
 });
 
 test('a subject tab shows its own games and the games that can be played in it', () => {
-  for (const subject of ['kanji', 'english', 'math', 'language']) {
+  for (const subject of ['kanji', 'english', 'math', 'science', 'language']) {
     const sections = hubSections(subject);
     const shown = sections.flatMap(s => s.games);
     assert.equal(new Set(shown).size, shown.length, subject);
@@ -45,7 +45,7 @@ test('opening a game from a subject tab starts it in that subject when it has th
 });
 
 test('tabs, NEW and genres line up with the games', () => {
-  assert.deepEqual(HUB_SUBJECTS.map(s => s.id), ['all', 'kanji', 'english', 'math', 'language']);
+  assert.deepEqual(HUB_SUBJECTS.map(s => s.id), ['all', 'kanji', 'english', 'math', 'science', 'language']);
   for (const id of NEWEST) assert.ok(miniGameRegistry[id], id);
   assert.ok(NEWEST.length <= 5);
   // Every game with a choice says so in its genre (漢字・英語・算数 or 英語・漢字).
