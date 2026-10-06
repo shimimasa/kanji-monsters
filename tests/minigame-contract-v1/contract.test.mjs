@@ -8,8 +8,8 @@ const create = (gameId, sessionId, onEvent = () => {}) => miniGameRegistry[gameI
   sessionId, random: seeded(42), onEvent,
 });
 
-test('all forty-one definitions expose only the required v1 creation boundary', () => {
-  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor', 'gotomonSnake', 'gotomonParts', 'gotomonSlash', 'gotomonColoring', 'gotomonDrum', 'gotomonRace', 'gotomonMerge', 'gotomonLink', 'gotomonOthello', 'gotomonSeek', 'gotomonMaze', 'gotomonJump', 'gotomonTag', 'gotomonGolf', 'gotomonHop', 'gotomonLand', 'gotomonTrace', 'gotomonPush']);
+test('all fifty definitions expose only the required v1 creation boundary', () => {
+  assert.deepEqual(Object.keys(miniGameRegistry), ['mathSprint', 'mathInvader', 'englishChoice', 'sentenceOrder', 'timedChoice', 'multiSelect', 'asyncChoice', 'kanjiDefense', 'photoRally', 'proverbDetective', 'tripSugoroku', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonToss', 'gotomonFishing', 'gotomonDelivery', 'gotomonBubble', 'gotomonPuyo', 'gotomonShooter', 'gotomonBreakout', 'gotomonMeteor', 'gotomonSnake', 'gotomonParts', 'gotomonSlash', 'gotomonColoring', 'gotomonDrum', 'gotomonRace', 'gotomonMerge', 'gotomonLink', 'gotomonOthello', 'gotomonSeek', 'gotomonMaze', 'gotomonJump', 'gotomonTag', 'gotomonGolf', 'gotomonHop', 'gotomonLand', 'gotomonTrace', 'gotomonPush', 'abcPost', 'englishRadio', 'replyCafe', 'englishRoom', 'wonderLab', 'lifeCycle', 'mapTown', 'shapeMosaic', 'historyBuild']);
   for (const [id, definition] of Object.entries(miniGameRegistry)) {
     assert.deepEqual(Object.keys(definition).sort(), ['create', 'createView', 'id', 'title']);
     assert.equal(definition.id, id);
@@ -283,6 +283,8 @@ test('instance exit is idempotent and permanently rejects old commands', () => {
           // The trip starts on the map, so its first command is a move.
           : id === 'tripSugoroku'
             ? { type: 'move', payload: { sessionId: before.sessionId, nodeId: before.map[0][0].nodeId } }
+          : id === 'historyBuild'
+            ? { type: 'choose', payload: { sessionId: before.sessionId, cardId: before.offers[0]?.id ?? null } }
           : id === 'asyncChoice'
             ? { type: 'answer', payload: { sessionId: before.sessionId, problemId: null,
               attemptId: null, choiceId: null } }

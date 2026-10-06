@@ -20,6 +20,7 @@ import { createBreedingDialog } from '../ui/breedingDialog.js';
 import { createEvolutionDialog } from '../ui/evolutionDialog.js';
 import { stickerSummary } from '../minigames/companionStickers.js';
 import { GAME_TYPES, typeInfo } from '../minigames/gotomonTypes.js';
+import { miniGameGotomonFor } from '../minigames/miniGameGotomonCatalog.js';
 import { supportEffectOf, MAX_SUPPORTERS } from '../minigames/gotomonMoves.js';
 import { stageData, getMonsterById } from '../loaders/dataLoader.js';
 
@@ -304,6 +305,17 @@ const hub = {
     const header = element(doc, 'div', 'yt-picker-header');
     header.append(element(doc, 'h2', '', definition.title), button(doc, '閉じる', () => dialog.close()));
     dialog.append(header, element(doc, 'p', '', '今回いっしょに遊ぶあいぼうを選ぼう。'));
+    const squareFriend = miniGameGotomonFor(definition.id);
+    if (squareFriend) {
+      const preview = element(doc, 'div', 'yt-square-gotomon-preview');
+      const portrait = element(doc, 'img', 'yt-square-gotomon-image');
+      portrait.src = squareFriend.imageUrl; portrait.alt = squareFriend.name;
+      portrait.width = 76; portrait.height = 76; portrait.decoding = 'async';
+      const copy = element(doc, 'div', 'yt-square-gotomon-copy');
+      const name = element(doc, 'strong', '', `このゲームのゴトモン：${squareFriend.name}`);
+      copy.append(name, typeChip(doc, squareFriend.type), element(doc, 'p', '', squareFriend.description));
+      preview.append(portrait, copy); dialog.append(preview);
+    }
     const guide = element(doc, 'section', 'yt-game-guide');
     guide.append(element(doc, 'h3', '', 'あそびかた'));
     const steps = element(doc, 'ol');

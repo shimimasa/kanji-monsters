@@ -92,6 +92,8 @@ import { createTraceGame } from './gotomonTrace/traceGame.js';
 import { createTraceView } from './gotomonTrace/traceView.js';
 import { createHistoryGame } from './historyBuild/historyGame.js';
 import { createHistoryView } from './historyBuild/historyView.js';
+import { createBalancedGame } from './balancedEight/game.js';
+import { createBalancedView } from './balancedEight/view.js';
 import { createPushGame } from './gotomonPush/pushGame.js';
 import { createPushView } from './gotomonPush/pushView.js';
 import { createPhotoRallyView } from './photoRally/photoRallyView.js';
@@ -269,6 +271,10 @@ function withCommandAdapter(createView) {
   });
 }
 
+const balancedEntry = (id, title) => Object.freeze({ id, title,
+  create: context => createBalancedGame(id, context),
+  createView: context => createBalancedView(id, context) });
+
 export const miniGameRegistry = Object.freeze({
   mathSprint: Object.freeze({ id: 'mathSprint', title: 'けいさんスプリント',
     create: createMathSprintGame, createView: createMathSprintView }),
@@ -352,6 +358,14 @@ export const miniGameRegistry = Object.freeze({
     create: context => createTraceGame({ ...context, content: shortSlashContent(context, 'gotomonTrace') }), createView: createTraceView }),
   gotomonPush: Object.freeze({ id: 'gotomonPush', title: 'ゴトモン・おしだし',
     create: context => createPushGame({ ...context, content: slashContent(context) }), createView: createPushView }),
+  abcPost: balancedEntry('abcPost', 'ABCポスト'),
+  englishRadio: balancedEntry('englishRadio', 'えいごのラジオ'),
+  replyCafe: balancedEntry('replyCafe', 'おへんじカフェ'),
+  englishRoom: balancedEntry('englishRoom', 'えいごの おへやづくり'),
+  wonderLab: balancedEntry('wonderLab', 'ふしぎ実験室'),
+  lifeCycle: balancedEntry('lifeCycle', '生きものの一年'),
+  mapTown: balancedEntry('mapTown', '地図記号でまちづくり'),
+  shapeMosaic: balancedEntry('shapeMosaic', 'かたちのモザイク'),
   historyBuild: Object.freeze({ id: 'historyBuild', title: 'れきしのカードづくり',
     create: createHistoryGame, createView: createHistoryView }),
 });

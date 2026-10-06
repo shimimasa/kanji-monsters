@@ -6,15 +6,17 @@ export const HUB_SUBJECTS = Object.freeze([
   Object.freeze({ id: 'kanji', label: '漢字' }),
   Object.freeze({ id: 'english', label: '英語' }),
   Object.freeze({ id: 'math', label: '算数' }),
+  Object.freeze({ id: 'science', label: '理科' }),
   Object.freeze({ id: 'language', label: 'ことば・社会' }),
 ]);
 
 // Games that practice one subject, easier and shorter first.
 const ONLY = Object.freeze({
   kanji: Object.freeze(['photoRally', 'kanjiBingo', 'kanjiMemory', 'gotomonShop', 'kanjiSort', 'gotomonParts', 'gotomonOthello', 'tripSugoroku', 'kanjiDefense']),
-  english: Object.freeze(['englishChoice', 'gotomonFishing', 'gotomonSnake']),
-  math: Object.freeze(['mathSprint', 'gotomonToss', 'gotomonColoring', 'mathInvader', 'gotomonMeteor', 'gotomonMerge', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout']),
-  language: Object.freeze(['historyBuild', 'sentenceOrder', 'timedChoice', 'proverbDetective', 'multiSelect', 'asyncChoice', 'gotomonDelivery']),
+  english: Object.freeze(['abcPost', 'englishRadio', 'replyCafe', 'englishRoom', 'englishChoice', 'gotomonFishing', 'gotomonSnake']),
+  math: Object.freeze(['shapeMosaic', 'mathSprint', 'gotomonToss', 'gotomonColoring', 'mathInvader', 'gotomonMeteor', 'gotomonMerge', 'gotomonBubble', 'gotomonPuyo', 'gotomonBreakout']),
+  science: Object.freeze(['wonderLab', 'lifeCycle']),
+  language: Object.freeze(['mapTown', 'historyBuild', 'sentenceOrder', 'timedChoice', 'proverbDetective', 'multiSelect', 'asyncChoice', 'gotomonDelivery']),
 });
 
 // Games where the child picks the subject (their `mode`), newest first, with the subjects each offers.
@@ -27,7 +29,7 @@ const CHOOSE = Object.freeze([
 ].map(([id, subjects]) => Object.freeze({ id, subjects: Object.freeze(subjects) })));
 
 // The newest games: they wear NEW until they are played.
-export const NEWEST = Object.freeze(['historyBuild', 'gotomonPush', 'gotomonTrace', 'gotomonLand', 'gotomonHop']);
+export const NEWEST = Object.freeze(['wonderLab', 'englishRadio', 'shapeMosaic', 'mapTown', 'abcPost']);
 
 // The subject a finished run counts for (the sticker book's 漢字・英語・算数 rewards): a game's own
 // subject, or the one chosen at the start for a game with a choice.
@@ -44,7 +46,7 @@ const label = id => HUB_SUBJECTS.find(subject => subject.id === id)?.label ?? id
 export function hubSections(subject = 'all') {
   if (subject === 'all') {
     return Object.freeze([
-      ...['kanji', 'english', 'math', 'language'].map(id => Object.freeze({ id, title: label(id), games: ONLY[id] })),
+      ...['kanji', 'english', 'math', 'science', 'language'].map(id => Object.freeze({ id, title: label(id), games: ONLY[id] })),
       Object.freeze({ id: 'choose', title: '漢字・英語・算数から えらべる', games: Object.freeze(CHOOSE.map(item => item.id)) }),
     ]);
   }

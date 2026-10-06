@@ -46,9 +46,11 @@ export const GAME_TYPES = Object.freeze({
   gotomonShop: 'food', gotomonToss: 'food', gotomonPuyo: 'food', gotomonMerge: 'food', asyncChoice: 'food', gotomonBubble: 'food',
   gotomonFishing: 'nature', gotomonSeek: 'nature', gotomonHop: 'nature', gotomonJump: 'nature', gotomonLand: 'nature', photoRally: 'nature', gotomonGolf: 'nature',
   gotomonDrum: 'fest', gotomonRace: 'fest', gotomonColoring: 'fest', multiSelect: 'fest', timedChoice: 'fest', kanjiBingo: 'fest',
-  proverbDetective: 'history', tripSugoroku: 'history', kanjiDefense: 'history', kanjiSort: 'history', sentenceOrder: 'history', gotomonOthello: 'history',
+  proverbDetective: 'history', tripSugoroku: 'history', kanjiDefense: 'history', kanjiSort: 'history', sentenceOrder: 'history', gotomonOthello: 'history', historyBuild: 'history',
   mathInvader: 'legend', gotomonShooter: 'legend', gotomonMeteor: 'legend', gotomonSlash: 'legend', gotomonMaze: 'legend', gotomonTag: 'legend',
   gotomonParts: 'craft', gotomonPush: 'craft', gotomonBreakout: 'craft', gotomonTrace: 'craft', gotomonLink: 'craft', kanjiMemory: 'craft', mathSprint: 'craft',
+  abcPost: 'odd', englishRadio: 'odd', replyCafe: 'food', englishRoom: 'craft',
+  wonderLab: 'craft', lifeCycle: 'nature', mapTown: 'history', shapeMosaic: 'craft',
   gotomonDelivery: 'odd', gotomonSnake: 'odd', englishChoice: 'odd',
 });
 // How much sooner the gauge fills for a companion of the game's type.
