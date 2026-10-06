@@ -38,6 +38,7 @@ export function typeOf(monster) {
   if (!monster) return 'odd';
   const fixed = TYPE_OVERRIDES[monster.id];
   if (fixed) return fixed;
+  if (GOTOMON_TYPES.some(type => type.id === monster.type)) return monster.type;
   return byRules(String(monster.category ?? '')) ?? (monster.category ? 'odd' : byRules(`${monster.habitat ?? ''} ${monster.desc ?? ''}`) ?? 'odd');
 }
 

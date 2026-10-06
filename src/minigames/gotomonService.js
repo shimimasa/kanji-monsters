@@ -17,6 +17,7 @@ import { typeOf } from './gotomonTypes.js';
 import { moveFor, supporterXP, MAX_SUPPORTERS } from './gotomonMoves.js';
 import { LEGEND_IDS, recipeFor, regionOf, candidates, firstPair, canBreed } from './gotomonBreeding.js';
 import { lookProgress, wornLook, openedLooks, LOOK_KEYS, evolvedImageUrl } from './companionLooks.js';
+import { miniGameGotomonFor, miniGameGotomonById } from './miniGameGotomonCatalog.js';
 
 // The sticker book's slots: every game in the square (the crown asks for all of them).
 const GAME_COUNT = new Set(hubSections('all').flatMap(section => section.games)).size;
@@ -42,6 +43,10 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
   const getGotomonById = (id, companions = read()?.snapshot.player.miniGames?.companions ?? {}) => {
     const data = lookup(id);
     if (!data) return { id, name: id, imageUrl: null };
+    const squareFriend = miniGameGotomonById(id);
+    if (squareFriend) return { ...squareFriend, support: supportStyle(squareFriend.category),
+      move: moveFor(squareFriend.type, growthStatus(companions?.[id]).level),
+      outfit: wornItems(companions?.[id], { gameCount: GAME_COUNT }), look: { evolve: false } };
     const folder = getBonusMonsterFolder(id) || folders[data.grade] || folders[1];
     const look = wornLook(companions?.[id], id);
     return { id, name: data.name || id, imageUrl: look.evolve ? evolvedImageUrl(id) : `/assets/images/monsters/full/${folder}/${id}.webp`,
@@ -55,6 +60,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
   };
   const getBaseGotomonById = id => {
     const gotomon = getGotomonById(id), data = lookup(id);
+    if (miniGameGotomonById(id)) return gotomon;
     if (!data) return gotomon;
     const folder = getBonusMonsterFolder(id) || folders[data.grade] || folders[1];
     return { ...gotomon, imageUrl: `/assets/images/monsters/full/${folder}/${id}.webp`, look: { ...gotomon.look, evolve: false } };
@@ -288,10 +294,16 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
           finished: !!memoryFinished, at: Math.max(0, Math.floor(now())) }) : null;
         // The sticker book: a real run played to the end (rank A or S makes it gold).
         const sticker = !shortCourse && run && completed && finished ? recordSticker(friend, { gameId, rank: rank.rank, subject, at: Math.max(0, Math.floor(now())) }) : null;
+        // A completed play welcomes this game's fixed friend once. It uses the same
+        // confirmed collection as adventure captures; review runs never enter here.
+        const squareFriend = miniGameGotomonFor(gameId);
+        const newGotomon = run && completed && finished && memoryFinished && squareFriend && !snapshot.player.collection.gotomonIds.includes(squareFriend.id)
+          ? squareFriend : null;
+        if (newGotomon) snapshot.player.collection.gotomonIds.push(newGotomon.id);
         reward = { earned, friendship: friend.friendship, plays: friend.plays,
           newBest: !shortCourse && points > previousBest, bestScore: game.bestScore, medals: [...friend.medals],
           before, after, earnedXP: after.xp - before.xp, levelUp: after.level > before.level, rank,
-          memory, sticker, newPhotos, newCases, journeyBest, supporters,
+          memory, sticker, newGotomon, newPhotos, newCases, journeyBest, supporters,
           // The stronger わざ is learned at Lv7.
           newMove: before.level < 7 && after.level >= 7,
           // きせかえ opened by this run (a sticker, a level or なかよし).

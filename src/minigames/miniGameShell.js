@@ -129,6 +129,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
   const stats = element(doc, 'p'), reward = element(doc, 'p', 'gt-reward'); reward.setAttribute('role', 'status');
   const record = element(doc, 'p', 'gt-record'), resultActions = element(doc, 'div', 'gt-result-actions');
   const memoryNotice = element(doc, 'p', 'gt-memory-notice'); memoryNotice.hidden = true; memoryNotice.setAttribute('role', 'status');
+  const captureNotice = element(doc, 'div', 'gt-capture-notice'); captureNotice.hidden = true; captureNotice.setAttribute('role', 'status');
   // パーティ: the supporters' XP and a newly learned わざ.
   const partyNotice = element(doc, 'p', 'gt-party-notice'); partyNotice.hidden = true; partyNotice.setAttribute('role', 'status');
   // The sticker book: a new or golden sticker for this companion, and the がんばり mark after the review.
@@ -158,7 +159,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
     const done = onBuildReviewDone?.();
     if (done?.mark) showSticker('review', `がんばりマークが ついた！ シール帳の シールに にじの ふち${done.newTitles?.length ? `　称号「${done.newTitles.join('」「')}」に なった！` : ''}`);
   } });
-  result.append(growthResult.root,stickerNotice,partyNotice,memoryNotice,challengeResult,nextGoal,buildReview.root,resultActions,reward,retrySave);
+  result.append(growthResult.root,captureNotice,stickerNotice,partyNotice,memoryNotice,challengeResult,nextGoal,buildReview.root,resultActions,reward,retrySave);
   shell.append(result);
   const legacyResult = root.querySelector('[class$="-result"]:not(.gt-result)');
   if (legacyResult) legacyResult.classList.add('gt-learning-result');
@@ -216,6 +217,13 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
     } else if (receipt.ok) {
       const value = receipt.reward;
       growthResult.show(value);
+      captureNotice.replaceChildren();
+      if (value?.newGotomon && !value.duplicate) {
+        const image = element(doc, 'img'); image.src = value.newGotomon.imageUrl; image.alt = value.newGotomon.name;
+        image.width = 84; image.height = 84;
+        captureNotice.append(image, element(doc, 'strong', '', `${value.newGotomon.name}が なかまになった！ ゴトモン図鑑でも 会えるよ。`));
+        captureNotice.hidden = false;
+      } else captureNotice.hidden = true;
       if (value && !value.duplicate) resultTitle.textContent = friendshipTitle(value.friendship).message;
       reward.textContent = value?.duplicate ? '記録は保存済みです。' : `なかよし +${value.earned} → ${value.friendship} · いっしょに${value.plays}回${value.medals.includes('five-plays') ? ' · メダル「いつものあいぼう」' : ''}`;
       record.textContent = shortCourse ? 'ちょこっとコースで あそんだよ。あいぼうは そだつよ。' : `${value?.newBest ? '✦ 自己ベスト！ ' : 'BEST '}${value?.bestScore ?? ''}`;

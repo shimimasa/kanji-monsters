@@ -36,7 +36,7 @@ test('a run and its review say which titles they earned; the summary lists every
   const marked = service.markReviewSticker({ owner: service.getOwner(), sessionId: 's1' });
   assert.deepEqual(marked.newTitles, ['ふくしゅう はじめ'], 'the first がんばり mark');
   const cards = service.getCompanionCards();
-  assert.deepEqual(cards.map(c => c.gotomon.id), ['HKD-E01', 'HKD-E02']);
+  assert.deepEqual(cards.map(c => c.gotomon.id), ['HKD-E01', 'HKD-E02', 'MG-041']);
   const first = cards[0];
   assert.equal(first.stickers.total, 5); assert.equal(first.stickers.review, 1); assert.equal(first.outfits, 2, 'the ribbon, and はなかんむり at なかよし 12');
   assert.equal(first.secretTotal, 2); assert.equal(first.secrets, 1);

@@ -314,6 +314,8 @@ const hub = {
       const copy = element(doc, 'div', 'yt-square-gotomon-copy');
       const name = element(doc, 'strong', '', `このゲームのゴトモン：${squareFriend.name}`);
       copy.append(name, typeChip(doc, squareFriend.type), element(doc, 'p', '', squareFriend.description));
+      if (!playOptions.review) copy.append(element(doc, 'small', 'yt-square-gotomon-goal',
+        gotomonService.getOwnedGotomon().some(friend => friend.id === squareFriend.id) ? 'もう なかまになったよ！' : 'クリアすると なかまになるよ！'));
       preview.append(portrait, copy); dialog.append(preview);
     }
     const guide = element(doc, 'section', 'yt-game-guide');
