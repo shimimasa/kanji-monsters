@@ -1,4 +1,5 @@
-// These are the first two full-length lessons from shimimasa/elementgirl-lesson.
+// First two subject journeys adapted from shimimasa/elementgirl-lesson.
+// The playable Gotomon versions live in public/lessons/gotomon.
 // Their IDs are separate from the square's fixed 50 mini-game Gotomon.
 const LESSONS = [
   { slug: 'kururu', id: 'EL-001', title: 'クルルの発電所', name: 'クルル', subject: '理科', gradeLabel: '小6', topic: '発電・蓄電・センサー', type: 'craft',
@@ -8,8 +9,8 @@ const LESSONS = [
 ];
 export const lessonCatalog = Object.freeze(LESSONS.map(lesson => Object.freeze({
   ...lesson, imageUrl: `/assets/images/monsters/full/lesson/${lesson.id}.svg`,
-  url: `/lessons/elementgirl/${lesson.slug}.html`,
-  sheetUrl: `/lessons/elementgirl/${lesson.slug}-sheet.html`,
+  url: `/lessons/gotomon/${lesson.slug}.html`,
+  sheetUrl: `/lessons/gotomon/${lesson.slug}-sheet.html`,
 })));
 export const lessonForSlug = slug => lessonCatalog.find(lesson => lesson.slug === slug) ?? null;
 export const lessonGotomonById = id => lessonCatalog.find(lesson => lesson.id === id) ?? null;

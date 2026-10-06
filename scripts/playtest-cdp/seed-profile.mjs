@@ -17,7 +17,7 @@ const send = (method, params = {}) => new Promise(resolve => {
   pending.set(requestId, resolve);
   ws.send(JSON.stringify({ id: requestId, method, params }));
 });
-await send('Page.navigate', { url: 'http://127.0.0.1:4173/' });
+await send('Page.navigate', { url: 'http://localhost:4173/' });
 await new Promise(resolve => setTimeout(resolve, 1000));
 const save = getDefaultSave();
 save.player.name = '41本プレイ確認';

@@ -140,7 +140,7 @@ const hub = {
     const journey = element(doc, 'section', 'yt-lesson-cards');
     journey.setAttribute('aria-label', '理科・社会の旅');
     journey.append(element(doc, 'h2', '', '理科・社会の旅（2）'),
-      element(doc, 'p', '', 'ものがたりを たどって 実験や 町づくりを たいけんしよう。さいごまで あそぶと、その作品のゴトモンが なかまになるよ。'));
+      element(doc, 'p', '', 'ゴトモンと いっしょに 実験し、村の 声を 聞いて 考えよう。さいごまで あそぶと、その作品のゴトモンが なかまになるよ。'));
     const journeyGrid = element(doc, 'div', 'yt-lesson-card-grid');
     const ownedIds = new Set(gotomonService.getOwnedGotomon().map(friend => friend.id));
     for (const lesson of lessonCatalog) {
