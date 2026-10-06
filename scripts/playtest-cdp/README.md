@@ -1,4 +1,8 @@
 # ブラウザでの実プレイ確認（headless Chrome + CDP）
+## 理科・社会の授業ゲーム2本（2026-10-06）
+
+ビルドとプレビューを起動し、下記の専用Chrome 9333番を使う。試験用プロファイルにだけ `node --experimental-default-type=module scripts/playtest-cdp/seed-profile.mjs` でセーブを入れ、`node scripts/playtest-cdp/lesson-v2-playtest.mjs 1280 800 --parent` と `node scripts/playtest-cdp/lesson-v2-playtest.mjs 390 844 --parent` を実行する。**各実行前に試験用セーブを入れ直す**。2本各5場面を実タップし、横はみ出し、画像、捕獲と保存キー一致を確かめる。`--shots` を加えると `docs/lesson-pilot/` に画面を保存する。旧版用の `lesson-pilot.mjs` は今の画面の操作には使わない。
+
 
 npm パッケージは追加していません（Node 22 の fetch / WebSocket だけで動きます）。
 
