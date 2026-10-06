@@ -4,9 +4,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const [widthArg = '1280', heightArg = '800', shotDir] = process.argv.slice(2);
+const [widthArg = '1280', heightArg = '800'] = process.argv.slice(2);
 const width = Number(widthArg), height = Number(heightArg);
 const parentMode = process.argv.includes('--parent');
+const shotDir = process.argv.slice(4).find(arg => arg !== '--parent');
 const pages = await (await fetch('http://127.0.0.1:9333/json')).json();
 const page = pages.find(tab => tab.type === 'page');
 assert.ok(page, 'Chrome の CDP ページが必要');
