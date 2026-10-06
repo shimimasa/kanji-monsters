@@ -1,0 +1,132 @@
+:root { font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif; color: #203a32; background: #dcefe4; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 280px; background: radial-gradient(circle at 15% 0%, #fff5bf, transparent 31%), linear-gradient(#cdebdc, #ecf6e8); }
+body[data-lesson="hitotsubu"] { color: #473621; background: radial-gradient(circle at 90% 0%, #ffe2a0, transparent 34%), linear-gradient(#f5e6bd, #fff8e9); }
+button { font: inherit; cursor: pointer; }
+button:focus-visible { outline: 4px solid #ee8a27; outline-offset: 3px; }
+.lgv-shell { width: min(100%, 1020px); margin: auto; padding: 16px clamp(12px, 3vw, 28px) 36px; }
+.lgv-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; font-weight: 800; }
+.lgv-subject, .lgv-progress { padding: 7px 13px; border-radius: 999px; background: #fffdf2df; box-shadow: 0 3px 9px #234c3619; }
+.lgv-hero { display: flex; align-items: center; gap: 22px; padding: 16px 22px; border: 3px solid #76b699; border-radius: 25px; background: #fffdf5; box-shadow: 0 10px 23px #244b3218; }
+body[data-lesson="hitotsubu"] .lgv-hero { border-color: #d9ad60; }
+.lgv-portrait { width: 128px; height: 128px; object-fit: contain; flex: none; }
+.lgv-hero-words { min-width: 0; }
+.lgv-name { display: inline-block; padding: 4px 12px; color: white; background: #266b4d; border-radius: 999px; font-size: 14px; font-weight: 800; }
+body[data-lesson="hitotsubu"] .lgv-name { background: #8d5f2c; }
+h1 { margin: 6px 0 8px; font-size: clamp(22px, 3.2vw, 34px); line-height: 1.3; }
+.lgv-hero p { margin: 0; line-height: 1.65; font-size: 17px; }
+.lgv-board { margin-top: 15px; padding: 18px; background: #fffef9; border: 2px solid #9ccbaa; border-radius: 24px; box-shadow: 0 8px 22px #234b3215; }
+body[data-lesson="hitotsubu"] .lgv-board { border-color: #e0bf79; }
+.lgv-play { min-height: 225px; padding: 18px; background: linear-gradient(145deg, #ddf3e8, #f5faf0); border: 2px solid #91c5a8; border-radius: 20px; overflow: hidden; }
+body[data-lesson="hitotsubu"] .lgv-play { background: linear-gradient(145deg, #fff0c7, #fffaf0); border-color: #e3bf78; }
+.lgv-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; }
+.lgv-control-label { flex-basis: 100%; margin: 2px 0 0; font-weight: 800; }
+.lgv-segments { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+.lgv-button { border: 2px solid #367b58; border-radius: 13px; background: #fff; color: #234832; font-weight: 800; padding: 10px 15px; line-height: 1.35; min-height: 47px; }
+.lgv-button:hover:not(:disabled) { background: #e6f6e9; }
+.lgv-button:disabled { opacity: .55; cursor: default; }
+.lgv-option { flex: 1 1 140px; }
+.lgv-option.is-selected, .lgv-ballot-choice.is-selected { border-width: 4px; background: #c8ebd3; }
+.lgv-primary, .lgv-action { background: #26784e; color: #fff; }
+.lgv-primary:hover:not(:disabled), .lgv-action:hover:not(:disabled) { background: #165e3a; }
+body[data-lesson="hitotsubu"] .lgv-button { border-color: #9c7035; color: #543a1e; }
+body[data-lesson="hitotsubu"] .lgv-option.is-selected, body[data-lesson="hitotsubu"] .lgv-ballot-choice.is-selected { background: #ffe4a6; }
+body[data-lesson="hitotsubu"] .lgv-primary, body[data-lesson="hitotsubu"] .lgv-action { background: #995f22; color: #fff; }
+body[data-lesson="hitotsubu"] .lgv-primary:hover:not(:disabled), body[data-lesson="hitotsubu"] .lgv-action:hover:not(:disabled) { background: #75430f; }
+.lgv-note { margin-top: 16px; min-height: 48px; padding: 12px 15px; background: #e7f2f9; border-left: 6px solid #5b9dc4; border-radius: 12px; line-height: 1.5; }
+body[data-lesson="hitotsubu"] .lgv-note { background: #fff1d4; border-left-color: #d3a24c; }
+.lgv-footer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
+.lgv-discovery { flex: 1 1 300px; margin: 0; line-height: 1.55; }
+.lgv-next { min-width: 205px; }
+.lgv-intro, .lgv-summary { text-align: center; }
+.lgv-intro-art { font-size: clamp(29px, 5vw, 51px); letter-spacing: .1em; }
+.lgv-intro p, .lgv-summary p { line-height: 1.65; }
+.lgv-stars { font-size: clamp(31px, 5vw, 50px); color: #bf810b; letter-spacing: .15em; }
+.lgv-machine { display: grid; justify-items: center; gap: 8px; }
+.lgv-spark { font-size: 26px; }
+.lgv-wheel { width: 90px; height: 90px; border-radius: 50%; border: 8px solid #659b76; font-size: 52px; padding: 0; line-height: 1; color: #205138; background: radial-gradient(circle, #fffdeb 30%, #b1d3a8 31%); transform: rotate(var(--turn, 0deg)); transition: transform .35s ease; }
+.lgv-count { font-size: 18px; }
+.lgv-gauge { height: 17px; width: min(100%, 360px); background: #b5cbb5; border-radius: 99px; overflow: hidden; }
+.lgv-gauge-fill { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #84bd68, #ffd459); transition: width .35s; }
+.lgv-readout { margin: 0; text-align: center; }
+.lgv-observations { margin-top: 13px; min-height: 36px; text-align: center; padding: 8px; border-radius: 10px; background: #fff9df; font-weight: 700; }
+.lgv-wire-world { display: grid; grid-template-columns: 1fr 100px 1fr; align-items: center; gap: 12px; min-height: 180px; }
+.lgv-world-panel { display: grid; place-items: center; min-height: 120px; padding: 12px; border-radius: 17px; background: #fff2b7; font-weight: 800; text-align: center; }
+.lgv-world-panel.is-night { color: #fff; background: #284459; }
+.lgv-wire { text-align: center; color: #e7a22b; font-size: 25px; animation: lgv-flow 1.2s ease-in-out infinite alternate; }
+@keyframes lgv-flow { from { opacity: .35; transform: translateX(-7px); } to { opacity: 1; transform: translateX(7px); } }
+.lgv-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.lgv-clock { display: block; margin: 0 0 14px; text-align: center; }
+.lgv-lamp-card { display: grid; justify-items: center; gap: 8px; padding: 14px; border-radius: 17px; text-align: center; background: #ffefad; box-shadow: 0 0 20px #ffd95860 inset; }
+.lgv-lamp-card.is-off { background: #dbe4e5; box-shadow: none; }
+.lgv-lamp-icon { font-size: 42px; }
+.lgv-lamp-card.is-off .lgv-lamp-icon { filter: grayscale(1); }
+.lgv-meter-wrap { display: grid; grid-template-columns: auto minmax(50px, 1fr) auto; align-items: center; gap: 8px; width: 100%; font-size: 13px; }
+.lgv-meter { height: 15px; background: #b9cbbc; border-radius: 99px; overflow: hidden; }
+.lgv-meter-fill { display: block; height: 100%; background: linear-gradient(90deg, #419f67, #e3c84e); transition: width .3s; }
+.lgv-timeline { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; width: 100%; }
+.lgv-tick { display: grid; justify-items: center; gap: 4px; padding: 10px 2px; border-radius: 12px; background: #fce9b1; color: #4d432b; }
+.lgv-tick.is-night { background: #324b62; color: white; }
+.lgv-tick.is-lit strong { text-shadow: 0 0 11px #ffe270; }
+.lgv-tick small { font-size: 11px; }
+.lgv-simulation { display: grid; gap: 14px; min-height: 155px; align-content: center; }
+.lgv-simulation p { margin: 0; text-align: center; font-weight: 800; }
+.lgv-path { text-align: center; padding: 12px; margin-bottom: 12px; border-radius: 15px; background: linear-gradient(#abcfe7, #618d6f); font-size: clamp(23px, 4vw, 42px); letter-spacing: .08em; }
+.lgv-village-map { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 14px; border-radius: 17px; background: linear-gradient(150deg, #bde2b2, #efcf8c); }
+.lgv-place { min-height: 90px; font-size: 18px; background: #fff9e8; }
+.lgv-visit { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-height: 108px; margin-top: 12px; padding: 12px; border-radius: 14px; background: #fff7df; }
+.lgv-visit h2, .lgv-visit p { margin: 0; }
+.lgv-visit p { flex-basis: 100%; }
+.lgv-visitor { height: 65px; width: 65px; object-fit: contain; }
+.lgv-wish-cards { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.lgv-wish-card { padding: 6px 11px; border-radius: 99px; background: #fff; font-weight: 800; }
+.lgv-history-years { display: flex; flex-wrap: wrap; gap: 7px; }
+.lgv-history-years .lgv-button { flex: 1 1 90px; }
+.lgv-crowd { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; padding: 15px; font-size: clamp(15px, 3vw, 29px); color: #b9a98d; }
+.lgv-crowd .is-eligible { color: #4b8e60; }
+.lgv-history-info { min-height: 95px; padding: 12px; border-radius: 12px; background: #fff9e9; line-height: 1.5; }
+.lgv-history-info p { margin: 4px 0 0; }
+.lgv-small { font-size: 13px; line-height: 1.5; }
+.lgv-booth { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.lgv-booth-part { display: grid; place-items: center; min-height: 145px; padding: 12px; border: 3px dashed #c5b9a0; border-radius: 16px; background: #eee7d9; color: #877c6e; font-size: 19px; text-align: center; }
+.lgv-booth-part.is-placed { border-style: solid; border-color: #9b763f; background: #fff9e9; color: #4d3921; box-shadow: 0 5px 12px #ae854530; }
+.lgv-ballot-result { display: grid; gap: 12px; min-height: 190px; align-content: center; padding: 15px; border-radius: 15px; background: #fffaf0; }
+.lgv-tally { display: grid; gap: 10px; width: 100%; }
+.lgv-tally-row { display: grid; grid-template-columns: 100px minmax(50px, 1fr) 42px; align-items: center; gap: 10px; }
+.lgv-tally-track { height: 20px; border-radius: 99px; overflow: hidden; background: #e5dac3; }
+.lgv-tally-fill { display: block; height: 100%; border-radius: inherit; background: #c4873d; transition: width .45s; }
+.lgv-private-booth { padding: 18px; border-radius: 18px; background: #e9d2a1; border: 4px solid #95672e; }
+.lgv-private-booth p { margin: 0 0 13px; font-weight: 800; }
+.lgv-ballot-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.lgv-ballot-choice { min-height: 85px; background: #fffef6; }
+.lgv-private-booth + .lgv-ballot-result { margin-top: 13px; }
+@media (max-width: 600px) {
+  .lgv-shell { padding: 9px 9px 22px; }
+  .lgv-top { font-size: 12px; margin-bottom: 7px; }
+  .lgv-hero { gap: 9px; padding: 10px; border-radius: 17px; }
+  .lgv-portrait { width: 68px; height: 83px; }
+  .lgv-name { font-size: 12px; padding: 2px 9px; }
+  h1 { font-size: 18px; margin: 3px 0; }
+  .lgv-hero p { font-size: 12px; line-height: 1.45; }
+  .lgv-board { margin-top: 9px; padding: 11px; border-radius: 17px; }
+  .lgv-play { min-height: 205px; padding: 11px; border-radius: 14px; }
+  .lgv-button { padding: 8px; font-size: 13px; min-height: 43px; }
+  .lgv-option { flex-basis: 90px; }
+  .lgv-note { font-size: 13px; margin-top: 10px; padding: 8px; }
+  .lgv-discovery { font-size: 13px; }
+  .lgv-next { width: 100%; }
+  .lgv-wire-world { grid-template-columns: 1fr 36px 1fr; gap: 5px; }
+  .lgv-world-panel { min-height: 125px; font-size: 12px; padding: 5px; }
+  .lgv-wire { font-size: 13px; }
+  .lgv-tick { padding: 6px 1px; font-size: 13px; }
+  .lgv-tick small { font-size: 9px; }
+  .lgv-village-map { padding: 7px; gap: 5px; }
+  .lgv-place { min-height: 64px; font-size: 13px; }
+  .lgv-visit { font-size: 13px; }
+  .lgv-history-info { font-size: 14px; }
+  .lgv-booth { gap: 5px; }
+  .lgv-booth-part { min-height: 100px; padding: 5px; font-size: 13px; }
+  .lgv-tally-row { grid-template-columns: 69px minmax(30px, 1fr) 31px; gap: 5px; font-size: 12px; }
+  .lgv-ballot-choices { grid-template-columns: 1fr; }
+  .lgv-ballot-choice { min-height: 48px; }
+}
