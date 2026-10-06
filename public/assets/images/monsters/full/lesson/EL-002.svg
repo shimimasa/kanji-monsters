@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 130" aria-hidden="true">
+            <ellipse cx="60" cy="120" rx="30" ry="6" fill="rgba(20,40,80,.18)"/>
+            <!-- からだ：投票箱 -->
+            <path d="M28 118 L26 82 Q26 76 32 76 L88 76 Q94 76 94 82 L92 118 Z" fill="#1a3c6e" stroke="#16294a" stroke-width="2"/>
+            <rect x="26" y="76" width="68" height="10" rx="3" fill="#e0a838" stroke="#16294a" stroke-width="2"/>
+            <rect x="52" y="79" width="16" height="4" rx="2" fill="#16294a"/>
+            <!-- とうひょう用紙が のぞく -->
+            <path d="M56 79 L64 79 L62 62 Q60 58 58 62 Z" fill="#fff" stroke="#16294a" stroke-width="1.5"/>
+            <!-- はた -->
+            <path d="M60 6 L60 22" stroke="#16294a" stroke-width="2"/>
+            <path d="M60 6 L76 12 L60 18 Z" fill="#ffe9a8" stroke="#16294a" stroke-width="1.5"/>
+            <!-- あたま -->
+            <circle cx="60" cy="42" r="25" fill="#f6e6c8" stroke="#16294a" stroke-width="2.5"/>
+            <!-- ほっぺ -->
+            <ellipse cx="46" cy="46" rx="5" ry="3.4" fill="#e0876a" opacity=".5"/>
+            <ellipse cx="74" cy="46" rx="5" ry="3.4" fill="#e0876a" opacity=".5"/>
+            <!-- め -->
+            <g class="eyes">
+              <ellipse cx="51" cy="40" rx="3.6" ry="5" fill="#16294a"/>
+              <ellipse cx="69" cy="40" rx="3.6" ry="5" fill="#16294a"/>
+              <circle cx="52.3" cy="37.5" r="1.2" fill="#fff"/>
+              <circle cx="70.3" cy="37.5" r="1.2" fill="#fff"/>
+            </g>
+            <!-- くち -->
+            <path d="M53 54 Q60 59 67 54" stroke="#16294a" fill="none" stroke-width="2" stroke-linecap="round"/>
+          </svg>

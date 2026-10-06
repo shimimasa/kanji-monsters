@@ -3,6 +3,7 @@ import { miniGameRegistry } from '../minigames/registry.js';
 import { gameExperiences } from '../minigames/gameExperiences.js';
 import { supportsShortCourse, courseCountLabel, SHORT_COURSE_COUNTS } from '../minigames/courseLength.js';
 import { gotomonService } from '../minigames/gotomonService.js';
+import { isSaveSessionReady } from '../core/gameState.js';
 import { element, button, companionPortrait, isolateScreen, typeChip } from '../ui/adventureUI.js';
 import { PLAYTEST_ENABLED, trackPlaytest } from '../playtest/developmentLogger.js';
 import { englishLearningService } from '../minigames/englishChoice/englishLearningService.js';
@@ -21,6 +22,8 @@ import { createEvolutionDialog } from '../ui/evolutionDialog.js';
 import { stickerSummary } from '../minigames/companionStickers.js';
 import { GAME_TYPES, typeInfo } from '../minigames/gotomonTypes.js';
 import { miniGameGotomonFor } from '../minigames/miniGameGotomonCatalog.js';
+import { lessonCatalog } from '../lessons/lessonCatalog.js';
+import '../lessons/lessonJourney.css';
 import { supportEffectOf, MAX_SUPPORTERS } from '../minigames/gotomonMoves.js';
 import { stageData, getMonsterById } from '../loaders/dataLoader.js';
 
@@ -134,6 +137,27 @@ const hub = {
         wrap.insertBefore(startHere, wrap.querySelector('.yt-recommendations'));
       }
     }
+    const journey = element(doc, 'section', 'yt-lesson-cards');
+    journey.setAttribute('aria-label', '理科・社会の旅');
+    journey.append(element(doc, 'h2', '', '理科・社会の旅（2）'),
+      element(doc, 'p', '', 'ものがたりを たどって 実験や 町づくりを たいけんしよう。さいごまで あそぶと、その作品のゴトモンが なかまになるよ。'));
+    const journeyGrid = element(doc, 'div', 'yt-lesson-card-grid');
+    const ownedIds = new Set(gotomonService.getOwnedGotomon().map(friend => friend.id));
+    for (const lesson of lessonCatalog) {
+      const card = button(doc, '', () => {
+        if (!isSaveSessionReady()) { this.showLessonSaveGuide(); return; }
+        publish('changeScreen', { name: 'lessonJourney', props: { slug: lesson.slug } });
+      }, 'yt-lesson-card');
+      card.dataset.lessonSlug = lesson.slug;
+      const portrait = element(doc, 'img'); portrait.src = lesson.imageUrl; portrait.alt = '';
+      const copy = element(doc, 'span');
+      const bestStars = ownedIds.has(lesson.id) ? 5 : Math.min(5, Math.max(0, Number(progress.lessonProgress?.[lesson.slug]?.bestStars) || 0));
+      copy.append(element(doc, 'small', '', `${lesson.subject} · ${lesson.gradeLabel}`),
+        element(doc, 'strong', '', lesson.title), element(doc, 'small', '', lesson.topic),
+        element(doc, 'small', '', `${bestStars}/5 こ の星 · ${ownedIds.has(lesson.id) ? `${lesson.name}は なかまだよ！` : `ゴトモン：${lesson.name}`}`));
+      card.append(portrait, copy); journeyGrid.append(card);
+    }
+    journey.append(journeyGrid); wrap.append(journey);
     // The games, by what the child wants to practice: a tab per subject (kept for next time),
     // and on ぜんぶ a section per subject, then the games where the subject is chosen.
     const games = new Map(Object.values(miniGameRegistry).map(definition => [definition.id, definition]));
@@ -193,6 +217,16 @@ const hub = {
     if (PLAYTEST_ENABLED) trackPlaytest('hubShown', {});
     if (props?.notebookContext) this.showLearningNotebook(props.notebookContext);
     if (props?.evolutionId) this.showEvolution(props.evolutionId);
+  },
+  showLessonSaveGuide() {
+    this.dialog?.close(); this.dialog?.remove();
+    const dialog = element(document, 'dialog', 'yt-companion-dialog');
+    dialog.setAttribute('aria-label', '理科・社会の旅の準備');
+    dialog.append(element(document, 'h2', '', '旅の なまえを きめよう'),
+      element(document, 'p', '', 'なまえを きめておくと、授業で なかまになったゴトモンを 図鑑に のこせるよ。'),
+      button(document, 'タイトルへ', () => { dialog.close(); publish('changeScreen', 'title'); }),
+      button(document, '広場に もどる', () => dialog.close()));
+    this.root.append(dialog); this.dialog = dialog; dialog.showModal();
   },
   showSettings() {
     this.dialog?.close(); this.dialog?.remove();

@@ -13,6 +13,7 @@ import menuScreenState     from '../screens/menuScreen.js';
 import { lazyState }       from './lazyState.js';
 const miniGameHost = lazyState(() => import('../minigames/miniGameHost.js'));
 const miniGameHub  = lazyState(() => import('../screens/miniGameHubScreen.js'));
+const lessonJourney = lazyState(() => import('../lessons/lessonJourneyScreen.js'));
 import { loadAllGameData } from '../loaders/dataLoader.js';
 import { subscribe }       from '../core/eventBus.js';
 import settingsState       from '../screens/settingsScreen.js';
@@ -48,6 +49,7 @@ export async function setupFSM() {
     menu:             menuScreenState,
     miniGame:         miniGameHost,
     miniGameHub:      miniGameHub,
+    lessonJourney:    lessonJourney,
     status:           statusScreen,
     achievements:     achievementsScreen,
     gradeSelect:      gradeSelectState,
@@ -90,7 +92,7 @@ export async function setupFSM() {
     console.log(`画面遷移: ${name}, props=`, props); // デバッグログを追加
     
     // 特定の画面名の場合は直接遷移する（安全リスト）
-    const safeScreens = ['title', 'menu', 'miniGame', 'miniGameHub', 'stageSelect', 'stageLoading', 'battle',
+    const safeScreens = ['title', 'menu', 'miniGame', 'miniGameHub', 'lessonJourney', 'stageSelect', 'stageLoading', 'battle',
                         'worldStageSelect', 'continentSelect', 'courseSelect',
                         // 追加
                         'profile',

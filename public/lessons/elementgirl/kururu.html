@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="lesson-bridge.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>クルルの発電所 — 発電・蓄電・センサー たいけん</title>
+<style>
+  .backHome{
+    position:fixed; top:8px; left:8px; z-index:9000;
+    display:inline-flex; align-items:center; gap:.3em;
+    color:#222; text-decoration:none; font-weight:700;
+    font-size:13px; white-space:nowrap;
+    padding:6px 12px; border-radius:999px;
+    background:rgba(255,255,255,.85);
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:background .2s;
+  }
+  .backHome:hover{ background:#fff; }
+  * { box-sizing: border-box; -webkit-user-select: none; user-select: none; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body {
+    background: linear-gradient(180deg, #fffaf0 0%, #fff0c2 45%, #ffdd8a 100%);
+    color: #3a2e10;
+    font-family: "BIZ UDPGothic", "Hiragino Maru Gothic ProN", "Yu Gothic UI", "Meiryo", sans-serif;
+    display: flex; flex-direction: column;
+  }
+  rt { font-size: 0.45em; letter-spacing: 0; }
+
+  /* ---------- ヘッダー ---------- */
+  header {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; gap: 1.2vw;
+    padding: .6vh 1.4vw .3vh;
+  }
+  #logo {
+    font-size: clamp(18px, 2.1vw, 29px); font-weight: 700;
+    color: #2e7d32; text-shadow: 0 0 14px rgba(46, 125, 50, .25);
+    white-space: nowrap;
+  }
+  #logo small { font-size: .55em; color: #b8790a; font-weight: 400; margin-left: .6em; }
+  #badges { display: flex; gap: .5vw; margin-left: auto; }
+  .badge {
+    width: clamp(30px, 3.2vw, 44px); height: clamp(30px, 3.2vw, 44px);
+    display: grid; place-items: center; border-radius: 50%;
+    background: #eaf3e6; border: 2px solid #bcd9bb;
+    font-size: clamp(16px, 1.8vw, 26px); color: #9fbf9d;
+    transition: all .3s;
+  }
+  .badge.on {
+    background: radial-gradient(circle at 35% 30%, #ffe58a, #ffa000);
+    border-color: #b36f00; color: #4a2f00;
+    box-shadow: 0 0 16px rgba(255, 160, 0, .65);
+    animation: pop .5s;
+  }
+  @keyframes pop { 0% { transform: scale(.3); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+  /* ---------- メインレイアウト ---------- */
+  main {
+    position: relative; z-index: 1;
+    flex: 1; display: flex; gap: 1.1vw;
+    padding: .4vh 1.2vw 1.2vh; min-height: 0;
+  }
+  #stageWrap {
+    flex: 1.5; position: relative; min-width: 0;
+    border-radius: 20px;
+    background: radial-gradient(circle at 50% 28%, #fffdf2 0%, #ffe9a0 70%, #ffcf5c 100%);
+    border: 3px solid #f0c96a;
+    box-shadow: inset 0 0 40px rgba(150, 110, 10, .16), 0 4px 18px rgba(120, 90, 10, .22);
+    overflow: hidden;
+  }
+  #stage { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: pointer; }
+  #stageTitle {
+    position: absolute; top: .55vh; left: 1.4vw; pointer-events: none;
+    color: #5c4a12; font-size: clamp(12px, 1.25vw, 17px);
+    max-width: 56%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #locChip {
+    position: absolute; top: .45vh; right: 1.2vw;
+    background: #2e7d32; color: #fffdf2; font-weight: 700;
+    font-size: clamp(13px, 1.4vw, 19px);
+    padding: .26em .8em; border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(20, 60, 10, .3);
+  }
+  /* 操作ボタン */
+  #controls {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    display: flex; flex-wrap: wrap; gap: .4vw; justify-content: center; align-items: center;
+    padding: .8vh .5vw; background: linear-gradient(180deg, transparent, rgba(220, 190, 110, .5) 40%);
+  }
+  .ctl {
+    font-family: inherit; font-size: clamp(13px, 1.4vw, 20px); font-weight: 700;
+    padding: .42em .8em; border-radius: 14px; border: 2px solid #a5d6a7; cursor: pointer;
+    background: linear-gradient(180deg, #66bb6a, #2e7d32); color: #fff;
+    box-shadow: 0 3px 0 #1b5e20; transition: transform .1s, opacity .2s;
+    white-space: nowrap;
+  }
+  .ctl:hover { transform: translateY(-2px); }
+  .ctl:active { transform: translateY(1px); }
+  .ctl:disabled { opacity: .3; cursor: default; transform: none; }
+  .ctl.warn { background: linear-gradient(180deg, #ff8a50, #e65100); border-color: #ffcc80; box-shadow: 0 3px 0 #8a3200; }
+
+  #side { flex: 1; display: flex; flex-direction: column; gap: .7vh; min-width: 280px; padding-bottom: 32px; }
+  #scopeWrap {
+    position: relative; width: min(100%, 25vh); aspect-ratio: 1;
+    margin: 0 auto; border-radius: 50%;
+    border: 4px solid #ffb300; overflow: hidden;
+    box-shadow: 0 3px 14px rgba(120, 90, 10, .28), inset 0 0 24px rgba(180, 140, 10, .14);
+    flex-shrink: 0; background: #fffaf0;
+  }
+  #scope { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #scopeCaption {
+    text-align: center; color: #7a6420;
+    font-size: clamp(11px, 1.15vw, 15px); margin-top: .3vh;
+  }
+  #stateName {
+    text-align: center; font-weight: 700;
+    font-size: clamp(16px, 1.8vw, 25px);
+    color: #2e7d32; min-height: 1.3em; line-height: 1.35;
+  }
+
+  /* ---------- ミッションカード ---------- */
+  #missionCard {
+    flex: 1; min-height: 0; display: flex; flex-direction: column; gap: .6vh;
+    background: #fdfdf3d9; border: 2px solid #d7ecd2; border-radius: 18px;
+    padding: .8vh .9vw; overflow-y: auto;
+  }
+  #catRow { display: flex; gap: .7vw; align-items: flex-start; }
+  #catBox { flex-shrink: 0; width: clamp(64px, 6.5vw, 96px); text-align: center; }
+  #catBox .catname { font-size: clamp(11px, 1vw, 14px); color: #6b5a1e; }
+  .mascot { width: 100%; animation: floaty 3.7s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  .mascot .eyes { transform-box: fill-box; transform-origin: center; animation: blink 4.5s infinite; }
+  @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+
+  #bubble {
+    flex: 1; background: #fff; color: #3a2e10;
+    border: 1.5px solid #d7ecd2;
+    border-radius: 16px; padding: .55em .85em; position: relative;
+    font-size: clamp(14px, 1.4vw, 20px); line-height: 1.6;
+    animation: fadeUp .35s;
+  }
+  #bubble::before {
+    content: ""; position: absolute; left: -10px; top: 26px;
+    border: 7px solid transparent; border-right-color: #fff;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  #bubble b { color: #2e7d32; background: #eaf3e6; padding: 0 .2em; border-radius: 4px; }
+
+  #wishCard {
+    display: none; align-items: center; gap: .7vw;
+    background: linear-gradient(180deg, #fbfff2, #eef7e0); color: #204020;
+    border: 2px solid #2e7d32; border-radius: 6px;
+    padding: .4em .7em; font-size: clamp(13px, 1.35vw, 19px); line-height: 1.55;
+    animation: fadeUp .35s; position: relative;
+  }
+  #wishCard .icon { font-size: clamp(26px, 3vw, 42px); flex-shrink: 0; }
+  #wishCard .wtitle { font-size: .75em; color: #2e7d32; font-weight: 700; }
+
+  #btnRow { display: flex; flex-wrap: wrap; gap: .6vw .8vw; justify-content: center; }
+  .btn {
+    font-family: inherit; font-size: clamp(15px, 1.6vw, 22px); font-weight: 700;
+    padding: .45em 1.2em; border-radius: 999px; border: none; cursor: pointer;
+    background: linear-gradient(180deg, #66bb6a, #2e7d32); color: #fffdf2;
+    box-shadow: 0 3px 0 #1b5e20, 0 5px 12px rgba(20, 60, 10, .3);
+    transition: transform .1s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #1b5e20; }
+  .btn.sub {
+    background: #eaf3e6; color: #245a28; box-shadow: 0 3px 0 #c8e6c9;
+    font-weight: 400; font-size: clamp(14px, 1.4vw, 19px);
+  }
+  .btn.choice { background: #fff; color: #3a2e10; box-shadow: 0 3px 0 #cfe6cf; font-weight: 400; border: 1.5px solid #d7ecd2; }
+  .btn.choice.picked { background: #eaf3e6; outline: 3px solid #66bb6a; font-weight: 700; }
+
+  /* ---------- オーバーレイ ---------- */
+  #overlay {
+    position: fixed; inset: 0; z-index: 50; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(30, 40, 10, .78);
+  }
+  #overlay.show { display: flex; }
+  .panel {
+    max-width: min(900px, 94vw); max-height: 94vh; overflow-y: auto;
+    background: linear-gradient(180deg, #fffdf5, #fff0cf);
+    border: 3px solid #f0c96a; border-radius: 22px;
+    padding: 2.4vh 3vw; text-align: center;
+    box-shadow: 0 10px 50px rgba(60, 40, 0, .4);
+    animation: fadeUp .4s;
+  }
+  .panel h1 {
+    margin: .1em 0; font-size: clamp(28px, 4.6vw, 54px);
+    color: #2e7d32; text-shadow: 0 2px 0 #fff;
+    letter-spacing: .04em;
+  }
+  .panel h2 { margin: 0 0 .3em; font-size: clamp(20px, 2.6vw, 32px); color: #2e7d32; }
+  .panel .sub { color: #7a6420; font-size: clamp(14px, 1.6vw, 21px); margin-bottom: 1.5vh; }
+  .panel p.talk {
+    background: #fff; color: #3a2e10; border: 1.5px solid #d7ecd2; border-radius: 16px;
+    padding: .5em .8em; font-size: clamp(14px, 1.55vw, 20px); line-height: 1.6;
+    text-align: left; margin: .6vh auto; max-width: 660px;
+  }
+  .panel .foot { color: #7a6420; font-size: clamp(11px, 1.1vw, 14px); margin-top: 1.6vh; }
+  .phasesStrip { font-size: clamp(20px, 2.6vw, 34px); letter-spacing: .3em; margin: .2vh 0; }
+
+  .voteCards { display: flex; gap: 1vw; justify-content: center; flex-wrap: wrap; margin: 1.5vh 0; }
+  .vcard {
+    width: clamp(170px, 24vw, 250px); cursor: pointer;
+    background: #fff; color: #3a2e10; border-radius: 14px;
+    padding: 1.1em .8em; font-size: clamp(14px, 1.5vw, 20px); line-height: 1.6;
+    border: 3px solid #d7ecd2; position: relative; transition: transform .12s;
+  }
+  .vcard:hover { transform: translateY(-3px); }
+  .vcard .vicon { font-size: clamp(30px, 3.6vw, 52px); display: block; margin-bottom: .2em; }
+  .vcard.picked { border-color: #66bb6a; background: #eef7e0; }
+  .vcard.picked::after {
+    content: "✔"; position: absolute; top: -14px; right: -8px;
+    background: #66bb6a; color: #fff; width: 34px; height: 34px; line-height: 34px;
+    border-radius: 50%; font-size: 20px; box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  }
+  #blankArea span.blankWord {
+    display: inline-block; min-width: 3.2em; border-bottom: 3px solid #2e7d32;
+    color: #2e7d32; font-weight: 700; cursor: pointer; text-align: center;
+  }
+
+  /* ---------- エフェクト・先生バー ---------- */
+  #fx { position: fixed; inset: 0; z-index: 70; pointer-events: none; display: none; }
+  #teacherBar {
+    position: fixed; right: 8px; bottom: 6px; z-index: 60;
+    display: flex; gap: 6px; align-items: center;
+    opacity: .4; transition: opacity .2s; font-size: 12px; color: #7a6420;
+  }
+  #teacherBar:hover { opacity: 1; }
+  #teacherBar button {
+    font-family: inherit; background: #eaf3e6; color: #245a28;
+    border: 1px solid #bcd9bb; border-radius: 8px;
+    padding: 4px 10px; cursor: pointer; font-size: 13px;
+  }
+  #teacherBar button:hover { background: #d7ecd2; }
+</style>
+<link rel="stylesheet" href="lesson-mobile.css">
+</head>
+<body>
+<script>
+/* === 施設PC/古ブラウザ対策 安全スクリプト（ES5で記述） ===
+   ・JSエラーを画面に赤字表示 → 「白画面で原因不明」を防ぐ
+   ・ctx.roundRect ポリフィル（Edge/Chrome 99未満で無く白画面になる対策） */
+(function () {
+  function showErr(msg) {
+    try {
+      var d = document.getElementById('__err');
+      if (!d) {
+        d = document.createElement('div');
+        d.id = '__err';
+        d.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:99999;background:#101426;color:#ffdada;font:14px/1.7 monospace;padding:18px;overflow:auto;white-space:pre-wrap';
+        (document.body || document.documentElement).appendChild(d);
+      }
+      d.appendChild(document.createTextNode('⚠ ' + msg + '\n'));
+    } catch (e) {}
+  }
+  window.addEventListener('error', function (e) {
+    showErr((e && e.message ? e.message : 'error') + '  @line ' + (e && e.lineno ? e.lineno : '?'));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    showErr('Promise: ' + (e && e.reason ? e.reason : ''));
+  });
+  try {
+    var P = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;
+    if (P && !P.roundRect) {
+      P.roundRect = function (x, y, w, h, r) {
+        var a;
+        if (typeof r === 'number') { a = [r, r, r, r]; }
+        else if (r && r.length) {
+          if (r.length === 1) { a = [r[0], r[0], r[0], r[0]]; }
+          else if (r.length === 2) { a = [r[0], r[1], r[0], r[1]]; }
+          else if (r.length === 3) { a = [r[0], r[1], r[2], r[1]]; }
+          else { a = [r[0], r[1], r[2], r[3]]; }
+        } else { a = [0, 0, 0, 0]; }
+        var m = Math.min(Math.abs(w), Math.abs(h)) / 2;
+        var tl = Math.min(a[0], m), tr = Math.min(a[1], m), br = Math.min(a[2], m), bl = Math.min(a[3], m);
+        this.moveTo(x + tl, y);
+        this.arcTo(x + w, y, x + w, y + h, tr);
+        this.arcTo(x + w, y + h, x, y + h, br);
+        this.arcTo(x, y + h, x, y, bl);
+        this.arcTo(x, y, x + w, y, tl);
+        this.closePath();
+        return this;
+      };
+    }
+  } catch (e) {}
+})();
+</script>
+
+<header>
+  <div id="logo">⚡ クルルの発電所<small>— 発電・蓄電・センサー —</small></div>
+  <div id="badges">
+    <div class="badge" id="bd_m_hatsuden" title="発電してみよう">★</div>
+    <div class="badge" id="bd_m_chikuden" title="ためて使おう">★</div>
+    <div class="badge" id="bd_m_mameled" title="豆電球とLED">★</div>
+    <div class="badge" id="bd_m_sensor" title="センサーで守ろう">★</div>
+    <div class="badge" id="bd_hakase" title="はかせ">★</div>
+  </div>
+</header>
+
+<main>
+  <section id="stageWrap">
+    <canvas id="stage"></canvas>
+    <div id="stageTitle">クルルの発電所</div>
+    <div id="locChip">はつでんじょ</div>
+    <div id="controls"></div>
+  </section>
+
+  <aside id="side">
+    <div id="scopeWrap">
+      <canvas id="scope"></canvas>
+    </div>
+    <div id="scopeCaption">🔍 クルルレンズ 〜見えない電気の量を見る〜</div>
+    <div id="stateName"></div>
+    <div id="missionCard">
+      <div id="catRow">
+        <div id="catBox">
+          <svg class="mascot" viewBox="0 0 120 130" aria-hidden="true">
+            <ellipse cx="60" cy="122" rx="28" ry="6" fill="rgba(60,40,0,.16)"/>
+            <circle cx="60" cy="72" r="40" fill="#2e7d32" stroke="#1b5e20" stroke-width="2.5"/>
+            <path d="M22 74 a38 38 0 0 1 76 0" fill="none" stroke="#ffd54f" stroke-width="4" stroke-linecap="round" opacity=".85"/>
+            <path d="M28 86 a32 26 0 0 0 64 0" fill="none" stroke="#ffd54f" stroke-width="3.4" stroke-linecap="round" opacity=".7"/>
+            <line x1="97" y1="72" x2="112" y2="58" stroke="#8d6e63" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="112" cy="58" r="6.5" fill="#bdbdbd" stroke="#616161" stroke-width="1.6"/>
+            <circle cx="60" cy="44" r="23" fill="#fffef2" stroke="#c98a12" stroke-width="2.5"/>
+            <ellipse cx="47" cy="50" rx="5" ry="3.2" fill="#ffd54f" opacity=".5"/>
+            <ellipse cx="73" cy="50" rx="5" ry="3.2" fill="#ffd54f" opacity=".5"/>
+            <g class="eyes">
+              <circle cx="51" cy="42" r="5" fill="#fff"/>
+              <circle cx="69" cy="42" r="5" fill="#fff"/>
+              <circle cx="51.6" cy="42.6" r="2.9" fill="#204020"/>
+              <circle cx="69.6" cy="42.6" r="2.9" fill="#204020"/>
+              <circle cx="52.8" cy="40.8" r="1" fill="#fff"/>
+              <circle cx="70.8" cy="40.8" r="1" fill="#fff"/>
+            </g>
+            <path d="M48 56 Q60 62 72 56" fill="none" stroke="#204020" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M55 6 L63 6 L58 16 L65 16 L52 30 L56 18 L49 18 Z" fill="#ffd54f" stroke="#c98a12" stroke-width="1"/>
+          </svg>
+          <div class="catname">手回し発電機の<ruby>精霊<rt>せいれい</rt></ruby> クルル</div>
+        </div>
+        <div id="bubble"></div>
+      </div>
+      <div id="wishCard">
+        <span class="icon"></span>
+        <span class="wtext"><span class="wtitle">⚡ クルルの発電所ミッション</span><br><span class="wbody"></span></span>
+      </div>
+      <div id="btnRow"></div>
+    </div>
+  </aside>
+</main>
+
+<div id="overlay"><div class="panel" id="panelBody"></div></div>
+<canvas id="fx"></canvas>
+
+<div id="teacherBar">
+  <span>せんせい用</span>
+  <button id="tbSound" title="音のオン・オフ">🔊</button>
+  <button id="tbPrev" title="ひとつ前へ">◀ まえ</button>
+  <button id="tbNext" title="次へ（スキップ）">つぎ ▶</button>
+  <button id="tbReset" title="さいしょからやりなおす">↺</button>
+</div>
+
+<script>
+'use strict';
+/* =====================================================
+   クルルの発電所 — 電気の利用（小6理科・協力型・1ファイル）
+   発電してみよう（メイン操作・数値階段①〜⑦）→
+   ためて使おう（メイン操作・時間送り①〜⑦）→
+   豆電球とLED（メイン操作・時間送り①〜⑦・比較）→
+   センサーで守ろう（発見型）→ はかせ（身のまわりの利用）。
+   数値：手回し発電機は速く回すほど電圧が大きくなる（1秒に2〜3回が目安）、
+   白色LEDは2.5〜2.7Vで点灯、コンデンサーにためた電気で比べると
+   豆電球はやく30秒で消え、LEDは5分(300秒)たってもついている。
+   ===================================================== */
+
+// ---------- ユーティリティ ----------
+const $ = id => document.getElementById(id);
+const TAU = Math.PI * 2;
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ruby = (k, f) => `<ruby>${k}<rt>${f}</rt></ruby>`;
+function easeInOut(x) { return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2; }
+function lerpArr(arr, floatIdx) {
+  const last = arr.length - 1;
+  const i0 = clamp(Math.floor(floatIdx), 0, last), i1 = clamp(Math.ceil(floatIdx), 0, last), f = floatIdx - i0;
+  return arr[i0] + (arr[i1] - arr[i0]) * f;
+}
+
+const W = {
+  hatsuden: ruby('発電', 'はつでん'),
+  hatsudenki: ruby('発電機', 'はつでんき'),
+  chikuden: ruby('蓄電', 'ちくでん'),
+  denatsu: ruby('電圧', 'でんあつ'),
+  denki: ruby('電気', 'でんき'),
+  mame: ruby('豆電球', 'まめでんきゅう'),
+  led: 'LED（' + ruby('発光', 'はっこう') + 'ダイオード）',
+  jinkan: ruby('人感', 'じんかん'),
+  seirei: ruby('精霊', 'せいれい'),
+  bousai: ruby('防災', 'ぼうさい'),
+  seigyo: ruby('制御', 'せいぎょ'),
+};
+
+const NUMS = '①②③④⑤⑥⑦⑧';
+
+// ---------- 数値データ（本物度） ----------
+// m_hatsuden：発電してみよう（メイン操作・数値階段①〜⑦、単位V）
+// 手回し発電機は回す速さを上げるほど電圧が大きくなる。目標2.5V以上（白色LEDが光る電圧の目安）
+const HATSUDEN_V = [0, 0.8, 1.4, 2.0, 2.6, 3.2, 3.8, 4.4];
+const HATSUDEN_TARGET = 2.5;
+function hatsudenState(v) {
+  if (v >= HATSUDEN_TARGET) return { ok: true, label: 'しっかり 光っている！（目ひょう達成）' };
+  if (v >= 1.2) return { ok: false, label: 'すこし 光っている' };
+  return { ok: false, label: 'ほとんど 光っていない' };
+}
+
+// m_chikuden：ためて使おう（メイン操作・時間送り①〜⑦、単位%）
+const CHIKUDEN_STEPS = [0, 14, 26, 38, 52, 66, 82, 100];
+
+// m_mameled：豆電球とLED（メイン操作・時間送り①〜⑦、経過秒）
+// 豆電球はやく30秒で消え、LEDは5分(300秒)たってもついているという実験結果を再現
+const TIME_STEPS = [0, 5, 10, 20, 30, 60, 120, 300];
+function mameCharge(t) { return clamp(100 - (t / 30) * 100, 0, 100); }
+function ledCharge(t) { return clamp(100 - (t / 1800) * 100, 0, 100); }
+
+// m_sensor：センサーで守ろう（発見型）
+const SENSOR_CARDS = [
+  { key: 0, num: '①', icon: '💡', name: 'あかるさセンサー', txt: 'まわりが 暗くなったら → 自動で 電気が つく。明るい 昼間は つかないので、むだな 電気を 使わない。' },
+  { key: 1, num: '②', icon: '🚶', name: `${W.jinkan}センサー`, txt: '人が 近づくと → 自動で 電気が つく。人が いなくなると → 自動で 消える。つけっぱなしを ふせぐ。' },
+  { key: 2, num: '③', icon: '🌡️', name: '温度センサー', txt: 'へやが あつくなったら → れいぼうが 自動で 動きだす。ちょうどよい 温度に たもつ。' },
+  { key: 3, num: '④', icon: '⏱️', name: 'タイマー', txt: 'きめた 時間が たったら → 自動で 電気を 消す。消しわすれを ふせぐ。' },
+];
+
+// ---------- はかせチャレンジ：身のまわりの発電・蓄電・センサー ----------
+const HAKASE_POINTS = [
+  { key: 0, letter: 'あ', icon: '☀️', name: '太陽光発電', txt: '屋根の 光電池(ソーラーパネル)に 日光が 当たると 発電する。晴れの日は たくさん、くもりの日は 少ししか 発電できない。' },
+  { key: 1, letter: 'い', icon: '💨', name: '風力発電', txt: '大きな 羽根(はね)が 風で 回る 力を 使って 発電する。風の 強い 海の近くや 山の上に 多い。' },
+  { key: 2, letter: 'う', icon: '🔋', name: 'モバイルバッテリー', txt: '外出先で スマートフォンなどを 充電できる、持ち運べる 蓄電池。あらかじめ 電気を ためて おける。' },
+  { key: 3, letter: 'え', icon: '🚪', name: '自動ドア・センサーライト', txt: '人が 近づくと センサーが 感じて、自動で ドアが開いたり 電気が ついたりする。' },
+];
+
+// ---------- 状態 ----------
+const S = {
+  stepIndex: 0,
+  scene: 'hatsuden',
+  scope: { type: 'idle' },
+  sound: Number(localStorage.getItem('seVolume') ?? 0.8) > 0,
+  votePicked: new Set(),
+  badges: new Set(),
+  tween: null,
+  phase: '',
+  // m_hatsuden
+  hatsudenIdx: 0,
+  hatsudenIdxDisplay: 0,
+  // m_chikuden
+  chikudenIdx: 0,
+  chikudenIdxDisplay: 0,
+  // m_mameled
+  mameIdx: 0,
+  mameIdxDisplay: 0,
+  // m_sensor
+  sensorFound: new Set(),
+  // hakase
+  hakaseFound: new Set(),
+};
+
+// ---------- 音 ----------
+let AC = null;
+function ac() {
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  if (AC && AC.state === 'suspended') AC.resume();
+  return AC;
+}
+function tone(freq, delay, dur, type, vol) {
+  const c = ac(); if (!c || !S.sound) return;
+  const t0 = c.currentTime + delay;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type || 'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0, t0);
+  const savedVolume = Number(localStorage.getItem('seVolume') ?? 0.8);
+  const lessonVolume = Number.isFinite(savedVolume) ? Math.max(0, Math.min(1, savedVolume)) : 0.8;
+  g.gain.linearRampToValueAtTime((vol || 0.12) * lessonVolume, t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(t0); o.stop(t0 + dur + 0.05);
+}
+const sTap = () => tone(660, 0, 0.09, 'triangle', 0.07);
+const sYes = () => [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, i * 0.09, 0.5, 'triangle', 0.11));
+const sHmm = () => { tone(392, 0, 0.18, 'sine', 0.07); tone(349, 0.16, 0.3, 'sine', 0.07); };
+const sFanfare = () => [523, 587, 659, 784, 880, 1046, 1318, 1568].forEach((f, i) => tone(f, i * 0.08, 0.45, 'triangle', 0.1));
+const sZap = () => { tone(880, 0, 0.08, 'square', 0.05); tone(1200, 0.05, 0.06, 'square', 0.04); };
+
+// ---------- キャンバス ----------
+const stageCv = $('stage'), scopeCv = $('scope'), fxCv = $('fx');
+const gctx = stageCv.getContext('2d'), sctx = scopeCv.getContext('2d'), fctx = fxCv.getContext('2d');
+function fitCanvas(cv) {
+  const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  return { w: r.width, h: r.height, dpr };
+}
+
+// ---------- 座標変換 ----------
+const PAD_T = 54, PAD_B = 60, PAD_X = 10;
+const MAPW = 1000, MAPH = 640;
+function mapTransform(w, h) {
+  const sc = Math.min((w - PAD_X * 2) / MAPW, (h - PAD_T - PAD_B) / MAPH);
+  const ox = PAD_X + (w - PAD_X * 2 - MAPW * sc) / 2;
+  const oy = PAD_T + (h - PAD_T - PAD_B - MAPH * sc) / 2;
+  return { sc, ox, oy };
+}
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function bgFill(X, Y, sc) {
+  const g = gctx.createLinearGradient(0, Y(0), 0, Y(640));
+  g.addColorStop(0, '#fffaf0'); g.addColorStop(1, '#ffdd8a');
+  gctx.fillStyle = g; gctx.fillRect(X(0), Y(0), 1000 * sc, 640 * sc);
+  gctx.fillStyle = '#fff3d2';
+  gctx.fillRect(X(0), Y(520), 1000 * sc, 120 * sc);
+}
+
+// ---------- 手回し発電機の共通描画 ----------
+function drawGenerator(X, Y, sc, cx, cy, spinAngle, glowT) {
+  gctx.fillStyle = '#eceff1'; gctx.strokeStyle = '#455a64'; gctx.lineWidth = 2.4 * sc;
+  roundRect(gctx, X(cx - 55), Y(cy - 35), 110 * sc, 70 * sc, 10 * sc);
+  gctx.fill(); gctx.stroke();
+  gctx.save();
+  gctx.translate(X(cx + 40), Y(cy));
+  gctx.rotate(spinAngle);
+  gctx.strokeStyle = '#8d6e63'; gctx.lineWidth = 5 * sc; gctx.lineCap = 'round';
+  gctx.beginPath(); gctx.moveTo(0, 0); gctx.lineTo(26 * sc, 0); gctx.stroke();
+  gctx.beginPath(); gctx.arc(26 * sc, 0, 7 * sc, 0, TAU); gctx.fillStyle = '#bdbdbd'; gctx.fill();
+  gctx.strokeStyle = '#616161'; gctx.lineWidth = 1.6 * sc; gctx.stroke();
+  gctx.restore();
+  gctx.beginPath(); gctx.arc(X(cx + 40), Y(cy), 8 * sc, 0, TAU); gctx.fillStyle = '#455a64'; gctx.fill();
+  gctx.fillStyle = '#3a2e10'; gctx.font = `700 ${13 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+  gctx.fillText('手回し発電機', X(cx), Y(cy + 50));
+  if (glowT > 0.02) {
+    gctx.save(); gctx.globalAlpha = glowT;
+    gctx.shadowColor = '#ffd54f'; gctx.shadowBlur = 14 * sc;
+    gctx.strokeStyle = '#ffb300'; gctx.lineWidth = 3 * sc;
+    gctx.beginPath(); gctx.moveTo(X(cx + 55), Y(cy)); gctx.lineTo(X(cx + 150), Y(cy)); gctx.stroke();
+    gctx.restore();
+  }
+}
+function drawBulb(X, Y, sc, cx, cy, brightness, kind) {
+  const b = clamp(brightness, 0, 1);
+  if (kind === 'led') {
+    if (b > 0.03) {
+      gctx.save(); gctx.globalAlpha = 0.5 * b;
+      const g = gctx.createRadialGradient(X(cx), Y(cy), 0, X(cx), Y(cy), 48 * sc);
+      g.addColorStop(0, '#dcffff'); g.addColorStop(1, 'rgba(200,255,255,0)');
+      gctx.fillStyle = g; gctx.beginPath(); gctx.arc(X(cx), Y(cy), 48 * sc, 0, TAU); gctx.fill();
+      gctx.restore();
+    }
+    gctx.fillStyle = b > 0.03 ? `rgba(170,235,255,${0.5 + 0.5 * b})` : '#cfd8dc';
+    gctx.strokeStyle = '#37474f'; gctx.lineWidth = 2 * sc;
+    gctx.beginPath(); gctx.arc(X(cx), Y(cy - 4), 16 * sc, Math.PI, 0);
+    gctx.lineTo(X(cx) + 16 * sc, Y(cy) + 16 * sc); gctx.lineTo(X(cx) - 16 * sc, Y(cy) + 16 * sc); gctx.closePath();
+    gctx.fill(); gctx.stroke();
+    gctx.fillStyle = '#9e9e9e'; gctx.fillRect(X(cx) - 7 * sc, Y(cy) + 16 * sc, 14 * sc, 9 * sc);
+  } else {
+    if (b > 0.03) {
+      gctx.save(); gctx.globalAlpha = 0.55 * b;
+      const g = gctx.createRadialGradient(X(cx), Y(cy), 0, X(cx), Y(cy), 52 * sc);
+      g.addColorStop(0, '#fff3b0'); g.addColorStop(1, 'rgba(255,220,120,0)');
+      gctx.fillStyle = g; gctx.beginPath(); gctx.arc(X(cx), Y(cy), 52 * sc, 0, TAU); gctx.fill();
+      gctx.restore();
+    }
+    gctx.fillStyle = b > 0.03 ? `rgba(255,220,120,${0.55 + 0.45 * b})` : '#e6e0d0';
+    gctx.strokeStyle = '#8d6e63'; gctx.lineWidth = 2 * sc;
+    gctx.beginPath(); gctx.arc(X(cx), Y(cy), 19 * sc, 0, TAU); gctx.fill(); gctx.stroke();
+    gctx.fillStyle = b > 0.03 ? '#e65100' : '#a09070';
+    gctx.beginPath(); gctx.arc(X(cx), Y(cy), 4 * sc, 0, TAU); gctx.fill();
+    gctx.fillStyle = '#9e9e9e'; gctx.fillRect(X(cx) - 8 * sc, Y(cy) + 19 * sc, 16 * sc, 10 * sc);
+  }
+}
+function drawCapacitor(X, Y, sc, cx, cy, pct, label) {
+  const w = 58, h = 92;
+  gctx.strokeStyle = '#455a64'; gctx.lineWidth = 2.4 * sc;
+  roundRect(gctx, X(cx - w / 2), Y(cy - h / 2), w * sc, h * sc, 8 * sc);
+  gctx.fillStyle = '#fff'; gctx.fill(); gctx.stroke();
+  gctx.save();
+  roundRect(gctx, X(cx - w / 2), Y(cy - h / 2), w * sc, h * sc, 8 * sc); gctx.clip();
+  const fh = h * (clamp(pct, 0, 100) / 100);
+  gctx.fillStyle = pct >= 100 ? '#66bb6a' : '#ffca28';
+  gctx.fillRect(X(cx - w / 2), Y(cy + h / 2 - fh), w * sc, fh * sc);
+  gctx.restore();
+  gctx.fillStyle = '#3a2e10'; gctx.font = `700 ${13 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+  gctx.fillText(label || 'コンデンサー', X(cx), Y(cy + h / 2 + 20));
+  gctx.font = `700 ${16 * sc}px sans-serif`;
+  gctx.fillText(Math.round(pct) + '%', X(cx), Y(cy));
+}
+
+// ---------- 1．発電してみよう（メイン操作・数値階段①〜⑦） ----------
+function drawHatsudenScene(X, Y, sc, t) {
+  bgFill(X, Y, sc);
+  const v = lerpArr(HATSUDEN_V, S.hatsudenIdxDisplay);
+  const st = hatsudenState(v);
+  const spin = t * (0.6 + v * 0.7);
+  drawGenerator(X, Y, sc, 300, 340, spin, clamp(v / HATSUDEN_TARGET, 0, 1));
+  drawBulb(X, Y, sc, 650, 300, clamp(v / HATSUDEN_TARGET, 0, 1), 'mame');
+  gctx.fillStyle = '#3a2e10'; gctx.font = `700 ${20 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+  const idxNow = Math.round(S.hatsudenIdxDisplay);
+  gctx.fillText(`${idxNow === 0 ? 'スタート' : NUMS[idxNow - 1]}　電圧 ${v.toFixed(1)}V`, X(500), Y(60));
+  gctx.font = `700 ${15 * sc}px sans-serif`; gctx.fillStyle = st.ok ? '#2e7d32' : '#7a6420';
+  gctx.fillText(st.label + `（目ひょう ${HATSUDEN_TARGET}V いじょう）`, X(500), Y(460));
+}
+
+// ---------- 2．ためて使おう（メイン操作・時間送り①〜⑦） ----------
+function drawChikudenScene(X, Y, sc, t) {
+  bgFill(X, Y, sc);
+  const pct = lerpArr(CHIKUDEN_STEPS, S.chikudenIdxDisplay);
+  drawGenerator(X, Y, sc, 240, 280, t * 1.3, clamp(pct / 100, 0.15, 1));
+  drawCapacitor(X, Y, sc, 560, 300, pct, 'コンデンサー');
+  gctx.fillStyle = '#3a2e10'; gctx.font = `700 ${20 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+  const idxNow = Math.round(S.chikudenIdxDisplay);
+  gctx.fillText(`${idxNow === 0 ? 'スタート' : NUMS[idxNow - 1]}　ちくでんりょう ${Math.round(pct)}%`, X(500), Y(60));
+  gctx.font = `700 ${15 * sc}px sans-serif`; gctx.fillStyle = '#7a6420';
+  gctx.fillText('目ひょう：100%まで ためよう', X(500), Y(470));
+}
+
+// ---------- 3．豆電球とLED（メイン操作・時間送り①〜⑦・比較） ----------
+function drawMameledScene(X, Y, sc) {
+  bgFill(X, Y, sc);
+  const tsec = lerpArr(TIME_STEPS, S.mameIdxDisplay);
+  const mp = mameCharge(tsec), lp = ledCharge(tsec);
+  drawCapacitor(X, Y, sc, 260, 380, mp, W.mame.replace(/<[^>]+>/g, ''));
+  drawBulb(X, Y, sc, 260, 190, mp / 100, 'mame');
+  drawCapacitor(X, Y, sc, 720, 380, lp, 'LED');
+  drawBulb(X, Y, sc, 720, 190, lp / 100, 'led');
+  gctx.strokeStyle = '#c98a12'; gctx.lineWidth = 2 * sc; gctx.setLineDash([4 * sc, 4 * sc]);
+  gctx.beginPath(); gctx.moveTo(X(500), Y(110)); gctx.lineTo(X(500), Y(480)); gctx.stroke();
+  gctx.setLineDash([]);
+  gctx.fillStyle = '#3a2e10'; gctx.font = `700 ${20 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+  const idxNow = Math.round(S.mameIdxDisplay);
+  gctx.fillText(`${idxNow === 0 ? 'スタート' : NUMS[idxNow - 1]}　けいか じかん ${Math.round(tsec)}びょう`, X(500), Y(60));
+}
+
+// ---------- 4．センサーで守ろう（発見型） ----------
+function drawSensorScene(X, Y, sc) {
+  bgFill(X, Y, sc);
+  const xs = [180, 380, 620, 820];
+  SENSOR_CARDS.forEach((c, i) => {
+    const done = S.sensorFound.has(c.key);
+    const px = xs[i], py = 300;
+    gctx.beginPath(); gctx.arc(X(px), Y(py), 46 * sc, 0, TAU);
+    gctx.fillStyle = done ? '#2e7d32' : '#eee7cf';
+    gctx.fill(); gctx.strokeStyle = '#c98a12'; gctx.lineWidth = 2.4 * sc; gctx.stroke();
+    gctx.font = `${34 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+    gctx.fillText(c.icon, X(px), Y(py - 2));
+    gctx.fillStyle = '#3a2e10'; gctx.font = `700 ${13 * sc}px sans-serif`;
+    gctx.fillText(c.num + ' ' + c.name.replace(/<[^>]+>/g, ''), X(px), Y(py + 62));
+  });
+  gctx.fillStyle = '#3a2e10'; gctx.font = `700 ${17 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+  gctx.fillText('①〜④をタッチして、かしこいセンサーを見つけよう', X(500), Y(70));
+}
+
+// ---------- 5．はかせ：身のまわりの発電・蓄電・センサー ----------
+function drawHakaseScene(X, Y, sc) {
+  bgFill(X, Y, sc);
+  const xs = [180, 380, 620, 820];
+  HAKASE_POINTS.forEach((p, i) => {
+    const done = S.hakaseFound.has(p.key);
+    const px = xs[i], py = 300;
+    gctx.beginPath(); gctx.arc(X(px), Y(py), 46 * sc, 0, TAU);
+    gctx.fillStyle = done ? '#2e7d32' : '#eee7cf';
+    gctx.fill(); gctx.strokeStyle = '#c98a12'; gctx.lineWidth = 2.4 * sc; gctx.stroke();
+    gctx.font = `${34 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+    gctx.fillText(p.icon, X(px), Y(py - 2));
+    gctx.fillStyle = '#3a2e10'; gctx.font = `700 ${13 * sc}px sans-serif`;
+    gctx.fillText(p.letter + ' ' + p.name, X(px), Y(py + 62));
+  });
+  gctx.fillStyle = '#3a2e10'; gctx.font = `700 ${17 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+  gctx.fillText('電気は 身のまわりの いろいろな ところで 使われている', X(500), Y(70));
+}
+
+// ---------- ステージ描画 ----------
+function drawStage(t, dt) {
+  const { w, h, dpr } = fitCanvas(stageCv);
+  gctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  gctx.clearRect(0, 0, w, h);
+  const { sc, ox, oy } = mapTransform(w, h);
+  const X = x => ox + x * sc, Y = y => oy + y * sc;
+  if (S.scene === 'hatsuden') drawHatsudenScene(X, Y, sc, t);
+  else if (S.scene === 'chikuden') drawChikudenScene(X, Y, sc, t);
+  else if (S.scene === 'mameled') drawMameledScene(X, Y, sc);
+  else if (S.scene === 'sensor') drawSensorScene(X, Y, sc);
+  else if (S.scene === 'hakase') drawHakaseScene(X, Y, sc);
+  else if (S.scene === 'done') drawHakaseScene(X, Y, sc);
+}
+
+// ---------- クルルレンズ（丸窓） ----------
+function drawScope(t, dt) {
+  const { w, h, dpr } = fitCanvas(scopeCv);
+  sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  sctx.clearRect(0, 0, w, h);
+  const R = w / 2;
+
+  let grd = sctx.createRadialGradient(R, R, 0, R, R, R);
+  grd.addColorStop(0, '#fffdf2'); grd.addColorStop(1, '#e6cf94');
+  sctx.fillStyle = grd; sctx.fillRect(0, 0, w, h);
+
+  const mode = S.scope.type;
+  if (mode === 'volt') {
+    drawVoltMeter(R, S.scope.v);
+    label(S.scope.label || '');
+  } else if (mode === 'charge') {
+    drawChargeRing(R, S.scope.pct);
+    label(S.scope.label || '');
+  } else if (mode === 'dual') {
+    drawDualBars(R, S.scope.mame, S.scope.led);
+    label(S.scope.label || '');
+  } else if (mode === 'point') {
+    sctx.fillStyle = '#2e7d32';
+    sctx.font = `${R * 0.4}px sans-serif`; sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText(S.scope.icon || '🔍', R, R * 0.85);
+    label(S.scope.name || '');
+  } else if (mode === 'glow') {
+    const g2 = sctx.createRadialGradient(R, R * 0.85, 0, R, R * 0.85, R * 0.7);
+    g2.addColorStop(0, '#ffe58a88'); g2.addColorStop(1, 'rgba(255,229,138,0)');
+    sctx.fillStyle = g2; sctx.beginPath(); sctx.arc(R, R * 0.85, R * 0.7, 0, TAU); sctx.fill();
+    sctx.fillStyle = '#2e7d32'; sctx.font = `${R * 0.4}px sans-serif`; sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText('⚡', R, R * 0.85);
+    label('かんせい！');
+  } else {
+    sctx.fillStyle = '#2e7d32'; sctx.font = `${R * 0.4}px sans-serif`; sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText('🔍', R, R * 0.85);
+    label('お話を きいてみよう');
+  }
+
+  function label(txt) {
+    sctx.font = `700 ${R * 0.098}px sans-serif`;
+    sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    const ly = h - R * 0.24;
+    const tw = sctx.measureText(txt).width;
+    sctx.fillStyle = 'rgba(255,255,255,.88)';
+    sctx.beginPath();
+    sctx.roundRect(R - tw / 2 - 8, ly - R * 0.09, tw + 16, R * 0.18, R * 0.09);
+    sctx.fill();
+    sctx.fillStyle = '#3a2e10';
+    sctx.fillText(txt, R, ly);
+  }
+
+  function drawVoltMeter(R, v) {
+    const cx = R, cy = R * 0.78, mr = R * 0.55, maxV = 4.5;
+    const frac = clamp(v / maxV, 0, 1);
+    sctx.lineWidth = R * 0.1; sctx.lineCap = 'round';
+    sctx.beginPath(); sctx.arc(cx, cy, mr, Math.PI, 0); sctx.strokeStyle = 'rgba(46,125,50,.16)'; sctx.stroke();
+    sctx.beginPath(); sctx.arc(cx, cy, mr, Math.PI, Math.PI + Math.PI * frac);
+    sctx.strokeStyle = v >= HATSUDEN_TARGET ? '#2e7d32' : v >= 1.2 ? '#ffb300' : '#9fbf9d';
+    sctx.stroke();
+    const ang = Math.PI + Math.PI * frac;
+    sctx.beginPath(); sctx.moveTo(cx, cy); sctx.lineTo(cx + Math.cos(ang) * mr * 0.85, cy + Math.sin(ang) * mr * 0.85);
+    sctx.strokeStyle = '#3a2e10'; sctx.lineWidth = R * 0.03; sctx.stroke();
+    sctx.beginPath(); sctx.arc(cx, cy, R * 0.05, 0, TAU); sctx.fillStyle = '#3a2e10'; sctx.fill();
+  }
+
+  function drawChargeRing(R, pct) {
+    const cx = R, cy = R * 0.78, mr = R * 0.55;
+    const frac = clamp(pct / 100, 0, 1);
+    sctx.lineWidth = R * 0.13; sctx.lineCap = 'round';
+    sctx.beginPath(); sctx.arc(cx, cy, mr, Math.PI, 0); sctx.strokeStyle = 'rgba(46,125,50,.16)'; sctx.stroke();
+    sctx.beginPath(); sctx.arc(cx, cy, mr, Math.PI, Math.PI + Math.PI * frac);
+    sctx.strokeStyle = pct >= 100 ? '#2e7d32' : '#ffb300'; sctx.stroke();
+  }
+
+  function drawDualBars(R, mp, lp) {
+    const barW = R * 0.26, barH = R * 0.85, baseY = R * 1.5;
+    [[R * 0.62, mp, '#ff8f4d', '豆'], [R * 1.38, lp, '#4fd7ea', 'LED']].forEach(a => {
+      const cx = a[0], p = a[1], col = a[2], lb = a[3];
+      const bx = cx - barW / 2, by = baseY - barH;
+      sctx.strokeStyle = '#c98a12'; sctx.lineWidth = 2; sctx.strokeRect(bx, by, barW, barH);
+      const fh = barH * (clamp(p, 0, 100) / 100);
+      sctx.globalAlpha = p > 0 ? 1 : 0.25;
+      sctx.fillStyle = col; sctx.fillRect(bx, baseY - fh, barW, fh);
+      sctx.globalAlpha = 1;
+      sctx.fillStyle = '#3a2e10'; sctx.font = `700 ${R * 0.09}px sans-serif`; sctx.textAlign = 'center';
+      sctx.fillText(lb, cx, baseY + R * 0.13);
+      sctx.font = `700 ${R * 0.08}px sans-serif`;
+      sctx.fillText(Math.round(p) + '%', cx, by - R * 0.06);
+    });
+  }
+}
+
+// ---------- キラキラ ----------
+let particles = [];
+function burst(x, y, n) {
+  for (let i = 0; i < (n || 70); i++) {
+    const a = Math.random() * TAU, sp = 60 + Math.random() * 260;
+    particles.push({
+      x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 60,
+      life: 1, size: 2 + Math.random() * 4,
+      col: ['#66bb6a', '#ffb300', '#ffe58a', '#fff'][Math.floor(Math.random() * 4)],
+    });
+  }
+}
+function scopeBurst() {
+  const r = $('scopeWrap').getBoundingClientRect();
+  burst(r.left + r.width / 2, r.top + r.height / 2);
+}
+function drawFx(dt) {
+  const { w, h, dpr } = fitCanvas(fxCv);
+  fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  fctx.clearRect(0, 0, w, h);
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    p.life -= dt * 0.7; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 140 * dt;
+    fctx.globalAlpha = Math.max(0, p.life);
+    fctx.fillStyle = p.col;
+    fctx.save();
+    fctx.translate(p.x, p.y); fctx.rotate(p.life * 5);
+    const s = p.size;
+    fctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const a1 = i * TAU / 5 - Math.PI / 2;
+      fctx.lineTo(Math.cos(a1) * s, Math.sin(a1) * s);
+      const a2 = a1 + TAU / 10;
+      fctx.lineTo(Math.cos(a2) * s * 0.45, Math.sin(a2) * s * 0.45);
+    }
+    fctx.closePath(); fctx.fill();
+    fctx.restore();
+  });
+  fctx.globalAlpha = 1;
+}
+
+// ---------- 汎用トゥイーン ----------
+function startTween(from, to, dur, setter, onDone) {
+  setter(from);
+  S.tween = { t: 0, dur, from, to, setter, onDone, fired: false };
+}
+
+// ---------- メインループ ----------
+let lastT = performance.now();
+function loop(now) {
+  const t = now / 1000, dt = Math.min(0.05, (now - lastT) / 1000);
+  lastT = now;
+  if (S.tween) {
+    const tw = S.tween;
+    tw.t = clamp(tw.t + dt / tw.dur, 0, 1);
+    tw.setter(lerp(tw.from, tw.to, easeInOut(tw.t)));
+    if (tw.t >= 1 && !tw.fired) {
+      tw.fired = true;
+      const cb = tw.onDone;
+      S.tween = null;
+      if (cb) cb();
+    }
+  }
+  drawStage(t, dt);
+  drawScope(t, dt);
+  drawFx(dt);
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener('keydown', ev => {
+  if (ev.key === 'Enter') {
+    const b = document.querySelector('#btnRow .btn:not(.sub)') || document.querySelector('#panelBody .btn:not(.sub)');
+    if (b) b.click();
+  }
+});
+
+// ---------- UIヘルパー ----------
+const bubbleEl = $('bubble'), wishEl = $('wishCard'), btnRow = $('btnRow');
+function say(html) {
+  bubbleEl.style.animation = 'none'; void bubbleEl.offsetWidth;
+  bubbleEl.style.animation = ''; bubbleEl.innerHTML = html;
+}
+function setWish(icon, html) {
+  wishEl.style.display = 'flex';
+  wishEl.querySelector('.icon').textContent = icon;
+  wishEl.querySelector('.wbody').innerHTML = html;
+}
+function hideWish() { wishEl.style.display = 'none'; }
+function setButtons(list) {
+  btnRow.innerHTML = '';
+  list.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'btn' + (b.cls ? ' ' + b.cls : '');
+    el.innerHTML = b.label;
+    el.onclick = () => { sTap(); b.cb(el); };
+    btnRow.appendChild(el);
+  });
+}
+function award(id) {
+  if (S.badges.has(id)) return;
+  S.badges.add(id);
+  $('bd_' + id).classList.add('on');
+  if (typeof recordBadge === 'function') recordBadge(S.badges.size, document.querySelectorAll('#badges .badge').length);
+}
+const overlayEl = $('overlay'), panelEl = $('panelBody');
+function showOverlay(html) { panelEl.innerHTML = html; overlayEl.classList.add('show'); }
+function hideOverlay() { overlayEl.classList.remove('show'); }
+const controlsEl = $('controls');
+function setControls(list) {
+  controlsEl.innerHTML = '';
+  list.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'ctl' + (b.cls ? ' ' + b.cls : ''); el.innerHTML = b.label;
+    el.disabled = !!b.disabled;
+    el.onclick = () => { if (el.disabled) return; ac(); b.cb(el); };
+    controlsEl.appendChild(el);
+  });
+}
+function updateLoc() {
+  const titles = {
+    hatsuden: '⚡ 発電してみよう',
+    chikuden: '🔋 ためて 使おう',
+    mameled: '💡 豆電球と LED',
+    sensor: '📡 センサーで 守ろう',
+    hakase: '🔎 はかせチャレンジ',
+    done: '⚡ クルルの発電所 ものがたり',
+  };
+  $('stageTitle').textContent = titles[S.scene] || 'クルルの発電所';
+}
+
+function choiceRow(opts, cb) {
+  return opts.map((label, i) => ({ label, cls: 'choice', cb: el => cb(i, el) }));
+}
+function markPicked(el) {
+  btnRow.querySelectorAll('.choice').forEach(b => b.classList.remove('picked'));
+  el.classList.add('picked');
+}
+
+// ---------- ステップ ----------
+const FLOW = ['intro', 'vote', 'm_hatsuden', 'm_chikuden', 'm_mameled', 'm_sensor', 'hakase', 'm_furikaeri', 'ending', 'free'];
+
+// ふりかえりタイム：4ミッションの場面を1つずつ見せ直すスライドショー
+const FURIKAERI_SLIDES = [
+  { scene: 'hatsuden', icon: '⚡', title: '発電してみよう', video: 'VtMl5yvaWj8', embeddable: false,
+    setup: () => { S.hatsudenIdxDisplay = HATSUDEN_V.length - 1; },
+    scope: () => ({ type: 'volt', v: HATSUDEN_V[HATSUDEN_V.length - 1], label: `${HATSUDEN_V[HATSUDEN_V.length - 1].toFixed(1)}V` }),
+    text: () => `ハンドルを はやく 回すほど、発電する ${W.denatsu}は 大きくなったね。目ひょうの ${HATSUDEN_TARGET}V いじょうまで 上げられたかな？` },
+  { scene: 'chikuden', icon: '🔋', title: 'ためて使おう',
+    setup: () => { S.chikudenIdxDisplay = CHIKUDEN_STEPS.length - 1; },
+    scope: () => ({ type: 'charge', pct: 100, label: '100%' }),
+    text: () => `コンデンサーに ${W.denki}を ためて おくと、あとで 使うことが できたね。` },
+  { scene: 'mameled', icon: '💡', title: '豆電球とLED', video: 'CWymwuKWzgg', embeddable: false,
+    setup: () => { S.mameIdxDisplay = TIME_STEPS.length - 1; },
+    scope: () => ({ type: 'dual', mame: mameCharge(300), led: ledCharge(300), label: '300びょう けいか' }),
+    text: () => `同じ 量の ${W.denki}でも、${W.mame}は やく<b>30秒</b>で 消えたのに、LEDは <b>5分</b>たっても まだ ついていたね。` },
+  { scene: 'sensor', icon: '📡', title: 'センサーで守ろう', video: 'vClKnOmC3G8', embeddable: false,
+    setup: () => { S.sensorFound = new Set(SENSOR_CARDS.map(c => c.key)); },
+    scope: () => ({ type: 'point', icon: SENSOR_CARDS[0].icon, name: SENSOR_CARDS[0].name }),
+    text: () => `センサーを 使うと、必要な ときだけ 自動で ${W.denki}を 使い、むだを へらせたね。` },
+];
+
+function gotoStep(i) {
+  S.stepIndex = clamp(i, 0, FLOW.length - 1);
+  S.phase = ''; S.tween = null;
+  hideOverlay(); hideWish();
+  setControls([]); setButtons([]);
+  STEPS[FLOW[S.stepIndex]].enter();
+  updateLoc();
+}
+const nextStep = () => gotoStep(S.stepIndex + 1);
+
+const STEPS = {
+  intro: {
+    enter() {
+      Object.assign(S, { scene: 'hatsuden', scope: { type: 'idle' } });
+      say('……');
+      setButtons([]);
+      showOverlay(`
+        <div class="phasesStrip">⚡🔋💡📡</div>
+        <h1>クルルの発電所</h1>
+        <div class="sub">〜 ${W.hatsuden}・${W.chikuden}・センサーの たいけん 〜</div>
+        <p class="talk">ようこそ！ わたしは 手回し${W.hatsudenki}の 取っ手から 生まれた ${W.seirei}、<b>クルル</b>。${W.denki}は 目に 見えないけれど、たしかに 「作る」「ためる」「かしこく 使う」ことが できるんだ。<br>
+        今日は 電気を 作る「${W.hatsuden}」、ためる「${W.chikuden}」、そして センサーで かしこく 使う ひみつを、いっしょに たしかめに いこう！</p>
+        <button class="btn" id="startBtn">たいけんを はじめる！</button>
+        <div class="foot">先生へ：F11キーで全画面表示になります。操作はぜんぶ画面のボタンです。</div>
+      `);
+      $('startBtn').onclick = () => { ac(); sTap(); nextStep(); };
+    },
+  },
+
+  vote: {
+    enter() {
+      showOverlay(`
+        <h2>🤔 よそうタイム</h2>
+        <p class="talk">手回し${W.hatsudenki}で 同じ 量の ${W.denki}を コンデンサーに ためて、${W.mame}と ${W.led}を つなぐと、どちらが 長く 光り続けると 思う？</p>
+        <div class="voteCards">
+          <div class="vcard" data-v="0"><span class="vicon">💡</span><b>ア</b> 豆電球の 方が 長い</div>
+          <div class="vcard" data-v="1"><span class="vicon">🔆</span><b>イ</b> LEDの 方が 長い</div>
+          <div class="vcard" data-v="2"><span class="vicon">🟰</span><b>ウ</b> 同じくらい</div>
+        </div>
+        <div class="sub">思う ものに タッチ。きろくシートにも 〇を つけてね。</div>
+        <button class="btn" id="voteGo">よし、たしかめよう！</button>
+      `);
+      panelEl.querySelectorAll('.vcard').forEach(c => {
+        c.onclick = () => { sTap(); panelEl.querySelectorAll('.vcard').forEach(x => x.classList.remove('picked')); c.classList.add('picked');
+          S.votePicked = new Set([+c.dataset.v]);
+        };
+      });
+      $('voteGo').onclick = () => { sTap(); nextStep(); };
+    },
+  },
+
+  // --- M1：発電してみよう（メイン操作・数値階段①〜⑦） ---
+  m_hatsuden: {
+    enter() {
+      Object.assign(S, { scene: 'hatsuden', hatsudenIdx: 0, hatsudenIdxDisplay: 0, scope: { type: 'volt', v: HATSUDEN_V[0], label: `${HATSUDEN_V[0].toFixed(1)}V` } });
+      updateLoc();
+      setWish('⚡', `「すすめる」ボタンで ハンドルを 回す 速さを 上げて、${W.denatsu}計が どう 変わるか 見よう。目ひょうは ${HATSUDEN_TARGET}V いじょう！`);
+      say(`手回し${W.hatsudenki}は、ハンドルを 回す 力で ${W.denki}を 作る きかい。はやく 回すほど、作られる ${W.denatsu}は 大きくなる。`);
+      this.refreshCtl();
+    },
+    refreshCtl() {
+      if (S.hatsudenIdx >= HATSUDEN_V.length - 1) { this.finish(); return; }
+      setControls([{ label: `⏭️ すすめる(${NUMS[S.hatsudenIdx]})`, cb: () => this.advance() }]);
+    },
+    advance() {
+      if (S.hatsudenIdx >= HATSUDEN_V.length - 1) return;
+      setControls([]);
+      const fromV = S.hatsudenIdx, toV = S.hatsudenIdx + 1;
+      startTween(fromV, toV, 0.9, v => {
+        S.hatsudenIdxDisplay = v;
+        const val = lerpArr(HATSUDEN_V, v);
+        S.scope = { type: 'volt', v: val, label: `${val.toFixed(1)}V` };
+      }, () => {
+        S.hatsudenIdx++; S.hatsudenIdxDisplay = S.hatsudenIdx;
+        sTap(); sZap();
+        this.refreshCtl();
+      });
+    },
+    finish() {
+      setControls([]);
+      say(`①〜⑦まで、ハンドルを 回す 速さを 上げてみたね。${W.denatsu}は どこまで 上がったかな？`);
+      setButtons([{ label: 'クイズに ちょうせん', cb: () => this.ask() }]);
+    },
+    ask() {
+      hideWish(); setButtons([]);
+      say(`手回し${W.hatsudenki}は、ハンドルを 回す 速さを 上げると、${W.denatsu}は どうなる？`);
+      setButtons(choiceRow(['大きくなる', '小さくなる', '変わらない'], (i, el) => this.judge(i, el)));
+    },
+    judge(i, el) {
+      markPicked(el);
+      if (i === 0) {
+        sYes(); scopeBurst(); award('m_hatsuden'); S.phase = 'done';
+        say(`せいかい！ ハンドルを はやく 回すほど、発電する ${W.denatsu}は 大きくなる。1秒間に 2〜3回くらいの 速さで 回すと、むりなく 発電できると 言われているよ。`);
+        setButtons([{ label: 'つぎへ（ためて使おう）', cb: nextStep }]);
+      } else {
+        say(`ヒントを もういちど 見て、いっしょに かんがえよう。`);
+        setButtons(choiceRow(['大きくなる', '小さくなる', '変わらない'], (i2, el2) => this.judge(i2, el2)));
+      }
+    },
+  },
+
+  // --- M2：ためて使おう（メイン操作・時間送り①〜⑦） ---
+  m_chikuden: {
+    enter() {
+      Object.assign(S, { scene: 'chikuden', chikudenIdx: 0, chikudenIdxDisplay: 0, scope: { type: 'charge', pct: CHIKUDEN_STEPS[0], label: `${CHIKUDEN_STEPS[0]}%` } });
+      updateLoc();
+      setWish('🔋', `「すすめる」ボタンで、発電した ${W.denki}を コンデンサーに ためていこう。目ひょうは 100%！`);
+      say(`発電した ${W.denki}は、そのままでは すぐに 消えてしまう。「コンデンサー」という 部品を 使うと、${W.denki}を ためて おいて、あとで 使うことが できるんだ。`);
+      this.refreshCtl();
+    },
+    refreshCtl() {
+      if (S.chikudenIdx >= CHIKUDEN_STEPS.length - 1) { this.finish(); return; }
+      setControls([{ label: `⏭️ すすめる(${NUMS[S.chikudenIdx]})`, cb: () => this.advance() }]);
+    },
+    advance() {
+      if (S.chikudenIdx >= CHIKUDEN_STEPS.length - 1) return;
+      setControls([]);
+      const fromV = S.chikudenIdx, toV = S.chikudenIdx + 1;
+      startTween(fromV, toV, 0.9, v => {
+        S.chikudenIdxDisplay = v;
+        const pct = lerpArr(CHIKUDEN_STEPS, v);
+        S.scope = { type: 'charge', pct, label: `${Math.round(pct)}%` };
+      }, () => {
+        S.chikudenIdx++; S.chikudenIdxDisplay = S.chikudenIdx;
+        sTap(); sZap();
+        this.refreshCtl();
+      });
+    },
+    finish() {
+      setControls([]);
+      say(`①〜⑦まで ${W.denki}を ためたね。コンデンサーには ${W.denki}を ためて おける、ということが わかったかな？`);
+      setButtons([{ label: 'クイズに ちょうせん', cb: () => this.ask() }]);
+    },
+    ask() {
+      hideWish(); setButtons([]);
+      say(`コンデンサーに ためた ${W.denki}は、あとで 使うことが できる？`);
+      setButtons(choiceRow(['できる', 'できない', 'すぐに全部消えてしまう'], (i, el) => this.judge(i, el)));
+    },
+    judge(i, el) {
+      markPicked(el);
+      if (i === 0) {
+        sYes(); scopeBurst(); award('m_chikuden'); S.phase = 'done';
+        say(`せいかい！ コンデンサーは ${W.denki}を ためて おける 部品。ためた ${W.denki}は、あとで ${W.mame}や LEDを 光らせるのに 使うことが できる。つぎは、ためた ${W.denki}で ${W.mame}と LEDを くらべてみよう！`);
+        setButtons([{ label: 'つぎへ（豆電球とLED）', cb: nextStep }]);
+      } else {
+        say(`ヒントを もういちど 見て、いっしょに かんがえよう。`);
+        setButtons(choiceRow(['できる', 'できない', 'すぐに全部消えてしまう'], (i2, el2) => this.judge(i2, el2)));
+      }
+    },
+  },
+
+  // --- M3：豆電球とLED（メイン操作・時間送り①〜⑦・比較） ---
+  m_mameled: {
+    enter() {
+      Object.assign(S, { scene: 'mameled', mameIdx: 0, mameIdxDisplay: 0, scope: { type: 'dual', mame: 100, led: 100, label: '0びょう' } });
+      updateLoc();
+      setWish('💡', `同じ 量の ${W.denki}を ためた 2つの コンデンサーに、${W.mame}と LEDを それぞれ つなげた。「はやおくり」で 時間を 進めて、どちらが 長く 光り続けるか くらべよう！`);
+      say(`よそうタイムで 予想した とおりに なるかな？ さあ、たしかめよう。`);
+      this.refreshCtl();
+    },
+    refreshCtl() {
+      if (S.mameIdx >= TIME_STEPS.length - 1) { this.finish(); return; }
+      setControls([{ label: `⏭️ はやおくり(${NUMS[S.mameIdx]})`, cls: 'warn', cb: () => this.advance() }]);
+    },
+    advance() {
+      if (S.mameIdx >= TIME_STEPS.length - 1) return;
+      setControls([]);
+      const fromV = S.mameIdx, toV = S.mameIdx + 1;
+      startTween(fromV, toV, 0.9, v => {
+        S.mameIdxDisplay = v;
+        const t = lerpArr(TIME_STEPS, v);
+        S.scope = { type: 'dual', mame: mameCharge(t), led: ledCharge(t), label: `${Math.round(t)}びょう けいか` };
+      }, () => {
+        S.mameIdx++; S.mameIdxDisplay = S.mameIdx;
+        sTap();
+        this.refreshCtl();
+      });
+    },
+    finish() {
+      setControls([]);
+      say(`①〜⑦まで、時間を 進めたね。${W.mame}と LED、どちらが 長く 光っていたかな？`);
+      setButtons([{ label: 'クイズに ちょうせん', cb: () => this.ask() }]);
+    },
+    ask() {
+      hideWish(); setButtons([]);
+      say(`同じ 量の ${W.denki}を ためて くらべたとき、どちらが 長く 光り続けた？`);
+      setButtons(choiceRow(['豆電球の方が長い', 'LEDの方が長い', '同じくらい'], (i, el) => this.judge(i, el)));
+    },
+    judge(i, el) {
+      markPicked(el);
+      if (i === 1) {
+        sYes(); scopeBurst(); award('m_mameled'); S.phase = 'done';
+        say(`せいかい！ じっさいの じっけんでも、${W.mame}は やく<b>30秒</b>で 消えたのに、LEDは <b>5分（300秒）</b>たっても まだ ついていたという けっかが あるよ。LEDは ${W.mame}より ずっと 少ない ${W.denki}で 光ることが できるんだ。`);
+        setButtons([{ label: 'つぎへ（センサーで守ろう）', cb: nextStep }]);
+      } else {
+        say(`ヒントを もういちど 見て、いっしょに かんがえよう。`);
+        setButtons(choiceRow(['豆電球の方が長い', 'LEDの方が長い', '同じくらい'], (i2, el2) => this.judge(i2, el2)));
+      }
+    },
+  },
+
+  // --- M4：センサーで守ろう（発見型） ---
+  m_sensor: {
+    enter() {
+      Object.assign(S, { scene: 'sensor', scope: { type: 'idle' }, sensorFound: new Set() });
+      updateLoc();
+      setWish('📡', `①〜④を タッチして、どんな センサーが ${W.denki}を かしこく 使う 手助けを しているか 見つけよう。`);
+      say(`${W.denki}は 作って ためるだけでなく、むだなく 使う 工夫も 大切。センサーを 使うと、コンピューターが 自動で ${W.denki}を ${W.seigyo}してくれる。`);
+      this.refreshCtl();
+    },
+    refreshCtl() {
+      setButtons(SENSOR_CARDS.map(c => ({
+        label: c.num + ' ' + (S.sensorFound.has(c.key) ? c.name : '？？？'),
+        cb: () => this.reveal(c),
+      })));
+      if (S.sensorFound.size >= SENSOR_CARDS.length) {
+        setButtons([{ label: 'クイズに ちょうせん', cb: () => this.ask() }]);
+      }
+    },
+    reveal(c) {
+      sTap(); S.sensorFound.add(c.key);
+      S.scope = { type: 'point', icon: c.icon, name: c.name.replace(/<[^>]+>/g, '') };
+      scopeBurst();
+      say(`${c.num} <b>${c.name}</b>：${c.txt}`);
+      this.refreshCtl();
+    },
+    ask() {
+      hideWish(); setButtons([]);
+      say(`センサーを 使うと、${W.denki}の 使い方は どうなる？`);
+      setButtons(choiceRow(['いつも全部つけっぱなしにできる', '必要なときだけ自動で使い、むだをへらせる', '電気をまったく使わなくてすむ'], (i, el) => this.judge(i, el)));
+    },
+    judge(i, el) {
+      markPicked(el);
+      if (i === 1) {
+        sYes(); scopeBurst(); award('m_sensor'); S.phase = 'done';
+        say(`せいかい！ センサーを 使うと、必要な ときだけ 自動で ${W.denki}を 使い、むだを へらすことが できる。「明るさで 点ける」「人が いなければ 消す」のように コンピューターに じょうけんを おぼえさせる、プログラミングの 力でもあるんだ。`);
+        setButtons([{ label: 'つぎへ（はかせチャレンジ）', cb: nextStep }]);
+      } else {
+        say(`ヒントを もういちど 見て、いっしょに かんがえよう。`);
+        setButtons(choiceRow(['いつも全部つけっぱなしにできる', '必要なときだけ自動で使い、むだをへらせる', '電気をまったく使わなくてすむ'], (i2, el2) => this.judge(i2, el2)));
+      }
+    },
+  },
+
+  // --- はかせチャレンジ：身のまわりの発電・蓄電・センサー ---
+  hakase: {
+    enter() {
+      Object.assign(S, { scene: 'hakase', scope: { type: 'idle' }, hakaseFound: new Set() });
+      updateLoc();
+      say(`さいごは <b>はかせチャレンジ</b>！ ${W.denki}を 作る・ためる・かしこく 使う くふうは、身のまわりに たくさん あるよ。`);
+      this.refreshCtl();
+    },
+    refreshCtl() {
+      setButtons(HAKASE_POINTS.map(p => ({
+        label: p.letter + ' ' + p.name + (S.hakaseFound.has(p.key) ? ' ✓' : ''),
+        cb: () => this.reveal(p),
+      })));
+      if (S.hakaseFound.size >= HAKASE_POINTS.length) {
+        setButtons([{ label: 'クイズに ちょうせん', cb: () => this.ask() }]);
+      }
+    },
+    reveal(p) {
+      sTap(); S.hakaseFound.add(p.key);
+      S.scope = { type: 'point', name: p.name, icon: p.icon };
+      scopeBurst();
+      say(p.txt);
+      this.refreshCtl();
+    },
+    ask() {
+      hideWish();
+      say(`太陽光発電は、天気に よって 発電できる 量が 変わる。いちばん たくさん 発電できるのは？`);
+      setButtons(choiceRow(['くもりの日', '晴れの日', '雨の日'], (i, el) => this.judge(i, el)));
+    },
+    judge(i, el) {
+      markPicked(el);
+      if (i === 1) {
+        sYes(); scopeBurst(); award('hakase'); S.phase = 'done';
+        say(`せいかい！ 太陽光発電は、日光が 強い <b>晴れの日</b>に いちばん たくさん 発電できる。天気に よって 発電量が 変わるのも、自然の ${W.denki}の おもしろい ところ。`);
+        setButtons([{ label: 'ふりかえりタイムへ', cb: nextStep }]);
+      } else {
+        say(`ヒントを もういちど 見て、いっしょに かんがえよう。`);
+        setButtons(choiceRow(['くもりの日', '晴れの日', '雨の日'], (i2, el2) => this.judge(i2, el2)));
+      }
+    },
+  },
+
+  // --- ふりかえりタイム：4ミッションの場面を1つずつ見せ直す ---
+  m_furikaeri: {
+    enter() {
+      S.furikaeriIdx = 0;
+      this.show();
+    },
+    show() {
+      const slide = FURIKAERI_SLIDES[S.furikaeriIdx];
+      const n = S.furikaeriIdx + 1, total = FURIKAERI_SLIDES.length;
+      const isLast = S.furikaeriIdx >= total - 1;
+      slide.setup();
+      Object.assign(S, { scene: slide.scene, scope: slide.scope() });
+      updateLoc();
+      const goNext = () => {
+        sTap();
+        if (isLast) { hideOverlay(); nextStep(); } else { S.furikaeriIdx++; this.show(); }
+      };
+      if (slide.video) {
+        const videoUrl = `https://www.youtube.com/watch?v=${slide.video}`;
+        const canEmbed = slide.embeddable !== false;
+        showOverlay(`
+          <h2>${slide.icon} ふりかえりタイム（${n}/${total}）${slide.title}</h2>
+          <div id="furikaeriThumb" style="max-width:380px;margin:0 auto;cursor:pointer">
+            <div style="position:relative;border-radius:12px;overflow:hidden;background:#000">
+              <img src="https://img.youtube.com/vi/${slide.video}/hqdefault.jpg" style="width:100%;display:block;opacity:.85">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+                <div style="width:15%;aspect-ratio:1;min-width:56px;border-radius:50%;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;color:#fff;font-size:clamp(24px,3vw,34px)">▶</div>
+              </div>
+            </div>
+            <div style="margin-top:.5em;color:#3a7ab8;font-size:clamp(12px,1.3vw,16px)">${canEmbed ? 'タップすると この画面で 動画が はじまるよ' : 'タップすると 新しい タブで 動画が ひらくよ'}</div>
+          </div>
+          <p class="talk">${slide.text()}</p>
+          <button class="btn" id="furikaeriNextBtn">${isLast ? 'まとめへ すすむ' : 'つぎへ'}</button>
+          <div class="foot">先生へ：動画はYouTubeの教育系チャンネルです。内容を事前にご確認ください。URL: ${videoUrl}</div>
+        `);
+        $('furikaeriThumb').onclick = () => {
+          sTap();
+          if (canEmbed) {
+            const embedUrl = `https://www.youtube-nocookie.com/embed/${slide.video}?rel=0&modestbranding=1&iv_load_policy=3&autoplay=1`;
+            $('furikaeriThumb').outerHTML = `<div style="max-width:380px;margin:0 auto;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#000"><iframe width="100%" height="100%" src="${embedUrl}" title="${slide.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+          } else {
+            window.open(videoUrl, '_blank', 'noopener');
+          }
+        };
+        $('furikaeriNextBtn').onclick = goNext;
+      } else {
+        hideOverlay();
+        scopeBurst();
+        say(`<b>ふりかえりタイム（${n}/${total}）${slide.icon} ${slide.title}</b><br>${slide.text()}`);
+        setButtons([{ label: isLast ? 'まとめへ すすむ' : 'つぎへ', cb: goNext }]);
+      }
+    },
+  },
+
+  ending: {
+    enter() {
+      window.yomitabiLessonComplete?.(S.badges.size, 5);
+      Object.assign(S, { scene: 'done', scope: { type: 'glow' } });
+      updateLoc();
+      const votedRight = S.votePicked.has(1);
+      showOverlay(`
+        <h2>⭐ クルルの発電所 みならい にんてい！ ⭐</h2>
+        <div class="phasesStrip">${'★'.repeat(S.badges.size)}${'☆'.repeat(Math.max(0, 5 - S.badges.size))}</div>
+        <p class="talk" id="blankArea">きょうの <b>4つの ひみつ</b>、いえるかな？（タッチで こたえ）<br>
+        ① 手回し発電機は ハンドルを（<span class="blankWord" data-a="はやく">？？？</span>）回すほど、発電する ${W.denatsu}が（<span class="blankWord" data-a="大きく">？？？</span>）なる。<br>
+        ② コンデンサーに ${W.denki}を（<span class="blankWord" data-a="ためて">？？？</span>）おくと、あとで 使うことが できる。<br>
+        ③ 同じ 量の ${W.denki}で くらべると、（<span class="blankWord" data-a="LED">？？？</span>）の方が ${W.mame}より ずっと 長く 光り続ける。<br>
+        ④ センサーを 使うと、必要な ときだけ ${W.denki}を 使い、むだを（<span class="blankWord" data-a="へらせる">？？？</span>）。</p>
+        <p class="talk">さいしょの よそうタイム、こたえは <b>イ LEDの方が長い</b>でした！${votedRight ? '（みんなの よそう、ばっちり！）' : ''}</p>
+        <p class="talk">🏠 <b>おうちミッション</b><br>家の中で、${W.hatsuden}・${W.chikuden}・センサーを 使っている ものを <b>3つ</b> さがしてみよう。れい：モバイルバッテリー、リモコンの かん電池、げんかんの センサーライト、自動水せん など。</p>
+        <div style="display:flex;gap:1vw;justify-content:center;flex-wrap:wrap;margin-top:1.5vh">
+          <button class="btn" id="freeBtn">じゆうモードで あそぶ</button>
+          <button class="btn sub" id="againBtn">はじめから もういちど</button>
+        </div>
+      `);
+      sFanfare();
+      setTimeout(scopeBurst, 200);
+      panelEl.querySelectorAll('.blankWord').forEach(sp => {
+        sp.onclick = function () {
+          this.textContent = this.dataset.a;
+          this.style.color = '#2e7d32'; sYes(); scopeBurst();
+        };
+      });
+      $('freeBtn').onclick = () => { sTap(); gotoStep(FLOW.indexOf('free')); };
+      $('againBtn').onclick = () => { location.reload(); };
+    },
+  },
+
+  free: {
+    enter() {
+      Object.assign(S, { scene: 'hakase', scope: { type: 'glow' } });
+      updateLoc();
+      say(`<b>じゆうモード</b>だよ！ ${ruby('友', 'とも')}だちと クイズを 出しあおう。<br>れい：「手回し発電機を はやく 回すと 電圧は？」「豆電球と LED、どちらが 長く 光る？」「センサーを 使うと 電気の むだは？」`);
+      setButtons([
+        { label: '⚡ 発電の図', cls: 'sub', cb: () => this.show('hatsuden') },
+        { label: '🔋 ためる図', cls: 'sub', cb: () => this.show('chikuden') },
+        { label: '💡 豆電球とLEDの図', cls: 'sub', cb: () => this.show('mameled') },
+        { label: '📡 センサーの図', cls: 'sub', cb: () => this.show('sensor') },
+        { label: '🔎 はかせチャレンジの図', cls: 'sub', cb: () => this.show('hakase') },
+        { label: 'まとめに もどる', cls: 'sub', cb: () => gotoStep(FLOW.indexOf('ending')) },
+      ]);
+    },
+    show(scene) { S.scene = scene; updateLoc(); sTap(); },
+  },
+};
+
+// ---------- 先生バー ----------
+$('tbPrev').onclick = () => gotoStep(S.stepIndex - 1);
+$('tbNext').onclick = () => gotoStep(S.stepIndex + 1);
+$('tbReset').onclick = () => location.reload();
+$('tbSound').onclick = function () { S.sound = !S.sound; this.textContent = S.sound ? '🔊' : '🔇'; };
+
+// ---------- 開始 ----------
+// （URLの後ろに ?step=m_mameled などで途中から始められます）
+gotoStep(0);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

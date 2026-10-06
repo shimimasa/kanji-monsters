@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>クルルの発電所 きろくノート（A4印刷用）</title>
+<style>
+  .backHomeSheet{
+    color:#fff; text-decoration:none; font-weight:700;
+    background:rgba(255,255,255,.25); padding:8px 16px; border-radius:8px;
+  }
+  .backHomeSheet:hover{ background:rgba(255,255,255,.4); }
+  @page { size: A4 portrait; margin: 10mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "BIZ UDPGothic", "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    color: #222; margin: 0; background: #888;
+  }
+  rt { font-size: 0.45em; }
+  .page {
+    width: 210mm; min-height: 296mm; margin: 8px auto; padding: 10mm;
+    background: #fff; page-break-after: always;
+  }
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; width: auto; min-height: auto; padding: 0; }
+    #printBar { display: none; }
+  }
+  #printBar {
+    position: sticky; top: 0; z-index: 10; background: #2e7d32; color: #fff;
+    padding: 10px 16px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  }
+  #printBar button {
+    font-family: inherit; font-size: 16px; font-weight: 700;
+    background: #ffe58a; border: none; border-radius: 8px; padding: 8px 20px; cursor: pointer;
+  }
+  #printBar small { opacity: .9; }
+
+  /* ---------- 子ども用シート ---------- */
+  .sheetHead {
+    display: flex; align-items: center; gap: 4mm;
+    border-bottom: 1.2mm solid #222; padding-bottom: 2mm; margin-bottom: 2.5mm;
+  }
+  .sheetHead h1 { font-size: 13pt; margin: 0; white-space: nowrap; }
+  .sheetHead .stars { font-size: 9pt; letter-spacing: .15em; }
+  .nameBox { margin-left: auto; font-size: 9.5pt; white-space: nowrap; }
+  .nameBox .line { display: inline-block; width: 26mm; border-bottom: .4mm solid #222; }
+  .nameBox .line.short { width: 16mm; }
+
+  .sec { margin-bottom: 0.8mm; }
+  .secTitle {
+    display: inline-block; background: #222; color: #fff;
+    font-size: 10pt; font-weight: 700;
+    padding: .6mm 3.5mm; border-radius: 4mm; margin-bottom: .8mm;
+  }
+  .secBody { font-size: 9pt; line-height: 1.28; }
+
+  .voteRow { display: flex; gap: 2mm; margin-top: 1mm; flex-wrap: wrap; }
+  .voteOpt {
+    flex: 1; min-width: 28mm; border: .5mm solid #222; border-radius: 3mm;
+    padding: 1.1mm 2mm; font-size: 8.4pt; text-align: center; line-height: 1.35;
+  }
+  .voteOpt .vnum { font-weight: 700; }
+
+  .levelTable { width: 100%; border-collapse: collapse; font-size: 8.6pt; margin-top: 1mm; text-align: center; }
+  .levelTable th, .levelTable td { border: .4mm solid #222; padding: 1.3mm 1mm; }
+  .levelTable th { background: #eaf3e6; }
+  .levelTable td.res { height: 6mm; }
+
+  .roundTable { width: 100%; border-collapse: collapse; font-size: 8.4pt; margin-top: 1mm; }
+  .roundTable th, .roundTable td { border: .4mm solid #222; padding: 1mm 1.6mm; text-align: center; }
+  .roundTable th { background: #eaf3e6; }
+
+  .fillLine { display: inline-block; width: 20mm; border-bottom: .5mm solid #222; height: 5mm; }
+  .fillLine.sm { width: 12mm; }
+
+  .homeBox { display: flex; gap: 4mm; align-items: center; border: .5mm dashed #222; border-radius: 3mm; padding: 2mm 3mm; }
+  .homeBox .icon { font-size: 22pt; }
+
+  .footNote { text-align: center; font-size: 9pt; margin-top: .6mm; letter-spacing: .2em; }
+
+  /* ---------- 先生用ページ ---------- */
+  .tHead { border-bottom: 1mm solid #222; padding-bottom: 1.2mm; margin-bottom: 2.2mm; }
+  .tHead h1 { font-size: 13.5pt; margin: 0; }
+  .tHead .sub { font-size: 9pt; color: #555; }
+  .tSec { margin-bottom: 1.8mm; }
+  .tSec h2 {
+    font-size: 10pt; margin: 0 0 1mm;
+    border-left: 2.5mm solid #222; padding-left: 2mm;
+  }
+  .tSec, .tSec p, .tSec li, .tSec td, .tSec th { font-size: 8.5pt; line-height: 1.3; }
+  .tSec ul { margin: 0; padding-left: 5mm; }
+  .flowTable { width: 100%; border-collapse: collapse; }
+  .flowTable th, .flowTable td { border: .4mm solid #222; padding: 1mm 1.6mm; text-align: left; }
+  .flowTable th { background: #eee; white-space: nowrap; }
+  .flowTable .min { white-space: nowrap; font-weight: 700; text-align: center; }
+  .ansBox { border: .5mm solid #222; border-radius: 2mm; padding: 2mm 3mm; background: #f5f5f5; }
+</style>
+</head>
+<body>
+<div id="printBar">
+  <button onclick="window.print()">🖨 いんさつする</button>
+  <small>1ページ目＝子ども用（人数分）／ 2ページ目＝先生用（1枚）。印刷画面で「ページ指定」をすると分けて刷れます。</small>
+</div>
+
+<!-- ========== 1ページ目：子ども用きろくノート ========== -->
+<div class="page">
+  <div class="sheetHead">
+    <h1>⚡ クルルの発電所 きろくノート</h1>
+    <span class="stars">☆☆☆☆☆</span>
+    <span class="nameBox">なまえ <span class="line"></span>　<ruby>日<rt>ひ</rt></ruby>づけ <span class="line short"></span></span>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">１．よそうタイム</span>
+    <div class="secBody">
+      手回し発電機で同じ量の電気をコンデンサーにためて、豆電球とLEDをつなぐと、どちらが長く光り続けると思う？（１つに 〇）
+      <div class="voteRow">
+        <div class="voteOpt"><span class="vnum">ア</span> 💡 豆電球の方が長い</div>
+        <div class="voteOpt"><span class="vnum">イ</span> 🔆 LEDの方が長い</div>
+        <div class="voteOpt"><span class="vnum">ウ</span> 🟰 同じくらい</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">２．発電してみよう</span>
+    <div class="secBody">
+      「すすめる」ボタンで①〜⑦を進め、電圧計（V）を記録しよう。目ひょうは2.5V以上。
+      <table class="levelTable">
+        <tr><th>スタート</th><th>①</th><th>②</th><th>③</th><th>④</th><th>⑤</th><th>⑥</th><th>⑦</th></tr>
+        <tr><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td></tr>
+      </table>
+      手回し発電機は、回す速さを上げると電圧は（大きくなる ／ 小さくなる ／ 変わらない）
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">３．ためて使おう</span>
+    <div class="secBody">
+      「すすめる」ボタンで①〜⑦を進め、ちくでんりょう（%）を記録しよう。目ひょうは100%。
+      <table class="levelTable">
+        <tr><th>スタート</th><th>①</th><th>②</th><th>③</th><th>④</th><th>⑤</th><th>⑥</th><th>⑦</th></tr>
+        <tr><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td></tr>
+      </table>
+      コンデンサーにためた電気は、あとで（使うことができる ／ 使うことができない）
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">４．豆電球とLED（けっかをくらべよう）</span>
+    <div class="secBody">
+      「はやおくり」で①〜⑦を進め、豆電球とLEDの明かりを記録しよう。
+      <table class="levelTable">
+        <tr><th>けいか時間</th><th>豆電球</th><th>LED</th></tr>
+        <tr><td>①〜③（〜10びょう）</td><td class="res"></td><td class="res"></td></tr>
+        <tr><td>④（30びょう）</td><td class="res"></td><td class="res"></td></tr>
+        <tr><td>⑦（300びょう＝5分）</td><td class="res"></td><td class="res"></td></tr>
+      </table>
+      同じ量の電気でくらべると、長く光り続けたのは（豆電球 ／ LED ／ 同じくらい）
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">５．センサーで守ろう</span>
+    <div class="secBody">
+      ①〜④を見つけて、どんなセンサーか書こう。
+      <table class="roundTable">
+        <tr><th>①あかるさ</th><th>②人感</th><th>③温度</th><th>④タイマー</th></tr>
+        <tr><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr>
+      </table>
+      センサーを使うと、電気の使い方は（必要なときだけ自動で使い、むだをへらせる ／ 全部つけっぱなしにできる）
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">６．はかせチャレンジ（身のまわりの発電・蓄電・センサー）</span>
+    <div class="secBody">
+      見つけたものに 〇を つけよう。
+      <table class="roundTable">
+        <tr><th>あ 太陽光発電</th><th>い 風力発電</th><th>う モバイルバッテリー</th><th>え 自動ドア・センサーライト</th></tr>
+        <tr><td>☐</td><td>☐</td><td>☐</td><td>☐</td></tr>
+      </table>
+      太陽光発電がいちばんたくさん発電できるのは（晴れの日 ／ くもりの日 ／ 雨の日）
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">７．きょうの ひみつ（まとめ）</span>
+    <div class="secBody">
+      ① 手回し発電機はハンドルを（<span class="fillLine sm"></span>）回すほど、発電する電圧が（<span class="fillLine sm"></span>）なる。<br>
+      ② コンデンサーに電気を（<span class="fillLine"></span>）おくと、あとで使うことができる。<br>
+      ③ 同じ量の電気でくらべると、（<span class="fillLine sm"></span>）の方が豆電球よりずっと長く光り続ける。<br>
+      ④ センサーを使うと、必要なときだけ電気を使い、むだを（<span class="fillLine"></span>）。
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">８．おうちミッション（発電・蓄電・センサーを さがそう）</span>
+    <div class="secBody">
+      <div class="homeBox">
+        <span class="icon">🔋</span>
+        <div>
+          家の中で、発電・蓄電・センサーを使っているものを3つさがしてみよう。れい：モバイルバッテリー、リモコンのかん電池、げんかんのセンサーライトなど。<br>
+          ☐ <span style="border-bottom:.4mm solid #222;display:inline-block;width:40mm">　</span>　☐ <span style="border-bottom:.4mm solid #222;display:inline-block;width:40mm">　</span>　☐ <span style="border-bottom:.4mm solid #222;display:inline-block;width:40mm">　</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footNote">✦ ✦ ✦　クルルの発電所 見習い、きょうも おつかれさま！　✦ ✦ ✦</div>
+</div>
+
+<!-- ========== 2ページ目：先生用 進行メモ ========== -->
+<div class="page">
+  <div class="tHead">
+    <h1>【先生用】クルルの発電所 — 授業進行メモ（45分）</h1>
+    <div class="sub">対象：小6理科「電気の利用（発電・蓄電・センサー）」・学力幅あり・協力型／ 使うもの：「kururu.html」・プロジェクタ・このノート（1ページ目を人数分）。理科エネルギー分野3作目（光＝カガミの丘、電磁石＝ウズの実験室の続編）です。</div>
+  </div>
+
+  <div class="tSec">
+    <h2>前日までの準備チェック</h2>
+    <ul>
+      <li>☐ 授業で使うPCでHTMLを開き、各ミッションを一通り操作して確認（ネット接続不要）</li>
+      <li>☐ プロジェクタ接続・<b>F11で全画面</b>／音の確認（出なくても成立。右下「せんせい用」🔊で消音可）</li>
+      <li>☐ シート1ページ目を人数分印刷。中断時は URL の後ろに <b>?step=m_mameled</b> などで途中再開（m_hatsuden／m_chikuden／m_mameled／m_sensor／hakase／ending）</li>
+      <li>☐ 手回し発電機やコンデンサー、LED豆電球の実物が手元にあれば、導入や発展で見せると実感がわく（必須ではない）</li>
+    </ul>
+  </div>
+
+  <div class="tSec">
+    <h2>45分の流れ（画面が進行役になります）</h2>
+    <table class="flowTable">
+      <tr><th>時間</th><th>画面</th><th>子どもの動き・声かけ</th></tr>
+      <tr><td class="min">0〜4分</td><td>オープニング → よそうタイム</td><td>シート１に〇。<b>答えは言わない</b>（まとめで判明します）</td></tr>
+      <tr><td class="min">4〜12分</td><td>⚡ 発電してみよう</td><td>「すすめる」ボタンで①〜⑦を進め、回す速さと電圧の関係を観察。目ひょう2.5V以上。シート２に記録</td></tr>
+      <tr><td class="min">12〜19分</td><td>🔋 ためて使おう</td><td>「すすめる」で①〜⑦を進め、コンデンサーに電気がたまる様子を観察。シート３に記録</td></tr>
+      <tr><td class="min">19〜29分</td><td>💡 豆電球とLED（<b>今日の見せ場</b>）</td><td>「はやおくり」で①〜⑦を進め、豆電球とLEDの光り続ける時間の圧倒的な差を観察。よそうタイムをここで回収。シート４に記録</td></tr>
+      <tr><td class="min">29〜36分</td><td>📡 センサーで守ろう</td><td>①〜④を発見し、あかるさ・人感・温度センサー、タイマーの仕組みを確認。シート５に記録</td></tr>
+      <tr><td class="min">36〜43分</td><td>🔎 はかせチャレンジ</td><td>太陽光発電・風力発電・モバイルバッテリー・自動ドアなど身のまわりの利用例を発見してクイズ。シート６に記録</td></tr>
+      <tr><td class="min">43〜45分</td><td>まとめ → おうちミッション予告</td><td>「？？？」タッチで穴埋め→シート７。「発電・蓄電・センサーをさがそう」（シート８）を予告</td></tr>
+    </table>
+    <p style="margin:1mm 0 0">⏱ 足りない時は「ためて使おう」を右下「つぎ▶」でスキップ可（<b>豆電球とLED・センサー・はかせ・まとめは削らない</b>）。</p>
+  </div>
+
+  <div class="tSec">
+    <h2>答え</h2>
+    <div class="ansBox">
+      よそうタイム＝<b>イ LEDの方が長い</b>／発電してみよう＝<b>大きくなる</b>／
+      ためて使おう＝<b>できる</b>／豆電球とLED＝<b>LEDの方が長い</b>／
+      センサーで守ろう＝<b>必要なときだけ自動で使い、むだをへらせる</b>／はかせ＝<b>晴れの日</b>／
+      まとめ＝①<b>はやく／大きく</b>　②<b>ためて</b>　③<b>LED</b>　④<b>へらせる</b>
+    </div>
+  </div>
+
+  <div class="tSec">
+    <h2>中身のたね明かし（本物の理科です）</h2>
+    <ul>
+      <li>手回し発電機はハンドルを回す力で発電する道具。回す速さを上げるほど発生する電圧は大きくなる（1秒間に2〜3回くらいの速さで回すと無理なく発電できるとされる）</li>
+      <li>発電した電気はそのままでは消えてしまうが、コンデンサーという部品にためておけば、あとで使うことができる（蓄電）</li>
+      <li>LED（発光ダイオード）は赤色で1.5〜1.7V、白色で2.5〜2.7Vの電圧がないと点灯しない半導体の部品。一方、豆電球は0.6V程度でもわずかに点灯する</li>
+      <li>コンデンサーに蓄えた同じ量の電気で豆電球とLEDの点灯時間を比べる実験では、豆電球は約30秒で消えたのに対し、LEDは5分（300秒）たってもついていたという結果が報告されている。LEDは豆電球よりずっと少ない電気で光ることができる</li>
+      <li>2020年改訂の学習指導要領で、小6理科「電気の利用」にはセンサーとプログラミング体験が加わった。明るさセンサー・人感センサー・温度センサー・タイマーなどの「もし〜ならば、〜する」という条件で電気の働きを制御する考え方は、プログラミング的思考の基礎になる</li>
+      <li>太陽光発電は日光の強さによって発電量が変わり、晴れの日にもっとも多く発電できる。風力発電は風の力で羽根を回して発電し、風の強い場所に向いている</li>
+      <li>停電時には、あらかじめためておいた蓄電池（モバイルバッテリーや非常用電源）が役立つ。防災リュックに懐中電灯やモバイルバッテリーを入れておくと安心</li>
+    </ul>
+  </div>
+
+  <div class="tSec">
+    <h2>声かけのヒント・安全</h2>
+    <ul>
+      <li>「豆電球とLED」が今日いちばんの見せ場。1人ずつ交代で「はやおくり」ボタンを押させると全員が参加できる</li>
+      <li>よそうタイムの答え（イ：LEDの方が長い）は、「LED＝省エネ」という知識だけでなく、「なぜ・どれくらい違うのか」を数字で実感させることを意識するとよい</li>
+      <li>センサーのミッションは、家庭にある人感センサーライトや自動ドアなど、子どもが実際に体験したことのある道具と結びつけて話すと理解が深まる</li>
+      <li>停電時に蓄電池が役立つという話は、防災の話題として日常の備え（モバイルバッテリーの充電習慣など）にもつなげられるとよい</li>
+    </ul>
+  </div>
+
+  <div class="tSec">
+    <h2>発展・次回への布石</h2>
+    <ul>
+      <li>じゆうモードのクイズ例：「手回し発電機をはやく回すと電圧は？」「豆電球とLED、どちらが長く光る？」「センサーを使うと電気のむだは？」</li>
+      <li>おうちミッションでは実際に家の中の発電・蓄電・センサーを使った道具を探し、画面の学びと日常生活を結びつける狙い</li>
+      <li>理科エネルギー分野は、光（カガミの丘）・電磁石（ウズの実験室）に続き本作で3作目。理科ロードマップの優先度Bには音の性質・電流のはたらき（乾電池とモーター）などが控えている</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>
