@@ -1,4 +1,16 @@
 # 作業引き継ぎ / 再開ガイド
+
+## 次回はここから（2026-10-06）
+
+- **状態**: 理科「クルルの発電所」と社会「ひとつぶ村」のゲームv2を本番公開済み。実装は PR #111、引き継ぎ更新は PR #112。最新 main のマージコミット `0f59ce9` は Vercel 本番 success。作業ブランチは `feature/content-bank-120`、公開結果までのコミットは `224828c`。
+- **入口**: 本番は `https://yomitabi.gamanavi.com/lessons/gotomon/kururu.html` と `https://yomitabi.gamanavi.com/lessons/gotomon/hitotsubu.html`。現行ゲームは `public/lessons/gotomon/lesson-game-v2.js`、計算は `lesson-model-v2.js`、表示は `lesson-game-v2.css`。旧 `lesson-game.js` は参照されない比較用。設計と確認画面は `docs/lesson-pilot/`。
+- **次の作業**: 先生と児童に両作品を遊んでもらい、操作で迷う場面、結果から学べたこと、楽しさ、所要時間、うまくいかなかった瞬間の受け止め方を記録する。結果を見てから修正点と残り73授業への展開を判断する。児童試遊はまだ行っていない。
+- **再検証**: `npm.cmd run build` → `npm.cmd run preview -- --port 4173 --strictPort`。専用Chrome 9333番で、試験用セーブを各回入れ直して `node scripts/playtest-cdp/lesson-v2-playtest.mjs 1280 800 --parent` と `node scripts/playtest-cdp/lesson-v2-playtest.mjs 390 844 --parent`。詳細は `scripts/playtest-cdp/README.md`。全テストは `bash scripts/playtest-cdp/run-all-tests.sh` の最終 `ALL-PASS` を見る。前回は19群1122件。
+- **作業ツリー**: この作業の前から音声・ミニゲーム・テスト・画像などに多数の未コミット変更がある。今回のPRには含めていない。次回は `git status --short` を見て、対象ファイルだけ明示してステージする。push・PR・マージ・公開は新たな明示指示があるときだけ行う。
+- **別件の未決**: Firestore セキュリティルールと公開先の一本化はユーザー判断待ち。使われていない画像17枚の削除も未決で、現状は残している。
+
+## 過去の記録
+
 > **次回はここから（2026-10-06、理科・社会の授業ゲームv2を本番公開）**: クルルの理科とヒョウの社会を、各5場面で操作し結果を比べるゲームに実装。設計 `2ec2e5f` と実装 `66c3454` を [PR #111](https://github.com/shimimasa/kanji-monsters/pull/111) で main にマージ（`36547ec`）。Vercel 本番コミットは success（Deployment has completed）で、https://yomitabi.gamanavi.com/lessons/gotomon/kururu.html と https://yomitabi.gamanavi.com/lessons/gotomon/hitotsubu.html は新スクリプト込みで HTTP 200。ビルド成功、全19群1122件 ALL-PASS。PC1280×800・スマホ縦390×844で両作品の5場面を実タップし、横はみ出し0・画像読込OK・例外0・親画面の捕獲保存を確認。観察シート2枚は各A4一ページで印刷確認。手順は `scripts/playtest-cdp/README.md` の v2 項目、設計と画面は `docs/lesson-pilot/`。次は児童と先生に遊んでもらい、理解と楽しさ、所要時間を観察する。残り73授業への展開はその結果を見て判断。作業前からの音声などの未コミット変更は含めていない。
 > **次回はここから（2026-10-06、理科・社会の授業ゲーム再設計）**: ユーザーが公開済み2本のゲーム性と学びの弱さを指摘。`docs/lesson-pilot/game-design-v2.md` に、小6向けのクルル「発電・蓄電・比較・センサー・夜の小道」とヒョウ「村の願い・選挙権の歴史・秘密投票・参加人数・一票」の5場面を、操作と結果がつながるゲームとして設計した。投票先は保存せず、星と仲間は取り組みに出す。これは設計文書のみで、公開済みゲームの実装はまだ変えていない。次は1場面ずつ操作できる試作を作り、PC・スマホで確認する。残り73授業へは2本の試遊後に広げる。作業前からの未コミット変更には触れていない。
 > **次回はここから（2026-10-06、ゴトモン授業試作2本を本番公開）**: ユーザー指示により試作・評価の3コミットを作業ブランチへpushし、[PR #109](https://github.com/shimimasa/kanji-monsters/pull/109) を main にマージ（`d0fbd90`）。Vercel の本番コミットステータスは success（Deployment has completed）。公開先は https://yomitabi.gamanavi.com で、クルル・ヒョウの試作HTMLは両方HTTP 200。ビルド成功、全19群のテストは ALL-PASS。過去の専用Chrome確認ではPC1280×800・スマホ縦390×844の両方で2本各5場面を実操作した。紙印刷と子どもの試遊は未確認。残り73授業への展開は先生の授業方針を聞いてから決める。作業前からの音声などの未コミット変更は含めていない。
