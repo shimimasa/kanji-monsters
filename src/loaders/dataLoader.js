@@ -4,6 +4,7 @@ import { gameState } from '../core/gameState.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 import { validateKanjiCatalog } from '../core/kanjiIdMigration.js';
 import { MINI_GAME_GOTOMON_BY_ID, miniGameGotomonById } from '../minigames/miniGameGotomonCatalog.js';
+import { lessonCatalog, lessonGotomonById } from '../lessons/lessonCatalog.js';
 
 export let stageData = [];
 let enemyData = [];
@@ -542,6 +543,8 @@ export function getKanjiById(id) {
  * @returns {object|null}
  */
 export function getMonsterById(id) {
+  const lessonFriend = lessonGotomonById(id);
+  if (lessonFriend) return { ...lessonFriend, grade: 13, prefecture: '理科・社会の旅', desc: lessonFriend.description, trivia: lessonFriend.appearance };
   const squareFriend = miniGameGotomonById(id);
   if (squareFriend) return { ...squareFriend, grade: 0, prefecture: 'ミニゲーム広場', desc: squareFriend.description, trivia: squareFriend.appearance };
   const m = enemyData.find(item => item.id === id);
@@ -556,8 +559,10 @@ export function getMonsterById(id) {
  * 全モンスターの ID リストを返却
  * @returns {Array<number|string>}
  */
-export function getAllMonsterIds({ includeMiniGames = false } = {}) {
-  return includeMiniGames ? [...enemyData.map(item => item.id), ...Object.keys(MINI_GAME_GOTOMON_BY_ID)] : enemyData.map(item => item.id);
+export function getAllMonsterIds({ includeMiniGames = false, includeLessons = false } = {}) {
+  return [...enemyData.map(item => item.id),
+    ...(includeMiniGames ? Object.keys(MINI_GAME_GOTOMON_BY_ID) : []),
+    ...(includeLessons ? lessonCatalog.map(item => item.id) : [])];
 }
 
 // --- 学年ボーナス用のボス探索ヘルパ ---

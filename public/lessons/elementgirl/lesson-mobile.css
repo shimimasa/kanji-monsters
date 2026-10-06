@@ -1,0 +1,36 @@
+/* Yomitabi owns navigation and the confirmed completion record. */
+.backHome, #teacherBar { display: none !important; }
+
+@media (max-width: 600px) and (orientation: portrait) {
+  body { min-width: 0; }
+  header { gap: 5px; padding: 6px 8px; }
+  #logo { font-size: 16px; white-space: nowrap; }
+  #logo small { display: none; }
+  #badges { gap: 2px; }
+  .badge { width: 28px; height: 28px; font-size: 17px; }
+  main { flex-direction: column; gap: 5px; padding: 3px 6px 6px; }
+  #stageWrap { flex: none; height: 30vh; min-height: 180px; border-radius: 14px; }
+  #stageTitle { max-width: 55%; font-size: 12px; }
+  #locChip { font-size: 12px; }
+  #controls { padding: 4px; gap: 4px; }
+  .ctl { font-size: 13px; padding: .35em .6em; }
+  #side { min-width: 0; flex: 1; gap: 3px; padding-bottom: 0; overflow: hidden; }
+  #scopeWrap { width: 66px; border-width: 2px; }
+  #scopeCaption { font-size: 10px; margin: 0; }
+  #stateName { font-size: 14px; min-height: 0; }
+  #missionCard { min-height: 0; padding: 6px; gap: 4px; border-radius: 12px; }
+  #catRow { gap: 6px; }
+  #catBox { width: 49px; }
+  #catBox .catname { font-size: 10px; }
+  #bubble { font-size: 13px; line-height: 1.45; padding: .45em .6em; }
+  #wishCard { font-size: 12px; }
+  #wishCard .icon { font-size: 22px; }
+  #btnRow { gap: 5px; }
+  .btn, .btn.sub { font-size: 14px; padding: .48em .85em; }
+  #overlay { padding: 6px; }
+  .panel { width: 100%; max-width: 100%; max-height: 100%; padding: 12px; border-radius: 14px; }
+  .panel h1 { font-size: 28px; }
+  .panel h2 { font-size: 21px; }
+  .panel p.talk { font-size: 14px; line-height: 1.5; }
+  .vcard { width: min(100%, 280px); padding: .55em; font-size: 14px; }
+}

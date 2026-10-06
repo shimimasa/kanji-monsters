@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>ひとつぶ村 きろくノート（A4印刷用）</title>
+<style>
+  .backHomeSheet{
+    color:#fff; text-decoration:none; font-weight:700;
+    background:rgba(255,255,255,.25); padding:8px 16px; border-radius:8px;
+  }
+  .backHomeSheet:hover{ background:rgba(255,255,255,.4); }
+  @page { size: A4 portrait; margin: 10mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "BIZ UDPGothic", "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    color: #222; margin: 0; background: #888;
+  }
+  rt { font-size: 0.45em; }
+  .page {
+    width: 210mm; min-height: 296mm; margin: 8px auto; padding: 10mm;
+    background: #fff; page-break-after: always;
+  }
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; width: auto; min-height: auto; padding: 0; }
+    #printBar { display: none; }
+  }
+  #printBar {
+    position: sticky; top: 0; z-index: 10; background: #1a3c6e; color: #fff;
+    padding: 10px 16px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  }
+  #printBar button {
+    font-family: inherit; font-size: 16px; font-weight: 700;
+    background: #ffe9a8; border: none; border-radius: 8px; padding: 8px 20px; cursor: pointer;
+  }
+  #printBar small { opacity: .9; }
+
+  /* ---------- 子ども用シート ---------- */
+  .sheetHead {
+    display: flex; align-items: center; gap: 4mm;
+    border-bottom: 1.2mm solid #222; padding-bottom: 2mm; margin-bottom: 2.5mm;
+  }
+  .sheetHead h1 { font-size: 13.5pt; margin: 0; white-space: nowrap; }
+  .sheetHead .stars { font-size: 9pt; letter-spacing: .15em; }
+  .nameBox { margin-left: auto; font-size: 9.5pt; white-space: nowrap; }
+  .nameBox .line { display: inline-block; width: 26mm; border-bottom: .4mm solid #222; }
+  .nameBox .line.short { width: 16mm; }
+
+  .sec { margin-bottom: 1.3mm; }
+  .secTitle {
+    display: inline-block; background: #222; color: #fff;
+    font-size: 10.5pt; font-weight: 700;
+    padding: .7mm 3.5mm; border-radius: 4mm; margin-bottom: .9mm;
+  }
+  .secBody { font-size: 10pt; line-height: 1.4; }
+
+  .voteRow { display: flex; gap: 2mm; margin-top: 1mm; flex-wrap: wrap; }
+  .voteOpt {
+    flex: 1; min-width: 28mm; border: .5mm solid #222; border-radius: 3mm;
+    padding: 1.2mm 2mm; font-size: 8.6pt; text-align: center; line-height: 1.4;
+  }
+  .voteOpt .vnum { font-weight: 700; }
+
+  .fillLine { display: inline-block; width: 24mm; border-bottom: .5mm solid #222; height: 5mm; }
+  .fillLine.sm { width: 12mm; }
+  .wordBank {
+    display: inline-block; border: .4mm dashed #666; border-radius: 2mm;
+    padding: .8mm 2.5mm; font-size: 9pt; background: #f7f7f7;
+  }
+
+  .clueRow { display: flex; gap: 1.6mm; margin-top: 1mm; flex-wrap: wrap; }
+  .clueBox {
+    flex: 1; min-width: 38mm; border: .5mm solid #222; border-radius: 2mm;
+    padding: 1mm 2mm; font-size: 8.6pt; line-height: 1.4;
+  }
+  .clueBox .rletter { display: inline-block; width: 6mm; height: 6mm; border-radius: 50%; border: .4mm solid #222; text-align: center; font-weight: 700; margin-right: 1.4mm; }
+
+  .levelTable { width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: 1mm; text-align: center; }
+  .levelTable th, .levelTable td { border: .4mm solid #222; padding: 1.6mm 1mm; }
+  .levelTable th { background: #dde6f6; }
+  .levelTable td.res { height: 7mm; }
+
+  .homeBox { display: flex; gap: 4mm; align-items: center; border: .5mm dashed #222; border-radius: 3mm; padding: 2mm 3mm; }
+  .homeBox .icon { font-size: 24pt; }
+
+  .footNote { text-align: center; font-size: 9pt; margin-top: .6mm; letter-spacing: .2em; }
+
+  /* ---------- 先生用ページ ---------- */
+  .tHead { border-bottom: 1mm solid #222; padding-bottom: 1.2mm; margin-bottom: 2.2mm; }
+  .tHead h1 { font-size: 13.5pt; margin: 0; }
+  .tHead .sub { font-size: 9pt; color: #555; }
+  .tSec { margin-bottom: 1.8mm; }
+  .tSec h2 {
+    font-size: 10pt; margin: 0 0 1mm;
+    border-left: 2.5mm solid #222; padding-left: 2mm;
+  }
+  .tSec, .tSec p, .tSec li, .tSec td, .tSec th { font-size: 8.5pt; line-height: 1.32; }
+  .tSec ul { margin: 0; padding-left: 5mm; }
+  .flowTable { width: 100%; border-collapse: collapse; }
+  .flowTable th, .flowTable td { border: .4mm solid #222; padding: 1mm 1.6mm; text-align: left; }
+  .flowTable th { background: #eee; white-space: nowrap; }
+  .flowTable .min { white-space: nowrap; font-weight: 700; text-align: center; }
+  .ansBox { border: .5mm solid #222; border-radius: 2mm; padding: 2mm 3mm; background: #f5f5f5; }
+</style>
+</head>
+<body>
+<div id="printBar">
+  <button onclick="window.print()">🖨 いんさつする</button>
+  <small>1ページ目＝子ども用（人数分）／ 2ページ目＝先生用（1枚）。印刷画面で「ページ指定」をすると分けて刷れます。</small>
+</div>
+
+<!-- ========== 1ページ目：子ども用きろくノート ========== -->
+<div class="page">
+  <div class="sheetHead">
+    <h1>🗳️ ひとつぶ村 きろくノート</h1>
+    <span class="stars">☆☆☆☆☆</span>
+    <span class="nameBox">なまえ <span class="line"></span>　<ruby>日<rt>ひ</rt></ruby>づけ <span class="line short"></span></span>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">１．よそうタイム</span>
+    <div class="secBody">
+      もし 村の 半分くらいの 人しか 投票に 行かなかったら、結果は みんなが 行った時と 同じに なると思う？（１つに 〇）
+      <div class="voteRow">
+        <div class="voteOpt"><span class="vnum">ア</span> 🟰 かならず 同じに なる</div>
+        <div class="voteOpt"><span class="vnum">イ</span> 🔀 ちがう 結果に なることも ある</div>
+        <div class="voteOpt"><span class="vnum">ウ</span> ❓ 決められなく なる</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">２．むかしの 選挙（普通選挙への 歩み）</span>
+    <div class="secBody">
+      4つの 時代を 調べよう。下の 言葉から えらんで（　）に 書こう。
+      <div class="clueRow">
+        <div class="clueBox"><span class="rletter">あ</span>1889年ごろ（　　　　　）</div>
+        <div class="clueBox"><span class="rletter">い</span>1925年ごろ（　　　　　）</div>
+        <div class="clueBox"><span class="rletter">う</span>1945年ごろ（　　　　　）</div>
+        <div class="clueBox"><span class="rletter">え</span>2016年ごろ（　　　　　）</div>
+      </div>
+      <div style="margin-top:1mm">
+        <span class="wordBank">1人だけ</span>
+        <span class="wordBank">男の人だけ</span>
+        <span class="wordBank">男女みんな(20さい)</span>
+        <span class="wordBank">18さいから</span>
+      </div>
+      <div style="margin-top:1.2mm">だれでも 1人1票 投票できる きまりを 何という？　ア 普通選挙 ・ イ 特別選挙 ・ ウ 限定選挙（〇を つけよう）</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">３．とうひょうじょ（秘密選挙）</span>
+    <div class="secBody">
+      記入台に 仕切りが あったり、用紙を おりたたんだり するのは なぜ？（〇を つけよう）<br>
+      ア 目立たせるため　・　イ だれに 投票したか わからないように するため　・　ウ 紙を きれいに 使うため
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">４．村の 広場 — 開票を ためそう</span>
+    <div class="secBody">
+      投票率①〜⑧で 開票して、1位に なった 候補を 書こう。①②で 逆転したのは どれ？
+      <table class="levelTable">
+        <tr><th>①</th><th>②</th><th>③</th><th>④</th><th>⑤</th><th>⑥</th><th>⑦</th><th>⑧</th></tr>
+        <tr><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td><td class="res"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">５．一票の重み（僅差）</span>
+    <div class="secBody">
+      票の 差が 少ない「僅差」の 時、1人の 1票の 重さは？（〇を つけよう）<br>
+      ア 軽くなる　・　イ 重くなる（結果を 左右する）　・　ウ 関係ない
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">６．はかせチャレンジ（いまの日本）</span>
+    <div class="secBody">
+      18さいで 投票に 行かなかったら、自分の 意見は？（〇を つけよう）<br>
+      ア 多数派と 同じ意見として 数えられる　・　イ 結果には 入らない　・　ウ あとで 意見を 聞いてもらえる
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">７．きょうの ひみつ（まとめ）</span>
+    <div class="secBody">
+      ① だれでも 1人1票 投票できる きまりを（<span class="fillLine"></span>）という。<br>
+      ② だれに 投票したか 知られないように する きまりを（<span class="fillLine"></span>）という。<br>
+      ③ 投票に 行った 人の わりあいを（<span class="fillLine"></span>）という。
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="secTitle">８．おうちミッション</span>
+    <div class="secBody">
+      <div class="homeBox">
+        <span class="icon">🏠</span>
+        <div>
+          おうちの 人に「選挙権は 何さいから？」「今まで 投票に 行ったこと あるか」を 聞いてみよう。<br>
+          ☐ 聞いた こと：<span style="border-bottom:.4mm solid #222;display:inline-block;width:60mm">　</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footNote">✦ ✦ ✦　ひとつぶ村 見習い、きょうも おつかれさま！　✦ ✦ ✦</div>
+</div>
+
+<!-- ========== 2ページ目：先生用 進行メモ ========== -->
+<div class="page">
+  <div class="tHead">
+    <h1>【先生用】ひとつぶ村 — 授業進行メモ（45分）</h1>
+    <div class="sub">対象：小6社会「公民（選挙のしくみと一票の価値）」・学力幅あり・協力型／ 使うもの：「hitotsubu.html」・プロジェクタ・このノート（1ページ目を人数分）。実験器具は不要です。</div>
+  </div>
+
+  <div class="tSec">
+    <h2>前日までの準備チェック</h2>
+    <ul>
+      <li>☐ 授業で使うPCでHTMLを開き、各ミッションを一通り操作して確認（ネット接続不要）</li>
+      <li>☐ プロジェクタ接続・<b>F11で全画面</b>／音の確認（出なくても成立。右下「せんせい用」🔊で消音可）</li>
+      <li>☐ シート1ページ目を人数分印刷。中断時は URL の後ろに <b>?step=m_kaihyou</b> などで途中再開（m_futsuu／m_himitsu／m_kaihyou／m_ippyo／hakase／ending）</li>
+    </ul>
+  </div>
+
+  <div class="tSec">
+    <h2>45分の流れ（画面が進行役になります）</h2>
+    <table class="flowTable">
+      <tr><th>時間</th><th>画面</th><th>子どもの動き・声かけ</th></tr>
+      <tr><td class="min">0〜4分</td><td>オープニング → よそうタイム</td><td>シート１に〇。<b>答えは言わない</b>（まとめで判明します）</td></tr>
+      <tr><td class="min">4〜11分</td><td>🕰️ むかしの 選挙</td><td>1889/1925/1945/2016の4時代をボタンで確認 → 普通選挙という言葉をクイズで確認</td></tr>
+      <tr><td class="min">11〜17分</td><td>🗳️ とうひょうじょ</td><td>受付→記入→おりたたむ→投票箱の4ステップを「つぎへ」で確認 → なぜ秘密にするかクイズ</td></tr>
+      <tr><td class="min">17〜28分</td><td>🏘️ 村の広場（開票、<b>今日の見せ場</b>）</td><td>投票率①〜⑧を選び「開票する」→結果を確認。①②で人気1位のはずの公園が逆転することに注目。1人ずつ交代で目もりを選ばせるとよい</td></tr>
+      <tr><td class="min">28〜35分</td><td>⚖️ 一票の重み</td><td>サチさんの1票をA案/B案どちらに入れるか両方試す → 僅差での1票の重みをクイズ</td></tr>
+      <tr><td class="min">35〜41分</td><td>📊 はかせチャレンジ</td><td>実際の投票率データを紹介 → 自分が18さいで棄権したらどうなるかクイズ</td></tr>
+      <tr><td class="min">41〜45分</td><td>まとめ → おうちミッション予告</td><td>「？？？」タッチで穴埋め→シート７。「家族に選挙権について聞く」（シート８）を予告</td></tr>
+    </table>
+    <p style="margin:1mm 0 0">⏱ 足りない時は「とうひょうじょ」を右下「つぎ▶」でスキップ可（<b>村の広場・一票の重み・まとめは削らない</b>）。</p>
+  </div>
+
+  <div class="tSec">
+    <h2>答え</h2>
+    <div class="ansBox">
+      よそうタイム＝<b>イ ちがう結果になることもある</b>／むかしの選挙＝<b>ア 普通選挙</b>／
+      とうひょうじょ＝<b>イ だれに投票したかわからないようにするため</b>／村の広場＝<b>イ 投票に行った人がたまたまふれあい広場を選んだ人ばかりだったから</b>（①②で逆転、③以降は公園が一貫して1位）／
+      一票の重み＝<b>イ 重くなる（結果を左右する）</b>／はかせ＝<b>イ 結果には入らない</b>／
+      まとめ＝①<b>普通選挙（ふつうせんきょ）</b>　②<b>秘密選挙（ひみつせんきょ）</b>　③<b>投票率（とうひょうりつ）</b>
+    </div>
+  </div>
+
+  <div class="tSec">
+    <h2>中身のたね明かし（本物の選挙制度・統計です）</h2>
+    <ul>
+      <li>選挙権の広がり：1889年(明治22年)最初の衆議院議員選挙法は直接国税15円以上を納める満25歳以上の男子のみ(有権者は総人口の約1.1%・約45万人)。1925年(大正14年)普通選挙法で納税額の制限を撤廃し満25歳以上の男子すべてに(女性はまだ不可)。1945年(昭和20年)12月の法改正で女性にも選挙権、満20歳以上の男女に拡大。2015年6月改正・2016年6月19日施行で選挙権年齢を満18歳以上に引き下げ</li>
+      <li>選挙の原則：普通選挙(性別・財産等で差別しない)・平等選挙(1人1票)・秘密選挙(誰に投票したか秘密)・直接選挙(有権者が直接選ぶ)の4原則</li>
+      <li>投票率（総務省統計）：戦後の衆議院議員総選挙で最高は1958年の76.99%、戦後最低は2014年の52.66%。近年はおおむね50%台で推移。年代別では18・19歳や20代が他の年代より低い傾向が続く（例：令和7年参議院議員通常選挙で10歳代45.29%・20歳代47.30%・30歳代56.52%、18歳45.78%・19歳37.63%）。最新の数字は総務省ウェブサイトで確認可能</li>
+      <li>「村の広場」の開票データは、投票率が低いと一部の熱心な層の意見だけで結果が決まりうる、という一般的な仕組みを示す教材用の設定（架空の候補・数値）。実際の選挙結果の予測や特定の政党・候補を示すものではない</li>
+      <li>僅差の選挙で同数（得票数が同じ）になった場合は、公職選挙法上、くじで当選者を決めることが定められている</li>
+    </ul>
+  </div>
+
+  <div class="tSec">
+    <h2>声かけのヒント・安全</h2>
+    <ul>
+      <li>「村の広場（開票）」が今日いちばんの見せ場。1人ずつ交代で投票率を選ばせると全員が参加できる</li>
+      <li>候補（公園・図書館・花だん・ふれあい広場）はすべて架空の施設で、特定の政党や政治的立場を扱うものではない。授業中に実在の政党・候補者・時事的な政治issueの話題が出た場合は、価値判断を示さず中立に受け止め、深入りしない</li>
+      <li>おうちミッションは「意見の中身」でなく「制度や経験の有無」を聞く設問にしてあるので、家庭の政治的立場に踏み込まずに実施できる</li>
+    </ul>
+  </div>
+
+  <div class="tSec">
+    <h2>発展・次回への布石</h2>
+    <ul>
+      <li>じゆうモードのクイズ例：「秘密選挙って何？」「投票率が低いとどうなる？」「僅差のときの1票の重みは？」</li>
+      <li>社会シリーズは公民分野に初進出（地図・水・お米・歴史3作・水産業に続く8作目）。次回は三権分立・税金と暮らし・国際社会などへの発展が考えられる</li>
+      <li>教科書・資料集の年代別投票率グラフを見ると、若い世代の投票率が他の世代より低い傾向を確認できる</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

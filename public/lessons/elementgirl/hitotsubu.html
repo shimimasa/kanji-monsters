@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script src="lesson-bridge.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ひとつぶ村 — せんきょと 一票のねうち たいけん</title>
+<style>
+  .backHome{
+    position:fixed; top:8px; left:8px; z-index:9000;
+    display:inline-flex; align-items:center; gap:.3em;
+    color:#222; text-decoration:none; font-weight:700;
+    font-size:13px; white-space:nowrap;
+    padding:6px 12px; border-radius:999px;
+    background:rgba(255,255,255,.85);
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:background .2s;
+  }
+  .backHome:hover{ background:#fff; }
+  * { box-sizing: border-box; -webkit-user-select: none; user-select: none; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body {
+    background: linear-gradient(180deg, #eef2fb 0%, #dde6f6 55%, #aebfe0 100%);
+    color: #16294a;
+    font-family: "BIZ UDPGothic", "Hiragino Maru Gothic ProN", "Yu Gothic UI", "Meiryo", sans-serif;
+    display: flex; flex-direction: column;
+  }
+  rt { font-size: 0.45em; letter-spacing: 0; }
+
+  /* ---------- ヘッダー ---------- */
+  header {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; gap: 1.2vw;
+    padding: .6vh 1.4vw .3vh;
+  }
+  #logo {
+    font-size: clamp(18px, 2.1vw, 29px); font-weight: 700;
+    color: #1a3c6e; text-shadow: 0 1px 0 #fff;
+    white-space: nowrap;
+  }
+  #logo small { font-size: .55em; color: #5c6f96; font-weight: 400; margin-left: .6em; }
+  #badges { display: flex; gap: .5vw; margin-left: auto; }
+  .badge {
+    width: clamp(30px, 3.2vw, 44px); height: clamp(30px, 3.2vw, 44px);
+    display: grid; place-items: center; border-radius: 50%;
+    background: #e3ebf9; border: 2px solid #b9c9ea;
+    font-size: clamp(16px, 1.8vw, 26px); color: #b9c9ea;
+    transition: all .3s;
+  }
+  .badge.on {
+    background: radial-gradient(circle at 35% 30%, #ffe9a8, #d4900f);
+    border-color: #8a5a0a; color: #16294a;
+    box-shadow: 0 0 14px rgba(212, 144, 15, .7);
+    animation: pop .5s;
+  }
+  @keyframes pop { 0% { transform: scale(.3); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+  /* ---------- メインレイアウト ---------- */
+  main {
+    position: relative; z-index: 1;
+    flex: 1; display: flex; gap: 1.1vw;
+    padding: .4vh 1.2vw 1.2vh; min-height: 0;
+  }
+  #stageWrap {
+    flex: 1.5; position: relative; min-width: 0;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #f7faff 0%, #e2eaf8 100%);
+    border: 3px solid #1a3c6e;
+    box-shadow: inset 0 0 40px rgba(20, 40, 80, .12), 0 4px 18px rgba(15, 35, 70, .22);
+    overflow: hidden;
+  }
+  #stage { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: pointer; }
+  #stageTitle {
+    position: absolute; top: .55vh; left: 1.4vw; pointer-events: none;
+    color: #16294a; font-size: clamp(12px, 1.25vw, 17px);
+    max-width: 56%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #locChip {
+    position: absolute; top: .45vh; right: 1.2vw;
+    background: #1a3c6e; color: #eef2fb; font-weight: 700;
+    font-size: clamp(13px, 1.4vw, 19px);
+    padding: .26em .8em; border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(15, 35, 70, .35);
+  }
+  /* 操作ボタン */
+  #controls {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    display: flex; flex-wrap: wrap; gap: .4vw; justify-content: center; align-items: center;
+    padding: .8vh .5vw; background: linear-gradient(180deg, transparent, rgba(15, 35, 70, .45) 40%);
+  }
+  .ctl {
+    font-family: inherit; font-size: clamp(13px, 1.4vw, 20px); font-weight: 700;
+    padding: .42em .8em; border-radius: 14px; border: 2px solid #cfdbf5; cursor: pointer;
+    background: linear-gradient(180deg, #3d6fc4, #1a3c6e); color: #fff;
+    box-shadow: 0 3px 0 #0d2242; transition: transform .1s, opacity .2s;
+    white-space: nowrap;
+  }
+  .ctl:hover { transform: translateY(-2px); }
+  .ctl:active { transform: translateY(1px); }
+  .ctl:disabled { opacity: .3; cursor: default; transform: none; }
+  .ctl.pos { background: linear-gradient(180deg, #8a7550, #5c4a2e); border-color: #d9c79a; box-shadow: 0 3px 0 #3a2e1a; }
+  .ctl.pos.sel { background: linear-gradient(180deg, #ffce54, #e0a020); border-color: #fff0c0; box-shadow: 0 3px 0 #a08010; color: #4a3a10; }
+
+  #side { flex: 1; display: flex; flex-direction: column; gap: .7vh; min-width: 280px; padding-bottom: 32px; }
+  #scopeWrap {
+    position: relative; width: min(100%, 25vh); aspect-ratio: 1;
+    margin: 0 auto; border-radius: 50%;
+    border: 4px solid #1a3c6e; overflow: hidden;
+    box-shadow: 0 3px 14px rgba(15, 35, 70, .3), inset 0 0 24px rgba(15, 35, 70, .18);
+    flex-shrink: 0; background: #eef2fb;
+  }
+  #scope { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #scopeCaption {
+    text-align: center; color: #5c6f96;
+    font-size: clamp(11px, 1.15vw, 15px); margin-top: .3vh;
+  }
+  #stateName {
+    text-align: center; font-weight: 700;
+    font-size: clamp(16px, 1.8vw, 25px);
+    color: #16294a; min-height: 1.3em; line-height: 1.35;
+  }
+
+  /* ---------- ミッションカード ---------- */
+  #missionCard {
+    flex: 1; min-height: 0; display: flex; flex-direction: column; gap: .6vh;
+    background: #f7faff; border: 2px solid #b9c9ea; border-radius: 18px;
+    padding: .8vh .9vw; overflow-y: auto;
+  }
+  #catRow { display: flex; gap: .7vw; align-items: flex-start; }
+  #catBox { flex-shrink: 0; width: clamp(64px, 6.5vw, 96px); text-align: center; }
+  #catBox .catname { font-size: clamp(11px, 1vw, 14px); color: #5c6f96; }
+  .mascot { width: 100%; animation: floaty 3.8s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  .mascot .eyes { transform-box: fill-box; transform-origin: center; animation: blink 4.5s infinite; }
+  @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+
+  #bubble {
+    flex: 1; background: #fff; color: #16294a;
+    border: 1.5px solid #cfdbf5;
+    border-radius: 16px; padding: .55em .85em; position: relative;
+    font-size: clamp(14px, 1.4vw, 20px); line-height: 1.6;
+    animation: fadeUp .35s;
+  }
+  #bubble::before {
+    content: ""; position: absolute; left: -10px; top: 26px;
+    border: 7px solid transparent; border-right-color: #fff;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  #bubble b { color: #1a3c6e; background: #ffe9a8; padding: 0 .2em; border-radius: 4px; }
+
+  #wishCard {
+    display: none; align-items: center; gap: .7vw;
+    background: linear-gradient(180deg, #dde6f6, #e6edfa); color: #16294a;
+    border: 2px solid #1a3c6e; border-radius: 6px;
+    padding: .4em .7em; font-size: clamp(13px, 1.35vw, 19px); line-height: 1.55;
+    animation: fadeUp .35s; position: relative;
+  }
+  #wishCard .icon { font-size: clamp(26px, 3vw, 42px); flex-shrink: 0; }
+  #wishCard .wtitle { font-size: .75em; color: #1a3c6e; font-weight: 700; }
+
+  #btnRow { display: flex; flex-wrap: wrap; gap: .6vw .8vw; justify-content: center; }
+  .btn {
+    font-family: inherit; font-size: clamp(15px, 1.6vw, 22px); font-weight: 700;
+    padding: .45em 1.2em; border-radius: 999px; border: none; cursor: pointer;
+    background: linear-gradient(180deg, #3d6fc4, #1a3c6e); color: #fff;
+    box-shadow: 0 3px 0 #0d2242, 0 5px 12px rgba(15, 35, 70, .3);
+    transition: transform .1s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #0d2242; }
+  .btn.sub {
+    background: #e3ebf9; color: #234276; box-shadow: 0 3px 0 #b9c9ea;
+    font-weight: 400; font-size: clamp(14px, 1.4vw, 19px);
+  }
+  .btn.choice { background: #fff; color: #16294a; box-shadow: 0 3px 0 #b9c9ea; font-weight: 400; border: 1.5px solid #cfdbf5; display: inline-flex; align-items: center; gap: .3em; }
+  .btn.choice.picked { background: #ffe9a8; outline: 3px solid #3d6fc4; font-weight: 700; }
+
+  /* ---------- オーバーレイ ---------- */
+  #overlay {
+    position: fixed; inset: 0; z-index: 50; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(10, 20, 45, .8);
+  }
+  #overlay.show { display: flex; }
+  .panel {
+    max-width: min(900px, 94vw); max-height: 94vh; overflow-y: auto;
+    background: linear-gradient(180deg, #f7faff, #e6edfa);
+    border: 3px solid #3d6fc4; border-radius: 22px;
+    padding: 2.4vh 3vw; text-align: center;
+    box-shadow: 0 10px 50px rgba(10, 20, 45, .45);
+    animation: fadeUp .4s;
+  }
+  .panel h1 {
+    margin: .1em 0; font-size: clamp(28px, 4.6vw, 54px);
+    color: #1a3c6e; text-shadow: 0 2px 0 #fff;
+    letter-spacing: .04em;
+  }
+  .panel h2 { margin: 0 0 .3em; font-size: clamp(20px, 2.6vw, 32px); color: #1a3c6e; }
+  .panel .sub { color: #5c6f96; font-size: clamp(14px, 1.6vw, 21px); margin-bottom: 1.5vh; }
+  .panel p.talk {
+    background: #fff; color: #16294a; border: 1.5px solid #cfdbf5; border-radius: 16px;
+    padding: .5em .8em; font-size: clamp(14px, 1.55vw, 20px); line-height: 1.6;
+    text-align: left; margin: .6vh auto; max-width: 660px;
+  }
+  .panel .foot { color: #5c6f96; font-size: clamp(11px, 1.1vw, 14px); margin-top: 1.6vh; }
+  .phasesStrip { font-size: clamp(20px, 2.6vw, 34px); letter-spacing: .3em; margin: .2vh 0; }
+
+  .voteCards { display: flex; gap: 1vw; justify-content: center; flex-wrap: wrap; margin: 1.5vh 0; }
+  .vcard {
+    width: clamp(150px, 20vw, 210px); cursor: pointer;
+    background: #fff; color: #16294a; border-radius: 14px;
+    padding: 1.1em .8em; font-size: clamp(14px, 1.5vw, 20px); line-height: 1.6;
+    border: 3px solid #cfdbf5; position: relative; transition: transform .12s;
+  }
+  .vcard:hover { transform: translateY(-3px); }
+  .vcard .vicon { font-size: clamp(30px, 3.6vw, 52px); display: block; margin-bottom: .2em; }
+  .vcard.picked { border-color: #1a3c6e; background: #ffe9a8; }
+  .vcard.picked::after {
+    content: "✔"; position: absolute; top: -14px; right: -8px;
+    background: #1a3c6e; color: #fff; width: 34px; height: 34px; line-height: 34px;
+    border-radius: 50%; font-size: 20px; box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  }
+  #blankArea span.blankWord {
+    display: inline-block; min-width: 3.2em; border-bottom: 3px solid #1a3c6e;
+    color: #16294a; font-weight: 700; cursor: pointer; text-align: center;
+  }
+
+  /* ---------- エフェクト・先生バー ---------- */
+  #fx { position: fixed; inset: 0; z-index: 70; pointer-events: none; display: none; }
+  #teacherBar {
+    position: fixed; right: 8px; bottom: 6px; z-index: 60;
+    display: flex; gap: 6px; align-items: center;
+    opacity: .4; transition: opacity .2s; font-size: 12px; color: #5c6f96;
+  }
+  #teacherBar:hover { opacity: 1; }
+  #teacherBar button {
+    font-family: inherit; background: #e3ebf9; color: #234276;
+    border: 1px solid #b9c9ea; border-radius: 8px;
+    padding: 4px 10px; cursor: pointer; font-size: 13px;
+  }
+  #teacherBar button:hover { background: #dde6f6; }
+</style>
+<link rel="stylesheet" href="lesson-mobile.css">
+</head>
+<body>
+<script>
+/* === 施設PC/古ブラウザ対策 安全スクリプト（ES5で記述） ===
+   ・JSエラーを画面に赤字表示 → 「白画面で原因不明」を防ぐ
+   ・ctx.roundRect ポリフィル（Edge/Chrome 99未満で無く白画面になる対策） */
+(function () {
+  function showErr(msg) {
+    try {
+      var d = document.getElementById('__err');
+      if (!d) {
+        d = document.createElement('div');
+        d.id = '__err';
+        d.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;z-index:99999;background:#101426;color:#ffdada;font:14px/1.7 monospace;padding:18px;overflow:auto;white-space:pre-wrap';
+        (document.body || document.documentElement).appendChild(d);
+      }
+      d.appendChild(document.createTextNode('⚠ ' + msg + '\n'));
+    } catch (e) {}
+  }
+  window.addEventListener('error', function (e) {
+    showErr((e && e.message ? e.message : 'error') + '  @line ' + (e && e.lineno ? e.lineno : '?'));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    showErr('Promise: ' + (e && e.reason ? e.reason : ''));
+  });
+  try {
+    var P = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;
+    if (P && !P.roundRect) {
+      P.roundRect = function (x, y, w, h, r) {
+        var a;
+        if (typeof r === 'number') { a = [r, r, r, r]; }
+        else if (r && r.length) {
+          if (r.length === 1) { a = [r[0], r[0], r[0], r[0]]; }
+          else if (r.length === 2) { a = [r[0], r[1], r[0], r[1]]; }
+          else if (r.length === 3) { a = [r[0], r[1], r[2], r[1]]; }
+          else { a = [r[0], r[1], r[2], r[3]]; }
+        } else { a = [0, 0, 0, 0]; }
+        var m = Math.min(Math.abs(w), Math.abs(h)) / 2;
+        var tl = Math.min(a[0], m), tr = Math.min(a[1], m), br = Math.min(a[2], m), bl = Math.min(a[3], m);
+        this.moveTo(x + tl, y);
+        this.arcTo(x + w, y, x + w, y + h, tr);
+        this.arcTo(x + w, y + h, x, y + h, br);
+        this.arcTo(x, y + h, x, y, bl);
+        this.arcTo(x, y, x + w, y, tl);
+        this.closePath();
+        return this;
+      };
+    }
+  } catch (e) {}
+})();
+</script>
+
+<header>
+  <div id="logo">🗳️ ひとつぶ村<small>— せんきょと 一票の ねうち —</small></div>
+  <div id="badges">
+    <div class="badge" id="bd_m_futsuu" title="むかしの選挙">★</div>
+    <div class="badge" id="bd_m_himitsu" title="秘密選挙">★</div>
+    <div class="badge" id="bd_m_kaihyou" title="村の広場">★</div>
+    <div class="badge" id="bd_m_ippyo" title="一票の重み">★</div>
+    <div class="badge" id="bd_hakase" title="はかせ">★</div>
+  </div>
+</header>
+
+<main>
+  <section id="stageWrap">
+    <canvas id="stage"></canvas>
+    <div id="stageTitle">ひとつぶ村と せんきょの ひみつ</div>
+    <div id="locChip"></div>
+    <div id="controls"></div>
+  </section>
+
+  <aside id="side">
+    <div id="scopeWrap">
+      <canvas id="scope"></canvas>
+    </div>
+    <div id="scopeCaption">🗳️ とうひょうの まど 〜 くわしく 見る 〜</div>
+    <div id="stateName"></div>
+    <div id="missionCard">
+      <div id="catRow">
+        <div id="catBox">
+          <svg class="mascot" viewBox="0 0 120 130" aria-hidden="true">
+            <ellipse cx="60" cy="120" rx="30" ry="6" fill="rgba(20,40,80,.18)"/>
+            <!-- からだ：投票箱 -->
+            <path d="M28 118 L26 82 Q26 76 32 76 L88 76 Q94 76 94 82 L92 118 Z" fill="#1a3c6e" stroke="#16294a" stroke-width="2"/>
+            <rect x="26" y="76" width="68" height="10" rx="3" fill="#e0a838" stroke="#16294a" stroke-width="2"/>
+            <rect x="52" y="79" width="16" height="4" rx="2" fill="#16294a"/>
+            <!-- とうひょう用紙が のぞく -->
+            <path d="M56 79 L64 79 L62 62 Q60 58 58 62 Z" fill="#fff" stroke="#16294a" stroke-width="1.5"/>
+            <!-- はた -->
+            <path d="M60 6 L60 22" stroke="#16294a" stroke-width="2"/>
+            <path d="M60 6 L76 12 L60 18 Z" fill="#ffe9a8" stroke="#16294a" stroke-width="1.5"/>
+            <!-- あたま -->
+            <circle cx="60" cy="42" r="25" fill="#f6e6c8" stroke="#16294a" stroke-width="2.5"/>
+            <!-- ほっぺ -->
+            <ellipse cx="46" cy="46" rx="5" ry="3.4" fill="#e0876a" opacity=".5"/>
+            <ellipse cx="74" cy="46" rx="5" ry="3.4" fill="#e0876a" opacity=".5"/>
+            <!-- め -->
+            <g class="eyes">
+              <ellipse cx="51" cy="40" rx="3.6" ry="5" fill="#16294a"/>
+              <ellipse cx="69" cy="40" rx="3.6" ry="5" fill="#16294a"/>
+              <circle cx="52.3" cy="37.5" r="1.2" fill="#fff"/>
+              <circle cx="70.3" cy="37.5" r="1.2" fill="#fff"/>
+            </g>
+            <!-- くち -->
+            <path d="M53 54 Q60 59 67 54" stroke="#16294a" fill="none" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <div class="catname">投票箱の<ruby>精霊<rt>せいれい</rt></ruby> <ruby>ヒョウ<rt></rt></ruby></div>
+        </div>
+        <div id="bubble"></div>
+      </div>
+      <div id="wishCard">
+        <span class="icon"></span>
+        <span class="wtext"><span class="wtitle">🗳️ ひとつぶ村ミッション</span><br><span class="wbody"></span></span>
+      </div>
+      <div id="btnRow"></div>
+    </div>
+  </aside>
+</main>
+
+<div id="overlay"><div class="panel" id="panelBody"></div></div>
+<canvas id="fx"></canvas>
+
+<div id="teacherBar">
+  <span>せんせい用</span>
+  <button id="tbSound" title="音のオン・オフ">🔊</button>
+  <button id="tbPrev" title="ひとつ前へ">◀ まえ</button>
+  <button id="tbNext" title="次へ（スキップ）">つぎ ▶</button>
+  <button id="tbReset" title="さいしょからやりなおす">↺</button>
+</div>
+
+<script>
+'use strict';
+/* =====================================================
+   ひとつぶ村 — せんきょと一票のねうち（小6社会公民・協力型・1ファイル）
+   むかしの選挙(普通選挙) → とうひょうじょ(秘密選挙) → 村の広場(開票・投票率シミュレーション) →
+   一票の重み(僅差) → はかせ（いまの日本の投票率）。
+   ===================================================== */
+
+// ---------- ユーティリティ ----------
+const $ = id => document.getElementById(id);
+const TAU = Math.PI * 2;
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ruby = (k, f) => `<ruby>${k}<rt>${f}</rt></ruby>`;
+function easeInOut(x) { return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2; }
+
+const W = {
+  futsuu: ruby('普通選挙', 'ふつうせんきょ'),
+  himitsu: ruby('秘密選挙', 'ひみつせんきょ'),
+  touhyouritsu: ruby('投票率', 'とうひょうりつ'),
+  senkyoken: ruby('選挙権', 'せんきょけん'),
+  kinsa: ruby('僅差', 'きんさ'),
+};
+
+const NUMS = '①②③④⑤⑥⑦⑧';
+
+const CAND = [
+  { name: '公園の遊具', icon: '🛝' },
+  { name: '図書館の本', icon: '📚' },
+  { name: '花だんの広場', icon: '🌷' },
+  { name: 'ふれあい広場', icon: '🐰' },
+];
+
+// ---------- 開票の表（投票率レベル①〜⑧：それぞれの得票） ----------
+const KAIHYOU_TABLE = [
+  { pct: 10, votes: [1, 1, 0, 2] },
+  { pct: 20, votes: [2, 1, 1, 4] },
+  { pct: 30, votes: [4, 3, 2, 3] },
+  { pct: 40, votes: [5, 4, 3, 4] },
+  { pct: 60, votes: [8, 6, 5, 5] },
+  { pct: 70, votes: [9, 7, 6, 6] },
+  { pct: 90, votes: [11, 9, 8, 8] },
+  { pct: 100, votes: [12, 10, 9, 9] },
+];
+function kaihyouWinnerIdx(votes) {
+  let mi = 0;
+  for (let i = 1; i < votes.length; i++) if (votes[i] > votes[mi]) mi = i;
+  return mi;
+}
+
+// ---------- むかしの選挙：4つの時代 ----------
+const FUTSUU_POINTS = [
+  { key: 0, letter: 'あ', name: '1889年ごろ', x: 150, y: 420,
+    txt: `1889年(明治22年)、日本で はじめて 選挙が 行われた。投票できたのは「税金を 15円以上 納める、満25さい以上の 男の人」だけ。日本全体を、ひとつぶ村のような 40人の 村に たとえると、投票できるのは たった 1人 だけだったんだ。` },
+  { key: 1, letter: 'い', name: '1925年ごろ', x: 400, y: 280,
+    txt: `1925年(大正14年)、税金の 金額による 制限が なくなった。満25さい以上の 男の人なら、だれでも 投票できるように なった。40人の 村では、男の人 約20人が 投票できる。でも 女の人は まだ 投票できなかった。` },
+  { key: 2, letter: 'う', name: '1945年ごろ', x: 650, y: 420,
+    txt: `1945年(昭和20年)、女の人にも 選挙権が みとめられた。満20さい以上の 男女 だれもが 投票できるように なったんだ。40人 みんなが 投票できるように なった。` },
+  { key: 3, letter: 'え', name: '2016年ごろ', x: 850, y: 280,
+    txt: `2016年(平成28年)、選挙権年齢が 満18さい以上に 引き下げられた。18さいの 誕生日を むかえたら、もう 投票できるよ。` },
+];
+
+// ---------- とうひょうじょ：4つのステップ ----------
+const HIMITSU_STEPS = [
+  { icon: '🎫', title: '投票用紙を もらう', txt: `受付で 名前を 確認してもらい、投票用紙を もらうよ。` },
+  { icon: '✏️', title: '記入台で 書く', txt: `まわりを 仕切りで かこまれた 記入台で、えらんだ 候補に 印を つける。だれにも 見えないよ。` },
+  { icon: '🗒️', title: '用紙を おりたたむ', txt: `書いた 用紙は、中身が 見えないように おりたたむ。` },
+  { icon: '📥', title: '投票箱に 入れる', txt: `おりたたんだ 用紙を、投票箱に 入れる。これで 投票 かんりょう！` },
+];
+
+// ---------- 状態 ----------
+const S = {
+  stepIndex: 0,
+  scene: 'village',
+  scope: { type: 'idle' },
+  sound: Number(localStorage.getItem('seVolume') ?? 0.8) > 0,
+  votePicked: new Set(),
+  badges: new Set(),
+  futsuuFound: new Set(),
+  futsuuEra: null,
+  himitsuStep: -1,
+  kaihyouLevel: 1,
+  kaihyouResult: null,
+  kaihyouTried: new Set(),
+  kaihyouAnimT: 0,
+  ippyoBase: [19, 20],
+  ippyoVotes: [19, 20],
+  ippyoAnimT: 1,
+  tween: null,
+  anim: {},
+};
+
+// ---------- 音 ----------
+let AC = null;
+function ac() {
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  if (AC && AC.state === 'suspended') AC.resume();
+  return AC;
+}
+function tone(freq, delay, dur, type, vol) {
+  const c = ac(); if (!c || !S.sound) return;
+  const t0 = c.currentTime + delay;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type || 'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0, t0);
+  const savedVolume = Number(localStorage.getItem('seVolume') ?? 0.8);
+  const lessonVolume = Number.isFinite(savedVolume) ? Math.max(0, Math.min(1, savedVolume)) : 0.8;
+  g.gain.linearRampToValueAtTime((vol || 0.12) * lessonVolume, t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(t0); o.stop(t0 + dur + 0.05);
+}
+const sTap = () => tone(660, 0, 0.09, 'triangle', 0.07);
+const sYes = () => [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, i * 0.09, 0.5, 'triangle', 0.11));
+const sHmm = () => { tone(392, 0, 0.18, 'sine', 0.07); tone(349, 0.16, 0.3, 'sine', 0.07); };
+const sFanfare = () => [523, 587, 659, 784, 880, 1046, 1318, 1568].forEach((f, i) => tone(f, i * 0.08, 0.45, 'triangle', 0.1));
+const sClank = () => { tone(220, 0, 0.14, 'square', 0.05); tone(180, 0.08, 0.22, 'square', 0.05); };
+
+// ---------- キャンバス ----------
+const stageCv = $('stage'), scopeCv = $('scope'), fxCv = $('fx');
+const gctx = stageCv.getContext('2d'), sctx = scopeCv.getContext('2d'), fctx = fxCv.getContext('2d');
+function fitCanvas(cv) {
+  const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  return { w: r.width, h: r.height, dpr };
+}
+
+// ---------- 座標変換 ----------
+const PAD_T = 54, PAD_B = 60, PAD_X = 10;
+const MAPW = 1000, MAPH = 640;
+function mapTransform(w, h) {
+  const sc = Math.min((w - PAD_X * 2) / MAPW, (h - PAD_T - PAD_B) / MAPH);
+  const ox = PAD_X + (w - PAD_X * 2 - MAPW * sc) / 2;
+  const oy = PAD_T + (h - PAD_T - PAD_B - MAPH * sc) / 2;
+  return { sc, ox, oy };
+}
+
+// ---------- 発見ポイントの共通描画 ----------
+function drawPoints(points, X, Y, sc, foundSet) {
+  points.forEach(p => {
+    const done = foundSet.has(p.key);
+    const px = X(p.x), py = Y(p.y);
+    gctx.beginPath(); gctx.arc(px, py, 22 * sc, 0, TAU);
+    gctx.fillStyle = done ? '#1a3c6e' : '#fff';
+    gctx.fill();
+    gctx.strokeStyle = '#16294a'; gctx.lineWidth = 2.4 * sc; gctx.stroke();
+    gctx.fillStyle = done ? '#fff' : '#1a3c6e';
+    gctx.font = `700 ${20 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+    gctx.fillText(p.letter, px, py + 1 * sc);
+  });
+}
+
+// ---------- 村の広場（intro/vote/done の背景） ----------
+function drawVillageScene(X, Y, sc) {
+  const g = gctx.createLinearGradient(0, Y(0), 0, Y(640));
+  g.addColorStop(0, '#eef2fb'); g.addColorStop(1, '#c7d6ef');
+  gctx.fillStyle = g; gctx.fillRect(X(0), Y(0), 1000 * sc, 640 * sc);
+  gctx.fillStyle = '#e4d9ae';
+  gctx.beginPath(); gctx.ellipse(X(500), Y(430), 380 * sc, 190 * sc, 0, 0, TAU); gctx.fill();
+
+  gctx.fillStyle = '#e0a838'; gctx.strokeStyle = '#16294a'; gctx.lineWidth = 2.5 * sc;
+  gctx.beginPath(); gctx.ellipse(X(500), Y(420), 20 * sc, 26 * sc, 0, 0, TAU); gctx.fill(); gctx.stroke();
+
+  const spots = [
+    { cx: 260, cy: 300, icon: '🛝' }, { cx: 740, cy: 300, icon: '📚' },
+    { cx: 260, cy: 540, icon: '🌷' }, { cx: 740, cy: 540, icon: '🐰' },
+  ];
+  spots.forEach(sp => {
+    gctx.strokeStyle = '#16294a'; gctx.lineWidth = 3 * sc;
+    gctx.beginPath(); gctx.moveTo(X(sp.cx), Y(sp.cy + 40)); gctx.lineTo(X(sp.cx), Y(sp.cy - 30)); gctx.stroke();
+    gctx.fillStyle = '#fff';
+    gctx.beginPath(); gctx.roundRect(X(sp.cx - 30), Y(sp.cy - 60), 60 * sc, 40 * sc, 6 * sc); gctx.fill(); gctx.stroke();
+    gctx.font = `${26 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+    gctx.fillText(sp.icon, X(sp.cx), Y(sp.cy - 40));
+  });
+  gctx.fillStyle = '#16294a'; gctx.font = `700 ${18 * sc}px sans-serif`; gctx.textAlign = 'center';
+  gctx.fillText('村の 広場', X(500), Y(220));
+}
+
+function drawVillageDoneScene(X, Y, sc) {
+  drawVillageScene(X, Y, sc);
+  gctx.font = `${90 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+  gctx.fillText('🛝', X(500), Y(340));
+  gctx.fillStyle = '#16294a'; gctx.font = `700 ${18 * sc}px sans-serif`;
+  gctx.fillText('村の たからもの「遊具のある 公園」完成！', X(500), Y(430));
+}
+
+// ---------- むかしの選挙 ----------
+function drawFutsuuScene(X, Y, sc) {
+  const g = gctx.createLinearGradient(0, Y(0), 0, Y(640));
+  g.addColorStop(0, '#eef2fb'); g.addColorStop(1, '#c7d6ef');
+  gctx.fillStyle = g; gctx.fillRect(X(0), Y(0), 1000 * sc, 640 * sc);
+
+  gctx.strokeStyle = '#8fa3cf'; gctx.lineWidth = 6 * sc; gctx.lineCap = 'round';
+  gctx.beginPath(); gctx.moveTo(X(120), Y(420)); gctx.lineTo(X(880), Y(420)); gctx.stroke();
+
+  drawPoints(FUTSUU_POINTS, X, Y, sc, S.futsuuFound);
+
+  const LIT = [1, 20, 40, 40];
+  const era = S.futsuuEra;
+  const lit = era === null ? 0 : LIT[era];
+  const cols = 10, cellW = 60, cellH = 34, startX = 200, startY = 470;
+  gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+  for (let i = 0; i < 40; i++) {
+    const cx = startX + (i % cols) * cellW, cy = startY + Math.floor(i / cols) * cellH;
+    const on = i < lit;
+    gctx.font = `${22 * sc}px sans-serif`;
+    gctx.globalAlpha = on ? 1 : 0.25;
+    gctx.fillText('🧑', X(cx), Y(cy));
+    gctx.globalAlpha = 1;
+  }
+}
+
+// ---------- とうひょうじょ ----------
+function drawHimitsuScene(X, Y, sc) {
+  const g = gctx.createLinearGradient(0, Y(0), 0, Y(640));
+  g.addColorStop(0, '#eef2fb'); g.addColorStop(1, '#c7d6ef');
+  gctx.fillStyle = g; gctx.fillRect(X(0), Y(0), 1000 * sc, 640 * sc);
+
+  gctx.fillStyle = '#f7faff'; gctx.strokeStyle = '#16294a'; gctx.lineWidth = 3 * sc;
+  gctx.beginPath(); gctx.roundRect(X(150), Y(120), 700 * sc, 420 * sc, 14 * sc); gctx.fill(); gctx.stroke();
+  gctx.fillStyle = '#16294a'; gctx.font = `700 ${20 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'alphabetic';
+  gctx.fillText('とうひょうじょ', X(500), Y(100));
+
+  const step = S.himitsuStep;
+  const stepIcons = ['🎫', '✏️', '🗒️', '📥'];
+  gctx.textBaseline = 'middle';
+  for (let i = 0; i < stepIcons.length; i++) {
+    const cx = 260 + i * 160, cy = 330;
+    gctx.font = `${70 * sc}px sans-serif`;
+    gctx.globalAlpha = i <= step ? 1 : 0.25;
+    gctx.fillText(stepIcons[i], X(cx), Y(cy));
+    gctx.globalAlpha = 1;
+    if (i <= step) {
+      gctx.strokeStyle = '#e0a838'; gctx.lineWidth = 4 * sc;
+      gctx.beginPath(); gctx.arc(X(cx), Y(cy), 55 * sc, 0, TAU); gctx.stroke();
+    }
+  }
+}
+
+// ---------- 村の広場（開票シミュレーション：メイン操作） ----------
+function drawKaihyouScene(X, Y, sc) {
+  const g = gctx.createLinearGradient(0, Y(0), 0, Y(640));
+  g.addColorStop(0, '#eef2fb'); g.addColorStop(1, '#c7d6ef');
+  gctx.fillStyle = g; gctx.fillRect(X(0), Y(0), 1000 * sc, 640 * sc);
+
+  const animT = S.kaihyouResult ? (S.tween ? clamp(S.kaihyouAnimT || 0, 0, 1) : 1) : 0;
+  const maxV = 12, baseY = 560, maxH = 300, jarW = 120;
+  for (let i = 0; i < 4; i++) {
+    const cx = 165 + i * 225;
+    const v = S.kaihyouResult ? S.kaihyouResult[i] : 0;
+    const fillH = (v / maxV) * maxH * animT;
+    gctx.fillStyle = '#e3ebf9'; gctx.strokeStyle = '#16294a'; gctx.lineWidth = 3 * sc;
+    gctx.beginPath(); gctx.roundRect(X(cx - jarW / 2), Y(baseY - maxH), jarW * sc, maxH * sc, 8 * sc);
+    gctx.fill(); gctx.stroke();
+    if (fillH > 0.5) {
+      gctx.fillStyle = '#3d6fc4';
+      gctx.fillRect(X(cx - jarW / 2 + 4), Y(baseY - 4 - fillH), (jarW - 8) * sc, fillH * sc);
+    }
+    gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+    gctx.font = `${34 * sc}px sans-serif`;
+    gctx.fillText(CAND[i].icon, X(cx), Y(baseY - maxH - 26));
+    gctx.fillStyle = '#16294a'; gctx.font = `700 ${14 * sc}px sans-serif`;
+    gctx.fillText(CAND[i].name, X(cx), Y(baseY + 20));
+    if (S.kaihyouResult) {
+      gctx.font = `700 ${17 * sc}px sans-serif`;
+      gctx.fillText(v + '票', X(cx), Y(baseY - fillH - 16));
+    }
+  }
+}
+
+// ---------- 一票の重み（隣村の相談） ----------
+function drawIppyoScene(X, Y, sc) {
+  const g = gctx.createLinearGradient(0, Y(0), 0, Y(640));
+  g.addColorStop(0, '#eef2fb'); g.addColorStop(1, '#c7d6ef');
+  gctx.fillStyle = g; gctx.fillRect(X(0), Y(0), 1000 * sc, 640 * sc);
+
+  const labels = ['A案：橋を 新しくする', 'B案：道を 広げる'];
+  const baseVotes = S.ippyoBase;
+  const targetVotes = S.ippyoVotes;
+  const animT = S.tween ? clamp(S.ippyoAnimT || 0, 0, 1) : 1;
+  const shown = [lerp(baseVotes[0], targetVotes[0], animT), lerp(baseVotes[1], targetVotes[1], animT)];
+  const maxV = 22, baseY = 560, maxH = 300, barW = 200;
+  for (let i = 0; i < 2; i++) {
+    const cx = 320 + i * 360;
+    const h = (shown[i] / maxV) * maxH;
+    gctx.fillStyle = '#e3ebf9'; gctx.strokeStyle = '#16294a'; gctx.lineWidth = 3 * sc;
+    gctx.beginPath(); gctx.roundRect(X(cx - barW / 2), Y(baseY - maxH), barW * sc, maxH * sc, 10 * sc);
+    gctx.fill(); gctx.stroke();
+    gctx.fillStyle = i === 0 ? '#3d6fc4' : '#e0a838';
+    if (h > 0.5) gctx.fillRect(X(cx - barW / 2 + 5), Y(baseY - 4 - h), (barW - 10) * sc, h * sc);
+    gctx.fillStyle = '#16294a'; gctx.font = `700 ${16 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+    gctx.fillText(labels[i], X(cx), Y(baseY + 26));
+    gctx.font = `700 ${24 * sc}px sans-serif`;
+    gctx.fillText(Math.round(shown[i]) + '票', X(cx), Y(baseY - h - 20));
+  }
+  gctx.font = `${40 * sc}px sans-serif`;
+  gctx.fillText('🙋', X(500), Y(150));
+  gctx.fillStyle = '#16294a'; gctx.font = `700 ${15 * sc}px sans-serif`;
+  gctx.fillText('サチさん（まだ 投票していない）', X(500), Y(190));
+}
+
+// ---------- はかせ：いまの日本 ----------
+function drawHakaseScene(X, Y, sc) {
+  gctx.fillStyle = '#eef2fb';
+  gctx.fillRect(X(0), Y(0), 1000 * sc, 640 * sc);
+  gctx.fillStyle = '#f7faff'; gctx.strokeStyle = '#16294a'; gctx.lineWidth = 3 * sc;
+  gctx.beginPath(); gctx.roundRect(X(220), Y(120), 560 * sc, 420 * sc, 14 * sc); gctx.fill(); gctx.stroke();
+  gctx.fillStyle = '#16294a'; gctx.font = `700 ${19 * sc}px sans-serif`; gctx.textAlign = 'center'; gctx.textBaseline = 'alphabetic';
+  gctx.fillText('年代べつ 投票率（国政選挙のれい）', X(500), Y(160));
+
+  const bars = [
+    { label: '18・19さい', v: 42 },
+    { label: '20代', v: 43 },
+    { label: '30代', v: 54 },
+    { label: '60代~', v: 65 },
+  ];
+  const baseY = 500, maxH = 260, barW = 80;
+  gctx.textBaseline = 'alphabetic';
+  bars.forEach((b, i) => {
+    const cx = 320 + i * 130;
+    const h = b.v / 100 * maxH;
+    gctx.fillStyle = i < 2 ? '#e0a838' : '#3d6fc4';
+    gctx.fillRect(X(cx - barW / 2), Y(baseY - h), barW * sc, h * sc);
+    gctx.fillStyle = '#16294a'; gctx.font = `700 ${15 * sc}px sans-serif`; gctx.textAlign = 'center';
+    gctx.fillText(b.label, X(cx), Y(baseY + 24));
+    gctx.fillText(b.v + '%', X(cx), Y(baseY - h - 14));
+  });
+}
+
+// ---------- ステージ描画 ----------
+function drawStage(t, dt) {
+  const { w, h, dpr } = fitCanvas(stageCv);
+  gctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  gctx.clearRect(0, 0, w, h);
+  const { sc, ox, oy } = mapTransform(w, h);
+  const X = x => ox + x * sc, Y = y => oy + y * sc;
+  if (S.scene === 'village') drawVillageScene(X, Y, sc);
+  else if (S.scene === 'futsuu') drawFutsuuScene(X, Y, sc);
+  else if (S.scene === 'himitsu') drawHimitsuScene(X, Y, sc);
+  else if (S.scene === 'kaihyou') drawKaihyouScene(X, Y, sc);
+  else if (S.scene === 'ippyo') drawIppyoScene(X, Y, sc);
+  else if (S.scene === 'hakase') drawHakaseScene(X, Y, sc);
+  else if (S.scene === 'done') drawVillageDoneScene(X, Y, sc);
+}
+
+// ---------- とうひょうの まど（スコープ） ----------
+function drawScope(t, dt) {
+  const { w, h, dpr } = fitCanvas(scopeCv);
+  sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  sctx.clearRect(0, 0, w, h);
+  const R = w / 2;
+
+  let grd = sctx.createRadialGradient(R, R, 0, R, R, R);
+  grd.addColorStop(0, '#f7faff'); grd.addColorStop(1, '#b9c9ea');
+  sctx.fillStyle = grd; sctx.fillRect(0, 0, w, h);
+
+  const mode = S.scope.type;
+  if (mode === 'era') {
+    const LIT = [1, 20, 40, 40];
+    const pct = Math.round((LIT[S.scope.era] || 0) / 40 * 100);
+    sctx.fillStyle = '#16294a'; sctx.font = `${R * 0.4}px sans-serif`; sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText('🧑', R, R * 0.6);
+    label(`投票できた 人 ${pct}%`);
+  } else if (mode === 'step') {
+    const icons = ['🎫', '✏️', '🗒️', '📥'];
+    sctx.font = `${R * 0.4}px sans-serif`; sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText(icons[S.scope.step] || '🗳️', R, R * 0.85);
+    label(['受付', '記入', 'おりたたむ', '投票箱へ'][S.scope.step] || '');
+  } else if (mode === 'turnout') {
+    const t2 = S.kaihyouResult ? KAIHYOU_TABLE[S.kaihyouLevel - 1].pct : 0;
+    const bw = R * 0.5, bh = R * 1.0, bx = R - bw / 2, by = R * 0.35;
+    sctx.strokeStyle = '#16294a'; sctx.lineWidth = R * 0.025;
+    sctx.strokeRect(bx, by, bw, bh);
+    const fillH = bh * (t2 / 100);
+    sctx.fillStyle = '#3d6fc4';
+    sctx.fillRect(bx, by + bh - fillH, bw, fillH);
+    label(`投票率 ${t2}%`);
+  } else if (mode === 'margin') {
+    const v = S.ippyoVotes;
+    sctx.font = `700 ${R * 0.22}px sans-serif`; sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillStyle = '#16294a';
+    sctx.fillText(`${v[0]} : ${v[1]}`, R, R * 0.7);
+    label('A案 : B案');
+  } else if (mode === 'stat') {
+    sctx.font = `${R * 0.4}px sans-serif`; sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText('📊', R, R * 0.85);
+    label('とうひょうの データ');
+  } else if (mode === 'glow') {
+    const g2 = sctx.createRadialGradient(R, R * 0.85, 0, R, R * 0.85, R * 0.7);
+    g2.addColorStop(0, '#ffe9a8'); g2.addColorStop(1, 'rgba(255,233,168,0)');
+    sctx.fillStyle = g2; sctx.beginPath(); sctx.arc(R, R * 0.85, R * 0.7, 0, TAU); sctx.fill();
+    sctx.fillStyle = '#16294a'; sctx.font = `${R * 0.4}px sans-serif`; sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText('🗳️', R, R * 0.85);
+    label('かんせい！');
+  } else {
+    sctx.fillStyle = '#16294a'; sctx.font = `${R * 0.4}px sans-serif`; sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText('🔭', R, R * 0.85);
+    label('お話を きいてみよう');
+  }
+
+  function label(txt) {
+    sctx.font = `700 ${R * 0.098}px sans-serif`;
+    sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    const ly = h - R * 0.24;
+    const tw = sctx.measureText(txt).width;
+    sctx.fillStyle = 'rgba(255,255,255,.9)';
+    sctx.beginPath();
+    sctx.roundRect(R - tw / 2 - 8, ly - R * 0.09, tw + 16, R * 0.18, R * 0.09);
+    sctx.fill();
+    sctx.fillStyle = '#16294a';
+    sctx.fillText(txt, R, ly);
+  }
+}
+
+// ---------- キラキラ ----------
+let particles = [];
+function burst(x, y, n) {
+  for (let i = 0; i < (n || 70); i++) {
+    const a = Math.random() * TAU, sp = 60 + Math.random() * 260;
+    particles.push({
+      x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 60,
+      life: 1, size: 2 + Math.random() * 4,
+      col: ['#1a3c6e', '#ffe9a8', '#3d6fc4', '#fff'][Math.floor(Math.random() * 4)],
+    });
+  }
+}
+function scopeBurst() {
+  const r = $('scopeWrap').getBoundingClientRect();
+  burst(r.left + r.width / 2, r.top + r.height / 2);
+}
+function drawFx(dt) {
+  const { w, h, dpr } = fitCanvas(fxCv);
+  fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  fctx.clearRect(0, 0, w, h);
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    p.life -= dt * 0.7; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 140 * dt;
+    fctx.globalAlpha = Math.max(0, p.life);
+    fctx.fillStyle = p.col;
+    fctx.save();
+    fctx.translate(p.x, p.y); fctx.rotate(p.life * 5);
+    const s = p.size;
+    fctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const a1 = i * TAU / 5 - Math.PI / 2;
+      fctx.lineTo(Math.cos(a1) * s, Math.sin(a1) * s);
+      const a2 = a1 + TAU / 10;
+      fctx.lineTo(Math.cos(a2) * s * 0.45, Math.sin(a2) * s * 0.45);
+    }
+    fctx.closePath(); fctx.fill();
+    fctx.restore();
+  });
+  fctx.globalAlpha = 1;
+}
+
+// ---------- 汎用トゥイーン ----------
+function startTween(from, to, dur, setter, onDone) {
+  setter(from);
+  S.tween = { t: 0, dur, from, to, setter, onDone, fired: false };
+}
+
+// ---------- メインループ ----------
+let lastT = performance.now();
+function loop(now) {
+  const t = now / 1000, dt = Math.min(0.05, (now - lastT) / 1000);
+  lastT = now;
+  if (S.tween) {
+    const tw = S.tween;
+    tw.t = clamp(tw.t + dt / tw.dur, 0, 1);
+    tw.setter(lerp(tw.from, tw.to, easeInOut(tw.t)));
+    if (tw.t >= 1 && !tw.fired) {
+      tw.fired = true;
+      const cb = tw.onDone;
+      S.tween = null;
+      if (cb) cb();
+    }
+  }
+  drawStage(t, dt);
+  drawScope(t, dt);
+  drawFx(dt);
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener('keydown', ev => {
+  if (ev.key === 'Enter') {
+    const b = document.querySelector('#btnRow .btn:not(.sub)') || document.querySelector('#panelBody .btn:not(.sub)');
+    if (b) b.click();
+  }
+});
+
+// ---------- UIヘルパー ----------
+const bubbleEl = $('bubble'), wishEl = $('wishCard'), btnRow = $('btnRow');
+function say(html) {
+  bubbleEl.style.animation = 'none'; void bubbleEl.offsetWidth;
+  bubbleEl.style.animation = ''; bubbleEl.innerHTML = html;
+}
+function setWish(icon, html) {
+  wishEl.style.display = 'flex';
+  wishEl.querySelector('.icon').textContent = icon;
+  wishEl.querySelector('.wbody').innerHTML = html;
+}
+function hideWish() { wishEl.style.display = 'none'; }
+function setButtons(list) {
+  btnRow.innerHTML = '';
+  list.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'btn' + (b.cls ? ' ' + b.cls : '');
+    el.innerHTML = b.label;
+    el.onclick = () => { sTap(); b.cb(el); };
+    btnRow.appendChild(el);
+  });
+}
+function award(id) {
+  if (S.badges.has(id)) return;
+  S.badges.add(id);
+  $('bd_' + id).classList.add('on');
+  if (typeof recordBadge === 'function') recordBadge(S.badges.size, document.querySelectorAll('#badges .badge').length);
+}
+const overlayEl = $('overlay'), panelEl = $('panelBody');
+function showOverlay(html) { panelEl.innerHTML = html; overlayEl.classList.add('show'); }
+function hideOverlay() { overlayEl.classList.remove('show'); }
+const controlsEl = $('controls');
+function setControls(list) {
+  controlsEl.innerHTML = '';
+  list.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'ctl' + (b.cls ? ' ' + b.cls : ''); el.innerHTML = b.label;
+    el.disabled = !!b.disabled;
+    el.onclick = () => { if (el.disabled) return; ac(); b.cb(el); };
+    controlsEl.appendChild(el);
+  });
+}
+function updateLoc() {
+  $('locChip').textContent = 'ひとつぶ村';
+  const titles = {
+    village: '🏘️ ひとつぶ村',
+    futsuu: '🕰️ むかしの 選挙',
+    himitsu: '🗳️ とうひょうじょ',
+    kaihyou: '🏘️ 村の 広場（開票）',
+    ippyo: '⚖️ となり村との 相談',
+    hakase: '📊 いまの 日本',
+    done: '🗳️ ひとつぶ村 ものがたり',
+  };
+  $('stageTitle').textContent = titles[S.scene] || 'ひとつぶ村と せんきょの ひみつ';
+}
+
+// ---------- ステップ ----------
+const FLOW = ['intro', 'vote', 'm_futsuu', 'm_himitsu', 'm_kaihyou', 'm_ippyo', 'hakase', 'm_furikaeri', 'ending', 'free'];
+
+// ふりかえりタイム：4ミッションの場面を1つずつ見せ直すスライドショー
+const FURIKAERI_SLIDES = [
+  { scene: 'futsuu', icon: '🕰️', title: 'むかしの選挙', video: 'kv5nvXrWlrE',
+    setup: () => { S.futsuuFound = new Set(FUTSUU_POINTS.map(p => p.key)); S.futsuuEra = 3; },
+    scope: () => ({ type: 'era', era: 3 }),
+    text: () => `1889年は 40人のうち たった1人しか 投票できなかった。${W.futsuu}が 実現した 1945年からは、みんなが 投票できるように なったんだったね。` },
+  { scene: 'himitsu', icon: '🗳️', title: 'とうひょうじょ', video: 'ifLTXZT3YuE',
+    setup: () => { S.himitsuStep = 3; },
+    scope: () => ({ type: 'step', step: 3 }),
+    text: () => `受付 → 記入台 → おりたたむ → 投票箱。だれに 投票したか わからないように する ${W.himitsu}の しくみ、おぼえてるかな？` },
+  { scene: 'kaihyou', icon: '🏘️', title: '村の広場（開票）',
+    setup: () => { S.kaihyouLevel = 8; S.kaihyouResult = KAIHYOU_TABLE[7].votes; S.kaihyouTried = new Set([8]); },
+    scope: () => ({ type: 'turnout' }),
+    text: () => `${W.touhyouritsu}が 低いと、たまたま 来た 人たちの 意見だけで 決まって しまうことが あったね。みんなが 行くほど、村の ほんとうの 気持ちに 近づくよ。` },
+  { scene: 'ippyo', icon: '⚖️', title: '一票の重み',
+    setup: () => { S.ippyoBase = [20, 20]; S.ippyoVotes = [20, 20]; },
+    scope: () => ({ type: 'margin' }),
+    text: () => `サチさんの たった1票で、A案19票・B案20票が 20票・20票の 同数に 変わったね。${W.kinsa}の 選挙では、1票が 結果を 変えることが あるんだ。` },
+];
+
+function gotoStep(i) {
+  S.stepIndex = clamp(i, 0, FLOW.length - 1);
+  S.phase = ''; S.tween = null;
+  hideOverlay(); hideWish();
+  setControls([]);
+  STEPS[FLOW[S.stepIndex]].enter();
+  updateLoc();
+}
+const nextStep = () => gotoStep(S.stepIndex + 1);
+
+function choiceRow(opts, cb) {
+  return opts.map((label, i) => ({ label, cls: 'choice', cb: el => cb(i, el) }));
+}
+function markPicked(el) {
+  btnRow.querySelectorAll('.choice').forEach(b => b.classList.remove('picked'));
+  el.classList.add('picked');
+}
+
+const STEPS = {
+  intro: {
+    enter() {
+      Object.assign(S, { scene: 'village', scope: { type: 'idle' } });
+      say('……');
+      setButtons([]);
+      showOverlay(`
+        <div class="phasesStrip">🗳️🏘️✨</div>
+        <h1>ひとつぶ村</h1>
+        <div class="sub">〜 せんきょと 一票の ねうち 〜</div>
+        <p class="talk">ようこそ！ わたしは 投票箱から 生まれた 精霊、<b>ヒョウ</b>。ひとつぶ村では 今、村の 広場に 作る「村の たからもの」を、村びと みんなの 投票で 1つ 決めようと しているんだ。<br>
+        投票って どういう しくみなんだろう？ 1つの 1票には、どんな 重さが あるんだろう？ <b>いっしょに たしかめに いこう！</b></p>
+        <button class="btn" id="startBtn">村を たしかめに 出かける！</button>
+        <div class="foot">先生へ：F11キーで全画面表示になります。操作は画面のボタンとタッチです。</div>
+      `);
+      $('startBtn').onclick = () => { ac(); sTap(); nextStep(); };
+    },
+  },
+
+  vote: {
+    enter() {
+      showOverlay(`
+        <h2>🤔 よそうタイム</h2>
+        <p class="talk">もし 村の 半分くらいの 人しか 投票に 行かなかったら、村の たからものを 選ぶ 結果は、みんなが 行った時と 同じに なると思う？</p>
+        <div class="voteCards">
+          <div class="vcard" data-v="0"><span class="vicon">🟰</span><b>ア</b> かならず 同じに なる</div>
+          <div class="vcard" data-v="1"><span class="vicon">🔀</span><b>イ</b> ちがう 結果に なることも ある</div>
+          <div class="vcard" data-v="2"><span class="vicon">❓</span><b>ウ</b> 決められなく なる</div>
+        </div>
+        <div class="sub">思う ものに タッチ。きろくシートにも 〇を つけてね。</div>
+        <button class="btn" id="voteGo">よし、たしかめよう！</button>
+      `);
+      panelEl.querySelectorAll('.vcard').forEach(c => {
+        c.onclick = () => { sTap(); panelEl.querySelectorAll('.vcard').forEach(x => x.classList.remove('picked')); c.classList.add('picked');
+          S.votePicked = new Set([+c.dataset.v]);
+        };
+      });
+      $('voteGo').onclick = () => { sTap(); nextStep(); };
+    },
+  },
+
+  // --- M1：むかしの選挙（普通選挙） ---
+  m_futsuu: {
+    enter() {
+      Object.assign(S, { scene: 'futsuu', scope: { type: 'idle' }, futsuuFound: new Set(), futsuuEra: null });
+      updateLoc();
+      hideWish();
+      say(`むかしから 今まで、「だれが 投票できるか」は 大きく 変わってきた。日本全体を、ひとつぶ村のような 40人の 村に たとえて、4つの 時代を 調べてみよう。下の ボタンを ぜんぶ おしてね。`);
+      this.refreshCtl();
+    },
+    refreshCtl() {
+      setButtons(FUTSUU_POINTS.map(p => ({
+        label: p.letter + ' ' + p.name + (S.futsuuFound.has(p.key) ? '✓' : ''),
+        cb: () => this.reveal(p),
+      })));
+      if (S.futsuuFound.size >= FUTSUU_POINTS.length) {
+        setButtons([{ label: 'クイズに ちょうせん', cb: () => this.ask() }]);
+      }
+    },
+    reveal(p) {
+      sTap(); S.futsuuFound.add(p.key); S.futsuuEra = p.key;
+      S.scope = { type: 'era', era: p.key };
+      scopeBurst();
+      say(p.txt);
+      this.refreshCtl();
+    },
+    ask() {
+      hideWish();
+      say(`今のように、だれでも（性別や 財産に 関係なく）1人1票 投票できる きまりを 何と いうだろう？`);
+      setButtons(choiceRow(['ア 普通選挙', 'イ 特別選挙', 'ウ 限定選挙'], (i, el) => this.pick(i, el)));
+    },
+    pick(n, el) {
+      markPicked(el);
+      if (n === 0) {
+        sYes(); scopeBurst(); award('m_futsuu'); S.phase = 'done';
+        say(`せいかい！ ${W.futsuu}だよ。1945年からは 男女とも 満20さい以上、2016年からは 満18さい以上の すべての 国民に 選挙権が あるんだ。`);
+        setButtons([{ label: 'つぎへ（秘密選挙）', cb: nextStep }]);
+      } else {
+        say(`ヒントを もういちど 見て、いっしょに かんがえよう。`);
+        setButtons(choiceRow(['ア 普通選挙', 'イ 特別選挙', 'ウ 限定選挙'], (i, el2) => this.pick(i, el2)));
+      }
+    },
+  },
+
+  // --- M2：とうひょうじょ（秘密選挙） ---
+  m_himitsu: {
+    enter() {
+      Object.assign(S, { scene: 'himitsu', scope: { type: 'step', step: -1 }, himitsuStep: -1 });
+      updateLoc();
+      hideWish();
+      say(`投票所では、どんな じゅんばんで 投票するのかな？「つぎへ」で 4つの ステップを 見てみよう。`);
+      setButtons([{ label: 'つぎへ①', cb: () => this.step() }]);
+    },
+    step() {
+      S.himitsuStep++;
+      S.scope = { type: 'step', step: S.himitsuStep };
+      sClank(); scopeBurst();
+      const s = HIMITSU_STEPS[S.himitsuStep];
+      say(`<b>${s.icon} ${s.title}</b><br>${s.txt}`);
+      if (S.himitsuStep < HIMITSU_STEPS.length - 1) {
+        setButtons([{ label: `つぎへ${['②', '③', '④'][S.himitsuStep]}`, cb: () => this.step() }]);
+      } else {
+        setButtons([{ label: 'クイズに ちょうせん', cb: () => this.ask() }]);
+      }
+    },
+    ask() {
+      say(`さっきの ②と③、記入台に 仕切りが あったり、用紙を おりたたんだり するのは なぜだろう？`);
+      setButtons(choiceRow(['ア 目立たせるため', 'イ だれに 投票したか、他の人に わからないように するため', 'ウ 紙を きれいに 使うため'], (i, el) => this.pick(i, el)));
+    },
+    pick(n, el) {
+      markPicked(el);
+      if (n === 1) {
+        sYes(); scopeBurst(); award('m_himitsu'); S.phase = 'done';
+        say(`せいかい！ ${W.himitsu}の きまりだよ。だれに 投票したか まわりに 知られないように することで、まわりの 目を 気にせず、自分の 気持ちで 自由に えらべるんだ。`);
+        setButtons([{ label: 'つぎへ（村の広場）', cb: nextStep }]);
+      } else {
+        say(`ヒントを もういちど 見て、いっしょに かんがえよう。`);
+        setButtons(choiceRow(['ア 目立たせるため', 'イ だれに 投票したか、他の人に わからないように するため', 'ウ 紙を きれいに 使うため'], (i, el2) => this.pick(i, el2)));
+      }
+    },
+  },
+
+  // --- M3：村の広場（開票シミュレーション・メイン操作） ---
+  m_kaihyou: {
+    enter() {
+      Object.assign(S, { scene: 'kaihyou', scope: { type: 'turnout' }, kaihyouLevel: 1, kaihyouResult: null, kaihyouTried: new Set() });
+      updateLoc();
+      setWish('🗳️', `村びと ぜんぶで 40人。投票率(投票に 行った 人の わりあい)を えらんで「開票する」を おそう。ちがう 投票率で 何回か ためしてみよう。`);
+      say(`目もりを えらんで、「開票する」ボタンを おそう。`);
+      this.refreshCtl();
+    },
+    refreshCtl() {
+      const list = [];
+      for (let n = 1; n <= 8; n++) list.push({ label: NUMS[n - 1], cls: 'pos' + (S.kaihyouLevel === n ? ' sel' : ''), cb: () => { S.kaihyouLevel = n; this.refreshCtl(); } });
+      list.push({ label: '🗳️ 開票する', cb: () => this.build() });
+      setControls(list);
+    },
+    build() {
+      setControls([]);
+      const t = KAIHYOU_TABLE[S.kaihyouLevel - 1];
+      say(`投票率 ${t.pct}% で 開票する……`);
+      sClank();
+      S.kaihyouResult = null;
+      startTween(0, 1, 1.1, v => { S.kaihyouAnimT = v; }, () => this.judge(t));
+    },
+    judge(t) {
+      S.kaihyouResult = t.votes;
+      S.kaihyouTried.add(S.kaihyouLevel);
+      const w = kaihyouWinnerIdx(t.votes);
+      scopeBurst(); sYes();
+      say(`投票率 ${t.pct}%（${t.votes.reduce((a, b) => a + b, 0)}人が投票）の 結果、いちばん 多かったのは「${CAND[w].icon} ${CAND[w].name}」でした！`);
+      if (S.kaihyouTried.size >= 2) {
+        setButtons([{ label: 'クイズに ちょうせん', cb: () => this.ask() }]);
+      } else {
+        setTimeout(() => this.refreshCtl(), 10);
+      }
+    },
+    ask() {
+      hideWish();
+      say(`投票率が ひくい とき（①や②）、いちばん 人気の はずの 🛝公園ではなく 🐰ふれあい広場が 1位に なったのは なぜだろう？`);
+      setButtons(choiceRow(['ア ふれあい広場が ほんとうに 1番 人気だから', 'イ 投票に 行った 人が、たまたま ふれあい広場を えらんだ 人ばかりだったから', 'ウ 数え まちがえたから'], (i, el) => this.pick(i, el)));
+    },
+    pick(n, el) {
+      markPicked(el);
+      if (n === 1) {
+        sYes(); scopeBurst(); award('m_kaihyou'); S.phase = 'done';
+        say(`せいかい！ 投票に 行く 人が 少ないと、たまたま 来た 人たちの 意見だけで 決まって しまうことが あるんだ。<br><br>💡 <b>たいせつポイント</b><br>投票に 行かないと、その人の 気持ちは 結果に 入らない。みんなが 行くほど、村の ほんとうの 気持ちに 近づくよ。`);
+        setButtons([{ label: 'つぎへ（一票の重み）', cb: nextStep }]);
+      } else {
+        say(`ヒントを もういちど 見て、いっしょに かんがえよう。`);
+        setButtons(choiceRow(['ア ふれあい広場が ほんとうに 1番 人気だから', 'イ 投票に 行った 人が、たまたま ふれあい広場を えらんだ 人ばかりだったから', 'ウ 数え まちがえたから'], (i, el2) => this.pick(i, el2)));
+      }
+    },
+  },
+
+  // --- M4：一票の重み（僅差） ---
+  m_ippyo: {
+    enter() {
+      Object.assign(S, { scene: 'ippyo', scope: { type: 'margin' }, ippyoBase: [19, 20], ippyoVotes: [19, 20] });
+      updateLoc();
+      setWish('⚖️', `となりの谷の 村では、「橋を 新しくする(A案)」と「道を 広げる(B案)」で 投票中。今 A案19票・B案20票で、あと1人 サチさんが まだ 投票していない。`);
+      say(`サチさんの 1票で、結果は 変わると思う？ どちらかに 投票させて 確かめよう。`);
+      this.refreshCtl();
+    },
+    refreshCtl() {
+      setControls([
+        { label: 'サチさんは A案(橋)に 入れる', cb: () => this.vote('A') },
+        { label: 'サチさんは B案(道)に 入れる', cb: () => this.vote('B') },
+      ]);
+    },
+    vote(which) {
+      setControls([]);
+      sClank();
+      const target = which === 'A' ? [20, 20] : [19, 21];
+      startTween(0, 1, 0.8, v => { S.ippyoAnimT = v; }, () => this.result(target, which));
+    },
+    result(votes, which) {
+      S.ippyoVotes = votes;
+      scopeBurst();
+      if (which === 'A') {
+        say(`A案20票・B案20票で 同じに なった！ これを「同数」というよ。同数の 時は くじ引きなどで 決めることが 多いんだ。サチさんの たった1票で、ここまで 変わったね。`);
+      } else {
+        sTap();
+        say(`A案19票・B案21票。B案が 勝ったよ。今度は もう一方も 試してみよう。`);
+      }
+      setButtons([
+        { label: 'もう一方も 試す', cls: 'sub', cb: () => { this.refreshCtl(); say('サチさんは どちらに 入れるか、もう一度 えらんでみよう。'); } },
+        { label: 'クイズに ちょうせん', cb: () => this.ask() },
+      ]);
+    },
+    ask() {
+      hideWish();
+      say(`きょうの 話のように、票の 差が 少ない（${W.kinsa}）とき、1人の 1票の 重さは どうなる？`);
+      setButtons(choiceRow(['ア 軽くなる', 'イ 重くなる（結果を 左右する）', 'ウ 関係ない'], (i, el) => this.pick(i, el)));
+    },
+    pick(n, el) {
+      markPicked(el);
+      if (n === 1) {
+        sYes(); scopeBurst(); award('m_ippyo'); S.phase = 'done';
+        say(`せいかい！ 票の 差が 少ない ${W.kinsa}の 選挙では、たった 1人の 1票が 結果を 変えることが あるんだ。だから 1票 1票が とても 大切。`);
+        setButtons([{ label: 'つぎへ（はかせチャレンジ）', cb: nextStep }]);
+      } else {
+        say(`ヒントを もういちど 見て、いっしょに かんがえよう。`);
+        setButtons(choiceRow(['ア 軽くなる', 'イ 重くなる（結果を 左右する）', 'ウ 関係ない'], (i, el2) => this.pick(i, el2)));
+      }
+    },
+  },
+
+  // --- はかせチャレンジ：いまの日本 ---
+  hakase: {
+    enter() {
+      Object.assign(S, { scene: 'hakase', scope: { type: 'stat' } });
+      updateLoc();
+      hideWish();
+      say(`さいごは <b>はかせチャレンジ</b>！ ほんとうの 日本の 選挙の データを 見てみよう。`);
+      setButtons([{ label: 'データを 見る', cb: () => this.show() }]);
+    },
+    show() {
+      sTap();
+      say(`日本全体の 国政選挙の ${W.touhyouritsu}は、ここ数十年 だいたい 50〜60%くらい。いちばん 高かったのは 1958年の 約77%、いちばん 低かったのは 2014年の 約53%だったよ。<br>年代べつに 見ると、18・19さいや 20代は だいたい 40%前後で、他の 年代より 低い 傾向が 続いているんだ。`);
+      setButtons([{ label: 'かんがえる', cb: () => this.ask() }]);
+    },
+    ask() {
+      say(`もし 自分が 18さいに なった時、投票に 行かなかったら、自分の 意見は 結果に どうなるだろう？`);
+      setButtons(choiceRow(['ア 多数派と 同じ意見として 数えられる', 'イ 結果には 入らない', 'ウ あとで 意見を 聞いてもらえる'], (i, el) => this.pick(i, el)));
+    },
+    pick(n, el) {
+      markPicked(el);
+      if (n === 1) {
+        sYes(); scopeBurst(); award('hakase'); S.phase = 'done';
+        say(`せいかい！ 投票に 行かないと、その人の 意見は 結果に 入らない。ひとつぶの 光（一票）が 集まって 村や 国の 未来が 決まる——だからこそ、ひとつの 1票が 大切なんだ。`);
+        setButtons([{ label: 'ふりかえりタイムへ', cb: nextStep }]);
+      } else {
+        say(`ヒントを もういちど 見て、いっしょに かんがえよう。`);
+        setButtons(choiceRow(['ア 多数派と 同じ意見として 数えられる', 'イ 結果には 入らない', 'ウ あとで 意見を 聞いてもらえる'], (i, el2) => this.pick(i, el2)));
+      }
+    },
+  },
+
+  // --- ふりかえりタイム：4ミッションの場面を1つずつ見せ直す ---
+  m_furikaeri: {
+    enter() {
+      S.furikaeriIdx = 0;
+      this.show();
+    },
+    show() {
+      const slide = FURIKAERI_SLIDES[S.furikaeriIdx];
+      const n = S.furikaeriIdx + 1, total = FURIKAERI_SLIDES.length;
+      const isLast = S.furikaeriIdx >= total - 1;
+      slide.setup();
+      Object.assign(S, { scene: slide.scene, scope: slide.scope() });
+      updateLoc();
+      const goNext = () => {
+        sTap();
+        if (isLast) { hideOverlay(); nextStep(); } else { S.furikaeriIdx++; this.show(); }
+      };
+      if (slide.video) {
+        const videoUrl = `https://www.youtube.com/watch?v=${slide.video}`;
+        const canEmbed = slide.embeddable !== false;
+        showOverlay(`
+          <h2>${slide.icon} ふりかえりタイム（${n}/${total}）${slide.title}</h2>
+          <div id="furikaeriThumb" style="max-width:380px;margin:0 auto;cursor:pointer">
+            <div style="position:relative;border-radius:12px;overflow:hidden;background:#000">
+              <img src="https://img.youtube.com/vi/${slide.video}/hqdefault.jpg" style="width:100%;display:block;opacity:.85">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+                <div style="width:15%;aspect-ratio:1;min-width:56px;border-radius:50%;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;color:#fff;font-size:clamp(24px,3vw,34px)">▶</div>
+              </div>
+            </div>
+            <div style="margin-top:.5em;color:#3a7ab8;font-size:clamp(12px,1.3vw,16px)">${canEmbed ? 'タップすると この画面で 動画が はじまるよ' : 'タップすると 新しい タブで 動画が ひらくよ'}</div>
+          </div>
+          <p class="talk">${slide.text()}</p>
+          <button class="btn" id="furikaeriNextBtn">${isLast ? 'まとめへ すすむ' : 'つぎへ'}</button>
+          <div class="foot">先生へ：動画はYouTubeの教育系チャンネルです。内容を事前にご確認ください。URL: ${videoUrl}</div>
+        `);
+        $('furikaeriThumb').onclick = () => {
+          sTap();
+          if (canEmbed) {
+            const embedUrl = `https://www.youtube-nocookie.com/embed/${slide.video}?rel=0&modestbranding=1&iv_load_policy=3&autoplay=1`;
+            $('furikaeriThumb').outerHTML = `<div style="max-width:380px;margin:0 auto;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#000"><iframe width="100%" height="100%" src="${embedUrl}" title="${slide.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+          } else {
+            window.open(videoUrl, '_blank', 'noopener');
+          }
+        };
+        $('furikaeriNextBtn').onclick = goNext;
+      } else {
+        hideOverlay();
+        scopeBurst();
+        say(`<b>ふりかえりタイム（${n}/${total}）${slide.icon} ${slide.title}</b><br>${slide.text()}`);
+        setButtons([{ label: isLast ? 'まとめへ すすむ' : 'つぎへ', cb: goNext }]);
+      }
+    },
+  },
+
+  ending: {
+    enter() {
+      window.yomitabiLessonComplete?.(S.badges.size, 5);
+      Object.assign(S, { scene: 'done', scope: { type: 'glow' } });
+      updateLoc();
+      const votedRight = S.votePicked.has(1);
+      showOverlay(`
+        <h2>⭐ ひとつぶ村 みならい にんてい！ ⭐</h2>
+        <div class="phasesStrip">${'★'.repeat(S.badges.size)}${'☆'.repeat(Math.max(0, 5 - S.badges.size))}</div>
+        <p class="talk" id="blankArea">きょうの <b>3つの ひみつ</b>、いえるかな？（タッチで こたえ）<br>
+        ① だれでも 1人1票、性別や 財産に 関係なく 投票できる きまりを「（<span class="blankWord" data-a="普通選挙（ふつうせんきょ）">？？？</span>）」という。<br>
+        ② だれに 投票したか 知られないように する きまりを「（<span class="blankWord" data-a="秘密選挙（ひみつせんきょ）">？？？</span>）」という。<br>
+        ③ 投票に 行った 人の わりあいを「（<span class="blankWord" data-a="投票率（とうひょうりつ）">？？？</span>）」という。</p>
+        <p class="talk">さいしょの よそうタイム、こたえは <b>イ ちがう 結果に なることも ある</b> でした！「村の 広場（開票）」で ためした 通り、投票率が 低いと、たまたま 来た 人たちの 意見だけで 決まって しまうことが あるんだ。${votedRight ? '（みんなの よそう、ばっちり！）' : ''}</p>
+        <p class="talk">🏠 <b>おうちミッション</b><br>おうちの 人に「選挙権(せんきょけん)は 何さいから？」「今まで 投票に 行ったこと あるか」を 聞いてみよう。</p>
+        <div style="display:flex;gap:1vw;justify-content:center;flex-wrap:wrap;margin-top:1.5vh">
+          <button class="btn" id="freeBtn">じゆうモードで あそぶ</button>
+          <button class="btn sub" id="againBtn">はじめから もういちど</button>
+        </div>
+      `);
+      sFanfare();
+      setTimeout(scopeBurst, 200);
+      panelEl.querySelectorAll('.blankWord').forEach(sp => {
+        sp.onclick = function () {
+          this.textContent = this.dataset.a;
+          this.style.color = '#16294a'; sYes(); scopeBurst();
+        };
+      });
+      $('freeBtn').onclick = () => { sTap(); gotoStep(FLOW.indexOf('free')); };
+      $('againBtn').onclick = () => { location.reload(); };
+    },
+  },
+
+  free: {
+    enter() {
+      Object.assign(S, { scene: 'kaihyou', scope: { type: 'glow' } });
+      if (!S.kaihyouResult) S.kaihyouResult = KAIHYOU_TABLE[7].votes;
+      updateLoc();
+      say(`<b>じゆうモード</b>だよ！ せんきょについて、${ruby('友', 'とも')}だちと クイズを 出しあおう。<br>れい：「秘密選挙って なに？」「投票率が 低いと どうなる？」`);
+      setButtons([
+        { label: '🕰️ むかしの選挙の 図', cls: 'sub', cb: () => this.show('futsuu') },
+        { label: '🗳️ とうひょうじょの 図', cls: 'sub', cb: () => this.show('himitsu') },
+        { label: '🏘️ 開票の 図', cls: 'sub', cb: () => this.show('kaihyou') },
+        { label: '⚖️ 一票の重みの 図', cls: 'sub', cb: () => this.show('ippyo') },
+        { label: 'まとめに もどる', cls: 'sub', cb: () => gotoStep(FLOW.indexOf('ending')) },
+      ]);
+    },
+    show(scene) {
+      S.scene = scene;
+      updateLoc(); sTap();
+    },
+  },
+};
+
+// ---------- 先生バー ----------
+$('tbPrev').onclick = () => gotoStep(S.stepIndex - 1);
+$('tbNext').onclick = () => gotoStep(S.stepIndex + 1);
+$('tbReset').onclick = () => location.reload();
+$('tbSound').onclick = function () { S.sound = !S.sound; this.textContent = S.sound ? '🔊' : '🔇'; };
+
+// ---------- 開始 ----------
+// （URLの後ろに ?step=m_kaihyou などで途中から始められます）
+gotoStep(0);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

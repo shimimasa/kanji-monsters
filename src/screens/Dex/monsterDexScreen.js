@@ -11,6 +11,7 @@ import { isLegend, recipeFor, BREED_LEVEL } from '../../minigames/gotomonBreedin
 import { regionName } from '../../minigames/breedingRegions.js';
 import { gotomonService } from '../../minigames/gotomonService.js';
 import { miniGameGotomonById } from '../../minigames/miniGameGotomonCatalog.js';
+import { lessonGotomonById } from '../../lessons/lessonCatalog.js';
 
 // --- グローバルスコープにあったヘルパー関数を、このファイル内に移動 ---
 
@@ -104,10 +105,10 @@ function createCard(monster, { showUncollected = false, isFavorite = false, onTo
   const img = document.createElement('img');
   // ボーナスの伝説/幻は thumb/日本・thumb/海外 に置かれている
   const folder = getBonusMonsterFolder(monster.id) || gradeFolderMap[monster.grade] || gradeFolderMap[1];
-  const thumbPath = miniGameGotomonById(monster.id)?.imageUrl || `/assets/images/monsters/thumb/${folder}/${monster.id}.webp`;
+  const thumbPath = (miniGameGotomonById(monster.id) ?? lessonGotomonById(monster.id))?.imageUrl || `/assets/images/monsters/thumb/${folder}/${monster.id}.webp`;
   img.dataset.thumb = thumbPath;
   img.alt = monster.name;
-  if (miniGameGotomonById(monster.id)) Object.assign(img.style, { width: '100%', height: '160px', objectFit: 'contain', imageRendering: 'pixelated' });
+  if (miniGameGotomonById(monster.id) || lessonGotomonById(monster.id)) Object.assign(img.style, { width: '100%', height: '160px', objectFit: 'contain', imageRendering: 'pixelated' });
   if (!isCollected) {
     img.style.filter = 'grayscale(100%) brightness(0.55) contrast(0.9)';
   }
@@ -257,7 +258,7 @@ function showMonsterModal(monster) {
   const img = document.createElement('img');
   // ボーナスの伝説/幻は full/日本・full/海外 に置かれている
   const folder = getBonusMonsterFolder(monster.id) || gradeFolderMap[monster.grade] || gradeFolderMap[1];
-  img.src = miniGameGotomonById(monster.id)?.imageUrl || `/assets/images/monsters/full/${folder}/${monster.id}.webp`;
+  img.src = (miniGameGotomonById(monster.id) ?? lessonGotomonById(monster.id))?.imageUrl || `/assets/images/monsters/full/${folder}/${monster.id}.webp`;
   img.alt = monster.name;
   img.classList.add('modal-monster-image');
 
@@ -325,9 +326,11 @@ const monsterDexState = {
   // DOM
   container: null,
 
-  enter(canvas) {
+  enter(input) {
     this._lifecycle.activate();
-    this.canvas = canvas || document.getElementById('gameCanvas');
+    const props = input && typeof input.getContext !== 'function' ? input : {};
+    this.canvas = input && typeof input.getContext === 'function' ? input : document.getElementById('gameCanvas');
+    this.returnScreen = props.currentMode === 'lesson' ? 'miniGameHub' : null;
     
     if (this.canvas) {
       this._prevCanvasVisibility = this.canvas.style.visibility;
@@ -342,7 +345,7 @@ const monsterDexState = {
     this.seenSet = loadSeenMonsters();
     this.favoritesSet = loadFavorites();
   
-    this.allMonsterIds = getAllMonsterIds({ includeMiniGames: true }).filter(id => {
+    this.allMonsterIds = getAllMonsterIds({ includeMiniGames: true, includeLessons: true }).filter(id => {
       const idStr = String(id);
       if (idStr.startsWith('PRV-')) return false;
       const m = getMonsterById(id);
@@ -355,6 +358,13 @@ const monsterDexState = {
   
     // 設定復元
     this.loadPreferences();
+    if (props.currentMode === 'lesson') {
+      this.currentMode = 'lesson';
+      this.currentRegionFilter = 'all';
+      this.currentTypeFilter = 'all';
+      this.favoritesOnly = false;
+      this.searchQuery = '';
+    }
   
     this.applyFiltersAndSort();
     // ページ境界補正
@@ -403,7 +413,7 @@ const monsterDexState = {
 
   /** 現在モードに応じた学年リストを返す */
   _getAllowedGrades() {
-    return this.currentMode === 'japan' ? [1,2,3,4,5,6,11,12] : this.currentMode === 'square' ? [0] : [7,8,9,10];
+    return this.currentMode === 'japan' ? [1,2,3,4,5,6,11,12] : this.currentMode === 'square' ? [0] : this.currentMode === 'lesson' ? [13] : [7,8,9,10];
   },
 
   /** 地域ごとのコンプリート状況を計算（現在モードのみ） */
@@ -452,7 +462,7 @@ loadPreferences() {
     const raw = localStorage.getItem(this._prefsKey);
     if (!raw) return;
     const p = JSON.parse(raw) || {};
-    if (['japan', 'world', 'square'].includes(p.currentMode)) this.currentMode = p.currentMode;
+    if (['japan', 'world', 'square', 'lesson'].includes(p.currentMode)) this.currentMode = p.currentMode;
     this.currentRegionFilter = (p.currentRegionFilter === 'all' || typeof p.currentRegionFilter === 'number') ? p.currentRegionFilter : 'all';
     this.currentSortOrder = (p.currentSortOrder === 'name') ? 'name' : 'id';
     this.favoritesOnly = !!p.favoritesOnly;
@@ -839,7 +849,7 @@ rightControls.appendChild(nextBtn);
     // 戻るボタン
     const backButton = document.createElement('button');
     backButton.className = 'btn-back';
-    backButton.textContent = '🐾 ステージ選択へ';
+    backButton.textContent = this.returnScreen === 'miniGameHub' ? '🐾 理科・社会の旅へ' : '🐾 ステージ選択へ';
     Object.assign(backButton.style, {
       background: 'linear-gradient(135deg, #6c757d, #5a6268)',
       color: 'white',
@@ -872,9 +882,9 @@ rightControls.appendChild(nextBtn);
     backButton.addEventListener('click', () => {
       publish('playSE', 'decide');
       publish('playBGM', 'title');
-      const targetScreen = gameState.previousScreen === 'title' ? 'title' : (gameState.previousScreen === 'worldStageSelect')
+      const targetScreen = this.returnScreen || (gameState.previousScreen === 'title' ? 'title' : (gameState.previousScreen === 'worldStageSelect')
         ? 'worldStageSelect'
-        : 'stageSelect';
+        : 'stageSelect');
       publish('changeScreen', targetScreen);
     });
     leftControls.appendChild(backButton);
@@ -899,6 +909,7 @@ rightControls.appendChild(nextBtn);
       <option value="japan">日本ゴトモン</option>
       <option value="world">世界ゴトモン</option>
       <option value="square">ミニゲーム広場</option>
+      <option value="lesson">理科・社会の旅</option>
     `;
     modeSelect.value = this.currentMode;
     modeSelect.addEventListener('change', (e) => {
@@ -936,7 +947,7 @@ rightControls.appendChild(nextBtn);
     });
 
     let optionsHTML = '<option value="all">すべて</option>';
-    const regionNames = this.currentMode === 'japan' ? japanRegionMap : this.currentMode === 'square' ? { 0: 'ミニゲーム広場' } : worldRegionMap;
+    const regionNames = this.currentMode === 'japan' ? japanRegionMap : this.currentMode === 'square' ? { 0: 'ミニゲーム広場' } : this.currentMode === 'lesson' ? { 13: '理科・社会の旅' } : worldRegionMap;
     const grades = this._getAllowedGrades();
     for (const grade of grades) {
       const regionName = regionNames[grade];

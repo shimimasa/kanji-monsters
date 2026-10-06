@@ -18,6 +18,7 @@ import { moveFor, supporterXP, MAX_SUPPORTERS } from './gotomonMoves.js';
 import { LEGEND_IDS, recipeFor, regionOf, candidates, firstPair, canBreed } from './gotomonBreeding.js';
 import { lookProgress, wornLook, openedLooks, LOOK_KEYS, evolvedImageUrl } from './companionLooks.js';
 import { miniGameGotomonFor, miniGameGotomonById } from './miniGameGotomonCatalog.js';
+import { lessonGotomonById } from '../lessons/lessonCatalog.js';
 
 // The sticker book's slots: every game in the square (the crown asks for all of them).
 const GAME_COUNT = new Set(hubSections('all').flatMap(section => section.games)).size;
@@ -43,9 +44,9 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
   const getGotomonById = (id, companions = read()?.snapshot.player.miniGames?.companions ?? {}) => {
     const data = lookup(id);
     if (!data) return { id, name: id, imageUrl: null };
-    const squareFriend = miniGameGotomonById(id);
-    if (squareFriend) return { ...squareFriend, support: supportStyle(squareFriend.category),
-      move: moveFor(squareFriend.type, growthStatus(companions?.[id]).level),
+    const specialFriend = miniGameGotomonById(id) ?? lessonGotomonById(id);
+    if (specialFriend) return { ...specialFriend, support: supportStyle(specialFriend.category),
+      move: moveFor(specialFriend.type, growthStatus(companions?.[id]).level),
       outfit: wornItems(companions?.[id], { gameCount: GAME_COUNT }), look: { evolve: false } };
     const folder = getBonusMonsterFolder(id) || folders[data.grade] || folders[1];
     const look = wornLook(companions?.[id], id);
@@ -60,7 +61,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
   };
   const getBaseGotomonById = id => {
     const gotomon = getGotomonById(id), data = lookup(id);
-    if (miniGameGotomonById(id)) return gotomon;
+    if (miniGameGotomonById(id) || lessonGotomonById(id)) return gotomon;
     if (!data) return gotomon;
     const folder = getBonusMonsterFolder(id) || folders[data.grade] || folders[1];
     return { ...gotomon, imageUrl: `/assets/images/monsters/full/${folder}/${id}.webp`, look: { ...gotomon.look, evolve: false } };
