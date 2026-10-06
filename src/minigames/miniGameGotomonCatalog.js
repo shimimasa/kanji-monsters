@@ -62,3 +62,5 @@ export const MINI_GAME_GOTOMON = Object.freeze(Object.fromEntries(ROWS.map(([gam
 })])));
 
 export const miniGameGotomonFor = gameId => MINI_GAME_GOTOMON[gameId] ?? null;
+export const MINI_GAME_GOTOMON_BY_ID = Object.freeze(Object.fromEntries(Object.values(MINI_GAME_GOTOMON).map(friend => [friend.id, friend])));
+export const miniGameGotomonById = id => MINI_GAME_GOTOMON_BY_ID[id] ?? null;

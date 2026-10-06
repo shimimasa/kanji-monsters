@@ -36,6 +36,9 @@
 .yt-square-gotomon-preview{display:flex;align-items:center;gap:12px;margin:10px 0;padding:9px 12px;border:1px solid #c7d9c5;border-radius:12px;background:#f2f7eb}
 .yt-square-gotomon-image{width:76px;height:76px;flex:none;object-fit:contain;image-rendering:pixelated}
 .yt-square-gotomon-copy{min-width:0}.yt-square-gotomon-copy strong{display:inline-block;margin-right:8px}.yt-square-gotomon-copy p{margin:3px 0 0;font-size:13px;line-height:1.45}
+.yt-square-gotomon-goal{display:block;margin-top:5px;color:#245c47;font-weight:700}
+.gt-capture-notice{display:flex;align-items:center;gap:12px;margin:12px 0;padding:12px;border:2px solid #93c7a2;border-radius:14px;background:#e8f6e9;color:#174d35}
+.gt-capture-notice[hidden]{display:none}.gt-capture-notice img{width:84px;height:84px;flex:none;object-fit:contain;image-rendering:pixelated}
 @media(max-width:480px){.yt-hub .yt-friend-banner{flex-wrap:wrap;padding:10px 0}.yt-memory-open{flex-basis:100%;margin-left:0}.yt-memory-intro{align-items:flex-start}}
 .yt-hub [data-action=learning-notebook]{margin:0 0 20px}.yt-learning-notebook{overflow-wrap:anywhere}.yt-learning-notebook .yt-picker-header{position:sticky;top:0;z-index:1;background:var(--yt-paper);padding:6px 0}.yt-learning-notebook summary{cursor:pointer;min-height:44px;padding:12px 0}.yt-learning-summary{font-weight:700}
 .yt-learning-notebook input[type=search]{box-sizing:border-box;width:100%;min-width:0;min-height:44px;font:inherit;padding:8px;border:1px solid #779780;border-radius:8px;background:#fff;color:var(--yt-ink)}.yt-search-status{font-weight:700}

@@ -3,6 +3,7 @@ import { fetchJsonResponse } from '../core/asyncDeadline.js';
 import { gameState } from '../core/gameState.js';
 import { canonicalizeStageId } from '../core/idCanonicalizer.js';
 import { validateKanjiCatalog } from '../core/kanjiIdMigration.js';
+import { MINI_GAME_GOTOMON_BY_ID, miniGameGotomonById } from '../minigames/miniGameGotomonCatalog.js';
 
 export let stageData = [];
 let enemyData = [];
@@ -541,6 +542,8 @@ export function getKanjiById(id) {
  * @returns {object|null}
  */
 export function getMonsterById(id) {
+  const squareFriend = miniGameGotomonById(id);
+  if (squareFriend) return { ...squareFriend, grade: 0, prefecture: 'ミニゲーム広場', desc: squareFriend.description, trivia: squareFriend.appearance };
   const m = enemyData.find(item => item.id === id);
   if (!m) {
     console.warn(`enemyData に ID=${id} のデータが見つかりません`);
@@ -553,8 +556,8 @@ export function getMonsterById(id) {
  * 全モンスターの ID リストを返却
  * @returns {Array<number|string>}
  */
-export function getAllMonsterIds() {
-  return enemyData.map(item => item.id);
+export function getAllMonsterIds({ includeMiniGames = false } = {}) {
+  return includeMiniGames ? [...enemyData.map(item => item.id), ...Object.keys(MINI_GAME_GOTOMON_BY_ID)] : enemyData.map(item => item.id);
 }
 
 // --- 学年ボーナス用のボス探索ヘルパ ---

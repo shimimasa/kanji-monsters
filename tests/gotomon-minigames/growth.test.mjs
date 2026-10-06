@@ -50,7 +50,7 @@ test('XP transaction crosses level and preserves capture/main stats/medals',asyn
   assert.equal(receipt.reward.earnedXP,30);assert.equal(receipt.reward.levelUp,true);assert.equal(receipt.reward.after.level,2);
   assert.equal(service.getProgress().companions['HKD-E01'].friendship,31);
   assert.deepEqual(service.getProgress().companions['HKD-E01'].medals,['old-medal','five-plays']);
-  assert.equal(loadSave().player.coreStats.exp,42);assert.deepEqual(loadSave().player.collection.gotomonIds,['HKD-E01','HKD-E02']);
+  assert.equal(loadSave().player.coreStats.exp,42);assert.deepEqual(loadSave().player.collection.gotomonIds,['HKD-E01','HKD-E02','MG-001']);
 });
 test('maxXP awards only remainingXP and never Lv11',async()=>{
   const {service}=await fixture({xp:1518});const result=service.awardGotomonPlayResult(run(service));
