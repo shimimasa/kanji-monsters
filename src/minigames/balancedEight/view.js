@@ -18,7 +18,7 @@ const CSS = `
 .be-tools button,.be-next{min-height:38px;padding:4px 14px;border:2px solid #416079;border-radius:12px;background:#fff;color:#20364c;font:inherit;font-size:clamp(14px,2vw,18px);font-weight:900;cursor:pointer;touch-action:manipulation}
 .be-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:min(100%,660px)}
 .be-option{min-width:0;min-height:65px;padding:6px 5px;border:3px solid #416079;border-radius:16px;background:#fff;color:#20364c;font:inherit;font-size:clamp(16px,2.4vw,22px);font-weight:900;line-height:1.25;cursor:pointer;touch-action:manipulation;overflow-wrap:anywhere;box-shadow:0 4px 0 #41607955}
-.be-option:focus-visible,.be-tools button:focus-visible,.be-next:focus-visible{outline:4px solid #f4a000;outline-offset:2px}
+.be-option:focus-visible,.be-tools button:focus-visible,.be-next:focus-visible,.be-place-target:focus-visible{outline:4px solid #f4a000;outline-offset:2px}
 .be-option:disabled{opacity:.6;cursor:default}
 .be-feedback{max-width:660px;min-height:1.5em;margin:0;font-size:clamp(14px,2vw,18px);font-weight:800;line-height:1.3}
 .be-next{background:#245d70;color:#fff;border-color:#245d70;min-height:44px;padding:6px 22px}
@@ -29,7 +29,14 @@ const CSS = `
 .be-trials button[data-seen=true]{background:#d4f3e7}
 .be-trials button:focus-visible{outline:4px solid #f4a000;outline-offset:2px}
 .be-observation{max-width:660px;min-height:2.6em;margin:0;font-size:clamp(15px,2vw,19px);font-weight:800;line-height:1.35}
-#abcPostScreen .be-art{background:linear-gradient(#ffe9ad,#fff8df)}#abcPostScreen .be-option{background:#fff4d0;border-radius:22px 22px 9px 9px}
+#abcPostScreen .be-art{z-index:1;overflow:visible;background:linear-gradient(#ffe9ad,#fff8df)}
+#abcPostScreen .be-art-text{cursor:grab;touch-action:none;user-select:none}
+#abcPostScreen .be-art-text[data-dragging=true]{cursor:grabbing;transition:none}
+#abcPostScreen .be-art-outcome{margin-bottom:4px;font-size:clamp(14px,2vw,18px)}
+#abcPostScreen .be-option{background:#fff4d0;border-radius:22px 22px 9px 9px;min-height:80px;font-size:clamp(25px,4vw,34px)}
+#abcPostScreen .be-option::before{content:'📮';display:block;font-size:clamp(22px,3vw,29px);line-height:1}
+#abcPostScreen .be-collection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:min(100%,300px)}
+#abcPostScreen .be-collection span{min-width:0;background:#fff3cf;border:2px solid #c88943}
 #englishRadioScreen .be-art{background:radial-gradient(circle,#f7e6ff,#d4d9ff)}#englishRadioScreen .be-art::after{content:'♪ 〜 ♪';position:absolute;right:7%;top:12%;font-size:28px;color:#805aa3}
 #replyCafeScreen .be-art{background:linear-gradient(#fff0d5,#efd1ac)}#replyCafeScreen .be-option{border-radius:22px;background:#fffaf1}
 #englishRoomScreen .be-art{background:linear-gradient(#e4f6ff 64%,#c9a579 65%)}#englishRoomScreen .be-option{background:#eef8ff}
@@ -42,16 +49,29 @@ const CSS = `
 #wonderLabScreen .be-art[data-filled=true] .be-art-text{animation:be-arrive .45s ease-out}
 #wonderLabScreen .be-art-outcome{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:max-content;max-width:95%;font-size:clamp(13px,2vw,18px)}
 #wonderLabScreen .be-art[data-filled=true] .be-art-outcome{display:block}
-#lifeCycleScreen .be-art{background:linear-gradient(#e6f9d8,#bfe6a8)}#lifeCycleScreen .be-collection span{border-radius:50%}
+#lifeCycleScreen .be-art{background:linear-gradient(#e6f9d8,#bfe6a8)}
+#lifeCycleScreen .be-art-text{padding:8px 20px;border:3px dashed #5b945e;border-radius:18px;background:#fffdf0}
+#lifeCycleScreen .be-options{position:relative;margin-top:12px}
+#lifeCycleScreen .be-options::before{content:'つぎの すがたを つなごう';position:absolute;bottom:100%;left:0;width:100%;font-size:clamp(13px,1.8vw,17px);font-weight:900;color:#285e3b}
+#lifeCycleScreen .be-option{border-color:#4c8557;border-radius:50% 50% 18px 18px;background:#f6ffe8;box-shadow:0 4px 0 #4c855755}
+#lifeCycleScreen .be-collection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;width:min(100%,440px)}
+#lifeCycleScreen .be-collection span{min-height:35px;border:2px solid #89b98a;border-radius:12px;background:#f5ffeb;font-size:clamp(14px,2vw,18px)}
 #mapTownScreen .be-art{background:linear-gradient(90deg,#e2edd8 49%,#c7dfd0 50%)}#mapTownScreen .be-collection span{background:#f4f0da}
-#shapeMosaicScreen .be-art{background:repeating-linear-gradient(45deg,#edf4ff 0 16px,#dfeaf9 16px 32px)}#shapeMosaicScreen .be-option{background:#e9f5ff}
+#shapeMosaicScreen .be-art{background:repeating-linear-gradient(45deg,#edf4ff 0 16px,#dfeaf9 16px 32px);grid-template-columns:1fr 1fr}
+#shapeMosaicScreen .be-art-text{font-size:clamp(42px,7vw,68px)}
+#shapeMosaicScreen .be-room-object{display:none}
+#shapeMosaicScreen .be-art-outcome{position:absolute;right:3%;bottom:6%;font-size:clamp(15px,2vw,19px)}
+#shapeMosaicScreen .be-option{background:#e9f5ff;border-radius:8px;min-height:74px}
+#shapeMosaicScreen .be-option[data-selected=true]{background:#ffe9ac;border-color:#b26829;transform:translateY(-3px)}
+.be-place-target{min-width:105px;min-height:74px;margin:6px;border:3px dashed #4169a5;border-radius:12px;background:#fffcf0;color:#294c78;font:inherit;font-size:clamp(15px,2.2vw,20px);font-weight:900;cursor:pointer;touch-action:manipulation}
+.be-place-target:disabled{opacity:.8;cursor:default}
 #mapTownScreen .be-collection,#shapeMosaicScreen .be-collection{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;width:min(240px,70%);padding:4px;border:2px solid #416079;border-radius:10px;background:#d3e3d3}
 #mapTownScreen .be-collection span,#shapeMosaicScreen .be-collection span{min-height:31px;background:#fffefa}
 #mapTownScreen .be-collection button{min-height:42px;border:1px solid #416079;border-radius:5px;background:#fffefa;color:#1d4355;font:inherit;font-size:clamp(15px,2vw,21px);font-weight:800;cursor:pointer}
 #mapTownScreen .be-collection button:focus-visible{outline:4px solid #f4a000;outline-offset:2px}
 #mapTownScreen .be-collection button:disabled{cursor:default}
 #shapeMosaicScreen .be-collection{background:#dce9ff}#shapeMosaicScreen .be-collection span{color:#476fc0}
-@media(max-width:520px){.be-wrap{inset:48px 2% 3px;gap:5px}.be-art{min-height:80px}.be-options{gap:5px}.be-option{min-height:60px;padding:4px 2px;font-size:clamp(14px,3.8vw,18px)}.be-collection span{min-width:27px}}
+@media(max-width:520px){.be-wrap{inset:48px 2% 3px;gap:5px}.be-art{min-height:80px}.be-options{gap:5px}.be-option{min-height:60px;padding:4px 2px;font-size:clamp(14px,3.8vw,18px)}.be-collection span{min-width:27px}.be-place-target{min-width:90px;min-height:62px}}
 `;
 
 const needsSpeech = new Set(['englishRadio', 'replyCafe', 'englishRoom']);
@@ -71,6 +91,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   const config = NEW_GAME_CONTENT[gameId];
   if (!config) throw new Error('Unknown balanced mini game view');
   let active = true, shownKey = '', shownCollection = -1, textShown = false;
+  let selectedShapeChoiceId = null, postDragId = null, postDragStart = null;
   const labSeen = new Set();
   let labRound = -1, labAction = null;
   const prepareLabRound = round => {
@@ -97,7 +118,10 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   const artText = el('span', 'be-art-text');
   const roomObject = el('span', 'be-room-object');
   const artResult = el('span', 'be-art-outcome');
-  art.append(artText, roomObject, artResult);
+  const shapePlace = el('button', 'be-place-target', '？ ここに はめる');
+  shapePlace.type = 'button'; shapePlace.dataset.action = 'place-shape';
+  shapePlace.hidden = gameId !== 'shapeMosaic'; shapePlace.disabled = true;
+  art.append(artText, roomObject, artResult, shapePlace);
   const question = el('h2', 'be-question');
   const transcript = el('p', 'be-transcript');
   const tools = el('div', 'be-tools');
@@ -105,15 +129,69 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   const showText = el('button', '', '文字で見る'); showText.type = 'button'; showText.dataset.action = 'show-text';
   tools.append(listen, showText);
   const options = el('div', 'be-options');
+  if (gameId === 'abcPost') options.setAttribute('aria-label', '小文字の ポストを えらぶ');
+  if (gameId === 'lifeCycle') options.setAttribute('aria-label', 'つぎの すがたを えらぶ');
+  if (gameId === 'shapeMosaic') options.setAttribute('aria-label', '形の タイルを えらぶ');
+  const answerChoice = choiceId => {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'answering' ||
+        !state.problem?.choices.some(choice => choice.choiceId === choiceId)) return false;
+    return dispatch({ type: 'answer', payload: {
+      sessionId: state.sessionId, attemptId: state.attemptId, choiceId } });
+  };
   const buttons = Array.from({ length: 3 }, () => {
     const button = el('button', 'be-option'); button.type = 'button'; options.append(button);
     on(button, 'click', () => {
       const state = getSnapshot();
-      if (active && state.phase === 'answering') dispatch({ type: 'answer', payload: {
-        sessionId: state.sessionId, attemptId: state.attemptId, choiceId: button.dataset.choiceId } });
+      if (!active || state.paused || state.phase !== 'answering') return;
+      if (gameId === 'shapeMosaic') {
+        selectedShapeChoiceId = button.dataset.choiceId;
+        buttons.forEach(tile => { tile.dataset.selected = String(tile === button); });
+        shapePlace.textContent = `${selectedShapeChoiceId.split(' ')[0]} ここに はめる`;
+        shapePlace.setAttribute('aria-label', `${selectedShapeChoiceId}の タイルを ここに はめる`);
+        shapePlace.disabled = false;
+        shapePlace.focus({ preventScroll: true });
+        return;
+      }
+      answerChoice(button.dataset.choiceId);
     });
     return button;
   });
+  on(shapePlace, 'click', () => {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'answering' || !selectedShapeChoiceId ||
+        !state.problem?.choices.some(choice => choice.choiceId === selectedShapeChoiceId)) return;
+    answerChoice(selectedShapeChoiceId);
+  });
+  if (gameId === 'abcPost') {
+    on(artText, 'pointerdown', event => {
+      const state = getSnapshot();
+      if (!active || state.paused || state.phase !== 'answering' || !event.isPrimary || event.button !== 0) return;
+      postDragId = event.pointerId;
+      postDragStart = { x: event.clientX, y: event.clientY };
+      artText.dataset.dragging = 'true';
+      artText.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+    on(artText, 'pointermove', event => {
+      if (event.pointerId !== postDragId || !postDragStart) return;
+      artText.style.transform = `translate(${event.clientX - postDragStart.x}px,${event.clientY - postDragStart.y}px)`;
+    });
+    const finishPostDrag = event => {
+      if (event.pointerId !== postDragId) return;
+      postDragId = null; postDragStart = null;
+      artText.dataset.dragging = 'false';
+      artText.style.transform = '';
+      if (artText.hasPointerCapture(event.pointerId)) artText.releasePointerCapture(event.pointerId);
+      if (event.type !== 'pointerup') return;
+      artText.style.pointerEvents = 'none';
+      const target = doc.elementFromPoint(event.clientX, event.clientY)?.closest('.be-option');
+      artText.style.pointerEvents = '';
+      if (target && options.contains(target)) answerChoice(target.dataset.choiceId);
+    };
+    on(artText, 'pointerup', finishPostDrag);
+    on(artText, 'pointercancel', finishPostDrag);
+  }
   const feedback = el('p', 'be-feedback'); feedback.setAttribute('role', 'status');
   const next = el('button', 'be-next', 'つぎへ'); next.type = 'button'; next.dataset.action = 'next';
   const trials = el('div', 'be-trials'); trials.setAttribute('aria-label', '条件をかえて実験する');
@@ -191,6 +269,18 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
       const key = `${state.round}:${state.phase}`;
       if (key !== shownKey) {
         shownKey = key;
+        if (gameId === 'abcPost') {
+          postDragId = null; postDragStart = null;
+          artText.dataset.dragging = 'false';
+          artText.style.transform = '';
+        }
+        if (gameId === 'shapeMosaic' && state.phase === 'answering') {
+          selectedShapeChoiceId = null;
+          shapePlace.textContent = '？ ここに はめる';
+          shapePlace.setAttribute('aria-label', 'タイルを えらんで ここに はめる');
+          shapePlace.disabled = true;
+          buttons.forEach(button => { button.dataset.selected = 'false'; });
+        }
         const problem = state.problem;
         if (problem) {
           if (gameId === 'wonderLab') {
@@ -207,10 +297,18 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
             artText.textContent = furniture;
             art.dataset.position = state.phase === 'feedback'
               ? (problem.correctChoiceId.includes(' 上') ? '上' : problem.correctChoiceId.includes(' 中') ? '中' : '下') : 'まえ';
-          } else { roomObject.textContent = ''; artText.textContent = gameId === 'wonderLab' && state.phase === 'feedback' && labAction ? labAction.visual : problem.visual; }
+          } else {
+            roomObject.textContent = '';
+            artText.textContent = gameId === 'wonderLab' && state.phase === 'feedback' && labAction ? labAction.visual
+              : gameId === 'abcPost' && state.phase === 'feedback'
+                ? `${problem.visual} → 📮 ${problem.correctChoiceId}`
+              : gameId === 'lifeCycle' && state.phase === 'feedback'
+                ? problem.visual.replace('？', problem.correctChoiceId.split(' ')[0]) : problem.visual;
+          }
           art.dataset.filled = String(state.phase === 'feedback' && (gameId !== 'wonderLab' || !!labAction));
           artResult.textContent = state.phase === 'feedback'
             ? gameId === 'wonderLab' ? labAction?.result ?? ''
+              : gameId === 'abcPost' ? `${problem.correctChoiceId} に とどいたよ`
               : (gameId === 'replyCafe' || gameId === 'lifeCycle' ||
                 gameId === 'mapTown' || gameId === 'shapeMosaic' || gameId === 'englishRoom')
               ? problem.correctChoiceId : 'できた！'
@@ -241,6 +339,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
         }
       }
       options.hidden = state.phase !== 'answering';
+      shapePlace.hidden = gameId !== 'shapeMosaic' || state.phase !== 'answering';
       trials.hidden = gameId !== 'wonderLab' || state.phase !== 'feedback';
       observation.hidden = trials.hidden;
       next.hidden = state.phase !== 'feedback' || (gameId === 'wonderLab' && labSeen.size < 2) ||
@@ -252,7 +351,11 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
         for (let index = 0; index < state.rounds; index++) {
           const item = state.artifacts[index];
           const mark = gameId === 'shapeMosaic' && item
-            ? ['▲', '■', '●', '▭', '▲', '●'][index] : item ?? '·';
+            ? ['▲', '■', '●', '▭', '▲', '●'][index]
+            : gameId === 'abcPost' && item
+              ? `${config.rounds[index].visual.split(' ')[1]} → ${config.rounds[index].correct}`
+            : gameId === 'lifeCycle' && item
+              ? item.replace('？', config.rounds[index].correct.split(' ')[0]) : item ?? '·';
           collection.append(el('span', '', mark));
         }
       }
@@ -263,7 +366,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
         progressValue: state.answered / state.rounds,
         progressLabel: `${state.answered}/${state.rounds}`, life: null, gaugeValue: play.gauge });
     },
-    stopInput() { active = false; [...buttons, ...trialButtons, ...townButtons, listen, showText, next].forEach(node => { node.disabled = true; }); Speech.cancel(); },
+    stopInput() { active = false; postDragId = null; artText.style.transform = ''; [...buttons, ...trialButtons, ...townButtons, shapePlace, listen, showText, next].forEach(node => { node.disabled = true; }); Speech.cancel(); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

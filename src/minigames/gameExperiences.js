@@ -2,8 +2,8 @@
 // `arcade` games draw their own real-time world; `paced` games offer ゆっくり.
 export const gameExperiences = Object.freeze({
   abcPost: { genre: '英語の文字', difficulty: '入門', time: '6つ', icon: '✉️', scene: 'post', arcade: true, manualNext: true, silentIncorrect: true,
-    description: '大文字の手紙を、小文字のポストへとどけよう。', goal: '大文字を見る → おなじ小文字をえらぶ', skill: 'おたよりの光', effect: '次の3こをかがやかせる', unit: '通', color: '#b77526',
-    howTo: ['大文字の手紙が1通ずつとどくよ。', 'おなじ文字の小文字ポストをタップしよう。', 'どの手紙もとどけられるよ。文字をたしかめて次へ進もう。'] },
+    description: '大文字の手紙を、小文字のポストへとどけよう。', goal: '大文字を見る → おなじ小文字のポストへとどける', skill: 'おたよりの光', effect: '次の3こをかがやかせる', unit: '通', color: '#b77526',
+    howTo: ['大文字の手紙が1通ずつとどくよ。', '手紙をおなじ文字のポストへ引っぱろう。ポストのタップでも遊べるよ。', 'どの手紙もとどけられるよ。文字をたしかめて次へ進もう。'] },
   englishRadio: { genre: '英語の聞き取り', difficulty: '入門', time: '6つ', icon: '📻', scene: 'radio', arcade: true, manualNext: true, silentIncorrect: true,
     description: '英語を聞いて、ぴったりの絵をえらぼう。', goal: '何度でも聞く → 合う絵をえらぶ', skill: 'ラジオの光', effect: '次の3つをかがやかせる', unit: '曲', color: '#7651a0',
     howTo: ['「きく」を押すと、英語が聞こえるよ。何回でも聞ける。', '音が出ないときは「文字で見る」も使えるよ。', '合う絵をタップしたら、英語と意味をいっしょにたしかめよう。'] },
@@ -23,8 +23,8 @@ export const gameExperiences = Object.freeze({
     description: '地図記号をえらんで、町の地図をつくろう。', goal: '建物を見る → 地図記号をえらぶ', skill: 'まちの光', effect: '次の3つをかがやかせる', unit: 'こ', color: '#517b54',
     howTo: ['建物や地図のしるしを見て、合うものをえらぼう。', 'どれをえらんでも、記号をたしかめて町が広がるよ。', '小学校・中学校、郵便局、病院、図書館が出てくるよ。'] },
   shapeMosaic: { genre: '算数の図形', difficulty: '入門', time: '6まい', icon: '🔷', scene: 'mosaic', arcade: true, manualNext: true, silentIncorrect: true,
-    description: '形のタイルをえらんで、あいぼうの絵を完成させよう。', goal: '絵のすきまを見る → 合う形をえらぶ', skill: 'モザイクの光', effect: '次の3まいをかがやかせる', unit: 'まい', color: '#476fc0',
-    howTo: ['屋根や窓に合う形のタイルをえらぼう。', '形をタップすると、絵にタイルがふえるよ。', '角や辺の数をたしかめながら、6まいで完成。'] },
+    description: '形のタイルをえらんで、6まいのモザイクをつくろう。', goal: '絵を見る → タイルをえらぶ → 枠にはめる', skill: 'モザイクの光', effect: '次の3まいをかがやかせる', unit: 'まい', color: '#476fc0',
+    howTo: ['屋根や窓に合う形のタイルをえらぼう。', 'タイルをえらんだら、絵の枠をタップしてはめよう。', '角や辺の数をたしかめながら、6まいで完成。'] },
   mathSprint: { genre: '算数', difficulty: '入門', time: '約1分', icon: '➜', scene: 'race', arcade: true, paced: true, badge: 'NEW',
     description: '計算してハードルをジャンプ！ ゴールまで走りぬけ。', goal: '答えるとジャンプ。止まらず走ってタイムを縮めよう。', skill: 'ゴトモンダッシュ', effect: '5秒間スピードアップ', unit: 'm', color: '#177a69',
     howTo: ['ハードルの計算に答えると、あいぼうがジャンプ！', '早く答えるほど止まらずに走れる。まちがえても前へ進めるよ。', '3回正解すると「ゴトモンダッシュ」が自動で発動！'],

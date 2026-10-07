@@ -6,7 +6,7 @@ const card = (prompt, choices, correct, explain, visual = '', speech = '') =>
 export const NEW_GAME_CONTENT = Object.freeze({
   abcPost: Object.freeze({
     title: 'ABCポスト', subject: 'english', skillId: 'english.letter.case',
-    intro: '大文字の手紙を、小文字のポストへとどけよう。',
+    intro: '手紙を引っぱるか、ポストをタップしてとどけよう。',
     rounds: Object.freeze([
       card('A の手紙は どのポスト？', ['a', 'd', 'q'], 'a', 'A と a は おなじ文字。', '✉️ A'),
       card('B の手紙は どのポスト？', ['p', 'b', 'd'], 'b', 'B と b は おなじ文字。', '✉️ B'),
@@ -90,7 +90,7 @@ export const NEW_GAME_CONTENT = Object.freeze({
   }),
   shapeMosaic: Object.freeze({
     title: 'かたちのモザイク', subject: 'math', skillId: 'math.geometry.shapes',
-    intro: '形のタイルをえらんで、あいぼうの絵をつくろう。',
+    intro: '形のタイルをえらんで、モザイクをつくろう。',
     rounds: Object.freeze([
       card('おうちの とがった屋根に ぴったりの形は？', ['▲ 三角形', '● 円', '■ 正方形'], '▲ 三角形', '屋根には 三角形のタイルを置いたよ。', '🏠'),
       card('4つの辺が どれも同じ長さの 窓は？', ['▭ 長方形', '■ 正方形', '● 円'], '■ 正方形', '4つの辺が同じ長さの 正方形だよ。', '🪟'),
