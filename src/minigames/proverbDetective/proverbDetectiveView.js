@@ -17,6 +17,8 @@ const CSS = `
 #proverbDetectiveScreen .pd-hintbar{height:8px;margin-top:8px;border-radius:99px;background:#0001;overflow:hidden}
 #proverbDetectiveScreen .pd-hintbar i{display:block;height:100%;width:calc(var(--p,0) * 100%);background:linear-gradient(90deg,#b99be0,#6b4e8a)}
 #proverbDetectiveScreen .pd-hint{margin:6px 0 0;padding:6px 10px;border-radius:8px;background:#efe6ff;color:#3a1f5c;font-size:15px;line-height:1.5}
+#proverbDetectiveScreen .pd-candidate{margin:6px 0 0;padding:5px 10px;border-radius:8px;background:#fff0bc;color:#3a2400;font-size:clamp(13px,1.8vw,16px);font-weight:900;line-height:1.45}
+#proverbDetectiveScreen .pd-candidate[hidden]{display:none}
 #proverbDetectiveScreen .pd-solved{margin:8px 0 0;padding:8px 10px;border-radius:8px;background:#e8f6ea;line-height:1.5;font-size:16px}
 #proverbDetectiveScreen .pd-solved strong{display:block;font-size:22px}
 #proverbDetectiveScreen .pd-stamp{position:absolute;right:10px;top:-14px;padding:4px 12px;border:4px solid #c0392b;border-radius:10px;color:#c0392b;font-size:22px;font-weight:900;transform:rotate(10deg);background:#fffdf6cc}
@@ -38,9 +40,13 @@ const CSS = `
 #proverbDetectiveScreen .pd-suspect small{font-size:.6em;color:#7a6a90;margin-right:6px}
 #proverbDetectiveScreen .pd-suspect em{display:block;margin-top:4px;font-style:normal;font-size:.62em;font-weight:700;color:#5d4a78}
 #proverbDetectiveScreen .pd-suspect:focus-visible{outline:3px solid #ffd54a;outline-offset:2px}
+#proverbDetectiveScreen .pd-suspect[data-selected=true]{background:#fff0bc;box-shadow:0 4px 0 #b38132,0 0 0 3px #ffcc48}
 #proverbDetectiveScreen .pd-suspect[data-status=alibi]{background:#e9e4f0;color:#7a6a90;box-shadow:0 4px 0 #c9bfd8}
 #proverbDetectiveScreen .pd-suspect[data-status=culprit]{background:#d7f7df;box-shadow:0 4px 0 #1f9d55}
 #proverbDetectiveScreen .pd-suspect.ya-nudge{animation:ya-nudge .35s ease-out}
+#proverbDetectiveScreen .pd-accuse{min-height:46px;padding:6px 12px;border:2px solid #ffcc48;border-radius:12px;background:#fff0bc;color:#3a2400;font:inherit;font-size:clamp(15px,1.9vw,18px);font-weight:900;cursor:pointer;touch-action:manipulation}
+#proverbDetectiveScreen .pd-accuse:disabled{opacity:.6;cursor:default}
+#proverbDetectiveScreen .pd-accuse:focus-visible{outline:3px solid #fff;outline-offset:2px}
 #proverbDetectiveScreen .pd-next{min-height:52px;border:0;border-radius:14px;background:#ffb627;color:#3a2400;font:inherit;font-size:20px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer}
 #proverbDetectiveScreen .pd-review{margin:0;padding:0;list-style:none;display:grid;gap:6px}
 #proverbDetectiveScreen .pd-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
@@ -55,7 +61,7 @@ const HINT_AT = .5;
 export function createProverbDetectiveView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
   // One of the child's Gotomon works as the detective's assistant for the whole run.
   const assistant = castAt(cast?.friends, 0) ?? castAt(cast?.wild, 0);
-  let active = true, problemId = null, lastSeq = -1, lastEventId = 0, lastTrySerial = 0, hintShown = false;
+  let active = true, problemId = null, lastSeq = -1, lastEventId = 0, lastTrySerial = 0, hintShown = false, selectedChoiceId = null;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'proverbDetectiveScreen', title: 'ことわざ探偵', theme: 'office' });
@@ -68,19 +74,28 @@ export function createProverbDetectiveView({ document: doc, dispatch, onBack, ge
   const memoTitle = el('h2', '', '事件メモ'), clues = el('div'), question = el('p', 'pd-question');
   const hintbar = el('div', 'pd-hintbar'); hintbar.append(el('i')); hintbar.setAttribute('aria-hidden', 'true');
   const hint = el('p', 'pd-hint'); hint.hidden = true;
+  const candidate = el('p', 'pd-candidate'); candidate.hidden = true;
   const solved = el('div', 'pd-solved'); solved.hidden = true;
   const stamp = el('span', 'pd-stamp', '解決！'); stamp.hidden = true;
-  memo.append(stamp, memoTitle, clues, question, hintbar, hint, solved);
+  memo.append(stamp, memoTitle, clues, question, candidate, hintbar, hint, solved);
   const hero = el('div', 'pd-hero');
   world.append(el('i', 'pd-window'), client, memo, hero);
   const helper = el('div', 'pd-helper');
   if (assistant) { const img = el('img'); img.alt = ''; img.src = assistant.imageUrl; helper.append(img, el('span', '', `助手 ${assistant.name}`)); world.append(helper); }
 
-  const ask = el('p', 'pd-ask', 'ぴったりのことわざを指名しよう！');
+  const ask = el('p', 'pd-ask', '事件メモを読んで、ことわざを選ぼう！');
   const suspectsBox = el('div', 'pd-suspects');
   const suspects = [0, 1, 2, 3].map(index => {
     const node = el('button', 'pd-suspect'); node.type = 'button'; node.dataset.choiceIndex = String(index + 1);
-    on(node, 'click', () => accuse(index)); suspectsBox.append(node); return node;
+    on(node, 'click', () => select(index)); suspectsBox.append(node); return node;
+  });
+  const accuseButton = el('button', 'pd-accuse', 'ことわざを えらぼう'); accuseButton.type = 'button';
+  accuseButton.dataset.action = 'accuse'; accuseButton.disabled = true;
+  on(accuseButton, 'click', () => accuseSelected());
+  on(accuseButton, 'keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    if (!event.repeat) accuseSelected();
   });
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
   const next = el('button', 'pd-next', 'つぎの事件へ'); next.type = 'button'; next.dataset.action = 'next'; next.hidden = true;
@@ -88,28 +103,57 @@ export function createProverbDetectiveView({ document: doc, dispatch, onBack, ge
     const state = getSnapshot();
     if (active && !state.paused && state.phase === 'feedback') dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem?.problemId } });
   });
-  dock.append(ask, suspectsBox, note, next);
+  dock.append(ask, suspectsBox, accuseButton, note, next);
   const review = el('div', 'ya-learning-result'); review.hidden = true;
   const reviewList = el('ol', 'pd-review'); review.append(el('h3', '', '今回のことわざ'), reviewList); frame.shell.append(review);
   doc.body.append(root);
   const answers = [];
 
-  function accuse(index) {
+  function select(index) {
     const state = getSnapshot(), choice = state.problem?.choices[index];
     if (!active || state.paused || state.phase !== 'answering' || !choice || state.ruledOut?.includes(choice.choiceId)) return false;
-    return dispatch({ type: 'answer', payload: { sessionId: state.sessionId, problemId: state.problem.problemId,
+    selectedChoiceId = choice.choiceId;
+    syncSelection(state);
+    note.textContent = `「${choice.text}」を 推理メモに おいたよ。選び直せるよ`;
+    return true;
+  }
+  function accuseSelected() {
+    const state = getSnapshot(), choice = state.problem?.choices.find(item => item.choiceId === selectedChoiceId);
+    if (!active || state.paused || state.phase !== 'answering' || !choice || state.ruledOut?.includes(choice.choiceId)) return false;
+    const submitted = dispatch({ type: 'answer', payload: { sessionId: state.sessionId, problemId: state.problem.problemId,
       attemptId: state.attemptId, choiceId: choice.choiceId } });
+    if (submitted) { selectedChoiceId = null; syncSelection(getSnapshot()); }
+    return submitted;
+  }
+  function syncSelection(state) {
+    const choice = state.phase === 'answering'
+      ? state.problem?.choices.find(item => item.choiceId === selectedChoiceId && !state.ruledOut?.includes(item.choiceId)) : null;
+    if (!choice) selectedChoiceId = null;
+    suspects.forEach(node => {
+      const selected = String(!!choice && node.dataset.choiceId === choice.choiceId);
+      if (node.dataset.selected !== selected) { node.dataset.selected = selected; node.setAttribute('aria-pressed', selected); }
+    });
+    candidate.hidden = !choice;
+    const memoText = choice ? `🔍 推理メモ：${choice.text}` : '';
+    if (candidate.textContent !== memoText) candidate.textContent = memoText;
+    const askText = choice ? '推理をきめたら「指名する」を押そう'
+      : state.phase === 'feedback' || state.phase === 'completed' ? '事件解決！' : '事件メモを読んで、ことわざを選ぼう！';
+    if (ask.textContent !== askText) ask.textContent = askText;
+    accuseButton.hidden = state.phase !== 'answering';
+    accuseButton.disabled = !choice || state.paused;
+    const buttonText = choice ? `「${choice.text}」を 指名する` : 'ことわざを えらぼう';
+    if (accuseButton.textContent !== buttonText) accuseButton.textContent = buttonText;
   }
   removes.push(bindArcadeKeys(doc, event => {
     if (!active || event.repeat) return false;
     const index = ['1', '2', '3', '4'].indexOf(event.key);
-    if (index >= 0) { accuse(index); return true; }
+    if (index >= 0) { if (select(index)) accuseButton.focus?.({ preventScroll: true }); return true; }
     if (event.key === 'Enter' && !next.hidden) { next.click(); return true; }
     return false;
   }));
 
   const showCase = (state, problem) => {
-    hintShown = false; lastTrySerial = 0;
+    hintShown = false; lastTrySerial = 0; selectedChoiceId = null;
     clientName.textContent = problem.client;
     memoTitle.textContent = `事件メモ No.${(state.answered ?? 0) + 1}`;
     clues.textContent = '';
@@ -117,7 +161,7 @@ export function createProverbDetectiveView({ document: doc, dispatch, onBack, ge
     const [before, after = ''] = problem.question.split(CASE_MASK);
     question.textContent = '';
     question.append(el('span', '', before), el('span', 'pd-blank', '？'), el('span', '', after));
-    hint.hidden = true; hint.textContent = ''; solved.hidden = true; solved.textContent = ''; stamp.hidden = true; hintbar.hidden = false;
+    hint.hidden = true; hint.textContent = ''; candidate.hidden = true; candidate.textContent = ''; solved.hidden = true; solved.textContent = ''; stamp.hidden = true; hintbar.hidden = false;
     suspects.forEach((node, index) => {
       const choice = problem.choices[index];
       node.hidden = !choice; delete node.dataset.status; node.textContent = '';
@@ -169,6 +213,7 @@ export function createProverbDetectiveView({ document: doc, dispatch, onBack, ge
       }
       const canAccuse = !state.paused && state.phase === 'answering';
       suspects.forEach(node => { node.disabled = !canAccuse || node.dataset.status === 'alibi'; });
+      syncSelection(state);
       next.hidden = state.phase !== 'feedback';
       next.disabled = !!state.paused;
       if (state.result && review.hidden) {
@@ -205,7 +250,7 @@ export function createProverbDetectiveView({ document: doc, dispatch, onBack, ge
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; suspects.forEach(node => { node.disabled = true; }); next.disabled = true; },
+    stopInput() { active = false; suspects.forEach(node => { node.disabled = true; }); accuseButton.disabled = true; next.disabled = true; },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
