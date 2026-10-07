@@ -1,5 +1,7 @@
 // Pure selection: viewing the hub never changes learning or play records.
-export function hubRecommendations({ gameIds, progress = {}, reviewCount = 0, timedReviewCount = 0, sentenceReviewCount = 0 }) {
+import { hubSections } from './hubCatalog.js';
+
+export function hubRecommendations({ gameIds, progress = {}, reviewCount = 0, timedReviewCount = 0, sentenceReviewCount = 0, preferredSubject = 'all' }) {
   const suggestions = [], activity = progress.hubActivity;
   const known = id => typeof id === 'string' && gameIds.includes(id);
   if (reviewCount > 0 && known('englishChoice')) {
@@ -19,7 +21,9 @@ export function hubRecommendations({ gameIds, progress = {}, reviewCount = 0, ti
       label: '最近あそんだゲーム', reason: 'はじめから、もう一度あそぼう。', action: 'もう一度あそぶ' });
   }
   const started = Array.isArray(activity?.startedGames) ? activity.startedGames : [];
-  const unplayed = gameIds.find(id => !started.includes(id) && !(progress.games?.[id]?.plays > 0) &&
+  const subjectIds = preferredSubject === 'all' ? gameIds
+    : hubSections(preferredSubject).flatMap(section => section.games).filter(known);
+  const unplayed = [...subjectIds, ...gameIds].find(id => !started.includes(id) && !(progress.games?.[id]?.plays > 0) &&
     !suggestions.some(item => item.gameId === id));
   if (unplayed) suggestions.push({ kind: 'new', gameId: unplayed,
     label: 'はじめての挑戦', reason: 'まだあそんでいないゲームを試そう。', action: 'このゲームを試す' });

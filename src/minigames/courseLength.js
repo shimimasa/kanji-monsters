@@ -1,6 +1,7 @@
 // Short runs end at a natural question or room boundary. Other games keep their
 // complete board or story until they have a separately reviewed short ending.
 export const SHORT_COURSE_COUNTS = Object.freeze({
+  gotomonMerge: 8,
   gotomonPush: 5,
   gotomonBreakout: 6,
   gotomonSlash: 6,
@@ -24,4 +25,4 @@ export const shortCourseCount = gameId => SHORT_COURSE_COUNTS[gameId] ?? null;
 export const courseUnit = gameId => gameId === 'gotomonPush' ? 'へや' : gameId === 'gotomonGolf' ? 'ホール'
   : gameId === 'gotomonLand' ? 'ステージ' : gameId === 'gotomonToss' ? '球'
   : gameId === 'gotomonDelivery' ? 'こ' : '問';
-export const courseCountLabel = (gameId, short = false) => `${short ? shortCourseCount(gameId) : ['gotomonPush', 'gotomonDelivery'].includes(gameId) ? 10 : 12}${courseUnit(gameId)}`;
+export const courseCountLabel = (gameId, short = false) => `${short ? shortCourseCount(gameId) : gameId === 'gotomonMerge' ? 16 : ['gotomonPush', 'gotomonDelivery'].includes(gameId) ? 10 : 12}${courseUnit(gameId)}`;

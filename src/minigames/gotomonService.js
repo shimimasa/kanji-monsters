@@ -4,7 +4,8 @@ import { ownedIdsFromSnapshot } from './collectionAdapter.js';
 import { getMonsterById } from '../loaders/dataLoader.js';
 import { getBonusMonsterFolder } from '../utils/monsterImagePaths.js';
 import { growthStatus, calculateXP, supportStyle } from './companionGrowth.js';
-import { scoreRank, betterRank } from './scoreRank.js';
+import { betterRank } from './scoreRank.js';
+import { gameRank } from './gameRank.js';
 import { supportsShortCourse } from './courseLength.js';
 import { recordCompanionMemory } from './companionMemories.js';
 import { recordSticker, markStickerReview } from './companionStickers.js';
@@ -232,7 +233,7 @@ export function createGotomonService({ ready = isSaveSessionReady, capture = cap
         game.recentSessionIds = [...(Array.isArray(game.recentSessionIds) ? game.recentSessionIds : []), sessionId].slice(-64);
         const titlesBefore = earnedTitleIds(progress.companions);
         const friend = progress.companions[gotomonId] ??= { plays: 0, friendship: 0, medals: [] };
-        const before = growthStatus(friend), rank = scoreRank(gameId, points, count(correct));
+        const before = growthStatus(friend), rank = gameRank(gameId, points, count(correct));
         const outfitBefore = outfitProgress(friend, { gameCount: GAME_COUNT }), lookBefore = lookProgress(friend, gotomonId);
         const earnedXP = run ? shortCourse && completed
           ? Math.max(2, calculateXP({ completed, finished: false, correct, rank: 'C', newBest: false, activeElapsedMs }))
