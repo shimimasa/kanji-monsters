@@ -170,6 +170,24 @@ test('the ball waits on the paddle until the answer is chosen, then launches by 
   assert.ok(R.speedPerMs.slow < R.speedPerMs.normal);
 });
 
+test('three launch directions let the child aim after choosing, without another answer', () => {
+  for (const [direction, sign] of [['left', -1], ['center', 0], ['right', 1]]) {
+    const { game, act, choose, events } = newBreakout({ seed: 21 });
+    choose();
+    game.update(R.autoLaunchMs - 100);
+    assert.equal(game.snapshot().ball.held, true, 'there is time to aim');
+    assert.equal(act('steer', { x: 3 }), true);
+    game.update(16);
+    assert.equal(game.snapshot().ball.x, 3);
+    assert.equal(act('launch', { direction }), true);
+    if (sign === 0) assert.ok(Math.abs(game.snapshot().ball.vx) < 1e-10);
+    else assert.equal(Math.sign(game.snapshot().ball.vx), sign);
+    assert.ok(game.snapshot().ball.vy < 0);
+    assert.equal(act('launch', { direction }), false);
+    assert.equal(events.filter(event => ['correct', 'incorrect'].includes(event.type)).length, 1);
+  }
+});
+
 test('old attempts and paused commands are refused', () => {
   const { game, sessionId, act } = newBreakout({ seed: 11 });
   game.setPaused(true); assert.equal(act('launch'), false); assert.equal(act('steer', { x: 3 }), false); assert.equal(act('choose', { blockId: game.snapshot().blocks[0].blockId }), false); game.setPaused(false);

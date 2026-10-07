@@ -8,7 +8,7 @@ export const BREAKOUT_RULES = Object.freeze({
   speedPerMs: Object.freeze({ normal: 0.0068, slow: 0.0044 }), step: 8,
   // After this many other blocks are hit, the companion aims the ball at the chosen block
   // (a stray bounce is play, never a learning result).
-  missesAllowed: 3, questions: 12, refillBelow: 12, autoLaunchMs: 1600,
+  missesAllowed: 3, questions: 12, refillBelow: 12, autoLaunchMs: 8000,
 });
 const R = BREAKOUT_RULES;
 const blockWidth = (R.width - R.gap * (R.columns + 1)) / R.columns;
@@ -71,9 +71,10 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
     version++;
   };
   const resetBall = () => { ball = { x: paddleX, y: R.paddleY - R.ballRadius - 0.05, vx: 0, vy: 0, held: true }; waitMs = 0; };
-  const launch = () => {
+  const launch = (direction = null) => {
     if (!ball?.held) return false;
-    const angle = -Math.PI / 2 + (random() - 0.5) * 0.7;
+    const tilt = { left: -0.5, center: 0, right: 0.5 }[direction] ?? (random() - 0.5) * 0.7;
+    const angle = -Math.PI / 2 + tilt;
     ball = { ...ball, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, held: false }; return true;
   };
   const answerBlock = () => blocks.find(block => block.number === current()?.answer) ?? null;
@@ -126,7 +127,7 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
     judge(right, block.number);
     lastChoice = Object.freeze({ choice: ++hitSerial, blockId: block.blockId, number: block.number, correct: right,
       x: colX(block.column) + blockWidth / 2, y: rowY(block.row) + R.blockHeight / 2 });
-    if (right) { chosenId = block.blockId; hintId = null; waitMs = R.autoLaunchMs - 400; }
+    if (right) { chosenId = block.blockId; hintId = null; waitMs = 0; }
     else hintId = answerBlock()?.blockId ?? null;
   };
   const hitBlock = block => {
@@ -211,9 +212,9 @@ export function createBreakoutGame({ sessionId, random = Math.random, onEvent = 
       if (!active || paused || notifying || phase !== 'answering' || s !== sessionId || a !== attemptId || !Number.isFinite(x)) return false;
       paddleX = Math.min(R.width - R.paddleWidth / 2, Math.max(R.paddleWidth / 2, x)); return true;
     },
-    launch({ sessionId: s, attemptId: a } = {}) {
+    launch({ sessionId: s, attemptId: a, direction } = {}) {
       if (!active || paused || notifying || phase !== 'answering' || s !== sessionId || a !== attemptId || !chosenId) return false;
-      return launch();
+      return launch(direction);
     },
     // Taps a block as the answer (until the answer's block is chosen).
     choose({ sessionId: s, attemptId: a, blockId } = {}) {
