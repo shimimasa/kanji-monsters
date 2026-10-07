@@ -38,7 +38,16 @@ const CSS = `
 #abcPostScreen .be-collection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:min(100%,300px)}
 #abcPostScreen .be-collection span{min-width:0;background:#fff3cf;border:2px solid #c88943}
 #englishRadioScreen .be-art{background:radial-gradient(circle,#f7e6ff,#d4d9ff)}#englishRadioScreen .be-art::after{content:'♪ 〜 ♪';position:absolute;right:7%;top:12%;font-size:28px;color:#805aa3}
-#replyCafeScreen .be-art{background:linear-gradient(#fff0d5,#efd1ac)}#replyCafeScreen .be-option{border-radius:22px;background:#fffaf1}
+#replyCafeScreen .be-art{min-height:158px;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:9px 15px 9px 65px;background:linear-gradient(#fff0d5,#efd1ac)}
+#replyCafeScreen .be-art-text{position:absolute;left:10px;bottom:9px;font-size:38px}
+#replyCafeScreen .be-art[data-filled=true] .be-art-text{transform:none}
+#replyCafeScreen .be-art-outcome{display:none}
+.be-cafe-partner,.be-cafe-reply{max-width:95%;padding:7px 12px;border:2px solid #8b664c;border-radius:17px;background:#fffaf0;font-size:clamp(16px,2.6vw,23px);font-weight:900;line-height:1.25;overflow-wrap:anywhere}
+.be-cafe-partner{align-self:flex-start}
+.be-cafe-reply{align-self:flex-end;border-style:dashed;background:#fff}
+#replyCafeScreen .be-art[data-filled=true] .be-cafe-reply{border-style:solid;border-color:#438275;background:#e7fff3;animation:be-arrive .3s ease-out}
+#replyCafeScreen .be-option{border-radius:22px;background:#fffaf1;cursor:grab;touch-action:none;user-select:none}
+#replyCafeScreen .be-option[data-dragging=true]{cursor:grabbing;transition:none;position:relative;z-index:3}
 #englishRoomScreen .be-art{min-height:205px;background:linear-gradient(#e4f6ff 64%,#c9a579 65%)}
 #englishRoomScreen .be-art-text{position:absolute;left:33%;top:51%;font-size:clamp(43px,7vw,66px);transform:translate(-50%,-50%)}
 #englishRoomScreen .be-art[data-filled=true] .be-art-text{transform:translate(-50%,-50%) scale(1.05)}
@@ -125,10 +134,13 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   const artText = el('span', 'be-art-text');
   const roomObject = el('span', 'be-room-object');
   const artResult = el('span', 'be-art-outcome');
+  const cafePartner = el('span', 'be-cafe-partner');
+  const cafeReply = el('span', 'be-cafe-reply');
+  cafePartner.hidden = gameId !== 'replyCafe'; cafeReply.hidden = gameId !== 'replyCafe';
   const shapePlace = el('button', 'be-place-target', '？ ここに はめる');
   shapePlace.type = 'button'; shapePlace.dataset.action = 'place-shape';
   shapePlace.hidden = gameId !== 'shapeMosaic'; shapePlace.disabled = true;
-  art.append(artText, roomObject, artResult, shapePlace);
+  art.append(artText, roomObject, artResult, cafePartner, cafeReply, shapePlace);
   const question = el('h2', 'be-question');
   const transcript = el('p', 'be-transcript');
   const tools = el('div', 'be-tools');
@@ -143,6 +155,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   if (gameId === 'abcPost') options.setAttribute('aria-label', '小文字の ポストを えらぶ');
   if (gameId === 'lifeCycle') options.setAttribute('aria-label', 'つぎの すがたを えらぶ');
   if (gameId === 'shapeMosaic') options.setAttribute('aria-label', '形の タイルを えらぶ');
+  if (gameId === 'replyCafe') options.setAttribute('aria-label', '返事を タップするか、会話の絵へ とどける');
   const answerChoice = choiceId => {
     const state = getSnapshot();
     if (!active || state.paused || state.phase !== 'answering' ||
@@ -154,6 +167,9 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
     const button = el('button', 'be-option'); button.type = 'button'; options.append(button);
     on(button, 'click', () => {
       const state = getSnapshot();
+      if (gameId === 'replyCafe' && button.dataset.dragged === 'true') {
+        button.dataset.dragged = 'false'; return;
+      }
       if (!active || state.paused || state.phase !== 'answering') return;
       if (gameId === 'shapeMosaic') {
         selectedShapeChoiceId = button.dataset.choiceId;
@@ -175,6 +191,39 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
     on(zone, 'click', () => { answerChoice(zone.dataset.choiceId); });
     return zone;
   }) : [];
+  if (gameId === 'replyCafe') buttons.forEach(button => {
+    let pointerId = null, start = null;
+    on(button, 'pointerdown', event => {
+      const state = getSnapshot();
+      if (!active || state.paused || state.phase !== 'answering' || !event.isPrimary || event.button !== 0) return;
+      pointerId = event.pointerId;
+      start = { x: event.clientX, y: event.clientY };
+      button.dataset.dragged = 'false';
+      button.setPointerCapture(pointerId);
+    });
+    on(button, 'pointermove', event => {
+      if (event.pointerId !== pointerId || !start) return;
+      const dx = event.clientX - start.x, dy = event.clientY - start.y;
+      if (!button.dataset.dragging && Math.hypot(dx, dy) < 8) return;
+      button.dataset.dragging = 'true';
+      button.dataset.dragged = 'true';
+      button.style.transform = `translate(${dx}px,${dy}px)`;
+    });
+    const finish = event => {
+      if (event.pointerId !== pointerId) return;
+      const wasDragging = button.dataset.dragging === 'true';
+      pointerId = null; start = null;
+      button.dataset.dragging = 'false';
+      button.style.transform = '';
+      if (button.hasPointerCapture(event.pointerId)) button.releasePointerCapture(event.pointerId);
+      if (event.type !== 'pointerup' || !wasDragging) return;
+      const target = art.getBoundingClientRect();
+      if (event.clientX >= target.left && event.clientX <= target.right &&
+          event.clientY >= target.top && event.clientY <= target.bottom) answerChoice(button.dataset.choiceId);
+    };
+    on(button, 'pointerup', finish);
+    on(button, 'pointercancel', finish);
+  });
   on(shapePlace, 'click', () => {
     const state = getSnapshot();
     if (!active || state.paused || state.phase !== 'answering' || !selectedShapeChoiceId ||
@@ -299,6 +348,9 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
           artText.dataset.dragging = 'false';
           artText.style.transform = '';
         }
+        if (gameId === 'replyCafe') buttons.forEach(button => {
+          button.dataset.dragging = 'false'; button.style.transform = '';
+        });
         if (gameId === 'shapeMosaic' && state.phase === 'answering') {
           selectedShapeChoiceId = null;
           shapePlace.textContent = '？ ここに はめる';
@@ -315,7 +367,12 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
               trial.dataset.seen = String(labSeen.has(index));
             });
           }
-          question.textContent = problem.prompt;
+          question.textContent = gameId === 'replyCafe' ? 'ゴトモンに なんて かえす？' : problem.prompt;
+          cafePartner.hidden = gameId !== 'replyCafe'; cafeReply.hidden = gameId !== 'replyCafe';
+          if (gameId === 'replyCafe') {
+            cafePartner.textContent = `ゴトモン: ${problem.speech}`;
+            cafeReply.textContent = state.phase === 'feedback' ? problem.correctChoiceId : 'ここへ 返事を とどけよう';
+          }
           if (gameId === 'englishRoom') {
             const [object, furniture] = problem.visual.split(' ');
             roomObject.textContent = object;
@@ -369,6 +426,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
           question.textContent = state.phase === 'completed' ? 'いっしょに 完成したよ！' : config.intro;
           artText.textContent = state.phase === 'completed' ? '✦ ✦ ✦' : '✦';
           roomObject.textContent = ''; artResult.textContent = ''; art.dataset.filled = 'false';
+          cafePartner.hidden = true; cafeReply.hidden = true;
           feedback.textContent = ''; transcript.hidden = true; listen.hidden = true; showText.hidden = true; roomHint.hidden = true;
         }
       }
