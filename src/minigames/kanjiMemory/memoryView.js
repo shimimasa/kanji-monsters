@@ -7,6 +7,7 @@ const CSS = `
 #kanjiMemoryScreen .mm-card{position:relative;min-width:0;min-height:0;padding:0;border:0;background:none;font:inherit;perspective:700px;cursor:pointer;touch-action:manipulation}
 #kanjiMemoryScreen .mm-card:disabled{cursor:default}
 #kanjiMemoryScreen .mm-card:focus-visible{outline:4px solid #ffd54a;outline-offset:2px;border-radius:14px}
+#kanjiMemoryScreen .mm-card[data-marked=true][data-up=false]::after{content:'★';position:absolute;right:7px;top:7px;z-index:2;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#ffe066;color:#563500;font-size:21px;box-shadow:0 2px 3px #0005;pointer-events:none}
 #kanjiMemoryScreen .mm-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .32s ease-out}
 #kanjiMemoryScreen .mm-card[data-up=true] .mm-inner{transform:rotateY(180deg)}
 #kanjiMemoryScreen .mm-back,#kanjiMemoryScreen .mm-face{position:absolute;inset:0;display:grid;place-items:center;border-radius:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 5px 0 #0003}
@@ -29,9 +30,10 @@ const CSS = `
 #kanjiMemoryScreen .mm-left{margin:0;text-align:center;font-size:15px;font-weight:800;color:#d8e6ee}
 #kanjiMemoryScreen .mm-found{margin:0;padding:10px 12px;border-radius:14px;background:#ffffff14;color:#fff;text-align:center;font-size:clamp(17px,2.2vw,22px);font-weight:800;line-height:1.5}
 #kanjiMemoryScreen .mm-target{display:inline-block;margin:0 2px;padding:0 6px;border-radius:8px;background:#ffe066;color:#3a2400;font-size:1.2em;line-height:1.25}
-#kanjiMemoryScreen .mm-tools{display:flex;justify-content:center}
-#kanjiMemoryScreen .mm-peek{min-height:48px;padding:4px 16px;border:2px solid #ffffff55;border-radius:99px;background:#ffffff1c;color:#fff;font:inherit;font-size:16px;font-weight:900;white-space:nowrap;cursor:pointer;touch-action:manipulation}
-#kanjiMemoryScreen .mm-peek:disabled{opacity:.4;cursor:default}
+#kanjiMemoryScreen .mm-tools{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+#kanjiMemoryScreen .mm-peek,#kanjiMemoryScreen .mm-mark{min-height:48px;padding:4px 16px;border:2px solid #ffffff55;border-radius:99px;background:#ffffff1c;color:#fff;font:inherit;font-size:16px;font-weight:900;white-space:nowrap;cursor:pointer;touch-action:manipulation}
+#kanjiMemoryScreen .mm-mark[aria-pressed=true]{background:#ffe066;border-color:#fff2a0;color:#3a2400}
+#kanjiMemoryScreen .mm-peek:disabled,#kanjiMemoryScreen .mm-mark:disabled{opacity:.4;cursor:default}
 #kanjiMemoryScreen .mm-review{margin:0;padding:0;list-style:none;display:grid;gap:6px}
 #kanjiMemoryScreen .mm-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
 #kanjiMemoryScreen .mm-review li[data-correct=false]{background:#fff3da}
@@ -48,6 +50,8 @@ export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot,
   const emblem = castAt(cast?.friends, 0) ?? castAt(cast?.wild, 0);
   let pairSerial = 0;
   let active = true, shownTries = 0, roundKey = null, lastSeq = -1, lastEventId = 0, lastPeeking = false, doneShown = false;
+  let marking = false;
+  const marks = new Set();
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'kanjiMemoryScreen', title: '漢字カードめくり', theme: 'cards' });
@@ -66,6 +70,8 @@ export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot,
   const tools = el('div', 'mm-tools');
   const peekButton = el('button', 'mm-peek'); peekButton.type = 'button'; peekButton.dataset.action = 'peek';
   on(peekButton, 'click', () => peek()); tools.append(peekButton);
+  const markButton = el('button', 'mm-mark', '★ 目印をつける'); markButton.type = 'button'; markButton.dataset.action = 'mark';
+  on(markButton, 'click', () => toggleMarking()); tools.append(markButton);
   // The shell advances after feedback; this stays hidden and only serves hosts without auto-advance.
   const go = el('button', 'mm-go', 'つぎへ'); go.type = 'button'; go.dataset.action = 'next'; go.hidden = true;
   on(go, 'click', () => proceed());
@@ -85,7 +91,27 @@ export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot,
   function peek() {
     const state = session();
     if (!active || state.paused || state.phase !== 'answering' || state.peeking) return false;
+    marking = false;
     return dispatch({ type: 'peek', payload: { sessionId: state.sessionId } });
+  }
+  function toggleMarking() {
+    const state = session();
+    if (!active || state.paused || state.phase !== 'answering' || state.peeking) return false;
+    marking = !marking;
+    renderBoard(state);
+    renderDock(state);
+    return true;
+  }
+  function tapCard(index) {
+    const state = session(), card = state.cards?.[index];
+    if (!active || state.paused || state.phase !== 'answering' || state.peeking || !card) return false;
+    if (!marking) return flip(index);
+    if (state.matched.includes(card.cardId) || state.up.includes(card.cardId)) return false;
+    if (marks.has(card.cardId)) marks.delete(card.cardId);
+    else marks.add(card.cardId);
+    renderBoard(state);
+    renderDock(state);
+    return true;
   }
   function proceed() {
     const state = session();
@@ -98,7 +124,7 @@ export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot,
     const inner = el('span', 'mm-inner'), back = el('span', 'mm-back', emblem ? '' : '？'), face = el('span', 'mm-face');
     if (emblem) { const img = el('img'); img.alt = ''; img.src = emblem.imageUrl; back.append(img); }
     inner.append(back, face); node.append(inner);
-    on(node, 'click', () => flip(index)); board.append(node);
+    on(node, 'click', () => tapCard(index)); board.append(node);
     return { node, face };
   };
   const setData = (node, key, value) => { if (node.dataset[key] !== value) node.dataset[key] = value; };
@@ -106,6 +132,8 @@ export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot,
     // Cards are built once per round; rebuilding during play would swallow a finger tap.
     if (roundKey !== `${state.sessionId}:${state.round}`) {
       roundKey = `${state.sessionId}:${state.round}`;
+      marking = false;
+      marks.clear();
       while (cards.length < state.cards.length) cards.push(makeCard(cards.length));
       cards.forEach(({ node, face }, index) => {
         const card = state.cards[index];
@@ -118,24 +146,30 @@ export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot,
     cards.forEach(({ node }, index) => {
       const card = state.cards[index]; if (!card) return;
       const matched = state.matched.includes(card.cardId), up = matched || state.up.includes(card.cardId) || state.peeking;
-      setData(node, 'up', String(up)); setData(node, 'matched', String(matched));
-      const label = up ? card.text : 'うらのカード';
+      if (matched) marks.delete(card.cardId);
+      setData(node, 'up', String(up)); setData(node, 'matched', String(matched)); setData(node, 'marked', String(marks.has(card.cardId)));
+      const label = up ? card.text : `うらのカード${marks.has(card.cardId) ? '、目印あり' : ''}`;
       if (node.getAttribute('aria-label') !== label) node.setAttribute('aria-label', label);
-      node.disabled = matched || state.phase !== 'answering' || state.paused || state.peeking;
+      node.disabled = matched || state.phase !== 'answering' || state.paused || state.peeking || (marking && up);
     });
   };
   const renderDock = state => {
+    if (state.phase !== 'answering' || state.paused || state.peeking) marking = false;
     const titleText = `ラウンド${state.round + 1}/${state.rounds}：${ROUND_NAMES[state.roundKind] ?? ''}のペア`;
     if (title.textContent !== titleText) title.textContent = titleText;
     const leftText = `のこり ${state.pairsLeft}組`;
     if (left.textContent !== leftText) left.textContent = leftText;
     if (state.phase === 'answering') {
-      const ask = state.peeking ? 'いまのうちに、場所をおぼえよう！' : state.up.length ? 'もう1まいめくろう' : 'カードを2まいめくって、ペアをさがそう';
+      const ask = state.peeking ? 'いまのうちに、場所をおぼえよう！' : marking ? '気になるカードに目印をつけよう。もう一度タップすると外せるよ' : state.up.length ? 'もう1まいめくろう' : 'カードを2まいめくって、ペアをさがそう';
       if (note.textContent !== ask) note.textContent = ask;
     }
     const peekText = `👀 のぞき見 ×${state.peeks}`;
     if (peekButton.textContent !== peekText) peekButton.textContent = peekText;
     peekButton.disabled = state.phase !== 'answering' || state.paused || state.peeking || !state.peeks;
+    markButton.setAttribute('aria-pressed', String(marking));
+    const markText = marking ? '✓ めくりにもどる' : '★ 目印をつける';
+    if (markButton.textContent !== markText) markButton.textContent = markText;
+    markButton.disabled = state.phase !== 'answering' || state.paused || state.peeking;
   };
   const showFound = (pair, kind) => {
     found.textContent = '';
@@ -203,7 +237,7 @@ export function createMemoryView({ document: doc, dispatch, onBack, getSnapshot,
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; [...cards.map(item => item.node), peekButton, go].forEach(node => { node.disabled = true; }); },
+    stopInput() { active = false; [...cards.map(item => item.node), peekButton, markButton, go].forEach(node => { node.disabled = true; }); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
