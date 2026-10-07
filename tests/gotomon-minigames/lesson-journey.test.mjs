@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createLessonCapture, createLessonProgress } from '../../src/lessons/lessonCapture.js';
-import { lessonCatalog } from '../../src/lessons/lessonCatalog.js';
+import { LESSON_GAMES_ENABLED, lessonCatalog } from '../../src/lessons/lessonCatalog.js';
 
 test('理科・社会の2授業は固有のゴトモン・HTML・記録シート・SVGを持つ', () => {
+  assert.equal(LESSON_GAMES_ENABLED, false);
   assert.equal(lessonCatalog.length, 2);
   assert.equal(new Set(lessonCatalog.map(x => x.id)).size, 2);
   assert.deepEqual(lessonCatalog.map(x => x.subject), ['理科', '社会']);

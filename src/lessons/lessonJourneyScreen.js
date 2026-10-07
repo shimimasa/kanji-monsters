@@ -1,6 +1,6 @@
 import { publish } from '../core/eventBus.js';
 import { element, button, isolateScreen } from '../ui/adventureUI.js';
-import { lessonForSlug } from './lessonCatalog.js';
+import { LESSON_GAMES_ENABLED, lessonForSlug } from './lessonCatalog.js';
 import { captureLesson, recordLessonProgress } from './lessonCapture.js';
 import './lessonJourney.css';
 
@@ -8,7 +8,7 @@ const screen = {
   enter({ slug } = {}) {
     this.exit();
     const lesson = lessonForSlug(slug);
-    if (!lesson) { publish('changeScreen', 'miniGameHub'); return; }
+    if (!LESSON_GAMES_ENABLED || !lesson) { publish('changeScreen', 'miniGameHub'); return; }
     this.lesson = lesson;
     publish('stopBGM', 0.2);
     const doc = document;
