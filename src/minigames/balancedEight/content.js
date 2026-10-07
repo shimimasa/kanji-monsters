@@ -30,7 +30,7 @@ export const NEW_GAME_CONTENT = Object.freeze({
   }),
   replyCafe: Object.freeze({
     title: 'おへんじカフェ', subject: 'english', skillId: 'english.phrase.reply',
-    intro: 'ゴトモンの声を聞いて、ぴったりの返事をえらぼう。',
+    intro: '返事のふきだしをタップするか、ゴトモンのところへ運ぼう。',
     rounds: Object.freeze([
       card('ゴトモン: Hello!', ['Hello!', 'Goodbye!', 'Thank you.'], 'Hello!', 'Hello! には Hello! と あいさつできるよ。', '☕ 👋', 'Hello!'),
       card('ゴトモン: Thank you.', ["You're welcome.", 'Good night.', 'I am ten.'], "You're welcome.", "You're welcome. は「どういたしまして」。", '☕ 🎁', 'Thank you.'),
