@@ -38,6 +38,12 @@ const CSS = `
 #kanjiSortScreen .ks-card-kanji{font-size:clamp(28px,4vw,40px);font-weight:900;line-height:1}
 #kanjiSortScreen .ks-card-word{font-size:13px;font-weight:700;color:#4a5e52;white-space:nowrap}
 #kanjiSortScreen .ks-card-word b{color:#c0392b}
+#kanjiSortScreen .ks-card-clue{display:block;padding:1px 6px;border-radius:7px;background:#e3f4e8;color:#22583b;font-size:clamp(13px,1.7vw,16px);font-weight:900;line-height:1.2}
+#kanjiSortScreen .ks-card-clue[hidden]{display:none}
+#kanjiSortScreen .ks-hint-toggle{align-self:center;min-height:40px;padding:5px 15px;border:2px solid #5b3a8c;border-radius:11px;background:#fffdf6;color:#4b2d77;font:inherit;font-size:clamp(14px,1.8vw,17px);font-weight:900;cursor:pointer;touch-action:manipulation}
+#kanjiSortScreen .ks-hint-toggle[aria-pressed=true]{background:#dff5e7;border-color:#36865d;color:#22583b}
+#kanjiSortScreen .ks-hint-toggle:focus-visible{outline:3px solid #ffd54a;outline-offset:2px}
+#kanjiSortScreen .ks-hint-toggle:disabled{opacity:.7;cursor:default}
 #kanjiSortScreen .ks-card:focus-visible{outline:3px solid #ffd54a;outline-offset:2px}
 #kanjiSortScreen .ks-card[data-placed=true]{visibility:hidden}
 #kanjiSortScreen .ks-card[data-hint=true]{background:#d7f7df;box-shadow:0 4px 0 #1f9d55,0 0 0 4px #37c871;animation:ks-glow .8s ease-in-out infinite alternate}
@@ -62,7 +68,7 @@ const readingText = card => card.word ? `「${wordOf(card)}」の「${card.kanji
 export function createSortView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
   // A Gotomon waits under each place in the row and cheers when its card arrives.
   let holderSerial = 0;
-  let active = true, lastSeq = -1, lastEventId = 0, puzzleKey = null, doneShown = false, shownAttempt = null;
+  let active = true, lastSeq = -1, lastEventId = 0, puzzleKey = null, doneShown = false, shownAttempt = null, hintShown = false;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'kanjiSortScreen', title: '漢字ならべパズル', theme: 'sort' });
@@ -87,6 +93,8 @@ export function createSortView({ document: doc, dispatch, onBack, getSnapshot, c
 
   const title = el('p', 'ks-title');
   const ask = el('p', 'ks-ask'); ask.dataset.role = 'problem';
+  const hintToggle = el('button', 'ks-hint-toggle'); hintToggle.type = 'button';
+  hintToggle.dataset.action = 'sort-hint'; hintToggle.setAttribute('aria-pressed', 'false');
   const tray = el('div', 'ks-tray'); tray.setAttribute('aria-label', 'ならべる漢字');
   const cards = Array.from({ length: MAX_CARDS }, (_, index) => {
     const node = el('button', 'ks-card'); node.type = 'button'; node.dataset.index = String(index);
@@ -96,13 +104,33 @@ export function createSortView({ document: doc, dispatch, onBack, getSnapshot, c
   const go = el('button', 'ks-go', 'つぎへ'); go.type = 'button'; go.dataset.action = 'next'; go.hidden = true;
   on(go, 'click', () => proceed());
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
-  dock.append(title, ask, tray, note, go);
+  dock.append(title, ask, hintToggle, tray, note, go);
   const review = el('div', 'ya-learning-result'); review.hidden = true;
   const reviewList = el('ol', 'ks-review'); review.append(el('h3', '', '今回ならべた漢字'), reviewList); frame.shell.append(review);
   doc.body.append(root);
   const finished = [];
 
   const session = () => getSnapshot();
+  const syncHint = kind => {
+    hintToggle.textContent = hintShown ? 'ヒントを とじる' : kind === 'reading' ? '読みを 見る' : '画数を 見る';
+    hintToggle.setAttribute('aria-pressed', String(hintShown));
+    const state = session();
+    cards.forEach((node, index) => {
+      const clue = node.querySelector('.ks-card-clue');
+      if (clue) clue.hidden = !hintShown;
+      const card = state.cards?.[index];
+      if (card) {
+        const label = card.word ? `「${wordOf(card)}」の「${card.kanji}」` : `「${card.kanji}」`;
+        node.setAttribute('aria-label', hintShown ? `${label}、${kind === 'reading' ? '読み' : '画数'} ${labelOf(kind, card)}` : label);
+      }
+    });
+  };
+  on(hintToggle, 'click', () => {
+    const state = session();
+    if (!active || state.paused || state.phase !== 'answering') return;
+    hintShown = !hintShown;
+    syncHint(state.kind);
+  });
   function place(index) {
     const state = session(), card = state.cards?.[index];
     if (!active || state.paused || state.phase !== 'answering' || !card || state.placed.includes(card.cardId)) return false;
@@ -118,6 +146,7 @@ export function createSortView({ document: doc, dispatch, onBack, getSnapshot, c
   const renderPuzzle = state => {
     if (puzzleKey === state.puzzleId) return;
     puzzleKey = state.puzzleId;
+    hintShown = false;
     const text = RULES[state.kind];
     rule.textContent = text.rule; firstEnd.textContent = text.first; lastEnd.textContent = text.last;
     // A clue about a wrong card stays until the next tap; a new puzzle starts clean.
@@ -133,7 +162,9 @@ export function createSortView({ document: doc, dispatch, onBack, getSnapshot, c
         word.append(el('span', '', card.word.before), el('b', '', card.kanji), el('span', '', card.word.after));
         node.append(word);
       }
-      node.setAttribute('aria-label', card.word ? `${card.word.before}${card.kanji}${card.word.after}の ${card.kanji}` : card.kanji);
+      const clue = el('span', 'ks-card-clue', labelOf(state.kind, card));
+      clue.hidden = true; node.append(clue);
+      node.setAttribute('aria-label', card.word ? `「${wordOf(card)}」の「${card.kanji}」` : `「${card.kanji}」`);
     });
     slots.forEach((slot, index) => {
       slot.node.hidden = index >= state.cards.length; slot.key = null;
@@ -142,6 +173,7 @@ export function createSortView({ document: doc, dispatch, onBack, getSnapshot, c
       slot.holder.hidden = !who; if (who) slot.holder.src = who.imageUrl;
     });
     tray.dataset.count = String(state.cards.length); rail.dataset.done = 'false'; holderSerial++;
+    syncHint(state.kind);
   };
   const renderRow = state => {
     const byId = new Map(state.cards.map(card => [card.cardId, card]));
@@ -169,6 +201,8 @@ export function createSortView({ document: doc, dispatch, onBack, getSnapshot, c
   const renderDock = state => {
     const titleText = state.phase === 'completed' ? '' : `パズル ${state.puzzle + 1}/${state.puzzles} · ⭐${state.stars}`;
     if (title.textContent !== titleText) title.textContent = titleText;
+    hintToggle.hidden = state.phase === 'completed';
+    hintToggle.disabled = state.paused || state.phase !== 'answering';
     if (state.phase === 'answering') {
       const text = state.hintCardId ? '光っているカードが、つぎに入るよ' : state.placed.length ? `${state.placed.length + 1}ばんめに入る漢字は どれかな？` : RULES[state.kind].ask;
       if (ask.textContent !== text) ask.textContent = text;
@@ -230,7 +264,7 @@ export function createSortView({ document: doc, dispatch, onBack, getSnapshot, c
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; [...cards, go].forEach(node => { node.disabled = true; }); },
+    stopInput() { active = false; [...cards, hintToggle, go].forEach(node => { node.disabled = true; }); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
