@@ -23,7 +23,9 @@ const CSS = `
 #gotomonBreakoutScreen .bk-question{margin:0;padding:10px 12px;border-radius:14px;background:#ffffff14;color:#fff;text-align:center;font-size:clamp(32px,5vw,46px);font-weight:900;font-variant-numeric:tabular-nums}
 #gotomonBreakoutScreen .bk-block[data-chosen=true]{box-shadow:inset 0 -4px 0 #0002,0 0 0 4px #ffd54a,0 0 14px #ffd54a}
 #gotomonBreakoutScreen .bk-block[data-wrong=true]{filter:grayscale(.7);opacity:.6}
-#gotomonBreakoutScreen .bk-launch{min-height:52px;border:0;border-radius:14px;background:#ffb627;color:#3a2400;font:inherit;font-size:20px;font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer;touch-action:manipulation}
+#gotomonBreakoutScreen .bk-aim{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#gotomonBreakoutScreen .bk-aim[hidden]{display:none}
+#gotomonBreakoutScreen .bk-launch{min-height:52px;border:0;border-radius:14px;background:#ffb627;color:#3a2400;font:inherit;font-size:clamp(14px,3.8vw,19px);font-weight:900;box-shadow:0 4px 0 #b57500;cursor:pointer;touch-action:manipulation}
 #gotomonBreakoutScreen .bk-launch[hidden]{display:none}
 #gotomonBreakoutScreen .bk-assist{min-height:48px;padding:6px 12px;border:2px solid #c7ecd2;border-radius:12px;background:#e9fff0;color:#214731;font:inherit;font-weight:800;cursor:pointer}
 #gotomonBreakoutScreen .bk-assist[hidden]{display:none}
@@ -55,15 +57,18 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
 
   const title = el('p', 'bk-title');
   const question = el('p', 'bk-question'); question.dataset.role = 'problem';
-  const launchButton = el('button', 'bk-launch', 'ボールをうつ！'); launchButton.type = 'button';
-  on(launchButton, 'click', () => command('launch'));
+  const aim = el('div', 'bk-aim');
+  const launchButtons = [['left', '↖ 左へ'], ['center', '↑ まんなか'], ['right', '右へ ↗']].map(([direction, label]) => {
+    const button = el('button', 'bk-launch', label); button.type = 'button'; button.dataset.direction = direction;
+    on(button, 'click', () => command('launch', { direction })); aim.append(button); return button;
+  });
   const assistButton = el('button', 'bk-assist', 'あいぼうに あててもらう'); assistButton.type = 'button'; assistButton.dataset.action = 'assist';
   on(assistButton, 'click', () => command('assist'));
   // The shell advances after feedback; this stays hidden and only serves hosts without auto-advance.
   const go = el('button', 'bk-go', 'つぎへ'); go.type = 'button'; go.dataset.action = 'next'; go.hidden = true;
   on(go, 'click', () => proceed());
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
-  dock.append(title, question, launchButton, assistButton, note, go);
+  dock.append(title, question, aim, assistButton, note, go);
   const review = el('div', 'ya-learning-result'); review.hidden = true;
   const reviewList = el('ol', 'bk-review'); review.append(el('h3', '', '今回の計算'), reviewList); frame.shell.append(review);
   doc.body.append(root);
@@ -80,7 +85,7 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
     return dispatch({ type: 'next', payload: { sessionId: state.sessionId } });
   }
   // A tap on a block chooses it as the answer (until the answer's block is chosen); anywhere
-  // else the paddle follows the finger, and a tap sends a waiting ball off.
+  // else the paddle follows the finger; the direction buttons launch a waiting ball.
   const xOf = event => { const box = board.getBoundingClientRect?.(); return box?.width && Number.isFinite(event?.clientX) ? (event.clientX - box.left) / box.width * R.width : null; };
   const yOf = event => { const box = board.getBoundingClientRect?.(); return box?.height && Number.isFinite(event?.clientY) ? (event.clientY - box.top) / box.height * R.height : null; };
   const wrongIds = new Set();
@@ -89,7 +94,7 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
     const state = session(), x = xOf(event), y = yOf(event);
     const block = !state.chosenId && x !== null && y !== null ? state.blocks.find(b => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) : null;
     if (block) { command('choose', { blockId: block.blockId }); return; }
-    dragging = true; if (x !== null) command('steer', { x }); if (state.ball?.held) command('launch');
+    dragging = true; if (x !== null) command('steer', { x });
   });
   on(board, 'pointermove', event => { if (!dragging && event.pointerType !== 'mouse') return; const x = xOf(event); if (x !== null) command('steer', { x }); });
   on(board, 'pointerup', () => { dragging = false; });
@@ -97,7 +102,8 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
   removes.push(bindArcadeKeys(doc, event => {
     const state = session();
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') return command('steer', { x: (state.paddle?.x ?? R.width / 2) + (event.key === 'ArrowLeft' ? -0.8 : 0.8) });
-    if (event.key === ' ' || event.key === 'Enter') return command('launch');
+    if (['1', '2', '3'].includes(event.key)) return command('launch', { direction: ['left', 'center', 'right'][Number(event.key) - 1] });
+    if (event.key === ' ' || event.key === 'Enter') return command('launch', { direction: 'center' });
     return false;
   }));
 
@@ -131,7 +137,7 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
     paddle.style.left = px(state.paddle.x); paddle.style.top = py(state.paddle.y); paddle.style.width = px(state.paddle.w);
     ballNode.hidden = !state.ball;
     if (state.ball) { ballNode.style.left = px(state.ball.x); ballNode.style.top = py(state.ball.y); }
-    launchButton.hidden = !(state.ball?.held && state.phase === 'answering' && state.chosenId);
+    aim.hidden = !(state.ball?.held && state.phase === 'answering' && state.chosenId);
     assistButton.hidden = !(state.phase === 'answering' && state.chosenId);
     const titleText = state.phase === 'completed' ? '' : `もんだい ${Math.min(state.questions, state.question + 1)}/${state.questions}　たすけたゴトモン ${state.freed}`;
     if (title.textContent !== titleText) title.textContent = titleText;
@@ -142,7 +148,7 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
     const choice = state.lastChoice;
     if (choice && choice.choice !== shownChoice) {
       shownChoice = choice.choice;
-      if (choice.correct) note.textContent = `「${choice.number}」に けってい！ ボールで ねらうか、あいぼうに まかせよう`;
+      if (choice.correct) note.textContent = `「${choice.number}」に けってい！ 板を動かして、打つ向きをえらぼう`;
       else { wrongIds.add(choice.blockId); const node = nodes.get(choice.blockId); if (node) restartClass(node, 'bk-bump'); note.textContent = `「${choice.number}」は ${state.problem.question} の答えじゃないよ。光っている ブロックを タップしよう`; }
       frame.announce(note.textContent);
     }
@@ -168,7 +174,7 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
   return {
     root,
     attachCompanion(portrait) { buddy.append(portrait); },
-    focusPlay() { launchButton.focus?.({ preventScroll: true }); },
+    focusPlay() { launchButtons[1].focus?.({ preventScroll: true }); },
     update(state) {
       if (!active) return;
       frame.setPaused(state.paused && !state.result);
@@ -199,7 +205,7 @@ export function createBreakoutView({ document: doc, dispatch, onBack, getSnapsho
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; dragging = false; [launchButton, go].forEach(node => { node.disabled = true; }); },
+    stopInput() { active = false; dragging = false; [...launchButtons, assistButton, go].forEach(node => { node.disabled = true; }); },
     dispose() { this.stopInput(); transient.splice(0).forEach(node => node.remove?.()); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
