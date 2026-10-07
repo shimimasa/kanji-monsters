@@ -6,7 +6,7 @@ const card = (prompt, choices, correct, explain, visual = '', speech = '') =>
 export const NEW_GAME_CONTENT = Object.freeze({
   abcPost: Object.freeze({
     title: 'ABCポスト', subject: 'english', skillId: 'english.letter.case',
-    intro: '大文字の手紙を、小文字のポストへとどけよう。',
+    intro: '手紙を引っぱるか、ポストをタップしてとどけよう。',
     rounds: Object.freeze([
       card('A の手紙は どのポスト？', ['a', 'd', 'q'], 'a', 'A と a は おなじ文字。', '✉️ A'),
       card('B の手紙は どのポスト？', ['p', 'b', 'd'], 'b', 'B と b は おなじ文字。', '✉️ B'),

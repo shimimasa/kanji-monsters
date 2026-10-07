@@ -34,6 +34,7 @@ npm パッケージは追加していません（Node 22 の fetch / WebSocket �
   … 広場からゲームを開き、開始オプションを選んで「スタート」まで押す。
   例: `enter-game.sh gotomonMaze とびらのもんだい math`、`enter-game.sh gotomonMerge けいさんのもんだい times`
 - `node scripts/playtest-cdp/tapnow.mjs "<要素を返すJS>"` … 同じ接続で位置を測ってすぐ指タップ（動く的でも外れにくい）
+- `node scripts/playtest-cdp/abc-post-drag-smoke.mjs [--touch]` … ABCポストを開始した専用Chromeで、ポストの外へ離しても回答せず、ポストへ届けた時だけ回答することを確かめる。`--touch` は390×844のタッチ操作。
 - `node scripts/playtest-cdp/errs.mjs` … 3秒間、例外とコンソールエラーを集める（`no errors` なら合格）
 - `bots/` … 算数モードなら答えを計算して、実際のタップ・なぞり・スワイプで最後まで遊ぶボット。
   引数は `<秒数> [わざとまちがえる回数]`（swipebot は `<秒数> wrong`）。

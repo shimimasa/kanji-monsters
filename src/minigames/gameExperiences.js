@@ -2,8 +2,8 @@
 // `arcade` games draw their own real-time world; `paced` games offer ゆっくり.
 export const gameExperiences = Object.freeze({
   abcPost: { genre: '英語の文字', difficulty: '入門', time: '6つ', icon: '✉️', scene: 'post', arcade: true, manualNext: true, silentIncorrect: true,
-    description: '大文字の手紙を、小文字のポストへとどけよう。', goal: '大文字を見る → おなじ小文字をえらぶ', skill: 'おたよりの光', effect: '次の3こをかがやかせる', unit: '通', color: '#b77526',
-    howTo: ['大文字の手紙が1通ずつとどくよ。', 'おなじ文字の小文字ポストをタップしよう。', 'どの手紙もとどけられるよ。文字をたしかめて次へ進もう。'] },
+    description: '大文字の手紙を、小文字のポストへとどけよう。', goal: '大文字を見る → おなじ小文字のポストへとどける', skill: 'おたよりの光', effect: '次の3こをかがやかせる', unit: '通', color: '#b77526',
+    howTo: ['大文字の手紙が1通ずつとどくよ。', '手紙をおなじ文字のポストへ引っぱろう。ポストのタップでも遊べるよ。', 'どの手紙もとどけられるよ。文字をたしかめて次へ進もう。'] },
   englishRadio: { genre: '英語の聞き取り', difficulty: '入門', time: '6つ', icon: '📻', scene: 'radio', arcade: true, manualNext: true, silentIncorrect: true,
     description: '英語を聞いて、ぴったりの絵をえらぼう。', goal: '何度でも聞く → 合う絵をえらぶ', skill: 'ラジオの光', effect: '次の3つをかがやかせる', unit: '曲', color: '#7651a0',
     howTo: ['「きく」を押すと、英語が聞こえるよ。何回でも聞ける。', '音が出ないときは「文字で見る」も使えるよ。', '合う絵をタップしたら、英語と意味をいっしょにたしかめよう。'] },

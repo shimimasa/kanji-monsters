@@ -29,7 +29,14 @@ const CSS = `
 .be-trials button[data-seen=true]{background:#d4f3e7}
 .be-trials button:focus-visible{outline:4px solid #f4a000;outline-offset:2px}
 .be-observation{max-width:660px;min-height:2.6em;margin:0;font-size:clamp(15px,2vw,19px);font-weight:800;line-height:1.35}
-#abcPostScreen .be-art{background:linear-gradient(#ffe9ad,#fff8df)}#abcPostScreen .be-option{background:#fff4d0;border-radius:22px 22px 9px 9px}
+#abcPostScreen .be-art{z-index:1;overflow:visible;background:linear-gradient(#ffe9ad,#fff8df)}
+#abcPostScreen .be-art-text{cursor:grab;touch-action:none;user-select:none}
+#abcPostScreen .be-art-text[data-dragging=true]{cursor:grabbing;transition:none}
+#abcPostScreen .be-art-outcome{margin-bottom:4px;font-size:clamp(14px,2vw,18px)}
+#abcPostScreen .be-option{background:#fff4d0;border-radius:22px 22px 9px 9px;min-height:80px;font-size:clamp(25px,4vw,34px)}
+#abcPostScreen .be-option::before{content:'📮';display:block;font-size:clamp(22px,3vw,29px);line-height:1}
+#abcPostScreen .be-collection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:min(100%,300px)}
+#abcPostScreen .be-collection span{min-width:0;background:#fff3cf;border:2px solid #c88943}
 #englishRadioScreen .be-art{background:radial-gradient(circle,#f7e6ff,#d4d9ff)}#englishRadioScreen .be-art::after{content:'♪ 〜 ♪';position:absolute;right:7%;top:12%;font-size:28px;color:#805aa3}
 #replyCafeScreen .be-art{background:linear-gradient(#fff0d5,#efd1ac)}#replyCafeScreen .be-option{border-radius:22px;background:#fffaf1}
 #englishRoomScreen .be-art{background:linear-gradient(#e4f6ff 64%,#c9a579 65%)}#englishRoomScreen .be-option{background:#eef8ff}
@@ -84,7 +91,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   const config = NEW_GAME_CONTENT[gameId];
   if (!config) throw new Error('Unknown balanced mini game view');
   let active = true, shownKey = '', shownCollection = -1, textShown = false;
-  let selectedShapeChoiceId = null;
+  let selectedShapeChoiceId = null, postDragId = null, postDragStart = null;
   const labSeen = new Set();
   let labRound = -1, labAction = null;
   const prepareLabRound = round => {
@@ -122,8 +129,16 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   const showText = el('button', '', '文字で見る'); showText.type = 'button'; showText.dataset.action = 'show-text';
   tools.append(listen, showText);
   const options = el('div', 'be-options');
+  if (gameId === 'abcPost') options.setAttribute('aria-label', '小文字の ポストを えらぶ');
   if (gameId === 'lifeCycle') options.setAttribute('aria-label', 'つぎの すがたを えらぶ');
   if (gameId === 'shapeMosaic') options.setAttribute('aria-label', '形の タイルを えらぶ');
+  const answerChoice = choiceId => {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'answering' ||
+        !state.problem?.choices.some(choice => choice.choiceId === choiceId)) return false;
+    return dispatch({ type: 'answer', payload: {
+      sessionId: state.sessionId, attemptId: state.attemptId, choiceId } });
+  };
   const buttons = Array.from({ length: 3 }, () => {
     const button = el('button', 'be-option'); button.type = 'button'; options.append(button);
     on(button, 'click', () => {
@@ -138,8 +153,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
         shapePlace.focus({ preventScroll: true });
         return;
       }
-      dispatch({ type: 'answer', payload: {
-        sessionId: state.sessionId, attemptId: state.attemptId, choiceId: button.dataset.choiceId } });
+      answerChoice(button.dataset.choiceId);
     });
     return button;
   });
@@ -147,9 +161,37 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
     const state = getSnapshot();
     if (!active || state.paused || state.phase !== 'answering' || !selectedShapeChoiceId ||
         !state.problem?.choices.some(choice => choice.choiceId === selectedShapeChoiceId)) return;
-    dispatch({ type: 'answer', payload: {
-      sessionId: state.sessionId, attemptId: state.attemptId, choiceId: selectedShapeChoiceId } });
+    answerChoice(selectedShapeChoiceId);
   });
+  if (gameId === 'abcPost') {
+    on(artText, 'pointerdown', event => {
+      const state = getSnapshot();
+      if (!active || state.paused || state.phase !== 'answering' || !event.isPrimary || event.button !== 0) return;
+      postDragId = event.pointerId;
+      postDragStart = { x: event.clientX, y: event.clientY };
+      artText.dataset.dragging = 'true';
+      artText.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+    on(artText, 'pointermove', event => {
+      if (event.pointerId !== postDragId || !postDragStart) return;
+      artText.style.transform = `translate(${event.clientX - postDragStart.x}px,${event.clientY - postDragStart.y}px)`;
+    });
+    const finishPostDrag = event => {
+      if (event.pointerId !== postDragId) return;
+      postDragId = null; postDragStart = null;
+      artText.dataset.dragging = 'false';
+      artText.style.transform = '';
+      if (artText.hasPointerCapture(event.pointerId)) artText.releasePointerCapture(event.pointerId);
+      if (event.type !== 'pointerup') return;
+      artText.style.pointerEvents = 'none';
+      const target = doc.elementFromPoint(event.clientX, event.clientY)?.closest('.be-option');
+      artText.style.pointerEvents = '';
+      if (target && options.contains(target)) answerChoice(target.dataset.choiceId);
+    };
+    on(artText, 'pointerup', finishPostDrag);
+    on(artText, 'pointercancel', finishPostDrag);
+  }
   const feedback = el('p', 'be-feedback'); feedback.setAttribute('role', 'status');
   const next = el('button', 'be-next', 'つぎへ'); next.type = 'button'; next.dataset.action = 'next';
   const trials = el('div', 'be-trials'); trials.setAttribute('aria-label', '条件をかえて実験する');
@@ -227,6 +269,11 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
       const key = `${state.round}:${state.phase}`;
       if (key !== shownKey) {
         shownKey = key;
+        if (gameId === 'abcPost') {
+          postDragId = null; postDragStart = null;
+          artText.dataset.dragging = 'false';
+          artText.style.transform = '';
+        }
         if (gameId === 'shapeMosaic' && state.phase === 'answering') {
           selectedShapeChoiceId = null;
           shapePlace.textContent = '？ ここに はめる';
@@ -253,12 +300,15 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
           } else {
             roomObject.textContent = '';
             artText.textContent = gameId === 'wonderLab' && state.phase === 'feedback' && labAction ? labAction.visual
+              : gameId === 'abcPost' && state.phase === 'feedback'
+                ? `${problem.visual} → 📮 ${problem.correctChoiceId}`
               : gameId === 'lifeCycle' && state.phase === 'feedback'
                 ? problem.visual.replace('？', problem.correctChoiceId.split(' ')[0]) : problem.visual;
           }
           art.dataset.filled = String(state.phase === 'feedback' && (gameId !== 'wonderLab' || !!labAction));
           artResult.textContent = state.phase === 'feedback'
             ? gameId === 'wonderLab' ? labAction?.result ?? ''
+              : gameId === 'abcPost' ? `${problem.correctChoiceId} に とどいたよ`
               : (gameId === 'replyCafe' || gameId === 'lifeCycle' ||
                 gameId === 'mapTown' || gameId === 'shapeMosaic' || gameId === 'englishRoom')
               ? problem.correctChoiceId : 'できた！'
@@ -302,6 +352,8 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
           const item = state.artifacts[index];
           const mark = gameId === 'shapeMosaic' && item
             ? ['▲', '■', '●', '▭', '▲', '●'][index]
+            : gameId === 'abcPost' && item
+              ? `${config.rounds[index].visual.split(' ')[1]} → ${config.rounds[index].correct}`
             : gameId === 'lifeCycle' && item
               ? item.replace('？', config.rounds[index].correct.split(' ')[0]) : item ?? '·';
           collection.append(el('span', '', mark));
@@ -314,7 +366,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
         progressValue: state.answered / state.rounds,
         progressLabel: `${state.answered}/${state.rounds}`, life: null, gaugeValue: play.gauge });
     },
-    stopInput() { active = false; [...buttons, ...trialButtons, ...townButtons, shapePlace, listen, showText, next].forEach(node => { node.disabled = true; }); Speech.cancel(); },
+    stopInput() { active = false; postDragId = null; artText.style.transform = ''; [...buttons, ...trialButtons, ...townButtons, shapePlace, listen, showText, next].forEach(node => { node.disabled = true; }); Speech.cancel(); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
