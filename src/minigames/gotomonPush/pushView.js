@@ -1,7 +1,7 @@
 import { createArcadeFrame, restartClass, bindArcadeKeys } from '../arcade/arcadeKit.js';
 import { castAt } from '../gotomonCast.js';
 import Speech from '../../audio/speech.js';
-import { PUSH_RULES as R, stepFrom } from './pushGame.js';
+import { PUSH_RULES as R, stepFrom, solvePush } from './pushGame.js';
 
 const N = R.size, CELL = 100 / N;
 const CSS = `
@@ -10,6 +10,8 @@ const CSS = `
   background:repeating-linear-gradient(0deg,transparent 0 calc(${CELL}% - 2px),#d9bd8a calc(${CELL}% - 2px) ${CELL}%),repeating-linear-gradient(90deg,transparent 0 calc(${CELL}% - 2px),#d9bd8a calc(${CELL}% - 2px) ${CELL}%),#e9d3a8;
   box-shadow:0 6px 0 #2a1f18,0 0 0 5px #7a5a40;touch-action:none;z-index:2}
 #gotomonPushScreen .ps-cell{position:absolute;width:${CELL}%;height:${CELL}%;padding:0;border:0;background:none;font:inherit;cursor:pointer}
+#gotomonPushScreen .ps-cell[data-plan=walk]{background:#56bdda66}
+#gotomonPushScreen .ps-cell[data-plan=stand]{background:#48c4ea99;box-shadow:inset 0 0 0 4px #087b9e}
 #gotomonPushScreen .ps-thing{position:absolute;width:${CELL}%;height:${CELL}%;display:grid;place-items:center;pointer-events:none;transition:left .12s linear,top .12s linear}
 #gotomonPushScreen .ps-rock{background:radial-gradient(circle at 40% 35%,#a8a29a,#6b655e 70%);border-radius:40% 45% 38% 42%;transform:scale(.88);box-shadow:inset 0 -4px 0 #4a4540}
 #gotomonPushScreen .ps-nest{border-radius:50%;background:radial-gradient(circle,#7a4a24 0 34%,#c98b52 35% 58%,#e9d3a8 60%);transform:scale(.92);box-shadow:0 0 0 3px #ffe066aa}
@@ -23,6 +25,7 @@ const CSS = `
 #gotomonPushScreen .ps-box[data-state=rock]>span{background:#bfa98d;color:#5a4a3a;box-shadow:inset 0 0 0 3px #8a7660;opacity:.75}
 #gotomonPushScreen .ps-box[data-state=chosen]>span{background:linear-gradient(#ffe066,#f3b51f);box-shadow:inset 0 0 0 3px #b07d06,0 0 0 3px #fff,0 4px 0 #6a4a04}
 #gotomonPushScreen .ps-box[data-hint=true]>span{box-shadow:inset 0 0 0 3px #8a531c,0 0 0 4px #37c871,0 0 14px #37c871;animation:ps-glow .8s ease-in-out infinite alternate}
+#gotomonPushScreen .ps-box[data-push-arrow]::after{content:attr(data-push-arrow);position:absolute;right:-8%;top:-18%;width:38%;aspect-ratio:1;display:grid;place-items:center;border-radius:50%;background:#ffe066;color:#4a3000;font-size:clamp(18px,3vh,28px);font-weight:900;box-shadow:0 2px 0 #9b6a00}
 #gotomonPushScreen .ps-box.ps-crack>span{animation:ps-crack .4s ease-out}
 #gotomonPushScreen .ps-player{z-index:4}
 #gotomonPushScreen .ps-player>*{width:84%!important;height:84%!important;object-fit:contain}
@@ -46,9 +49,10 @@ const CSS = `
 #gotomonPushScreen .ps-arrow[data-direction=left]{grid-column:1;grid-row:2}
 #gotomonPushScreen .ps-arrow[data-direction=down]{grid-column:2;grid-row:2}
 #gotomonPushScreen .ps-arrow[data-direction=right]{grid-column:3;grid-row:2}
-#gotomonPushScreen .ps-tools{display:grid;gap:6px}
-#gotomonPushScreen .ps-tool{min-height:40px;padding:4px 12px;border:0;border-radius:10px;background:#ffffff22;color:#fff;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+#gotomonPushScreen .ps-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;width:min(100%,340px)}
+#gotomonPushScreen .ps-tool{min-height:44px;padding:4px 8px;border:0;border-radius:10px;background:#ffffff22;color:#fff;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
 #gotomonPushScreen .ps-tool:disabled{opacity:.35;cursor:default}
+#gotomonPushScreen .ps-plan-button[data-active=true]{background:#48c4ea;color:#063049}
 #gotomonPushScreen .ps-help{background:#37c871;color:#06301a;box-shadow:0 3px 0 #1d7a44}
 @keyframes ps-glow{from{filter:brightness(1)}to{filter:brightness(1.25)}}
 @keyframes ps-crack{0%,100%{transform:none}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
@@ -57,7 +61,7 @@ const CSS = `
 `;
 
 export function createPushView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
-  let active = true, lastEventId = 0, doneShown = false, shownAnswer = 0, shownClear = 0, problemKey = null, roomKey = null, start = null;
+  let active = true, lastEventId = 0, doneShown = false, shownAnswer = 0, shownClear = 0, problemKey = null, roomKey = null, start = null, planOn = false, planKey = null;
   const removes = [], boxNodes = new Map(), roomNodes = [], cellButtons = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'gotomonPushScreen', title: 'ゴトモン・おしだし', theme: 'push' });
@@ -102,10 +106,13 @@ export function createPushView({ document: doc, dispatch, onBack, getSnapshot, c
   const tools = el('div', 'ps-tools');
   const undo = el('button', 'ps-tool', '↶ 1つ もどす'); undo.type = 'button'; undo.dataset.action = 'undo';
   const reset = el('button', 'ps-tool', '⟲ さいしょから'); reset.type = 'button'; reset.dataset.action = 'reset';
+  const planButton = el('button', 'ps-tool ps-plan-button', '🧭 つぎの一手'); planButton.type = 'button'; planButton.dataset.action = 'plan';
+  planButton.setAttribute('aria-pressed', 'false');
   const carry = el('button', 'ps-tool ps-help', 'ここから はこんでもらう'); carry.type = 'button'; carry.dataset.action = 'carry';
   on(undo, 'click', () => command('undo')); on(reset, 'click', () => command('reset'));
+  on(planButton, 'click', () => togglePlan());
   on(carry, 'click', () => command('carry'));
-  tools.append(undo, reset, carry); controls.append(pad, tools);
+  tools.append(undo, reset, planButton, carry); controls.append(pad, tools);
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
   dock.append(title, prompt, choices, controls, note);
   doc.body.append(root);
@@ -125,10 +132,66 @@ export function createPushView({ document: doc, dispatch, onBack, getSnapshot, c
     const direction = ['up', 'down', 'left', 'right'].find(dir => stepFrom(s.player, dir) === index);
     return direction ? move(direction) : false;
   }
+  const directions = ['up', 'down', 'left', 'right'];
+  const arrowFor = { up: '↑', down: '↓', left: '←', right: '→' };
+  const nameFor = { up: '上', down: '下', left: '左', right: '右' };
+  function clearPlanMarks() {
+    cellButtons.forEach(cell => { delete cell.dataset.plan; });
+    boxNodes.forEach(node => { delete node.dataset.pushArrow; });
+    planKey = null;
+  }
+  function walkToStand(state, stand, blocked) {
+    const before = new Map([[state.player, null]]), queue = [state.player];
+    while (queue.length && !before.has(stand)) {
+      const at = queue.shift();
+      for (const direction of directions) {
+        const next = stepFrom(at, direction);
+        if (next < 0 || blocked.has(next) || before.has(next)) continue;
+        before.set(next, at); queue.push(next);
+      }
+    }
+    if (!before.has(stand)) return null;
+    const path = [];
+    for (let at = stand; at !== state.player; at = before.get(at)) path.unshift(at);
+    return path;
+  }
+  function renderPlan(state) {
+    if (!planOn || state.phase !== 'pushing') {
+      if (planOn || planKey) { planOn = false; clearPlanMarks(); planButton.dataset.active = 'false'; planButton.setAttribute('aria-pressed', 'false'); }
+      return;
+    }
+    const chosen = state.boxes.find(item => item.state === 'chosen');
+    if (!chosen) return;
+    const key = `${state.room}:${state.player}:${chosen.cell}`;
+    if (key === planKey) return;
+    clearPlanMarks();
+    const blocked = new Set([...state.rocks, ...state.boxes.filter(item => item.boxId !== chosen.boxId).map(item => item.cell)]);
+    const solved = solvePush({ blocked, box: chosen.cell, player: state.player, goal: state.goal });
+    const nextPush = solved?.plan[0];
+    if (!nextPush) {
+      note.textContent = state.canUndo ? '↶ 1つ もどすと、べつの道を さがせるよ' : 'ここから はこんでもらう も えらべるよ';
+    } else {
+      const path = walkToStand(state, nextPush.from, new Set([...blocked, chosen.cell]));
+      for (const at of path ?? []) cellButtons[at].dataset.plan = 'walk';
+      if (nextPush.from !== state.player) cellButtons[nextPush.from].dataset.plan = 'stand';
+      boxNodes.get(chosen.boxId).dataset.pushArrow = arrowFor[nextPush.direction];
+      note.textContent = path?.length ? `青い道を ${path.length}マスすすんで、はこを ${nameFor[nextPush.direction]}へ おそう` : `いまの ばしょから はこを ${nameFor[nextPush.direction]}へ おそう`;
+    }
+    planKey = key; frame.announce(note.textContent);
+  }
+  function togglePlan() {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'pushing') return false;
+    planOn = !planOn; planButton.dataset.active = String(planOn); planButton.setAttribute('aria-pressed', String(planOn));
+    if (planOn) renderPlan(state);
+    else { clearPlanMarks(); note.textContent = 'はこの うしろから おそう。いつでも 作戦を 見られるよ'; }
+    return true;
+  }
   removes.push(bindArcadeKeys(doc, event => {
     const direction = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[event.key];
     if (direction) { move(direction); return true; }
     if (event.key === 'z' || event.key === 'Backspace') { command('undo'); return true; }
+    if (event.key === 'h') { togglePlan(); return true; }
     const k = ['1', '2', '3', '4'].indexOf(event.key);
     return k >= 0 ? choose(choiceButtons[k]?.dataset.choice) : false;
   }));
@@ -160,7 +223,7 @@ export function createPushView({ document: doc, dispatch, onBack, getSnapshot, c
     place(player, state.player);
     const choosing = state.phase === 'choosing', pushing = state.phase === 'pushing';
     choices.hidden = !choosing; controls.hidden = !pushing;
-    undo.disabled = !state.canUndo; reset.disabled = !state.canUndo; carry.hidden = !pushing;
+    undo.disabled = !state.canUndo; reset.disabled = !state.canUndo; planButton.hidden = !pushing; carry.hidden = !pushing;
     const pkey = `${state.phase}:${state.problem?.problemId ?? state.room}`;
     if (pkey !== problemKey) {
       problemKey = pkey;
@@ -184,6 +247,7 @@ export function createPushView({ document: doc, dispatch, onBack, getSnapshot, c
     });
     const titleText = state.phase === 'completed' ? '' : `へや ${state.room + 1} / ${state.rooms}　⭐${state.stars}${state.phase === 'pushing' ? `　おした ${state.pushes}回` : ''}`;
     if (title.textContent !== titleText) title.textContent = titleText;
+    renderPlan(state);
   };
   const showAnswer = state => {
     const a = state.lastAnswer;
@@ -236,7 +300,7 @@ export function createPushView({ document: doc, dispatch, onBack, getSnapshot, c
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; [...choiceButtons, ...arrows, undo, reset, carry, ...cellButtons].forEach(button => { button.disabled = true; }); },
+    stopInput() { active = false; planOn = false; clearPlanMarks(); [...choiceButtons, ...arrows, undo, reset, planButton, carry, ...cellButtons].forEach(button => { button.disabled = true; }); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
