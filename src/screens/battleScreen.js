@@ -39,6 +39,7 @@ import {
 } from './battle/theme.js';
 import { placeCompactBattleInput, compactLogBox, showAnswerReveal, clearAnswerReveal, drawAnswerReveal } from './battle/compactLayout.js';
 import { openLeaveConfirm, closeLeaveConfirm } from './battle/leaveConfirm.js';
+import { openCheckpointChoice } from './battle/checkpointChoice.js';
 import { PORTRAIT_LAYOUT, isPortraitCanvas, syncPortraitCanvas, restoreLandscapeCanvas } from './battle/portraitLayout.js';
 
 // battleStateに残り時間プロパティを追加
@@ -47,6 +48,9 @@ battleState.timeRemaining = 60;
 // プレイヤーに進行状況を示すUI追加も可能
 // ステージの途中に立てる旗の位置（この数だけ倒したら、力尽きても次はここから）
 const BATTLE_CHECKPOINT_AT = 5;
+const PLAYER_RESPONSE_WAIT_MS = 600;
+const ENEMY_RESPONSE_WAIT_MS = 800;
+const INPUT_READY_WAIT_MS = 200;
 
 // 読めなかった字を、何問あとにもう一度出すか。
 // 直近 RECENT_QUESTIONS_BUFFER_SIZE 問は候補から外れるので、
@@ -109,6 +113,36 @@ function scheduleGameOverTransition(delayMs = 1500) {
   cancelGameOverTransition(); // 二重予約を防止
   battleScreenState._gameOverTimeoutId = setManagedTimeout(() => publish('changeScreen', 'gameOver'), delayMs);
   return battleScreenState._gameOverTimeoutId;
+}
+
+function offerCheckpointChoice(resume) {
+  if (!battleScreenState._active) return;
+  battleState.turn = 'checkpoint';
+  battleState.inputEnabled = false;
+  battleScreenState.inputEl?.blur();
+  const openedAt = performance.now();
+  battleScreenState._checkpointChoiceCleanup?.();
+  battleScreenState._checkpointChoiceCleanup = openCheckpointChoice(choice => {
+    battleScreenState._checkpointChoiceCleanup = null;
+    if (!battleScreenState._active) return;
+    battleScreenState._timePauseAccMs += Math.max(0, performance.now() - openedAt);
+    battleState.checkpointPower = choice === 'power' ? 3 : 0;
+    battleState.checkpointGuard = choice === 'guard' ? 2 : 0;
+    const message = choice === 'power' ? 'ことばの ちからを えらんだ！ つぎの3回の こうげきが 強くなるよ。'
+      : choice === 'guard' ? 'まもりの ちからを えらんだ！ つぎの2回の こうげきを やわらげるよ。'
+      : 'そのまま 旅を つづけよう！';
+    battleState.log.push(message);
+    battleScreenState.showLogBlock([message]);
+    resume();
+  });
+}
+
+function checkpointDamage(attack) {
+  if (battleState.checkpointGuard > 0) {
+    battleState.checkpointGuard--;
+    return Math.max(1, Math.ceil(attack / 2));
+  }
+  return attack;
 }
 
 const battleScreenState = {
@@ -869,6 +903,10 @@ updateShieldBreakEffect() {
       battleState.message            = '';
       battleState.enemyAction        = null;
       battleState.enemyActionTimer   = 0;
+      battleState.checkpointPower    = 0;
+      battleState.checkpointGuard    = 0;
+      this._checkpointChoiceCleanup?.();
+      this._checkpointChoiceCleanup = null;
       
       // 経験値アニメーション関連の初期化
       this.isAnimatingExp = false;
@@ -1050,6 +1088,12 @@ updateShieldBreakEffect() {
             // 敵の生成と最初の漢字を選択
             spawnEnemy();
             pickNextKanji();
+            if (savedCheckpoint === BATTLE_CHECKPOINT_AT && !/^bonus_g/i.test(String(gameState.currentStageId || ''))) {
+              offerCheckpointChoice(() => {
+                battleState.turn = 'player';
+                battleState.inputEnabled = true;
+              });
+            }
             this.logOffset = 0;
       
            // ステージ開始ごとにブロック履歴をリセット（ステージ跨ぎ持ち越し防止）
@@ -3467,6 +3511,8 @@ if (enemy && enemy.isBoss && Number(enemy.shieldHp) > 0) {
   exit() {
     clearAnswerReveal(this);
     closeLeaveConfirm();
+    this._checkpointChoiceCleanup?.();
+    this._checkpointChoiceCleanup = null;
     // ほかの 画面は 800×600 で 描くので、たて長の 盤面は ここで 戻す
     restoreLandscapeCanvas(this.canvas);
     if (this.inputEl?.dataset) delete this.inputEl.dataset.toggleSide;
@@ -5061,6 +5107,11 @@ const readingMsg = `正しいよみ: 音「${onyomiStr}」訓「${kunyomiStr}」
       battleState.comboCount = 0;
     }
     dmg = companionMatchup(dmg, gameState.currentEnemy, battleState.log); // TYPE-MATCHUP
+    if (battleState.checkpointPower > 0 && !(gameState.currentEnemy.isBoss && gameState.currentEnemy.shieldHp > 0)) {
+      dmg = Math.max(dmg + 1, Math.ceil(dmg * 1.25));
+      battleState.checkpointPower--;
+      battleState.log.push('ことばの ちからで こうげきが 強くなった！');
+    }
     
     // ====== ボス戦のシールドシステム ======
 if (gameState.currentEnemy.isBoss) {
@@ -5278,26 +5329,27 @@ setManagedTimeout(() => {
                            return;
                          }
 
-                         spawnEnemy();
-                         pickNextKanji();
-                         battleState.turn = 'player';
-                         battleState.inputEnabled = true;
-                         
-                         // 学年ボーナス連戦: バトル間 自動回復30%
-                         if (/^bonus_g/i.test(String(gameState.currentStageId || ''))) {
-                           const stats = gameState.playerStats;
-                           const heal = Math.floor(stats.maxHp * 0.3);
-                           stats.hp = Math.min(stats.maxHp, stats.hp + heal);
-                           battleState.playerHpTarget = stats.hp;
-                           battleState.playerHpAnimating = true;
-                           battleState.log.push('連戦の合間にHPが回復した！（+30%）');
-                           battleScreenState.showLogBlock([
-                             '連戦の合間にHPが回復した！（+30%）'
-                           ]);
-                         }
-                         
-                         // 次の問題に進む際にヒントレベルをリセット
-                         gameState.hintLevel = 0;
+                         const continueStage = () => {
+                           spawnEnemy();
+                           pickNextKanji();
+                           battleState.turn = 'player';
+                           battleState.inputEnabled = true;
+
+                           // 学年ボーナス連戦: バトル間 自動回復30%
+                           if (/^bonus_g/i.test(String(gameState.currentStageId || ''))) {
+                             const stats = gameState.playerStats;
+                             const heal = Math.floor(stats.maxHp * 0.3);
+                             stats.hp = Math.min(stats.maxHp, stats.hp + heal);
+                             battleState.playerHpTarget = stats.hp;
+                             battleState.playerHpAnimating = true;
+                             battleState.log.push('連戦の合間にHPが回復した！（+30%）');
+                             battleScreenState.showLogBlock(['連戦の合間にHPが回復した！（+30%）']);
+                           }
+                           gameState.hintLevel = 0;
+                         };
+                         if (gameState.currentEnemyIndex === BATTLE_CHECKPOINT_AT && !/^bonus_g/i.test(String(gameState.currentStageId || '')))
+                           offerCheckpointChoice(continueStage);
+                         else continueStage();
 
                       });
                     } else {// 最後の敵を倒した場合の処理を修正
@@ -5351,13 +5403,13 @@ setManagedTimeout(() => {
             pickNextKanji();
             battleState.turn = 'player';
             battleState.inputEnabled = true;
-          }, 1700);
+          }, ENEMY_RESPONSE_WAIT_MS);
         } else {
           pickNextKanji();
           battleState.turn = 'player';
           battleState.inputEnabled = true;
         }
-      }, 1300);
+      }, PLAYER_RESPONSE_WAIT_MS);
     }
     
   } else if (handleWrongReadingSystem(answer, scope, inputEl)) {
@@ -5449,8 +5501,8 @@ setManagedTimeout(() => {
                  pickNextKanji();
                  battleState.turn = 'player';
                  battleState.inputEnabled = true;
-              }, 1700);
-            }, 1300);
+              }, ENEMY_RESPONSE_WAIT_MS);
+            }, PLAYER_RESPONSE_WAIT_MS);
   }
   
   // 入力欄をクリア
@@ -5663,7 +5715,7 @@ gameState.playerStats.healsSuccessful++;
       try { return localStorage.getItem('gameMode') || 'jikkuri'; } catch { return 'jikkuri'; }
     })();
     if (!isPracticeContext && persistedGameMode === 'challenge') {
-      const atk = gameState.currentEnemy.atk || 5;
+      const atk = checkpointDamage(gameState.currentEnemy.atk || 5);
       gameState.playerStats.hp = Math.max(0, gameState.playerStats.hp - atk);
       if (gameState.playerStats.hp === 0) {
         if (battleScreenState.timerId) { clearInterval(battleScreenState.timerId); battleScreenState.timerId = null; }
@@ -5689,9 +5741,9 @@ gameState.playerStats.healsSuccessful++;
             setManagedTimeout(() => {
               battleState.turn = 'player';
               battleState.inputEnabled = true;
-            }, 650);
-          }, 1700);
-        }, 1300);
+            }, INPUT_READY_WAIT_MS);
+          }, ENEMY_RESPONSE_WAIT_MS);
+        }, PLAYER_RESPONSE_WAIT_MS);
       } else {
         // 攻撃なしモード: 直接次の問題へ
         setManagedTimeout(() => {
@@ -5700,8 +5752,8 @@ gameState.playerStats.healsSuccessful++;
           setManagedTimeout(() => {
             battleState.turn = 'player';
             battleState.inputEnabled = true;
-          }, 650);
-        }, 1300);
+          }, INPUT_READY_WAIT_MS);
+        }, PLAYER_RESPONSE_WAIT_MS);
       }
 }
   
@@ -5791,7 +5843,7 @@ function enemyTurn() {
   battleState.enemyActionTimer = ENEMY_ATTACK_ANIM_DURATION;
   battleScreenState._pixelMotion?.actionStarted();
 
-  const atk = gameState.currentEnemy.atk || 5;
+  const atk = checkpointDamage(gameState.currentEnemy.atk || 5);
   // 敵攻撃メッセージのフォーマットを `${e.name} のこうげき！プレイヤー名に～のダメージ！` に変更
   battleState.log.push(
     `${gameState.currentEnemy.name} のこうげき！${gameState.playerName}に${atk}のダメージ！`

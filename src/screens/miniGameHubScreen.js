@@ -12,7 +12,7 @@ import { hubRecommendations } from '../minigames/hubRecommendations.js';
 import { createCompanionMemoryDialog } from '../ui/companionMemoryDialog.js';
 import { createLearningNotebookDialog } from '../ui/learningNotebookDialog.js';
 import { companionCourse } from '../minigames/companionCourses.js';
-import { HUB_SUBJECTS, NEWEST, hubSections, choiceSubjects, modeForSubject } from '../minigames/hubCatalog.js';
+import { HUB_SUBJECTS, NEWEST, hubSections, choiceSubjects, modeForSubject, subjectOf } from '../minigames/hubCatalog.js';
 import { createPhotoAlbumDialog } from '../ui/photoAlbumDialog.js';
 import { createStickerBookDialog } from '../ui/stickerBookDialog.js';
 import { createAllStickersDialog } from '../ui/allStickersDialog.js';
@@ -23,6 +23,7 @@ import { GAME_TYPES, typeInfo } from '../minigames/gotomonTypes.js';
 import { miniGameGotomonFor } from '../minigames/miniGameGotomonCatalog.js';
 import { supportEffectOf, MAX_SUPPORTERS } from '../minigames/gotomonMoves.js';
 import { stageData, getMonsterById } from '../loaders/dataLoader.js';
+import { NEW_GAME_CONTENT } from '../minigames/balancedEight/content.js';
 
 // Photo rally spots: elementary stages the child has reached in the adventure.
 const rallyStages = () => {
@@ -103,7 +104,26 @@ const hub = {
     }
     const reviewCount = englishLearningService.getReviewIds().length, progress = gotomonService.getProgress();
     const suggestions = hubRecommendations({ gameIds: Object.keys(miniGameRegistry), progress, reviewCount,
-      sentenceReviewCount: sentenceLearningService.getReviewIds().length, timedReviewCount: timedLearningService.getReviewIds().length });
+      sentenceReviewCount: sentenceLearningService.getReviewIds().length, timedReviewCount: timedLearningService.getReviewIds().length,
+      preferredSubject: readSubject() });
+    let refreshQuick = null;
+    if (selected) {
+      const quick = element(doc, 'section', 'yt-start-here');
+      refreshQuick = () => {
+        const subject = readSubject(), recentId = progress.hubActivity?.lastGameId;
+        const firstBySubject = { science: 'wonderLab', language: 'mapTown', english: 'abcPost', math: 'shapeMosaic' };
+        const fitsSubject = subject === 'all' || subjectOf(recentId) === subject || choiceSubjects(recentId).includes(subject);
+        const quickId = fitsSubject && (supportsShortCourse(recentId) || NEW_GAME_CONTENT[recentId])
+          ? recentId : firstBySubject[subject] || 'gotomonSeek';
+        const quickGame = miniGameRegistry[quickId];
+        quick.replaceChildren(element(doc, 'h2', '', 'すぐ あそぶ'),
+          element(doc, 'p', '', `${quickGame.title}を ちょこっと あそぼう。あいぼうと はやさは いつもの 設定を つかうよ。`),
+          button(doc, `${quickGame.title}を はじめる`, () => this.selectGame(quickGame,
+            { quickStart: true, ...(supportsShortCourse(quickId) ? { courseLength: 'short' } : {}), subject }), 'yt-primary'));
+      };
+      refreshQuick();
+      wrap.append(quick);
+    }
     // Today's picks come first (they used to sit under all forty cards, out of sight).
     if (selected && suggestions.length) {
       const recommendation = element(doc, 'section', 'yt-recommendations');
@@ -122,17 +142,6 @@ const hub = {
       }
       recommendation.append(list);
       wrap.append(recommendation);
-    }
-    if (selected && !Object.values(progress.games ?? {}).some(game => game?.plays > 0)) {
-      const first = suggestions.find(item => miniGameRegistry[item.gameId]) ?? { gameId: 'gotomonSeek' };
-      const firstGame = miniGameRegistry[first.gameId];
-      if (firstGame) {
-        const startHere = element(doc, 'section', 'yt-start-here');
-        startHere.append(element(doc, 'h2', '', 'まずは あいぼうと ひとつ あそぼう'),
-          element(doc, 'p', '', 'さいごまで あそぶと あいぼうが そだつよ。Lv5に なったら「しんかのへや」で すがたを かえられるよ。'),
-          button(doc, `${firstGame.title}で あそぶ`, () => this.selectGame(firstGame), 'yt-primary'));
-        wrap.insertBefore(startHere, wrap.querySelector('.yt-recommendations'));
-      }
     }
     // The games, by what the child wants to practice: a tab per subject (kept for next time),
     // and on ぜんぶ a section per subject, then the games where the subject is chosen.
@@ -171,7 +180,7 @@ const hub = {
     const tabs = element(doc, 'div', 'yt-subject-tabs'); tabs.setAttribute('role', 'group'); tabs.setAttribute('aria-label', 'あそぶ 教科');
     const shelf = element(doc, 'div', 'yt-game-shelf');
     const tabButtons = HUB_SUBJECTS.map(item => {
-      const tab = button(doc, item.label, () => { subject = item.id; writeSubject(subject); render(); }, 'yt-subject-tab');
+      const tab = button(doc, item.label, () => { subject = item.id; writeSubject(subject); render(); refreshQuick?.(); }, 'yt-subject-tab');
       tab.dataset.subject = item.id; tabs.append(tab); return tab;
     });
     const render = () => {
@@ -350,7 +359,7 @@ const hub = {
       select.onchange = () => { mathLevel = select.value; }; label.append(select); dialog.append(label,
         element(doc, 'p', 'yt-note', definition.id === 'gotomonBubble' ? 'どちらも15発。泡にとじこめられているのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonPuyo' ? 'どちらも16組。たまごからうまれるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonBreakout' ? 'いつものコースは12問。ブロックから出てくるのは、きみが旅で出会ったゴトモンたちです。' : definition.id === 'gotomonMeteor' ? 'どちらも12こ。基地を守るのは、きみがつかまえたゴトモンたちです。' : definition.id === 'gotomonColoring' ? 'ぬりえになるのは、きみがつかまえたゴトモン（まだいなければ旅で出会ったゴトモン）です。' : definition.id === 'gotomonMerge' ? 'どちらも16問。タイルの数が大きくなると、旅で出会ったゴトモンにかわります。' : 'いつものコースは12球。かごを持つのは、きみがつかまえたゴトモンたちです。'));
     }
-    let courseLength = readLength();
+    let courseLength = playOptions.courseLength || readLength();
     if (supportsShortCourse(definition.id) && !playOptions.review) {
       const label = element(doc, 'label', 'yt-memory-picker', '今回あそぶ長さ');
       const select = element(doc, 'select'); select.setAttribute('aria-label', 'あそぶ長さ');
@@ -512,6 +521,7 @@ const hub = {
     if (!owned.length) dialog.append(element(doc, 'p', '', 'まだ捕獲したゴトモンがいません。本編でステージをクリアして、なかまに しよう。'), button(doc, '冒険へ', () => publish('changeScreen', 'title')));
     dialog.append(grid, party, courseLabel, message, begin, element(doc, 'p', 'yt-note', '通常コースと復習は、どのあいぼうでも遊べます。得意コースでも問題の正解は同じです。'));
     this.root.append(dialog); this.dialog = dialog; dialog.showModal();
+    if (playOptions.quickStart && !begin.disabled) { begin.click(); return; }
     if (selected) begin.focus();
   },
   update() {},

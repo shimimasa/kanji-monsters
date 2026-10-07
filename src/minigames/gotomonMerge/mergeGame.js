@@ -68,8 +68,9 @@ export function slideTiles(tiles, direction, size = R.size) {
 // slides every tile; two tiles of the same number merge into their sum, and bigger
 // numbers are bigger Gotomon. Sixteen question tiles; a full board simply ends the
 // play early. No game over. One learning result per question tile.
-export function createMergeGame({ sessionId, random = Math.random, onEvent = () => {}, content }) {
+export function createMergeGame({ sessionId, random = Math.random, onEvent = () => {}, content, courseLength = 'full' }) {
   const level = content?.level === 'times' ? 'times' : 'addsub';
+  const questionLimit = courseLength === 'short' ? 8 : R.questions;
   let active = true, paused = false, notifying = false, observer = onEvent;
   let phase = 'ready', seq = 0, activeElapsedMs = 0, tileSerial = 0, moveSerial = 0, asked = 0;
   let answered = 0, correct = 0, incorrect = 0, merges = 0, best = 0, full = false;
@@ -85,7 +86,7 @@ export function createMergeGame({ sessionId, random = Math.random, onEvent = () 
   };
   const snapshot = () => Object.freeze({
     gameId: 'gotomonMerge', mode: 'merge', sessionId, phase, paused, active, aborted, seq, activeElapsedMs, level, size: R.size,
-    tiles: Object.freeze(tiles.map(tile => Object.freeze({ ...tile }))), asked, questions: R.questions, merges, best, full,
+    tiles: Object.freeze(tiles.map(tile => Object.freeze({ ...tile }))), asked, questions: questionLimit, merges, best, full,
     problem, attemptId, answered, correct, incorrect, result, lastAnswer, lastMove, missed: Object.freeze([...missed]),
   });
   const notify = (type, payload = {}) => {
@@ -108,7 +109,7 @@ export function createMergeGame({ sessionId, random = Math.random, onEvent = () 
   // A question tile arrives on an empty square; none left (or all asked) ends the play.
   const ask = () => {
     const free = empties();
-    if (asked >= R.questions || !free.length) { full = asked < R.questions; complete(); return; }
+    if (asked >= questionLimit || !free.length) { full = asked < questionLimit; complete(); return; }
     const [row, column] = pick(free, random);
     const value = weighted(R.spawn[level], random), question = mergeQuestion(value, level, random);
     asked++;

@@ -5,6 +5,16 @@ import { createBalancedGame } from '../../src/minigames/balancedEight/game.js';
 import { miniGameRegistry } from '../../src/minigames/registry.js';
 import { gameExperiences } from '../../src/minigames/gameExperiences.js';
 import { hubSections, subjectOf } from '../../src/minigames/hubCatalog.js';
+import { gameRank } from '../../src/minigames/gameRank.js';
+
+test('6問の全問正解はSランクになり、到達不能な次の目標を出さない', () => {
+  for (const id of NEW_GAME_IDS) {
+    assert.equal(gameRank(id, 600, 6).rank, 'S', id);
+    assert.equal(gameRank(id, 600, 6).next, null, id);
+    assert.equal(gameRank(id, 400, 4).rank, 'A', id);
+  }
+  assert.equal(gameRank('mathSprint', 1600, 8).rank, 'S');
+});
 
 test('8種類48問のデータは重複のない選択肢と一意の正答を持ち、全て登録される', () => {
   assert.equal(NEW_GAME_IDS.length, 8);

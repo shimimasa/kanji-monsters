@@ -17,6 +17,12 @@ test('first visit offers one unplayed game; legacy completions count as played',
   assert.deepEqual(hubRecommendations({ gameIds }).map(x => [x.kind, x.gameId]), [['new', 'mathSprint']]);
   assert.equal(hubRecommendations({ gameIds, progress: { games: { mathSprint: { plays: 1 } } } })[0].gameId, 'englishChoice');
 });
+
+test('the discovery pick follows the chosen subject without hiding other available games', () => {
+  assert.equal(hubRecommendations({ gameIds, preferredSubject: 'language' })[0].gameId, 'sentenceOrder');
+  assert.equal(hubRecommendations({ gameIds, preferredSubject: 'english' })[0].gameId, 'englishChoice');
+  assert.equal(hubRecommendations({ gameIds, preferredSubject: 'science' })[0].gameId, 'mathSprint');
+});
 test('review, recent and discovery are ordered and never duplicate a game', () => {
   const progress = { hubActivity: { lastGameId: 'mathSprint', startedGames: ['mathSprint'] } };
   const before = JSON.stringify(progress);

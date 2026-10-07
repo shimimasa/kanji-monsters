@@ -11,7 +11,7 @@ import { createCompanionPlay, answerKind } from './companionPlay.js';
 import { createMiniGameShell } from './miniGameShell.js';
 import { supportsShortCourse } from './courseLength.js';
 import { PLAYTEST_ENABLED, trackPlaytest, observePlaytestCommand } from '../playtest/developmentLogger.js';
-import { scoreRank } from './scoreRank.js';
+import { gameRank } from './gameRank.js';
 import { englishLearningService } from './englishChoice/englishLearningService.js';
 import { timedLearningService } from './timedChoice/timedLearningService.js';
 import { sentenceLearningService } from './sentenceOrder/sentenceLearningService.js';
@@ -247,7 +247,7 @@ export function createMiniGameHost({ document: doc = globalThis.document,
       if (PLAYTEST_ENABLED && state.result && !observedResult) {
         observedResult=true;
         const current=play.snapshot(),gameId=props.gameId||'mathSprint',points=(state.result.score??current.learningPoints)+current.bonus;
-        trackPlaytest('completed', {sessionId:state.sessionId,score:points,correct:current.correct,resultRank:scoreRank(gameId,points,current.correct).rank,activeElapsedMs:state.activeElapsedMs});
+        trackPlaytest('completed', {sessionId:state.sessionId,score:points,correct:current.correct,resultRank:gameRank(gameId,points,current.correct).rank,activeElapsedMs:state.activeElapsedMs});
       }
       const ctx = view.canvas?.getContext('2d');
       if (ctx) {

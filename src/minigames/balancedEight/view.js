@@ -9,8 +9,8 @@ const CSS = `
 .be-art{position:relative;display:grid;place-items:center;width:min(100%,640px);min-height:100px;border:3px solid #375b72;border-radius:20px;background:#fafff9;box-shadow:0 5px 0 #375b7244;overflow:hidden}
 .be-art-text{position:relative;z-index:1;font-size:clamp(34px,7vw,66px);line-height:1.2;transition:transform .2s}
 .be-art[data-filled=true] .be-art-text{transform:scale(1.08)}
-.be-art-result{position:relative;z-index:2;display:none;max-width:88%;padding:5px 12px;border-radius:12px;background:#fffef4;color:#194c56;font-size:clamp(15px,2.4vw,23px);font-weight:900;line-height:1.25}
-.be-art[data-filled=true] .be-art-result{display:block;animation:be-arrive .3s ease-out}
+.be-art-outcome{position:relative;z-index:2;display:none;max-width:88%;padding:5px 12px;border-radius:12px;background:#fffef4;color:#194c56;font-size:clamp(15px,2.4vw,23px);font-weight:900;line-height:1.25}
+.be-art[data-filled=true] .be-art-outcome{display:block;animation:be-arrive .3s ease-out}
 @keyframes be-arrive{from{opacity:0;transform:translateY(12px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
 .be-question{max-width:660px;margin:0;font-size:clamp(18px,3vw,27px);font-weight:900;line-height:1.3}
 .be-transcript{margin:0;padding:4px 12px;border-radius:8px;background:#fff;max-width:100%;font-size:clamp(17px,2.5vw,23px);font-weight:800;overflow-wrap:anywhere}
@@ -24,6 +24,11 @@ const CSS = `
 .be-next{background:#245d70;color:#fff;border-color:#245d70;min-height:44px;padding:6px 22px}
 .be-collection{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;width:min(100%,660px);min-height:29px}
 .be-collection span{display:grid;place-items:center;min-width:34px;min-height:28px;padding:1px 5px;border-radius:8px;background:#fff9;color:#1d4355;font-size:clamp(14px,2vw,21px);font-weight:800}
+.be-trials{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;width:min(100%,660px)}
+.be-trials button{min-height:48px;padding:6px 12px;border:3px solid #347b87;border-radius:14px;background:#effdfa;color:#20364c;font:inherit;font-weight:900;cursor:pointer}
+.be-trials button[data-seen=true]{background:#d4f3e7}
+.be-trials button:focus-visible{outline:4px solid #f4a000;outline-offset:2px}
+.be-observation{max-width:660px;min-height:2.6em;margin:0;font-size:clamp(15px,2vw,19px);font-weight:800;line-height:1.35}
 #abcPostScreen .be-art{background:linear-gradient(#ffe9ad,#fff8df)}#abcPostScreen .be-option{background:#fff4d0;border-radius:22px 22px 9px 9px}
 #englishRadioScreen .be-art{background:radial-gradient(circle,#f7e6ff,#d4d9ff)}#englishRadioScreen .be-art::after{content:'♪ 〜 ♪';position:absolute;right:7%;top:12%;font-size:28px;color:#805aa3}
 #replyCafeScreen .be-art{background:linear-gradient(#fff0d5,#efd1ac)}#replyCafeScreen .be-option{border-radius:22px;background:#fffaf1}
@@ -32,24 +37,49 @@ const CSS = `
 #englishRoomScreen .be-art[data-position=上] .be-room-object{left:52%;top:0}
 #englishRoomScreen .be-art[data-position=中] .be-room-object{left:49%;top:28%}
 #englishRoomScreen .be-art[data-position=下] .be-room-object{left:52%;top:60%}
-#englishRoomScreen .be-art-result{position:absolute;right:3%;bottom:5%;font-size:15px}
+#englishRoomScreen .be-art-outcome{position:absolute;right:3%;bottom:5%;font-size:15px}
 #wonderLabScreen .be-art{background:radial-gradient(circle at 50% 72%,#bdfff4,#ecf7ff)}#wonderLabScreen .be-art::after{content:'✦ ✧ ✦';position:absolute;top:10%;right:12%;color:#347ba1}
 #wonderLabScreen .be-art[data-filled=true] .be-art-text{animation:be-arrive .45s ease-out}
+#wonderLabScreen .be-art-outcome{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:max-content;max-width:95%;font-size:clamp(13px,2vw,18px)}
+#wonderLabScreen .be-art[data-filled=true] .be-art-outcome{display:block}
 #lifeCycleScreen .be-art{background:linear-gradient(#e6f9d8,#bfe6a8)}#lifeCycleScreen .be-collection span{border-radius:50%}
 #mapTownScreen .be-art{background:linear-gradient(90deg,#e2edd8 49%,#c7dfd0 50%)}#mapTownScreen .be-collection span{background:#f4f0da}
 #shapeMosaicScreen .be-art{background:repeating-linear-gradient(45deg,#edf4ff 0 16px,#dfeaf9 16px 32px)}#shapeMosaicScreen .be-option{background:#e9f5ff}
 #mapTownScreen .be-collection,#shapeMosaicScreen .be-collection{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;width:min(240px,70%);padding:4px;border:2px solid #416079;border-radius:10px;background:#d3e3d3}
 #mapTownScreen .be-collection span,#shapeMosaicScreen .be-collection span{min-height:31px;background:#fffefa}
+#mapTownScreen .be-collection button{min-height:42px;border:1px solid #416079;border-radius:5px;background:#fffefa;color:#1d4355;font:inherit;font-size:clamp(15px,2vw,21px);font-weight:800;cursor:pointer}
+#mapTownScreen .be-collection button:focus-visible{outline:4px solid #f4a000;outline-offset:2px}
+#mapTownScreen .be-collection button:disabled{cursor:default}
 #shapeMosaicScreen .be-collection{background:#dce9ff}#shapeMosaicScreen .be-collection span{color:#476fc0}
 @media(max-width:520px){.be-wrap{inset:48px 2% 3px;gap:5px}.be-art{min-height:80px}.be-options{gap:5px}.be-option{min-height:60px;padding:4px 2px;font-size:clamp(14px,3.8vw,18px)}.be-collection span{min-width:27px}}
 `;
 
 const needsSpeech = new Set(['englishRadio', 'replyCafe', 'englishRoom']);
+// The prediction is the learning answer. Trying conditions afterwards changes
+// only the observation, so no extra learning outcome is written.
+const LAB_TRIALS = Object.freeze([
+  [{ label: 'じしゃくを 近づける', result: 'くぎが くっついた！', visual: '🧲 ✨ 🔩' }, { label: 'じしゃくを 離す', result: 'くぎは そのまま。', visual: '🧲　　🔩' }],
+  [{ label: '水を まぜる', result: '食塩が 水に とけて 見えにくくなった！', visual: '🧂 ↻ 💧' }, { label: 'そのまま 観察', result: '食塩は ゆっくり とけていく。', visual: '🧂 → 💧' }],
+  [{ label: '十分に 冷やす', result: '水が こおりに なった！', visual: '💧 → 🧊' }, { label: 'そのまま 置く', result: '水の ままだね。', visual: '💧' }],
+  [{ label: '風を 当てる', result: '風車が まわった！', visual: '🌬️ → 🎡' }, { label: '風を とめる', result: '風車は とまった。', visual: '🎡' }],
+  [{ label: '虫めがねで 見る', result: '小さな 文字が 大きく 見える！', visual: '🔍 → Ａ' }, { label: 'そのまま 見る', result: '文字の 大きさは そのまま。', visual: '📖' }],
+  [{ label: '水に 入れる', result: 'こおりが 水に ういた！', visual: '🧊 ↑ 💧' }, { label: '机に 置く', result: '机の 上に のっている。', visual: '🧊 ▰' }],
+]);
+const MAP_SYMBOLS = Object.freeze(['文', '〒', '＋', '📖', '文', '〒']);
 
 export function createBalancedView(gameId, { document: doc, dispatch, getSnapshot, onBack }) {
   const config = NEW_GAME_CONTENT[gameId];
   if (!config) throw new Error('Unknown balanced mini game view');
   let active = true, shownKey = '', shownCollection = -1, textShown = false;
+  const labSeen = new Set();
+  let labRound = -1, labAction = null;
+  const prepareLabRound = round => {
+    if (labRound === round) return;
+    labRound = round;
+    labSeen.clear();
+    labAction = null;
+  };
+  const townPlacedRounds = new Set(), townLots = Array(6).fill(null);
   const removes = [];
   const on = (node, type, listener) => {
     node.addEventListener(type, listener);
@@ -66,7 +96,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   const art = el('div', 'be-art');
   const artText = el('span', 'be-art-text');
   const roomObject = el('span', 'be-room-object');
-  const artResult = el('span', 'be-art-result');
+  const artResult = el('span', 'be-art-outcome');
   art.append(artText, roomObject, artResult);
   const question = el('h2', 'be-question');
   const transcript = el('p', 'be-transcript');
@@ -86,7 +116,49 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   });
   const feedback = el('p', 'be-feedback'); feedback.setAttribute('role', 'status');
   const next = el('button', 'be-next', 'つぎへ'); next.type = 'button'; next.dataset.action = 'next';
+  const trials = el('div', 'be-trials'); trials.setAttribute('aria-label', '条件をかえて実験する');
+  const observation = el('p', 'be-observation'); observation.setAttribute('role', 'status');
+  const trialButtons = gameId === 'wonderLab' ? Array.from({ length: 2 }, (_, index) => {
+    const trial = el('button'); trial.type = 'button'; trials.append(trial);
+    on(trial, 'click', () => {
+      const state = getSnapshot();
+      if (!active || state.paused || state.phase !== 'feedback') return;
+      prepareLabRound(state.round);
+      const action = LAB_TRIALS[state.round]?.[index];
+      if (!action) return;
+      labSeen.add(index);
+      labAction = action;
+      artText.textContent = action.visual;
+      art.dataset.filled = 'true';
+      artResult.textContent = action.result;
+      trial.dataset.seen = 'true';
+      observation.textContent = labSeen.size === 2
+        ? `${action.result} 2つの 条件を くらべたよ。 ${state.problem.explain}`
+        : `${action.result} もう一つも ためして、ちがいを くらべよう。`;
+      next.hidden = labSeen.size < 2;
+      if (labSeen.size === 2) next.focus({ preventScroll: true });
+    });
+    return trial;
+  }) : [];
   const collection = el('div', 'be-collection'); collection.setAttribute('aria-label', 'できたもの');
+  const townButtons = gameId === 'mapTown' ? Array.from({ length: 6 }, (_, index) => {
+    const lot = el('button', '', '·'); lot.type = 'button';
+    lot.setAttribute('aria-label', `${index + 1}番の 区画に 建物を おく`);
+    collection.append(lot);
+    on(lot, 'click', () => {
+      const state = getSnapshot();
+      if (!active || state.paused || state.phase !== 'feedback' || townPlacedRounds.has(state.round) || townLots[index]) return;
+      townLots[index] = MAP_SYMBOLS[state.round] ?? state.problem.visual;
+      townPlacedRounds.add(state.round);
+      lot.textContent = townLots[index];
+      lot.disabled = true;
+      lot.setAttribute('aria-label', `${index + 1}番の 区画: ${state.problem.correctChoiceId}`);
+      feedback.textContent = `町の 地図に おいたよ。 ${state.problem.explain}`;
+      next.hidden = false;
+      next.focus({ preventScroll: true });
+    });
+    return lot;
+  }) : [];
   on(frame.back, 'click', () => { if (active) onBack(); });
   on(listen, 'click', () => {
     const state = getSnapshot();
@@ -100,10 +172,11 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   });
   on(next, 'click', () => {
     const state = getSnapshot();
-    if (active && state.phase === 'feedback') dispatch({ type: 'next', payload: {
+    if (active && state.phase === 'feedback' && (gameId !== 'wonderLab' || labSeen.size === 2) &&
+        (gameId !== 'mapTown' || townPlacedRounds.has(state.round))) dispatch({ type: 'next', payload: {
       sessionId: state.sessionId, problemId: state.problem?.problemId } });
   });
-  wrap.append(top, art, question, transcript, tools, options, feedback, next, collection);
+  wrap.append(top, art, question, transcript, tools, options, trials, observation, feedback, next, collection);
   world.append(wrap);
   dock.append(el('p', 'ya-dock-note', config.intro));
   doc.body.append(root);
@@ -114,11 +187,19 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
       if (!active) return;
       frame.setPaused(state.paused && !state.result);
       progress.textContent = `${Math.min(state.round + 1, state.rounds)}/${state.rounds}`;
+      if (gameId === 'wonderLab') prepareLabRound(state.round);
       const key = `${state.round}:${state.phase}`;
       if (key !== shownKey) {
         shownKey = key;
         const problem = state.problem;
         if (problem) {
+          if (gameId === 'wonderLab') {
+            if (!labSeen.size) observation.textContent = state.phase === 'feedback' ? '予想したら、2つの 条件を ためして くらべよう。' : '';
+            trialButtons.forEach((trial, index) => {
+              trial.textContent = LAB_TRIALS[state.round][index].label;
+              trial.dataset.seen = String(labSeen.has(index));
+            });
+          }
           question.textContent = problem.prompt;
           if (gameId === 'englishRoom') {
             const [object, furniture] = problem.visual.split(' ');
@@ -126,10 +207,11 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
             artText.textContent = furniture;
             art.dataset.position = state.phase === 'feedback'
               ? (problem.correctChoiceId.includes(' 上') ? '上' : problem.correctChoiceId.includes(' 中') ? '中' : '下') : 'まえ';
-          } else { roomObject.textContent = ''; artText.textContent = problem.visual; }
-          art.dataset.filled = String(state.phase === 'feedback');
+          } else { roomObject.textContent = ''; artText.textContent = gameId === 'wonderLab' && state.phase === 'feedback' && labAction ? labAction.visual : problem.visual; }
+          art.dataset.filled = String(state.phase === 'feedback' && (gameId !== 'wonderLab' || !!labAction));
           artResult.textContent = state.phase === 'feedback'
-            ? (gameId === 'replyCafe' || gameId === 'wonderLab' || gameId === 'lifeCycle' ||
+            ? gameId === 'wonderLab' ? labAction?.result ?? ''
+              : (gameId === 'replyCafe' || gameId === 'lifeCycle' ||
                 gameId === 'mapTown' || gameId === 'shapeMosaic' || gameId === 'englishRoom')
               ? problem.correctChoiceId : 'できた！'
             : '';
@@ -145,7 +227,10 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
           transcript.textContent = problem.speech || '';
           transcript.hidden = gameId !== 'englishRadio' || (audioUsable && !textShown && state.phase === 'answering');
           if (gameId === 'englishRadio' && state.phase === 'answering') question.textContent = audioUsable ? problem.prompt : `${problem.speech}　— ${problem.prompt}`;
-          feedback.textContent = state.phase === 'feedback' ? problem.explain : '';
+          feedback.textContent = state.phase === 'feedback' && gameId === 'mapTown'
+            ? townPlacedRounds.has(state.round) ? `町の 地図に おいたよ。 ${problem.explain}`
+              : '町の 地図で、建物を おく 場所を えらぼう。'
+            : state.phase === 'feedback' && gameId !== 'wonderLab' ? problem.explain : '';
           buttons.forEach(button => { button.disabled = state.phase !== 'answering'; });
           next.textContent = state.round + 1 === state.rounds ? 'できたものを見る' : 'つぎへ';
         } else {
@@ -156,9 +241,12 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
         }
       }
       options.hidden = state.phase !== 'answering';
-      next.hidden = state.phase !== 'feedback';
+      trials.hidden = gameId !== 'wonderLab' || state.phase !== 'feedback';
+      observation.hidden = trials.hidden;
+      next.hidden = state.phase !== 'feedback' || (gameId === 'wonderLab' && labSeen.size < 2) ||
+        (gameId === 'mapTown' && !townPlacedRounds.has(state.round));
       tools.hidden = listen.hidden && showText.hidden;
-      if (state.artifacts.length !== shownCollection) {
+      if (gameId !== 'mapTown' && state.artifacts.length !== shownCollection) {
         shownCollection = state.artifacts.length;
         collection.textContent = '';
         for (let index = 0; index < state.rounds; index++) {
@@ -175,7 +263,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
         progressValue: state.answered / state.rounds,
         progressLabel: `${state.answered}/${state.rounds}`, life: null, gaugeValue: play.gauge });
     },
-    stopInput() { active = false; [...buttons, listen, showText, next].forEach(node => { node.disabled = true; }); Speech.cancel(); },
+    stopInput() { active = false; [...buttons, ...trialButtons, ...townButtons, listen, showText, next].forEach(node => { node.disabled = true; }); Speech.cancel(); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

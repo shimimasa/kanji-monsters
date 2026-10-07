@@ -4,7 +4,7 @@ import { gameExperiences } from './gameExperiences.js';
 import { createCompanionScene } from './companionScene.js';
 import { createGrowthResult } from './growthResult.js';
 import { friendshipTitle } from './companionGrowth.js';
-import { scoreRank } from './scoreRank.js';
+import { gameRank } from './gameRank.js';
 import { createFindings } from './scenePolish.js';
 import { createBuildReviewPanel } from './buildReviewPanel.js';
 import { outfitItem } from './companionOutfits.js';
@@ -342,7 +342,7 @@ export function createMiniGameShell({ doc, view, definition, gotomon, supporters
         retryMistakes.textContent = `今回まちがえた${mistakeCount}問を練習`;
         review.textContent = definition.id === 'timedChoice' ? `時間なしで復習する（${getReviewCount()}語）` : definition.id === 'sentenceOrder' ? `まちがえた文をもう一度（${getReviewCount()}文）` : `まちがえた語をもう一度（${getReviewCount()}語）`;
         const points = (state.result.score ?? current.learningPoints) + current.bonus;
-        const rank = scoreRank(definition.id, points, current.correct);
+        const rank = gameRank(definition.id, points, current.correct);
         rankLabel.textContent = `${rank.rank} RANK`; rankLabel.dataset.rank = rank.rank;
         nextGoal.textContent = reviewing ? `${state.correct} / ${state.totalQuestions}${definition.id === 'sentenceOrder' ? '文' : '語'}に正解。${getReviewCount() ? 'もう一度たしかめよう。' : '今回の復習はできたね！'}` : shortCourse ? 'また あそぼう！ いつものコースにも ちょうせんできるよ。' : rank.next ? rank.goal : current.world?.goal || '次は自己ベストをこえよう';
         const challenge = reviewing || shortCourse ? null : current.world?.challenge;
