@@ -1,11 +1,12 @@
 import { createArcadeFrame, restartClass, bindArcadeKeys } from '../arcade/arcadeKit.js';
 import { castAt } from '../gotomonCast.js';
-import { MERGE_RULES as R } from './mergeGame.js';
+import { MERGE_RULES as R, slideTiles } from './mergeGame.js';
 
 const N = R.size, CELL = 100 / N;
 // Tile colours by size: small numbers pale, big numbers warm.
 const COLORS = ['#fff4d6', '#ffe7b0', '#ffd08a', '#ffb366', '#ff9a52', '#ff7a45', '#f25c54', '#e0457b', '#b83c9e', '#7b3fbf'];
 const tier = value => Math.max(0, Math.round(Math.log2(value)) - 1);
+const DIRECTION_NAMES = { up: '上', left: '左', down: '下', right: '右' };
 const CSS = `
 #gotomonMergeScreen .ya-field{background:radial-gradient(circle at 15% 20%,#ffffff22 0 6%,transparent 7%),linear-gradient(#2d4a6b,#1f3450)}
 #gotomonMergeScreen .mg-board{position:absolute;left:50%;top:58px;bottom:2%;aspect-ratio:1;max-width:94%;transform:translateX(-50%);border-radius:18px;background:#c9b79c;box-shadow:0 6px 0 #9c8a6e;touch-action:none;z-index:2}
@@ -22,12 +23,21 @@ const CSS = `
 #gotomonMergeScreen .mg-tile.mg-pop{animation:mg-pop .25s ease-out}
 #gotomonMergeScreen .mg-tile.mg-no{animation:mg-no .4s ease-out}
 #gotomonMergeScreen .mg-tile.mg-gone{z-index:1;animation:mg-gone .16s ease-in forwards}
+#gotomonMergeScreen .mg-preview{position:absolute;inset:0;border-radius:18px;background:#f0e4d4ef;pointer-events:none;z-index:4}
+#gotomonMergeScreen .mg-preview-slot,#gotomonMergeScreen .mg-preview-tile{position:absolute;width:calc(${CELL}% - 12px);height:calc(${CELL}% - 12px);margin:6px;border-radius:12px}
+#gotomonMergeScreen .mg-preview-slot{background:#d8c8b0}
+#gotomonMergeScreen .mg-preview-tile{display:grid;place-items:center;background:var(--c);color:#3a2a1a;font-size:clamp(20px,min(4vw,5.4vh),46px);font-weight:900;text-shadow:0 2px 0 #fff9}
+#gotomonMergeScreen .mg-preview-tile[data-merged=true]{outline:4px solid #2c9d65;outline-offset:-4px}
+#gotomonMergeScreen .mg-preview-tile[data-big=true]{color:#fff;text-shadow:0 2px 0 #0005}
 #gotomonMergeScreen .mg-title{margin:0;text-align:center;font-size:14px;font-weight:900;color:#bfe3ff}
 #gotomonMergeScreen .mg-prompt{margin:0;padding:8px 12px;border-radius:14px;background:#ffffff14;color:#fff;text-align:center;font-size:clamp(22px,3vw,30px);font-weight:900}
 #gotomonMergeScreen .mg-choices{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 #gotomonMergeScreen .mg-choice{min-height:64px;border:0;border-radius:14px;background:#fffdf6;color:#1b2a36;font:inherit;font-size:clamp(24px,3vw,32px);font-weight:900;box-shadow:0 4px 0 #9c8a6e;cursor:pointer;touch-action:manipulation}
+#gotomonMergeScreen .mg-plan{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;color:#e8fff4;text-align:center;font-size:15px;font-weight:800}
+#gotomonMergeScreen .mg-go{min-height:44px;padding:5px 14px;border:0;border-radius:12px;background:#ffe066;color:#302341;font:inherit;font-weight:900;cursor:pointer;touch-action:manipulation}
 #gotomonMergeScreen .mg-pad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,56px);gap:6px;justify-content:center}
 #gotomonMergeScreen .mg-arrow{border:0;border-radius:12px;background:#ffffff26;color:#fff;font:inherit;font-size:26px;font-weight:900;cursor:pointer;touch-action:manipulation}
+#gotomonMergeScreen .mg-arrow[data-planned=true]{background:#ffe066;color:#302341}
 #gotomonMergeScreen .mg-arrow[data-direction=up]{grid-column:2}
 #gotomonMergeScreen .mg-arrow[data-direction=left]{grid-column:1;grid-row:2}
 #gotomonMergeScreen .mg-arrow[data-direction=down]{grid-column:2;grid-row:2}
@@ -40,7 +50,7 @@ const CSS = `
 `;
 
 export function createMergeView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
-  let active = true, lastEventId = 0, doneShown = false, shownAnswer = 0, shownMove = 0, problemKey = null, start = null;
+  let active = true, lastEventId = 0, doneShown = false, shownAnswer = 0, shownMove = 0, problemKey = null, start = null, planned = null;
   const removes = [], nodes = new Map(), bestShown = new Set();
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'gotomonMergeScreen', title: 'けいさん2048', theme: 'merge' });
@@ -52,6 +62,11 @@ export function createMergeView({ document: doc, dispatch, onBack, getSnapshot, 
   for (let row = 0; row < N; row++) for (let column = 0; column < N; column++) {
     const slot = el('i', 'mg-slot'); slot.style.left = `${column * CELL}%`; slot.style.top = `${row * CELL}%`; board.append(slot);
   }
+  const preview = el('div', 'mg-preview'); preview.setAttribute('aria-hidden', 'true'); preview.hidden = true;
+  for (let row = 0; row < N; row++) for (let column = 0; column < N; column++) {
+    const slot = el('i', 'mg-preview-slot'); slot.style.left = `${column * CELL}%`; slot.style.top = `${row * CELL}%`; preview.append(slot);
+  }
+  board.append(preview);
   world.append(board);
   // A swipe on the board slides the tiles.
   on(board, 'pointerdown', event => { start = [event.clientX, event.clientY]; });
@@ -59,7 +74,7 @@ export function createMergeView({ document: doc, dispatch, onBack, getSnapshot, 
     if (!start) return;
     const dx = event.clientX - start[0], dy = event.clientY - start[1]; start = null;
     if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
-    slide(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
+    slideNow(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
   });
 
   const title = el('p', 'mg-title');
@@ -69,14 +84,18 @@ export function createMergeView({ document: doc, dispatch, onBack, getSnapshot, 
     const button = el('button', 'mg-choice'); button.type = 'button';
     on(button, 'click', () => answer(button.dataset.choice)); choices.append(button); choiceButtons.push(button);
   }
+  const plan = el('div', 'mg-plan'), planText = el('span', 'mg-plan-text');
+  const go = el('button', 'mg-go', 'この向きに うごかす'); go.type = 'button';
+  on(go, 'click', () => followPlan()); plan.append(planText, go); plan.hidden = true;
   const pad = el('div', 'mg-pad'), arrows = [];
   for (const [direction, text] of [['up', '↑'], ['left', '←'], ['down', '↓'], ['right', '→']]) {
     const button = el('button', 'mg-arrow', text); button.type = 'button'; button.dataset.direction = direction;
     button.setAttribute('aria-label', { up: 'うえ', left: 'ひだり', down: 'した', right: 'みぎ' }[direction]);
-    on(button, 'click', () => slide(direction)); pad.append(button); arrows.push(button);
+    button.setAttribute('aria-pressed', 'false');
+    on(button, 'click', () => chooseDirection(direction)); pad.append(button); arrows.push(button);
   }
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
-  dock.append(title, prompt, choices, pad, note);
+  dock.append(title, prompt, choices, plan, pad, note);
   doc.body.append(root);
 
   function answer(choiceId) {
@@ -84,16 +103,51 @@ export function createMergeView({ document: doc, dispatch, onBack, getSnapshot, 
     if (!active || state.paused || state.phase !== 'answering' || !choiceId) return false;
     return dispatch({ type: 'answer', payload: { sessionId: state.sessionId, attemptId: state.attemptId, choiceId } });
   }
-  function slide(direction) {
+  function clearPlan() {
+    if (!planned) return;
+    planned = null; preview.hidden = true; plan.hidden = true;
+    arrows.forEach(button => { delete button.dataset.planned; button.setAttribute('aria-pressed', 'false'); });
+  }
+  function slideNow(direction) {
     const state = getSnapshot();
     if (!active || state.paused || state.phase !== 'sliding') return false;
+    clearPlan();
     const moved = dispatch({ type: 'slide', payload: { sessionId: state.sessionId, attemptId: state.attemptId, direction } });
     if (!moved) { note.textContent = 'そっちには うごかないよ。ほかの向きにしてみよう'; nodes.forEach(node => restartClass(node, 'mg-no')); }
     return moved;
   }
+  function followPlan() {
+    const state = getSnapshot();
+    if (!planned || state.attemptId !== planned.attemptId) return false;
+    return slideNow(planned.direction);
+  }
+  function chooseDirection(direction) {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'sliding') return false;
+    if (planned?.direction === direction) return followPlan();
+    clearPlan();
+    const next = slideTiles(state.tiles, direction);
+    if (!next) { note.textContent = 'そっちには うごかないよ。ほかの向きを見てみよう'; return false; }
+    planned = { direction, attemptId: state.attemptId };
+    preview.querySelectorAll('.mg-preview-tile').forEach(tile => tile.remove());
+    for (const tile of next.tiles) {
+      const ghost = el('div', 'mg-preview-tile', String(tile.value));
+      ghost.style.left = `${tile.column * CELL}%`; ghost.style.top = `${tile.row * CELL}%`;
+      ghost.style.setProperty('--c', COLORS[Math.min(COLORS.length - 1, tier(tile.value))]);
+      ghost.dataset.merged = String(tile.merged); ghost.dataset.big = String(tile.value >= 64);
+      preview.append(ghost);
+    }
+    const arrow = arrows.find(button => button.dataset.direction === direction);
+    arrow.dataset.planned = 'true'; arrow.setAttribute('aria-pressed', 'true');
+    planText.textContent = next.joined ? `${DIRECTION_NAMES[direction]}へ うごかすと ${next.joined}こ合体！` : `${DIRECTION_NAMES[direction]}へ うごかした あとの ならび`;
+    plan.hidden = false; preview.hidden = false;
+    frame.announce(`${planText.textContent}。この向きに うごかすボタンか 同じ矢印を もう一度押して すすもう`);
+    return true;
+  }
   removes.push(bindArcadeKeys(doc, event => {
     const direction = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[event.key];
-    if (direction) { slide(direction); return true; }
+    if (direction) { chooseDirection(direction); return true; }
+    if (event.key === 'Enter' && getSnapshot().phase === 'sliding') return followPlan();
     const k = ['1', '2', '3', '4'].indexOf(event.key);
     return k >= 0 ? answer(choiceButtons[k]?.dataset.choice) : false;
   }));
@@ -129,6 +183,7 @@ export function createMergeView({ document: doc, dispatch, onBack, getSnapshot, 
   };
   const renderDock = state => {
     const answering = state.phase === 'answering', sliding = state.phase === 'sliding';
+    if (planned && (!sliding || planned.attemptId !== state.attemptId)) clearPlan();
     choices.hidden = !answering; pad.hidden = !sliding;
     const key = `${state.phase}:${state.problem?.problemId ?? ''}`;
     if (key !== problemKey) {
@@ -136,7 +191,7 @@ export function createMergeView({ document: doc, dispatch, onBack, getSnapshot, 
       if (answering) {
         prompt.textContent = state.problem.prompt;
         state.problem.choices.forEach((choice, i) => { choiceButtons[i].textContent = choice.text; choiceButtons[i].dataset.choice = choice.choiceId; });
-      } else prompt.textContent = sliding ? 'スワイプで うごかそう！' : state.phase === 'completed' ? 'おしまい！' : '';
+      } else prompt.textContent = sliding ? '矢印で次のならびを見よう。スワイプなら すぐ動くよ！' : state.phase === 'completed' ? 'おしまい！' : '';
     }
     const titleText = state.phase === 'completed' ? '' : `もんだい ${state.asked}/${state.questions}　いちばん大きい ${state.best}`;
     if (title.textContent !== titleText) title.textContent = titleText;
@@ -195,7 +250,7 @@ export function createMergeView({ document: doc, dispatch, onBack, getSnapshot, 
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; [...choiceButtons, ...arrows].forEach(button => { button.disabled = true; }); },
+    stopInput() { active = false; clearPlan(); [...choiceButtons, ...arrows, go].forEach(button => { button.disabled = true; }); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
