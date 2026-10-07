@@ -15,6 +15,7 @@ const CSS = `
 #kanjiBingoScreen .kb-cell[data-line=true]{box-shadow:0 4px 0 #c9951a,0 0 0 4px #ffc400}
 #kanjiBingoScreen .kb-cell[data-reach=true]:not([data-mark]){box-shadow:0 4px 0 #c9b98f,0 0 0 3px #ffb627;animation:kb-reach 1s ease-in-out infinite alternate}
 #kanjiBingoScreen .kb-cell[data-answer=true]{background:#d7f7df;box-shadow:0 4px 0 #1f9d55,0 0 0 4px #37c871}
+#kanjiBingoScreen .kb-cell[data-plan=true]{outline:4px solid #72e9ff;outline-offset:-6px}
 #kanjiBingoScreen .kb-cell[data-stampable=true]{animation:kb-reach .7s ease-in-out infinite alternate}
 #kanjiBingoScreen .kb-cell.kb-miss{animation:kb-miss .4s ease-out}
 #kanjiBingoScreen .kb-buddy{position:absolute;left:10px;bottom:10px;z-index:3;width:clamp(56px,8vw,88px);height:clamp(56px,8vw,88px);pointer-events:none}
@@ -28,10 +29,15 @@ const CSS = `
 #kanjiBingoScreen .kb-ball[data-kind=meaning] b{background:radial-gradient(circle at 28% 22%,#fff 0 9%,#4fb0ff 34%,#1b5fa8)}
 #kanjiBingoScreen .kb-clue{font-size:clamp(18px,2.3vw,23px);font-weight:800;line-height:1.5}
 #kanjiBingoScreen .kb-target{display:inline-block;margin:0 2px;padding:0 6px;border-radius:8px;background:#ffe066;color:#3a2400;font-size:1.2em;line-height:1.25}
-#kanjiBingoScreen .kb-tools{display:flex;justify-content:center}
-#kanjiBingoScreen .kb-stampbtn{min-height:48px;padding:4px 16px;border:2px solid #ffffff55;border-radius:99px;background:#ffffff1c;color:#fff;font:inherit;font-size:16px;font-weight:900;white-space:nowrap;cursor:pointer;touch-action:manipulation}
-#kanjiBingoScreen .kb-stampbtn:disabled{opacity:.4;cursor:default}
+#kanjiBingoScreen .kb-tools{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+#kanjiBingoScreen .kb-stampbtn,#kanjiBingoScreen .kb-planbtn{min-height:48px;padding:4px 16px;border:2px solid #ffffff55;border-radius:99px;background:#ffffff1c;color:#fff;font:inherit;font-size:16px;font-weight:900;white-space:nowrap;cursor:pointer;touch-action:manipulation}
+#kanjiBingoScreen .kb-stampbtn:disabled,#kanjiBingoScreen .kb-planbtn:disabled{opacity:.4;cursor:default}
 #kanjiBingoScreen .kb-stampbtn[data-armed=true]{opacity:1;background:#ffe066;color:#3a2400;border-color:#ffe066}
+#kanjiBingoScreen .kb-planbtn[aria-expanded=true]{background:#d6f7ff;color:#12394b;border-color:#72e9ff}
+#kanjiBingoScreen .kb-planlist{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+#kanjiBingoScreen .kb-planlist button{min-width:0;min-height:44px;padding:4px 2px;border:2px solid #ffffff55;border-radius:10px;background:#ffffff1c;color:#fff;font:inherit;font-size:14px;font-weight:900;cursor:pointer;touch-action:manipulation}
+#kanjiBingoScreen .kb-planlist button[aria-pressed=true]{background:#72e9ff;border-color:#d6f7ff;color:#12394b}
+#kanjiBingoScreen .kb-planlist button:disabled{opacity:.4;cursor:default}
 #kanjiBingoScreen .kb-review{margin:0;padding:0;list-style:none;display:grid;gap:6px}
 #kanjiBingoScreen .kb-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
 #kanjiBingoScreen .kb-review li[data-correct=false]{background:#fff3da}
@@ -43,12 +49,14 @@ const CSS = `
 @keyframes kb-cheer{0%,100%{transform:none}40%{transform:translateY(-14px)}}
 @keyframes kb-miss{0%,100%{transform:none}30%{transform:translateX(-6px)}60%{transform:translateX(5px)}}
 `;
+const LINE_NAMES = Object.freeze(['よこ1', 'よこ2', 'よこ3', 'よこ4', 'たて1', 'たて2', 'たて3', 'たて4', 'ななめ↘', 'ななめ↙']);
 
 export function createBingoView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
   // Every bingo line earns a Gotomon sticker, stuck on the middle of that line.
   const stickers = new Map();
   let lastSticker = null;
   let active = true, stampNote = false, cardKey = null, clueKey = null, lastSeq = -1, lastEventId = 0;
+  let planning = false, plannedLine = null;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'kanjiBingoScreen', title: '漢字ビンゴ', theme: 'hall' });
@@ -70,11 +78,18 @@ export function createBingoView({ document: doc, dispatch, onBack, getSnapshot, 
   const tools = el('div', 'kb-tools');
   const stampButton = el('button', 'kb-stampbtn'); stampButton.type = 'button'; stampButton.dataset.action = 'stamp';
   on(stampButton, 'click', () => toggleStamp()); tools.append(stampButton);
+  const planButton = el('button', 'kb-planbtn', '🎯 ねらう列'); planButton.type = 'button'; planButton.dataset.action = 'plan';
+  on(planButton, 'click', () => togglePlan()); tools.append(planButton);
+  const planList = el('div', 'kb-planlist'); planList.hidden = true; planList.setAttribute('aria-label', 'ねらう列');
+  const lineButtons = LINE_NAMES.map((name, index) => {
+    const node = el('button', '', name); node.type = 'button'; node.dataset.line = String(index);
+    on(node, 'click', () => chooseLine(index)); planList.append(node); return node;
+  });
   // The shell advances after feedback; this stays hidden and only serves hosts without auto-advance.
   const go = el('button', 'kb-go', 'つぎへ'); go.type = 'button'; go.dataset.action = 'next'; go.hidden = true;
   on(go, 'click', () => proceed());
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
-  dock.append(title, ball, tools, note, go);
+  dock.append(title, ball, tools, planList, note, go);
   const review = el('div', 'ya-learning-result'); review.hidden = true;
   const reviewList = el('ol', 'kb-review'); review.append(el('h3', '', '今回のビンゴの漢字'), reviewList); frame.shell.append(review);
   doc.body.append(root);
@@ -83,7 +98,7 @@ export function createBingoView({ document: doc, dispatch, onBack, getSnapshot, 
   const session = () => getSnapshot();
   function tap(index) {
     const state = session(), cell = state.card?.[index];
-    if (!active || state.paused || state.phase !== 'answering' || !cell || state.marked[index]) return false;
+    if (!active || state.paused || state.phase !== 'answering' || planning || !cell || state.marked[index]) return false;
     if (state.stampArmed) {
       // The square being called is for the child to find, so it cannot be stamped.
       if (cell.cellId === state.problem?.cellId) { stampNote = true; restartClass(cells[index], 'kb-miss'); return false; }
@@ -96,6 +111,23 @@ export function createBingoView({ document: doc, dispatch, onBack, getSnapshot, 
     if (!active || state.paused || state.phase !== 'answering') return false;
     return dispatch({ type: 'armStamp', payload: { sessionId: state.sessionId, armed: !state.stampArmed } });
   }
+  function togglePlan() {
+    const state = session();
+    if (!active || state.paused || state.phase !== 'answering') return false;
+    planning = !planning;
+    renderCard(state);
+    renderDock(state);
+    return true;
+  }
+  function chooseLine(index) {
+    const state = session();
+    if (!active || state.paused || state.phase !== 'answering' || !BINGO_LINES[index]) return false;
+    plannedLine = index;
+    planning = false;
+    renderCard(state);
+    renderDock(state);
+    return true;
+  }
   function proceed() {
     const state = session();
     if (!active || state.paused || state.phase !== 'feedback') return false;
@@ -106,6 +138,7 @@ export function createBingoView({ document: doc, dispatch, onBack, getSnapshot, 
   const renderCard = state => {
     if (cardKey !== state.sessionId) {
       cardKey = state.sessionId;
+      planning = false; plannedLine = null;
       state.card.forEach((cell, index) => { cells[index].textContent = cell.kanji; cells[index].dataset.cellId = cell.cellId; });
     }
     const inLine = new Set(state.lines.flatMap(line => BINGO_LINES[line]));
@@ -133,12 +166,15 @@ export function createBingoView({ document: doc, dispatch, onBack, getSnapshot, 
       setData(node, 'reach', reach.has(index) ? 'true' : null);
       setData(node, 'answer', showAnswer && cell.cellId === state.lastAnswer.correctChoiceId ? 'true' : null);
       setData(node, 'stampable', state.stampArmed && !mark && cell.cellId !== state.problem?.cellId ? 'true' : null);
-      const label = `${cell.kanji}${mark ? '（あいた）' : ''}`;
+      const inPlan = plannedLine !== null && BINGO_LINES[plannedLine].includes(index);
+      setData(node, 'plan', inPlan ? 'true' : null);
+      const label = `${cell.kanji}${mark ? '（あいた）' : ''}${inPlan ? '、ねらう列' : ''}`;
       if (node.getAttribute('aria-label') !== label) node.setAttribute('aria-label', label);
-      node.disabled = !!mark || state.phase !== 'answering' || state.paused;
+      node.disabled = !!mark || state.phase !== 'answering' || state.paused || planning;
     });
   };
   const renderDock = state => {
+    if (state.phase !== 'answering' || state.paused) planning = false;
     if (state.problem && clueKey !== state.problem.problemId) {
       clueKey = state.problem.problemId;
       const problem = state.problem;
@@ -151,7 +187,7 @@ export function createBingoView({ document: doc, dispatch, onBack, getSnapshot, 
     title.textContent = state.problem ? `よびだし ${calls.made}/${calls.total}` : '';
     if (state.phase === 'answering') {
       if (!state.stampArmed) stampNote = false;
-      const ask = state.stampArmed ? (stampNote ? 'よびだし中の漢字には⭐をおせないよ。ほかのマスをえらぼう' : '⭐をおすマスをタップ（よびだし中の漢字はのぞく）')
+      const ask = planning ? 'そろえたい列をえらぼう。あいたマスの数も見られるよ' : state.stampArmed ? (stampNote ? 'よびだし中の漢字には⭐をおせないよ。ほかのマスをえらぼう' : '⭐をおすマスをタップ（よびだし中の漢字はのぞく）')
         : state.problem?.kind === 'reading' ? '黄色の読みの漢字はどれ？' : 'この意味の漢字はどれ？';
       if (note.textContent !== ask) note.textContent = ask;
     }
@@ -159,6 +195,20 @@ export function createBingoView({ document: doc, dispatch, onBack, getSnapshot, 
     if (stampButton.textContent !== stampText) stampButton.textContent = stampText;
     stampButton.dataset.armed = String(!!state.stampArmed);
     stampButton.disabled = state.phase !== 'answering' || state.paused || (!state.stamps && !state.stampArmed);
+    const remaining = plannedLine === null ? null : BINGO_LINES[plannedLine].filter(index => !state.marked[index]).length;
+    const planText = plannedLine === null ? '🎯 ねらう列' : `🎯 ${LINE_NAMES[plannedLine]} ${remaining ? `あと${remaining}` : 'ビンゴ！'}`;
+    if (planButton.textContent !== planText) planButton.textContent = planText;
+    planButton.setAttribute('aria-expanded', String(planning));
+    planButton.disabled = state.phase !== 'answering' || state.paused;
+    planList.hidden = !planning;
+    lineButtons.forEach((node, index) => {
+      const open = BINGO_LINES[index].filter(cell => !state.marked[cell]).length;
+      const text = `${LINE_NAMES[index]} ${4 - open}/4`;
+      if (node.textContent !== text) node.textContent = text;
+      node.setAttribute('aria-label', `${LINE_NAMES[index]}、あと${open}マス`);
+      node.setAttribute('aria-pressed', String(plannedLine === index));
+      node.disabled = state.phase !== 'answering' || state.paused;
+    });
   };
   const showAnswer = state => {
     const answer = state.lastAnswer, problem = state.problem;
@@ -215,7 +265,7 @@ export function createBingoView({ document: doc, dispatch, onBack, getSnapshot, 
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; [...cells, stampButton, go].forEach(node => { node.disabled = true; }); },
+    stopInput() { active = false; [...cells, stampButton, planButton, ...lineButtons, go].forEach(node => { node.disabled = true; }); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
