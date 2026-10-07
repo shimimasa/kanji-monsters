@@ -90,7 +90,7 @@ export const NEW_GAME_CONTENT = Object.freeze({
   }),
   shapeMosaic: Object.freeze({
     title: 'かたちのモザイク', subject: 'math', skillId: 'math.geometry.shapes',
-    intro: '形のタイルをえらんで、あいぼうの絵をつくろう。',
+    intro: '形のタイルをえらんで、モザイクをつくろう。',
     rounds: Object.freeze([
       card('おうちの とがった屋根に ぴったりの形は？', ['▲ 三角形', '● 円', '■ 正方形'], '▲ 三角形', '屋根には 三角形のタイルを置いたよ。', '🏠'),
       card('4つの辺が どれも同じ長さの 窓は？', ['▭ 長方形', '■ 正方形', '● 円'], '■ 正方形', '4つの辺が同じ長さの 正方形だよ。', '🪟'),
