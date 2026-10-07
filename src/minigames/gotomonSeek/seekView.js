@@ -10,6 +10,8 @@ const CSS = `
 #gotomonSeekScreen .sk-pond{position:absolute;left:40%;top:64%;width:24%;height:12%;border-radius:50%;background:radial-gradient(ellipse,#8fd3ff,#4aa3d8);opacity:.8}
 #gotomonSeekScreen .sk-hider{position:absolute;width:clamp(64px,10vw,110px);aspect-ratio:1;transform:translate(-50%,-50%);padding:0;border:0;background:none;cursor:pointer;touch-action:manipulation;z-index:3}
 #gotomonSeekScreen .sk-hider:focus-visible{outline:3px solid #2a6fb0;outline-offset:2px;border-radius:12px}
+#gotomonSeekScreen .sk-hider[data-picked=true]{outline:4px solid #ffe066;outline-offset:2px;border-radius:12px}
+#gotomonSeekScreen .sk-hider[data-revealed=false]::after{content:'？';position:absolute;left:50%;bottom:-8%;transform:translateX(-50%);padding:1px 9px;border-radius:9px;background:#fffdf6;border:2px solid #7a5a2b;color:#2a1b0d;font-size:20px;font-weight:900;z-index:4;pointer-events:none}
 #gotomonSeekScreen .sk-who{position:absolute;left:14%;right:14%;top:0;height:78%;animation:sk-peek var(--peek,3.6s) ease-in-out infinite;animation-delay:var(--delay,0s)}
 #gotomonSeekScreen .sk-who img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 2px #0004)}
 #gotomonSeekScreen .sk-cover{position:absolute;left:0;right:0;bottom:6%;height:48%;z-index:2;pointer-events:none}
@@ -18,6 +20,7 @@ const CSS = `
 #gotomonSeekScreen .sk-cover[data-cover=rock]{height:40%;border-radius:45% 55% 20% 20%;background:radial-gradient(circle at 35% 30%,#d8d4cc,#9a948a 70%)}
 #gotomonSeekScreen .sk-cover[data-cover=grass]{background:repeating-linear-gradient(75deg,transparent 0 6px,#4fa84a 6px 10px),repeating-linear-gradient(-70deg,transparent 0 7px,#3f9a3c 7px 11px);clip-path:polygon(0 100%,5% 20%,15% 60%,25% 5%,35% 55%,45% 10%,55% 50%,65% 0,75% 55%,85% 15%,95% 60%,100% 100%)}
 #gotomonSeekScreen .sk-tag{position:absolute;left:50%;bottom:-8%;transform:translateX(-50%);max-width:150%;padding:1px 8px;border-radius:9px;background:#fffdf6;border:2px solid #7a5a2b;color:#2a1b0d;font-size:clamp(13px,min(1.8vw,2.6vh),20px);font-weight:900;white-space:nowrap;z-index:3;box-shadow:0 2px 0 #7a5a2b}
+#gotomonSeekScreen .sk-hider[data-revealed=false] .sk-tag{visibility:hidden}
 #gotomonSeekScreen .sk-hider[data-hint=true] .sk-tag{border-color:#37c871;box-shadow:0 0 0 4px #37c871aa}
 #gotomonSeekScreen .sk-hider[data-hint=true] .sk-who{animation:sk-sparkle .8s ease-in-out infinite alternate}
 #gotomonSeekScreen .sk-hider[data-state=wrong]{opacity:.55;cursor:default}
@@ -28,6 +31,8 @@ const CSS = `
 #gotomonSeekScreen .sk-prompt small{display:block;margin-top:4px;font-size:15px;font-weight:700;color:#e0f4d8}
 #gotomonSeekScreen .sk-prompt small b{color:#ffe066}
 #gotomonSeekScreen .sk-ask{margin:0;text-align:center;color:#ffe2b8;font-size:14px;font-weight:800}
+#gotomonSeekScreen .sk-confirm{min-height:52px;border:0;border-radius:14px;background:#ffe066;color:#26402e;font:inherit;font-size:19px;font-weight:900;cursor:pointer;touch-action:manipulation}
+#gotomonSeekScreen .sk-confirm:disabled{opacity:.5;cursor:default}
 @keyframes sk-peek{0%,100%{transform:translateY(34%)}35%,65%{transform:translateY(0)}}
 @keyframes sk-sparkle{from{transform:translateY(0);filter:drop-shadow(0 0 4px #fff)}to{transform:translateY(-8%);filter:drop-shadow(0 0 12px #ffe066)}}
 @keyframes sk-found{0%{transform:translateY(0) scale(1)}40%{transform:translateY(-60%) scale(1.25)}100%{transform:translateY(-40%) scale(1.15)}}
@@ -35,7 +40,8 @@ const CSS = `
 `;
 
 export function createSeekView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
-  let active = true, lastEventId = 0, doneShown = false, shownTap = 0, problemKey = null, sceneKey = null;
+  let active = true, lastEventId = 0, doneShown = false, shownTap = 0, problemKey = null, sceneKey = null, pickedId = null;
+  const peeked = new Set();
   const removes = [], nodes = new Map();
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'gotomonSeekScreen', title: 'ゴトモンさがし', theme: 'seek' });
@@ -46,9 +52,11 @@ export function createSeekView({ document: doc, dispatch, onBack, getSnapshot, c
 
   const title = el('p', 'sk-title');
   const prompt = el('p', 'sk-prompt'); prompt.dataset.role = 'problem';
-  const ask = el('p', 'sk-ask', '答えのふだを持っているゴトモンを さがして タップ！');
+  const ask = el('p', 'sk-ask', 'かくれ場所を押して ふだをのぞこう');
+  const confirm = el('button', 'sk-confirm', 'このゴトモンを 見つける'); confirm.type = 'button';
+  on(confirm, 'click', () => confirmPick());
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
-  dock.append(title, prompt, ask, note);
+  dock.append(title, prompt, ask, confirm, note);
   doc.body.append(root);
 
   function tap(hiderId) {
@@ -56,11 +64,28 @@ export function createSeekView({ document: doc, dispatch, onBack, getSnapshot, c
     if (!active || state.paused || state.phase !== 'answering') return false;
     return dispatch({ type: 'tap', payload: { sessionId: state.sessionId, attemptId: state.attemptId, hiderId } });
   }
+  function confirmPick() {
+    if (!pickedId) return false;
+    const id = pickedId;
+    pickedId = null;
+    return tap(id);
+  }
+  function peek(hiderId) {
+    const state = getSnapshot();
+    const hider = state.hiders.find(item => item.hiderId === hiderId && item.state === 'hiding');
+    if (!active || state.paused || state.phase !== 'answering' || !hider) return false;
+    if (pickedId === hiderId && peeked.has(hiderId)) return confirmPick();
+    peeked.add(hiderId);
+    pickedId = hiderId;
+    render(state);
+    frame.announce(`「${hider.text}」のふだ。ほかの場所も のぞけるよ`);
+    return true;
+  }
 
   // A new question: everyone hides again in new places.
   const hideAll = state => {
     for (const node of nodes.values()) node.remove?.();
-    nodes.clear();
+    nodes.clear(); peeked.clear(); pickedId = null;
     state.hiders.forEach((hider, i) => {
       const node = el('button', 'sk-hider'); node.type = 'button';
       node.style.left = pct(hider.x); node.style.top = pct(hider.y);
@@ -69,17 +94,23 @@ export function createSeekView({ document: doc, dispatch, onBack, getSnapshot, c
       if (friend) { const img = el('img'); img.alt = ''; img.src = friend.imageUrl; who.append(img); node.dataset.name = friend.name; }
       const cover = el('div', 'sk-cover'); cover.dataset.cover = COVERS[hider.spot % COVERS.length];
       node.append(who, cover, el('span', 'sk-tag', hider.text));
-      node.setAttribute('aria-label', `「${hider.text}」のふだ`);
-      on(node, 'click', () => tap(hider.hiderId));
+      node.setAttribute('aria-label', `かくれ場所 ${i + 1}、ふだをのぞく`);
+      on(node, 'click', () => peek(hider.hiderId));
       world.append(node); nodes.set(hider.hiderId, node);
     });
   };
   const render = state => {
     const key = `${state.problemIndex}:${state.hiders[0]?.hiderId}`;
     if (key !== sceneKey) { sceneKey = key; hideAll(state); }
-    for (const hider of state.hiders) {
+    for (const [index, hider] of state.hiders.entries()) {
       const node = nodes.get(hider.hiderId); if (!node) continue;
       if (node.dataset.state !== hider.state) node.dataset.state = hider.state;
+      const revealed = String(peeked.has(hider.hiderId) || hider.state !== 'hiding');
+      const picked = String(pickedId === hider.hiderId);
+      if (node.dataset.revealed !== revealed) node.dataset.revealed = revealed;
+      if (node.dataset.picked !== picked) node.dataset.picked = picked;
+      const label = revealed === 'true' ? `「${hider.text}」のふだ${picked === 'true' ? '、もう一度押すと見つける' : ''}` : `かくれ場所 ${index + 1}、ふだをのぞく`;
+      if (node.getAttribute?.('aria-label') !== label) node.setAttribute('aria-label', label);
       const hint = String(hider.hiderId === state.hintHiderId);
       if (node.dataset.hint !== hint) node.dataset.hint = hint;
       node.disabled = hider.state !== 'hiding';
@@ -92,9 +123,16 @@ export function createSeekView({ document: doc, dispatch, onBack, getSnapshot, c
     }
     const titleText = state.phase === 'completed' ? '' : `もんだい ${Math.min(state.total, state.problemIndex + 1)}/${state.total}　見つけた ${state.found}`;
     if (title.textContent !== titleText) title.textContent = titleText;
+    const picked = state.hiders.find(item => item.hiderId === pickedId);
+    const askText = picked ? `「${picked.text}」のふだ。ほかの場所も のぞけるよ` : 'かくれ場所を押して ふだをのぞこう';
+    if (ask.textContent !== askText) ask.textContent = askText;
+    confirm.hidden = state.phase !== 'answering';
+    confirm.disabled = !picked || state.paused;
   };
   const showTap = state => {
     const t = state.lastTap, node = nodes.get(t.hiderId), name = node?.dataset.name;
+    pickedId = null;
+    if (!t.correct && state.hintHiderId) peeked.add(state.hintHiderId);
     if (t.correct) {
       fx.burst(t.x * 100, t.y * 100, t.first ? 'great' : 'good', t.first ? 1.4 : 1.1);
       fx.pop(t.x * 100, t.y * 100 - 10, 'みつけた！', 'great');
@@ -115,7 +153,7 @@ export function createSeekView({ document: doc, dispatch, onBack, getSnapshot, c
       frame.setPaused(state.paused && !state.result);
       if (!state.hiders?.length) return;
       render(state);
-      if (state.lastTap && state.lastTap.tap !== shownTap) { shownTap = state.lastTap.tap; showTap(state); }
+      if (state.lastTap && state.lastTap.tap !== shownTap) { shownTap = state.lastTap.tap; showTap(state); render(state); }
       if (state.result && !doneShown) {
         doneShown = true;
         fx.banner('ぜんいん みつけた！', 'great'); fx.burst(50, 50, 'great', 2);
@@ -137,7 +175,7 @@ export function createSeekView({ document: doc, dispatch, onBack, getSnapshot, c
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; nodes.forEach(node => { node.disabled = true; }); },
+    stopInput() { active = false; pickedId = null; confirm.disabled = true; nodes.forEach(node => { node.disabled = true; }); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
