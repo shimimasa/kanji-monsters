@@ -1,7 +1,7 @@
 import { createArcadeFrame, restartClass, bindArcadeKeys } from '../arcade/arcadeKit.js';
 import { castAt } from '../gotomonCast.js';
 import Speech from '../../audio/speech.js';
-import { MAZE_RULES as R } from './mazeGame.js';
+import { MAZE_RULES as R, wayBetween } from './mazeGame.js';
 
 const N = R.size, CELL = 100 / N;
 const CSS = `
@@ -12,6 +12,9 @@ const CSS = `
 #gotomonMazeScreen .mz-cell[data-s=false]{border-bottom-width:4px}
 #gotomonMazeScreen .mz-cell[data-w=false]{border-left-width:4px}
 #gotomonMazeScreen .mz-cell[data-e=false]{border-right-width:4px}
+#gotomonMazeScreen .mz-cell[data-route=true]{background:#64c9a377}
+#gotomonMazeScreen .mz-cell[data-route-end=true]{background:#ffe066aa;box-shadow:inset 0 0 0 4px #ef9d27}
+#gotomonMazeScreen .mz-cell[data-route-target=true]{outline:3px dashed #ffe066;outline-offset:-5px}
 #gotomonMazeScreen .mz-thing{position:absolute;inset:12%;display:grid;place-items:center;pointer-events:none;font-weight:900}
 #gotomonMazeScreen .mz-door{border-radius:10px;background:linear-gradient(#c0392b,#8e2a20);color:#fff;font-size:clamp(16px,3.4vh,30px);box-shadow:0 3px 0 #5a1a12,inset 0 0 0 3px #ffcf5a}
 #gotomonMazeScreen .mz-door[data-open=true]{background:#e4f7e8;color:#37c871;box-shadow:inset 0 0 0 2px #37c871;opacity:.8}
@@ -31,6 +34,8 @@ const CSS = `
 #gotomonMazeScreen .mz-choice{min-height:58px;border:3px solid transparent;border-radius:14px;background:#fffdf6;color:#1b2a36;font:inherit;font-size:clamp(18px,2.4vw,26px);font-weight:900;box-shadow:0 4px 0 #1c1530;cursor:pointer;touch-action:manipulation}
 #gotomonMazeScreen .mz-choice[data-hint=true]{border-color:#37c871;box-shadow:0 0 0 4px #37c871aa}
 #gotomonMazeScreen .mz-leave{justify-self:center;padding:6px 14px;border:0;border-radius:10px;background:#ffffff22;color:#fff;font:inherit;font-weight:800;cursor:pointer}
+#gotomonMazeScreen .mz-route{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;color:#e8fff4;text-align:center;font-size:15px;font-weight:800}
+#gotomonMazeScreen .mz-go{min-height:44px;padding:5px 14px;border:0;border-radius:12px;background:#ffe066;color:#302341;font:inherit;font-weight:900;cursor:pointer;touch-action:manipulation}
 #gotomonMazeScreen .mz-pad{display:grid;grid-template-columns:repeat(3,60px);grid-template-rows:repeat(2,52px);gap:6px;justify-content:center}
 #gotomonMazeScreen .mz-arrow{border:0;border-radius:12px;background:#ffffff26;color:#fff;font:inherit;font-size:24px;font-weight:900;cursor:pointer;touch-action:manipulation}
 #gotomonMazeScreen .mz-arrow[data-direction=up]{grid-column:2}
@@ -43,7 +48,7 @@ const CSS = `
 `;
 
 export function createMazeView({ document: doc, dispatch, onBack, getSnapshot, cast }) {
-  let active = true, lastEventId = 0, doneShown = false, shownAnswer = 0, shownFriend = 0, problemKey = null, floorKey = null, start = null;
+  let active = true, lastEventId = 0, doneShown = false, shownAnswer = 0, shownFriend = 0, problemKey = null, floorKey = null, start = null, planned = null, swipeUntil = 0;
   const removes = [], cellNodes = [], thingNodes = new Map();
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'gotomonMazeScreen', title: 'ゴトモン迷路', theme: 'maze' });
@@ -56,7 +61,8 @@ export function createMazeView({ document: doc, dispatch, onBack, getSnapshot, c
     const cell = el('button', 'mz-cell'); cell.type = 'button';
     cell.style.left = `${(index % N) * CELL}%`; cell.style.top = `${Math.floor(index / N) * CELL}%`;
     cell.setAttribute('aria-label', `${Math.floor(index / N) + 1}行 ${(index % N) + 1}列`);
-    on(cell, 'click', () => walkTo(index));
+    cell.setAttribute('aria-pressed', 'false');
+    on(cell, 'click', () => { if (Date.now() >= swipeUntil) chooseRoute(index); });
     board.append(cell); cellNodes.push(cell);
   }
   const player = el('div', 'mz-player'), token = el('div', 'mz-token'); player.append(token);
@@ -69,6 +75,7 @@ export function createMazeView({ document: doc, dispatch, onBack, getSnapshot, c
     if (!start) return;
     const dx = event.clientX - start[0], dy = event.clientY - start[1]; start = null;
     if (Math.max(Math.abs(dx), Math.abs(dy)) < 28) return;
+    swipeUntil = Date.now() + 300;
     move(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
   });
 
@@ -81,6 +88,9 @@ export function createMazeView({ document: doc, dispatch, onBack, getSnapshot, c
   }
   const leave = el('button', 'mz-leave', 'とびらからはなれる'); leave.type = 'button';
   on(leave, 'click', () => { const s = getSnapshot(); if (active && s.phase === 'answering') dispatch({ type: 'leave', payload: { sessionId: s.sessionId } }); });
+  const route = el('div', 'mz-route'), routeText = el('span', 'mz-route-text');
+  const go = el('button', 'mz-go', 'この道を すすむ'); go.type = 'button';
+  on(go, 'click', () => followRoute()); route.append(routeText, go); route.hidden = true;
   const pad = el('div', 'mz-pad'), arrows = [];
   for (const [direction, text] of [['up', '↑'], ['left', '←'], ['down', '↓'], ['right', '→']]) {
     const button = el('button', 'mz-arrow', text); button.type = 'button'; button.dataset.direction = direction;
@@ -88,15 +98,50 @@ export function createMazeView({ document: doc, dispatch, onBack, getSnapshot, c
     on(button, 'click', () => move(direction)); pad.append(button); arrows.push(button);
   }
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
-  dock.append(title, prompt, choices, leave, pad, note);
+  dock.append(title, prompt, choices, leave, route, pad, note);
   doc.body.append(root);
 
   const send = (type, extra) => {
     const state = getSnapshot();
     return dispatch({ type, payload: { sessionId: state.sessionId, attemptId: state.attemptId, ...extra } });
   };
-  function move(direction) { const s = getSnapshot(); if (!active || s.paused || s.phase !== 'walking') return false; return send('move', { direction }); }
-  function walkTo(cell) { const s = getSnapshot(); if (!active || s.paused || s.phase !== 'walking') return false; return send('walkTo', { cell }); }
+  function clearRoute() {
+    if (!planned) return;
+    for (const cell of planned.path) { delete cellNodes[cell].dataset.route; delete cellNodes[cell].dataset.routeEnd; }
+    delete cellNodes[planned.cell].dataset.routeTarget;
+    cellNodes[planned.cell].setAttribute('aria-pressed', 'false');
+    planned = null; route.hidden = true;
+  }
+  function move(direction) {
+    const s = getSnapshot(); if (!active || s.paused || s.phase !== 'walking') return false;
+    clearRoute(); return send('move', { direction });
+  }
+  function followRoute() {
+    const s = getSnapshot();
+    if (!active || s.paused || s.phase !== 'walking' || s.walking || !planned || planned.from !== s.player || planned.floor !== s.floor) return false;
+    const cell = planned.cell; clearRoute(); return send('walkTo', { cell });
+  }
+  function chooseRoute(cell) {
+    const s = getSnapshot();
+    if (!active || s.paused || s.phase !== 'walking' || s.walking) return false;
+    if (planned?.cell === cell) return followRoute();
+    clearRoute();
+    if (cell === s.player) return false;
+    const wholePath = wayBetween(s.cells, N, s.player, cell);
+    if (!wholePath?.length) return false;
+    const stopAt = wholePath.findIndex(at => s.doors.some(door => door.cell === at && !door.open) || at === s.goal);
+    const path = stopAt < 0 ? wholePath : wholePath.slice(0, stopAt + 1);
+    const end = path.at(-1), door = s.doors.some(item => item.cell === end && !item.open);
+    const friends = s.friends.filter(friend => !friend.met && path.includes(friend.cell)).length;
+    planned = { cell, from: s.player, floor: s.floor, path };
+    for (const at of path) cellNodes[at].dataset.route = 'true';
+    cellNodes[end].dataset.routeEnd = 'true';
+    cellNodes[cell].dataset.routeTarget = 'true';
+    cellNodes[cell].setAttribute('aria-pressed', 'true');
+    routeText.textContent = `${path.length}マスの道${door ? '・とびらで いったん止まる' : end === s.goal ? '・ゴールへ' : friends ? `・なかまに ${friends}ひき会える` : ''}`;
+    route.hidden = false; frame.announce(`${routeText.textContent}。この道を すすむボタンか 同じマスを もう一度押して すすもう`);
+    return true;
+  }
   function answer(choiceId) { const s = getSnapshot(); if (!active || s.paused || s.phase !== 'answering' || !choiceId) return false; return send('answer', { choiceId }); }
   removes.push(bindArcadeKeys(doc, event => {
     const direction = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[event.key];
@@ -119,7 +164,8 @@ export function createMazeView({ document: doc, dispatch, onBack, getSnapshot, c
   };
   const render = state => {
     const key = `${state.floor}:${state.doors[0]?.doorId}`;
-    if (key !== floorKey) { floorKey = key; buildFloor(state); }
+    if (key !== floorKey) { clearRoute(); floorKey = key; buildFloor(state); }
+    if (planned && (state.player !== planned.from || state.floor !== planned.floor || state.phase !== 'walking' || state.walking)) clearRoute();
     for (const door of state.doors) {
       const node = thingNodes.get(door.doorId); if (!node) continue;
       if (node.dataset.open !== String(door.open)) { node.dataset.open = String(door.open); node.textContent = door.open ? '✓' : '？'; }
@@ -138,7 +184,7 @@ export function createMazeView({ document: doc, dispatch, onBack, getSnapshot, c
         const word = state.problem.kind === 'en2ja' ? state.problem.prompt.split(' ')[0] : null;
         if (word) Speech.speakEnglish(word);
         const door = thingNodes.get(state.problem.doorId); if (door) restartClass(door, 'mz-knock');
-      } else prompt.textContent = state.phase === 'walking' ? 'マスをタップするか 矢印で すすもう。🏁 がゴール！' : state.phase === 'cleared' ? `${state.floor + 1}かい クリア！` : state.phase === 'completed' ? 'ゴール！' : '';
+      } else prompt.textContent = state.phase === 'walking' ? '行きたいマスをタップして 道を見よう。🏁 がゴール！' : state.phase === 'cleared' ? `${state.floor + 1}かい クリア！` : state.phase === 'completed' ? 'ゴール！' : '';
     }
     choiceButtons.forEach(button => { const hint = String(!!state.hintChoiceId && button.dataset.choice === state.hintChoiceId); if (button.dataset.hint !== hint) button.dataset.hint = hint; });
     const titleText = state.phase === 'completed' ? '' : `${state.floor + 1}かい / ${state.floors}　あけたとびら ${state.opened}/${state.total}`;
@@ -191,7 +237,7 @@ export function createMazeView({ document: doc, dispatch, onBack, getSnapshot, c
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; [...choiceButtons, ...arrows, ...cellNodes, leave].forEach(button => { button.disabled = true; }); },
+    stopInput() { active = false; clearRoute(); [...choiceButtons, ...arrows, ...cellNodes, leave, go].forEach(button => { button.disabled = true; }); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
