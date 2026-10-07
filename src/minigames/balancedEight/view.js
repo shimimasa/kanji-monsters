@@ -37,7 +37,21 @@ const CSS = `
 #abcPostScreen .be-option::before{content:'📮';display:block;font-size:clamp(22px,3vw,29px);line-height:1}
 #abcPostScreen .be-collection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:min(100%,300px)}
 #abcPostScreen .be-collection span{min-width:0;background:#fff3cf;border:2px solid #c88943}
-#englishRadioScreen .be-art{background:radial-gradient(circle,#f7e6ff,#d4d9ff)}#englishRadioScreen .be-art::after{content:'♪ 〜 ♪';position:absolute;right:7%;top:12%;font-size:28px;color:#805aa3}
+#englishRadioScreen .be-art{min-height:155px;display:grid;grid-template-columns:72px minmax(0,1fr);grid-template-rows:auto auto;gap:7px;padding:10px 16px;background:radial-gradient(circle,#f7e6ff,#d4d9ff)}
+#englishRadioScreen .be-art-text{grid-column:1;grid-row:1/3;font-size:clamp(42px,7vw,60px)}
+#englishRadioScreen .be-room-object{display:none}
+#englishRadioScreen .be-art-outcome{display:none}
+#englishRadioScreen .be-radio-window{grid-column:2;grid-row:1;display:grid;place-items:center;min-height:58px;padding:5px 8px;border:3px solid #67568d;border-radius:15px;background:#fff;color:#493766;font-size:clamp(16px,2.7vw,24px);font-weight:900;line-height:1.25}
+#englishRadioScreen .be-art[data-filled=true] .be-radio-window{background:#ebfff2;border-color:#438275;animation:be-arrive .3s ease-out}
+#englishRadioScreen .be-radio-receive{grid-column:2;grid-row:2;min-height:44px;border:2px solid #594b83;border-radius:12px;background:#594b83;color:#fff;font:inherit;font-size:clamp(15px,2vw,18px);font-weight:900;cursor:pointer;touch-action:manipulation}
+#englishRadioScreen .be-radio-receive:disabled{opacity:.58;cursor:default}
+#englishRadioScreen .be-radio-receive:focus-visible{outline:4px solid #f4a000;outline-offset:2px}
+#englishRadioScreen .be-radio-window[hidden],#englishRadioScreen .be-radio-receive[hidden]{display:none}
+#englishRadioScreen .be-option{background:#f8f2ff;border-color:#67568d;min-height:78px;box-shadow:0 4px 0 #67568d55}
+#englishRadioScreen .be-option::before{content:'CH ' attr(data-channel);display:block;margin-bottom:2px;color:#67568d;font-size:clamp(12px,1.6vw,15px)}
+#englishRadioScreen .be-option[data-selected=true]{background:#ffe7a9;border-color:#9a6127;transform:translateY(-3px)}
+#englishRadioScreen .be-collection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;width:min(100%,520px)}
+#englishRadioScreen .be-collection span{min-width:0;border:2px solid #a091c1;background:#fffaff;font-size:clamp(13px,1.8vw,18px)}
 #replyCafeScreen .be-art{min-height:158px;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:9px 15px 9px 65px;background:linear-gradient(#fff0d5,#efd1ac)}
 #replyCafeScreen .be-art-text{position:absolute;left:10px;bottom:9px;font-size:38px}
 #replyCafeScreen .be-art[data-filled=true] .be-art-text{transform:none}
@@ -107,7 +121,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   const config = NEW_GAME_CONTENT[gameId];
   if (!config) throw new Error('Unknown balanced mini game view');
   let active = true, shownKey = '', shownCollection = -1, textShown = false, roomHintShown = false;
-  let selectedShapeChoiceId = null, postDragId = null, postDragStart = null;
+  let selectedShapeChoiceId = null, selectedRadioChoiceId = null, postDragId = null, postDragStart = null;
   const labSeen = new Set();
   let labRound = -1, labAction = null;
   const prepareLabRound = round => {
@@ -137,10 +151,15 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   const cafePartner = el('span', 'be-cafe-partner');
   const cafeReply = el('span', 'be-cafe-reply');
   cafePartner.hidden = gameId !== 'replyCafe'; cafeReply.hidden = gameId !== 'replyCafe';
+  const radioWindow = el('span', 'be-radio-window');
+  const radioReceive = el('button', 'be-radio-receive', 'この絵で こたえる');
+  radioReceive.type = 'button'; radioReceive.dataset.action = 'receive-radio';
+  radioWindow.hidden = gameId !== 'englishRadio';
+  radioReceive.hidden = gameId !== 'englishRadio'; radioReceive.disabled = true;
   const shapePlace = el('button', 'be-place-target', '？ ここに はめる');
   shapePlace.type = 'button'; shapePlace.dataset.action = 'place-shape';
   shapePlace.hidden = gameId !== 'shapeMosaic'; shapePlace.disabled = true;
-  art.append(artText, roomObject, artResult, cafePartner, cafeReply, shapePlace);
+  art.append(artText, roomObject, artResult, cafePartner, cafeReply, radioWindow, radioReceive, shapePlace);
   const question = el('h2', 'be-question');
   const transcript = el('p', 'be-transcript');
   const tools = el('div', 'be-tools');
@@ -156,6 +175,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   if (gameId === 'lifeCycle') options.setAttribute('aria-label', 'つぎの すがたを えらぶ');
   if (gameId === 'shapeMosaic') options.setAttribute('aria-label', '形の タイルを えらぶ');
   if (gameId === 'replyCafe') options.setAttribute('aria-label', '返事を タップするか、会話の絵へ とどける');
+  if (gameId === 'englishRadio') options.setAttribute('aria-label', 'ラジオの チャンネルを えらぶ');
   const answerChoice = choiceId => {
     const state = getSnapshot();
     if (!active || state.paused || state.phase !== 'answering' ||
@@ -171,6 +191,14 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
         button.dataset.dragged = 'false'; return;
       }
       if (!active || state.paused || state.phase !== 'answering') return;
+      if (gameId === 'englishRadio') {
+        selectedRadioChoiceId = button.dataset.choiceId;
+        buttons.forEach(channel => { channel.dataset.selected = String(channel === button); });
+        radioWindow.textContent = selectedRadioChoiceId;
+        radioReceive.disabled = false;
+        radioReceive.focus({ preventScroll: true });
+        return;
+      }
       if (gameId === 'shapeMosaic') {
         selectedShapeChoiceId = button.dataset.choiceId;
         buttons.forEach(tile => { tile.dataset.selected = String(tile === button); });
@@ -183,6 +211,11 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
       answerChoice(button.dataset.choiceId);
     });
     return button;
+  });
+  on(radioReceive, 'click', () => {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'answering' || !selectedRadioChoiceId) return;
+    answerChoice(selectedRadioChoiceId);
   });
   const roomZones = gameId === 'englishRoom' ? ['上', '中', '下'].map(position => {
     const zone = el('button', 'be-room-zone', `${position}に おく`);
@@ -358,6 +391,11 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
           shapePlace.disabled = true;
           buttons.forEach(button => { button.dataset.selected = 'false'; });
         }
+        if (gameId === 'englishRadio' && state.phase === 'answering') {
+          selectedRadioChoiceId = null;
+          radioReceive.disabled = true;
+          buttons.forEach(button => { button.dataset.selected = 'false'; });
+        }
         const problem = state.problem;
         if (problem) {
           if (gameId === 'wonderLab') {
@@ -369,6 +407,13 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
           }
           question.textContent = gameId === 'replyCafe' ? 'ゴトモンに なんて かえす？' : problem.prompt;
           cafePartner.hidden = gameId !== 'replyCafe'; cafeReply.hidden = gameId !== 'replyCafe';
+          radioWindow.hidden = gameId !== 'englishRadio';
+          radioReceive.hidden = gameId !== 'englishRadio' || state.phase !== 'answering';
+          if (gameId === 'englishRadio') {
+            radioWindow.textContent = state.phase === 'feedback'
+              ? problem.correctChoiceId : selectedRadioChoiceId ?? '絵を えらんでね';
+            radioReceive.disabled = !selectedRadioChoiceId || state.phase !== 'answering';
+          }
           if (gameId === 'replyCafe') {
             cafePartner.textContent = `ゴトモン: ${problem.speech}`;
             cafeReply.textContent = state.phase === 'feedback' ? problem.correctChoiceId : 'ここへ 返事を とどけよう';
@@ -398,7 +443,10 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
           buttons.forEach((button, index) => {
             const choice = problem.choices[index];
             button.hidden = !choice;
-            if (choice) { button.textContent = choice.text; button.dataset.choiceId = choice.choiceId; }
+            if (choice) {
+              button.textContent = choice.text; button.dataset.choiceId = choice.choiceId;
+              if (gameId === 'englishRadio') button.dataset.channel = String(index + 1);
+            }
           });
           roomZones.forEach(zone => {
             const choice = problem.choices.find(item => item.choiceId.endsWith(` ${zone.dataset.position}`));
@@ -427,6 +475,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
           artText.textContent = state.phase === 'completed' ? '✦ ✦ ✦' : '✦';
           roomObject.textContent = ''; artResult.textContent = ''; art.dataset.filled = 'false';
           cafePartner.hidden = true; cafeReply.hidden = true;
+          radioWindow.hidden = true; radioReceive.hidden = true;
           feedback.textContent = ''; transcript.hidden = true; listen.hidden = true; showText.hidden = true; roomHint.hidden = true;
         }
       }
@@ -451,6 +500,8 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
             ? ['▲', '■', '●', '▭', '▲', '●'][index]
             : gameId === 'abcPost' && item
               ? `${config.rounds[index].visual.split(' ')[1]} → ${config.rounds[index].correct}`
+            : gameId === 'englishRadio' && item
+              ? config.rounds[index].correct
             : gameId === 'lifeCycle' && item
               ? item.replace('？', config.rounds[index].correct.split(' ')[0]) : item ?? '·';
           collection.append(el('span', '', mark));
@@ -463,7 +514,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
         progressValue: state.answered / state.rounds,
         progressLabel: `${state.answered}/${state.rounds}`, life: null, gaugeValue: play.gauge });
     },
-    stopInput() { active = false; postDragId = null; artText.style.transform = ''; [...buttons, ...roomZones, ...trialButtons, ...townButtons, shapePlace, listen, showText, roomHint, next].forEach(node => { node.disabled = true; }); Speech.cancel(); },
+    stopInput() { active = false; postDragId = null; artText.style.transform = ''; [...buttons, ...roomZones, ...trialButtons, ...townButtons, shapePlace, radioReceive, listen, showText, roomHint, next].forEach(node => { node.disabled = true; }); Speech.cancel(); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

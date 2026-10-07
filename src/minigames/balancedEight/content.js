@@ -18,7 +18,7 @@ export const NEW_GAME_CONTENT = Object.freeze({
   }),
   englishRadio: Object.freeze({
     title: 'えいごのラジオ', subject: 'english', skillId: 'english.phrase.listening',
-    intro: '音を聞いて、ぴったりの絵をえらぼう。文字でも見られるよ。',
+    intro: '音を聞いて、絵のチャンネルをえらび、ラジオを合わせよう。文字でも見られるよ。',
     rounds: Object.freeze([
       card('何のことを言っているかな？', ['🍎 りんご', '🍌 バナナ', '🍇 ぶどう'], '🍎 りんご', 'an apple は「りんご」。', '📻', 'an apple'),
       card('何のことを言っているかな？', ['🐈 ねこ', '🐕 いぬ', '🐇 うさぎ'], '🐕 いぬ', 'a dog は「いぬ」。', '📻', 'a dog'),
