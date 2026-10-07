@@ -110,9 +110,13 @@ for (const slug of ['kururu', 'hitotsubu']) {
     await next();
 
     await tap('.lgv-controls .lgv-action');
+    assert.equal(await inGame("d.querySelector('.lgv-next')?.disabled"), true);
+    for (let i = 0; i < 7; i++) await tap('.lgv-step');
+    assert.match(await inGame("d.querySelector('.lgv-simulation').textContent"), /目盛 光った/);
     await tap('.lgv-controls .lgv-segments:nth-of-type(2) .lgv-option', 1);
     await tap('.lgv-controls .lgv-segments:nth-of-type(3) .lgv-option', 1);
     await tap('.lgv-controls .lgv-action');
+    for (let i = 0; i < 7; i++) await tap('.lgv-step');
     assert.match(await inGame("d.querySelector('.lgv-simulation').textContent"), /4目盛 光った/);
     await shot('kururu-v2-final'); await next();
   } else {
@@ -130,8 +134,14 @@ for (const slug of ['kururu', 'hitotsubu']) {
     await tap('.lgv-controls .lgv-action');
     await next();
 
-    await tap('.lgv-controls .lgv-option', 0);
-    await tap('.lgv-controls .lgv-option', 1);
+    await tap('.lgv-controls .lgv-action');
+    assert.equal(await inGame("d.querySelector('.lgv-next')?.disabled"), true);
+    await tap('.lgv-controls .lgv-action');
+    assert.match(await inGame("d.querySelector('.lgv-ballot-result').textContent"), /10 \/ 10通/);
+    await tap('.lgv-turnout-choices .lgv-option', 1);
+    await tap('.lgv-controls .lgv-action');
+    await tap('.lgv-controls .lgv-action');
+    assert.match(await inGame("d.querySelector('.lgv-ballot-result').textContent"), /20 \/ 20通/);
     await shot('hitotsubu-v2-turnout'); await next();
 
     await tap('.lgv-ballot-choice', 1);

@@ -1,12 +1,13 @@
 # 作業引き継ぎ / 再開ガイド
 
-## 次回はここから（2026-10-06）
+## 次回はここから（2026-10-07）
 
-- **状態**: 理科「クルルの発電所」と社会「ひとつぶ村」のゲームv2を本番公開済み。実装は PR #111、引き継ぎ更新は PR #112。最新 main のマージコミット `0f59ce9` は Vercel 本番 success。作業ブランチは `feature/content-bank-120`、公開結果までのコミットは `224828c`。
+- **状態**: 本番の理科「クルルの発電所」と社会「ひとつぶ村」のゲームv2はそのまま。作業ブランチ `feature/content-bank-120` で、ゲーム性を高める改良をローカル実装した。push・PR・公開はしていない。
 - **入口**: 本番は `https://yomitabi.gamanavi.com/lessons/gotomon/kururu.html` と `https://yomitabi.gamanavi.com/lessons/gotomon/hitotsubu.html`。現行ゲームは `public/lessons/gotomon/lesson-game-v2.js`、計算は `lesson-model-v2.js`、表示は `lesson-game-v2.css`。旧 `lesson-game.js` は参照されない比較用。設計と確認画面は `docs/lesson-pilot/`。
+- **今回の改良**: 理科の最終ミッションは試運転を7目盛に分け、電気の残りと夜の4か所の明かりを一歩ずつ見せる。組み直して再試行でき、どの結果でも星を得る。社会の投票所はついたてによる見え方を示し、開票は固定した20通を5通ずつ開く。最後の一票のあとには選んだ願いと残る願いを村の景色として示す。投票先は保存しない。
 - **次の作業**: 先生と児童に両作品を遊んでもらい、操作で迷う場面、結果から学べたこと、楽しさ、所要時間、うまくいかなかった瞬間の受け止め方を記録する。結果を見てから修正点と残り73授業への展開を判断する。児童試遊はまだ行っていない。
-- **再検証**: `npm.cmd run build` → `npm.cmd run preview -- --port 4173 --strictPort`。専用Chrome 9333番で、試験用セーブを各回入れ直して `node scripts/playtest-cdp/lesson-v2-playtest.mjs 1280 800 --parent` と `node scripts/playtest-cdp/lesson-v2-playtest.mjs 390 844 --parent`。詳細は `scripts/playtest-cdp/README.md`。全テストは `bash scripts/playtest-cdp/run-all-tests.sh` の最終 `ALL-PASS` を見る。前回は19群1122件。
-- **作業ツリー**: この作業の前から音声・ミニゲーム・テスト・画像などに多数の未コミット変更がある。今回のPRには含めていない。次回は `git status --short` を見て、対象ファイルだけ明示してステージする。push・PR・マージ・公開は新たな明示指示があるときだけ行う。
+- **再検証**: `npm.cmd run build` 成功、全19群1122件 `ALL-PASS`。専用Chrome 9333番で試験用セーブを各回入れ直し、`node scripts/playtest-cdp/lesson-v2-playtest.mjs 1280 800 --parent` と `node scripts/playtest-cdp/lesson-v2-playtest.mjs 390 844 --parent` を通した。2作品各5場面を実タップし、横はみ出し0・画像読込OK・例外0・捕獲保存と保存キー一致を確認。詳細は `scripts/playtest-cdp/README.md`。
+- **作業ツリー**: この作業の前から音声・ミニゲーム・テスト・画像などに多数の未コミット変更がある。今回の変更とは分け、対象ファイルだけ明示してステージする。push・PR・マージ・公開は新たな明示指示があるときだけ行う。
 - **別件の未決**: Firestore セキュリティルールと公開先の一本化はユーザー判断待ち。使われていない画像17枚の削除も未決で、現状は残している。
 
 ## 過去の記録

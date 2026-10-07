@@ -38,9 +38,20 @@ export const PROPOSALS = Object.freeze([
   { id: 'map', name: '案内板', gotomon: 'チズリン', icon: '🗺️', image: '/assets/images/monsters/full/mini-game/MG-048.webp', place: '分かれ道', action: '村までの道を探す', need: '初めて来た子は、分かれ道で迷ってしまうね。', wish: '案内板があれば、村へ来る道が分かるよ。', reason: '初めての子も迷いにくい' },
 ]);
 
+// 匿名の架空票。最初の10通と、あとから参加する10通を固定して比較する。
+export const TURNOUT_BALLOTS = Object.freeze([
+  'market', 'bridge', 'map', 'market', 'map', 'market', 'bridge', 'market', 'map', 'market',
+  'bridge', 'map', 'bridge', 'market', 'bridge', 'bridge', 'map', 'bridge', 'market', 'bridge',
+]);
+
+export function countTurnoutBallots(revealed) {
+  const votes = { bridge: 0, market: 0, map: 0 };
+  for (const choice of TURNOUT_BALLOTS.slice(0, Math.max(0, Math.min(20, revealed)))) votes[choice] += 1;
+  return votes;
+}
+
 export function turnoutTally(participants) {
-  if (participants === 10) return { bridge: 2, market: 5, map: 3 };
-  if (participants === 20) return { bridge: 8, market: 7, map: 5 };
+  if (participants === 10 || participants === 20) return countTurnoutBallots(participants);
   return null;
 }
 
