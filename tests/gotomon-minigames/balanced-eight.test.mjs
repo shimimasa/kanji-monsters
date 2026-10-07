@@ -35,6 +35,15 @@ test('8種類48問のデータは重複のない選択肢と一意の正答を�
   }
 });
 
+test('おへやの6問は絵の上・中・下にそれぞれ一つずつ置ける', () => {
+  for (const [index, round] of NEW_GAME_CONTENT.englishRoom.rounds.entries()) {
+    for (const position of ['上', '中', '下']) {
+      assert.equal(round.choices.filter(choice => choice.endsWith(` ${position}`)).length, 1,
+        `englishRoom:${index}:${position}`);
+    }
+  }
+});
+
 test('8種類とも6回の明示的な回答だけを記録し、どの答えでも最後まで進める', () => {
   for (const id of NEW_GAME_IDS) {
     const events = [];

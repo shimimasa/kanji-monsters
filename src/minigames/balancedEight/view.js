@@ -39,12 +39,18 @@ const CSS = `
 #abcPostScreen .be-collection span{min-width:0;background:#fff3cf;border:2px solid #c88943}
 #englishRadioScreen .be-art{background:radial-gradient(circle,#f7e6ff,#d4d9ff)}#englishRadioScreen .be-art::after{content:'♪ 〜 ♪';position:absolute;right:7%;top:12%;font-size:28px;color:#805aa3}
 #replyCafeScreen .be-art{background:linear-gradient(#fff0d5,#efd1ac)}#replyCafeScreen .be-option{border-radius:22px;background:#fffaf1}
-#englishRoomScreen .be-art{background:linear-gradient(#e4f6ff 64%,#c9a579 65%)}#englishRoomScreen .be-option{background:#eef8ff}
-#englishRoomScreen .be-art-text{font-size:clamp(43px,7vw,66px)}#englishRoomScreen .be-room-object{position:absolute;z-index:2;left:23%;top:35%;font-size:clamp(33px,6vw,52px);transition:left .35s,top .35s}
-#englishRoomScreen .be-art[data-position=上] .be-room-object{left:52%;top:0}
-#englishRoomScreen .be-art[data-position=中] .be-room-object{left:49%;top:28%}
-#englishRoomScreen .be-art[data-position=下] .be-room-object{left:52%;top:60%}
+#englishRoomScreen .be-art{min-height:205px;background:linear-gradient(#e4f6ff 64%,#c9a579 65%)}
+#englishRoomScreen .be-art-text{position:absolute;left:33%;top:51%;font-size:clamp(43px,7vw,66px);transform:translate(-50%,-50%)}
+#englishRoomScreen .be-art[data-filled=true] .be-art-text{transform:translate(-50%,-50%) scale(1.05)}
+#englishRoomScreen .be-room-object{position:absolute;z-index:2;left:12%;top:43%;font-size:clamp(33px,6vw,52px);transition:left .35s,top .35s}
+#englishRoomScreen .be-art[data-position=上] .be-room-object{left:30%;top:2%}
+#englishRoomScreen .be-art[data-position=中] .be-room-object{left:30%;top:40%}
+#englishRoomScreen .be-art[data-position=下] .be-room-object{left:30%;top:73%}
 #englishRoomScreen .be-art-outcome{position:absolute;right:3%;bottom:5%;font-size:15px}
+.be-room-zone{position:absolute;right:3%;width:35%;height:28%;min-height:46px;border:3px dashed #31768e;border-radius:12px;background:#f6fdff;color:#1b4c63;font:inherit;font-size:clamp(16px,2.3vw,21px);font-weight:900;cursor:pointer;touch-action:manipulation}
+.be-room-zone[data-position=上]{top:4%}.be-room-zone[data-position=中]{top:36%}.be-room-zone[data-position=下]{top:68%}
+.be-room-zone:focus-visible{outline:4px solid #f4a000;outline-offset:2px}
+.be-room-hint{max-width:660px;margin:0;padding:4px 10px;border-radius:9px;background:#fffef0;font-size:clamp(14px,2vw,18px);font-weight:800}
 #wonderLabScreen .be-art{background:radial-gradient(circle at 50% 72%,#bdfff4,#ecf7ff)}#wonderLabScreen .be-art::after{content:'✦ ✧ ✦';position:absolute;top:10%;right:12%;color:#347ba1}
 #wonderLabScreen .be-art[data-filled=true] .be-art-text{animation:be-arrive .45s ease-out}
 #wonderLabScreen .be-art-outcome{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:max-content;max-width:95%;font-size:clamp(13px,2vw,18px)}
@@ -72,6 +78,7 @@ const CSS = `
 #mapTownScreen .be-collection button:disabled{cursor:default}
 #shapeMosaicScreen .be-collection{background:#dce9ff}#shapeMosaicScreen .be-collection span{color:#476fc0}
 @media(max-width:520px){.be-wrap{inset:48px 2% 3px;gap:5px}.be-art{min-height:80px}.be-options{gap:5px}.be-option{min-height:60px;padding:4px 2px;font-size:clamp(14px,3.8vw,18px)}.be-collection span{min-width:27px}.be-place-target{min-width:90px;min-height:62px}}
+@media(max-width:520px){#englishRoomScreen .be-art[data-position=上] .be-room-object{top:12%}}
 `;
 
 const needsSpeech = new Set(['englishRadio', 'replyCafe', 'englishRoom']);
@@ -90,7 +97,7 @@ const MAP_SYMBOLS = Object.freeze(['文', '〒', '＋', '📖', '文', '〒']);
 export function createBalancedView(gameId, { document: doc, dispatch, getSnapshot, onBack }) {
   const config = NEW_GAME_CONTENT[gameId];
   if (!config) throw new Error('Unknown balanced mini game view');
-  let active = true, shownKey = '', shownCollection = -1, textShown = false;
+  let active = true, shownKey = '', shownCollection = -1, textShown = false, roomHintShown = false;
   let selectedShapeChoiceId = null, postDragId = null, postDragStart = null;
   const labSeen = new Set();
   let labRound = -1, labAction = null;
@@ -127,7 +134,11 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
   const tools = el('div', 'be-tools');
   const listen = el('button', '', '🔊 きく'); listen.type = 'button'; listen.dataset.action = 'listen';
   const showText = el('button', '', '文字で見る'); showText.type = 'button'; showText.dataset.action = 'show-text';
-  tools.append(listen, showText);
+  const roomHint = el('button', '', 'ことばの ヒント'); roomHint.type = 'button'; roomHint.dataset.action = 'room-hint';
+  roomHint.hidden = true; roomHint.setAttribute('aria-expanded', 'false');
+  const roomHintText = el('p', 'be-room-hint', 'on は 上、in は 中、under は 下。');
+  roomHintText.hidden = true;
+  tools.append(listen, showText, roomHint);
   const options = el('div', 'be-options');
   if (gameId === 'abcPost') options.setAttribute('aria-label', '小文字の ポストを えらぶ');
   if (gameId === 'lifeCycle') options.setAttribute('aria-label', 'つぎの すがたを えらぶ');
@@ -157,6 +168,13 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
     });
     return button;
   });
+  const roomZones = gameId === 'englishRoom' ? ['上', '中', '下'].map(position => {
+    const zone = el('button', 'be-room-zone', `${position}に おく`);
+    zone.type = 'button'; zone.dataset.position = position; zone.hidden = true;
+    art.append(zone);
+    on(zone, 'click', () => { answerChoice(zone.dataset.choiceId); });
+    return zone;
+  }) : [];
   on(shapePlace, 'click', () => {
     const state = getSnapshot();
     if (!active || state.paused || state.phase !== 'answering' || !selectedShapeChoiceId ||
@@ -248,19 +266,26 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
       textShown = true; transcript.hidden = false; showText.hidden = true;
     }
   });
+  on(roomHint, 'click', () => {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'answering' || gameId !== 'englishRoom') return;
+    roomHintShown = !roomHintShown;
+    roomHintText.hidden = !roomHintShown;
+    roomHint.setAttribute('aria-expanded', String(roomHintShown));
+  });
   on(next, 'click', () => {
     const state = getSnapshot();
     if (active && state.phase === 'feedback' && (gameId !== 'wonderLab' || labSeen.size === 2) &&
         (gameId !== 'mapTown' || townPlacedRounds.has(state.round))) dispatch({ type: 'next', payload: {
       sessionId: state.sessionId, problemId: state.problem?.problemId } });
   });
-  wrap.append(top, art, question, transcript, tools, options, trials, observation, feedback, next, collection);
+  wrap.append(top, art, question, transcript, tools, roomHintText, options, trials, observation, feedback, next, collection);
   world.append(wrap);
   dock.append(el('p', 'ya-dock-note', config.intro));
   doc.body.append(root);
   return {
     root,
-    focusPlay() { (gameId === 'englishRadio' ? listen : buttons[0]).focus?.({ preventScroll: true }); },
+    focusPlay() { (gameId === 'englishRadio' ? listen : gameId === 'englishRoom' ? roomZones[0] : buttons[0]).focus?.({ preventScroll: true }); },
     update(state) {
       if (!active) return;
       frame.setPaused(state.paused && !state.result);
@@ -318,10 +343,19 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
             button.hidden = !choice;
             if (choice) { button.textContent = choice.text; button.dataset.choiceId = choice.choiceId; }
           });
-          if (state.phase === 'answering') textShown = false;
+          roomZones.forEach(zone => {
+            const choice = problem.choices.find(item => item.choiceId.endsWith(` ${zone.dataset.position}`));
+            zone.dataset.choiceId = choice?.choiceId ?? '';
+            zone.setAttribute('aria-label', choice?.text ?? `${zone.dataset.position}に おく`);
+          });
+          if (state.phase === 'answering') {
+            textShown = false; roomHintShown = false;
+            roomHint.setAttribute('aria-expanded', 'false');
+          }
           const audioUsable = Speech.isSupported() && Speech.isEnabled();
           listen.hidden = !needsSpeech.has(gameId) || !audioUsable || !problem.speech || state.phase !== 'answering';
           showText.hidden = gameId !== 'englishRadio' || !audioUsable || textShown || state.phase !== 'answering';
+          roomHint.hidden = gameId !== 'englishRoom' || state.phase !== 'answering';
           transcript.textContent = problem.speech || '';
           transcript.hidden = gameId !== 'englishRadio' || (audioUsable && !textShown && state.phase === 'answering');
           if (gameId === 'englishRadio' && state.phase === 'answering') question.textContent = audioUsable ? problem.prompt : `${problem.speech}　— ${problem.prompt}`;
@@ -335,16 +369,21 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
           question.textContent = state.phase === 'completed' ? 'いっしょに 完成したよ！' : config.intro;
           artText.textContent = state.phase === 'completed' ? '✦ ✦ ✦' : '✦';
           roomObject.textContent = ''; artResult.textContent = ''; art.dataset.filled = 'false';
-          feedback.textContent = ''; transcript.hidden = true; listen.hidden = true; showText.hidden = true;
+          feedback.textContent = ''; transcript.hidden = true; listen.hidden = true; showText.hidden = true; roomHint.hidden = true;
         }
       }
-      options.hidden = state.phase !== 'answering';
+      options.hidden = gameId === 'englishRoom' || state.phase !== 'answering';
+      roomZones.forEach(zone => {
+        zone.hidden = state.phase !== 'answering' || !zone.dataset.choiceId;
+        zone.disabled = state.phase !== 'answering';
+      });
       shapePlace.hidden = gameId !== 'shapeMosaic' || state.phase !== 'answering';
       trials.hidden = gameId !== 'wonderLab' || state.phase !== 'feedback';
       observation.hidden = trials.hidden;
       next.hidden = state.phase !== 'feedback' || (gameId === 'wonderLab' && labSeen.size < 2) ||
         (gameId === 'mapTown' && !townPlacedRounds.has(state.round));
-      tools.hidden = listen.hidden && showText.hidden;
+      roomHintText.hidden = gameId !== 'englishRoom' || state.phase !== 'answering' || !roomHintShown;
+      tools.hidden = listen.hidden && showText.hidden && roomHint.hidden;
       if (gameId !== 'mapTown' && state.artifacts.length !== shownCollection) {
         shownCollection = state.artifacts.length;
         collection.textContent = '';
@@ -366,7 +405,7 @@ export function createBalancedView(gameId, { document: doc, dispatch, getSnapsho
         progressValue: state.answered / state.rounds,
         progressLabel: `${state.answered}/${state.rounds}`, life: null, gaugeValue: play.gauge });
     },
-    stopInput() { active = false; postDragId = null; artText.style.transform = ''; [...buttons, ...trialButtons, ...townButtons, shapePlace, listen, showText, next].forEach(node => { node.disabled = true; }); Speech.cancel(); },
+    stopInput() { active = false; postDragId = null; artText.style.transform = ''; [...buttons, ...roomZones, ...trialButtons, ...townButtons, shapePlace, listen, showText, roomHint, next].forEach(node => { node.disabled = true; }); Speech.cancel(); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }

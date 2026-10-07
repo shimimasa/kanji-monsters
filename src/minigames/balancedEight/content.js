@@ -42,7 +42,7 @@ export const NEW_GAME_CONTENT = Object.freeze({
   }),
   englishRoom: Object.freeze({
     title: 'えいごの おへやづくり', subject: 'english', skillId: 'english.position',
-    intro: '英語の案内を聞いて、置く場所をえらぼう。',
+    intro: '英語の案内を聞いて、絵の中の置き場所をタップしよう。',
     rounds: Object.freeze([
       card('Put the cat on the box.', ['はこの 上', 'はこの 中', 'はこの 下'], 'はこの 上', 'on は「上に」。ねこが はこの上に すわったよ。', '🐈 📦', 'Put the cat on the box.'),
       card('Put the ball in the box.', ['はこの 下', 'はこの 中', 'はこの 上'], 'はこの 中', 'in は「中に」。ボールが はこの中に 入ったよ。', '⚽ 📦', 'Put the ball in the box.'),
