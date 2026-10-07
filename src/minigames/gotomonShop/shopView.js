@@ -25,10 +25,15 @@ const CSS = `
 #gotomonShopScreen .gs-request{margin:0;padding:10px 12px;border-radius:14px;background:#ffffff14;color:#fff;text-align:center;font-size:clamp(17px,2.2vw,22px);font-weight:800;line-height:1.5}
 #gotomonShopScreen .gs-target{display:inline-block;margin:0 2px;padding:0 6px;border-radius:8px;background:#ffe066;color:#3a2400;font-size:1.15em;line-height:1.25}
 #gotomonShopScreen .gs-shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px;border-radius:14px;background:#7a4a22}
-#gotomonShopScreen .gs-kanji{min-height:62px;border:0;border-radius:12px;background:#fffdf6;color:#1b2a36;font:inherit;font-size:clamp(28px,4vw,40px);font-weight:900;line-height:1;box-shadow:0 4px 0 #c9b98f;cursor:pointer;touch-action:manipulation}
+#gotomonShopScreen .gs-kanji{min-height:62px;border:0;border-radius:12px;background:#fffdf6;color:#1b2a36;font:inherit;font-size:clamp(28px,4vw,40px);font-weight:900;line-height:1;box-shadow:0 4px 0 #c9b98f;cursor:pointer;touch-action:none}
+#gotomonShopScreen .gs-kanji[data-selected=true]{background:#fff0bc;box-shadow:0 4px 0 #b38132,0 0 0 3px #ffcc48}
+#gotomonShopScreen .gs-kanji[data-dragging=true]{position:relative;z-index:12;touch-action:none;box-shadow:0 10px 18px #0006,0 0 0 3px #ffcc48}
 #gotomonShopScreen .gs-kanji:focus-visible{outline:3px solid #ffd54a;outline-offset:2px}
 #gotomonShopScreen .gs-kanji[data-hint=true]{background:#d7f7df;box-shadow:0 4px 0 #1f9d55,0 0 0 4px #37c871;animation:gs-glow .8s ease-in-out infinite alternate}
 #gotomonShopScreen .gs-kanji.gs-given{animation:gs-give .35s ease-out}
+#gotomonShopScreen .gs-give{align-self:stretch;min-height:42px;padding:6px 12px;border:2px solid #ffcc48;border-radius:11px;background:#fff0bc;color:#432b10;font:inherit;font-size:clamp(14px,1.8vw,17px);font-weight:900;cursor:pointer;touch-action:manipulation}
+#gotomonShopScreen .gs-give:disabled{opacity:.65;cursor:default}
+#gotomonShopScreen .gs-give:focus-visible{outline:3px solid #fff;outline-offset:2px}
 #gotomonShopScreen .gs-review{margin:0;padding:0;list-style:none;display:grid;gap:6px}
 #gotomonShopScreen .gs-review li{padding:6px 10px;border-radius:10px;background:#eef6ef;font-weight:700}
 #gotomonShopScreen .gs-review li[data-correct=false]{background:#fff3da}
@@ -41,7 +46,7 @@ const CSS = `
 const moodFace = mood => mood >= .6 ? '😊' : mood >= .3 ? '🙂' : '😐';
 
 export function createShopView({ document: doc, dispatch, onBack, getSnapshot }) {
-  let active = true, lastSeq = -1, lastEventId = 0, requestKey = null, doneShown = false, shownAttempt = null;
+  let active = true, lastSeq = -1, lastEventId = 0, requestKey = null, doneShown = false, shownAttempt = null, selectedCellId = null;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'gotomonShopScreen', title: 'ゴトモンのおねがい', theme: 'shop' });
@@ -64,29 +69,81 @@ export function createShopView({ document: doc, dispatch, onBack, getSnapshot })
   const shelfBox = el('div', 'gs-shelf'); shelfBox.setAttribute('aria-label', 'たなの漢字');
   const shelf = Array.from({ length: SHELF_SIZE }, (_, index) => {
     const node = el('button', 'gs-kanji'); node.type = 'button'; node.dataset.index = String(index);
-    on(node, 'click', () => give(index)); shelfBox.append(node); return node;
+    on(node, 'click', () => {
+      if (node.dataset.dragged === 'true') { node.dataset.dragged = 'false'; return; }
+      selectCard(index);
+    });
+    let pointerId = null, start = null;
+    on(node, 'pointerdown', event => {
+      const state = getSnapshot();
+      if (!active || state.paused || state.phase !== 'answering' || !event.isPrimary || event.button !== 0) return;
+      pointerId = event.pointerId; start = { x: event.clientX, y: event.clientY };
+      node.dataset.dragged = 'false'; node.setPointerCapture(pointerId);
+    });
+    on(node, 'pointermove', event => {
+      if (event.pointerId !== pointerId || !start) return;
+      const dx = event.clientX - start.x, dy = event.clientY - start.y;
+      if (node.dataset.dragging !== 'true' && Math.hypot(dx, dy) < 8) return;
+      node.dataset.dragging = 'true'; node.dataset.dragged = 'true';
+      node.style.transform = `translate(${dx}px,${dy}px)`;
+    });
+    const finishDrag = event => {
+      if (event.pointerId !== pointerId) return;
+      const wasDragging = node.dataset.dragging === 'true';
+      pointerId = null; start = null; node.dataset.dragging = 'false'; node.style.transform = '';
+      if (node.hasPointerCapture(event.pointerId)) node.releasePointerCapture(event.pointerId);
+      if (event.type !== 'pointerup' || !wasDragging) return;
+      const customer = doc.elementFromPoint(event.clientX, event.clientY)?.closest('.gs-customer');
+      if (customer && slots.some(item => item.node === customer)) {
+        const state = getSnapshot();
+        selectedCellId = state.shelf?.[index]?.cellId ?? null;
+        deliverTo(Number(customer.dataset.slot));
+      }
+    };
+    on(node, 'pointerup', finishDrag); on(node, 'pointercancel', finishDrag);
+    shelfBox.append(node); return node;
   });
+  const giveButton = el('button', 'gs-give', '漢字を えらぼう'); giveButton.type = 'button';
+  giveButton.dataset.action = 'shop-give'; giveButton.disabled = true;
+  on(giveButton, 'click', () => deliverTo(getSnapshot().focus));
   // The shell advances after feedback; this stays hidden and only serves hosts without auto-advance.
   const go = el('button', 'gs-go', 'つぎへ'); go.type = 'button'; go.dataset.action = 'next'; go.hidden = true;
   on(go, 'click', () => proceed());
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
   const keeper = el('div', 'gs-keeper');
-  dock.append(keeper, title, request, shelfBox, note, go);
+  dock.append(keeper, title, request, shelfBox, giveButton, note, go);
   const review = el('div', 'ya-learning-result'); review.hidden = true;
   const reviewList = el('ol', 'gs-review'); review.append(el('h3', '', '今回わたした漢字'), reviewList); frame.shell.append(review);
   doc.body.append(root);
   const answers = [];
 
   const session = () => getSnapshot();
+  function deliverTo(slot) {
+    let state = session();
+    if (!active || state.paused || state.phase !== 'answering' || !selectedCellId ||
+        !state.shelf?.some(cell => cell.cellId === selectedCellId) || !state.customers?.some(customer => customer.slot === slot)) return false;
+    if (state.focus !== slot) {
+      if (!dispatch({ type: 'focus', payload: { sessionId: state.sessionId, slot } })) return false;
+      state = session();
+    }
+    if (state.phase !== 'answering' || state.focus !== slot) return false;
+    const handed = dispatch({ type: 'give', payload: { sessionId: state.sessionId, attemptId: state.attemptId, cellId: selectedCellId } });
+    if (handed) selectedCellId = null;
+    return handed;
+  }
   function choose(slot) {
     const state = session();
-    if (!active || state.paused || state.phase !== 'answering' || state.focus === slot) return false;
+    if (!active || state.paused || state.phase !== 'answering') return false;
+    if (selectedCellId) return deliverTo(slot);
+    if (state.focus === slot) return false;
     return dispatch({ type: 'focus', payload: { sessionId: state.sessionId, slot } });
   }
-  function give(index) {
+  function selectCard(index) {
     const state = session(), cell = state.shelf?.[index];
     if (!active || state.paused || state.phase !== 'answering' || !cell) return false;
-    return dispatch({ type: 'give', payload: { sessionId: state.sessionId, attemptId: state.attemptId, cellId: cell.cellId } });
+    selectedCellId = selectedCellId === cell.cellId ? null : cell.cellId;
+    renderDock(state);
+    return true;
   }
   function proceed() {
     const state = session();
@@ -108,7 +165,8 @@ export function createShopView({ document: doc, dispatch, onBack, getSnapshot })
         else item.bubble.append(el('span', '', `${customer.clue.meaning}、ください！`));
         item.img.src = customer.imageUrl || ''; item.img.hidden = !customer.imageUrl;
         item.name.textContent = customer.name;
-        item.node.setAttribute('aria-label', `${customer.name}のおねがい`);
+        const clueText = customer.kind === 'reading' ? customer.clue.reading : customer.clue.meaning;
+        item.node.setAttribute('aria-label', `${customer.name}のおねがい、${clueText}の漢字`);
       }
       const face = moodFace(customer.mood);
       if (item.face !== face) { item.face = face; item.mood.textContent = face; }
@@ -129,16 +187,23 @@ export function createShopView({ document: doc, dispatch, onBack, getSnapshot })
       if (problem.kind === 'reading') request.append(el('span', '', problem.clue.before), el('span', 'gs-target', problem.clue.reading), el('span', '', problem.clue.after));
       else request.append(el('span', 'gs-target', problem.clue.meaning));
     }
+    if (selectedCellId && !state.shelf.some(cell => cell.cellId === selectedCellId)) selectedCellId = null;
     shelf.forEach((node, index) => {
       const cell = state.shelf[index];
       node.hidden = !cell; if (!cell) return;
       if (node.dataset.cellId !== cell.cellId) { node.dataset.cellId = cell.cellId; node.textContent = cell.kanji; node.setAttribute('aria-label', cell.kanji); }
+      const selected = String(state.phase === 'answering' && selectedCellId === cell.cellId);
+      if (node.dataset.selected !== selected) { node.dataset.selected = selected; node.setAttribute('aria-pressed', selected); }
       const hint = String(state.phase === 'answering' && state.hintCellId === cell.cellId);
       if (node.dataset.hint !== hint) node.dataset.hint = hint;
       node.disabled = state.phase !== 'answering' || state.paused;
     });
+    const chosen = state.phase === 'answering' ? state.shelf.find(cell => cell.cellId === selectedCellId) : null;
+    const customer = state.customers.find(entry => entry.slot === state.focus);
+    giveButton.disabled = state.paused || !chosen;
+    giveButton.textContent = chosen ? `「${chosen.kanji}」を ${customer?.name ?? 'おきゃくさん'}に わたす` : '漢字を えらぼう';
     if (state.phase === 'answering') {
-      const ask = state.hintCellId ? '光っている漢字をわたしてあげよう' : problem?.kind === 'reading' ? '黄色の読みの漢字を、たなからわたそう' : 'この意味の漢字を、たなからわたそう';
+      const ask = chosen ? `「${chosen.kanji}」を えらんだよ。おきゃくさんへ とどけよう` : state.hintCellId ? '光っている漢字をわたしてあげよう' : problem?.kind === 'reading' ? '黄色の読みの漢字を、たなからえらぼう' : 'この意味の漢字を、たなからえらぼう';
       if (note.textContent !== ask) note.textContent = ask;
     }
   };
@@ -155,7 +220,7 @@ export function createShopView({ document: doc, dispatch, onBack, getSnapshot })
       if (answer.tip >= 3) fx.pop(50, 30, 'ごきげん！', 'great');
     } else {
       if (slot) restartClass(slot.node, 'gs-no');
-      note.textContent = `${answer.name}「ちがうよ〜。ほしいのは「${answer.kanji}」だよ」`;
+      note.textContent = `${answer.name}「おねがいの漢字は「${answer.kanji}」だよ。もう一度 えらんでみよう」`;
     }
     frame.announce(note.textContent);
   };
@@ -197,7 +262,7 @@ export function createShopView({ document: doc, dispatch, onBack, getSnapshot })
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; [...slots.map(item => item.node), ...shelf, go].forEach(node => { node.disabled = true; }); },
+    stopInput() { active = false; [...slots.map(item => item.node), ...shelf, giveButton, go].forEach(node => { node.disabled = true; }); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
