@@ -4,14 +4,16 @@ import { readFileSync } from 'node:fs';
 import { lessonCatalog } from '../../src/lessons/lessonCatalog.js';
 import { stories, canAdvance, outcomeFor } from '../../public/lessons/gotomon/lesson-game.js';
 
-test('2作品の広場リンクはゴトモン版と対応する記録シートを開く', () => {
+test('休止中の2作品は直接URLから遊べず、記録シートと元データは残る', () => {
   for (const lesson of lessonCatalog) {
     assert.equal(lesson.url, `/lessons/gotomon/${lesson.slug}.html`);
     assert.equal(lesson.sheetUrl, `/lessons/gotomon/${lesson.slug}-sheet.html`);
     const html = readFileSync(new URL(`../../public${lesson.url}`, import.meta.url), 'utf8');
     const sheet = readFileSync(new URL(`../../public${lesson.sheetUrl}`, import.meta.url), 'utf8');
     assert.match(html, new RegExp(`data-lesson="${lesson.slug}"`));
-    assert.match(html, /lesson-bridge\.js/);
+    assert.match(html, /この旅は お休み中/);
+    assert.match(html, /href="\/"/);
+    assert.doesNotMatch(html, /<script/);
     assert.match(sheet, /いんさつする/);
     assert.equal(stories[lesson.slug].stages.length, 5);
   }

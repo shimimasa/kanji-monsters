@@ -348,6 +348,7 @@ const monsterDexState = {
     this.allMonsterIds = getAllMonsterIds({ includeMiniGames: true, includeLessons: true }).filter(id => {
       const idStr = String(id);
       if (idStr.startsWith('PRV-')) return false;
+      if (idStr.startsWith('EL-') && !this.dexSet.has(id)) return false;
       const m = getMonsterById(id);
       return !!m;
     });
@@ -358,7 +359,9 @@ const monsterDexState = {
   
     // 設定復元
     this.loadPreferences();
-    if (props.currentMode === 'lesson') {
+    const hasLessonFriend = this.allMonsterIds.some(id => String(id).startsWith('EL-'));
+    if (this.currentMode === 'lesson' && !hasLessonFriend) { this.currentMode = 'japan'; this.currentRegionFilter = 'all'; }
+    if (props.currentMode === 'lesson' && hasLessonFriend) {
       this.currentMode = 'lesson';
       this.currentRegionFilter = 'all';
       this.currentTypeFilter = 'all';
@@ -849,7 +852,7 @@ rightControls.appendChild(nextBtn);
     // 戻るボタン
     const backButton = document.createElement('button');
     backButton.className = 'btn-back';
-    backButton.textContent = this.returnScreen === 'miniGameHub' ? '🐾 理科・社会の旅へ' : '🐾 ステージ選択へ';
+    backButton.textContent = this.returnScreen === 'miniGameHub' ? '🐾 ミニゲーム広場へ' : '🐾 ステージ選択へ';
     Object.assign(backButton.style, {
       background: 'linear-gradient(135deg, #6c757d, #5a6268)',
       color: 'white',
@@ -909,8 +912,9 @@ rightControls.appendChild(nextBtn);
       <option value="japan">日本ゴトモン</option>
       <option value="world">世界ゴトモン</option>
       <option value="square">ミニゲーム広場</option>
-      <option value="lesson">理科・社会の旅</option>
+      <option value="lesson">これまでの授業のなかま</option>
     `;
+    if (!this.allMonsterIds.some(id => String(id).startsWith('EL-'))) modeSelect.querySelector('option[value="lesson"]')?.remove();
     modeSelect.value = this.currentMode;
     modeSelect.addEventListener('change', (e) => {
       this.currentMode = e.target.value;
@@ -947,7 +951,7 @@ rightControls.appendChild(nextBtn);
     });
 
     let optionsHTML = '<option value="all">すべて</option>';
-    const regionNames = this.currentMode === 'japan' ? japanRegionMap : this.currentMode === 'square' ? { 0: 'ミニゲーム広場' } : this.currentMode === 'lesson' ? { 13: '理科・社会の旅' } : worldRegionMap;
+    const regionNames = this.currentMode === 'japan' ? japanRegionMap : this.currentMode === 'square' ? { 0: 'ミニゲーム広場' } : this.currentMode === 'lesson' ? { 13: 'これまでの授業のなかま' } : worldRegionMap;
     const grades = this._getAllowedGrades();
     for (const grade of grades) {
       const regionName = regionNames[grade];

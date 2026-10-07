@@ -5,13 +5,13 @@ import { lessonCatalog } from '../../src/lessons/lessonCatalog.js';
 import { ENERGY_CAPACITY, ELECTION_ERAS, compareLamps, simulateLightPlan,
   TURNOUT_BALLOTS, countTurnoutBallots, turnoutTally, ballotTally } from '../../public/lessons/gotomon/lesson-model-v2.js';
 
-test('授業2本は新しいゲームと記録シートを開き、既存の親画面への橋を残す', () => {
+test('授業2本の直接URLは休止案内を出し、ゲームを起動しない', () => {
   for (const lesson of lessonCatalog) {
     const html = readFileSync(new URL(`../../public${lesson.url}`, import.meta.url), 'utf8');
     const sheet = readFileSync(new URL(`../../public${lesson.sheetUrl}`, import.meta.url), 'utf8');
     assert.match(html, new RegExp(`data-lesson="${lesson.slug}"`));
-    assert.match(html, /lesson-bridge\.js/);
-    assert.match(html, /lesson-game-v2\.js/);
+    assert.match(html, /この旅は お休み中/);
+    assert.doesNotMatch(html, /<script/);
     assert.match(sheet, /いんさつする/);
   }
 });

@@ -23,6 +23,7 @@ body[data-lesson="hitotsubu"] .lgv-play { background: linear-gradient(145deg, #f
 .lgv-control-label { flex-basis: 100%; margin: 2px 0 0; font-weight: 800; }
 .lgv-segments { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
 .lgv-button { border: 2px solid #367b58; border-radius: 13px; background: #fff; color: #234832; font-weight: 800; padding: 10px 15px; line-height: 1.35; min-height: 47px; }
+.lgv-return { display: inline-flex; align-items: center; text-decoration: none; }
 .lgv-button:hover:not(:disabled) { background: #e6f6e9; }
 .lgv-button:disabled { opacity: .55; cursor: default; }
 .lgv-option { flex: 1 1 140px; }
