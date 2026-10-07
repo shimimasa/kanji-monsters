@@ -8,6 +8,7 @@ const CSS = `
 #tripSugorokuScreen .tr-road{position:absolute;left:4%;right:4%;top:50%;height:10px;transform:translateY(-50%);border-radius:99px;background:repeating-linear-gradient(90deg,#e8d6a8 0 18px,#d9c28a 18px 36px);box-shadow:0 2px 0 #0002}
 #tripSugorokuScreen .tr-node{position:absolute;z-index:2;width:clamp(46px,6.4vw,64px);height:clamp(46px,6.4vw,64px);transform:translate(-50%,-50%);padding:0;border:3px solid #fffdf6;border-radius:50%;background:#f1e3bf;font-size:clamp(20px,3vw,28px);box-shadow:0 4px 0 #0003;cursor:pointer;touch-action:manipulation}
 #tripSugorokuScreen .tr-node[data-state=open]{background:#ffe066;border-color:#b86a00;animation:tr-bob .8s ease-in-out infinite alternate}
+#tripSugorokuScreen .tr-node[data-selected=true]{outline:4px solid #2474b5;outline-offset:4px}
 #tripSugorokuScreen .tr-node[data-state=visited]{background:#bff0c8;border-color:#2f8a4f}
 #tripSugorokuScreen .tr-node[data-state=skipped]{opacity:.35}
 #tripSugorokuScreen .tr-node:focus-visible{outline:3px solid #2a6fb0;outline-offset:2px}
@@ -26,12 +27,16 @@ const CSS = `
 #tripSugorokuScreen .tr-hp i[data-full=false]{color:#0003;text-shadow:none}
 #tripSugorokuScreen .tr-scroll{padding:16px 22px;border-radius:12px;background:linear-gradient(#fff6dc,#f1dfae);border:4px solid #b88340;color:#7a4a12;font-weight:900;font-size:40px;box-shadow:0 8px 0 #0003}
 #tripSugorokuScreen .tr-gift{font-size:72px;animation:tr-pop .45s ease-out}
+#tripSugorokuScreen .tr-preview{display:grid;gap:8px;max-width:88%;padding:14px 18px;border:4px solid #fff3b0;border-radius:16px;background:#fff8de;color:#573800;text-align:center;box-shadow:0 6px 0 #98723a;font-weight:800}
+#tripSugorokuScreen .tr-preview strong{font-size:clamp(21px,3vw,30px)}
+#tripSugorokuScreen .tr-preview span{font-size:clamp(14px,1.8vw,18px);line-height:1.4}
 #tripSugorokuScreen .tr-title{margin:0;text-align:center;font-size:16px;font-weight:900;color:#ffe2b8}
 #tripSugorokuScreen .tr-stops{display:grid;gap:8px}
 #tripSugorokuScreen .tr-stop{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;min-height:64px;padding:8px 12px;border:0;border-radius:14px;background:#f5f8fa;color:#16242c;font:inherit;text-align:left;box-shadow:0 4px 0 #9fb3bf;cursor:pointer;touch-action:manipulation}
 #tripSugorokuScreen .tr-stop b{grid-row:span 2;font-size:30px}
 #tripSugorokuScreen .tr-stop strong{font-size:20px}
 #tripSugorokuScreen .tr-stop small{font-size:13px;color:#4a5e6a}
+#tripSugorokuScreen .tr-stop[data-selected=true]{background:#fff2ba;box-shadow:0 4px 0 #bd850e,0 0 0 3px #ffd54a}
 #tripSugorokuScreen .tr-stop:focus-visible,#tripSugorokuScreen .tr-choice:focus-visible{outline:3px solid #ffd54a;outline-offset:2px}
 #tripSugorokuScreen .tr-question{margin:0;padding:10px 12px;border-radius:12px;background:#ffffff14;text-align:center;font-size:clamp(18px,2.3vw,23px);font-weight:800;line-height:1.5;color:#fff}
 #tripSugorokuScreen .tr-target{display:inline-block;margin:0 2px;padding:0 6px;border-radius:8px;background:#ffe066;color:#3a2400;font-size:1.3em;line-height:1.2}
@@ -62,6 +67,7 @@ const COLUMN_X = [18, 36, 54, 72], ROW_Y = [22, 78], START_X = 3, BOSS_X = 92;
 
 export function createTripView({ document: doc, dispatch, onBack, getSnapshot }) {
   let active = true, shownKey = null, lastSeq = -1, lastEventId = 0, bossHp = null, sceneKey = null, bannered = false, stopsKey = null, foeBox = null, hpBox = null;
+  let selectedStopId = null, selectionKey = null;
   const removes = [];
   const on = (target, type, fn) => { target.addEventListener(type, fn); removes.push(() => target.removeEventListener(type, fn)); };
   const frame = createArcadeFrame(doc, { id: 'tripSugorokuScreen', title: '旅すごろく', theme: 'road' });
@@ -74,7 +80,7 @@ export function createTripView({ document: doc, dispatch, onBack, getSnapshot })
   for (let column = 0; column < TRIP_COLUMNS; column++) for (let row = 0; row < 2; row++) {
     const node = el('button', 'tr-node'); node.type = 'button'; node.dataset.column = String(column); node.dataset.row = String(row);
     node.style.left = `${COLUMN_X[column]}%`; node.style.top = `${ROW_Y[row]}%`;
-    on(node, 'click', () => move(node.dataset.nodeId)); route.append(node); nodes.push(node);
+    on(node, 'click', () => chooseStop(node.dataset.nodeId)); route.append(node); nodes.push(node);
   }
   const bossMark = el('span', 'tr-boss', '👑'); route.append(bossMark);
   const token = el('div', 'tr-token'); route.append(token);
@@ -85,7 +91,7 @@ export function createTripView({ document: doc, dispatch, onBack, getSnapshot })
   const stops = el('div', 'tr-stops');
   const stopButtons = [0, 1].map(index => {
     const node = el('button', 'tr-stop'); node.type = 'button'; node.dataset.choiceIndex = String(index + 1);
-    on(node, 'click', () => move(node.dataset.nodeId)); stops.append(node); return node;
+    on(node, 'click', () => chooseStop(node.dataset.nodeId)); stops.append(node); return node;
   });
   const question = el('p', 'tr-question'); question.dataset.role = 'problem';
   const choicesBox = el('div', 'tr-choices');
@@ -101,6 +107,11 @@ export function createTripView({ document: doc, dispatch, onBack, getSnapshot })
   const rewardText = el('p', 'tr-reward');
   const go = el('button', 'tr-go', 'すすむ'); go.type = 'button'; go.dataset.action = 'next';
   on(go, 'click', () => proceed());
+  on(go, 'keydown', event => {
+    if (event.key !== 'Enter' || event.repeat || session().phase !== 'map') return;
+    event.preventDefault();
+    proceed();
+  });
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
   dock.append(title, stops, question, choicesBox, itemsBox, rewardText, go, note);
   const review = el('div', 'ya-learning-result'); review.hidden = true;
@@ -109,6 +120,16 @@ export function createTripView({ document: doc, dispatch, onBack, getSnapshot })
   const answers = [];
 
   const session = () => getSnapshot();
+  function chooseStop(nodeId) {
+    const state = session(), stop = state.map?.[state.column]?.find(item => item.nodeId === nodeId);
+    if (!active || state.paused || state.phase !== 'map' || !stop) return false;
+    selectedStopId = nodeId;
+    renderRoute(state);
+    renderScene(state);
+    renderDock(state);
+    go.focus?.({ preventScroll: true });
+    return true;
+  }
   function move(nodeId) {
     const state = session();
     if (!active || state.paused || state.phase !== 'map' || !nodeId) return false;
@@ -126,13 +147,15 @@ export function createTripView({ document: doc, dispatch, onBack, getSnapshot })
   }
   function proceed() {
     const state = session();
-    if (!active || state.paused || !['reward', 'feedback'].includes(state.phase)) return false;
+    if (!active || state.paused) return false;
+    if (state.phase === 'map') return selectedStopId ? move(selectedStopId) : false;
+    if (!['reward', 'feedback'].includes(state.phase)) return false;
     return dispatch({ type: 'next', payload: { sessionId: state.sessionId, problemId: state.problem?.problemId } });
   }
   removes.push(bindArcadeKeys(doc, event => {
     if (!active || event.repeat) return false;
     const state = session(), index = ['1', '2', '3', '4'].indexOf(event.key);
-    if (index >= 0 && state.phase === 'map') { move(stopButtons[index]?.dataset.nodeId); return true; }
+    if (index >= 0 && state.phase === 'map') { chooseStop(stopButtons[index]?.dataset.nodeId); return true; }
     if (index >= 0) { answer(index); return true; }
     if (event.key === 'Enter' && !go.hidden) { proceed(); return true; }
     return false;
@@ -153,16 +176,24 @@ export function createTripView({ document: doc, dispatch, onBack, getSnapshot })
     if (state.problem?.kind === 'proverb') { scene.append(el('div', 'tr-scroll', '📜')); return; }
     if (state.opponent) { scene.append(foe(state.opponent.name, state.opponent.imageUrl, false)); return; }
     if (state.node?.type === 'training') { scene.append(el('div', 'tr-scroll', '🔥 修行')); return; }
-    if (state.phase === 'map') scene.append(el('span', 'tr-gift', '🗺'));
+    if (state.phase === 'map') {
+      const selected = state.map[state.column]?.find(stop => stop.nodeId === selectedStopId);
+      if (!selected) { scene.append(el('span', 'tr-gift', '🗺')); return; }
+      const type = NODE_TYPES[selected.type], preview = el('div', 'tr-preview');
+      preview.append(el('strong', '', `${type.icon} ${type.label}`), el('span', '', type.note));
+      scene.append(preview);
+    }
   };
   const renderRoute = state => {
     nodes.forEach(node => {
       const column = Number(node.dataset.column), row = Number(node.dataset.row), stop = state.map[column]?.[row];
       const icon = stop ? NODE_TYPES[stop.type].icon : '';
       node.dataset.nodeId = stop?.nodeId ?? ''; if (node.textContent !== icon) node.textContent = icon;
-      node.setAttribute('aria-label', stop ? `${column + 1}列目 ${NODE_TYPES[stop.type].label}` : '');
+      node.setAttribute('aria-label', stop ? `${column + 1}列目 ${NODE_TYPES[stop.type].label}${stop.nodeId === selectedStopId ? '、えらんだ道' : ''}` : '');
       node.dataset.state = state.path.includes(stop?.nodeId) ? 'visited' : column < state.column ? 'skipped'
         : column === state.column && state.phase === 'map' ? 'open' : 'ahead';
+      node.dataset.selected = String(state.phase === 'map' && stop?.nodeId === selectedStopId);
+      node.setAttribute('aria-pressed', String(state.phase === 'map' && stop?.nodeId === selectedStopId));
       node.disabled = !(column === state.column && state.phase === 'map');
     });
     const last = state.path.at(-1), lastNode = nodes.find(node => node.dataset.nodeId === last);
@@ -173,7 +204,8 @@ export function createTripView({ document: doc, dispatch, onBack, getSnapshot })
   const renderDock = state => {
     const map = state.phase === 'map', asking = ['answering', 'feedback'].includes(state.phase), reward = state.phase === 'reward';
     stops.hidden = !map; question.hidden = !asking; choicesBox.hidden = !asking; itemsBox.hidden = !asking;
-    rewardText.hidden = !reward; go.hidden = !reward;
+    rewardText.hidden = !reward; go.hidden = !reward && !(map && selectedStopId);
+    go.textContent = map ? 'この道へすすむ' : 'すすむ';
     if (map) {
       title.textContent = `${state.column + 1}つ目の分かれ道。どっちへ進む？`;
       // Build the stop buttons once per fork; rebuilding every frame would swallow a finger tap.
@@ -182,6 +214,11 @@ export function createTripView({ document: doc, dispatch, onBack, getSnapshot })
         const node = stopButtons[index], type = NODE_TYPES[stop.type];
         node.dataset.nodeId = stop.nodeId; node.textContent = '';
         node.append(el('b', '', type.icon), el('strong', '', type.label), el('small', '', type.note));
+      });
+      stopButtons.forEach(node => {
+        const chosen = node.dataset.nodeId === selectedStopId;
+        node.dataset.selected = String(chosen);
+        node.setAttribute('aria-pressed', String(chosen));
       });
       note.textContent = `道具：🔥${state.items.hint}　⭐${state.items.power}`;
     }
@@ -241,8 +278,12 @@ export function createTripView({ document: doc, dispatch, onBack, getSnapshot })
       if (!active) return;
       frame.setPaused(state.paused && !state.result);
       if (!state.map) return;
+      if (state.phase === 'map' && selectionKey !== `${state.sessionId}:${state.column}`) {
+        selectionKey = `${state.sessionId}:${state.column}`;
+        selectedStopId = null;
+      }
       renderRoute(state);
-      const key = `${state.phase}:${state.problem?.problemId ?? ''}:${state.column}:${state.path.length}`;
+      const key = `${state.phase}:${state.problem?.problemId ?? ''}:${state.column}:${state.path.length}:${state.phase === 'map' ? selectedStopId ?? '' : ''}`;
       if (key !== sceneKey) { sceneKey = key; renderScene(state); }
       const hp = hpBox;
       if (hp && state.boss && bossHp !== `${state.boss.hp}:${key}`) { bossHp = `${state.boss.hp}:${key}`; hp.textContent = ''; hp.setAttribute('aria-label', `のこり${state.boss.hp}`);
