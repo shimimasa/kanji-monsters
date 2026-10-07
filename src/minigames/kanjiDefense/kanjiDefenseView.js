@@ -27,6 +27,13 @@ const CSS = `
 #kanjiDefenseScreen .kd-hint{position:absolute;top:-58px;left:50%;transform:translateX(-50%);padding:4px 10px;border-radius:10px;background:#1b3550;color:#fff;font-size:15px;font-weight:800;white-space:nowrap}
 #kanjiDefenseScreen .kd-target{display:flex;align-items:center;justify-content:center;gap:10px;margin:0;min-height:44px;font-size:16px;color:#d8e8f0}
 #kanjiDefenseScreen .kd-target strong{font-size:clamp(26px,4vw,34px);color:#fff;letter-spacing:.06em}
+#kanjiDefenseScreen .kd-lanes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#kanjiDefenseScreen .kd-lane{display:grid;place-items:center;gap:2px;min-width:0;min-height:52px;padding:4px;border:2px solid #ffffff55;border-radius:12px;background:#ffffff1c;color:#fff;font:inherit;cursor:pointer;touch-action:manipulation}
+#kanjiDefenseScreen .kd-lane strong{font-size:clamp(17px,2.5vw,22px);line-height:1.2}
+#kanjiDefenseScreen .kd-lane small{font-size:12px;line-height:1.2}
+#kanjiDefenseScreen .kd-lane[data-target=true]{background:#fff1bb;border-color:#ffb627;color:#523300}
+#kanjiDefenseScreen .kd-lane[data-near=true]:not([data-target=true]){border-color:#ffd166}
+#kanjiDefenseScreen .kd-lane:disabled{opacity:.45;cursor:default}
 #kanjiDefenseScreen .kd-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
 #kanjiDefenseScreen .kd-form input{min-width:0;height:60px;border:0;border-radius:14px;padding:0 14px;background:#fff;color:#16242c;font:inherit;font-size:clamp(24px,3.6vw,30px);font-weight:800;box-shadow:inset 0 -4px 0 #0002;-webkit-user-select:text;user-select:text}
 #kanjiDefenseScreen .kd-form input.ya-miss{animation:ya-nudge .35s ease-out}
@@ -43,6 +50,7 @@ const CSS = `
 `;
 
 const LANE_X = [20, 50, 80];
+const LANE_NAMES = ['左', '中', '右'];
 const HERO = { x: 50, y: 90 };
 // Monsters enter on the road, below the HUD, so the kanji sign is readable from the start.
 const START_Y = 26;
@@ -63,6 +71,13 @@ export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSna
   world.append(el('div', 'kd-gate'), guard, hero);
 
   const target = el('p', 'kd-target');
+  const lanes = el('div', 'kd-lanes'); lanes.setAttribute('aria-label', 'ねらう道');
+  const laneButtons = LANE_NAMES.map((name, lane) => {
+    const node = el('button', 'kd-lane'); node.type = 'button'; node.dataset.aimLane = String(lane);
+    const label = el('strong', '', `${name} まち`), status = el('small', '', 'ここに出るよ');
+    node.append(label, status); on(node, 'click', () => selectLane(lane)); lanes.append(node);
+    return { node, label, status };
+  });
   const form = el('div', 'kd-form');
   const input = el('input'); input.type = 'text'; input.inputMode = 'text'; input.autocomplete = 'off'; input.maxLength = 16;
   input.setAttribute('autocapitalize', 'off'); input.setAttribute('spellcheck', 'false');
@@ -70,7 +85,7 @@ export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSna
   const submit = el('button', '', 'こうげき'); submit.type = 'button'; submit.dataset.action = 'answer';
   form.append(input, submit);
   const note = el('p', 'ya-dock-note', '同じ読みのモンスターに、自動で命中するよ');
-  dock.append(target, form, note);
+  dock.append(target, lanes, form, note);
   const review = el('div', 'ya-learning-result'); review.hidden = true;
   const words = el('div', 'kd-words');
   const strongBox = el('section'), weakBox = el('section');
@@ -86,6 +101,17 @@ export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSna
     const accepted = dispatch({ type: 'submit', payload: { sessionId: state.sessionId, token: state.inputToken, value: input.value } });
     if (accepted) input.value = '';
     return accepted;
+  };
+  const selectEnemy = enemyId => {
+    const state = getSnapshot(), enemy = state.enemies.find(item => item.enemyId === enemyId);
+    if (!active || state.paused || state.phase !== 'playing' || !enemy) return false;
+    const selected = dispatch({ type: 'select', payload: { sessionId: state.sessionId, enemyId: enemy.enemyId, problemId: enemy.problemId } });
+    input.focus?.({ preventScroll: true });
+    return selected;
+  };
+  const selectLane = lane => {
+    const enemy = getSnapshot().enemies.find(item => item.lane === lane);
+    return enemy ? selectEnemy(enemy.enemyId) : false;
   };
   on(input, 'compositionstart', () => { composing = true; });
   on(input, 'compositionend', () => { composing = false; });
@@ -109,12 +135,7 @@ export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSna
         on(image, 'error', () => { image.hidden = true; fallback.hidden = false; });
         body.append(image, fallback); node.append(sign, body);
         node.style.left = `${LANE_X[enemy.lane]}%`;
-        on(node, 'click', () => {
-          const current = getSnapshot();
-          if (!active || current.paused) return;
-          dispatch({ type: 'select', payload: { sessionId: current.sessionId, enemyId: enemy.enemyId, problemId: enemy.problemId } });
-          input.focus?.();
-        });
+        on(node, 'click', () => selectEnemy(enemy.enemyId));
         world.append(node); entry = { node }; enemyNodes.set(enemy.enemyId, entry);
       }
       entry.node.style.top = `${laneY(enemy.progress)}%`;
@@ -125,6 +146,19 @@ export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSna
       entry.node.disabled = state.paused || state.phase !== 'playing';
       entry.node.setAttribute('aria-label', `${enemy.lane + 1}番、${enemy.monsterName}、${enemy.prompt}、${enemy.threat}`);
     }
+  };
+  const syncLanes = state => {
+    laneButtons.forEach(({ node, label, status }, lane) => {
+      const enemy = state.enemies.find(item => item.lane === lane);
+      const labelText = enemy ? `${LANE_NAMES[lane]} ${enemy.prompt}` : `${LANE_NAMES[lane]} まち`;
+      const statusText = !enemy ? 'ここに出るよ' : enemy.progress >= .7 ? '門の近く' : enemy.progress >= .48 ? '近づいている' : 'むかっている';
+      if (label.textContent !== labelText) label.textContent = labelText;
+      if (status.textContent !== statusText) status.textContent = statusText;
+      node.dataset.target = String(!!enemy && state.targetId === enemy.enemyId);
+      node.dataset.near = String(!!enemy && enemy.progress >= .7);
+      node.disabled = !enemy || state.paused || state.phase !== 'playing';
+      node.setAttribute('aria-label', `${labelText}、${statusText}${enemy && state.targetId === enemy.enemyId ? '、ねらい中' : ''}`);
+    });
   };
   const showHint = (enemyId, text) => {
     hint?.remove(); hint = null;
@@ -176,6 +210,7 @@ export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSna
       if (!active) return;
       frame.setPaused(state.paused && !state.result);
       syncEnemies(state);
+      syncLanes(state);
       reactToEvents(state);
       lights.forEach((node, index) => toggleClass(node, 'off', index >= state.life));
       const aimed = state.targetEnemy;
@@ -205,7 +240,7 @@ export function createKanjiDefenseView({ document: doc, dispatch, onBack, getSna
         life: state?.life ?? 3, maxLife: 3, lifeLabel: '門', gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; composing = false; input.disabled = true; submit.disabled = true; },
+    stopInput() { active = false; composing = false; input.disabled = true; submit.disabled = true; laneButtons.forEach(({ node }) => { node.disabled = true; }); },
     dispose() {
       this.stopInput(); removes.splice(0).forEach(remove => remove());
       enemyNodes.clear(); frame.dispose();
