@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { lessonCatalog } from '../../src/lessons/lessonCatalog.js';
 import { ENERGY_CAPACITY, ELECTION_ERAS, compareLamps, simulateLightPlan,
-  turnoutTally, ballotTally } from '../../public/lessons/gotomon/lesson-model-v2.js';
+  TURNOUT_BALLOTS, countTurnoutBallots, turnoutTally, ballotTally } from '../../public/lessons/gotomon/lesson-model-v2.js';
 
 test('授業2本は新しいゲームと記録シートを開き、既存の親画面への橋を残す', () => {
   for (const lesson of lessonCatalog) {
@@ -39,6 +39,10 @@ test('選挙権の年と最初の選挙を分け、投票者が増えた例の�
     { bridge: 6, market: 2, map: 2 });
   assert.ok(half.market > half.bridge);
   assert.ok(all.bridge > all.market);
+  assert.equal(TURNOUT_BALLOTS.length, 20);
+  assert.deepEqual(countTurnoutBallots(10), half);
+  assert.deepEqual(countTurnoutBallots(20), all);
+  assert.deepEqual(countTurnoutBallots(5), { bridge: 1, market: 2, map: 2 });
 });
 
 test('模擬投票先はどれを選んでも一票だけ加わる', () => {

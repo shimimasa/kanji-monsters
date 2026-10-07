@@ -1,5 +1,6 @@
 import { ENERGY_CAPACITY, VOLTAGE_LEVELS, SPEED_NAMES, compareLamps,
-  simulateLightPlan, ELECTION_ERAS, PROPOSALS, turnoutTally, ballotTally } from './lesson-model-v2.js';
+  simulateLightPlan, ELECTION_ERAS, PROPOSALS, TURNOUT_BALLOTS,
+  countTurnoutBallots, ballotTally } from './lesson-model-v2.js';
 
 const slug = document.body.dataset.lesson;
 const root = document.getElementById('lesson-game');
@@ -91,11 +92,12 @@ function choiceGroup(target, options, selected, onSelect) {
   }
 }
 
-function timeline(ticks) {
+function timeline(ticks, revealed = ticks.length) {
   const line = node('div', 'lgv-timeline');
-  for (const tick of ticks) {
-    const cell = node('div', `lgv-tick ${tick.dark ? 'is-night' : 'is-day'} ${tick.lit ? 'is-lit' : ''}`);
-    cell.append(node('span', '', tick.dark ? '🌙' : '☀️'), node('strong', '', tick.lit ? '💡' : '·'), node('small', '', tick.label));
+  for (const [index, tick] of ticks.entries()) {
+    const pending = index >= revealed;
+    const cell = node('div', `lgv-tick ${tick.dark ? 'is-night' : 'is-day'} ${!pending && tick.lit ? 'is-lit' : ''} ${pending ? 'is-pending' : ''}`);
+    cell.append(node('span', '', tick.dark ? '🌙' : '☀️'), node('strong', '', pending ? '？' : tick.lit ? '💡' : '·'), node('small', '', tick.label));
     line.append(cell);
   }
   return line;
@@ -103,7 +105,7 @@ function timeline(ticks) {
 
 function tallyChart(votes) {
   const chart = node('div', 'lgv-tally');
-  const maximum = Math.max(...Object.values(votes));
+  const maximum = Math.max(1, ...Object.values(votes));
   for (const proposal of PROPOSALS) {
     const count = votes[proposal.id];
     const row = node('div', 'lgv-tally-row');
@@ -139,29 +141,39 @@ function renderKururuCrank() {
     turns = Math.min(3, turns + 1);
     rotation += speed === 'fast' ? 145 : speed === 'middle' ? 95 : 55;
     wheel.style.setProperty('--turn', `${rotation}deg`);
-    gauge.style.width = `${VOLTAGE_LEVELS[speed]}%`;
+    gauge.style.width = `${Math.round(VOLTAGE_LEVELS[speed] * turns / 3)}%`;
     gaugeLabel.textContent = `電圧計の針: ${SPEED_NAMES[speed]}回すと ${speed === 'fast' ? '高い' : speed === 'slow' ? '低い' : '中くらい'}`;
     count.textContent = `${turns} / 3 回`;
+    for (const [index, cell] of [...charges.children].entries()) cell.classList.toggle('is-charged', index < turns);
     if (turns === 3) {
+      wheel.disabled = true;
       records.add(speed);
-      observations.textContent = [...records].map(key => `${SPEED_NAMES[key]}: ${key === 'fast' ? '高い' : key === 'slow' ? '低い' : '中くらい'}`).join('　｜　');
+      clear(observations);
+      for (const key of records) observations.append(node('span', 'lgv-voltage-card',
+        `${key === 'fast' ? '⚡' : key === 'middle' ? '🔄' : '🐢'} ${SPEED_NAMES[key]}：${key === 'fast' ? '高い' : key === 'slow' ? '低い' : '中くらい'}`));
       ui.say(`${SPEED_NAMES[speed]}速さで3回回したよ。別の速さでも比べよう。`);
       if (records.size >= 2) ui.unlock('同じ発電機では、速く回すほど電圧計の針が大きく動いたね。');
     }
   }, 'lgv-wheel');
   wheel.setAttribute('aria-label', '発電機を1回回す');
   const count = node('strong', 'lgv-count', '0 / 3 回');
+  const charges = node('div', 'lgv-charges');
+  for (let index = 0; index < 3; index++) charges.append(node('span', '', '⚡'));
   const gaugeBox = node('div', 'lgv-gauge');
   const gauge = node('span', 'lgv-gauge-fill');
   gaugeBox.append(gauge);
   const gaugeLabel = paragraph('速さを選んで、発電機を回そう。', 'lgv-readout');
-  machine.append(node('span', 'lgv-spark', '⚡'), wheel, count, gaugeBox, gaugeLabel);
+  machine.append(node('span', 'lgv-spark', '⚡'), wheel, count, charges, gaugeBox, gaugeLabel);
   const observations = node('div', 'lgv-observations', '観察カードはここに並ぶよ');
   ui.play.append(machine, observations);
   ui.controls.append(paragraph('回す速さを選ぶ', 'lgv-control-label'), dial);
   const drawDial = () => choiceGroup(dial, [
     { value: 'slow', label: '🐢 ゆっくり' }, { value: 'middle', label: '🔄 ふつう' }, { value: 'fast', label: '⚡ はやく' },
-  ], speed, value => { speed = value; turns = 0; count.textContent = '0 / 3 回'; drawDial(); ui.say(`${SPEED_NAMES[speed]}速さで、3回回してみよう。`); });
+  ], speed, value => {
+    speed = value; turns = 0; wheel.disabled = false; gauge.style.width = '0%'; count.textContent = '0 / 3 回';
+    for (const cell of charges.children) cell.classList.remove('is-charged');
+    drawDial(); ui.say(`${SPEED_NAMES[speed]}速さで、3回回してみよう。`);
+  });
   drawDial();
 }
 
@@ -247,54 +259,89 @@ function renderKururuSensor() {
 }
 
 function renderKururuFinal() {
-  const ui = stageShell(stageTitles[4], '部品を組み合わせて、夜の小道を4目盛の間、照らしてみよう。');
+  const ui = stageShell(stageTitles[4], '部品を組み合わせ、昼から夜へ一歩ずつ進めよう。夜の4か所に明かりを届けられるかな？');
   const settings = { store: true, lamp: 'bulb', rule: 'always' };
   const groups = [node('div', 'lgv-segments'), node('div', 'lgv-segments'), node('div', 'lgv-segments')];
   const result = node('div', 'lgv-simulation', '組み合わせを選んで試運転しよう。');
+  let outcome = null, revealed = 0;
+  const step = button('次の1目盛へすすむ', () => {
+    if (!outcome || revealed >= outcome.ticks.length) return;
+    revealed += 1;
+    drawRun();
+    const current = outcome.ticks[revealed - 1];
+    ui.say(current.dark
+      ? current.lit ? `${current.label}の小道に明かりが届いた！` : `${current.label}は暗いまま。電気を使った場所を見直してみよう。`
+      : current.lit ? `${current.label}に点灯したよ。夜へ残る電気も見てみよう。` : `${current.label}は点灯しなかったよ。電気は夜へ残せるかな？`);
+    if (revealed === outcome.ticks.length) {
+      step.disabled = true;
+      ui.say(outcome.nightLit === 4 ? '夜の4か所全部に明かりが届いた！別の組み合わせも試せるよ。'
+        : `夜の4か所のうち${outcome.nightLit}か所を照らしたよ。部品を変えて、もう一度試せるよ。`);
+      ui.unlock('作る・ためる・使う方法を組み合わせて考えたね。どの結果も発見の星になるよ。');
+    }
+  }, 'lgv-action lgv-step');
+  step.disabled = true;
+  const drawRun = () => {
+    if (!outcome) return;
+    const current = outcome.ticks[revealed - 1];
+    const path = node('div', 'lgv-night-path');
+    for (let index = 0; index < 4; index++) {
+      const night = outcome.ticks[index + 3];
+      const visited = revealed > index + 3;
+      path.append(node('span', `lgv-path-light ${visited ? night.lit ? 'is-lit' : 'is-dark' : ''}`,
+        `${visited ? night.lit ? '💡' : '·' : '？'} ${index + 1}`));
+    }
+    clear(result, paragraph(`小道のミッション　夜の4か所を照らそう　${revealed}/7目盛`, 'lgv-mission'),
+      timeline(outcome.ticks, revealed), path, meter('残りの電気', current ? current.energy : settings.store ? ENERGY_CAPACITY : 0),
+      paragraph(revealed === 7 ? `夜の小道は 4目盛のうち ${outcome.nightLit}目盛 光ったよ。` : '自分のペースで一歩ずつ進めよう。'));
+  };
+  const resetRun = () => {
+    outcome = null; revealed = 0; step.disabled = true;
+    result.textContent = '組み合わせを変えたよ。試運転を始めよう。';
+  };
   const renderGroups = () => {
     choiceGroup(groups[0], [{ value: false, label: '昼に直接使う' }, { value: true, label: 'ためて夜へ' }], settings.store,
-      value => { settings.store = value; renderGroups(); });
+      value => { settings.store = value; resetRun(); renderGroups(); });
     choiceGroup(groups[1], [{ value: 'bulb', label: '豆電球' }, { value: 'led', label: 'LED' }], settings.lamp,
-      value => { settings.lamp = value; renderGroups(); });
+      value => { settings.lamp = value; resetRun(); renderGroups(); });
     choiceGroup(groups[2], [{ value: 'always', label: 'いつも点灯' }, { value: 'dark', label: '暗い時だけ' }], settings.rule,
-      value => { settings.rule = value; renderGroups(); });
+      value => { settings.rule = value; resetRun(); renderGroups(); });
   };
-  ui.play.append(node('div', 'lgv-path', '🏠　💡　💡　💡　🌲'), result);
+  ui.play.append(node('div', 'lgv-path', '🏠　🌲　🌲　🌲　🌲'), result);
   ui.controls.append(paragraph('1 電気の行き先', 'lgv-control-label'), groups[0],
     paragraph('2 明かりの道具', 'lgv-control-label'), groups[1],
     paragraph('3 点灯の命令', 'lgv-control-label'), groups[2],
     button('小道で試運転する', () => {
-      const outcome = simulateLightPlan(settings);
-      clear(result, timeline(outcome.ticks), paragraph(`夜の小道は 4目盛のうち ${outcome.nightLit}目盛 光ったよ。`),
-        meter('残りの電気', outcome.remaining));
-      ui.say(outcome.nightLit === 4 ? '小道が夜の間ずっと光った！ほかの組み合わせも試せるよ。'
-        : 'ここまでの明かりが見えたね。部品を変えてもう一度試せるよ。');
-      ui.unlock('作る・ためる・使う方法を組み合わせて考えたね。結果にかかわらず、この発見は星になるよ。');
-    }, 'lgv-action'));
+      outcome = simulateLightPlan(settings); revealed = 0; step.disabled = false; drawRun();
+      ui.say('電気をどこで使うか、昼から夜へ一歩ずつ見てみよう。');
+    }, 'lgv-action'), step);
   renderGroups();
 }
 
 function renderHyouVillage() {
   const ui = stageShell(stageTitles[0], '川、畑、分かれ道へ。好きな順に行って、3人の困りごとを確かめよう。');
   const seen = new Set();
+  const progress = node('div', 'lgv-village-progress', '願いカード 0 / 3');
   const map = node('div', 'lgv-village-map');
   const visit = node('div', 'lgv-visit', '場所を選んで村を歩こう。');
   const cards = node('div', 'lgv-wish-cards');
   for (const proposal of PROPOSALS) {
-    map.append(button(`${proposal.icon} ${proposal.place}`, () => {
+    const place = button(`${proposal.icon} ${proposal.place}`, () => {
       const face = node('img', 'lgv-visitor'); face.src = proposal.image; face.alt = proposal.gotomon;
       clear(visit, face, node('h2', '', `${proposal.gotomon}のいる${proposal.place}`),
         button(proposal.action, () => {
           seen.add(proposal.id);
+          place.classList.add('is-visited');
+          progress.textContent = `願いカード ${seen.size} / 3`;
           clear(visit, face, node('h2', '', `${proposal.place}で見つけたこと`), paragraph(proposal.need), paragraph(proposal.wish));
           clear(cards);
           for (const found of PROPOSALS.filter(item => seen.has(item.id))) cards.append(node('span', 'lgv-wish-card', `${found.icon} ${found.name}`));
           ui.say(`${proposal.gotomon}の願いを聞いたよ。ほかの場所にも行ってみよう。`);
           if (seen.size === 3) ui.unlock('3人には違う願いがあり、それぞれに理由がある。');
         }, 'lgv-action'));
-    }, 'lgv-place'));
+    }, 'lgv-place');
+    map.append(place);
   }
-  ui.play.append(map, visit, cards);
+  ui.play.append(progress, map, visit, cards);
 }
 
 function renderHyouHistory() {
@@ -329,6 +376,8 @@ function renderHyouBooth() {
     for (const [id, icon, label] of [['desk', '📝', '受付'], ['screen', '🚪', 'ついたて'], ['box', '🗳️', '投票箱']]) {
       booth.append(node('div', `lgv-booth-part ${parts.has(id) ? 'is-placed' : ''}`, `${icon} ${label}`));
     }
+    booth.append(node('div', `lgv-sightline ${parts.has('screen') ? 'is-private' : ''}`,
+      parts.has('screen') ? '👀　ついたてで投票先が見えない' : '👀　記入するところが周りから見える'));
     clear(partButtons);
     for (const [id, label] of [['desk', '受付'], ['screen', 'ついたて'], ['box', '投票箱']]) {
       const control = button(`${parts.has(id) ? '✓ ' : '+ '}${label}`, () => {
@@ -351,22 +400,56 @@ function renderHyouBooth() {
 }
 
 function renderHyouTurnout() {
-  const ui = stageShell(stageTitles[3], '村の20人の例。参加が10人と20人のとき、開票を比べよう。');
+  const ui = stageShell(stageTitles[3], '架空の20人の票を5通ずつ開こう。参加が10人と20人のとき、先頭はどうなるかな？');
   const seen = new Set();
-  const chart = node('div', 'lgv-ballot-result', '参加人数を選んで開票しよう。');
-  const choices = node('div', 'lgv-segments');
+  let target = 10, revealed = 0, prediction = null;
+  const chart = node('div', 'lgv-ballot-result');
+  const envelopes = node('div', 'lgv-envelopes');
+  const choices = node('div', 'lgv-segments lgv-turnout-choices');
+  const guesses = node('div', 'lgv-segments');
+  const draw = () => {
+    clear(envelopes);
+    for (let index = 0; index < target; index++) {
+      const opened = index < revealed;
+      const proposal = opened ? PROPOSALS.find(item => item.id === TURNOUT_BALLOTS[index]) : null;
+      envelopes.append(node('span', `lgv-envelope ${opened ? 'is-open' : ''}`,
+        opened ? proposal.icon : '✉️'));
+    }
+    clear(chart, node('strong', '', `📬 ${revealed} / ${target}通を開いたよ`), envelopes,
+      tallyChart(countTurnoutBallots(revealed)));
+    open.disabled = revealed >= target;
+  };
+  const open = button('次の5通を開く', () => {
+    if (revealed >= target) return;
+    revealed = Math.min(target, revealed + 5);
+    draw();
+    if (revealed === target) {
+      seen.add(target);
+      ui.say(target === 10 ? '10人では市場が先頭。さらに10人が参加したらどうなるかな？'
+        : '20人では橋が先頭。増えた票で数字がどう変わったかな？');
+      if (seen.size === 2) ui.unlock('この例では参加人数が変わると先頭も変わった。いつも変わるわけではないよ。');
+    } else ui.say('票が少しずつ積み上がっているね。次の5通も開いてみよう。');
+  }, 'lgv-action');
   for (const participants of [10, 20]) {
     choices.append(button(`${participants}人が参加`, () => {
-      const votes = turnoutTally(participants);
-      seen.add(participants);
-      clear(chart, node('strong', '', `📬 ${participants} / 20人が参加（投票率 ${participants * 5}%）`), tallyChart(votes));
-      ui.say(participants === 10 ? 'この例では市場が先頭だね。20人のときも見てみよう。'
-        : 'この例では橋が先頭だね。10人のときと何が変わったかな？');
-      if (seen.size === 2) ui.unlock('この例では参加人数が変わると結果も変わった。いつも変わるわけではないよ。');
+      if (target !== participants) revealed = participants === 20 && revealed === 10 ? 10 : 0;
+      target = participants;
+      for (const [index, control] of [...choices.children].entries()) {
+        control.classList.toggle('is-selected', index === (participants === 10 ? 0 : 1));
+        control.setAttribute('aria-pressed', String(index === (participants === 10 ? 0 : 1)));
+      }
+      draw();
+      ui.say(participants === 20 && revealed === 10 ? '最初の10通に、あと10通を加えて開こう。'
+        : `${participants}人の票を、5通ずつ開いてみよう。`);
     }, 'lgv-option'));
   }
+  const drawGuesses = () => choiceGroup(guesses, PROPOSALS.map(item => ({ value: item.id, label: `${item.icon} ${item.name}` })), prediction,
+    value => { prediction = value; drawGuesses(); ui.say('予想を置いたよ。開票して確かめよう。'); });
   ui.play.append(chart);
-  ui.controls.append(paragraph('同じ20人の村で比べる', 'lgv-control-label'), choices);
+  ui.controls.append(paragraph('先頭を予想する（変えてもいいよ）', 'lgv-control-label'), guesses,
+    paragraph('同じ20人の村で比べる', 'lgv-control-label'), choices,
+    paragraph('10人の参加は50%、20人の参加は100%。票の数はこの物語だけの例だよ。', 'lgv-small'), open);
+  drawGuesses(); choices.firstChild.classList.add('is-selected'); choices.firstChild.setAttribute('aria-pressed', 'true'); draw();
 }
 
 function renderHyouVote() {
@@ -382,9 +465,14 @@ function renderHyouVote() {
     cast = true;
     const votes = ballotTally(selected);
     clear(booth, paragraph(sample ? '先生が動かす架空の一票を入れたよ。' : '自分の一票を入れたよ。投票先は保存されないよ。'));
-    clear(result, node('strong', '', '村の小さな模擬投票　開票結果'), tallyChart(votes));
-    ui.say('一票を加えると、数字が変わったね。どんな理由で選んだか考えてみよう。');
     const chosen = PROPOSALS.find(proposal => proposal.id === selected);
+    const future = node('div', 'lgv-village-future');
+    future.append(node('span', 'lgv-future-icon', chosen.icon),
+      node('strong', '', `${chosen.name}への一票で、村に新しい道が見えたよ。`),
+      paragraph(`${chosen.gotomon}の願い：${chosen.wish}`),
+      paragraph(`ほかの願いも村に残っているよ：${PROPOSALS.filter(item => item.id !== selected).map(item => `${item.icon} ${item.name}`).join('　')}`));
+    clear(result, node('strong', '', '村の小さな模擬投票　開票結果'), tallyChart(votes), future);
+    ui.say('一票を加えると、数字が変わったね。どんな理由で選んだか考えてみよう。');
     clear(reasons, button(`💬 ${chosen.reason}`, () => {
       ui.say('理由を言葉にできたね。ほかの願いにも目を向けてみよう。');
       ui.unlock('自分の考えで一票を選んだ。投票先に正解はないよ。');

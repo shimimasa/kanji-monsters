@@ -46,10 +46,14 @@ body[data-lesson="hitotsubu"] .lgv-note { background: #fff1d4; border-left-color
 .lgv-spark { font-size: 26px; }
 .lgv-wheel { width: 90px; height: 90px; border-radius: 50%; border: 8px solid #659b76; font-size: 52px; padding: 0; line-height: 1; color: #205138; background: radial-gradient(circle, #fffdeb 30%, #b1d3a8 31%); transform: rotate(var(--turn, 0deg)); transition: transform .35s ease; }
 .lgv-count { font-size: 18px; }
+.lgv-charges { display: flex; gap: 8px; }
+.lgv-charges span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #d4e0d3; filter: grayscale(1); opacity: .55; }
+.lgv-charges span.is-charged { background: #ffe597; filter: none; opacity: 1; box-shadow: 0 0 13px #ffcf61; }
 .lgv-gauge { height: 17px; width: min(100%, 360px); background: #b5cbb5; border-radius: 99px; overflow: hidden; }
 .lgv-gauge-fill { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #84bd68, #ffd459); transition: width .35s; }
 .lgv-readout { margin: 0; text-align: center; }
-.lgv-observations { margin-top: 13px; min-height: 36px; text-align: center; padding: 8px; border-radius: 10px; background: #fff9df; font-weight: 700; }
+.lgv-observations { display: flex; justify-content: center; flex-wrap: wrap; gap: 7px; margin-top: 13px; min-height: 36px; text-align: center; padding: 8px; border-radius: 10px; background: #fff9df; font-weight: 700; }
+.lgv-voltage-card { padding: 5px 9px; border-radius: 9px; background: white; box-shadow: 0 2px 5px #634b1c24; }
 .lgv-wire-world { display: grid; grid-template-columns: 1fr 100px 1fr; align-items: center; gap: 12px; min-height: 180px; }
 .lgv-world-panel { display: grid; place-items: center; min-height: 120px; padding: 12px; border-radius: 17px; background: #fff2b7; font-weight: 800; text-align: center; }
 .lgv-world-panel.is-night { color: #fff; background: #284459; }
@@ -68,12 +72,20 @@ body[data-lesson="hitotsubu"] .lgv-note { background: #fff1d4; border-left-color
 .lgv-tick { display: grid; justify-items: center; gap: 4px; padding: 10px 2px; border-radius: 12px; background: #fce9b1; color: #4d432b; }
 .lgv-tick.is-night { background: #324b62; color: white; }
 .lgv-tick.is-lit strong { text-shadow: 0 0 11px #ffe270; }
+.lgv-tick.is-pending { opacity: .52; filter: saturate(.45); }
 .lgv-tick small { font-size: 11px; }
 .lgv-simulation { display: grid; gap: 14px; min-height: 155px; align-content: center; }
 .lgv-simulation p { margin: 0; text-align: center; font-weight: 800; }
 .lgv-path { text-align: center; padding: 12px; margin-bottom: 12px; border-radius: 15px; background: linear-gradient(#abcfe7, #618d6f); font-size: clamp(23px, 4vw, 42px); letter-spacing: .08em; }
+.lgv-mission { padding: 8px; border-radius: 12px; background: #fff2ba; }
+.lgv-night-path { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.lgv-path-light { padding: 10px 4px; border-radius: 14px; background: #dce5e8; text-align: center; font-weight: 800; font-size: 20px; }
+.lgv-path-light.is-lit { background: #ffe394; box-shadow: 0 0 16px #ffce50; }
+.lgv-path-light.is-dark { color: white; background: #354a62; }
 .lgv-village-map { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 14px; border-radius: 17px; background: linear-gradient(150deg, #bde2b2, #efcf8c); }
+.lgv-village-progress { margin-bottom: 10px; padding: 8px; border-radius: 10px; background: #fff5d7; text-align: center; font-weight: 800; }
 .lgv-place { min-height: 90px; font-size: 18px; background: #fff9e8; }
+.lgv-place.is-visited { background: #dff2d9; box-shadow: inset 0 0 0 3px #6ea56e; }
 .lgv-visit { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-height: 108px; margin-top: 12px; padding: 12px; border-radius: 14px; background: #fff7df; }
 .lgv-visit h2, .lgv-visit p { margin: 0; }
 .lgv-visit p { flex-basis: 100%; }
@@ -90,7 +102,13 @@ body[data-lesson="hitotsubu"] .lgv-note { background: #fff1d4; border-left-color
 .lgv-booth { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .lgv-booth-part { display: grid; place-items: center; min-height: 145px; padding: 12px; border: 3px dashed #c5b9a0; border-radius: 16px; background: #eee7d9; color: #877c6e; font-size: 19px; text-align: center; }
 .lgv-booth-part.is-placed { border-style: solid; border-color: #9b763f; background: #fff9e9; color: #4d3921; box-shadow: 0 5px 12px #ae854530; }
+.lgv-sightline { grid-column: 1 / -1; padding: 10px; border: 2px dashed #ae7355; border-radius: 12px; background: #fff0de; text-align: center; font-weight: 800; }
+.lgv-sightline.is-private { border-color: #68a17c; background: #e4f3df; }
 .lgv-ballot-result { display: grid; gap: 12px; min-height: 190px; align-content: center; padding: 15px; border-radius: 15px; background: #fffaf0; }
+.lgv-envelopes { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; }
+.lgv-envelope { display: grid; place-items: center; min-height: 31px; border-radius: 7px; background: #e9dcc4; font-size: 20px; }
+.lgv-envelope.is-open { background: #ffefb7; animation: lgv-reveal .3s ease-out; }
+@keyframes lgv-reveal { from { transform: translateY(-5px) scale(.8); opacity: .3; } to { transform: translateY(0) scale(1); opacity: 1; } }
 .lgv-tally { display: grid; gap: 10px; width: 100%; }
 .lgv-tally-row { display: grid; grid-template-columns: 100px minmax(50px, 1fr) 42px; align-items: center; gap: 10px; }
 .lgv-tally-track { height: 20px; border-radius: 99px; overflow: hidden; background: #e5dac3; }
@@ -100,6 +118,9 @@ body[data-lesson="hitotsubu"] .lgv-note { background: #fff1d4; border-left-color
 .lgv-ballot-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .lgv-ballot-choice { min-height: 85px; background: #fffef6; }
 .lgv-private-booth + .lgv-ballot-result { margin-top: 13px; }
+.lgv-village-future { display: grid; justify-items: center; gap: 6px; padding: 13px; border-radius: 15px; background: #e6f2db; text-align: center; }
+.lgv-future-icon { font-size: 35px; }
+.lgv-village-future p { margin: 0; line-height: 1.5; }
 @media (max-width: 600px) {
   .lgv-shell { padding: 9px 9px 22px; }
   .lgv-top { font-size: 12px; margin-bottom: 7px; }
@@ -127,6 +148,8 @@ body[data-lesson="hitotsubu"] .lgv-note { background: #fff1d4; border-left-color
   .lgv-booth { gap: 5px; }
   .lgv-booth-part { min-height: 100px; padding: 5px; font-size: 13px; }
   .lgv-tally-row { grid-template-columns: 69px minmax(30px, 1fr) 31px; gap: 5px; font-size: 12px; }
+  .lgv-envelopes { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .lgv-path-light { font-size: 15px; }
   .lgv-ballot-choices { grid-template-columns: 1fr; }
   .lgv-ballot-choice { min-height: 48px; }
 }
