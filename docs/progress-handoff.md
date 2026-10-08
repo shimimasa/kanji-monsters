@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-08、四国・九州のボーナス背景を追加）
+
+- **状態**: 冒険先選択の地図改善は [PR #140](https://github.com/shimimasa/kanji-monsters/pull/140) で main `794752a5` にマージし、Vercelの本番デプロイ状態は success（`Deployment has completed`）。公開先は https://yomitabi.gamanavi.com/ 。今回のボーナス背景2枚は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
+- **今回の変更**: 欠けていた `shikoku_bonus_area.webp` と `kyushu_bonus_area.webp` を既存背景と同じ512×341の画素調で追加。四国は瀬戸内海を望む山寺、九州は阿蘇の草原。画像はそれぞれ51,378バイト・44,308バイトで、既存の `loadBgImage` がステージIDから自動選択する。画像生成のプロンプトを記録した。回答判定・学習記録・セーブ処理は変更しない。
+- **確認**: `npm.cmd run build` 成功、全19群1127件 `ALL-PASS`。`stages.bonus.json` の対象2ステージと画像2枚を照合。専用ChromeでPC1280×800の四国ボーナス、スマホ縦390×844（盤面480×680）の九州ボーナスを実際の読み込み経路からバトルまで確認。両画像HTTP 200、スマホの横はみ出し0、ブラウザエラー0件、試験用セーブ2キー一致。
+- **再開するときは**: 子どもの試遊で背景と敵・問題の見分けやすさを確認する。公開はその回の明示指示がある場合だけ進める。音・絵の残項目は `docs/sound-and-visual-review.md` を確認する。
+
 ## 次回はここから（2026-10-08、冒険先選択の地図を描き直した）
 
 - **状態**: 実績一覧のバッジ改善は [PR #139](https://github.com/shimimasa/kanji-monsters/pull/139) で main `84f8c9d4` にマージし、Vercelの本番デプロイ状態は success（`Deployment has completed`）。公開先は https://yomitabi.gamanavi.com/ 。今回の地図改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
