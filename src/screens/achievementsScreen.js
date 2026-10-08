@@ -3,6 +3,7 @@
 import { publish } from '../core/eventBus.js';
 import { gameState, isAchievementUnlocked } from '../core/gameState.js';
 import { drawButton, isMouseOverRect } from '../ui/uiRenderer.js';
+import { drawAchievementBadge, getAchievementBadgeLabel } from '../ui/achievementBadges.js';
 import { loadDex as loadKanjiDex } from '../models/kanjiDex.js';
 import { loadDex as loadMonsterDex } from '../models/monsterDex.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
@@ -144,7 +145,7 @@ const achievementsScreen = {
     ctx.font = '18px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'right';
     ctx.fillStyle = '#FFD700';
-    ctx.fillText(`🏆 ${unlockedCount}/${totalCount} (${percentage}%)`, canvas.width - 20, 40);
+    ctx.fillText(`バッジ ${unlockedCount}/${totalCount} (${percentage}%)`, canvas.width - 20, 40);
 
     // 実績リスト描画
     this.drawAchievementsList();
@@ -191,12 +192,12 @@ const achievementsScreen = {
         ctx.fillStyle = gradient;
       } else {
         // 未解除：暗い背景
-        ctx.fillStyle = 'rgba(100, 100, 100, 0.1)';
+        ctx.fillStyle = 'rgba(148, 168, 187, 0.12)';
       }
       ctx.fillRect(L.x, y - itemHeight/2, itemWidth, itemHeight);
       
       // 枠線
-      ctx.strokeStyle = isUnlocked ? '#FFD700' : '#555';
+      ctx.strokeStyle = isUnlocked ? '#FFD700' : '#6d7c8b';
       ctx.lineWidth = 1;
       ctx.strokeRect(L.x, y - itemHeight/2, itemWidth, itemHeight);
 
@@ -214,11 +215,8 @@ const achievementsScreen = {
   drawUnlockedAchievement(achievement, y) {
     const { ctx } = this;
     
-    // トロフィーアイコン
-    ctx.fillStyle = '#FFD700';
-    ctx.font = '24px serif';
     const L = this._list || LIST_WIDE;
-    ctx.fillText('🏆', L.iconX, y);
+    drawAchievementBadge(ctx, achievement, L.iconX, y, true);
     
     // タイトル
     ctx.fillStyle = '#FFD700';
@@ -235,7 +233,7 @@ const achievementsScreen = {
       ctx.fillStyle = '#00FF00';
       ctx.font = '12px "UDデジタル教科書体", sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText('✓ 解除済み', L.rightX, y);
+      ctx.fillText('✓ できた！', L.rightX, y);
       ctx.textAlign = 'left';
     }
   },
@@ -244,27 +242,24 @@ const achievementsScreen = {
   drawLockedAchievement(achievement, y) {
     const { ctx } = this;
     
-    // ロックアイコン
-    ctx.fillStyle = '#666';
-    ctx.font = '24px serif';
     const L = this._list || LIST_WIDE;
-    ctx.fillText('🔒', L.iconX, y);
+    drawAchievementBadge(ctx, achievement, L.iconX, y, false);
     
     // 隠されたタイトル
-    ctx.fillStyle = '#666';
+    ctx.fillStyle = '#d5dceb';
     ctx.font = '18px "UDデジタル教科書体", sans-serif';
-    ctx.fillText('？？？', L.textX, y - 8);
+    ctx.fillText(`${getAchievementBadgeLabel(achievement)}の バッジ`, L.textX, y - 8);
     
     // 隠された説明
-    ctx.fillStyle = '#555';
+    ctx.fillStyle = '#bfcbd9';
     ctx.font = '14px "UDデジタル教科書体", sans-serif';
     // たての 画面は 右に 場所が ないので、ヒントが あれば 説明の 行に 出す
     const hint = this.shouldShowHint(achievement) ? this.getConditionHint(achievement) : '';
-    ctx.fillText(!L.rightX && hint ? hint : '未解除の実績です', L.textX, y + 12);
+    ctx.fillText(!L.rightX && hint ? hint : 'あそびながら 見つけよう', L.textX, y + 12);
     
     // 条件のヒント（オプション）
     if (L.rightX && this.shouldShowHint(achievement)) {
-      ctx.fillStyle = '#888';
+      ctx.fillStyle = '#c1cbd8';
       ctx.font = '12px "UDデジタル教科書体", sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText(this.getConditionHint(achievement), L.rightX, y);

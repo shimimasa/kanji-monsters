@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-08、実績一覧に種類別のバッジを追加）
+
+- **状態**: ステージ準備画面の改善は [PR #138](https://github.com/shimimasa/kanji-monsters/pull/138) で main `a350a2b3` にマージし、Vercelの本番デプロイ状態は success（`Deployment has completed`）。公開先は https://yomitabi.gamanavi.com/ 。今回のバッジ改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
+- **今回の変更**: 実績一覧の共通のトロフィー・鍵の絵文字を、達成条件に応じた8種類の盾形バッジへ変更。達成前も種類名をひらがなで示し、暗い画面で読めるように文字と枠の明るさを上げた。達成条件・判定・学習記録・セーブ処理は変更しない。
+- **確認**: `npm.cmd run build` 成功、全19群1127件 `ALL-PASS`。実績73件の条件16種類が8種類のバッジにすべて対応。専用ChromeでPC1280×800とスマホ縦390×844（盤面480×680）の達成済み・達成前表示を確認。スマホでは実タップで2ページ目へ進み、横はみ出し0、ブラウザエラー0件。変更ファイルの改行差分は `git diff --numstat` と `--ignore-cr-at-eol` が一致。
+- **再開するときは**: 子どもの試遊でバッジの種類と達成前の案内を読み取れるか確認する。公開はその回の明示指示がある場合だけ進める。音・絵の見直しの残項目は `docs/sound-and-visual-review.md` を確認する。
+
 ## 次回はここから（2026-10-08、ステージ準備画面に行き先の絵を表示）
 
 - **状態**: 名前入力画面の改善は [PR #137](https://github.com/shimimasa/kanji-monsters/pull/137) で main `c8aa4a2d` にマージし、Vercelの本番デプロイ状態は success（`Deployment has completed`）。公開先は https://yomitabi.gamanavi.com/ 。今回のステージ準備画面の改善は `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
