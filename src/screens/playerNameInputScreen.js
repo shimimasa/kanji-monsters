@@ -7,6 +7,8 @@ import { getGameCoordinates, isValidCoordinates, gameToScreenCoordinates } from 
 import { bindInputSubmission } from '../core/answerSubmission.js';
 import { syncPortraitCanvas, restoreLandscapeCanvas, isPortraitCanvas } from './battle/portraitLayout.js';
 
+const WELCOME_GOTOMON_URL = '/assets/images/monsters/full/grade1-hokkaido/HKD-E01.webp';
+
 // 並び。スマホを たてに 持った時（480×680）は 文字と ボタンを 大きく（2026-10-04）
 function nameLayout(canvas) {
   const cx = canvas.width / 2;
@@ -25,6 +27,14 @@ const playerNameInputState = {
     syncPortraitCanvas(this.canvas);
     this.confirmButton = { ...nameLayout(this.canvas).button, text: 'けってい' };
     this.validationMessage = '';
+    // 名前を決める前の画面なので、旅で出会うゴトモンを案内役として見せる。
+    const visit = this._welcomeVisit = (this._welcomeVisit ?? 0) + 1;
+    this._welcomeImage = null;
+    if (typeof Image !== 'undefined') {
+      const image = new Image();
+      image.onload = () => { if (this._welcomeVisit === visit) this._welcomeImage = image; };
+      image.src = WELCOME_GOTOMON_URL;
+    }
 
     // HTML入力欄をセットアップ（存在しなければ動的に生成する）
     this.nameInputElement = document.getElementById('playerNameInputField');
@@ -37,12 +47,20 @@ const playerNameInputState = {
       this.nameInputElement.setAttribute('autocorrect', 'off');
       this.nameInputElement.spellcheck = false;
       this.nameInputElement.placeholder = 'なまえ';
+      this.nameInputElement.setAttribute('aria-label', 'なまえ（5もじまで）');
       this.nameInputElement.style.position = 'absolute';
       this.nameInputElement.style.textAlign = 'center';
       this.nameInputElement.style.zIndex = '1001';
       document.body.appendChild(this.nameInputElement);
     }
     this.nameInputElement.style.display = 'block';
+    this.nameInputElement.style.boxSizing = 'border-box';
+    this.nameInputElement.style.padding = '0 10px';
+    this.nameInputElement.style.border = '3px solid #f5d899';
+    this.nameInputElement.style.borderRadius = '10px';
+    this.nameInputElement.style.backgroundColor = '#fffaf0';
+    this.nameInputElement.style.color = '#362515';
+    this.nameInputElement.style.fontFamily = '"UDデジタル教科書体",sans-serif';
     this.nameInputElement.value = "";
     this.nameInputElement.maxLength = 5;
 
@@ -89,12 +107,31 @@ const playerNameInputState = {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, cw, ch);
 
-    // 背景
-    const bg = ctx.createLinearGradient(0, 0, cw, ch);
-    bg.addColorStop(0, '#2c1810');
-    bg.addColorStop(1, '#3d2414');
+    // 旅の入口を思わせる、文字が読みやすい暗めの夕空。
+    const bg = ctx.createLinearGradient(0, 0, 0, ch);
+    bg.addColorStop(0, '#253b4a');
+    bg.addColorStop(0.58, '#345248');
+    bg.addColorStop(1, '#70472e');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, cw, ch);
+
+    const art = portrait
+      ? { x: cw / 2, y: 574, size: 132, labelY: 656 }
+      : { x: cw - 116, y: 400, size: 144, labelY: 503 };
+    const glow = ctx.createRadialGradient(art.x, art.y, 12, art.x, art.y, art.size);
+    glow.addColorStop(0, 'rgba(255,215,139,0.32)');
+    glow.addColorStop(1, 'rgba(255,215,139,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(art.x - art.size, art.y - art.size, art.size * 2, art.size * 2);
+    if (this._welcomeImage?.naturalWidth > 0) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(this._welcomeImage, art.x - art.size / 2, art.y - art.size / 2, art.size, art.size);
+      ctx.imageSmoothingEnabled = true;
+    }
+    ctx.fillStyle = '#fff0cf';
+    ctx.font = '18px "UDデジタル教科書体",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('いっしょに たびへ', art.x, art.labelY);
 
     // タイトル
     ctx.fillStyle = 'white';
@@ -102,19 +139,16 @@ const playerNameInputState = {
     ctx.textAlign = 'center';
     if (portrait) {
       // たての 画面は 1行に 入らないので 2行に
-      ctx.fillText('なまえを', cw / 2, L.titleY - 40);
-      ctx.fillText('にゅうりょく してください', cw / 2, L.titleY);
+      ctx.fillText('きみの なまえを', cw / 2, L.titleY - 40);
+      ctx.fillText('おしえてね', cw / 2, L.titleY);
     } else {
-      ctx.fillText('なまえを にゅうりょく してください', cw / 2, L.titleY);
+      ctx.fillText('きみの なまえを おしえてね', cw / 2, L.titleY);
     }
     
     ctx.font = '20px "UDデジタル教科書体",sans-serif';
     ctx.fillText('(5もじまで)', cw / 2, L.noteY);
 
-    // 入力欄の枠（HTMLの入力欄が見えるように透明な枠を描画）
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(L.frame.x, L.frame.y, L.frame.w, L.frame.h);
+    // 入力欄の枠は、位置を合わせたHTML入力欄が描く。
 
     // 入力チェックのメッセージ（alertの代わりにゲーム内で表示）
     if (this.validationMessage) {
@@ -134,6 +168,8 @@ const playerNameInputState = {
 
   /** 画面離脱時のクリーンアップ */
   exit() {
+    this._welcomeVisit = (this._welcomeVisit ?? 0) + 1;
+    this._welcomeImage = null;
     restoreLandscapeCanvas(this.canvas); // ほかの 画面は 800×600 で 描く
     this.unregisterHandlers();
     if (this._resizeHandler) {
