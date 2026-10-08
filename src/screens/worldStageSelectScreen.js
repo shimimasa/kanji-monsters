@@ -290,6 +290,7 @@ enter(arg) {
   const isCanvasArg = arg && typeof arg.getContext === 'function';
   this.canvas = isCanvasArg ? arg : document.getElementById('gameCanvas');
   this.ctx = this.canvas.getContext('2d');
+  this.notice = null;
 
   // ← 追加: 入場タイムスタンプ（残留クリック抑止に使用）
   try {
@@ -1158,6 +1159,40 @@ this._drawUncaughtBadge(ctx, badgeX, badgeY, uncaught);
     
     // 学年目安バッジと簡易ツールチップを最後に重ねる
     __wss_renderSchoolHintOverlays(this, ctx);
+    this._drawNotice(ctx, cw, ch);
+  },
+
+  _showNotice(lines) {
+    this.notice = lines;
+    this.update(0);
+  },
+
+  _drawNotice(ctx, width, height) {
+    if (!this.notice) return;
+    const boxWidth = Math.min(width - 36, 560);
+    const boxHeight = 86 + this.notice.length * 34;
+    const left = (width - boxWidth) / 2;
+    const top = (height - boxHeight) / 2;
+    ctx.save();
+    ctx.fillStyle = 'rgba(5, 22, 38, 0.75)';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = '#183f55';
+    ctx.fillRect(left, top, boxWidth, boxHeight);
+    ctx.strokeStyle = '#8ed8e8';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(left, top, boxWidth, boxHeight);
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    this.notice.forEach((line, index) => {
+      ctx.font = '20px "UDデジタル教科書体", sans-serif';
+      if (ctx.measureText(line).width > boxWidth - 24) ctx.font = '16px "UDデジタル教科書体", sans-serif';
+      ctx.fillText(line, width / 2, top + 31 + index * 34);
+    });
+    ctx.fillStyle = '#b8f4df';
+    ctx.font = '18px "UDデジタル教科書体", sans-serif';
+    ctx.fillText('タップして もどる', width / 2, top + boxHeight - 23);
+    ctx.restore();
   },
 
   /** クリックイベント処理 */
@@ -1188,6 +1223,7 @@ handleClick(e) {
     
     const x = coords.x;
     const y = coords.y;
+    if (this.notice) { this.notice = null; publish('playSE', 'cancel'); return; }
 
             // 総復習モードのクリック
             const isReview = (this.selectedTabLevel === 'review' || this.selectedGrade === 0);
@@ -1197,7 +1233,7 @@ handleClick(e) {
                   if (isMouseOverRect(x, y, btn)) {
                     if (!isBonusUnlocked(btn.grade)) {
                       publish('playSE', 'cancel');
-                      alert('この学年の総復習はまだ解放されていません。\n同学年のボーナスを解放してください。');
+                      this._showNotice(['総ふくしゅうは この先に あるよ', 'この学年の ボーナスに すすむと', 'ここから あそべるよ']);
                       return;
                     }
             
@@ -1260,7 +1296,7 @@ handleClick(e) {
               const g = parseInt(m[1], 10);
               if (!isBonusUnlocked(g)) {
                 publish('playSE', 'cancel');
-                alert('この級のボーナスはまだ解放されていません。\n同級の通常ステージをすべてクリアし、該当級の漢字を全てマスターすると解放されます。');
+                this._showNotice(['この級の ボーナスは この先に あるよ', 'この級の ステージを クリアして', '漢字を マスターすると ひらくよ']);
                 return;
               }
             }
@@ -1411,12 +1447,12 @@ _drawAllCaughtMark(ctx, x, y) {
         gameState.gameMode = 'practice';
         publish('changeScreen', 'practiceBattle');
       } else {
-        alert('練習できるステージがありません。');
+        this._showNotice(['いまは すすめる ステージが ないよ', 'ほかの 級も のぞいてみよう']);
       }
     }
     // ステージが選択されていない場合
     else {
-      alert('練習したいステージを先に選択してください。');
+      this._showNotice(['れんしゅうしたい ステージを えらんでね']);
     }
   },
   
@@ -1584,6 +1620,7 @@ _drawAllCaughtMark(ctx, x, y) {
     this._mousemoveHandler = null;
     this.stageButtons = [];
     this.selectedStage = null;
+    this.notice = null;
     this.canvas = null;
     this.ctx = null;
   },
