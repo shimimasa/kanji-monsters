@@ -112,7 +112,7 @@ const courseSelectScreen = {
       ctx,
       this.japanButton,
       '日本編（小学生の漢字）',
-      images.japanMap
+      images.japanAdventureMap || images.japanMap
     );
     
     // 右側エリア（世界編）
@@ -120,10 +120,10 @@ const courseSelectScreen = {
       ctx,
       this.worldButton,
       '世界編（漢検4級〜2級）',
-      images.worldMap
+      images.worldAdventureMap || images.worldMap
     );
         // ヒントテキスト
-        ctx.fillStyle = '#7f8c8d';
+        ctx.fillStyle = '#d4e1e8';
         ctx.font = '16px "UDデジタル教科書体", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
@@ -138,36 +138,33 @@ const courseSelectScreen = {
   
   /** コースエリアを描画 */
   _drawCourseArea(ctx, area, title, image) {
-    // エリアの背景
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    // 明るい額縁と海の色で、地図を小さな画面でも見分けやすくする
+    ctx.fillStyle = '#f7efd9';
     ctx.fillRect(area.x, area.y, area.width, area.height);
-    
-    // エリアの枠線
-    ctx.strokeStyle = '#f39c12';
+    ctx.strokeStyle = '#e5ad5b';
     ctx.lineWidth = 3;
     ctx.strokeRect(area.x, area.y, area.width, area.height);
-    
-    // タイトル
-    ctx.fillStyle = '#ecf0f1';
+
+    ctx.fillStyle = '#253d4a';
     ctx.font = 'bold 24px "UDデジタル教科書体", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(title, area.x + area.width / 2, area.y + 20);
-    
-    // 画像（存在する場合）
-    if (image) {
-      let imgWidth = Math.min(area.width - 40, image.width);
-      let imgHeight = Math.min(area.height - 100, image.height);
-      if (isPortraitCanvas(this.canvas) && image.width && image.height) {
-        // たての 画面は 枠が 横長なので、地図の 形を くずさずに 収める
-        const s = Math.min((area.width - 40) / image.width, (area.height - 80) / image.height);
-        imgWidth = image.width * s;
-        imgHeight = image.height * s;
-      }
-      const imgX = area.x + (area.width - imgWidth) / 2;
-      const imgY = isPortraitCanvas(this.canvas) ? area.y + 58 : area.y + 70;
-      
-      ctx.drawImage(image, imgX, imgY, imgWidth, imgHeight);
+    ctx.fillText(title, area.x + area.width / 2, area.y + 17);
+
+    const mapX = area.x + 12;
+    const mapY = area.y + 58;
+    const mapWidth = area.width - 24;
+    const mapHeight = area.height - 70;
+    if (image?.width && image?.height) {
+      const scale = Math.min(mapWidth / image.width, mapHeight / image.height);
+      const width = image.width * scale;
+      const height = image.height * scale;
+      const x = mapX + (mapWidth - width) / 2;
+      const y = mapY + (mapHeight - height) / 2;
+      ctx.drawImage(image, x, y, width, height);
+      ctx.strokeStyle = '#b38f64';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x, y, width, height);
     }
   },
 
