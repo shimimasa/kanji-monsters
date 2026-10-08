@@ -55,6 +55,8 @@ const UI_IMAGE_PATHS = {
   // 地方選択画面用の画像を追加
   japanMap: '/assets/images/stage.select/日本地図.png',
   worldMap: '/assets/images/stage.select/世界地図.png',
+  japanAdventureMap: '/assets/images/stage.select/japan-adventure-map.webp',
+  worldAdventureMap: '/assets/images/stage.select/world-adventure-map.webp',
   woodenSign:    '/assets/images/wooden_sign.png',
   regionMarker:  '/assets/images/region_marker.png',
   // タイトル画面用の背景画像を追加
