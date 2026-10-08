@@ -15,6 +15,7 @@ const stageLoadingState = {
   ctx: null,
   progress: 0,
   stageId: null,
+  previewBackground: null,
   _lifecycle: createScreenLifecycle(),
 
   async enter(canvas) {
@@ -41,6 +42,7 @@ const stageLoadingState = {
       };
       this.canvas.addEventListener?.('click',this._clickHandler);
       this.progress = 0;
+      this.previewBackground = null;
       this.stageId = gameState.currentStageId;
 
       if (!this.stageId) {
@@ -77,7 +79,11 @@ const stageLoadingState = {
         this.update(0);
       };
 
-      const wrappedPromises = loadPromises.map(p => p.then(result => {
+      const wrappedPromises = loadPromises.map((p, index) => p.then(result => {
+        // 背景の読み込みが先に終われば、その絵を準備画面にも映す。
+        if (index === 0 && this._lifecycle.active && this._lifecycle.generation === generation) {
+          this.previewBackground = result;
+        }
         progressCallback();
         return result;
       }));
@@ -117,39 +123,73 @@ const stageLoadingState = {
     // 出る時に 800×600 へ 戻さないのは、バトル・ステージ選択が 自分で 合わせるから（戻すと 一瞬 小さくなる）
     syncPortraitCanvas(canvas);
 
-    // ローディング画面の描画
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    bg.addColorStop(0, '#2c1810');
-    bg.addColorStop(1, '#3d2414');
+    const cw = canvas.width, ch = canvas.height;
+    const portrait = cw < ch;
+    ctx.clearRect(0, 0, cw, ch);
+    const bg = ctx.createLinearGradient(0, 0, 0, ch);
+    bg.addColorStop(0, '#203d49');
+    bg.addColorStop(1, '#69442c');
     ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, cw, ch);
+    const image = this.previewBackground;
+    if (image?.naturalWidth > 0 && image?.naturalHeight > 0) {
+      const scale = Math.max(cw / image.naturalWidth, ch / image.naturalHeight);
+      const width = image.naturalWidth * scale, height = image.naturalHeight * scale;
+      ctx.drawImage(image, (cw - width) / 2, (ch - height) / 2, width, height);
+      ctx.fillStyle = 'rgba(13,29,35,0.64)';
+      ctx.fillRect(0, 0, cw, ch);
+    } else {
+      ctx.fillStyle = 'rgba(255,221,157,0.15)';
+      ctx.beginPath();
+      ctx.arc(cw * 0.77, ch * 0.22, 72, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-    const barWidth = Math.min(600, canvas.width - 60);
-    const barHeight = 30;
-    const x = (canvas.width - barWidth) / 2;
-    const y = (canvas.height - barHeight) / 2;
+    const panelWidth = Math.min(620, cw - 48);
+    const panelHeight = portrait ? 248 : 210;
+    const panelX = (cw - panelWidth) / 2;
+    const panelY = (ch - panelHeight) / 2;
+    ctx.fillStyle = 'rgba(13,31,37,0.84)';
+    ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+    ctx.strokeStyle = '#dfc58f';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
 
-    ctx.fillStyle = 'rgba(255,255,255,0.16)';
-    ctx.fillRect(x, y, barWidth, barHeight);
-    ctx.fillStyle = '#CD853F';
-    ctx.fillRect(x, y, barWidth * this.progress, barHeight);
-    ctx.strokeStyle = '#D2B48C';
-    ctx.strokeRect(x, y, barWidth, barHeight);
-
-    ctx.fillStyle = '#fff';
-    ctx.font = '18px "UDデジタル教科書体", sans-serif';
+    ctx.fillStyle = '#fff8e7';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(`${Math.floor(this.progress * 100)}%`, canvas.width / 2, y + barHeight + 8);
-    ctx.font = 'bold 26px "UDデジタル教科書体", sans-serif';
-    ctx.fillText('ステージを じゅんびしています', canvas.width / 2, y - 44);
+    ctx.font = `bold ${portrait ? 26 : 28}px "UDデジタル教科書体", sans-serif`;
+    if (portrait) {
+      ctx.fillText('ぼうけんの じゅんびを', cw / 2, panelY + 35);
+      ctx.fillText('しているよ', cw / 2, panelY + 68);
+    } else {
+      ctx.fillText('ぼうけんの じゅんびを しているよ', cw / 2, panelY + 38);
+    }
+
+    const barWidth = panelWidth - 64;
+    const barHeight = 26;
+    const x = (cw - barWidth) / 2;
+    const y = panelY + (portrait ? 115 : 88);
+    const progress = Math.max(0, Math.min(1, this.progress));
+    ctx.fillStyle = 'rgba(255,255,255,0.20)';
+    ctx.fillRect(x, y, barWidth, barHeight);
+    ctx.fillStyle = '#f5c266';
+    ctx.fillRect(x, y, barWidth * progress, barHeight);
+    ctx.strokeStyle = '#ffe5af';
+    ctx.strokeRect(x, y, barWidth, barHeight);
+
+    ctx.fillStyle = '#fff8e7';
+    ctx.font = '20px "UDデジタル教科書体", sans-serif';
+    ctx.fillText(`${Math.floor(progress * 100)}%`, cw / 2, y + barHeight + 10);
+    ctx.font = '19px "UDデジタル教科書体", sans-serif';
+    ctx.fillText('じぶんの ペースで たのしもう', cw / 2, panelY + panelHeight - 48);
     const controls = getLearningControls(canvas);
     drawLearningButton(ctx,controls.back,controls.scale);
   },
 
   exit() {
     this._lifecycle.deactivate();
+    this.previewBackground = null;
     this.canvas?.removeEventListener?.('click',this._clickHandler);
     if (this._errorPanel) { hideBootProgress(); this._errorPanel = null; }
     console.log("🚪 stageLoadingState.exit() 実行");
