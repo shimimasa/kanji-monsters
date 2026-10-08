@@ -17,7 +17,7 @@ const p=s.querySelector('.gf-prompt')?.firstChild?.textContent||'';let ans=null;
 if(/=/.test(p)){const q=p.replace('= ?','').replace('−','-').replace('×','*');ans=String(eval(q));}
 const cups=[...s.querySelectorAll('.gf-cup')].map(n=>{const r=n.getBoundingClientRect();return {text:n.querySelector('.gf-plate')?.textContent,x:r.x+r.width/2,y:r.y+r.height/2,
   gone:n.dataset.gone==='true',chosen:n.dataset.chosen==='true',choosing:n.dataset.choosing==='true',hint:n.dataset.hint==='true'}});
-return {p,ans,c:[c.x,c.y,c.width,c.height],bx:b.x+b.width/2,by:b.y+b.height/2,cups,power:!s.querySelector('.gf-power').hidden,
+return {p,ans,c:[c.x,c.y,c.width,c.height],bx:b.x+b.width/2,by:b.y+b.height/2,cups,power:!s.querySelector('.gf-aim-controls').hidden,
   title:s.querySelector('.gf-title')?.textContent,note:s.querySelector('[data-role=feedback]')?.textContent}})()`;
 const look = async () => (await send('Runtime.evaluate', { expression: probe, returnByValue: true })).result?.result?.value;
 const mouse = (type, x, y) => send('Input.dispatchMouseEvent', { type, x, y, button: 'left', buttons: type === 'mouseReleased' ? 0 : 1, clickCount: 1 });

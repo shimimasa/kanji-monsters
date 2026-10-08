@@ -27,6 +27,23 @@ const MONSTER_PANEL = { x: 560, y: 90, w: 220, h: 170 };
 // 漢字パネル（中央）。他のバトル画面と違い出題は1体固定なので、位置は固定値でよい
 const KANJI_BOX = { centerX: 380, centerY: 300, w: 200, h: 200 };
 
+function drawWrappedResultText(ctx, text, centerX, startY, maxWidth, lineHeight) {
+  let line = '', y = startY;
+  for (const char of text) {
+    if (line && ctx.measureText(line + char).width > maxWidth && !'、。」）'.includes(char)) {
+      ctx.fillText(line, centerX, y);
+      y += lineHeight;
+      line = '';
+    }
+    line += char;
+  }
+  if (line) {
+    ctx.fillText(line, centerX, y);
+    y += lineHeight;
+  }
+  return y;
+}
+
 const gradeQuizScreen = {
   canvas: null,
   ctx: null,
@@ -54,9 +71,15 @@ const gradeQuizScreen = {
     Object.assign(MONSTER_PANEL, { x: 560, y: 90, w: 220, h: 170 });
     Object.assign(KANJI_BOX, { centerX: 380, w: 200, h: 200 });
     Object.assign(BTN.back, controls.back);
-    for (const [key, source] of [['again','attack'],['review','heal'],['select','hint']]) {
-      const label = BTN[key].label;
-      Object.assign(BTN[key], controls[source], {label, y: controls.compact ? controls.submit.y : 480});
+    if (controls.compact) {
+      for (const [key, source] of [['again','attack'],['review','heal'],['select','hint']]) {
+        const label = BTN[key].label;
+        Object.assign(BTN[key], controls[source], {label, y: controls.submit.y});
+      }
+    } else {
+      Object.assign(BTN.again, { x: 150, y: 480, w: 150, h: 52 });
+      Object.assign(BTN.review, { x: 325, y: 480, w: 150, h: 52 });
+      Object.assign(BTN.select, { x: 500, y: 480, w: 170, h: 52 });
     }
     controls.submit.y = controls.compact ? controls.submit.y : 480;
     KANJI_BOX.centerY = 220;
@@ -366,11 +389,19 @@ const gradeQuizScreen = {
     } else {
       // リザルト画面
       const centerX = canvas.width / 2;
+      const portrait = controls.portrait;
+      const panel = portrait ? { x: 16, y: 104, w: 448, h: 360 } : { x: 112, y: 102, w: 576, h: 320 };
+      ctx.fillStyle = 'rgba(13, 38, 68, 0.84)';
+      drawRoundedRect(ctx, panel.x, panel.y, panel.w, panel.h, 18);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
       ctx.fillStyle = 'white';
-      ctx.font = '24px "UDデジタル教科書体",sans-serif';
-      ctx.fillText('テスト結果', centerX, 120);
+      ctx.font = `${portrait ? 28 : 24}px "UDデジタル教科書体",sans-serif`;
+      ctx.fillText('テスト結果', centerX, portrait ? 126 : 122);
 
       const summary = getQuizResultSummary(this.stats.answers, this.order.length);
       const total = summary.total;
@@ -379,18 +410,21 @@ const gradeQuizScreen = {
       // 上向きに数え、「不合格」に相当する表示は出さない
       const need = Math.ceil(total * 0.8);
       const reached = correct >= need;
-      ctx.font = '18px "UDデジタル教科書体",sans-serif';
+      ctx.font = `${portrait ? 25 : 20}px "UDデジタル教科書体",sans-serif`;
       ctx.fillStyle = reached ? '#2ecc71' : '#f1c40f';
-      ctx.fillText(`今回の正解入力: ${correct} / ${total}`, centerX, 160);
+      ctx.fillText(`今回の正解入力: ${correct} / ${total}`, centerX, portrait ? 172 : 161);
 
-      ctx.font = '16px "UDデジタル教科書体",sans-serif';
-      ctx.fillText(reached ? '今回の問題、よく取り組んだね！' : `今回の問題で あと${need - correct}もん！`, centerX, 188);
+      ctx.font = `${portrait ? 22 : 18}px "UDデジタル教科書体",sans-serif`;
+      const lineHeight = portrait ? 31 : 27;
+      const maxWidth = panel.w - 32;
+      let textY = portrait ? 214 : 198;
+      textY = drawWrappedResultText(ctx, reached ? '今回の問題、よく取り組んだね！' : `今回の問題で あと${need - correct}もん！`, centerX, textY, maxWidth, lineHeight) + 10;
 
       ctx.fillStyle = 'white';
-      ctx.fillText(`ヒントなしで正解入力: ${summary.independentCorrect}もん`, centerX, 216);
+      textY = drawWrappedResultText(ctx, `ヒントなしで正解入力: ${summary.independentCorrect}もん`, centerX, textY, maxWidth, lineHeight) + 10;
       const examples = summary.independentKanjiIds.map(id => getKanjiById(id)?.kanji).filter(Boolean);
-      if (examples.length) ctx.fillText(`今回じぶんで答えた字: ${examples.join('・')}`, centerX, 242);
-      ctx.fillText('読みちがいの漢字は「つぎのふくしゅう」に いれておいたよ', centerX, 268);
+      if (examples.length) textY = drawWrappedResultText(ctx, `今回じぶんで答えた字: ${examples.join('・')}`, centerX, textY, maxWidth, lineHeight) + 10;
+      drawWrappedResultText(ctx, '読みちがいの漢字は「つぎのふくしゅう」に いれておいたよ', centerX, textY, maxWidth, lineHeight);
 
       // ボタン
       drawLearningButton(ctx, BTN.again, controls.scale);

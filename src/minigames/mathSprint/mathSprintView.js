@@ -9,7 +9,7 @@ const CSS = `
 #mathSprintScreen .sp-hills{top:30%;height:23%;background-image:radial-gradient(ellipse 160px 80px at 120px 100%,#6fbf73 60%,transparent 61%),radial-gradient(ellipse 200px 110px at 380px 100%,#58a860 60%,transparent 61%);background-size:520px 100%}
 #mathSprintScreen .sp-track{position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(#c8764c,#a85c38);border-top:6px solid #f1efe6}
 #mathSprintScreen .sp-lines{position:absolute;left:0;right:0;top:34%;height:4px;background:repeating-linear-gradient(90deg,#fff 0 40px,transparent 40px 90px);opacity:.75}
-#mathSprintScreen .sp-runner,#mathSprintScreen .sp-ghost{position:absolute;bottom:31%;width:clamp(72px,10vw,108px);height:clamp(72px,10vw,108px);transform:translateX(-50%);z-index:5}
+#mathSprintScreen .sp-runner{position:absolute;bottom:31%;width:clamp(72px,10vw,108px);height:clamp(72px,10vw,108px);transform:translateX(-50%);z-index:5}
 #mathSprintScreen .sp-runner .gt-portrait{display:block;width:100%;height:100%;background:none;border:0}
 #mathSprintScreen .sp-runner .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 3px #0005)}
 #mathSprintScreen .sp-runner[data-state=run] .gt-portrait{animation:sp-bob var(--stride,.4s) ease-in-out infinite alternate}
@@ -19,8 +19,9 @@ const CSS = `
 #mathSprintScreen .sp-runner[data-fever=true]::before{content:'';position:absolute;right:70%;top:25%;width:120%;height:50%;background:repeating-linear-gradient(0deg,transparent 0 8px,#fff6 8px 11px);filter:blur(1px);animation:sp-lines .25s linear infinite}
 #mathSprintScreen .sp-runner[data-fever=true]::after{content:'';position:absolute;inset:-10%;border-radius:50%;background:radial-gradient(circle,#ffd54a77,transparent 70%);animation:ya-glow .4s infinite alternate}
 #mathSprintScreen .sp-bubble{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);padding:4px 10px;border-radius:12px;background:#fff;color:#16242c;font-weight:900;font-size:15px;white-space:nowrap;box-shadow:0 3px 0 #0003}
-#mathSprintScreen .sp-ghost{opacity:.35;filter:grayscale(1) brightness(1.6);pointer-events:none;z-index:4}
-#mathSprintScreen .sp-ghost span{position:absolute;left:50%;top:-18px;transform:translateX(-50%);font-size:11px;font-weight:900;color:#16242c;white-space:nowrap}
+#mathSprintScreen .sp-ghost{position:absolute;bottom:calc(31% - 42px);width:72px;height:26px;transform:translateX(-50%);display:grid;place-items:center;border:2px dashed #244d5b;border-radius:8px;background:#fffdf3;color:#16242c;box-shadow:0 2px 5px #0004;pointer-events:none;z-index:4}
+#mathSprintScreen .sp-ghost::before{content:'';position:absolute;bottom:100%;left:50%;height:14px;border-left:2px dashed #244d5b}
+#mathSprintScreen .sp-ghost span{font-size:13px;font-weight:900;white-space:nowrap}
 #mathSprintScreen .sp-hurdle{position:absolute;bottom:31%;width:40px;height:62px;transform:translateX(-50%);z-index:3}
 #mathSprintScreen .sp-hurdle::before{content:'';position:absolute;left:0;right:0;top:6px;height:12px;border-radius:4px;background:repeating-linear-gradient(90deg,#fff 0 10px,#e2412f 10px 20px);box-shadow:0 2px 0 #0003}
 #mathSprintScreen .sp-hurdle::after{content:'';position:absolute;left:4px;right:4px;top:18px;bottom:0;border-left:5px solid #ddd;border-right:5px solid #ddd}

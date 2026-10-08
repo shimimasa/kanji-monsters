@@ -45,8 +45,10 @@ const CSS = `
 #gotomonGolfScreen .gf-choice[data-chosen=true]{background:#ffd16655;box-shadow:0 0 0 3px #ffd166}
 #gotomonGolfScreen .gf-choice[data-hint=true]{box-shadow:0 0 0 3px #37c871}
 #gotomonGolfScreen .gf-choice:disabled{opacity:.4;cursor:default}
-#gotomonGolfScreen .gf-power{height:12px;border-radius:8px;background:#ffffff26;overflow:hidden}
-#gotomonGolfScreen .gf-power i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7ed957,#ffd166,#ff6f61)}
+#gotomonGolfScreen .gf-aim-controls{display:grid;grid-template-columns:auto minmax(70px,1fr) auto;align-items:center;gap:8px;color:#fff;font-size:14px;font-weight:800}
+#gotomonGolfScreen .gf-aim-controls[hidden]{display:none}
+#gotomonGolfScreen .gf-aim-controls input{width:100%;height:44px;accent-color:#ffd166;touch-action:manipulation}
+#gotomonGolfScreen .gf-shoot{min-height:48px;padding:4px 12px;border:0;border-radius:12px;background:#ffd166;color:#3a2400;font:inherit;font-size:16px;font-weight:900;cursor:pointer}
 #gotomonGolfScreen .gf-help{margin:0;text-align:center;font-size:13px;color:#d4e8ff}
 @keyframes gf-bob{from{translate:0 0}to{translate:0 -4px}}
 @keyframes gf-glow{from{filter:brightness(1)}to{filter:brightness(1.15)}}
@@ -87,24 +89,45 @@ export function createGolfView({ document: doc, dispatch, onBack, getSnapshot, c
   const title = el('p', 'gf-title');
   const prompt = el('p', 'gf-prompt'); prompt.dataset.role = 'problem';
   const choices = el('div', 'gf-choices'), choiceButtons = [];
-  const power = el('div', 'gf-power'), powerBar = el('i'); power.append(powerBar); power.hidden = true;
+  const aimControls = el('div', 'gf-aim-controls');
+  const powerLabel = el('label', '', 'つよさ');
+  const powerRange = el('input'); powerRange.type = 'range'; powerRange.min = '10'; powerRange.max = '100'; powerRange.step = '5'; powerRange.value = '55'; powerRange.setAttribute('aria-label', 'ボールを打つつよさ');
+  const shootButton = el('button', 'gf-shoot', 'この向きに うつ'); shootButton.type = 'button';
+  aimControls.append(powerLabel, powerRange, shootButton); aimControls.hidden = true;
+  on(powerRange, 'input', () => {
+    const state = getSnapshot();
+    if (!active || state.paused || state.phase !== 'aiming' || !aim) return;
+    aim = { angle: aim.angle, power: Number(powerRange.value) / 100 };
+    keyAim = { ...aim };
+  });
+  on(shootButton, 'click', () => { if (aim) shoot(aim); });
   const help = el('p', 'gf-help');
   const note = el('p', 'ya-dock-note'); note.dataset.role = 'feedback';
-  dock.append(title, prompt, choices, power, help, note);
+  dock.append(title, prompt, choices, aimControls, help, note);
   doc.body.append(root);
 
   const place = (node, x, y) => { node.style.left = `${x / R.W * 100}%`; node.style.top = `${y * 100}%`; };
+  const aimToCup = (state, plateId, power = keyAim.power) => {
+    const cup = state.hole?.cups.find(item => item.plateId === plateId);
+    return cup && state.ball ? { angle: Math.atan2(cup.y - state.ball.y, cup.x - state.ball.x), power } : null;
+  };
   const choose = plateId => {
     const state = getSnapshot();
     if (!active || state.paused || !state.canChoose) return false;
     const ok = dispatch({ type: 'choose', payload: { sessionId: state.sessionId, attemptId: state.attemptId, plateId } });
-    if (ok) { note.textContent = 'コースの どこでも ゆびで おして、うしろへ 引っぱって はなすと 打てるよ'; frame.announce(note.textContent); }
+    if (ok) {
+      aim = aimToCup(state, plateId, 0.55); keyAim = { ...aim };
+      note.textContent = 'コースを タップして ねらいを 変え、つよさを 決めて 打とう。引っぱって すぐ打つこともできるよ';
+      frame.announce(note.textContent);
+    }
     return ok;
   };
   const shoot = ({ angle, power: p }) => {
     const state = getSnapshot();
     if (!active || state.paused || state.phase !== 'aiming' || !state.chosenPlateId || p < MIN_POWER) return false;
-    return dispatch({ type: 'shoot', payload: { sessionId: state.sessionId, attemptId: state.attemptId, angle, power: Math.min(1, p) } });
+    const ok = dispatch({ type: 'shoot', payload: { sessionId: state.sessionId, attemptId: state.attemptId, angle, power: Math.min(1, p) } });
+    if (ok) { keyAim = { angle, power: Math.min(1, p) }; aim = null; }
+    return ok;
   };
   // Pulling back from where the finger went down: the ball flies the other way, harder the farther the pull.
   const aimFrom = event => {
@@ -124,11 +147,24 @@ export function createGolfView({ document: doc, dispatch, onBack, getSnapshot, c
       if (state.phase === 'choosing') { note.textContent = 'さきに、答えの旗を タップしてね'; frame.announce(note.textContent); }
       return;
     }
-    event.preventDefault?.(); pulling = { x: event.clientX, y: event.clientY }; aim = null;
+    event.preventDefault?.(); pulling = { x: event.clientX, y: event.clientY, power: aim?.power ?? Number(powerRange.value) / 100 }; aim = null;
   });
   on(doc, 'pointermove', event => { if (pulling) aim = aimFrom(event); });
   on(doc, 'pointerup', event => {
     if (!pulling) return;
+    if (Math.hypot(event.clientX - pulling.x, event.clientY - pulling.y) < 20) {
+      const tapPower = pulling.power;
+      pulling = null;
+      const state = getSnapshot(), box = course.getBoundingClientRect?.();
+      if (!box?.width || !state.ball) return;
+      const x = (event.clientX - box.left) / box.width * R.W, y = (event.clientY - box.top) / box.height;
+      if (Math.hypot(x - state.ball.x, y - state.ball.y) < R.ballR) return;
+      aim = { angle: Math.atan2(y - state.ball.y, x - state.ball.x), power: tapPower };
+      keyAim = { ...aim };
+      note.textContent = '点線で ころがりかたを 見て、つよさを えらぼう';
+      frame.announce(note.textContent);
+      return;
+    }
     const shot = aimFrom(event) ?? aim; pulling = null; aim = null;
     if (shot && !shoot(shot) && shot.power < MIN_POWER) { note.textContent = 'もっと 長く 引っぱってみよう'; frame.announce(note.textContent); }
   });
@@ -199,9 +235,11 @@ export function createGolfView({ document: doc, dispatch, onBack, getSnapshot, c
     });
   };
   const renderGuide = state => {
+    if (state.phase === 'aiming' && state.chosenPlateId && !aim && !pulling) aim = aimToCup(state, state.chosenPlateId);
     const show = state.phase === 'aiming' && state.chosenPlateId && aim && aim.power >= MIN_POWER;
-    power.hidden = !(state.phase === 'aiming' && state.chosenPlateId);
-    powerBar.style.width = `${(aim?.power ?? 0) * 100}%`;
+    aimControls.hidden = !(state.phase === 'aiming' && state.chosenPlateId);
+    shootButton.disabled = !show;
+    if (aim && powerRange.value !== String(Math.round(aim.power * 20) * 5)) powerRange.value = String(Math.round(aim.power * 20) * 5);
     if (!show) { path.setAttribute('points', ''); pull.setAttribute('x1', 0); pull.setAttribute('y1', 0); pull.setAttribute('x2', 0); pull.setAttribute('y2', 0); return; }
     const h = { ...state.hole.course, cups: state.hole.cups };
     const points = tracePath(h, state.ball.x, state.ball.y, aim.angle, aim.power, state.worldMs, 0.25 + aim.power * 0.45);
@@ -234,8 +272,8 @@ export function createGolfView({ document: doc, dispatch, onBack, getSnapshot, c
     if (state.phase !== 'sunk' && ball.classList?.contains('gf-sink')) ball.classList.remove('gf-sink');
     renderGuide(state);
     const helpText = state.phase === 'choosing' ? '答えの旗を タップしよう（ボタンや 1〜4キーでも えらべるよ）'
-      : state.phase === 'aiming' && state.canChoose ? '旗は 打つまで えらびなおせるよ。かべや ゴトモンで はねかえるよ'
-        : state.phase === 'aiming' ? 'うしろへ 引っぱって はなそう（矢印キーで ねらって スペースでも 打てるよ）' : '';
+      : state.phase === 'aiming' && state.canChoose ? '旗は 打つまで えらびなおせるよ。点線を 見て ねらおう'
+        : state.phase === 'aiming' ? 'コースを タップして ねらうか、うしろへ 引っぱって 打とう' : '';
     if (help.textContent !== helpText) help.textContent = helpText;
   };
   const showCup = state => {
@@ -298,7 +336,7 @@ export function createGolfView({ document: doc, dispatch, onBack, getSnapshot, c
         life: null, gaugeValue: play.gauge, fever: w.fever,
         missionText: mission ? `${mission.status === 'achieved' ? '✓ ' : '★ '}${mission.name} ${mission.progress}` : '', missionDone: mission?.status === 'achieved' });
     },
-    stopInput() { active = false; pulling = null; aim = null; choiceButtons.forEach(button => { button.disabled = true; }); },
+    stopInput() { active = false; pulling = null; aim = null; [...choiceButtons, powerRange, shootButton].forEach(button => { button.disabled = true; }); },
     dispose() { this.stopInput(); removes.splice(0).forEach(remove => remove()); frame.dispose(); },
   };
 }
