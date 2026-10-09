@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-09、ふりかえりCSVの案内をボタン下に表示）
+
+- **状態**: 前回のタイトル手動セーブ案内改善は [PR #149](https://github.com/shimimasa/kanji-monsters/pull/149) で main `5b4b9210` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のふりかえりCSV案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
+- **今回の変更**: 設定画面の『ふりかえりを もちかえる』の結果をCSVボタン下の案内にまとめ、長いファイル名も折り返して表示。記録がまだない時、ダウンロードを始めた時、CSVを作れない時を画面内で示し、成功時の1.2秒で消える通知を外す。書き出しデータや学習記録は変更しない。
+- **確認**: `npm.cmd run build` 成功、`bash scripts/playtest-cdp/run-all-tests.sh` は `ALL-PASS`。専用Chromeのスマホ縦390×844で記録なし案内と、試験用1件の記録を入れた後のダウンロード開始案内を実タップ。長いファイル名の案内は画面内（上451〜下523px）、横はみ出し0。PC1280×800では開始案内とブラウザの試験用URL作成失敗による作成不可案内を確認。試験用セーブ2キー一致、通常画面のブラウザエラー0件。変更ファイルの改行差分は `git diff --numstat` と `--ignore-cr-at-eol` が一致。
+- **再開するときは**: 子どもと先生・おうちの人の試遊で、CSVの案内とダウンロードしたファイルの場所が分かるか確かめる。今回の改善の公開は、その回の明示指示がある場合だけ進める。
+
 ## 次回はここから（2026-10-09、タイトルのセーブ結果を画面内に表示）
 
 - **状態**: 前回の保存先選択の案内改善は [PR #148](https://github.com/shimimasa/kanji-monsters/pull/148) で main `f8b9fba6` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のタイトルの手動セーブ案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。

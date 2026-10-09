@@ -303,20 +303,36 @@ const settingsScreenState = {
     const row = document.createElement('div');
     row.className = 'inline-controls';
 
-    const status = document.createElement('span');
-    status.style.marginLeft = '8px';
+    const status = document.createElement('div');
+    status.className = 'save-help';
+    status.setAttribute('role', 'status');
+    status.style.fontSize = '16px';
+    status.style.color = '#ffe4a8';
+    status.style.overflowWrap = 'anywhere';
+    status.hidden = true;
+    const showStatus = (message) => {
+      status.textContent = message;
+      status.hidden = false;
+      status.scrollIntoView?.({ block: 'nearest' });
+    };
 
     const save = (kind, build) => {
       publish('playSE', 'decide');
       if (!ReviewExport.hasAnything()) {
         // 空のファイルを渡しても先生が困るだけなので、理由を出して止める
-        status.textContent = '（まだ きろくが ありません）';
+        showStatus('まだ きろくが ありません。あそんだ あとに つくれるよ');
         return;
       }
-      const fileName = ReviewExport.buildFileName(kind);
-      const ok = ReviewExport.downloadCsv(build(), fileName);
-      status.textContent = ok ? `（${fileName} を ほぞんしました）` : '（ほぞんできませんでした）';
-      if (ok) this._showSaveToast('ふりかえりを 書き出しました');
+      try {
+        const fileName = ReviewExport.buildFileName(kind);
+        const ok = ReviewExport.downloadCsv(build(), fileName);
+        showStatus(ok
+          ? `ダウンロードを はじめました。${fileName} を たいせつに しまってね`
+          : 'いまは CSVを つくれませんでした。おうちの人や 先生と もういちど ためしてね');
+      } catch (error) {
+        console.error(error);
+        showStatus('いまは CSVを つくれませんでした。おうちの人や 先生と もういちど ためしてね');
+      }
     };
 
     const kanjiBtn = document.createElement('button');
@@ -332,10 +348,10 @@ const settingsScreenState = {
 
     row.appendChild(kanjiBtn);
     row.appendChild(dailyBtn);
-    row.appendChild(status);
 
     group.appendChild(label);
     group.appendChild(row);
+    group.appendChild(status);
 
     this._setupTooltipEvents(
       tip,
