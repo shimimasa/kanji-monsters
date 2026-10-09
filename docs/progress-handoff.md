@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-09、タイトルのセーブ準備案内を画面内に表示）
+
+- **状態**: 前回の名前変更案内改善は [PR #146](https://github.com/shimimasa/kanji-monsters/pull/146) で main `80e78331` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のタイトル案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
+- **今回の変更**: タイトルから本編へ進む時にセーブの準備が整っていない場合のブラウザ `alert` を、本編ボタン下に残る案内へ変更。前回の場所からの再開も同じ案内を出し、準備が整うまでは画面遷移しない。セーブや学習記録の処理は変更しない。
+- **確認**: `npm.cmd run build` 成功、`bash scripts/playtest-cdp/run-all-tests.sh` は `ALL-PASS`。専用ChromeのPC1280×800とスマホ縦390×844で、試験用のセーブ世代だけを一時的に変えて本編ボタンを実タップ。スマホでは案内全文が画面内（上482〜下610px）、横はみ出し0。PCでは前回の場所からの再開と別の場所選択の両方でタイトルに留まることを確認。世代を戻した通常状態では本編へ進み、ブラウザエラー0件、試験用セーブ2キー一致。変更ファイルの改行差分は `git diff --numstat` と `--ignore-cr-at-eol` が一致。
+- **再開するときは**: 子どもとおうちの人の試遊で、タイトルの案内と『せってい』への行き方が分かるか確かめる。今回の改善の公開は、その回の明示指示がある場合だけ進める。
+
 ## 次回はここから（2026-10-09、名前変更の結果を入力欄の下に表示）
 
 - **状態**: 前回のかんたんセーブ案内改善は [PR #145](https://github.com/shimimasa/kanji-monsters/pull/145) で main `863b05c0` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回の名前変更案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
