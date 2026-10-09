@@ -14,12 +14,15 @@ const silent=t=>{for(const k of ['log','warn','error'])t.mock.method(console,k,(
 test('E03: title manual save quota displays failure, never success',async t=>{
   silent(t);saveNow(getDefaultSave(),{replace:true});await loadGameData();
   let button;globalThis.document={getElementById:()=>null,createElement:()=>({style:{}}),body:{appendChild:b=>button=b}};
-  const messages=[];t.mock.method(title,'_showSaveToast',s=>messages.push(s));title._injectSaveButton();
+  const messages=[];const previousTitle=title._adventureTitle;
+  title._adventureTitle={showSaveGuide:s=>messages.push(s)};
+  t.after(()=>{title._adventureTitle=previousTitle;});
+  title._injectSaveButton();
   const before=storage.getItem('krb_save');storage.fail=(op,key)=>{if(op==='set'&&key==='yomitabi_phase_a_pending')throw quota();};
   await button.onclick();await new Promise(r=>setTimeout(r,30));
   storage.fail=null;assert.equal(storage.getItem('krb_save'),before);
-  assert.ok(messages.some(s=>s.includes('できません')));assert.ok(!messages.includes('セーブしました'));
-  await button.onclick();assert.equal(messages.filter(s=>s==='セーブしました').length,1);
+  assert.ok(messages.some(s=>s.includes('できません')));assert.ok(!messages.some(s=>s.includes('セーブしました')));
+  await button.onclick();assert.equal(messages.filter(s=>s==='つづきを セーブしました').length,1);
   delete globalThis.document;
 });
 test('U05: level-up with reduced motion starts no Canvas interval',t=>{

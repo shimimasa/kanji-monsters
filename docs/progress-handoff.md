@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-09、タイトルのセーブ結果を画面内に表示）
+
+- **状態**: 前回の保存先選択の案内改善は [PR #148](https://github.com/shimimasa/kanji-monsters/pull/148) で main `f8b9fba6` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のタイトルの手動セーブ案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
+- **今回の変更**: 任意表示のタイトル『セーブ』ボタンの結果を、1.2秒で消える通知から本編ボタン下の既存案内へ変更。保存できた時と保存できなかった時の両方を表示し、例外時も案内する。セーブ処理は変更しない。既存の保存容量不足テストは案内の表示先を確認する形に更新し、失敗時に成功と示さない確認を維持する。
+- **確認**: `npm.cmd run build` 成功、`bash scripts/playtest-cdp/run-all-tests.sh` は `ALL-PASS`。専用ChromeのPC1280×800で保存成功、スマホ縦390×844で試験用の無効な図鑑JSONによる保存不可と復旧後の成功を実タップ。いずれも1.5秒後に案内が残る。スマホの保存不可案内は画面内（上593〜下696px）、横はみ出し0。試験データを戻し、通常画面のブラウザエラー0件、試験用セーブ2キー一致。変更ファイルの改行差分は `git diff --numstat` と `--ignore-cr-at-eol` が一致。
+- **再開するときは**: 子どもとおうちの人の試遊で、タイトルのセーブ案内が分かるか確かめる。今回の改善の公開は、その回の明示指示がある場合だけ進める。
+
 ## 次回はここから（2026-10-09、保存先を切り替えられない時の案内を画面内に表示）
 
 - **状態**: 前回のタイトルのセーブ準備案内改善は [PR #147](https://github.com/shimimasa/kanji-monsters/pull/147) で main `652710aa` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回の保存先選択の案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
