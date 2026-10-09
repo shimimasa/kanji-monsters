@@ -137,27 +137,16 @@ const titleState = {
         const result = saveGameData();
         if (result.ok) {
           publish('playSE', 'decide');
-          this._showSaveToast('セーブしました');
+          this._adventureTitle?.showSaveGuide('つづきを セーブしました');
         } else {
-          this._showSaveToast('セーブできませんでした。前の記録は残っています。');
+          this._adventureTitle?.showSaveGuide('いまは セーブできませんでした。おうちの人と もういちど ためしてね。前の きろくは のこっているよ。');
         }
       } catch (e) {
         console.error(e);
+        this._adventureTitle?.showSaveGuide('いまは セーブできませんでした。おうちの人と もういちど ためしてね。前の きろくは のこっているよ。');
       }
     };
     document.body.appendChild(btn);
-  },
-
-  _showSaveToast(message) {
-    const toast = document.createElement('div');
-    Object.assign(toast.style, {
-      position: 'fixed', right: '16px', bottom: '16px', zIndex: 100001,
-      background: 'rgba(0,0,0,0.85)', color: '#fff', padding: '10px 14px', borderRadius: '8px',
-      border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
-    });
-    toast.textContent = message || '保存しました';
-    document.body.appendChild(toast);
-    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 1200);
   },
 
   /** セーブの準備が整っていない時はタイトル内で案内する */
