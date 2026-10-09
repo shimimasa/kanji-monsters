@@ -1609,6 +1609,18 @@ const settingsScreenState = {
         inlineStatus.textContent = `（いまは: ${enabled ? `${minutes}分ごと` : 'OFF'}）`;
       } catch {}
   
+      const autoGuide = document.createElement('div');
+      autoGuide.className = 'save-help';
+      autoGuide.setAttribute('role', 'status');
+      autoGuide.style.fontSize = '16px';
+      autoGuide.style.color = '#ffe4a8';
+      autoGuide.hidden = true;
+      const showAutoGuide = (message) => {
+        autoGuide.textContent = message;
+        autoGuide.hidden = false;
+        autoGuide.scrollIntoView?.({ block: 'nearest' });
+      };
+
       const applyBtn = document.createElement('button');
       applyBtn.className = 'settings-button';
       applyBtn.textContent = '適用';
@@ -1618,10 +1630,18 @@ const settingsScreenState = {
         const minutesNow = parseInt(autoInterval.value || '5', 10);
         try {
           publish('updateAutosaveSettings', { enabled: enabledNow, minutes: minutesNow });
-          this._showSaveToast('オートセーブ設定を更新しました');
+          const savedEnabled = (localStorage.getItem('autosaveEnabled') ?? '1') === '1';
+          const savedMinutes = parseInt(localStorage.getItem('autosaveMinutes') || '5', 10);
+          inlineStatus.textContent = `（いまは: ${savedEnabled ? `${savedMinutes}分ごと` : 'OFF'}）`;
           this._refreshSaveStatus();
-          inlineStatus.textContent = `（いまは: ${enabledNow ? `${minutesNow}分ごと` : 'OFF'}）`;
-        } catch {}
+          if (savedEnabled === enabledNow && savedMinutes === minutesNow) {
+            showAutoGuide(`オートセーブを ${enabledNow ? `${minutesNow}分ごと` : 'OFF'} に しました`);
+          } else {
+            showAutoGuide('いまは オートセーブを かえられませんでした。おうちの人と もういちど ためしてね');
+          }
+        } catch {
+          showAutoGuide('いまは オートセーブを かえられませんでした。おうちの人と もういちど ためしてね');
+        }
       });
   
       autoRow.appendChild(autoToggle);
@@ -1629,6 +1649,7 @@ const settingsScreenState = {
       autoRow.appendChild(applyBtn);
       autoGroup.appendChild(autoLabel);
       autoGroup.appendChild(autoRow);
+      autoGroup.appendChild(autoGuide);
       panel.appendChild(autoGroup);
   
       // 表示更新とfile input追加

@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-09、オートセーブの適用結果を画面内に表示）
+
+- **状況**: 前回のふりかえりCSV案内改善は [PR #150](https://github.com/shimimasa/kanji-monsters/pull/150) で main `d635f8af` にマージし、Vercel 本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のオートセーブ案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。別件の音声・CSS・テスト・報告書などの差分は含めない。
+- **今回の変更**: 設定画面のオートセーブ「適用」の結果を、ボタン下に残る案内で表示。設定イベントの受け手は書き込み例外を内部で処理するため、適用後に保存値を読み直して選んだ値と照合する。一致すれば現在の設定を案内し、不一致や読み取り不可なら再試行を案内する。現在値の表示も読み直した値に合わせる。セーブと学習記録のしくみは変更しない。
+- **確認**: `npm.cmd run build` 成功、`bash scripts/playtest-cdp/run-all-tests.sh` は `ALL-PASS`。専用 Chrome の PC1280×800 で OFF 適用（保存値 `0`）と書き込み失敗（保存値 `0`、現在値 OFF のまま）を実タップ。スマホ縦390×844で10分ごとを適用（保存値 `1` / `10`）、案内は画面内の横37～353pxに収まり、1.5秒後も表示。試験用セーブ2キー一致、通常画面のブラウザエラー0件。変更コードの改行差分は通常と `--ignore-cr-at-eol` で一致。
+- **再開するときは**: 子どもと先生・おうちの人の試遊で、オートセーブ案内が読みやすいか確かめる。今回の改善の公開は、次に明示の指示がある場合だけ進める。
+
 ## 次回はここから（2026-10-09、ふりかえりCSVの案内をボタン下に表示）
 
 - **状態**: 前回のタイトル手動セーブ案内改善は [PR #149](https://github.com/shimimasa/kanji-monsters/pull/149) で main `5b4b9210` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のふりかえりCSV案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
