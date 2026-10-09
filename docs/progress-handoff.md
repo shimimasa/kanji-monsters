@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-09、名前変更の結果を入力欄の下に表示）
+
+- **状態**: 前回のかんたんセーブ案内改善は [PR #145](https://github.com/shimimasa/kanji-monsters/pull/145) で main `863b05c0` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回の名前変更案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
+- **今回の変更**: 設定画面の名前変更で、保存できた時と保存できなかった時の1.2秒で消える通知を、既存の名前欄下の案内に変更。案内を画面内へスクロールし、入力を始めると消す。名前の保存処理は変更しない。
+- **確認**: `npm.cmd run build` 成功、`bash scripts/playtest-cdp/run-all-tests.sh` は `ALL-PASS`。専用ChromeのPC1280×800とスマホ縦390×844で名前変更を実タップ。スマホでは試験用の無効な図鑑JSONで保存できない状態を作り、元の名前が維持され、案内全文が画面内（上306〜下354px）に出ることを確認後、元に戻した。横はみ出し0、通常画面のブラウザエラー0件、試験用セーブ2キー一致。変更ファイルの改行差分は `git diff --numstat` と `--ignore-cr-at-eol` が一致。
+- **再開するときは**: 子どもとおうちの人の試遊で、名前変更の案内を読み取れるか確かめる。今回の改善の公開は、その回の明示指示がある場合だけ進める。
+
 ## 次回はここから（2026-10-09、かんたんセーブの案内を画面内に変更）
 
 - **状態**: 前回のバックアップ案内改善は [PR #144](https://github.com/shimimasa/kanji-monsters/pull/144) で main `1ae473fa` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のかんたんセーブ案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
