@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-08、世界編ステージ選択の案内を画面内に変更）
+
+- **状態**: 四国・九州のボーナス背景は [PR #141](https://github.com/shimimasa/kanji-monsters/pull/141) で main `2fcb4d32` にマージし、Vercel本番のデプロイ状態は success（`Deployment has completed`）。公開先は https://yomitabi.gamanavi.com/ 。今回の世界編ステージ選択の改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
+- **今回の変更**: 世界編ステージ選択のブラウザ `alert` 4か所を、画面内でタップして閉じられる案内に変更。総復習・ボーナスの行き方と、練習先を選ぶ操作を前向きな文で伝える。回答判定・学習記録・セーブ処理は変更しない。
+- **確認**: `npm.cmd run build` 成功、全19群1127件 `ALL-PASS`。専用ChromeでPC1280×800とスマホ縦390×844（盤面480×680）を実タップ。ボーナス、総復習、練習先未選択の案内を確認し、案内はタップで閉じた。スマホの横はみ出し0、ブラウザエラー0件、試験用セーブ2キー一致。
+- **再開するときは**: 子どもの試遊で案内の文が読めるか、戻る操作が分かるかを確認する。公開はその回の明示指示がある場合だけ進める。音・絵の残項目は `docs/sound-and-visual-review.md` を確認する。
+
 ## 次回はここから（2026-10-08、四国・九州のボーナス背景を追加）
 
 - **状態**: 冒険先選択の地図改善は [PR #140](https://github.com/shimimasa/kanji-monsters/pull/140) で main `794752a5` にマージし、Vercelの本番デプロイ状態は success（`Deployment has completed`）。公開先は https://yomitabi.gamanavi.com/ 。今回のボーナス背景2枚は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
