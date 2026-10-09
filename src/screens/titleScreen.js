@@ -160,10 +160,15 @@ const titleState = {
     setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 1200);
   },
 
+  /** セーブの準備が整っていない時はタイトル内で案内する */
+  _showSaveNotReady() {
+    this._adventureTitle?.showSaveGuide('いまは 本編の つづきを ひらけません。おうちの人と ページを よみこみなおすか、下の「せってい」から バックアップを よみこんでね。もとの きろくは のこっているよ。');
+  },
+
   /** プレイヤー名確認と画面遷移の共通処理 */
 _startGame() {
   if (!isSaveSessionReady()) {
-    alert('セーブを安全に読み込めていません。通信を確認して再読込するか、設定からバックアップを読み込んでください。元のデータは保持しています。');
+    this._showSaveNotReady();
     return;
   }
   // プレイヤー名未設定なら名前入力画面へ遷移
@@ -198,6 +203,10 @@ _startGame() {
 
   /** クイック再開: 前回ステージの地図（ステージ選択画面）へ直行する */
   _quickResume() {
+    if (!isSaveSessionReady()) {
+      this._showSaveNotReady();
+      return;
+    }
     const id = this.continueButton?.stageId;
     const stage = Array.isArray(stageData) ? stageData.find(s => s.stageId === id) : null;
     if (!stage) {

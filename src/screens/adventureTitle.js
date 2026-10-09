@@ -27,6 +27,11 @@ export function createAdventureTitle({ document: doc = document, playerName, onS
     const other = button(doc, 'ほかの場所をえらぶ', onStart, 'yt-title-sublink'); other.id = 'titleChooseCourseButton';
     storyPath.append(other);
   }
+  const saveGuide = element(doc, 'p', 'yt-title-save-guide');
+  saveGuide.id = 'titleSaveGuide';
+  saveGuide.setAttribute('role', 'status');
+  saveGuide.hidden = true;
+  storyPath.append(saveGuide);
   const miniPath = element(doc, 'section', 'yt-title-path');
   miniPath.append(element(doc, 'h2', '', 'ミニゲーム'), element(doc, 'p', '', '算数・英語・文ならべなどを、好きなゲームから練習しよう。'));
   const hub = button(doc, 'ミニゲーム広場へ', onHub, 'yt-secondary'); hub.id = 'titleMiniGameButton';
@@ -40,5 +45,9 @@ export function createAdventureTitle({ document: doc = document, playerName, onS
   }
   content.append(links, element(doc, 'small', 'yt-credit', '© 清水 2025'));
   doc.body.append(root); const restore = isolateScreen(doc, root);
-  return { root, start, dispose() { restore(); root.remove(); } };
+  return { root, start, showSaveGuide(message) {
+    saveGuide.textContent = message;
+    saveGuide.hidden = false;
+    saveGuide.scrollIntoView?.({ block: 'nearest' });
+  }, dispose() { restore(); root.remove(); } };
 }
