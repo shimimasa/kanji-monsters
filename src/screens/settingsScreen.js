@@ -1458,6 +1458,19 @@ const settingsScreenState = {
       advNote.className = 'subnote';
       advNote.textContent = 'おうちの人といっしょに使ってね。バックアップをつくったり、よみこんだりできます。';
       advanced.appendChild(advNote);
+
+      const backupGuide = document.createElement('div');
+      backupGuide.className = 'save-help';
+      backupGuide.setAttribute('role', 'status');
+      backupGuide.style.fontSize = '16px';
+      backupGuide.style.color = '#ffe4a8';
+      backupGuide.hidden = true;
+      const showBackupGuide = (message) => {
+        backupGuide.textContent = message;
+        backupGuide.hidden = false;
+        backupGuide.scrollIntoView?.({ block: 'nearest' });
+      };
+      const clearBackupGuide = () => { backupGuide.textContent = ''; backupGuide.hidden = true; };
   
       const btnRow1 = document.createElement('div');
       btnRow1.className = 'settings-button-row compact';
@@ -1467,6 +1480,7 @@ const settingsScreenState = {
       btnExport.textContent = '⬇️ バックアップをつくる (.json)';
       btnExport.addEventListener('click', async () => {
         publish('playSE', 'decide');
+        clearBackupGuide();
         try {
           // ▼ 追加: 事前に現在の状態をセーブ
           const result = await saveGameData();
@@ -1480,8 +1494,9 @@ const settingsScreenState = {
           const ts = new Date().toISOString().replace(/[:.]/g, '-');
           a.download = `kanji-save-${ts}.json`;
           document.body.appendChild(a); a.click(); a.remove();
+          showBackupGuide('ダウンロードを はじめました。ファイルを たいせつに しまってね');
         } catch (e) {
-          alert('書き出しに失敗しました');
+          showBackupGuide('バックアップを つくれませんでした。おうちの人と もういちど ためしてね');
         }
       });
   
@@ -1494,6 +1509,7 @@ const settingsScreenState = {
       file.addEventListener('change', async (e) => {
           const f = e.target.files && e.target.files[0];
           if (!f) return;
+          clearBackupGuide();
           try {
             const context = captureSaveContext();
             const text = await f.text();
@@ -1504,10 +1520,11 @@ const settingsScreenState = {
           if (!result.ok) throw result.error;
           if (!await loadGameData()) throw new Error('復元したデータを読み込めませんでした');
           this._showSaveToast('バックアップを読み込みました');
+          showBackupGuide('バックアップを よみこみました');
           this._refreshSaveStatus();
         } catch (err) {
           console.error(err);
-          alert('読み込みに失敗しました。ファイル形式を確認してください。');
+          showBackupGuide('バックアップを よみこめませんでした。おうちの人と ファイルを たしかめてね');
         } finally {
           e.target.value = '';
         }
@@ -1516,6 +1533,7 @@ const settingsScreenState = {
       btnRow1.appendChild(btnExport);
       btnRow1.appendChild(btnImport);
       advanced.appendChild(btnRow1);
+      advanced.appendChild(backupGuide);
       panel.appendChild(advanced);
   
       advToggle.addEventListener('click', () => {
