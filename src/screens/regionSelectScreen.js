@@ -28,6 +28,7 @@ const regionSelectState = {
   ctx: null,
   animationTime: 0,
   hoveredMarker: null,
+  notice: null,
   
   // ズームアニメーション用の状態
   isZooming: false,
@@ -52,6 +53,7 @@ const regionSelectState = {
     this.ctx = this.canvas.getContext('2d');
     this.animationTime = 0;
     this.hoveredMarker = null;
+    this.notice = null;
     this.isZooming = false;
     this.zoomProgress = 0;
     this.zoomTarget = null;
@@ -238,6 +240,46 @@ const regionSelectState = {
     if (this.hoveredMarker && !this.isZooming) {
       this.drawMarkerTooltip(this.hoveredMarker);
     }
+    this.drawNotice();
+  },
+
+  showNotice(lines) {
+    this.notice = lines;
+    this.hoveredMarker = null;
+    this.update(0);
+  },
+
+  drawNotice() {
+    if (!this.notice) return;
+    const width = this.canvas.width;
+    const height = this.canvas.height;
+    const mobile = window.innerWidth <= 600 && window.innerHeight >= window.innerWidth * 1.25;
+    const boxWidth = Math.min(width - 36, mobile ? 720 : 560);
+    const lineHeight = mobile ? 56 : 34;
+    const boxHeight = (mobile ? 138 : 86) + this.notice.length * lineHeight;
+    const left = (width - boxWidth) / 2;
+    const top = (height - boxHeight) / 2;
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.fillStyle = 'rgba(5, 22, 38, 0.75)';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = '#183f55';
+    ctx.fillRect(left, top, boxWidth, boxHeight);
+    ctx.strokeStyle = '#8ed8e8';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(left, top, boxWidth, boxHeight);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff';
+    this.notice.forEach((line, index) => {
+      ctx.font = `${mobile ? 34 : 20}px "UDデジタル教科書体", sans-serif`;
+      if (ctx.measureText(line).width > boxWidth - 24) ctx.font = `${mobile ? 29 : 16}px "UDデジタル教科書体", sans-serif`;
+      ctx.fillText(line, width / 2, top + (mobile ? 50 : 31) + index * lineHeight);
+    });
+    ctx.fillStyle = '#b8f4df';
+    ctx.font = `${mobile ? 30 : 18}px "UDデジタル教科書体", sans-serif`;
+    ctx.fillText('タップして ちずへ もどる', width / 2, top + boxHeight - (mobile ? 37 : 23));
+    ctx.restore();
   },
 
   drawJapanMap() {
@@ -832,6 +874,7 @@ const regionSelectState = {
 
   exit() {
     this._lifecycle.deactivate();
+    this.notice = null;
     this.canvas.removeEventListener('click', this._clickHandler);
     this.canvas.removeEventListener('touchstart', this._clickHandler);
     this.canvas.removeEventListener('mousemove', this._mouseMoveHandler);
@@ -854,6 +897,12 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
     const coords = getGameCoordinates(e, this.canvas);
     if (!isValidCoordinates(coords)) {
       return false; // 黒帯エリアのクリックは無視
+    }
+    if (this.notice) {
+      this.notice = null;
+      publish('playSE', 'cancel');
+      this.update(0);
+      return;
     }
     
     const x = coords.x;
@@ -881,9 +930,9 @@ e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
         if (!this.isRegionUnlocked(marker.grade)) {
           publish('playSE', 'cancel');
           // grade 11/12 は内部の通し番号。子どもに見せる文には出さない
-          alert(marker.grade === 11
-            ? 'ここは まだ とびらが しまっているよ。\n1年〜6年の ステージを ぜんぶ クリアすると ひらくよ！'
-            : 'ここは まだ とびらが しまっているよ。\n1年〜6年と 四国地方を クリアすると ひらくよ！');
+          this.showNotice(marker.grade === 11
+            ? ['四国地方は この先に あるよ', '1〜6年の ステージを クリアして', 'あたらしい 地方へ すすもう']
+            : ['九州地方は この先に あるよ', '1〜6年と 四国地方の ステージを', 'クリアすると ひらくよ']);
           return;
         }
         this.startZoomAnimation(marker);
