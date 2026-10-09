@@ -1006,6 +1006,12 @@ const settingsScreenState = {
   status.style.marginLeft = '8px';
   status.textContent = `（いまは: ${gameState?.playerName || '未設定'}）`;
 
+  const nameGuide = document.createElement('div');
+  nameGuide.setAttribute('role', 'status');
+  nameGuide.style.minHeight = '1.5em';
+  nameGuide.style.color = '#ffe4a8';
+  nameGuide.style.fontSize = '16px';
+
   const applyChange = async () => {
     const name = input.value.trim();
     if (
@@ -1015,10 +1021,11 @@ const settingsScreenState = {
       name === 'ゲスト' ||
       name === '新規プレイヤー'
     ) {
-      alert('有効な なまえを いれてください。（5もじまで）');
+      nameGuide.textContent = 'べつの なまえを 1〜5もじで いれてね';
       input.focus();
       return;
     }
+    nameGuide.textContent = '';
     publish('playSE', 'decide');
     const savedName = updatePlayerName(name);
     if (!savedName.ok) { this._showSaveToast('保存に失敗しました'); return; }
@@ -1034,6 +1041,7 @@ const settingsScreenState = {
 
   apply.addEventListener('click', applyChange);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') applyChange(); });
+  input.addEventListener('input', () => { nameGuide.textContent = ''; });
 
   row.appendChild(input);
   row.appendChild(apply);
@@ -1041,6 +1049,7 @@ const settingsScreenState = {
 
   group.appendChild(label);
   group.appendChild(row);
+  group.appendChild(nameGuide);
   panel.appendChild(group);
   return panel;
 },
