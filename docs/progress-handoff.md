@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-09、保存先を切り替えられない時の案内を画面内に表示）
+
+- **状態**: 前回のタイトルのセーブ準備案内改善は [PR #147](https://github.com/shimimasa/kanji-monsters/pull/147) で main `652710aa` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回の保存先選択の案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
+- **今回の変更**: タイトルの『だれが あそぶ？』で保存先を安全に切り替えられなかった時のブラウザ `alert` を、選択パネル内に残る案内へ変更。案内を画面内へスクロールする。保存先の切り替え処理や記録の仕組みは変更しない。
+- **確認**: `npm.cmd run build` 成功、`bash scripts/playtest-cdp/run-all-tests.sh` は `ALL-PASS`。専用ChromeのPC1280×800とスマホ縦390×844で、試験用の空き保存先データを一時的に読めない状態にして2番の保存先を実タップ。スマホでは案内全文が画面内（上284〜下378px）、横はみ出し0。両画面で選択パネルを閉じられ、現在の保存先は1のまま、試験用セーブ2キー一致。試験データを元に戻し、ブラウザエラー0件。変更ファイルの改行差分は `git diff --numstat` と `--ignore-cr-at-eol` が一致。
+- **再開するときは**: 子どもとおうちの人の試遊で、保存先を選ぶ画面と案内が分かるか確かめる。今回の改善の公開は、その回の明示指示がある場合だけ進める。
+
 ## 次回はここから（2026-10-09、タイトルのセーブ準備案内を画面内に表示）
 
 - **状態**: 前回の名前変更案内改善は [PR #146](https://github.com/shimimasa/kanji-monsters/pull/146) で main `80e78331` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のタイトル案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
