@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-09、開発者用レベル変更の確認を画面内に表示）
+
+- **状況**: 前回のオートセーブ案内改善は [PR #151](https://github.com/shimimasa/kanji-monsters/pull/151) で main `11da7185` にマージし、Vercel 本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のレベル変更案内は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・ミニゲーム・テスト・報告書などの別件差分は含めない。
+- **今回の変更**: 開発者用の設定画面に残っていたレベル変更の `confirm` と結果の `alert` を画面内の確認・案内に変更。選択後に内容を確認し、「このレベルにする」を押した時だけ既存のレベル変更処理を実行する。戻る操作では現在のレベルを保つ。セーブと学習記録の仕組みは変更しない。
+- **確認**: `npm.cmd run build` 成功、`bash scripts/playtest-cdp/run-all-tests.sh` は `ALL-PASS`。専用 Chrome の PC 起動サイズ1280×800でレベル1から小学4年生を選択し、確認中はレベル1、戻る操作でもレベル1、最終適用でレベル11と案内を確認。スマホ縦390×844で確認欄は横37～353px、縦466～669pxに収まり、適用後1.5秒でも案内が残った。画面の横はみ出し0、試験用セーブ2キー一致、ブラウザエラー0件。
+- **再開するときは**: 開発者用レベル設定を先生が使う場合に、確認文と二段階操作が分かりやすいか確かめる。今回の改善の公開は次の明示指示がある場合だけ進める。
+
 ## 次回はここから（2026-10-09、オートセーブの適用結果を画面内に表示）
 
 - **状況**: 前回のふりかえりCSV案内改善は [PR #150](https://github.com/shimimasa/kanji-monsters/pull/150) で main `d635f8af` にマージし、Vercel 本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のオートセーブ案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。別件の音声・CSS・テスト・報告書などの差分は含めない。
