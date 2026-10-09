@@ -1432,17 +1432,31 @@ const settingsScreenState = {
       btnSaveNow.textContent = '💾 かんたんセーブ';
       btnSaveNow.addEventListener('click', async () => {
         publish('playSE', 'decide');
+        saveGuide.hidden = true;
         try {
           const result = await saveGameData();
           if (!result.ok) throw result.error;
-          this._showSaveToast('保存しました');
+          showSaveGuide('つづきを セーブしました');
           this._refreshSaveStatus();
         } catch {
-          this._showSaveToast('保存に失敗しました');
+          showSaveGuide('いまは セーブできませんでした。おうちの人と もういちど ためしてね');
         }
       });
       mainRow.appendChild(btnSaveNow);
       panel.appendChild(mainRow);
+
+      const saveGuide = document.createElement('div');
+      saveGuide.className = 'save-help';
+      saveGuide.setAttribute('role', 'status');
+      saveGuide.style.fontSize = '16px';
+      saveGuide.style.color = '#ffe4a8';
+      saveGuide.hidden = true;
+      const showSaveGuide = (message) => {
+        saveGuide.textContent = message;
+        saveGuide.hidden = false;
+        saveGuide.scrollIntoView?.({ block: 'nearest' });
+      };
+      panel.appendChild(saveGuide);
   
       // くわしいメニュー（折りたたみ）
       const advToggle = document.createElement('button');

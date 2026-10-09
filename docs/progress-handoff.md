@@ -1,5 +1,12 @@
 # 作業引き継ぎ / 再開ガイド
 
+## 次回はここから（2026-10-09、かんたんセーブの案内を画面内に変更）
+
+- **状態**: 前回のバックアップ案内改善は [PR #144](https://github.com/shimimasa/kanji-monsters/pull/144) で main `1ae473fa` にマージし、Vercel本番は success（`Deployment has completed`）、公開先 https://yomitabi.gamanavi.com/ は HTTP 200。今回のかんたんセーブ案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
+- **今回の変更**: 設定画面の「かんたんセーブ」結果を1.2秒で消えるトーストから、ボタン直下に残る案内へ変更。保存できた時と保存できなかった時の両方を表示し、画面外なら案内へスクロールする。セーブ処理は変更しない。
+- **確認**: `npm.cmd run build` 成功、`bash scripts/playtest-cdp/run-all-tests.sh` は `ALL-PASS`。専用ChromeのPC1280×800とスマホ縦390×844で実タップし、保存成功を確認。スマホでは試験用の無効な図鑑JSONで保存できない状態を作り、案内全文が画面内（上446〜下494px）に出ることを確認後、元に戻した。横はみ出し0、通常画面のブラウザエラー0件、試験用セーブ2キー一致。変更ファイルの改行差分は `git diff --numstat` と `--ignore-cr-at-eol` が一致。
+- **再開するときは**: 子どもとおうちの人の試遊で、かんたんセーブの案内を読み取れるか確かめる。今回の改善の公開は、その回の明示指示がある場合だけ進める。
+
 ## 次回はここから（2026-10-09、バックアップの案内を画面内に変更）
 
 - **状態**: 前回の地方地図・名前入力の案内改善は [PR #143](https://github.com/shimimasa/kanji-monsters/pull/143) で main `4ffbd435` にマージし、Vercel本番は success（`Deployment has completed`）。公開先は https://yomitabi.gamanavi.com/ 。今回のバックアップ案内改善は作業ブランチ `feature/content-bank-120` のローカルのみ。作業前からある音声・CSS・テスト・報告書などの別件差分は含めない。
