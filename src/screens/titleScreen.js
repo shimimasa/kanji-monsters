@@ -377,6 +377,12 @@ _startGame() {
     note.style.cssText = 'font-size:14px;text-align:center;opacity:0.8;margin-bottom:14px;';
     panel.appendChild(note);
 
+    const slotGuide = document.createElement('div');
+    slotGuide.setAttribute('role', 'status');
+    slotGuide.style.cssText = 'font-size:16px;line-height:1.5;color:#ffe4a8;background:#3b4a63;border:1px solid #f1d494;border-radius:10px;padding:10px;margin-bottom:12px;';
+    slotGuide.hidden = true;
+    panel.appendChild(slotGuide);
+
     listSlots().forEach(slot => {
       const row = document.createElement('button');
       row.type = 'button';
@@ -398,7 +404,9 @@ _startGame() {
           // 切り替えたら読み込み直す（前の子の状態を残さない）
           location.reload();
         } else {
-          alert('セーブを安全に切り替えられませんでした。元のデータは保持しています。');
+          slotGuide.textContent = 'いまは この ばしょへ きりかえられません。おうちの人と いっしょに たしかめてね。いまの きろくは そのままだよ。';
+          slotGuide.hidden = false;
+          slotGuide.scrollIntoView?.({ block: 'nearest' });
         }
       });
       panel.appendChild(row);
