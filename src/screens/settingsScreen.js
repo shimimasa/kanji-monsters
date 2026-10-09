@@ -1028,7 +1028,11 @@ const settingsScreenState = {
     nameGuide.textContent = '';
     publish('playSE', 'decide');
     const savedName = updatePlayerName(name);
-    if (!savedName.ok) { this._showSaveToast('保存に失敗しました'); return; }
+    if (!savedName.ok) {
+      nameGuide.textContent = 'いまは なまえを かえられませんでした。おうちの人と もういちど ためしてね';
+      nameGuide.scrollIntoView?.({ block: 'nearest' });
+      return;
+    }
 
     const user = getCurrentUser();
     if (user?.uid) {
@@ -1036,7 +1040,8 @@ const settingsScreenState = {
     }
 
     status.textContent = `（いまは: ${name}）`;
-    this._showSaveToast('プレイヤー名を更新しました');
+    nameGuide.textContent = 'なまえを かえました';
+    nameGuide.scrollIntoView?.({ block: 'nearest' });
   };
 
   apply.addEventListener('click', applyChange);
