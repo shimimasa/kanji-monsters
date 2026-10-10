@@ -2,6 +2,7 @@
 import { getEnemiesByStageId, getKanjiByStageId } from '../loaders/dataLoader.js';
 import battleScreenState from '../screens/battleScreen.js';
 import { publish } from '../core/eventBus.js';
+import { returnWithScreenNotice } from '../ui/screenRecoveryNotice.js';
 import { gameState, battleState, resetStageProgress, saveGameData } from '../core/gameState.js';
 import { showBattleCompanion, hideBattleCompanion } from '../ui/battleCompanion.js'; // ゴトモン拡張: あいぼうが バトルを 見まもる
 
@@ -29,8 +30,7 @@ export default function createBattleState(stageId){
       
       if (!canvas) {
         console.error('gameCanvas要素が見つかりません');
-        alert('ゲーム画面が見つかりません。ステージ選択に戻ります。');
-        publish('changeScreen', 'stageSelect');
+        returnWithScreenNotice('stageSelect', 'ゲーム画面を ひらけませんでした。行き先を もう一度 えらんでね。記録は そのままです。');
         return;
       }
       
@@ -52,6 +52,7 @@ export default function createBattleState(stageId){
         };
         publish('changeScreen', 'resultWin', resultData);
       });
+      if (!battleScreenState._active) return;
       showBattleCompanion();
     },
     update(dt) {

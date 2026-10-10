@@ -5,6 +5,7 @@ import { drawButton, isMouseOverRect, drawStoneButton } from '../ui/uiRenderer.j
 import { loadMonsterImage, loadBgImage, images, clearImageCache, drawStonePanel } from '../loaders/assetsLoader.js';
 import { getEnemiesByStageId, getKanjiByStageId, kanjiData, stageData } from '../loaders/dataLoader.js';
 import { publish } from '../core/eventBus.js';
+import { returnWithScreenNotice } from '../ui/screenRecoveryNotice.js';
 import { addKanji } from '../models/kanjiDex.js';
 import { addMonster } from '../models/monsterDex.js';
 import { drawRoundedRect as traceRoundedRect } from '../ui/canvasUtils.js';
@@ -877,8 +878,7 @@ updateShieldBreakEffect() {
       });
       
       if (!gameState.currentStageId) {
-        alert('ステージIDが未設定です。タイトルに戻ります。');
-        publish('changeScreen', 'title');
+        returnWithScreenNotice('title', '行き先を もう一度 えらんでね。記録は そのままです。');
         return;
       }
       
@@ -1043,9 +1043,8 @@ updateShieldBreakEffect() {
       gameState.kanjiPool = getKanjiByStageId(gameState.currentStageId);
       
       if (!gameState.kanjiPool.length) {
-        alert('このステージに紐づく漢字データがありません。\nステージ選択へ戻ります。');
         const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-        publish('changeScreen', target);
+        returnWithScreenNotice(target, 'この場所の 問題を ひらけませんでした。ほかの場所を えらんでね。記録は そのままです。');
         return;
       }
       
@@ -1141,9 +1140,8 @@ updateShieldBreakEffect() {
     } catch (error) {
       // エラーハンドリング
       console.error("❌ battleScreen.enter() でエラー発生:", error);
-      alert(`ゲーム画面の初期化に失敗しました: ${error.message}\nステージ選択に戻ります。`);
       const target = (gameState.previousScreen === 'worldStageSelect') ? 'worldStageSelect' : 'stageSelect';
-      publish('changeScreen', target);
+      returnWithScreenNotice(target, '旅の準備が できませんでした。行き先を もう一度 えらんでね。記録は そのままです。');
     }
   },
 // 2. 設定から回復回数上限を取得する新しいメソッド

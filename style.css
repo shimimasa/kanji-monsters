@@ -3339,3 +3339,57 @@ html,body{
 .level-change-button.success {
   animation: levelChangeSuccess 0.6s ease-in-out;
 }
+
+.screen-recovery-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background: rgba(8, 27, 39, 0.84);
+}
+
+.screen-recovery-panel {
+  box-sizing: border-box;
+  width: min(100%, 440px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 24px;
+  border: 2px solid #e9d28e;
+  border-radius: 18px;
+  background: #fffaf0;
+  color: #203c3a;
+  font-family: "UDデジタル教科書体", "Hiragino Sans", sans-serif;
+  box-shadow: 0 18px 50px rgba(6, 25, 35, 0.6);
+}
+
+.screen-recovery-panel h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+.screen-recovery-panel p {
+  margin: 0 0 18px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.screen-recovery-panel button {
+  width: 100%;
+  min-height: 48px;
+  border: 2px solid #276656;
+  border-radius: 10px;
+  background: #276656;
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.screen-recovery-panel button:focus-visible {
+  outline: 3px solid #246bbc;
+  outline-offset: 3px;
+}
