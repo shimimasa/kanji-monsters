@@ -1738,7 +1738,7 @@ const settingsScreenState = {
     // 確認ボタン
     const confirmButton = document.createElement('button');
     confirmButton.className = 'level-change-button';
-    confirmButton.textContent = 'レベル変更を適用';
+    confirmButton.textContent = 'レベル変更を たしかめる';
     confirmButton.id = 'confirmLevelChange';
     confirmButton.disabled = true;
     
@@ -1746,6 +1746,39 @@ const settingsScreenState = {
     levelGroup.appendChild(currentLevelDisplay);
     levelGroup.appendChild(levelRadioContainer);
     levelGroup.appendChild(confirmButton);
+
+    const levelConfirm = document.createElement('div');
+    levelConfirm.id = 'levelChangeConfirm';
+    levelConfirm.className = 'level-confirm-panel';
+    levelConfirm.setAttribute('role', 'group');
+    levelConfirm.setAttribute('aria-label', 'レベル変更の確認');
+    levelConfirm.hidden = true;
+
+    const levelConfirmText = document.createElement('p');
+    levelConfirmText.id = 'levelChangeConfirmText';
+    levelConfirm.appendChild(levelConfirmText);
+
+    const levelConfirmActions = document.createElement('div');
+    levelConfirmActions.className = 'level-confirm-actions';
+    const cancelLevelChange = document.createElement('button');
+    cancelLevelChange.id = 'cancelLevelChange';
+    cancelLevelChange.type = 'button';
+    cancelLevelChange.textContent = 'もどる';
+    const applyLevelChange = document.createElement('button');
+    applyLevelChange.id = 'applyLevelChange';
+    applyLevelChange.type = 'button';
+    applyLevelChange.textContent = 'このレベルにする';
+    levelConfirmActions.appendChild(cancelLevelChange);
+    levelConfirmActions.appendChild(applyLevelChange);
+    levelConfirm.appendChild(levelConfirmActions);
+    levelGroup.appendChild(levelConfirm);
+
+    const levelGuide = document.createElement('p');
+    levelGuide.id = 'levelChangeGuide';
+    levelGuide.className = 'level-change-guide';
+    levelGuide.setAttribute('role', 'status');
+    levelGuide.hidden = true;
+    levelGroup.appendChild(levelGuide);
     
     // ツールチップとイベントリスナーを設定
     this._setupTooltipEvents(
@@ -1761,26 +1794,37 @@ const settingsScreenState = {
   setupLevelEvents() {
     setTimeout(() => {
       this.updateCurrentLevelDisplay();
-      
-      // ラジオボタンの変更イベント
+
       const levelRadios = document.querySelectorAll('input[name="playerLevel"]');
       const confirmButton = document.getElementById('confirmLevelChange');
-      
+      const confirmPanel = document.getElementById('levelChangeConfirm');
+      const guide = document.getElementById('levelChangeGuide');
+
       levelRadios.forEach(radio => {
         radio.addEventListener('change', () => {
           if (confirmButton) {
             confirmButton.disabled = false;
             confirmButton.classList.add('enabled');
           }
+          if (confirmPanel) {
+            confirmPanel.hidden = true;
+            confirmPanel.dataset.levelKey = '';
+          }
+          if (guide) guide.hidden = true;
         });
       });
-      
-      // 確認ボタンのクリックイベント
-      if (confirmButton) {
-        confirmButton.addEventListener('click', () => {
-          this.handleLevelChange();
-        });
-      }
+
+      confirmButton?.addEventListener('click', () => this.handleLevelChange());
+      document.getElementById('cancelLevelChange')?.addEventListener('click', () => {
+        if (confirmPanel) {
+          confirmPanel.hidden = true;
+          confirmPanel.dataset.levelKey = '';
+        }
+        this.showLevelChangeGuide('レベルは そのままです');
+      });
+      document.getElementById('applyLevelChange')?.addEventListener('click', () => {
+        this.confirmLevelChange();
+      });
     }, 100);
   },
 
@@ -1819,56 +1863,68 @@ const settingsScreenState = {
     }
   },
 
-  /** レベル変更処理 */
+  /** 選んだレベルを画面内で確認 */
   handleLevelChange() {
     const selectedRadio = document.querySelector('input[name="playerLevel"]:checked');
-    if (!selectedRadio) {
-      alert('レベルを選択してください。');
-      return;
-    }
-    
-    const selectedPreset = LEVEL_PRESETS[selectedRadio.value];
+    const selectedPreset = selectedRadio && LEVEL_PRESETS[selectedRadio.value];
     if (!selectedPreset) {
-      console.error('選択されたプリセットが見つかりません:', selectedRadio.value);
+      this.showLevelChangeGuide('レベルを えらんでね');
       return;
     }
-    
-    // 確認ダイアログ
-    const confirmMessage = `${selectedPreset.label}（レベル${selectedPreset.level}）に変更しますか？\n\n` +
-      'レベル・経験値・HP・攻撃力が調整されます。';
-    
-    if (!confirm(confirmMessage)) {
+
+    const confirmPanel = document.getElementById('levelChangeConfirm');
+    const confirmText = document.getElementById('levelChangeConfirmText');
+    if (!confirmPanel || !confirmText) return;
+
+    confirmPanel.dataset.levelKey = selectedRadio.value;
+    confirmText.textContent = `${selectedPreset.label}（レベル${selectedPreset.level}）に かえる？ レベル・けいけんち・HP・こうげきりょくを 調整します。`;
+    confirmPanel.hidden = false;
+    const guide = document.getElementById('levelChangeGuide');
+    if (guide) guide.hidden = true;
+    confirmPanel.scrollIntoView?.({ block: 'nearest' });
+  },
+
+  /** 確認したレベルを適用 */
+  confirmLevelChange() {
+    const confirmPanel = document.getElementById('levelChangeConfirm');
+    if (!confirmPanel || confirmPanel.hidden) return;
+
+    const selectedRadio = document.querySelector('input[name="playerLevel"]:checked');
+    const selectedPreset = selectedRadio && LEVEL_PRESETS[selectedRadio.value];
+    if (!selectedPreset || selectedRadio.value !== confirmPanel.dataset.levelKey) {
+      confirmPanel.hidden = true;
+      this.showLevelChangeGuide('えらんだ レベルを もういちど たしかめてね');
       return;
     }
-    
+    confirmPanel.hidden = true;
+    confirmPanel.dataset.levelKey = '';
+
     try {
-      // レベル変更を実行
       this.applyLevelChange(selectedPreset);
-      
-      // 成功フィードバック
       publish('playSE', 'levelUp');
-      alert(`${selectedPreset.label}に変更しました！`);
-      
-      // 表示を更新
       this.updateCurrentLevelDisplay();
-      
-      // 確認ボタンを無効化
+
       const confirmButton = document.getElementById('confirmLevelChange');
       if (confirmButton) {
         confirmButton.disabled = true;
         confirmButton.classList.remove('enabled');
       }
-      
-      // ラジオボタンをリセット
-      const levelRadios = document.querySelectorAll('input[name="playerLevel"]');
-      levelRadios.forEach(radio => {
+      document.querySelectorAll('input[name="playerLevel"]').forEach(radio => {
         radio.checked = false;
       });
-      
+      this.showLevelChangeGuide(`${selectedPreset.label}（レベル${selectedPreset.level}）に しました`);
     } catch (error) {
       console.error('レベル変更中にエラーが発生しました:', error);
-      alert('レベル変更に失敗しました。');
+      this.showLevelChangeGuide('いまは レベルを かえられませんでした。もういちど ためしてね');
     }
+  },
+
+  showLevelChangeGuide(message) {
+    const guide = document.getElementById('levelChangeGuide');
+    if (!guide) return;
+    guide.textContent = message;
+    guide.hidden = false;
+    guide.scrollIntoView?.({ block: 'nearest' });
   },
 
   /** レベル変更を適用 */
@@ -2073,14 +2129,70 @@ const settingsScreenState = {
         const clearSaveBtn = document.createElement('button');
         clearSaveBtn.className = 'settings-button danger';
         clearSaveBtn.textContent = 'セーブをなおす（こしょう時）';
-        clearSaveBtn.title = 'セーブ保存箱だけ作り直します。進み具合は基本的に残ります（復旧用）。';
+        clearSaveBtn.title = '現在のセーブを消して、保存箱を作り直します（復旧用）。';
+        clearSaveBtn.id = 'repairSaveButton';
+
+        const repairSection = document.createElement('div');
+        repairSection.className = 'save-repair-section';
+        const repairConfirm = document.createElement('div');
+        repairConfirm.id = 'repairSaveConfirm';
+        repairConfirm.className = 'save-repair-confirm';
+        repairConfirm.setAttribute('role', 'group');
+        repairConfirm.setAttribute('aria-label', 'セーブ保存箱の作り直し確認');
+        repairConfirm.hidden = true;
+        const repairText = document.createElement('p');
+        repairText.textContent = '現在のセーブが消えます。必要な記録は先にバックアップを書き出してください。保存箱を作り直しますか？';
+        const repairActions = document.createElement('div');
+        repairActions.className = 'save-repair-actions';
+        const cancelRepair = document.createElement('button');
+        cancelRepair.type = 'button';
+        cancelRepair.id = 'cancelSaveRepair';
+        cancelRepair.textContent = 'やめる';
+        const applyRepair = document.createElement('button');
+        applyRepair.type = 'button';
+        applyRepair.id = 'applySaveRepair';
+        applyRepair.textContent = '保存箱を作り直す';
+        repairActions.appendChild(cancelRepair);
+        repairActions.appendChild(applyRepair);
+        repairConfirm.appendChild(repairText);
+        repairConfirm.appendChild(repairActions);
+        const repairGuide = document.createElement('p');
+        repairGuide.id = 'repairSaveGuide';
+        repairGuide.className = 'save-repair-guide';
+        repairGuide.setAttribute('role', 'status');
+        repairGuide.hidden = true;
+        repairSection.appendChild(clearSaveBtn);
+        repairSection.appendChild(repairConfirm);
+        repairSection.appendChild(repairGuide);
+
         clearSaveBtn.addEventListener('click', () => {
           publish('playSE', 'decide');
-          if (confirm('セーブ保存箱を作り直します。通常は不要です。続行しますか？')) {
+          repairGuide.hidden = true;
+          repairConfirm.hidden = false;
+          repairConfirm.scrollIntoView?.({ block: 'nearest' });
+        });
+        cancelRepair.addEventListener('click', () => {
+          repairConfirm.hidden = true;
+          repairGuide.textContent = 'セーブは そのままです';
+          repairGuide.hidden = false;
+        });
+        applyRepair.addEventListener('click', () => {
+          if (repairConfirm.hidden || applyRepair.disabled) return;
+          repairConfirm.hidden = true;
+          applyRepair.disabled = true;
+          try {
             const result = clearSaveData();
-            if (result.ok) location.reload();
-            else this._showSaveToast('保存箱の変更に失敗しました');
+            if (result.ok) {
+              location.reload();
+              return;
+            }
+          } catch (error) {
+            console.error('保存箱の作り直し中にエラーが発生しました:', error);
           }
+          applyRepair.disabled = false;
+          repairGuide.textContent = '保存箱を作り直せませんでした。記録をたしかめて、もういちど お試しください';
+          repairGuide.hidden = false;
+          repairGuide.scrollIntoView?.({ block: 'nearest' });
         });
 
     // データリセットボタン（ツールチップ付き）
@@ -2134,7 +2246,7 @@ const settingsScreenState = {
             ((typeof location !== 'undefined') &&
               ((location.search && location.search.includes('dev=1')) ||
                (location.hash && location.hash.includes('dev'))));
-          if (dev) buttonSection.appendChild(clearSaveBtn);
+          if (dev) buttonSection.appendChild(repairSection);
         } catch {}
     
         buttonSection.appendChild(resetButtonContainer);
@@ -2142,9 +2254,9 @@ const settingsScreenState = {
     
         // 隠し操作: 設定ボタン領域で Alt+ダブルクリック → 一時的に表示
         buttonSection.addEventListener('dblclick', (e) => {
-          if (e.altKey && !clearSaveBtn.parentNode) {
+          if (e.altKey && !repairSection.parentNode) {
             try { localStorage.setItem('devTools', '1'); } catch {}
-            buttonSection.insertBefore(clearSaveBtn, resetButtonContainer);
+            buttonSection.insertBefore(repairSection, resetButtonContainer);
             this._showSaveToast('開発者メニューを表示しました');
           }
         });
