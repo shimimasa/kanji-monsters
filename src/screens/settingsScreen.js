@@ -2206,8 +2206,15 @@ const settingsScreenState = {
     resetButton.className = 'settings-button danger';
     resetButton.textContent = 'データリセット（はじめから）';
     resetButton.addEventListener('click', () => {
+      if (resetBusy) return;
       publish('playSE', 'decide');
-      this.resetData();
+      resetGuide.hidden = true;
+      resetDone.hidden = true;
+      resetWordPanel.hidden = true;
+      resetWord.value = '';
+      resetApply.disabled = true;
+      resetConfirm.hidden = false;
+      resetConfirm.scrollIntoView?.({ block: 'nearest' });
     });
     
     // ツールチップトリガー
@@ -2222,6 +2229,102 @@ const settingsScreenState = {
     // ツールチップイベントを設定
     this._setupTooltipEvents(resetTooltipTrigger, '全てのセーブデータが削除され、元に戻せなくなります。レベル、図鑑、ステージ進捗、設定など、ゲームの全ての記録が完全に消去されます。');
     
+    const resetNode = (tag, id, className, text) => {
+      const node = document.createElement(tag);
+      if (id) node.id = id;
+      if (className) node.className = className;
+      if (text) node.textContent = text;
+      return node;
+    };
+    const resetFlow = resetNode('div', null, 'settings-reset-flow');
+    resetFlow.appendChild(resetButtonContainer);
+
+    const resetConfirm = resetNode('div', 'settingsResetConfirm', 'settings-reset-panel');
+    resetConfirm.setAttribute('role', 'group');
+    resetConfirm.setAttribute('aria-label', 'データリセットの確認');
+    resetConfirm.hidden = true;
+    resetConfirm.appendChild(resetNode('p', null, null, 'レベル、図鑑、ステージの進み具合など、現在の記録が消えます。元には戻せません。先にバックアップを書き出してね。'));
+    const resetConfirmActions = resetNode('div', null, 'settings-reset-actions');
+    resetConfirmActions.appendChild(resetNode('button', 'cancelSettingsReset', null, 'やめる'));
+    resetConfirmActions.appendChild(resetNode('button', 'continueSettingsReset', null, '内容を確認した'));
+    resetConfirm.appendChild(resetConfirmActions);
+
+    const resetWordPanel = resetNode('div', 'settingsResetWordPanel', 'settings-reset-panel');
+    resetWordPanel.setAttribute('role', 'group');
+    resetWordPanel.setAttribute('aria-label', 'データリセットの最終確認');
+    resetWordPanel.hidden = true;
+    const resetWordLabel = resetNode('label', null, null, '続けるには「リセット」と入力してね');
+    resetWordLabel.htmlFor = 'settingsResetWord';
+    const resetWord = resetNode('input', 'settingsResetWord');
+    resetWord.type = 'text';
+    resetWord.autocomplete = 'off';
+    resetWord.autocapitalize = 'off';
+    resetWord.spellcheck = false;
+    const resetWordActions = resetNode('div', null, 'settings-reset-actions');
+    resetWordActions.appendChild(resetNode('button', 'backSettingsReset', null, 'やめる'));
+    const resetApply = resetNode('button', 'applySettingsReset', null, 'リセットする');
+    resetApply.disabled = true;
+    resetWordActions.appendChild(resetApply);
+    resetWordPanel.appendChild(resetWordLabel);
+    resetWordPanel.appendChild(resetWord);
+    resetWordPanel.appendChild(resetWordActions);
+
+    const resetGuide = resetNode('p', 'settingsResetGuide', 'settings-reset-panel');
+    resetGuide.setAttribute('role', 'status');
+    resetGuide.hidden = true;
+    const resetDone = resetNode('div', 'settingsResetDone', 'settings-reset-panel');
+    resetDone.setAttribute('role', 'status');
+    resetDone.hidden = true;
+    resetDone.appendChild(resetNode('p', null, null, 'データをリセットしました。タイトルから、また遊べます。'));
+    const resetDoneActions = resetNode('div', null, 'settings-reset-actions');
+    resetDoneActions.appendChild(resetNode('button', 'reloadAfterSettingsReset', null, 'タイトルへもどる'));
+    resetDone.appendChild(resetDoneActions);
+    resetFlow.appendChild(resetConfirm);
+    resetFlow.appendChild(resetWordPanel);
+    resetFlow.appendChild(resetGuide);
+    resetFlow.appendChild(resetDone);
+    let resetBusy = false;
+    const cancelReset = () => {
+      resetConfirm.hidden = true;
+      resetWordPanel.hidden = true;
+      resetWord.value = '';
+      resetApply.disabled = true;
+      resetGuide.textContent = '記録は そのままです';
+      resetGuide.hidden = false;
+      resetGuide.scrollIntoView?.({ block: 'nearest' });
+    };
+    resetFlow.querySelector('#cancelSettingsReset').addEventListener('click', cancelReset);
+    resetFlow.querySelector('#backSettingsReset').addEventListener('click', cancelReset);
+    resetFlow.querySelector('#continueSettingsReset').addEventListener('click', () => {
+      resetConfirm.hidden = true;
+      resetWordPanel.hidden = false;
+      resetWord.focus();
+      resetWordPanel.scrollIntoView?.({ block: 'nearest' });
+    });
+    resetWord.addEventListener('input', () => {
+      resetApply.disabled = resetWord.value !== 'リセット';
+    });
+    resetApply.addEventListener('click', async () => {
+      if (resetBusy || resetWordPanel.hidden || resetWord.value !== 'リセット') return;
+      resetBusy = true;
+      resetApply.disabled = true;
+      resetWordPanel.hidden = true;
+      const completed = await this.resetData();
+      if (completed) {
+        resetButton.disabled = true;
+        resetDone.hidden = false;
+        resetDone.scrollIntoView?.({ block: 'nearest' });
+      } else {
+        resetGuide.textContent = '記録の整理が終わりませんでした。残っている記録を おうちの人と たしかめてね';
+        resetGuide.hidden = false;
+        resetGuide.scrollIntoView?.({ block: 'nearest' });
+      }
+      resetBusy = false;
+    });
+    resetFlow.querySelector('#reloadAfterSettingsReset').addEventListener('click', () => {
+      window.location.reload();
+    });
+
     // メインメニューへ戻るボタン
     const backButton = document.createElement('button');
     backButton.className = 'settings-button primary';
@@ -2249,14 +2352,14 @@ const settingsScreenState = {
           if (dev) buttonSection.appendChild(repairSection);
         } catch {}
     
-        buttonSection.appendChild(resetButtonContainer);
+        buttonSection.appendChild(resetFlow);
         buttonSection.appendChild(backButton);
     
         // 隠し操作: 設定ボタン領域で Alt+ダブルクリック → 一時的に表示
         buttonSection.addEventListener('dblclick', (e) => {
           if (e.altKey && !repairSection.parentNode) {
             try { localStorage.setItem('devTools', '1'); } catch {}
-            buttonSection.insertBefore(repairSection, resetButtonContainer);
+            buttonSection.insertBefore(repairSection, resetFlow);
             this._showSaveToast('開発者メニューを表示しました');
           }
         });
@@ -2369,81 +2472,26 @@ const settingsScreenState = {
       e.preventDefault(); // ダブルタップによる画面拡大などを防ぐ
     },
 
-  /** データリセット処理 - 完全版 */
+  /** 確認文字の入力後に、既存のデータリセットを実行 */
   async resetData() {
-    const user = getCurrentUser();
-    
+    let loadingElement = null;
     try {
-      // 第1段階: 具体的な確認ダイアログ
-      const firstConfirm = confirm(
-        '【最終確認】レベル、図鑑、ステージの進捗など、全てのセーブデータが完全に削除されます。\n' +
-        'この操作は取り消せません。よろしいですか？'
-      );
-      
-      if (!firstConfirm) {
-        console.log('データリセット操作がキャンセルされました（第1段階）');
-        return;
-      }
-
-      // 第2段階: ダブルチェック - 確認ワードの入力
-      const confirmWord = prompt(
-        '最終確認として、以下の文字を正確に入力してください：\n\n' +
-        '「リセット」\n\n' +
-        '※ひらがな・カタカナは区別されます'
-      );
-      
-      if (confirmWord !== 'リセット') {
-        if (confirmWord === null) {
-          console.log('データリセット操作がキャンセルされました（第2段階）');
-        } else {
-          alert('入力された文字が正しくありません。データリセットを中止します。');
-          console.log('データリセット操作が中止されました（確認ワード不一致）');
-        }
-        return;
-      }
-
-      // 第3段階: 実際のデータ削除処理
+      const user = getCurrentUser();
       console.log('データリセット処理を開始します...');
-      
-      // ローディング表示
-      const loadingElement = this._showLoadingMessage('データを削除中...');
-      
-      try {
-        // 1. LocalStorageの全関連データを削除
-        const reset = hardResetAllLocalData();
-              if (!reset.ok) throw reset.error;
-        
-        // 2. Firebase Firestoreのユーザーデータを削除
-        if (user?.uid) {
-          await this._clearFirebaseUserData(user.uid);
-        }
-        
-        // 3. アクセシビリティ設定も初期化
-        this._resetAccessibilitySettings();
-        
-        // 4. GameStateの初期化
-        this._resetGameState();
-        
-        // ローディング表示を非表示
-        this._hideLoadingMessage(loadingElement);
-        
-        console.log('データリセット処理が完了しました');
-        
-        // 成功メッセージ表示
-        alert('全てのデータが正常にリセットされました。\nタイトル画面に戻ります。');
-        
-        // 完全リセットのためリロード
-        window.location.reload();
-        
-      } catch (error) {
-        console.error('データリセット処理中にエラーが発生しました:', error);
-        this._hideLoadingMessage(loadingElement);
-        alert('データのリセット中にエラーが発生しました。\n一部のデータが削除されていない可能性があります。');
-      }
-      
+      loadingElement = this._showLoadingMessage('データを整理しています...');
+
+      const reset = hardResetAllLocalData();
+      if (!reset.ok) throw reset.error || new Error('Local data reset failed');
+      if (user?.uid) await this._clearFirebaseUserData(user.uid);
+      this._resetAccessibilitySettings();
+      this._resetGameState();
+      console.log('データリセット処理が完了しました');
+      return true;
     } catch (error) {
-      console.error('データリセット処理でエラーが発生しました:', error);
-      alert('データのリセットに失敗しました。');
+      console.error('データリセット処理中にエラーが発生しました:', error);
+      return false;
+    } finally {
+      this._hideLoadingMessage(loadingElement);
     }
   },
 
