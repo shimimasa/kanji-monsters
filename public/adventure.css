@@ -201,3 +201,15 @@
 .gt-portrait[data-look] img{filter:var(--look-hue,hue-rotate(0deg)) var(--look-glow,drop-shadow(0 0 0 transparent))}
 .yt-look{display:grid;gap:6px;margin:10px 0}.yt-look-stage{display:flex;justify-content:center}.yt-look-stage .gt-portrait{width:110px;height:104px}.yt-look-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.yt-look-item{display:grid;gap:2px;justify-items:center;padding:8px!important;min-width:0}.yt-look-item small{font-size:12px;text-align:center}.yt-look-item[aria-pressed=true]{border:3px solid #b8860b!important;background:#fff3cf!important}
 .yt-title-path .yt-resume-where{display:block;font-size:13px;font-weight:600;opacity:.9;margin-top:2px}.yt-title-actions .yt-title-sublink{background:transparent!important;color:#e6e4ca!important;border:1px solid #ffffff55!important;box-shadow:none!important;min-height:44px!important;font-size:15px!important}
+
+.yt-title-reset-overlay{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;background:#081b27d9}
+.yt-title-reset-panel{width:min(100%,440px);max-height:calc(100dvh - 32px);overflow:auto;padding:24px;border:2px solid #e9d28e;border-radius:18px;background:#fffaf0;color:#203c3a;text-align:left;box-shadow:0 18px 50px #06192399}
+.yt-title-reset-panel h2{margin:0 0 12px;font-size:22px;line-height:1.4}
+.yt-title-reset-message{margin:0 0 16px;font-size:16px;line-height:1.7}
+.yt-title-reset-word-label{display:block;margin-bottom:8px;font-weight:700;font-size:16px}
+.yt-title-reset-word{width:100%;min-height:48px;padding:8px 12px;border:2px solid #327563;border-radius:10px;background:white;color:#203c3a;font:inherit;font-size:18px}
+.yt-title-reset-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.yt-title .yt-title-reset-actions button{flex:1 1 150px;min-height:48px;border:2px solid #276656;background:#276656;color:white;font-weight:700}
+.yt-title .yt-title-reset-actions .yt-title-reset-cancel{border-color:#81958e;background:#fff;color:#203c3a}
+.yt-title .yt-title-reset-actions .yt-title-reset-apply{border-color:#a54b3c;background:#a54b3c}
+.yt-title-reset-word:focus-visible{outline:3px solid #246bbc;outline-offset:3px}
