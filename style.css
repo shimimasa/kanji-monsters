@@ -1470,6 +1470,57 @@ html,body{
   border: 2px solid rgba(139, 69, 19, 0.3);
 }
 
+.save-repair-section {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.save-repair-confirm,
+.save-repair-guide {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 228, 168, 0.55);
+  border-radius: 8px;
+  background: rgba(25, 39, 58, 0.9);
+  color: #ffe4a8;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.save-repair-confirm p {
+  margin: 0;
+}
+
+.save-repair-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.save-repair-actions button {
+  flex: 1 1 140px;
+  min-height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 7px;
+  background: #9e4137;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.save-repair-actions #cancelSaveRepair {
+  background: #4a5869;
+}
+
+.save-repair-actions button:focus-visible {
+  outline: 3px solid #ffe4a8;
+  outline-offset: 2px;
+}
+
 /* === DOM設定ボタンのスタイル === */
 
 .settings-button {

@@ -2129,14 +2129,70 @@ const settingsScreenState = {
         const clearSaveBtn = document.createElement('button');
         clearSaveBtn.className = 'settings-button danger';
         clearSaveBtn.textContent = 'セーブをなおす（こしょう時）';
-        clearSaveBtn.title = 'セーブ保存箱だけ作り直します。進み具合は基本的に残ります（復旧用）。';
+        clearSaveBtn.title = '現在のセーブを消して、保存箱を作り直します（復旧用）。';
+        clearSaveBtn.id = 'repairSaveButton';
+
+        const repairSection = document.createElement('div');
+        repairSection.className = 'save-repair-section';
+        const repairConfirm = document.createElement('div');
+        repairConfirm.id = 'repairSaveConfirm';
+        repairConfirm.className = 'save-repair-confirm';
+        repairConfirm.setAttribute('role', 'group');
+        repairConfirm.setAttribute('aria-label', 'セーブ保存箱の作り直し確認');
+        repairConfirm.hidden = true;
+        const repairText = document.createElement('p');
+        repairText.textContent = '現在のセーブが消えます。必要な記録は先にバックアップを書き出してください。保存箱を作り直しますか？';
+        const repairActions = document.createElement('div');
+        repairActions.className = 'save-repair-actions';
+        const cancelRepair = document.createElement('button');
+        cancelRepair.type = 'button';
+        cancelRepair.id = 'cancelSaveRepair';
+        cancelRepair.textContent = 'やめる';
+        const applyRepair = document.createElement('button');
+        applyRepair.type = 'button';
+        applyRepair.id = 'applySaveRepair';
+        applyRepair.textContent = '保存箱を作り直す';
+        repairActions.appendChild(cancelRepair);
+        repairActions.appendChild(applyRepair);
+        repairConfirm.appendChild(repairText);
+        repairConfirm.appendChild(repairActions);
+        const repairGuide = document.createElement('p');
+        repairGuide.id = 'repairSaveGuide';
+        repairGuide.className = 'save-repair-guide';
+        repairGuide.setAttribute('role', 'status');
+        repairGuide.hidden = true;
+        repairSection.appendChild(clearSaveBtn);
+        repairSection.appendChild(repairConfirm);
+        repairSection.appendChild(repairGuide);
+
         clearSaveBtn.addEventListener('click', () => {
           publish('playSE', 'decide');
-          if (confirm('セーブ保存箱を作り直します。通常は不要です。続行しますか？')) {
+          repairGuide.hidden = true;
+          repairConfirm.hidden = false;
+          repairConfirm.scrollIntoView?.({ block: 'nearest' });
+        });
+        cancelRepair.addEventListener('click', () => {
+          repairConfirm.hidden = true;
+          repairGuide.textContent = 'セーブは そのままです';
+          repairGuide.hidden = false;
+        });
+        applyRepair.addEventListener('click', () => {
+          if (repairConfirm.hidden || applyRepair.disabled) return;
+          repairConfirm.hidden = true;
+          applyRepair.disabled = true;
+          try {
             const result = clearSaveData();
-            if (result.ok) location.reload();
-            else this._showSaveToast('保存箱の変更に失敗しました');
+            if (result.ok) {
+              location.reload();
+              return;
+            }
+          } catch (error) {
+            console.error('保存箱の作り直し中にエラーが発生しました:', error);
           }
+          applyRepair.disabled = false;
+          repairGuide.textContent = '保存箱を作り直せませんでした。記録をたしかめて、もういちど お試しください';
+          repairGuide.hidden = false;
+          repairGuide.scrollIntoView?.({ block: 'nearest' });
         });
 
     // データリセットボタン（ツールチップ付き）
@@ -2190,7 +2246,7 @@ const settingsScreenState = {
             ((typeof location !== 'undefined') &&
               ((location.search && location.search.includes('dev=1')) ||
                (location.hash && location.hash.includes('dev'))));
-          if (dev) buttonSection.appendChild(clearSaveBtn);
+          if (dev) buttonSection.appendChild(repairSection);
         } catch {}
     
         buttonSection.appendChild(resetButtonContainer);
@@ -2198,9 +2254,9 @@ const settingsScreenState = {
     
         // 隠し操作: 設定ボタン領域で Alt+ダブルクリック → 一時的に表示
         buttonSection.addEventListener('dblclick', (e) => {
-          if (e.altKey && !clearSaveBtn.parentNode) {
+          if (e.altKey && !repairSection.parentNode) {
             try { localStorage.setItem('devTools', '1'); } catch {}
-            buttonSection.insertBefore(clearSaveBtn, resetButtonContainer);
+            buttonSection.insertBefore(repairSection, resetButtonContainer);
             this._showSaveToast('開発者メニューを表示しました');
           }
         });
