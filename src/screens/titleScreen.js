@@ -1,7 +1,7 @@
 import { publish } from '../core/eventBus.js';
 import { isMouseOverRect } from '../ui/uiRenderer.js';
 import { gameState, updatePlayerName, clearSaveData, isSaveSessionReady, saveGameData } from '../core/gameState.js';
-import { getCurrentUser } from '../services/firebase/firebaseController.js';
+import { openTitleResetDialog } from './titleResetDialog.js';
 import { getGameCoordinates, isValidCoordinates } from '../utils/coordinateUtils.js';
 import { hardResetAllLocalData } from '../core/saveData.js';
 import { stageData } from '../loaders/dataLoader.js';
@@ -210,69 +210,12 @@ _startGame() {
     publish('changeScreen', target);
   },
 
-  /** データリセット処理 */
-  async _resetGameData() {
-    try {
-      // 第1段階: 具体的な確認ダイアログ
-      const firstConfirm = confirm(
-        '【最終確認】レベル、図鑑、ステージの進捗など、全てのセーブデータが完全に削除されます。\n' +
-        'この操作は取り消せません。よろしいですか？'
-      );
-      
-      if (!firstConfirm) {
-        console.log('データリセット操作がキャンセルされました（第1段階）');
-        return;
-      }
-
-      // 第2段階: ダブルチェック - 確認ワードの入力
-      const confirmWord = prompt(
-        '最終確認として、以下の文字を正確に入力してください：\n\n' +
-        '「リセット」\n\n' +
-        '※ひらがな・カタカナは区別されます'
-      );
-      
-      if (confirmWord !== 'リセット') {
-        if (confirmWord === null) {
-          console.log('データリセット操作がキャンセルされました（第2段階）');
-        } else {
-          alert('入力された文字が正しくありません。データリセットを中止します。');
-          console.log('データリセット操作が中止されました（確認ワード不一致）');
-        }
-        return;
-      }
-
-            // 第3段階: 実際のデータ削除処理
-            console.log('データリセット処理を開始します...');
-      
-            try {
-              // 1. ゲームデータのクリア（完全削除）
-              const reset = hardResetAllLocalData();
-              if (!reset.ok) throw reset.error;
-              
-              // 2. Firebase関連データのクリア（必要に応じて）
-              const user = getCurrentUser();
-              if (user?.uid) {
-                // Firebase側のデータも削除（具体的な実装はfirebaseControllerに依存）
-                // await clearFirebaseUserData(user.uid);
-              }
-        
-        console.log('データリセット処理が完了しました');
-        
-        // 成功メッセージ表示
-        alert('全てのデータが正常にリセットされました。\nタイトル画面をリロードします。');
-        
-        // ページをリロードして完全にリセット
-        window.location.reload();
-        
-      } catch (error) {
-        console.error('データリセット処理中にエラーが発生しました:', error);
-        alert('データのリセット中にエラーが発生しました。\n一部のデータが削除されていない可能性があります。');
-      }
-      
-    } catch (error) {
-      console.error('データリセット処理でエラーが発生しました:', error);
-      alert('データのリセットに失敗しました。');
-    }
+  /** タイトルのデータ管理で、削除前の案内を画面内に表示する */
+  _resetGameData() {
+    openTitleResetDialog(this._adventureTitle?.root, () => {
+      const reset = hardResetAllLocalData();
+      if (!reset.ok) throw reset.error || new Error('Local data reset failed');
+    });
   },
 
   handleClick(e) {
