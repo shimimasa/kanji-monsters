@@ -40,7 +40,7 @@ export function initializeFirebaseServices() {
         // ① app が無ければここで初期化
         if (!firebase.apps.length) {
           if (!firebaseConfig?.apiKey || firebaseConfig.apiKey === 'XXXXXXXXXXXXXXX') {
-            alert('⚠ Firebase の API キーが未設定です。\nsrc/firebaseConfig.js を正しく記入してください。');
+            console.error('Firebase API キーが未設定です');
             return false;
           }
           firebase.initializeApp(firebaseConfig);
@@ -69,7 +69,6 @@ export function initializeFirebaseServices() {
         return true;
       } catch (err) {
         console.error('Error initializing Firebase services:', err);
-        alert('Firebase 初期化に失敗しました。ネット接続と API キーを確認してください。');
         return false;
       }
     }

@@ -41,6 +41,7 @@ export function hideBootProgress() {
 
 export function showBootError(message = 'データを読み込めませんでした。', { retry = () => location.reload(), back = null, recover = null } = {}) {
   const el = showBootProgress();
+  el.style.zIndex = '2147483647';
   const wrap = el.firstElementChild;
   wrap.replaceChildren();
   const label = document.createElement('p');
