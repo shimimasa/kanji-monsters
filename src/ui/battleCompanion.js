@@ -1,4 +1,5 @@
 import { companionPortrait, element } from './adventureUI.js';
+import { getContainedRect } from './viewportLayout.js';
 import { subscribe } from '../core/eventBus.js';
 import { gotomonService } from '../minigames/gotomonService.js';
 import { typeInfo } from '../minigames/gotomonTypes.js';
@@ -25,7 +26,8 @@ export function showBattleCompanion(doc = globalThis.document) {
     display: 'inline-flex', filter: 'drop-shadow(0 3px 0 #0006)' });
   const bubble = element(doc, 'span', 'yt-battle-companion-cheer');
   Object.assign(bubble.style, { visibility: 'hidden', background: '#fff8d6', color: '#5a3b00', border: '2px solid #ffc93c',
-    borderRadius: '10px', padding: '1px 6px', fontSize: '12px', fontWeight: '700', whiteSpace: 'nowrap' });
+    borderRadius: '10px', padding: '1px 6px', fontSize: '12px', fontWeight: '700', maxWidth: '100%',
+    boxSizing: 'border-box', textAlign: 'center', overflowWrap: 'anywhere' });
   const name = element(doc, 'span', '', companion.name);
   Object.assign(name.style, { fontSize: '11px', color: '#fff', textShadow: '0 1px 2px #000', maxWidth: '84px',
     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' });
@@ -38,13 +40,12 @@ export function showBattleCompanion(doc = globalThis.document) {
   return layer;
 }
 
-// Where it covers nothing: beside the battle canvas when there is room, else above it, else inside it
-// on the left between the 「1つまえの漢字」 panel and the れんしゅうへ button, shrunk to fit.
-// (2026-10-04: inside used to be 30% down, right over the 「1つまえの漢字」 panel and れんしゅうへ.)
+// Keep the companion inside the drawn board, not in the surrounding black margins.
+// In landscape, use the space between 「1つまえの漢字」 and れんしゅうへ; shrink to fit.
 function place(doc) {
   const canvas = doc.getElementById?.('gameCanvas');
   if (!layer || !canvas?.getBoundingClientRect) return;
-  const box = canvas.getBoundingClientRect();
+  const box = getContainedRect(canvas.getBoundingClientRect(), canvas.width, canvas.height);
   if (!box.width) return;
   setFaceSize(72);
   const height = layer.offsetHeight || 110;
@@ -52,27 +53,33 @@ function place(doc) {
     // スマホを たてに 持った時: 出題の 漢字の 右の 空き（portraitLayout.js）
     const scale = box.width / canvas.width, spot = PORTRAIT_LAYOUT.companion;
     setFaceSize(Math.max(40, Math.min(72, Math.floor(120 * scale) - 24)));
-    layer.style.left = `${Math.round(box.left + spot.x * scale)}px`;
-    layer.style.top = `${Math.round(box.top + spot.y * scale)}px`;
+    setPosition(doc, box.left + spot.x * scale, box.top + spot.y * scale, box);
     return;
   }
-  if (box.left >= 100) {
-    layer.style.left = `${Math.round(box.left - 92)}px`;
-    layer.style.top = `${Math.round(box.top + box.height * 0.5)}px`;
-    return;
-  }
-  layer.style.left = `${Math.round(box.left + 8)}px`;
-  if (box.top >= height + 8) {
-    layer.style.top = `${Math.round(box.top - height - 4)}px`;
-    return;
-  }
+  const left = box.left + 8;
   const scale = box.width / (canvas.width || 800);
   const top = PREV_KANJI_PANEL_BOTTOM + 8;
   const practiceTop = BTN.practice.y > top ? BTN.practice.y : (canvas.height || 600) - 150;
   const room = (practiceTop - 6 - top) * scale;
   // 吹き出しと名前のぶん（height - 72）を引いた残りに 顔を収める（小さくても 32px）
   setFaceSize(Math.max(32, Math.min(72, Math.floor(room - (height - 72)))));
-  layer.style.top = `${Math.round(box.top + top * scale)}px`;
+  setPosition(doc, left, box.top + top * scale, box);
+}
+
+// Keep the whole layer visible, reserving room for the cheer's lift and enlargement.
+function setPosition(doc, x, y, board) {
+  const viewport = doc.defaultView?.visualViewport;
+  const width = viewport?.width ?? doc.defaultView?.innerWidth ?? doc.documentElement?.clientWidth;
+  const height = viewport?.height ?? doc.defaultView?.innerHeight ?? doc.documentElement?.clientHeight;
+  const left = Math.max(board.left, viewport?.offsetLeft ?? 0);
+  const top = Math.max(board.top, viewport?.offsetTop ?? 0);
+  const right = Math.min(board.left + board.width, (viewport?.offsetLeft ?? 0) + (width || board.width));
+  const bottom = Math.min(board.top + board.height, (viewport?.offsetTop ?? 0) + (height || board.height));
+  const inset = 12;
+  x = Math.max(left + inset, Math.min(x, right - (layer.offsetWidth || 84) - inset));
+  y = Math.max(top + 20, Math.min(y, bottom - (layer.offsetHeight || 110) - inset));
+  layer.style.left = `${Math.round(x)}px`;
+  layer.style.top = `${Math.round(y)}px`;
 }
 
 function setFaceSize(px) {
@@ -91,6 +98,7 @@ function cheer({ factor } = {}) {
   const bubble = layer._bubble, portrait = layer._portrait;
   bubble.textContent = `${typeInfo(layer.dataset.type).name}パワー！ ×${factor}`;
   bubble.style.visibility = 'visible';
+  place(layer.ownerDocument);
   layer.style.transform = 'translateY(-8px) scale(1.08)';
   portrait.style.filter = 'drop-shadow(0 0 6px #ffe066) drop-shadow(0 0 12px #ffb000)';
   clearTimeout(cheerTimer);

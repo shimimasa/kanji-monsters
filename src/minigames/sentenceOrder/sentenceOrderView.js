@@ -17,7 +17,7 @@ const CSS = `
 #sentenceOrderScreen .so-plank[data-hint=true]{box-shadow:0 0 0 4px #ffe066,0 0 24px #ffd54a;animation:so-glow .6s ease-in-out infinite alternate}
 #sentenceOrderScreen .so-plank.so-nope{animation:so-nope .45s ease-out}
 #sentenceOrderScreen .so-plank[data-rainbow=true]{background:linear-gradient(90deg,#ffb3b3,#ffe08a,#b8f0a8,#a8d8ff,#d8b8ff);border-bottom-color:#7a5aa0}
-#sentenceOrderScreen .so-hero{position:absolute;z-index:6;width:clamp(64px,9vw,92px);height:clamp(64px,9vw,92px);transform:translate(-50%,-100%);top:46%;transition:left .25s ease-out}
+#sentenceOrderScreen .so-hero{position:absolute;z-index:6;--so-hero-size:clamp(64px,9vw,92px);width:var(--so-hero-size);height:var(--so-hero-size);transform:translate(-50%,-100%);top:46%;transition:left .25s ease-out}
 #sentenceOrderScreen .so-hero .gt-portrait{display:block;width:100%;height:100%;background:none;border:0}
 #sentenceOrderScreen .so-hero .gt-portrait img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 3px #0005)}
 #sentenceOrderScreen .so-hero[data-walking=true] .gt-portrait{animation:so-step .35s ease-in-out infinite alternate}
@@ -58,7 +58,9 @@ export function createSentenceOrderView({ document: doc, dispatch, onBack, getSn
   const left = el('div', 'so-bank'); left.dataset.side = 'left';
   const right = el('div', 'so-bank'); right.dataset.side = 'right';
   world.append(el('div', 'so-waves'), left, right);
-  const hero = el('div', 'so-hero'); hero.style.left = `${WALK_FROM}%`; world.append(hero);
+  const hero = el('div', 'so-hero');
+  const placeHero = x => { hero.style.left = `clamp(calc(var(--so-hero-size) * .6 + 6px), ${x}%, calc(100% - var(--so-hero-size) * .6 - 6px))`; };
+  placeHero(WALK_FROM); world.append(hero);
   const friend = el('img', 'so-friend'); friend.alt = ''; friend.hidden = true; world.append(friend);
   // Built once per sentence: taps never land on a node that is being replaced.
   let slots = [], planks = [];
@@ -207,7 +209,7 @@ export function createSentenceOrderView({ document: doc, dispatch, onBack, getSn
       }
       let x = WALK_FROM + (w.progress ?? 0) * (BANK_EDGE - WALK_FROM);
       if (crossing !== null) { crossing = Math.min(1, crossing + dt / 420); x = BANK_EDGE + crossing * (95 - BANK_EDGE); }
-      hero.style.left = `${x}%`;
+      placeHero(x);
       hero.dataset.walking = String(crossing !== null ? crossing < 1 : state.phase === 'answering' && !w.arrived && state.mode !== 'review');
       hero.dataset.fever = String(!!w.fever);
       const event = w.lastEvent;
