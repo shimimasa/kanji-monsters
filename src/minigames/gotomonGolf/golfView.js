@@ -30,7 +30,7 @@ const CSS = `
 #gotomonGolfScreen .gf-cup[data-choosing=true] .gf-plate{animation:gf-bob .9s ease-in-out infinite alternate}
 #gotomonGolfScreen .gf-ball{width:${R.ballR * 200 / R.W}%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#e8e8e8 60%,#bdbdbd);box-shadow:0 2px 2px #0006;z-index:5}
 #gotomonGolfScreen .gf-ball.gf-sink{animation:gf-sink .5s ease-in forwards}
-#gotomonGolfScreen .gf-buddy{width:clamp(34px,11cqh,70px);aspect-ratio:1;z-index:4;transform:translate(-110%,-75%);transition:left .25s,top .25s}
+#gotomonGolfScreen .gf-buddy{--gf-buddy-size:clamp(34px,11cqh,70px);width:var(--gf-buddy-size);aspect-ratio:1;z-index:4;transform:translate(-110%,-75%);transition:left .25s,top .25s}
 #gotomonGolfScreen .gf-buddy>*{width:100%!important;height:100%!important;object-fit:contain;filter:drop-shadow(0 4px 3px #0005)}
 #gotomonGolfScreen .gf-token{border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#ffcf5a)}
 #gotomonGolfScreen .gf-guide{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;overflow:visible}
@@ -268,7 +268,14 @@ export function createGolfView({ document: doc, dispatch, onBack, getSnapshot, c
       if (button.dataset.chosen !== chosen) button.dataset.chosen = chosen;
       if (button.dataset.hint !== hint) button.dataset.hint = hint;
     });
-    if (state.ball) { place(ball, state.ball.x, state.ball.y); if (!state.ball.moving && state.phase !== 'sunk') place(buddy, state.ball.x, state.ball.y); }
+    if (state.ball) {
+      place(ball, state.ball.x, state.ball.y);
+      if (!state.ball.moving && state.phase !== 'sunk') {
+        // Only the watching companion is inset; the ball and aiming coordinates stay exact.
+        buddy.style.left = `clamp(calc(var(--gf-buddy-size) * 1.1 + 4px), ${state.ball.x / R.W * 100}%, calc(100% + var(--gf-buddy-size) * .1 - 4px))`;
+        buddy.style.top = `clamp(calc(var(--gf-buddy-size) * .75 + 4px), ${state.ball.y * 100}%, calc(100% - var(--gf-buddy-size) * .25 - 4px))`;
+      }
+    }
     if (state.phase !== 'sunk' && ball.classList?.contains('gf-sink')) ball.classList.remove('gf-sink');
     renderGuide(state);
     const helpText = state.phase === 'choosing' ? '答えの旗を タップしよう（ボタンや 1〜4キーでも えらべるよ）'
